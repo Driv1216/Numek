@@ -1,0 +1,404 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>DataTrust Reliability Report</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #18212f;
+      --muted: #5c6978;
+      --line: #d9e1ea;
+      --panel: #f6f8fb;
+      --accent: #176b87;
+      --good: #167a4a;
+      --warn: #9a6500;
+      --bad: #b3261e;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--ink);
+      background: #ffffff;
+      line-height: 1.5;
+    }
+    main { max-width: 1120px; margin: 0 auto; padding: 40px 28px 64px; }
+    header { border-bottom: 2px solid var(--line); padding-bottom: 24px; margin-bottom: 28px; }
+    h1 { font-size: 34px; margin: 0 0 8px; letter-spacing: 0; }
+    h2 { font-size: 22px; margin: 34px 0 14px; }
+    h3 { font-size: 17px; margin: 0 0 8px; }
+    p { margin: 0 0 10px; }
+    table { width: 100%; border-collapse: collapse; margin: 12px 0 0; font-size: 14px; }
+    th, td { border-bottom: 1px solid var(--line); padding: 10px 8px; text-align: left; vertical-align: top; }
+    th { color: var(--muted); font-weight: 650; background: var(--panel); }
+    .meta { color: var(--muted); font-size: 14px; }
+    .grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+    .score-grid { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 12px; }
+    .card {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 14px;
+      background: #fff;
+    }
+    .metric { font-size: 26px; font-weight: 760; margin-top: 4px; }
+    .label { color: var(--muted); font-size: 13px; }
+    .summary {
+      display: grid;
+      grid-template-columns: 1.1fr 2fr;
+      gap: 16px;
+      align-items: stretch;
+    }
+    .risk-badge {
+      display: inline-block;
+      border-radius: 999px;
+      padding: 4px 10px;
+      font-size: 13px;
+      font-weight: 700;
+      color: #fff;
+      background: var(--accent);
+    }
+    .risk-badge.Low { background: var(--good); }
+    .risk-badge.Moderate, .risk-badge.Elevated { background: var(--warn); }
+    .risk-badge.High { background: var(--bad); }
+    .risk-list { display: grid; gap: 12px; }
+    .risk-card { border-left: 4px solid var(--accent); }
+    .risk-card.High { border-left-color: var(--bad); }
+    .risk-card.Moderate { border-left-color: var(--warn); }
+    .risk-card.Low { border-left-color: var(--good); }
+    .small { font-size: 13px; color: var(--muted); }
+    .section-note { color: var(--muted); margin-bottom: 12px; }
+    @media (max-width: 860px) {
+      .grid, .score-grid, .summary { grid-template-columns: 1fr; }
+      main { padding: 28px 18px 48px; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <h1>DataTrust Reliability Report</h1>
+      <p class="meta">Dataset: /Users/drivyaanshyadav/Desktop/Numek/validation/data/mutations/constant_field.csv | Target: annual_income_over_50k | Generated: 2026-06-14 07:26:12</p>
+    </header>
+
+    <section>
+      <h2>1. Executive Summary</h2>
+      <div class="summary">
+        <div class="card">
+          <span class="risk-badge Elevated">Elevated Risk</span>
+          <div class="metric">69.0</div>
+          <p class="label">Overall reliability score with high-stakes guardrails</p>
+          <p>Fix the highlighted issues before using this dataset for high-stakes decisions.</p>
+        </div>
+        <div class="risk-list">
+          
+          <div class="card risk-card Moderate">
+            <h3>Target imbalance <span class="small">(Moderate)</span></h3>
+            <p>The target is dominated by one class, so headline accuracy may hide poor minority-class performance.</p>
+            <p><strong>Recommended action:</strong> Use class-sensitive metrics and consider resampling, weighting, or collecting more minority examples.</p>
+          </div>
+          
+          <div class="card risk-card Moderate">
+            <h3>Low-value constant fields <span class="small">(Moderate)</span></h3>
+            <p>1 feature column(s) contain only one observed value.</p>
+            <p><strong>Recommended action:</strong> Remove constant fields from modeling inputs unless they are required for downstream lineage.</p>
+          </div>
+          
+          <div class="card risk-card Moderate">
+            <h3>Numeric outlier concentration <span class="small">(Moderate)</span></h3>
+            <p>1 numeric feature(s) have notable IQR-based outlier rates.</p>
+            <p><strong>Recommended action:</strong> Inspect the outlier rows and confirm whether they are real edge cases or data entry errors.</p>
+          </div>
+          
+        </div>
+      </div>
+      
+      <h3 style="margin-top: 16px;">Applied guardrails</h3>
+      <div class="risk-list">
+        
+        <div class="card">
+          <p><strong>Overall score cap: 69.0</strong></p>
+          <p>The target balance sub-score is 47.86, indicating a critical weakness.</p>
+        </div>
+        
+      </div>
+      
+    </section>
+
+    <section>
+      <h2>2. Dataset Health</h2>
+      <div class="grid">
+        <div class="card"><div class="label">Rows</div><div class="metric">48842</div></div>
+        <div class="card"><div class="label">Columns</div><div class="metric">16</div></div>
+        <div class="card"><div class="label">Missing Cells</div><div class="metric">0.83%</div></div>
+        <div class="card"><div class="label">Duplicate Rows</div><div class="metric">0.11%</div></div>
+      </div>
+      
+    </section>
+
+    <section>
+      <h2>3. Target &amp; Label Quality</h2>
+      <p class="section-note">V1 checks target distribution and class imbalance. Label-noise estimation is reserved for a future Cleanlab-style workflow.</p>
+      <div class="grid">
+        <div class="card"><div class="label">Classes</div><div class="metric">2</div></div>
+        <div class="card"><div class="label">Labeled Rows</div><div class="metric">48842</div></div>
+        <div class="card"><div class="label">Missing Target Labels</div><div class="metric">0 (0.0%)</div></div>
+        <div class="card"><div class="label">Largest Class</div><div class="metric">76.07%</div></div>
+        <div class="card"><div class="label">Minority Class</div><div class="metric">23.93%</div></div>
+        <div class="card"><div class="label">Target Balance Score</div><div class="metric">47.86</div></div>
+      </div>
+      <p class="section-note">Class counts and percentages exclude rows with missing target labels.</p>
+      <table>
+        <thead><tr><th>Class</th><th>Rows</th><th>Percentage</th></tr></thead>
+        <tbody>
+          
+          <tr><td>&lt;=50K</td><td>37155</td><td>76.07%</td></tr>
+          
+          <tr><td>&gt;50K</td><td>11687</td><td>23.93%</td></tr>
+          
+        </tbody>
+      </table>
+    </section>
+
+    <section>
+      <h2>4. Feature Risk</h2>
+      <div class="score-grid">
+        
+        <div class="card"><div class="label">Completeness</div><div class="metric">99.17</div></div>
+        
+        <div class="card"><div class="label">Uniqueness</div><div class="metric">99.89</div></div>
+        
+        <div class="card"><div class="label">Target Balance</div><div class="metric">47.86</div></div>
+        
+        <div class="card"><div class="label">Feature Usability</div><div class="metric">98.13</div></div>
+        
+        <div class="card"><div class="label">Leakage Risk</div><div class="metric">100.0</div></div>
+        
+      </div>
+      
+      <table>
+        <thead><tr><th>Leakage review column</th><th>Classification</th><th>Reason</th><th>Scoring effect</th></tr></thead>
+        <tbody>
+          
+          <tr>
+            <td>marital_status</td>
+            <td>Review only</td>
+            <td>generic status-like name; verify when the value becomes available</td>
+            <td>No automatic score penalty or cap</td>
+          </tr>
+          
+        </tbody>
+      </table>
+      
+    </section>
+
+    <section>
+      <h2>5. Methodology &amp; Limitations</h2>
+      <div class="card">
+        <p>DataTrust V1 uses transparent checks for missingness, duplicates, class balance, feature usability, and heuristic leakage risk. Missing target labels are excluded from class calculations. Strong leakage candidates and severe findings can cap the overall score; every applied cap is shown above.</p>
+        <p>Review-only leakage prompts use conservative wording and do not automatically reduce the score. All leakage-name findings require confirmation of when the value becomes available.</p>
+        <p>The report is an evidence aid, not a certification.</p>
+        <p>Not included in V1: label-noise detection, drift monitoring, fairness testing, model calibration, human review of business rules, or regulatory compliance determination.</p>
+      </div>
+    </section>
+
+    <section>
+      <h2>6. Appendix</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Column</th>
+            <th>Role</th>
+            <th>Type</th>
+            <th>Missing</th>
+            <th>Unique</th>
+            <th>Constant</th>
+            <th>High Cardinality</th>
+            <th>Outliers</th>
+          </tr>
+        </thead>
+        <tbody>
+          
+          <tr>
+            <td>age</td>
+            <td>feature</td>
+            <td>int64</td>
+            <td>0.0%</td>
+            <td>74 (0.15%)</td>
+            <td>No</td>
+            <td>No</td>
+            <td>0.44%</td>
+          </tr>
+          
+          <tr>
+            <td>workclass</td>
+            <td>feature</td>
+            <td>str</td>
+            <td>5.73%</td>
+            <td>8 (0.02%)</td>
+            <td>No</td>
+            <td>No</td>
+            <td>0.0%</td>
+          </tr>
+          
+          <tr>
+            <td>final_weight</td>
+            <td>feature</td>
+            <td>int64</td>
+            <td>0.0%</td>
+            <td>28523 (58.4%)</td>
+            <td>No</td>
+            <td>No</td>
+            <td>2.97%</td>
+          </tr>
+          
+          <tr>
+            <td>education</td>
+            <td>feature</td>
+            <td>str</td>
+            <td>0.0%</td>
+            <td>16 (0.03%)</td>
+            <td>No</td>
+            <td>No</td>
+            <td>0.0%</td>
+          </tr>
+          
+          <tr>
+            <td>education_years</td>
+            <td>feature</td>
+            <td>int64</td>
+            <td>0.0%</td>
+            <td>16 (0.03%)</td>
+            <td>No</td>
+            <td>No</td>
+            <td>3.67%</td>
+          </tr>
+          
+          <tr>
+            <td>marital_status</td>
+            <td>feature</td>
+            <td>str</td>
+            <td>0.0%</td>
+            <td>7 (0.01%)</td>
+            <td>No</td>
+            <td>No</td>
+            <td>0.0%</td>
+          </tr>
+          
+          <tr>
+            <td>occupation</td>
+            <td>feature</td>
+            <td>str</td>
+            <td>5.75%</td>
+            <td>14 (0.03%)</td>
+            <td>No</td>
+            <td>No</td>
+            <td>0.0%</td>
+          </tr>
+          
+          <tr>
+            <td>relationship</td>
+            <td>feature</td>
+            <td>str</td>
+            <td>0.0%</td>
+            <td>6 (0.01%)</td>
+            <td>No</td>
+            <td>No</td>
+            <td>0.0%</td>
+          </tr>
+          
+          <tr>
+            <td>race</td>
+            <td>feature</td>
+            <td>str</td>
+            <td>0.0%</td>
+            <td>5 (0.01%)</td>
+            <td>No</td>
+            <td>No</td>
+            <td>0.0%</td>
+          </tr>
+          
+          <tr>
+            <td>sex</td>
+            <td>feature</td>
+            <td>str</td>
+            <td>0.0%</td>
+            <td>2 (0.0%)</td>
+            <td>No</td>
+            <td>No</td>
+            <td>0.0%</td>
+          </tr>
+          
+          <tr>
+            <td>capital_gain</td>
+            <td>feature</td>
+            <td>int64</td>
+            <td>0.0%</td>
+            <td>123 (0.25%)</td>
+            <td>No</td>
+            <td>No</td>
+            <td>0.0%</td>
+          </tr>
+          
+          <tr>
+            <td>capital_loss</td>
+            <td>feature</td>
+            <td>int64</td>
+            <td>0.0%</td>
+            <td>99 (0.2%)</td>
+            <td>No</td>
+            <td>No</td>
+            <td>0.0%</td>
+          </tr>
+          
+          <tr>
+            <td>hours_per_week</td>
+            <td>feature</td>
+            <td>int64</td>
+            <td>0.0%</td>
+            <td>96 (0.2%)</td>
+            <td>No</td>
+            <td>No</td>
+            <td>27.63%</td>
+          </tr>
+          
+          <tr>
+            <td>native_country</td>
+            <td>feature</td>
+            <td>str</td>
+            <td>1.75%</td>
+            <td>41 (0.08%)</td>
+            <td>No</td>
+            <td>No</td>
+            <td>0.0%</td>
+          </tr>
+          
+          <tr>
+            <td>annual_income_over_50k</td>
+            <td>target</td>
+            <td>str</td>
+            <td>0.0%</td>
+            <td>2 (0.0%)</td>
+            <td>No</td>
+            <td>No</td>
+            <td>0.0%</td>
+          </tr>
+          
+          <tr>
+            <td>validation_constant</td>
+            <td>feature</td>
+            <td>str</td>
+            <td>0.0%</td>
+            <td>1 (0.0%)</td>
+            <td>Yes</td>
+            <td>No</td>
+            <td>0.0%</td>
+          </tr>
+          
+        </tbody>
+      </table>
+    </section>
+  </main>
+</body>
+</html>

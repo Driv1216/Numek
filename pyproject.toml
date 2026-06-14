@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "datatrust"
+version = "0.1.0"
+description = "Local-first dataset reliability reports for AI teams."
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+  "click>=8.0",
+  "jinja2>=3.0",
+  "pandas>=1.5",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=7.0",
+]
+
+[project.scripts]
+datatrust = "datatrust.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+datatrust = ["templates/*.html"]

@@ -1,0 +1,595 @@
+{
+  "generated_at": "2026-06-14T01:56:13.226559+00:00",
+  "mutation_assertions": [
+    {
+      "detail": "feature_usability: 98.86 -> 95.86; guardrails=['severe_feature_missingness', 'critical_sub_score']",
+      "mutation": "feature_missingness_100",
+      "passed": true
+    },
+    {
+      "detail": "uniqueness: 99.89 -> 90.62",
+      "mutation": "duplicates",
+      "passed": true
+    },
+    {
+      "detail": "target_balance: 47.86 -> 2.66",
+      "mutation": "target_imbalance",
+      "passed": true
+    },
+    {
+      "detail": "leakage_risk: 100.0 -> 60.0; guardrails=['strong_leakage', 'critical_sub_score']",
+      "mutation": "strong_leakage",
+      "passed": true
+    },
+    {
+      "detail": "leakage_risk: 100.0 -> 100.0",
+      "mutation": "review_only_leakage",
+      "passed": true
+    },
+    {
+      "detail": "guardrail-only expectation; guardrails=['missing_target_labels', 'critical_sub_score']",
+      "mutation": "missing_targets",
+      "passed": true
+    },
+    {
+      "detail": "feature_usability: 98.86 -> 98.13",
+      "mutation": "constant_field",
+      "passed": true
+    }
+  ],
+  "results": {
+    "adult": {
+      "column_count": 15,
+      "dataset_path": "data/prepared/adult.csv",
+      "guardrails": [
+        {
+          "cap": 69.0,
+          "code": "critical_sub_score",
+          "explanation": "The target balance sub-score is 47.86, indicating a critical weakness."
+        }
+      ],
+      "leakage_details": [
+        {
+          "classification": "review_only",
+          "column": "marital_status",
+          "reason": "generic status-like name; verify when the value becomes available"
+        }
+      ],
+      "name": "adult",
+      "overall": 69.0,
+      "report_path": "reports/adult.html",
+      "risk_level": "Elevated",
+      "risks": [
+        {
+          "finding": "The target is dominated by one class, so headline accuracy may hide poor minority-class performance.",
+          "recommendation": "Use class-sensitive metrics and consider resampling, weighting, or collecting more minority examples.",
+          "severity": "Moderate",
+          "title": "Target imbalance"
+        },
+        {
+          "finding": "1 numeric feature(s) have notable IQR-based outlier rates.",
+          "recommendation": "Inspect the outlier rows and confirm whether they are real edge cases or data entry errors.",
+          "severity": "Moderate",
+          "title": "Numeric outlier concentration"
+        },
+        {
+          "finding": "Columns such as marital_status have generic status or target-related names, but their names alone are not strong leakage evidence.",
+          "recommendation": "Confirm when these values become available; this review prompt does not reduce the leakage score or cap the overall score.",
+          "severity": "Low",
+          "title": "Leakage review prompts"
+        }
+      ],
+      "row_count": 48842,
+      "runtime_seconds": 0.087798,
+      "sub_scores": {
+        "completeness": 99.12,
+        "feature_usability": 98.86,
+        "leakage_risk": 100.0,
+        "target_balance": 47.86,
+        "uniqueness": 99.89
+      },
+      "target_missing_count": 0
+    },
+    "bank_marketing": {
+      "column_count": 17,
+      "dataset_path": "data/prepared/bank_marketing.csv",
+      "guardrails": [
+        {
+          "cap": 69.0,
+          "code": "critical_sub_score",
+          "explanation": "The target balance sub-score is 23.4, indicating a critical weakness."
+        }
+      ],
+      "leakage_details": [
+        {
+          "classification": "review_only",
+          "column": "previous_campaign_outcome",
+          "reason": "prior or historical outcome-like name; verify availability for the current target"
+        }
+      ],
+      "name": "bank_marketing",
+      "overall": 69.0,
+      "report_path": "reports/bank_marketing.html",
+      "risk_level": "Elevated",
+      "risks": [
+        {
+          "finding": "The target is dominated by one class, so headline accuracy may hide poor minority-class performance.",
+          "recommendation": "Use class-sensitive metrics and consider resampling, weighting, or collecting more minority examples.",
+          "severity": "Moderate",
+          "title": "Target imbalance"
+        },
+        {
+          "finding": "3 numeric feature(s) have notable IQR-based outlier rates.",
+          "recommendation": "Inspect the outlier rows and confirm whether they are real edge cases or data entry errors.",
+          "severity": "Moderate",
+          "title": "Numeric outlier concentration"
+        },
+        {
+          "finding": "Columns such as previous_campaign_outcome have generic status or target-related names, but their names alone are not strong leakage evidence.",
+          "recommendation": "Confirm when these values become available; this review prompt does not reduce the leakage score or cap the overall score.",
+          "severity": "Low",
+          "title": "Leakage review prompts"
+        }
+      ],
+      "row_count": 45211,
+      "runtime_seconds": 0.087316,
+      "sub_scores": {
+        "completeness": 100.0,
+        "feature_usability": 98.5,
+        "leakage_risk": 100.0,
+        "target_balance": 23.4,
+        "uniqueness": 100.0
+      },
+      "target_missing_count": 0
+    },
+    "german_credit": {
+      "column_count": 21,
+      "dataset_path": "data/prepared/german_credit.csv",
+      "guardrails": [],
+      "leakage_details": [
+        {
+          "classification": "review_only",
+          "column": "checking_account_status",
+          "reason": "generic status-like name; verify when the value becomes available"
+        },
+        {
+          "classification": "review_only",
+          "column": "credit_history",
+          "reason": "name references target term(s) credit"
+        },
+        {
+          "classification": "review_only",
+          "column": "credit_amount",
+          "reason": "name references target term(s) credit"
+        },
+        {
+          "classification": "review_only",
+          "column": "savings_status",
+          "reason": "generic status-like name; verify when the value becomes available"
+        },
+        {
+          "classification": "review_only",
+          "column": "personal_status_sex",
+          "reason": "generic status-like name; verify when the value becomes available"
+        }
+      ],
+      "name": "german_credit",
+      "overall": 91.84,
+      "report_path": "reports/german_credit.html",
+      "risk_level": "Low",
+      "risks": [
+        {
+          "finding": "2 numeric feature(s) have notable IQR-based outlier rates.",
+          "recommendation": "Inspect the outlier rows and confirm whether they are real edge cases or data entry errors.",
+          "severity": "Moderate",
+          "title": "Numeric outlier concentration"
+        },
+        {
+          "finding": "Columns such as checking_account_status, credit_history, credit_amount have generic status or target-related names, but their names alone are not strong leakage evidence.",
+          "recommendation": "Confirm when these values become available; this review prompt does not reduce the leakage score or cap the overall score.",
+          "severity": "Low",
+          "title": "Leakage review prompts"
+        }
+      ],
+      "row_count": 1000,
+      "runtime_seconds": 0.016305,
+      "sub_scores": {
+        "completeness": 100.0,
+        "feature_usability": 99.2,
+        "leakage_risk": 100.0,
+        "target_balance": 60.0,
+        "uniqueness": 100.0
+      },
+      "target_missing_count": 0
+    },
+    "mutation_constant_field": {
+      "column_count": 16,
+      "dataset_path": "data/mutations/constant_field.csv",
+      "guardrails": [
+        {
+          "cap": 69.0,
+          "code": "critical_sub_score",
+          "explanation": "The target balance sub-score is 47.86, indicating a critical weakness."
+        }
+      ],
+      "leakage_details": [
+        {
+          "classification": "review_only",
+          "column": "marital_status",
+          "reason": "generic status-like name; verify when the value becomes available"
+        }
+      ],
+      "name": "mutation_constant_field",
+      "overall": 69.0,
+      "report_path": "reports/mutation_constant_field.html",
+      "risk_level": "Elevated",
+      "risks": [
+        {
+          "finding": "The target is dominated by one class, so headline accuracy may hide poor minority-class performance.",
+          "recommendation": "Use class-sensitive metrics and consider resampling, weighting, or collecting more minority examples.",
+          "severity": "Moderate",
+          "title": "Target imbalance"
+        },
+        {
+          "finding": "1 feature column(s) contain only one observed value.",
+          "recommendation": "Remove constant fields from modeling inputs unless they are required for downstream lineage.",
+          "severity": "Moderate",
+          "title": "Low-value constant fields"
+        },
+        {
+          "finding": "1 numeric feature(s) have notable IQR-based outlier rates.",
+          "recommendation": "Inspect the outlier rows and confirm whether they are real edge cases or data entry errors.",
+          "severity": "Moderate",
+          "title": "Numeric outlier concentration"
+        }
+      ],
+      "row_count": 48842,
+      "runtime_seconds": 0.094599,
+      "sub_scores": {
+        "completeness": 99.17,
+        "feature_usability": 98.13,
+        "leakage_risk": 100.0,
+        "target_balance": 47.86,
+        "uniqueness": 99.89
+      },
+      "target_missing_count": 0
+    },
+    "mutation_duplicates": {
+      "column_count": 15,
+      "dataset_path": "data/mutations/duplicates.csv",
+      "guardrails": [
+        {
+          "cap": 69.0,
+          "code": "critical_sub_score",
+          "explanation": "The target balance sub-score is 47.94, indicating a critical weakness."
+        }
+      ],
+      "leakage_details": [
+        {
+          "classification": "review_only",
+          "column": "marital_status",
+          "reason": "generic status-like name; verify when the value becomes available"
+        }
+      ],
+      "name": "mutation_duplicates",
+      "overall": 69.0,
+      "report_path": "reports/mutation_duplicates.html",
+      "risk_level": "Elevated",
+      "risks": [
+        {
+          "finding": "Duplicate rows may cause the model to overfit repeated examples or inflate validation confidence.",
+          "recommendation": "Deduplicate records or confirm that repeated rows represent legitimate repeated events.",
+          "severity": "Moderate",
+          "title": "Duplicate records"
+        },
+        {
+          "finding": "The target is dominated by one class, so headline accuracy may hide poor minority-class performance.",
+          "recommendation": "Use class-sensitive metrics and consider resampling, weighting, or collecting more minority examples.",
+          "severity": "Moderate",
+          "title": "Target imbalance"
+        },
+        {
+          "finding": "1 numeric feature(s) have notable IQR-based outlier rates.",
+          "recommendation": "Inspect the outlier rows and confirm whether they are real edge cases or data entry errors.",
+          "severity": "Moderate",
+          "title": "Numeric outlier concentration"
+        }
+      ],
+      "row_count": 53842,
+      "runtime_seconds": 0.093274,
+      "sub_scores": {
+        "completeness": 99.11,
+        "feature_usability": 98.86,
+        "leakage_risk": 100.0,
+        "target_balance": 47.94,
+        "uniqueness": 90.62
+      },
+      "target_missing_count": 0
+    },
+    "mutation_feature_missingness_100": {
+      "column_count": 15,
+      "dataset_path": "data/mutations/feature_missingness_100.csv",
+      "guardrails": [
+        {
+          "cap": 69.0,
+          "code": "severe_feature_missingness",
+          "explanation": "Feature columns with at least 50% missing values require resolution: workclass"
+        },
+        {
+          "cap": 69.0,
+          "code": "critical_sub_score",
+          "explanation": "The target balance sub-score is 47.86, indicating a critical weakness."
+        }
+      ],
+      "leakage_details": [
+        {
+          "classification": "review_only",
+          "column": "marital_status",
+          "reason": "generic status-like name; verify when the value becomes available"
+        }
+      ],
+      "name": "mutation_feature_missingness_100",
+      "overall": 69.0,
+      "report_path": "reports/mutation_feature_missingness_100.html",
+      "risk_level": "Elevated",
+      "risks": [
+        {
+          "finding": "Feature columns with at least 50% missing values include: workclass.",
+          "recommendation": "Review each severe column and decide whether to recollect, impute, add an explicit missing indicator, or exclude it.",
+          "severity": "High",
+          "title": "Severe feature missingness"
+        },
+        {
+          "finding": "The target is dominated by one class, so headline accuracy may hide poor minority-class performance.",
+          "recommendation": "Use class-sensitive metrics and consider resampling, weighting, or collecting more minority examples.",
+          "severity": "Moderate",
+          "title": "Target imbalance"
+        },
+        {
+          "finding": "1 feature column(s) contain only one observed value.",
+          "recommendation": "Remove constant fields from modeling inputs unless they are required for downstream lineage.",
+          "severity": "Moderate",
+          "title": "Low-value constant fields"
+        }
+      ],
+      "row_count": 48842,
+      "runtime_seconds": 0.083882,
+      "sub_scores": {
+        "completeness": 92.83,
+        "feature_usability": 95.86,
+        "leakage_risk": 100.0,
+        "target_balance": 47.86,
+        "uniqueness": 99.88
+      },
+      "target_missing_count": 0
+    },
+    "mutation_missing_targets": {
+      "column_count": 15,
+      "dataset_path": "data/mutations/missing_targets.csv",
+      "guardrails": [
+        {
+          "cap": 69.0,
+          "code": "missing_target_labels",
+          "explanation": "4885 row(s) have missing target labels and were excluded from class calculations."
+        },
+        {
+          "cap": 69.0,
+          "code": "critical_sub_score",
+          "explanation": "The target balance sub-score is 47.48, indicating a critical weakness."
+        }
+      ],
+      "leakage_details": [
+        {
+          "classification": "review_only",
+          "column": "marital_status",
+          "reason": "generic status-like name; verify when the value becomes available"
+        }
+      ],
+      "name": "mutation_missing_targets",
+      "overall": 69.0,
+      "report_path": "reports/mutation_missing_targets.html",
+      "risk_level": "Elevated",
+      "risks": [
+        {
+          "finding": "4885 row(s) (10.0%) have no target label and were excluded from class calculations.",
+          "recommendation": "Resolve, exclude, or separately account for unlabeled rows before model training and evaluation.",
+          "severity": "High",
+          "title": "Missing target labels"
+        },
+        {
+          "finding": "The target is dominated by one class, so headline accuracy may hide poor minority-class performance.",
+          "recommendation": "Use class-sensitive metrics and consider resampling, weighting, or collecting more minority examples.",
+          "severity": "Moderate",
+          "title": "Target imbalance"
+        },
+        {
+          "finding": "1 numeric feature(s) have notable IQR-based outlier rates.",
+          "recommendation": "Inspect the outlier rows and confirm whether they are real edge cases or data entry errors.",
+          "severity": "Moderate",
+          "title": "Numeric outlier concentration"
+        }
+      ],
+      "row_count": 48842,
+      "runtime_seconds": 0.0891,
+      "sub_scores": {
+        "completeness": 98.45,
+        "feature_usability": 98.86,
+        "leakage_risk": 100.0,
+        "target_balance": 47.48,
+        "uniqueness": 99.92
+      },
+      "target_missing_count": 4885
+    },
+    "mutation_review_only_leakage": {
+      "column_count": 16,
+      "dataset_path": "data/mutations/review_only_leakage.csv",
+      "guardrails": [
+        {
+          "cap": 69.0,
+          "code": "critical_sub_score",
+          "explanation": "The target balance sub-score is 47.86, indicating a critical weakness."
+        }
+      ],
+      "leakage_details": [
+        {
+          "classification": "review_only",
+          "column": "marital_status",
+          "reason": "generic status-like name; verify when the value becomes available"
+        },
+        {
+          "classification": "review_only",
+          "column": "employment_status",
+          "reason": "generic status-like name; verify when the value becomes available"
+        }
+      ],
+      "name": "mutation_review_only_leakage",
+      "overall": 69.0,
+      "report_path": "reports/mutation_review_only_leakage.html",
+      "risk_level": "Elevated",
+      "risks": [
+        {
+          "finding": "The target is dominated by one class, so headline accuracy may hide poor minority-class performance.",
+          "recommendation": "Use class-sensitive metrics and consider resampling, weighting, or collecting more minority examples.",
+          "severity": "Moderate",
+          "title": "Target imbalance"
+        },
+        {
+          "finding": "1 numeric feature(s) have notable IQR-based outlier rates.",
+          "recommendation": "Inspect the outlier rows and confirm whether they are real edge cases or data entry errors.",
+          "severity": "Moderate",
+          "title": "Numeric outlier concentration"
+        },
+        {
+          "finding": "Columns such as marital_status, employment_status have generic status or target-related names, but their names alone are not strong leakage evidence.",
+          "recommendation": "Confirm when these values become available; this review prompt does not reduce the leakage score or cap the overall score.",
+          "severity": "Low",
+          "title": "Leakage review prompts"
+        }
+      ],
+      "row_count": 48842,
+      "runtime_seconds": 0.098676,
+      "sub_scores": {
+        "completeness": 98.81,
+        "feature_usability": 98.93,
+        "leakage_risk": 100.0,
+        "target_balance": 47.86,
+        "uniqueness": 99.89
+      },
+      "target_missing_count": 0
+    },
+    "mutation_strong_leakage": {
+      "column_count": 16,
+      "dataset_path": "data/mutations/strong_leakage.csv",
+      "guardrails": [
+        {
+          "cap": 49.0,
+          "code": "strong_leakage",
+          "explanation": "Strong outcome-like leakage candidate(s) require review before the dataset can be relied on: post_income_outcome"
+        },
+        {
+          "cap": 69.0,
+          "code": "critical_sub_score",
+          "explanation": "The target balance sub-score is 47.86, indicating a critical weakness."
+        }
+      ],
+      "leakage_details": [
+        {
+          "classification": "review_only",
+          "column": "marital_status",
+          "reason": "generic status-like name; verify when the value becomes available"
+        },
+        {
+          "classification": "strong",
+          "column": "post_income_outcome",
+          "reason": "name contains outcome-like phrase(s): outcome"
+        }
+      ],
+      "name": "mutation_strong_leakage",
+      "overall": 49.0,
+      "report_path": "reports/mutation_strong_leakage.html",
+      "risk_level": "High",
+      "risks": [
+        {
+          "finding": "Strong outcome-like column names such as post_income_outcome may expose information unavailable at prediction time.",
+          "recommendation": "Confirm when each flagged value becomes available and exclude post-outcome fields before training or validation.",
+          "severity": "High",
+          "title": "Possible target leakage"
+        },
+        {
+          "finding": "The target is dominated by one class, so headline accuracy may hide poor minority-class performance.",
+          "recommendation": "Use class-sensitive metrics and consider resampling, weighting, or collecting more minority examples.",
+          "severity": "Moderate",
+          "title": "Target imbalance"
+        },
+        {
+          "finding": "1 numeric feature(s) have notable IQR-based outlier rates.",
+          "recommendation": "Inspect the outlier rows and confirm whether they are real edge cases or data entry errors.",
+          "severity": "Moderate",
+          "title": "Numeric outlier concentration"
+        }
+      ],
+      "row_count": 48842,
+      "runtime_seconds": 0.096029,
+      "sub_scores": {
+        "completeness": 99.17,
+        "feature_usability": 98.93,
+        "leakage_risk": 60.0,
+        "target_balance": 47.86,
+        "uniqueness": 99.89
+      },
+      "target_missing_count": 0
+    },
+    "mutation_target_imbalance": {
+      "column_count": 15,
+      "dataset_path": "data/mutations/target_imbalance.csv",
+      "guardrails": [
+        {
+          "cap": 69.0,
+          "code": "critical_sub_score",
+          "explanation": "The target balance sub-score is 2.66, indicating a critical weakness."
+        }
+      ],
+      "leakage_details": [
+        {
+          "classification": "review_only",
+          "column": "marital_status",
+          "reason": "generic status-like name; verify when the value becomes available"
+        }
+      ],
+      "name": "mutation_target_imbalance",
+      "overall": 69.0,
+      "report_path": "reports/mutation_target_imbalance.html",
+      "risk_level": "Elevated",
+      "risks": [
+        {
+          "finding": "The target is dominated by one class, so headline accuracy may hide poor minority-class performance.",
+          "recommendation": "Use class-sensitive metrics and consider resampling, weighting, or collecting more minority examples.",
+          "severity": "High",
+          "title": "Target imbalance"
+        },
+        {
+          "finding": "2 numeric feature(s) have notable IQR-based outlier rates.",
+          "recommendation": "Inspect the outlier rows and confirm whether they are real edge cases or data entry errors.",
+          "severity": "Moderate",
+          "title": "Numeric outlier concentration"
+        },
+        {
+          "finding": "Columns such as marital_status have generic status or target-related names, but their names alone are not strong leakage evidence.",
+          "recommendation": "Confirm when these values become available; this review prompt does not reduce the leakage score or cap the overall score.",
+          "severity": "Low",
+          "title": "Leakage review prompts"
+        }
+      ],
+      "row_count": 37655,
+      "runtime_seconds": 0.068688,
+      "sub_scores": {
+        "completeness": 98.98,
+        "feature_usability": 97.71,
+        "leakage_risk": 100.0,
+        "target_balance": 2.66,
+        "uniqueness": 99.88
+      },
+      "target_missing_count": 0
+    }
+  }
+}
