@@ -76,10 +76,10 @@ the code and protocol are ready:
 
 ```bash
 .venv/bin/python -m validation.dry_runs.reviewer_packet create \
-  --id DRY_RUN_RC_002_REVIEWER_PACKET
+  --id DRY_RUN_RC_003_REVIEWER_PACKET
 .venv/bin/python -m validation.dry_runs.release_candidate create \
-  --id DRY_RUN_RC_002 \
-  --packet-manifest validation/dry_runs/packets/DRY_RUN_RC_002_REVIEWER_PACKET.manifest.json
+  --id DRY_RUN_RC_003 \
+  --packet-manifest validation/dry_runs/packets/DRY_RUN_RC_003_REVIEWER_PACKET.manifest.json
 .venv/bin/python -m validation.dry_runs.verify
 ```
 

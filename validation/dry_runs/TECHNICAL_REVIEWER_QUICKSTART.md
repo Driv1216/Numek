@@ -49,34 +49,48 @@ sha256sum "<dataset-path>"
 
 1. Confirm you have not worked on DataTrust or seen its output for this dataset.
 2. Inspect the assigned CSV using your normal local process.
-3. Record dataset alias, SHA-256, row count, column count, and target in the
-   technical evidence form.
-4. Complete `MANUAL_FIRST_ASSESSMENT.md`.
-5. Give the completed assessment to the facilitator to seal before seeing any
+3. Complete `MANUAL_FIRST_ASSESSMENT.md`.
+4. Give the completed assessment to the facilitator to seal before seeing any
    DataTrust output.
 
 The manual-first assessment is separate from the `15`-minute install/run timer.
 
-## Check Python Before Timing
+## Select Python Before Timing
 
 Python `3.11` or newer is required.
 
-Windows PowerShell:
+Select one installed Python command that reports version `3.11` or newer.
+Record the OS/version, selected command, and exact Python version in the
+Environment And Installation Evidence section. Use that same selection to
+create the environment. Do not silently switch interpreters.
+
+Windows PowerShell examples:
 
 ```powershell
-py -3.11 --version
+$PythonExe = "py"
+$PythonArgs = @("-3.11")
+& $PythonExe @PythonArgs --version
 ```
 
-macOS/Linux:
+Other valid Windows selections may include `@("-3.12")` or a quoted full path
+to a Python executable. Keep `$PythonExe` and `$PythonArgs` unchanged throughout
+the run.
+
+macOS/Linux examples:
 
 ```bash
-python3.11 --version
+PYTHON_CMD=(python3.11)
+"${PYTHON_CMD[@]}" --version
 ```
 
-If the command is missing or reports an older version, stop before the timed
-run. Record the issue and install Python 3.11 from https://www.python.org/downloads/
-or ask the facilitator to reschedule after Python is available. Do not silently
-fall back to another Python version.
+Other valid macOS/Linux selections may include `python3.12`, `python3.13`,
+`python3`, or a quoted full executable path. Keep `PYTHON_CMD` unchanged
+throughout the run.
+
+If a candidate command is missing or reports Python older than `3.11`, try
+another installed command before timing. If no installed command reports
+Python `3.11` or newer, stop before the timed run. Record the issue and install
+a supported Python from https://www.python.org/downloads/ or reschedule.
 
 ## Windows PowerShell Timed Run
 
@@ -84,7 +98,7 @@ Start the timer immediately before `Set-Location`:
 
 ```powershell
 Set-Location -LiteralPath "<extracted-reviewer-packet-directory>"
-py -3.11 -m venv ".venv"
+& $PythonExe @PythonArgs -m venv ".venv"
 & ".venv\Scripts\python.exe" -m pip install --no-build-isolation -e "."
 & ".venv\Scripts\datatrust.exe" audit "<dataset-path>" --target "<target-column>" --task classification --out "<output-report-path>"
 ```
@@ -103,7 +117,7 @@ Start the timer immediately before `cd`:
 
 ```bash
 cd "<extracted-reviewer-packet-directory>"
-python3.11 -m venv ".venv"
+"${PYTHON_CMD[@]}" -m venv ".venv"
 ".venv/bin/python" -m pip install --no-build-isolation -e "."
 ".venv/bin/datatrust" audit "<dataset-path>" --target "<target-column>" --task classification --out "<output-report-path>"
 ```
@@ -118,6 +132,37 @@ Activation is not required when using the explicit executable paths above.
 
 Stop the timer when the command confirms the report was written. Open the local
 HTML report only after stopping the timer.
+
+## Record Environment And Installation Evidence
+
+After installation, record the exact environment Python version, pip version,
+and complete `pip freeze` output in the Environment And Installation Evidence
+section. This evidence is separate from private dataset evidence.
+
+Windows PowerShell:
+
+```powershell
+& ".venv\Scripts\python.exe" --version
+& ".venv\Scripts\python.exe" -m pip --version
+& ".venv\Scripts\python.exe" -m pip freeze
+```
+
+macOS/Linux:
+
+```bash
+".venv/bin/python" --version
+".venv/bin/python" -m pip --version
+".venv/bin/python" -m pip freeze
+```
+
+The environment Python version must match the interpreter selected before
+timing and must be Python `3.11` or newer.
+
+## Record Private Dataset Evidence
+
+Record dataset alias, local SHA-256, row count, column count, and target in the
+separate Private Dataset Evidence section. Do not include private rows or raw
+values.
 
 ## Record The Generated Report Identity
 
@@ -159,8 +204,10 @@ audit.generate_report("<output-report-path>")
 Record every error, uncertainty, workaround, and attempted command verbatim.
 The facilitator cannot answer setup or product questions during the timed run.
 
-- If Python 3.11 is missing, stop before timing and follow the Python
-  instructions above.
+- If no installed command reports Python `3.11` or newer, stop before timing
+  and follow the Python instructions above.
+- If the environment Python version differs from the selected interpreter,
+  stop and record the mismatch.
 - If installation fails, record the full error and commands attempted.
 - If PowerShell blocks activation, continue with explicit `.venv\Scripts\...`
   executable paths; activation is optional.

@@ -22,23 +22,30 @@ post-hoc reinterpretation.
 1. Provide only the verified clean reviewer packet, assigned eligible CSV path,
    dataset alias, target, output report alias, and blank reviewer-facing forms.
 2. Keep DataTrust output hidden until the manual-first assessment is complete.
-3. Confirm the evidence form records dataset alias, local dataset SHA-256, row
+3. Before timing, confirm the reviewer selected and recorded one installed
+   Python command that reports `3.11` or newer. Do not suggest which command to
+   select.
+4. Confirm environment/version evidence is recorded separately from dataset
+   evidence. Confirm dataset evidence records alias, local dataset SHA-256, row
    count, column count, and target. Receive the completed manual-first form,
    calculate its SHA-256, and seal it.
-4. Start the `15`-minute timer immediately before the reviewer begins the
+5. Start the `15`-minute timer immediately before the reviewer begins the
    quickstart's timed install/run steps.
-5. Do not answer setup, command, target-selection, interpretation, or product
+6. Do not answer setup, command, target-selection, interpretation, or product
    questions. Record every question/request verbatim.
-6. Permitted responses are limited to: “Please use the written instructions,”
+7. Permitted responses are limited to: “Please use the written instructions,”
    “I cannot assist during this dry run,” and neutral timer updates if requested.
-7. Do not point, type, click, suggest commands, correct mistakes, or confirm
+8. Do not point, type, click, suggest commands, correct mistakes, or confirm
    interpretations.
-8. Stop the timer when the CLI confirms the report was written.
-9. Record the generated report alias and SHA-256 before anyone else receives
+9. Stop the timer when the CLI confirms the report was written.
+10. Confirm the reviewer records exact environment Python, pip version, and
+   post-install `pip freeze`, and that environment Python matches the selected
+   supported interpreter.
+11. Record the generated report alias and SHA-256 before anyone else receives
    the report. Let the reviewer complete the top-risk communication and workflow
    sections
    without prompting.
-10. Verify the candidate again after the session, then apply objective rules.
+12. Verify the candidate again after the session, then apply objective rules.
 
 ## Non-Technical Dry Run
 

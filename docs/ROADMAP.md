@@ -44,8 +44,11 @@ Current Phase 1 evidence:
 - objective dry-run materials and facilitator rules are prepared outside
   runtime package code
 - historical dry-run candidate `DRY_RUN_RC_001` is preserved
-- active dry-run candidate `DRY_RUN_RC_002` and its allowlist-only clean
+- historical dry-run candidate `DRY_RUN_RC_002` is preserved
+- active dry-run candidate `DRY_RUN_RC_003` and its allowlist-only clean
   reviewer packet are frozen and hash-verifiable
+- technical dry-run evidence captures the selected Python `>=3.11` command,
+  exact environment Python/pip versions, and post-install dependency freeze
 - practitioner-owned runs and all dry-run/practitioner gates remain pending
 
 Blocked future work:

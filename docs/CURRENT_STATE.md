@@ -54,14 +54,16 @@ Turn the working DataTrust prototype into a credible, useful reliability report 
   - objective pass/fail, pause, fix, and rerun rules
   - frozen practitioner-round evidence template
 - Deterministic SHA-256 release-candidate creation and verification
-- Cross-platform reviewer instructions for Windows PowerShell (`py -3.11`) and
-  macOS/Linux (`python3.11`) with quoted paths and explicit environment
-  executable paths
+- Cross-platform reviewer instructions that select and reuse one installed
+  Python `>=3.11` command, with quoted paths and explicit environment executable
+  paths
+- Separate technical evidence for OS/version, selected Python command, exact
+  Python and pip versions, and post-install `pip freeze`
 - Dataset and generated-report SHA-256 identity recorded across both dry runs
 - Deterministic allowlist-only clean reviewer packet creation and verification
-- Active frozen dry-run candidate `DRY_RUN_RC_002`
-- Historical candidate `DRY_RUN_RC_001` preserved as an immutable superseded
-  record
+- Active frozen dry-run candidate `DRY_RUN_RC_003`
+- Historical candidates `DRY_RUN_RC_001` and `DRY_RUN_RC_002` preserved as
+  immutable superseded records
 
 ## Verified Commands
 
@@ -99,7 +101,8 @@ Generate the sample report:
 - `validation/dry_runs/README.md`
 - `validation/dry_runs/release_candidates/DRY_RUN_RC_001.json`
 - `validation/dry_runs/release_candidates/DRY_RUN_RC_002.json`
-- `validation/dry_runs/packets/DRY_RUN_RC_002_REVIEWER_PACKET.zip`
+- `validation/dry_runs/release_candidates/DRY_RUN_RC_003.json`
+- `validation/dry_runs/packets/DRY_RUN_RC_003_REVIEWER_PACKET.zip`
 - `METHODOLOGY.md`
 - `docs/NUMEK_MASTER_CONTEXT.md`
 - `docs/AI_COLLABORATION_PROTOCOL.md`
@@ -142,10 +145,13 @@ Generate the sample report:
 ## Immediate Next Task
 
 Conduct the two prepared Milestone 3 human dry runs against unchanged
-`DRY_RUN_RC_002` using only `DRY_RUN_RC_002_REVIEWER_PACKET.zip`:
+`DRY_RUN_RC_003` using only `DRY_RUN_RC_003_REVIEWER_PACKET.zip`:
 
 - verify the candidate and clean packet before and after each session
 - run one uninvolved technical install/run dry run without founder assistance
+- record selected Python `>=3.11` command, exact environment Python/pip
+  versions, and post-install `pip freeze` separately from private dataset
+  evidence
 - run one separate non-technical comprehension dry run with report only
 - confirm both sessions reference the same unchanged generated-report SHA-256
 - pause on any objective failure and make only the evidenced targeted fix
@@ -159,15 +165,19 @@ Conduct the two prepared Milestone 3 human dry runs against unchanged
 - Quickstart-generated report contains all six V1 sections
 - `DRY_RUN_RC_001` is preserved unchanged as historical candidate record
   SHA-256 `9c7b8d7754557a1dc10694068e297d55c484ea374e40640bf1f111486faf0fe1`
-- `DRY_RUN_RC_002` identifies `30` candidate files with aggregate SHA-256
-  `b8511b890b7beed51ac190c5f2af167d784783fe474824e3b2c3e0e703eac434`
+- `DRY_RUN_RC_002` is preserved unchanged as historical candidate record
+  SHA-256 `cf73b1285439813fd4db501f442554eabe67cbea5222f8dcded69e3fee7644a0`
+- `DRY_RUN_RC_003` identifies `30` candidate files with aggregate SHA-256
+  `888cf3b30a82d44c11bb0bad0ddd5be94c5b4f5a97fcc2bc051533ff2b684b96`
 - Clean reviewer packet archive SHA-256:
-  `4b2694e0458147a36847b3e8dfe3728c5c54b9f44b0cd81f6c9e5e653c6d4946`
+  `ba23513ff44493384bf057cd6235018d7c9e4a41a4e63134f21e075936b042cc`
 - Packet verification confirms required files are present and prohibited
   reports, validation results/comparisons, internal docs, previous evidence,
   and virtual environments are absent
 - Deterministic packet recreation produces the same archive SHA-256
 - Clean packet installs and generates a report from paths containing spaces
+- Selected-interpreter workflow verified with matching environment Python,
+  exact pip version, and complete post-install `pip freeze`
 - Active candidate and packet verification pass after preparation
 - No profiling, scoring, risk, report-content, or runtime package behavior was
   changed during preparation

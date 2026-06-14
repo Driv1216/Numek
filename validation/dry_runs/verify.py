@@ -15,6 +15,9 @@ REQUIRED_CONTENT = {
         "Troubleshooting",
         "Windows PowerShell Timed Run",
         "macOS/Linux Timed Run",
+        "Select Python Before Timing",
+        "Record Environment And Installation Evidence",
+        "Record Private Dataset Evidence",
         "Record The Generated Report Identity",
     ),
     "MANUAL_FIRST_ASSESSMENT.md": (
@@ -29,6 +32,10 @@ REQUIRED_CONTENT = {
         "Candidate verified after session",
         "Local dataset SHA-256",
         "Generated report SHA-256",
+        "Operating system and exact version",
+        "Selected Python command",
+        "Post-install `pip freeze` output",
+        "Private Dataset Evidence",
         "Objective Outcome",
     ),
     "NON_TECHNICAL_COMPREHENSION.md": (

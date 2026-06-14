@@ -11,6 +11,19 @@ answers or outcomes.
 - Candidate ID:
 - Candidate manifest path:
 - Candidate verified before session: [ ] Pass [ ] Fail
+
+## Environment And Installation Evidence
+
+- Operating system and exact version:
+- Selected Python command:
+- Selected command exact Python version:
+- Environment exact Python version after creation:
+- Environment Python matches selected interpreter: [ ] Yes [ ] No
+- Exact pip version after installation:
+- Post-install `pip freeze` output:
+
+## Private Dataset Evidence
+
 - Dataset alias only:
 - Local dataset SHA-256:
 - Dataset row count:
@@ -62,6 +75,8 @@ Without facilitator prompts, the reviewer records for every displayed top risk:
   [ ] Yes [ ] No
 - Any protocol deviation:
 - Candidate verified after session: [ ] Pass [ ] Fail
+- Environment/version evidence kept separate from private dataset evidence:
+  [ ] Yes [ ] No
 - Technical and non-technical sessions reference the same unchanged report
   SHA-256: [ ] Confirmed [ ] Not confirmed
 

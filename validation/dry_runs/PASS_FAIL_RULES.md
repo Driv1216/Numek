@@ -12,6 +12,11 @@ The technical dry run passes only if every rule passes:
 - `T3`: eligible CSV classification dataset and target are used
 - `T3a`: dataset alias, local SHA-256, row count, column count, and target are
   recorded
+- `T3b`: OS/version, selected Python command, exact selected Python version,
+  exact environment Python version, exact pip version, and post-install
+  `pip freeze` are recorded separately from private dataset evidence
+- `T3c`: the selected command reports Python `3.11` or newer, is used to create
+  the environment, and the resulting environment uses that selected interpreter
 - `T4`: manual-first assessment is completed and sealed before output is viewed
 - `T5`: reviewer installs and produces the HTML report within `15` minutes
 - `T6`: no founder/team assistance is provided
