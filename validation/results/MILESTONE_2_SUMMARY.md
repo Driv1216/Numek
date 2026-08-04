@@ -1,22 +1,22 @@
 # Milestone 2 Validation Summary
 
-Generated and verified on 2026-06-14.
+Refreshed and verified on 2026-08-05 after the evidence-first report upgrade.
 
 ## Public Corpus
 
 | Dataset | Rows | Columns | DataTrust runtime | Overall | Risk band |
 |---|---:|---:|---:|---:|---|
-| UCI German Credit | 1,000 | 21 | 0.016305s | 91.84 | Low |
-| UCI Bank Marketing | 45,211 | 17 | 0.087316s | 69.0 | Elevated |
-| UCI Adult | 48,842 | 15 | 0.087798s | 69.0 | Elevated |
+| UCI German Credit | 1,000 | 21 | 0.034377s | 91.84 | Low |
+| UCI Bank Marketing | 45,211 | 17 | 0.183144s | 69.0 | Elevated |
+| UCI Adult | 48,842 | 15 | 0.183002s | 69.0 | Elevated |
 
-Every public report contains all six V1 sections and generated in under `30s`.
+Every public report contains all eight report sections and generated in under `30s`.
 Prepared CSV and raw archive checksums are recorded in the manifests and
 `sources.json`.
 
 ## Controlled Mutations
 
-Seven deterministic Adult mutations cover:
+Eight deterministic Adult mutations cover:
 
 - `100%` feature missingness
 - duplicates
@@ -25,9 +25,11 @@ Seven deterministic Adult mutations cover:
 - review-only leakage
 - missing targets
 - a constant field
+- feature-identical groups with conflicting target labels
 
 All expected directional assertions pass. Strong leakage triggers the explained
-strong-leakage guardrail; review-only leakage leaves the leakage score unchanged.
+strong-leakage guardrail; review-only leakage leaves the leakage score unchanged;
+and conflicting-label evidence is surfaced without changing uniqueness.
 
 ## Leakage Review
 
@@ -48,7 +50,7 @@ One internal Adult comparison was run against Evidently OSS `0.7.21` using its
 DataSummaryPreset in `validation/.venv-evidently`. Both validation environments
 use Python `3.11.15`.
 
-- DataTrust report runtime: `0.087798s`
+- DataTrust report runtime in the historical comparison: `0.087798s`
 - Evidently DataSummaryPreset runtime: `0.433635s`
 
 These values are descriptive, not a performance benchmark. The comparison
@@ -59,11 +61,15 @@ superiority. It is internal supporting evidence only and is not a V1 pass gate.
 
 ```text
 Validation corpus verification passed.
-23 passed
+36 passed
 ```
 
-Still unproven:
+Deferred, non-blocking product-validation questions:
 
-- practitioner-owned CSV runs
-- technical and non-technical dry runs
-- practitioner finding-quality, score-defensibility, and shareability gates
+- performance and usefulness on private or practitioner-owned CSVs
+- independent reader comprehension outside the founder/Codex loop
+- external finding-quality, score-defensibility, and shareability reactions
+
+These questions were formerly tied to a mandatory external validation gate.
+That gate was superseded on 2026-08-04 and is no longer required for V1 product
+building.

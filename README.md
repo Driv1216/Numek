@@ -1,18 +1,31 @@
 # DataTrust
 
-DataTrust is a local-first Python package that generates stakeholder-readable
-HTML dataset reliability reports. It is designed for an ML or data lead who
-needs to explain whether a dataset is reliable enough to use, and why.
+DataTrust is a local-first Python package and browser UI that generates
+stakeholder-readable HTML dataset reliability reports. It is designed for an
+ML or data lead who needs to explain whether a classification dataset is
+reliable enough to use, and why.
 
-V1 is intentionally small: no cloud, no database, no dashboard, and no PDF
-export. A CSV goes in, an HTML reliability report comes out.
+DataTrust has no cloud upload, account, database, or saved report history. A CSV
+is processed locally and produces a standalone HTML report; the browser's print
+dialog provides the Save-as-PDF path.
 
 ## Quick Start
 
 ```bash
-/opt/homebrew/bin/python3.11 -m venv .venv
+/opt/homebrew/bin/python3.10 -m venv .venv
 .venv/bin/python -m pip install --upgrade pip setuptools wheel
 .venv/bin/python -m pip install --no-build-isolation -e ".[dev]"
+.venv/bin/datatrust ui
+```
+
+The UI opens at `http://127.0.0.1:8000/`. It guides the user through upload,
+target selection, binary/multiclass confirmation, optional report context, and
+report generation. The default upload limit is `100 MiB` and can be changed
+with `--max-upload-mib`.
+
+The existing CLI remains available:
+
+```bash
 .venv/bin/datatrust audit examples/loan_data.csv --target default --task classification --out examples/report.html
 ```
 
@@ -27,15 +40,18 @@ audit.generate_report("examples/report.html")
 
 ## What V1 Checks
 
-- Dataset shape, column types, missingness, and duplicate rows
-- Classification target balance
+- Dataset shape, feature type counts, cell-level and row-level missingness
+- Exact duplicate groups and feature-identical groups with conflicting labels
+- Binary, multiclass, and single-class target evidence, including the
+  majority-class baseline and majority-to-minority ratio
 - Constant and near-constant columns
 - High-cardinality categorical columns
-- Numeric outliers using the IQR rule
+- Numeric quartiles, zero/negative/non-finite counts, and IQR outliers
 - Basic target leakage candidates based on column names
 - Transparent sub-scores for completeness, uniqueness, target balance,
   feature usability, and leakage risk
-- Top three plain-language risks and a recommended next action
+- Top three executive risks plus a complete prioritized action plan
+- Print-safe target-distribution and feature-missingness visuals
 
 ## Positioning
 

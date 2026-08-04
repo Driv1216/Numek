@@ -29,6 +29,10 @@ MUTATION_EXPECTATIONS = {
     "review_only_leakage": {"unchanged_score": "leakage_risk"},
     "missing_targets": {"guardrail": "missing_target_labels"},
     "constant_field": {"score": "feature_usability"},
+    "conflicting_labels": {
+        "unchanged_score": "uniqueness",
+        "finding": "conflicting_target_labels",
+    },
 }
 
 
@@ -58,8 +62,13 @@ def _analyze(name: str, path: Path, target: str) -> dict:
         "sub_scores": result["scores"]["sub_scores"],
         "guardrails": result["scores"]["guardrails"],
         "risks": result["risks"],
+        "finding_codes": [finding["code"] for finding in result["findings"]],
         "leakage_details": result["profile"]["leakage_details"],
         "target_missing_count": result["profile"]["target_missing_count"],
+        "classification_subtype": result["profile"]["classification_subtype"],
+        "missing_feature_row_rate": result["profile"]["missing_feature_row_rate"],
+        "duplicate_group_count": result["profile"]["duplicate_group_count"],
+        "conflicting_label_group_count": result["profile"]["conflicting_label_group_count"],
     }
 
 
@@ -89,6 +98,10 @@ def _verify_mutations(results: dict) -> list:
             codes = [item["code"] for item in result["guardrails"]]
             passed = passed and expected_guardrail in codes
             detail += f"; guardrails={codes}"
+        expected_finding = expectation.get("finding")
+        if expected_finding:
+            passed = passed and expected_finding in result["finding_codes"]
+            detail += f"; findings={result['finding_codes']}"
         assertions.append(
             {
                 "mutation": mutation,
@@ -108,6 +121,7 @@ def _write_timings(results: dict) -> None:
         writer = csv.DictWriter(
             handle,
             fieldnames=["name", "dataset_path", "rows", "columns", "runtime_seconds", "under_30s"],
+            lineterminator="\n",
         )
         writer.writeheader()
         for result in results.values():
@@ -148,7 +162,9 @@ def _write_leakage_reviews(results: dict) -> None:
                 }
             )
     with (RESULT_ROOT / "leakage_review.csv").open("w", newline="", encoding="utf-8") as handle:
-        writer = csv.DictWriter(handle, fieldnames=list(rows[0].keys()))
+        writer = csv.DictWriter(
+            handle, fieldnames=list(rows[0].keys()), lineterminator="\n"
+        )
         writer.writeheader()
         writer.writerows(rows)
 

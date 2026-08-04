@@ -3,17 +3,18 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>DataTrust Reliability Report</title>
+  <title>{{ context.dataset_name }} — DataTrust Reliability Report</title>
   <style>
     :root {
       color-scheme: light;
-      --ink: #18212f;
-      --muted: #5c6978;
-      --line: #d9e1ea;
-      --panel: #f6f8fb;
+      --ink: #17202d;
+      --muted: #5d6877;
+      --line: #d8e0e9;
+      --panel: #f5f7fa;
       --accent: #176b87;
+      --accent-soft: #e7f3f7;
       --good: #167a4a;
-      --warn: #9a6500;
+      --warn: #956200;
       --bad: #b3261e;
     }
     * { box-sizing: border-box; }
@@ -21,41 +22,34 @@
       margin: 0;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       color: var(--ink);
-      background: #ffffff;
+      background: #fff;
       line-height: 1.5;
     }
-    main { max-width: 1120px; margin: 0 auto; padding: 40px 28px 64px; }
+    main { max-width: 1160px; margin: 0 auto; padding: 42px 28px 68px; }
     header { border-bottom: 2px solid var(--line); padding-bottom: 24px; margin-bottom: 28px; }
-    h1 { font-size: 34px; margin: 0 0 8px; letter-spacing: 0; }
-    h2 { font-size: 22px; margin: 34px 0 14px; }
+    h1 { font-size: 34px; margin: 0 0 6px; line-height: 1.2; }
+    h2 { font-size: 23px; margin: 38px 0 14px; padding-top: 4px; }
     h3 { font-size: 17px; margin: 0 0 8px; }
     p { margin: 0 0 10px; }
-    table { width: 100%; border-collapse: collapse; margin: 12px 0 0; font-size: 14px; }
-    th, td { border-bottom: 1px solid var(--line); padding: 10px 8px; text-align: left; vertical-align: top; }
-    th { color: var(--muted); font-weight: 650; background: var(--panel); }
-    .meta { color: var(--muted); font-size: 14px; }
+    table { width: 100%; border-collapse: collapse; margin: 12px 0 0; font-size: 13px; }
+    th, td { border-bottom: 1px solid var(--line); padding: 9px 8px; text-align: left; vertical-align: top; }
+    th { color: var(--muted); font-weight: 680; background: var(--panel); }
+    .table-wrap { overflow-x: auto; }
+    .meta, .small, .section-note { color: var(--muted); font-size: 13px; }
+    .purpose { max-width: 820px; margin-top: 10px; }
     .grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+    .grid.three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
     .score-grid { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 12px; }
-    .card {
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      padding: 14px;
-      background: #fff;
-    }
-    .metric { font-size: 26px; font-weight: 760; margin-top: 4px; }
-    .label { color: var(--muted); font-size: 13px; }
-    .summary {
-      display: grid;
-      grid-template-columns: 1.1fr 2fr;
-      gap: 16px;
-      align-items: stretch;
-    }
+    .card { border: 1px solid var(--line); border-radius: 9px; padding: 14px; background: #fff; }
+    .metric { font-size: 26px; font-weight: 760; margin-top: 4px; overflow-wrap: anywhere; }
+    .label { color: var(--muted); font-size: 12px; letter-spacing: .02em; text-transform: uppercase; }
+    .summary { display: grid; grid-template-columns: 1fr 2fr; gap: 16px; align-items: stretch; }
     .risk-badge {
       display: inline-block;
       border-radius: 999px;
       padding: 4px 10px;
-      font-size: 13px;
-      font-weight: 700;
+      font-size: 12px;
+      font-weight: 750;
       color: #fff;
       background: var(--accent);
     }
@@ -67,19 +61,44 @@
     .risk-card.High { border-left-color: var(--bad); }
     .risk-card.Moderate { border-left-color: var(--warn); }
     .risk-card.Low { border-left-color: var(--good); }
-    .small { font-size: 13px; color: var(--muted); }
-    .section-note { color: var(--muted); margin-bottom: 12px; }
+    .detail-line { margin-top: 8px; }
+    .action-table td:first-child { white-space: nowrap; }
+    .chart { display: grid; gap: 9px; margin-top: 14px; }
+    .bar-row { display: grid; grid-template-columns: minmax(120px, 220px) 1fr 86px; gap: 10px; align-items: center; }
+    .bar-label { font-size: 13px; overflow-wrap: anywhere; }
+    .bar-track { height: 13px; border-radius: 999px; background: #e8edf2; overflow: hidden; }
+    .bar { min-width: 2px; height: 100%; border-radius: inherit; background: var(--accent); }
+    .bar.missing { background: var(--warn); }
+    .bar-value { color: var(--muted); font-size: 12px; text-align: right; }
+    .callout { background: var(--accent-soft); border: 1px solid #c9e3eb; border-radius: 9px; padding: 14px; }
+    .section-note { margin-bottom: 12px; }
+    .nowrap { white-space: nowrap; }
     @media (max-width: 860px) {
-      .grid, .score-grid, .summary { grid-template-columns: 1fr; }
+      .grid, .grid.three, .score-grid, .summary { grid-template-columns: 1fr; }
+      .bar-row { grid-template-columns: 110px 1fr 70px; }
       main { padding: 28px 18px 48px; }
+    }
+    @media print {
+      @page { size: A4; margin: 14mm; }
+      body { font-size: 10pt; }
+      main { max-width: none; padding: 0; }
+      h1 { font-size: 24pt; }
+      h2 { break-after: avoid; font-size: 16pt; margin-top: 22px; }
+      .card, .callout, .bar-row, tr { break-inside: avoid; }
+      .table-wrap { overflow: visible; }
+      table { font-size: 8.5pt; }
+      th { color: #333; }
+      a { color: inherit; text-decoration: none; }
     }
   </style>
 </head>
 <body>
   <main>
     <header>
-      <h1>DataTrust Reliability Report</h1>
-      <p class="meta">Dataset: {{ profile.dataset_path }} | Target: {{ profile.target }} | Generated: {{ generated_at }}</p>
+      <p class="label">DataTrust Reliability Report</p>
+      <h1>{{ context.dataset_name }}</h1>
+      <p class="meta">Source: {{ context.source_filename }} · Target: {{ profile.target }} · Classification: {{ profile.classification_subtype }} · Generated: {{ generated_at }}</p>
+      {% if context.purpose %}<p class="purpose"><strong>Purpose:</strong> {{ context.purpose }}</p>{% endif %}
     </header>
 
     <section>
@@ -88,7 +107,7 @@
         <div class="card">
           <span class="risk-badge {{ scores.risk_level }}">{{ scores.risk_level }} Risk</span>
           <div class="metric">{{ scores.overall }}</div>
-          <p class="label">Overall reliability score with high-stakes guardrails</p>
+          <p class="label">Overall reliability score with existing guardrails</p>
           <p>{{ scores.recommended_action }}</p>
         </div>
         <div class="risk-list">
@@ -96,125 +115,170 @@
           <div class="card risk-card {{ risk.severity }}">
             <h3>{{ risk.title }} <span class="small">({{ risk.severity }})</span></h3>
             <p>{{ risk.finding }}</p>
-            <p><strong>Recommended action:</strong> {{ risk.recommendation }}</p>
+            <p><strong>Next review:</strong> {{ risk.recommendation }}</p>
           </div>
           {% endfor %}
         </div>
       </div>
-      {% if scores.guardrails %}
-      <h3 style="margin-top: 16px;">Applied guardrails</h3>
-      <div class="risk-list">
-        {% for guardrail in scores.guardrails %}
-        <div class="card">
-          <p><strong>Overall score cap: {{ guardrail.cap }}</strong></p>
-          <p>{{ guardrail.explanation }}</p>
-        </div>
-        {% endfor %}
-      </div>
-      {% endif %}
     </section>
 
     <section>
-      <h2>2. Dataset Health</h2>
+      <h2>2. Prioritized Action Plan</h2>
+      <p class="section-note">Every supported finding is shown below. Evidence-only findings are visible but do not alter the score.</p>
+      <div class="table-wrap">
+        <table class="action-table">
+          <thead><tr><th>Severity</th><th>Finding and evidence</th><th>Possible modeling impact</th><th>Recommended review</th><th>Score effect</th></tr></thead>
+          <tbody>
+            {% for finding in findings %}
+            <tr>
+              <td><span class="risk-badge {{ finding.severity }}">{{ finding.severity }}</span></td>
+              <td><strong>{{ finding.title }}</strong><br>{{ finding.finding }}<br><span class="small">Evidence: {{ finding.evidence }}</span></td>
+              <td>{{ finding.modeling_impact }}</td>
+              <td>{{ finding.recommendation }}</td>
+              <td>{{ finding.score_effect }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section>
+      <h2>3. Dataset Overview</h2>
       <div class="grid">
         <div class="card"><div class="label">Rows</div><div class="metric">{{ profile.row_count }}</div></div>
         <div class="card"><div class="label">Columns</div><div class="metric">{{ profile.column_count }}</div></div>
-        <div class="card"><div class="label">Missing Cells</div><div class="metric">{{ profile.missing_rate }}%</div></div>
-        <div class="card"><div class="label">Duplicate Rows</div><div class="metric">{{ profile.duplicate_rate }}%</div></div>
+        <div class="card"><div class="label">Potential features</div><div class="metric">{{ profile.feature_count }}</div></div>
+        <div class="card"><div class="label">Target</div><div class="metric">{{ profile.target }}</div></div>
+        <div class="card"><div class="label">Numeric features</div><div class="metric">{{ profile.numeric_feature_count }}</div></div>
+        <div class="card"><div class="label">Non-numeric features</div><div class="metric">{{ profile.non_numeric_feature_count }}</div></div>
+        <div class="card"><div class="label">Missing cells</div><div class="metric">{{ profile.missing_rate }}%</div></div>
+        <div class="card"><div class="label">Repeated rows</div><div class="metric">{{ profile.duplicate_rate }}%</div></div>
       </div>
-      {% if profile.severe_missing_columns %}
-      <p class="section-note">Feature columns with at least 50% missing values: {{ profile.severe_missing_columns | join(", ") }}</p>
-      {% endif %}
+      <div class="callout" style="margin-top: 14px;">
+        <p><strong>Interpretation:</strong> This is a {{ profile.classification_subtype }} classification dataset with {{ profile.labeled_row_count }} usable labels. {{ profile.missing_feature_row_rate }}% of records contain at least one missing feature, and {{ profile.duplicate_rows }} rows repeat a complete record.</p>
+      </div>
     </section>
 
     <section>
-      <h2>3. Target &amp; Label Quality</h2>
-      <p class="section-note">V1 checks target distribution and class imbalance. Label-noise estimation is reserved for a future Cleanlab-style workflow.</p>
+      <h2>4. Missingness Evidence</h2>
       <div class="grid">
-        <div class="card"><div class="label">Classes</div><div class="metric">{{ profile.class_balance.class_count }}</div></div>
-        <div class="card"><div class="label">Labeled Rows</div><div class="metric">{{ profile.labeled_row_count }}</div></div>
-        <div class="card"><div class="label">Missing Target Labels</div><div class="metric">{{ profile.target_missing_count }} ({{ profile.target_missing_rate }}%)</div></div>
-        <div class="card"><div class="label">Largest Class</div><div class="metric">{{ profile.class_balance.largest_class_percentage }}%</div></div>
-        <div class="card"><div class="label">Minority Class</div><div class="metric">{{ profile.class_balance.minority_class_percentage }}%</div></div>
-        <div class="card"><div class="label">Target Balance Score</div><div class="metric">{{ scores.sub_scores.target_balance }}</div></div>
+        <div class="card"><div class="label">Missing cells</div><div class="metric">{{ profile.missing_cells }}</div></div>
+        <div class="card"><div class="label">Rows with missing features</div><div class="metric">{{ profile.missing_feature_row_rate }}%</div></div>
+        <div class="card"><div class="label">Missing target labels</div><div class="metric">{{ profile.target_missing_count }}</div></div>
+        <div class="card"><div class="label">Severe feature columns</div><div class="metric">{{ profile.severe_missing_columns | length }}</div></div>
       </div>
-      <p class="section-note">Class counts and percentages exclude rows with missing target labels.</p>
-      <table>
-        <thead><tr><th>Class</th><th>Rows</th><th>Percentage</th></tr></thead>
-        <tbody>
-          {% for item in profile.target_distribution %}
-          <tr><td>{{ item.label }}</td><td>{{ item.count }}</td><td>{{ item.percentage }}%</td></tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </section>
-
-    <section>
-      <h2>4. Feature Risk</h2>
-      <div class="score-grid">
-        {% for name, score in scores.sub_scores.items() %}
-        <div class="card"><div class="label">{{ name.replace("_", " ").title() }}</div><div class="metric">{{ score }}</div></div>
+      <div class="grid three" style="margin-top: 12px;">
+        <div class="card"><div class="label">Rows missing 1 feature</div><div class="metric">{{ profile.rows_with_1_missing_feature }}</div></div>
+        <div class="card"><div class="label">Rows missing 2 features</div><div class="metric">{{ profile.rows_with_2_missing_features }}</div></div>
+        <div class="card"><div class="label">Rows missing 3+ features</div><div class="metric">{{ profile.rows_with_3_plus_missing_features }}</div></div>
+      </div>
+      {% if missingness_chart %}
+      <h3 style="margin-top: 20px;">Missingness by feature</h3>
+      <p class="section-note">Up to 15 features with non-zero missingness. Exact values for every column appear in the appendix.</p>
+      <div class="chart" role="img" aria-label="Horizontal bars showing missing percentage by feature">
+        {% for column in missingness_chart %}
+        <div class="bar-row">
+          <div class="bar-label">{{ column.name }}</div>
+          <div class="bar-track"><div class="bar missing" style="width: {{ column.missing_rate }}%"></div></div>
+          <div class="bar-value">{{ column.missing_count }} · {{ column.missing_rate }}%</div>
+        </div>
         {% endfor %}
       </div>
-      {% if profile.leakage_details %}
-      <table>
-        <thead><tr><th>Leakage review column</th><th>Classification</th><th>Reason</th><th>Scoring effect</th></tr></thead>
-        <tbody>
-          {% for item in profile.leakage_details %}
-          <tr>
-            <td>{{ item.column }}</td>
-            <td>{{ "Strong candidate" if item.classification == "strong" else "Review only" }}</td>
-            <td>{{ item.reason }}</td>
-            <td>{{ "Affects leakage score and guardrails" if item.classification == "strong" else "No automatic score penalty or cap" }}</td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
       {% else %}
-      <p class="section-note">No obvious V1 target leakage candidates were detected from column names.</p>
+      <div class="callout" style="margin-top: 14px;">No missing feature values were detected.</div>
       {% endif %}
     </section>
 
     <section>
-      <h2>5. Methodology &amp; Limitations</h2>
-      <div class="card">
-        <p>DataTrust V1 uses transparent checks for missingness, duplicates, class balance, feature usability, and heuristic leakage risk. Missing target labels are excluded from class calculations. Strong leakage candidates and severe findings can cap the overall score; every applied cap is shown above.</p>
-        <p>Review-only leakage prompts use conservative wording and do not automatically reduce the score. All leakage-name findings require confirmation of when the value becomes available.</p>
-        <p>The report is an evidence aid, not a certification.</p>
-        <p>Not included in V1: label-noise detection, drift monitoring, fairness testing, model calibration, human review of business rules, or regulatory compliance determination.</p>
+      <h2>5. Target and Label Evidence</h2>
+      <div class="grid">
+        <div class="card"><div class="label">Classification subtype</div><div class="metric">{{ profile.classification_subtype }}</div></div>
+        <div class="card"><div class="label">Observed classes</div><div class="metric">{{ profile.class_balance.class_count }}</div></div>
+        <div class="card"><div class="label">Majority baseline</div><div class="metric">{{ profile.majority_class_baseline }}%</div></div>
+        <div class="card"><div class="label">Majority : minority</div><div class="metric">{% if profile.majority_to_minority_ratio is not none %}{{ profile.majority_to_minority_ratio }} : 1{% else %}N/A{% endif %}</div></div>
+      </div>
+      <h3 style="margin-top: 20px;">Target distribution</h3>
+      <div class="chart" role="img" aria-label="Horizontal bars showing target class distribution">
+        {% for item in target_chart %}
+        <div class="bar-row">
+          <div class="bar-label">{{ item.label }}</div>
+          <div class="bar-track"><div class="bar" style="width: {{ item.percentage }}%"></div></div>
+          <div class="bar-value">{{ item.count }} · {{ item.percentage }}%</div>
+        </div>
+        {% endfor %}
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Class</th><th>Rows</th><th>Percentage of labeled rows</th></tr></thead>
+          <tbody>{% for item in profile.target_distribution %}<tr><td>{{ item.label }}</td><td>{{ item.count }}</td><td>{{ item.percentage }}%</td></tr>{% endfor %}</tbody>
+        </table>
+      </div>
+      <p class="section-note">Class calculations exclude {{ profile.target_missing_count }} row(s) without target labels. The majority baseline is the accuracy obtained by always predicting the largest class; it is context, not a model-quality result.</p>
+    </section>
+
+    <section>
+      <h2>6. Duplicate and Feature Evidence</h2>
+      <div class="grid">
+        <div class="card"><div class="label">Repeated rows</div><div class="metric">{{ profile.duplicate_rows }}</div></div>
+        <div class="card"><div class="label">Duplicate groups</div><div class="metric">{{ profile.duplicate_group_count }}</div></div>
+        <div class="card"><div class="label">Largest group</div><div class="metric">{{ profile.largest_duplicate_group_size }}</div></div>
+        <div class="card"><div class="label">Conflicting-label groups</div><div class="metric">{{ profile.conflicting_label_group_count }}</div></div>
+      </div>
+      <p class="section-note">A conflicting-label group contains identical recorded feature values but more than one non-missing target label. It requires context review and is not automatically treated as a labeling error.</p>
+
+      <h3 style="margin-top: 20px;">Leakage-name review</h3>
+      {% if profile.leakage_details %}
+      <div class="table-wrap"><table>
+        <thead><tr><th>Column</th><th>Classification</th><th>Reason</th><th>Scoring effect</th></tr></thead>
+        <tbody>{% for item in profile.leakage_details %}<tr><td>{{ item.column }}</td><td>{{ "Strong candidate" if item.classification == "strong" else "Review only" }}</td><td>{{ item.reason }}</td><td>{{ "Affects score and guardrails" if item.classification == "strong" else "No automatic penalty" }}</td></tr>{% endfor %}</tbody>
+      </table></div>
+      {% else %}<p class="section-note">No name-based leakage candidates were detected.</p>{% endif %}
+
+      <h3 style="margin-top: 20px;">Numeric feature evidence</h3>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Feature</th><th>Min</th><th>Q1</th><th>Median</th><th>Q3</th><th>Max</th><th>Zero</th><th>Negative</th><th>Non-finite</th><th>IQR outliers</th></tr></thead>
+        <tbody>
+          {% for column in profile.columns if column.role == "feature" and column.is_numeric %}
+          <tr><td>{{ column.name }}</td><td>{{ column.numeric_summary.min }}</td><td>{{ column.numeric_summary.q1 }}</td><td>{{ column.numeric_summary.median }}</td><td>{{ column.numeric_summary.q3 }}</td><td>{{ column.numeric_summary.max }}</td><td>{{ column.numeric_summary.zero_count }} ({{ column.numeric_summary.zero_rate }}%)</td><td>{{ column.numeric_summary.negative_count }} ({{ column.numeric_summary.negative_rate }}%)</td><td>{{ column.numeric_summary.non_finite_count }}</td><td>{{ column.outlier_count }} ({{ column.outlier_rate }}%)</td></tr>
+          {% else %}<tr><td colspan="10">No numeric features were detected.</td></tr>{% endfor %}
+        </tbody>
+      </table></div>
+
+      <h3 style="margin-top: 20px;">Non-numeric feature evidence</h3>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Feature</th><th>Non-null</th><th>Unique</th><th>Most common value</th><th>Most common share</th><th>Near constant</th><th>High cardinality</th></tr></thead>
+        <tbody>
+          {% for column in profile.columns if column.role == "feature" and not column.is_numeric %}
+          <tr><td>{{ column.name }}</td><td>{{ column.non_null_count }}</td><td>{{ column.unique_count }} ({{ column.unique_rate }}%)</td><td>{% if column.top_value_hidden %}Withheld (high cardinality){% elif column.top_value_is_missing %}(missing){% elif column.top_value is not none %}{{ column.top_value }}{% else %}—{% endif %}</td><td>{{ column.top_value_count }} ({{ column.top_value_rate }}%)</td><td>{{ "Yes" if column.near_constant else "No" }}</td><td>{{ "Yes" if column.high_cardinality else "No" }}</td></tr>
+          {% else %}<tr><td colspan="7">No non-numeric features were detected.</td></tr>{% endfor %}
+        </tbody>
+      </table></div>
+    </section>
+
+    <section>
+      <h2>7. Scoring, Methodology, and Limitations</h2>
+      <div class="score-grid">
+        {% for name, score in scores.sub_scores.items() %}<div class="card"><div class="label">{{ name.replace("_", " ").title() }}</div><div class="metric">{{ score }}</div></div>{% endfor %}
+      </div>
+      {% if scores.guardrails %}
+      <h3 style="margin-top: 18px;">Applied guardrails</h3>
+      <div class="risk-list">{% for guardrail in scores.guardrails %}<div class="card"><p><strong>Overall score cap: {{ guardrail.cap }}</strong></p><p>{{ guardrail.explanation }}</p></div>{% endfor %}</div>
+      {% endif %}
+      <div class="callout" style="margin-top: 16px;">
+        <p>Scores retain the established DataTrust formulas for completeness, uniqueness, target balance, feature usability, and name-based leakage risk. New row-impact and conflicting-label evidence does not alter scoring.</p>
+        <p>Findings are evidence for human review, not proof of causation or instructions to clean data automatically. Leakage findings require confirmation of when a value becomes available.</p>
+        <p>Not included: label-noise estimation, drift, fairness, calibration, semantic date validation, fuzzy category normalization, feature correlation, compliance, or certification.</p>
       </div>
     </section>
 
     <section>
-      <h2>6. Appendix</h2>
-      <table>
-        <thead>
-          <tr>
-            <th>Column</th>
-            <th>Role</th>
-            <th>Type</th>
-            <th>Missing</th>
-            <th>Unique</th>
-            <th>Constant</th>
-            <th>High Cardinality</th>
-            <th>Outliers</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for column in profile.columns %}
-          <tr>
-            <td>{{ column.name }}</td>
-            <td>{{ column.role }}</td>
-            <td>{{ column.dtype }}</td>
-            <td>{{ column.missing_rate }}%</td>
-            <td>{{ column.unique_count }} ({{ column.unique_rate }}%)</td>
-            <td>{{ "Yes" if column.constant else "No" }}</td>
-            <td>{{ "Yes" if column.high_cardinality else "No" }}</td>
-            <td>{{ column.outlier_rate }}%</td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
+      <h2>8. Technical Appendix</h2>
+      <p class="section-note">Complete per-column evidence. Percentages use total dataset rows unless stated otherwise.</p>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Column</th><th>Role</th><th>Type</th><th>Non-null</th><th>Missing</th><th>Unique</th><th>Top share</th><th>Constant</th><th>Near constant</th><th>High cardinality</th><th>Outliers</th></tr></thead>
+        <tbody>{% for column in profile.columns %}<tr><td>{{ column.name }}</td><td>{{ column.role }}</td><td>{{ column.dtype }}</td><td>{{ column.non_null_count }}</td><td>{{ column.missing_count }} ({{ column.missing_rate }}%)</td><td>{{ column.unique_count }} ({{ column.unique_rate }}%)</td><td>{{ column.top_value_rate }}%</td><td>{{ "Yes" if column.constant else "No" }}</td><td>{{ "Yes" if column.near_constant else "No" }}</td><td>{{ "Yes" if column.high_cardinality else "No" }}</td><td>{{ column.outlier_count }} ({{ column.outlier_rate }}%)</td></tr>{% endfor %}</tbody>
+      </table></div>
     </section>
   </main>
 </body>

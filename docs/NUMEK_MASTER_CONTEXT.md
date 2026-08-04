@@ -2,6 +2,9 @@
 
 ## Changelog
 
+- **2026-08-05: Added the local UI and evidence-first report.** Added the loopback-only guided CSV workflow, eight-section report, full action plan, row-level missingness, duplicate-group and conflicting-label evidence, richer numeric/categorical summaries, print-safe visuals, browser Save-as-PDF path, and compatible CLI/Python API extensions. Existing scoring formulas remain unchanged.
+- **2026-08-04: Removed the mandatory external five-practitioner validation gate.** RC_003 technical review is completed and preserved as historical evidence. Product building is now the active priority, with development reviews and acceptance checks handled internally by Drivyaansh and Codex.
+- **2026-08-02: Lowered the active package requirement to Python 3.10+.** Package metadata and active reviewer-facing setup text were changed from Python 3.11+ to Python 3.10+.
 - **2026-06-14: Upgraded the project and validation environments to Python 3.11.** Raised the package minimum to Python 3.11, rebuilt both environments on Python 3.11.15, migrated the isolated comparison to Evidently 0.7.21 and its current DataSummaryPreset API, regenerated validation evidence, and verified the full suite without runtime package changes.
 - **2026-06-14: Completed the reproducible validation corpus.** Prepared three pinned UCI datasets, generated seven controlled mutations and ten timed reports, reviewed every leakage flag, completed an isolated Evidently Adult comparison, and corrected one public-corpus false severe leakage classification.
 - **2026-06-14: Completed DataTrust V1 correctness invariants.** Added separate target-missingness handling, severe column-missingness evidence, strong versus review-only leakage classification, explained score guardrails, deterministic risk priority, and regression coverage for credibility-breaking contradictions.
@@ -21,7 +24,7 @@ The long-term thesis is that companies deploying AI into real decisions need evi
 
 The current execution focus is much narrower:
 
-**DataTrust V1:** a local-first Python package that generates an HTML dataset reliability report from a CSV.
+**DataTrust V1:** a local-first Python package and browser UI that generates an HTML dataset reliability report from a CSV.
 
 The first reader is not a regulator directly. The first reader is an **ML/data lead who needs to explain dataset reliability to a non-technical stakeholder** such as a CTO, VP, risk lead, compliance reviewer, or enterprise customer.
 
@@ -173,27 +176,43 @@ audit.generate_report("examples/report.html")
 .venv/bin/datatrust audit examples/loan_data.csv --target default --task classification --out examples/report.html
 ```
 
+### Local browser UI
+
+```bash
+.venv/bin/datatrust ui
+```
+
+The UI runs on loopback, keeps uploads only for the running process, and guides
+the user through target selection, classification subtype confirmation, report
+generation, HTML download, and browser print/save as PDF.
+
 The report is the product. The code exists to produce a report that is worth showing.
 
 ## V1 Definition Of Done
 
-DataTrust V1 is done only when every approved gate passes in one frozen
-practitioner validation round:
+DataTrust V1 is done when Drivyaansh accepts the current product state after
+Codex verifies the implemented V1 behavior:
 
-- at least `4/5` ML/data reviewers install and run without founder intervention
-- all three public datasets and two practitioner-owned CSVs report in under `30s`
-- structure and claims, finding quality, and score defensibility gates pass
-- at least `4/5` practitioners would share the report with minor or no edits
-- the separate non-technical reviewer passes all four comprehension questions
+- the local UI, CLI, and Python API generate a complete HTML report from a CSV
+  classification dataset
+- the generated report contains all eight report sections
+- automated tests for implemented V1 behavior pass
+- public validation reports and controlled mutation checks remain reproducible
+  enough for internal confidence
+- product and docs avoid unsupported certification, compliance, fairness,
+  label-noise, drift, model-correctness, and legal claims
+- known limitations are documented clearly
 
-Any scoring, profiling, risk-summary, or report-content change invalidates the
-active practitioner validation round. There is no conditional pass.
+The previous mandatory external five-practitioner validation round was
+superseded on 2026-08-04. RC_003 and its returned technical-review evidence
+remain historical evidence, but external practitioner validation is not an
+active V1 gate or blocker.
 
 Anything not required to reach this condition is V2.
 
 Examples of V2 or later work:
 
-- PDF export
+- generated PDF export beyond the browser print/save path
 - SaaS dashboard
 - live monitoring
 - model calibration
@@ -243,12 +262,13 @@ Generate the sample report:
 Current verified test state:
 
 ```text
-23 passed
+36 passed
 ```
 
 ## Report Anatomy
 
-DataTrust V1 reports have six sections.
+DataTrust reports have eight sections organized as executive summary, complete
+action plan, and technical evidence.
 
 ### 1. Executive Summary
 
@@ -256,43 +276,57 @@ Communicates the overall reliability score, risk level, recommended next action,
 
 This is the most important section for the non-technical stakeholder.
 
-### 2. Dataset Health
+### 2. Prioritized Action Plan
 
-Shows basic dataset condition:
+Shows every supported finding with evidence, possible modeling impact,
+recommended review, and score effect. Evidence-only findings remain visible
+without changing the score.
+
+### 3. Dataset Overview
+
+Shows basic dataset condition and composition:
 
 - rows
 - columns
-- missing cells
-- duplicate rows
+- potential, numeric, and non-numeric features
+- missing-cell and repeated-row rates
 
 This section answers whether the dataset has obvious structural quality problems.
 
-### 3. Target & Label Quality
+### 4. Missingness Evidence
 
-Shows target distribution and class balance.
+Separates cell-level missingness from rows affected by missing features, shows
+one/two/three-plus missing-feature buckets, and charts the most affected
+features. Target missingness remains separate.
+
+### 5. Target and Label Evidence
+
+Shows classification subtype, target distribution, class balance,
+majority-class baseline, and majority-to-minority ratio.
 
 Missing target labels are tracked separately and excluded from class counts.
 Datasets with no usable target labels fail clearly. V1 does not implement true
 label-noise detection yet.
 
-### 4. Feature Risk
+### 6. Duplicate and Feature Evidence
 
-Shows transparent sub-scores and highlights feature-level risks:
+Shows exact duplicate groups, potentially conflicting target labels, leakage
+review evidence, numeric summaries, and non-numeric feature summaries:
 
 - constant fields
 - near-constant fields
 - high-cardinality categoricals
-- numeric outlier concentration
+- numeric quartiles, zero/negative/non-finite counts, and outlier concentration
 - strong leakage candidates that affect scoring and guardrails
 - review-only leakage prompts that do not automatically reduce the score
 
-### 5. Methodology & Limitations
+### 7. Scoring, Methodology, and Limitations
 
 Explains what was checked, how to interpret the report, and what the report does not prove.
 
 This section is crucial because credibility comes from clarity, not from pretending the tool does more than it does.
 
-### 6. Appendix
+### 8. Technical Appendix
 
 Shows detailed per-column metrics:
 
@@ -301,7 +335,7 @@ Shows detailed per-column metrics:
 - type
 - missing rate
 - unique count and rate
-- constant flag
+- constant and near-constant flags
 - high-cardinality flag
 - outlier rate
 
@@ -342,6 +376,8 @@ Current limitations:
 - no model calibration yet
 - no production monitoring yet
 - no legal or compliance certification
+- no generated PDF or Word document; PDF uses the browser print dialog
+- no semantic date, fuzzy category, correlation, or missingness-pattern checks
 - leakage detection is heuristic and must be reviewed by a human
 
 ## Credibility Problem
@@ -365,6 +401,8 @@ V1 earns early trust through transparency:
 - simple, inspectable checks
 - guardrails for high-stakes risks such as target leakage
 - code and report structure that can be reviewed
+- internal Drivyaansh + Codex verification during product development
+- RC_003 technical review preserved as historical evidence
 
 ### Credibility Still Missing
 
@@ -377,6 +415,8 @@ Numek does not yet have:
 - pilots with real ML teams
 - comparative studies against adjacent tools
 - evidence that the scoring weights feel correct to domain experts
+
+These are credibility gaps, not current blockers to product building.
 
 ### Credibility Milestones
 
@@ -391,7 +431,9 @@ The path to stronger credibility should be:
 7. Add expert/advisor review.
 8. Version reports and methodology so old results remain interpretable.
 
-Early credibility comes from glass walls: make the method inspectable before asking people to trust the brand.
+Early credibility comes from glass walls: make the method inspectable before
+asking people to trust the brand. External review can still be useful later,
+but it is no longer a mandatory V1 acceptance process.
 
 ## Competitor And Adjacent Tool Map
 
@@ -444,8 +486,8 @@ Focus:
 - correctness and trust invariants **completed**
 - reproducible three-dataset validation corpus and controlled mutations **completed**
 - internal adjacent-tool comparison as supporting evidence **completed**
-- technical and non-technical dry runs
-- one frozen all-gates-pass practitioner validation round
+- RC_003 technical review **completed and archived as historical evidence**
+- product implementation with internal Drivyaansh + Codex verification
 
 ### Phase 2: Stronger Dataset Checks
 
@@ -559,38 +601,44 @@ Known unknowns require evidence, not just decisions.
 ### Do ML leads actually read reliability reports?
 
 - **Why it matters:** if ML leads do not read or share reports, the product needs a different artifact.
-- **How to resolve:** show the report to ML/data leads and ask what they would use, ignore, forward, or remove.
-- **Evidence needed:** at least five reactions from target users, including whether they would share it with a stakeholder.
+- **How to resolve:** show the report to ML/data leads when useful and ask what they would use, ignore, forward, or remove.
+- **Evidence needed:** detailed reactions from target users, including whether they would share it with a stakeholder.
+- **Status:** deferred and non-blocking.
 
 ### Is local-first a selling point or friction?
 
 - **Why it matters:** local-first protects sensitive data, but CLI/local setup can be inconvenient.
 - **How to resolve:** ask target users whether they prefer CLI, notebook, Docker, local web app, customer-cloud, or hosted upload.
-- **Evidence needed:** workflow preferences from at least five ML/data leads or technical buyers.
+- **Evidence needed:** workflow preferences from ML/data leads or technical buyers.
+- **Status:** deferred and non-blocking.
 
 ### Is the leakage heuristic acceptable on real data?
 
 - **Why it matters:** false positives can destroy trust if DataTrust flags legitimate columns as dangerous too often.
 - **How to resolve:** test the heuristic on multiple public and real-world-style datasets.
 - **Evidence needed:** a small benchmark of flagged columns reviewed by humans.
+- **Status:** deferred and non-blocking.
 
 ### Do scoring weights feel correct to domain experts?
 
 - **Why it matters:** a score that feels wrong will not be trusted, even if the raw checks are useful.
 - **How to resolve:** show score breakdowns to ML leads and ask whether risk levels match their intuition.
-- **Evidence needed:** feedback on at least ten reports or report mockups.
+- **Evidence needed:** feedback on reviewed reports or report mockups.
+- **Status:** deferred and non-blocking.
 
 ### Is lending-tech the right first customer?
 
 - **Why it matters:** the first segment determines language, report design, metrics, and sales motion.
 - **How to resolve:** compare reactions from lending-tech vendors, fintech ML teams, and broader AI SaaS teams.
 - **Evidence needed:** concrete evidence of urgency, willingness to run the tool, and willingness to share the report internally.
+- **Status:** deferred and non-blocking.
 
 ### Is HTML enough before PDF?
 
 - **Why it matters:** HTML is easier to build, but some stakeholders may expect PDFs.
 - **How to resolve:** ask users whether they would share HTML, screenshot it, export it, or require PDF.
 - **Evidence needed:** user preference from report review sessions.
+- **Status:** deferred and non-blocking.
 
 ## Open Decisions
 

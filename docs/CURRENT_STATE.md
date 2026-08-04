@@ -1,18 +1,25 @@
 # Numek Current State
 
-Last updated: 2026-06-15  
-Current milestone: DataTrust V1  
-Status: Milestone 3 dry-run preparation complete; human dry runs not started
+Last updated: 2026-08-05
+Current phase: Local UI and evidence-first report implemented; internal acceptance review
+Status: DataTrust generates reports through the local browser UI, CLI, and Python API
 
 ## Current Objective
 
-Turn the working DataTrust prototype into a credible, useful reliability report that can satisfy the V1 exit gate.
+Continue building DataTrust as a usable local-first product. Technical review,
+product review, and acceptance review during development are now conducted
+internally by Drivyaansh and Codex unless Drivyaansh explicitly requests a
+separate outside opinion for learning.
 
 ## What Currently Works
 
-- Python `3.11.15` project environment installed in `.venv`
+- Python package metadata now allows Python `>=3.10`
 - Public Python API through `DataTrust`
 - Click-based CLI
+- Loopback-only Flask UI launched with `datatrust ui`
+- Guided upload, target selection, classification subtype confirmation, report
+  preview, HTML download, and browser print-to-PDF flow
+- Process-scoped temporary uploads with a configurable `100 MiB` default limit
 - CSV ingestion for classification datasets
 - Dataset profiling for:
   - shape and data types
@@ -24,6 +31,11 @@ Turn the working DataTrust prototype into a credible, useful reliability report 
   - numeric IQR outliers
   - separate target missingness and labeled-row counts
   - column-level severe missingness
+  - row-level feature missingness impact
+  - exact duplicate groups and feature-identical conflicting-label groups
+  - binary/multiclass/single-class subtype, majority baseline, and class ratio
+  - numeric quartiles, zeros, negatives, and non-finite values
+  - non-null and most-common-value shares
   - strong and review-only heuristic target leakage candidates with reasons
 - Transparent sub-scores:
   - completeness
@@ -33,54 +45,39 @@ Turn the working DataTrust prototype into a credible, useful reliability report 
   - leakage risk
 - Explained guardrails for strong leakage, missing target labels, severe
   missingness, severe duplicates, and critical sub-scores
-- Plain-language top-three risk summaries
-- Jinja-based HTML report with six V1 sections
+- Plain-language top-three risk summaries and complete prioritized findings
+- Jinja-based HTML report with eight sections, two print-safe evidence visuals,
+  and a technical appendix
 - Synthetic lending-style example dataset
 - Generated example report
-- Automated test suite
+- Automated test suite with profiler, report, CLI, and Flask UI coverage
 - Separate reproducible `validation/` workspace
 - Prepared semantic-column UCI German Credit, Bank Marketing, and Adult CSVs
-- Seven deterministic controlled Adult mutations
-- Ten generated six-section validation reports with runtime measurements
+- Eight deterministic controlled Adult mutations
+- Eleven generated eight-section validation reports with runtime measurements
 - Reviewed leakage ledger covering every validation-corpus leakage flag
 - Internal isolated Evidently OSS comparison on Adult
 - Validation artifact checksum and acceptance verifier
-- Separate `validation/dry_runs/` workspace with:
-  - uninvolved technical-reviewer quickstart
-  - sealed manual-first assessment template
-  - technical dry-run evidence form
-  - separate non-technical comprehension form
-  - facilitator non-assistance and anti-anchoring instructions
-  - objective pass/fail, pause, fix, and rerun rules
-  - frozen practitioner-round evidence template
-- Deterministic SHA-256 release-candidate creation and verification
-- Cross-platform reviewer instructions that select and reuse one installed
-  Python `>=3.11` command, with quoted paths and explicit environment executable
-  paths
-- Separate technical evidence for OS/version, selected Python command, exact
-  Python and pip versions, and post-install `pip freeze`
-- Dataset and generated-report SHA-256 identity recorded across both dry runs
-- Deterministic allowlist-only clean reviewer packet creation and verification
-- Active frozen dry-run candidate `DRY_RUN_RC_003`
-- Historical candidates `DRY_RUN_RC_001` and `DRY_RUN_RC_002` preserved as
-  immutable superseded records
+- Historical `validation/dry_runs/` workspace with RC_003 technical-review
+  materials, reviewer packet tooling, and release-candidate archive records
+- Historical candidates `DRY_RUN_RC_001`, `DRY_RUN_RC_002`, and
+  `DRY_RUN_RC_003` preserved as immutable records
+- `DRY_RUN_RC_003` reviewer packet archive and manifest preserved as historical
+  technical-review evidence
 
 ## Verified Commands
 
 Run tests:
 
 ```bash
-.venv/bin/python -m pytest -q
+PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=src .venv/bin/python -B -m pytest -q -p no:cacheprovider
 ```
 
 Latest verified result:
 
 ```text
-23 passed
+36 passed
 ```
-
-Both the project environment and isolated Evidently validation environment use
-Python `3.11.15`.
 
 Generate the sample report:
 
@@ -103,16 +100,42 @@ Generate the sample report:
 - `validation/dry_runs/release_candidates/DRY_RUN_RC_002.json`
 - `validation/dry_runs/release_candidates/DRY_RUN_RC_003.json`
 - `validation/dry_runs/packets/DRY_RUN_RC_003_REVIEWER_PACKET.zip`
+- `validation/dry_runs/evidence/`
 - `METHODOLOGY.md`
 - `docs/NUMEK_MASTER_CONTEXT.md`
 - `docs/AI_COLLABORATION_PROTOCOL.md`
+
+## RC_003 Technical Review Status
+
+RC_003 has completed its founder-accepted technical review and is now
+historical evidence, not an active gate.
+
+Returned reviewer evidence received on 2026-08-04 includes:
+
+- manual-first assessment text for dataset alias `spam.csv`
+- reviewer-recorded target column `Category`
+- reviewer-recorded independent risk band `Low`
+- reviewer note: data looked proper, with high class imbalance as the main issue
+- generated report file received locally as `spam_report (1).html`
+- additional generated report file received locally as `train (1).html`
+
+Important evidence caveat:
+
+- The returned form records `Reviewer ID: 123` and `Candidate ID: 123`.
+- It does not record the formal `DRY_RUN_RC_003` candidate ID.
+- Historical SHA-256 fields from the old form were left blank.
+- Therefore this evidence is preserved as a completed technical review record
+  accepted by Drivyaansh, not as a formal sealed protocol artifact.
+
+This caveat does not require another external technical review. The approved
+decision is to move forward with product building and internal verification.
 
 ## Current Limitations
 
 - Supports classification only
 - Supports CSV input only
-- No real-user validation yet
-- No benchmark proving findings match or exceed manual review
+- Local UI is single-user and non-persistent
+- Browser printing is the PDF path; no generated PDF or Word output
 - Leakage detection is heuristic
 - Leakage classifications still require domain review of feature availability
 - No label-noise detection
@@ -121,20 +144,18 @@ Generate the sample report:
 - No model calibration analysis
 - No JSON report output
 - No demo notebook
-- HTML report design is functional but not yet polished
-- No practitioner-owned CSV validation runs yet
-- No technical or non-technical dry run yet
-- Windows instructions are prepared but have not yet been exercised by a human
-  Windows reviewer
+- External product-validation questions remain unresolved, deferred, and
+  non-blocking
 
 ## Milestone 2 Evidence
 
-- UCI German Credit: `1,000 x 21`, report in `0.016305s`
-- UCI Bank Marketing: `45,211 x 17`, report in `0.087316s`
-- UCI Adult: `48,842 x 15`, report in `0.087798s`
-- All ten public and mutation reports contain all six V1 sections and complete
+- UCI German Credit: `1,000 x 21`, report in `0.034377s`
+- UCI Bank Marketing: `45,211 x 17`, report in `0.183144s`
+- UCI Adult: `48,842 x 15`, report in `0.183002s`
+- All eleven public and mutation reports contain all eight report sections and complete
   in under `30s`
-- All seven controlled mutation directional assertions pass
+- All eight controlled mutation assertions pass, including evidence-only
+  conflicting-label detection with unchanged uniqueness
 - Every leakage flag has a recorded reason and matching reviewed classification
 - The corpus exposed and justified one narrow runtime correction:
   `previous_campaign_outcome` is review-only rather than strong leakage
@@ -142,27 +163,11 @@ Generate the sample report:
   isolated Python `3.11.15` validation environment in `0.433635s` and remains
   internal supporting evidence only
 
-## Immediate Next Task
+## Historical Milestone 3 Evidence
 
-Conduct the two prepared Milestone 3 human dry runs against unchanged
-`DRY_RUN_RC_003` using only `DRY_RUN_RC_003_REVIEWER_PACKET.zip`:
-
-- verify the candidate and clean packet before and after each session
-- run one uninvolved technical install/run dry run without founder assistance
-- record selected Python `>=3.11` command, exact environment Python/pip
-  versions, and post-install `pip freeze` separately from private dataset
-  evidence
-- run one separate non-technical comprehension dry run with report only
-- confirm both sessions reference the same unchanged generated-report SHA-256
-- pause on any objective failure and make only the evidenced targeted fix
-- proceed toward practitioner validation only if both dry runs pass on one
-  unchanged candidate
-
-## Milestone 3 Preparation Evidence
-
-- Dry-run preparation verifier passes without executing human dry runs
-- Clean Python `3.11` quickstart installation and CLI report generation verified
-- Quickstart-generated report contains all six V1 sections
+- Dry-run preparation verifier passed without executing human dry runs
+- Clean Python quickstart installation and CLI report generation were verified
+- Quickstart-generated report contained all six V1 sections
 - `DRY_RUN_RC_001` is preserved unchanged as historical candidate record
   SHA-256 `9c7b8d7754557a1dc10694068e297d55c484ea374e40640bf1f111486faf0fe1`
 - `DRY_RUN_RC_002` is preserved unchanged as historical candidate record
@@ -171,21 +176,45 @@ Conduct the two prepared Milestone 3 human dry runs against unchanged
   `888cf3b30a82d44c11bb0bad0ddd5be94c5b4f5a97fcc2bc051533ff2b684b96`
 - Clean reviewer packet archive SHA-256:
   `ba23513ff44493384bf057cd6235018d7c9e4a41a4e63134f21e075936b042cc`
-- Packet verification confirms required files are present and prohibited
+- Packet verification confirmed required files were present and prohibited
   reports, validation results/comparisons, internal docs, previous evidence,
-  and virtual environments are absent
-- Deterministic packet recreation produces the same archive SHA-256
-- Clean packet installs and generates a report from paths containing spaces
+  and virtual environments were absent
+- Deterministic packet recreation produced the same archive SHA-256
+- Clean packet installed and generated a report from paths containing spaces
 - Selected-interpreter workflow verified with matching environment Python,
   exact pip version, and complete post-install `pip freeze`
-- Active candidate and packet verification pass after preparation
 - No profiling, scoring, risk, report-content, or runtime package behavior was
-  changed during preparation
-- No human dry-run outcome or practitioner evidence has been fabricated
+  changed during RC_003 preparation
+- RC_003 technical review is now completed and archived as historical evidence
+
+## Immediate Next Task
+
+Founder review of the implemented local UI and upgraded report.
+
+For future development, the normal acceptance loop is:
+
+1. Drivyaansh approves the objective.
+2. Codex updates the implementation or docs.
+3. Codex runs relevant tests and checks.
+4. Drivyaansh and Codex review the result internally.
+5. Living docs are updated when the verified project state changes.
+
+Do not schedule or require a five-practitioner external validation round before
+continuing product work.
 
 ## V1 Exit Gate
 
-DataTrust V1 passes only when every approved Run, Runtime, Structure and Claims,
-Finding Quality, Score Defensibility, and Shareability gate passes in one frozen
-practitioner validation round. A `3/5` reviewer result or any gate-level failure
-is a V1 failure that requires a fix and a new applicable validation round.
+DataTrust V1 passes when Drivyaansh accepts the current product state after
+Codex verifies:
+
+- the local UI, CLI, and Python API generate a complete HTML report from a CSV
+  classification dataset
+- the generated report contains all eight report sections
+- automated tests for implemented V1 behavior pass
+- public validation reports and controlled mutation checks remain reproducible
+  enough for internal confidence
+- unsupported claims are absent from product and docs
+- known limitations are documented clearly
+
+External technical review, external product review, and the former
+five-practitioner validation round are not V1 exit-gate requirements.

@@ -42,6 +42,22 @@ def build_mutations(base: pd.DataFrame) -> dict:
     constant["validation_constant"] = "constant"
     mutations["constant_field"] = constant
 
+    conflicting_labels = base.copy()
+    labels = list(conflicting_labels[MUTATION_TARGET].dropna().unique())
+    if len(labels) < 2:
+        raise ValueError("Conflicting-label mutation requires at least two target classes.")
+    feature_columns = [column for column in base.columns if column != MUTATION_TARGET]
+    source_indices = conflicting_labels.index[
+        conflicting_labels[MUTATION_TARGET] == labels[0]
+    ][:25]
+    destination_indices = conflicting_labels.index[
+        conflicting_labels[MUTATION_TARGET] == labels[1]
+    ][:25]
+    conflicting_labels.loc[destination_indices, feature_columns] = conflicting_labels.loc[
+        source_indices, feature_columns
+    ].to_numpy()
+    mutations["conflicting_labels"] = conflicting_labels
+
     return mutations
 
 

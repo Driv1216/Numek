@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>DataTrust Local Report Generator</title>
+  <style>
+    :root { color-scheme: light; --ink:#17202d; --muted:#5d6877; --line:#d8e0e9; --panel:#f5f7fa; --accent:#176b87; --bad:#b3261e; }
+    * { box-sizing: border-box; }
+    body { margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; color:var(--ink); background:#f3f6f9; line-height:1.5; }
+    main { max-width:1100px; margin:0 auto; padding:32px 24px 56px; }
+    header { display:flex; justify-content:space-between; align-items:baseline; margin-bottom:24px; }
+    h1 { font-size:27px; margin:0; } h2 { margin:0 0 8px; font-size:22px; } h3 { margin:20px 0 8px; }
+    p { margin:0 0 10px; } a { color:var(--accent); }
+    .muted { color:var(--muted); font-size:14px; }
+    .panel { background:#fff; border:1px solid var(--line); border-radius:12px; padding:24px; box-shadow:0 8px 30px rgba(32,50,70,.06); }
+    .steps { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:18px; }
+    .step { padding:5px 10px; border-radius:999px; background:#e6ebf0; color:var(--muted); font-size:12px; font-weight:700; }
+    .step.active { background:var(--accent); color:#fff; }
+    label { display:block; font-weight:680; margin:16px 0 6px; }
+    input[type=file], input[type=text], select, textarea { width:100%; border:1px solid #bfc9d5; border-radius:7px; padding:11px; font:inherit; background:#fff; }
+    textarea { min-height:90px; resize:vertical; }
+    .drop { border:2px dashed #9fb0bf; background:var(--panel); border-radius:10px; padding:28px; text-align:center; }
+    button, .button { display:inline-block; border:0; border-radius:7px; padding:10px 16px; background:var(--accent); color:#fff; font:inherit; font-weight:700; text-decoration:none; cursor:pointer; }
+    .button.secondary, button.secondary { background:#e7edf2; color:var(--ink); }
+    .actions { display:flex; gap:10px; flex-wrap:wrap; margin-top:20px; align-items:center; }
+    .grid { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:10px; margin:16px 0; }
+    .card { border:1px solid var(--line); border-radius:8px; padding:12px; background:#fff; }
+    .metric { font-size:22px; font-weight:760; overflow-wrap:anywhere; }
+    .label { text-transform:uppercase; letter-spacing:.03em; color:var(--muted); font-size:11px; }
+    .table-wrap { overflow:auto; max-height:360px; border:1px solid var(--line); border-radius:8px; }
+    table { border-collapse:collapse; min-width:100%; font-size:13px; }
+    th,td { padding:8px; text-align:left; border-bottom:1px solid var(--line); white-space:nowrap; }
+    th { position:sticky; top:0; background:var(--panel); }
+    .flash { padding:12px 14px; margin-bottom:14px; border-radius:8px; background:#fff0ef; border:1px solid #efbbb7; color:var(--bad); }
+    .confirm { background:#eaf5f8; border:1px solid #c6e1e8; padding:14px; border-radius:8px; }
+    iframe { width:100%; height:72vh; border:1px solid var(--line); border-radius:8px; background:#fff; }
+    form.inline { display:inline; }
+    @media(max-width:760px){ .grid{grid-template-columns:1fr 1fr} main{padding:22px 14px 40px} .panel{padding:18px} }
+  </style>
+</head>
+<body>
+<main>
+  <header><h1>DataTrust</h1><span class="muted">Local classification dataset review</span></header>
+  {% with messages = get_flashed_messages(with_categories=true) %}{% for category, message in messages %}<div class="flash" role="alert">{{ message }}</div>{% endfor %}{% endwith %}
+
+  {% if stage not in ["result", "error"] %}
+  <div class="steps" aria-label="Report generation progress">
+    <span class="step {{ 'active' if stage == 'upload' else '' }}">1 · Upload</span>
+    <span class="step {{ 'active' if stage == 'configure' else '' }}">2 · Configure</span>
+    <span class="step {{ 'active' if stage == 'confirm' else '' }}">3 · Confirm</span>
+    <span class="step">4 · Report</span>
+  </div>
+  {% endif %}
+
+  {% if stage == "upload" %}
+  <section class="panel">
+    <h2>Generate a reliability report</h2>
+    <p class="muted">Your CSV is processed by this local application and is not sent to DataTrust or a cloud service.</p>
+    <form method="post" action="{{ url_for('upload') }}" enctype="multipart/form-data">
+      <input type="hidden" name="form_token" value="{{ form_token }}">
+      <div class="drop">
+        <label for="dataset">Choose one comma-delimited CSV</label>
+        <input id="dataset" name="dataset" type="file" accept=".csv,text/csv" required>
+        <p class="muted">Header required · Maximum {{ max_upload_mib }} MiB · Classification only</p>
+      </div>
+      <div class="actions"><button type="submit">Inspect dataset</button></div>
+    </form>
+  </section>
+
+  {% elif stage == "configure" %}
+  <section class="panel">
+    <h2>Configure the analysis</h2>
+    <div class="grid">
+      <div class="card"><div class="label">File</div><div class="metric">{{ job.source_filename }}</div></div>
+      <div class="card"><div class="label">Size</div><div class="metric">{{ "%.2f"|format(job.file_size / 1048576) }} MiB</div></div>
+      <div class="card"><div class="label">Rows</div><div class="metric">{{ job.inspection.row_count }}</div></div>
+      <div class="card"><div class="label">Columns</div><div class="metric">{{ job.inspection.column_count }}</div></div>
+    </div>
+    <h3>First 10 rows</h3>
+    <div class="table-wrap"><table><thead><tr>{% for column in job.inspection.columns %}<th>{{ column }}</th>{% endfor %}</tr></thead><tbody>{% for row in job.inspection.preview %}<tr>{% for column in job.inspection.columns %}<td>{{ row[column] }}</td>{% endfor %}</tr>{% endfor %}</tbody></table></div>
+    <form method="post">
+      <input type="hidden" name="form_token" value="{{ form_token }}">
+      <label for="target">Target column</label>
+      <select id="target" name="target" required><option value="">Choose the value you want to predict</option>{% for column in job.inspection.columns %}<option value="{{ column }}">{{ column }}</option>{% endfor %}</select>
+      <label for="dataset_name">Dataset/report name <span class="muted">(optional, 120 characters)</span></label>
+      <input id="dataset_name" name="dataset_name" type="text" maxlength="120" placeholder="Defaults to the filename">
+      <label for="purpose">Purpose <span class="muted">(optional, 1,000 characters)</span></label>
+      <textarea id="purpose" name="purpose" maxlength="1000" placeholder="What prediction or decision will this dataset support?"></textarea>
+      <div class="actions"><button type="submit">Review selection</button><a class="button secondary" href="{{ url_for('index') }}">Back</a></div>
+    </form>
+  </section>
+
+  {% elif stage == "confirm" %}
+  <section class="panel">
+    <h2>Confirm the analysis</h2>
+    <div class="confirm"><strong>Detected {{ job.target_info.classification_subtype }} classification</strong><br><span class="muted">Based on {{ job.target_info.class_count }} observed target class(es). Missing labels are excluded.</span></div>
+    <div class="grid">
+      <div class="card"><div class="label">Dataset</div><div class="metric">{{ job.dataset_name or job.source_filename }}</div></div>
+      <div class="card"><div class="label">Target</div><div class="metric">{{ job.target }}</div></div>
+      <div class="card"><div class="label">Labeled rows</div><div class="metric">{{ job.target_info.labeled_row_count }}</div></div>
+      <div class="card"><div class="label">Missing labels</div><div class="metric">{{ job.target_info.target_missing_count }}</div></div>
+    </div>
+    <div class="table-wrap"><table><thead><tr><th>Target class</th><th>Rows</th><th>Percentage</th></tr></thead><tbody>{% for item in job.target_info.target_distribution %}<tr><td>{{ item.label }}</td><td>{{ item.count }}</td><td>{{ item.percentage }}%</td></tr>{% endfor %}</tbody></table></div>
+    <form method="post" action="{{ url_for('generate') }}"><input type="hidden" name="form_token" value="{{ form_token }}"><div class="actions"><button type="submit">Generate reliability report</button><a class="button secondary" href="{{ url_for('configure') }}">Change selection</a></div></form>
+  </section>
+
+  {% elif stage == "result" %}
+  <section class="panel">
+    <h2>Report ready</h2>
+    <p class="muted">The HTML below is the canonical report. Browser printing provides the Save-as-PDF path.</p>
+    <div class="actions">
+      <a class="button" href="{{ url_for('report') }}" target="_blank" rel="noopener">View report</a>
+      <a class="button secondary" href="{{ url_for('download') }}">Download HTML</a>
+      <button class="secondary" type="button" onclick="document.getElementById('report-frame').contentWindow.focus(); document.getElementById('report-frame').contentWindow.print();">Print / Save as PDF</button>
+      <form class="inline" method="post" action="{{ url_for('new_analysis') }}"><input type="hidden" name="form_token" value="{{ form_token }}"><button class="secondary" type="submit">New analysis</button></form>
+    </div>
+    <iframe id="report-frame" title="Generated DataTrust reliability report" src="{{ url_for('report') }}"></iframe>
+  </section>
+
+  {% else %}
+  <section class="panel"><h2>Unable to continue</h2><p>{{ error_message }}</p><div class="actions"><a class="button" href="{{ url_for('index') }}">Start again</a></div></section>
+  {% endif %}
+</main>
+</body>
+</html>

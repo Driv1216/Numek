@@ -9,9 +9,10 @@ setup(
     package_dir={"": "src"},
     package_data={"datatrust": ["templates/*.html"]},
     include_package_data=True,
-    python_requires=">=3.11",
+    python_requires=">=3.10",
     install_requires=[
         "click>=8.0",
+        "flask>=3.0",
         "jinja2>=3.0",
         "pandas>=1.5",
     ],

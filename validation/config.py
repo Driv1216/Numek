@@ -30,11 +30,13 @@ MUTATION_TARGET = "annual_income_over_50k"
 
 REPORT_SECTIONS = [
     "1. Executive Summary",
-    "2. Dataset Health",
-    "3. Target &amp; Label Quality",
-    "4. Feature Risk",
-    "5. Methodology &amp; Limitations",
-    "6. Appendix",
+    "2. Prioritized Action Plan",
+    "3. Dataset Overview",
+    "4. Missingness Evidence",
+    "5. Target and Label Evidence",
+    "6. Duplicate and Feature Evidence",
+    "7. Scoring, Methodology, and Limitations",
+    "8. Technical Appendix",
 ]
 
 

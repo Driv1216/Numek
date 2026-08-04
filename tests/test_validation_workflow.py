@@ -36,3 +36,11 @@ def test_controlled_mutations_have_expected_structural_effects():
     assert "employment_status" in mutations["review_only_leakage"]
     assert mutations["missing_targets"]["annual_income_over_50k"].isna().any()
     assert mutations["constant_field"]["validation_constant"].nunique() == 1
+    conflict_features = [
+        column for column in mutations["conflicting_labels"].columns
+        if column != "annual_income_over_50k"
+    ]
+    conflict_counts = mutations["conflicting_labels"].groupby(
+        conflict_features, dropna=False
+    )["annual_income_over_50k"].nunique()
+    assert (conflict_counts > 1).any()

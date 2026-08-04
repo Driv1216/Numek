@@ -21,7 +21,7 @@ archive names, and pinned checksums live in `sources.json`.
 From the repository root:
 
 ```bash
-/opt/homebrew/bin/python3.11 -m venv .venv
+/opt/homebrew/bin/python3.10 -m venv .venv
 .venv/bin/python -m pip install --upgrade pip setuptools wheel
 .venv/bin/python -m pip install --no-build-isolation -e ".[dev]"
 .venv/bin/python -m validation.prepare --download
@@ -40,7 +40,7 @@ can run offline and validates the pinned archive checksums:
 
 - `data/prepared/`: semantic-column public validation CSVs and manifest
 - `data/mutations/`: controlled Adult mutations and manifest
-- `reports/`: complete six-section DataTrust HTML reports
+- `reports/`: complete eight-section DataTrust HTML reports
 - `results/runtime_measurements.csv`: report-generation timings
 - `results/mutation_assertions.json`: expected directional behavior
 - `results/leakage_review.csv`: every leakage flag, reason, and reviewed classification
@@ -48,31 +48,31 @@ can run offline and validates the pinned archive checksums:
 
 ## Isolated Evidently Comparison
 
-The project and validation environments use Python 3.11. Evidently is pinned in
+The project and validation environments use Python 3.10 or newer. Evidently is pinned in
 its own environment and is never added to DataTrust runtime dependencies.
 
 ```bash
-/opt/homebrew/bin/python3.11 -m venv validation/.venv-evidently
+/opt/homebrew/bin/python3.10 -m venv validation/.venv-evidently
 validation/.venv-evidently/bin/python -m pip install --upgrade pip
 validation/.venv-evidently/bin/python -m pip install -r validation/requirements-evidently.txt
 validation/.venv-evidently/bin/python validation/evidently_compare.py
 .venv/bin/python -m validation.verify
 ```
 
-The comparison is internal supporting evidence only. It is not a V1 pass gate
-and must not influence blinded practitioner reviews.
+The comparison is internal supporting evidence only. It is not a V1 pass gate.
 
-## Milestone 3 Dry-Run Preparation
+## Historical Milestone 3 / RC_003 Review Materials
 
-The separate `dry_runs/` workspace contains the cross-platform uninvolved
-technical-reviewer quickstart, sealed manual-first template, technical and
-non-technical evidence forms with dataset/report SHA-256 identity, facilitator
-protocol, objective pass/fail rules, practitioner evidence template,
+The separate `dry_runs/` workspace contains the historical RC_003 technical
+review materials: cross-platform reviewer quickstart, manual-first
+template, technical and non-technical evidence forms, facilitator protocol,
+objective pass/fail rules, superseded practitioner evidence template,
 allowlist-only clean reviewer packet tooling, and deterministic
 release-candidate identification tooling.
 
-Create and verify a clean reviewer packet, then freeze its candidate only after
-the code and protocol are ready:
+RC_003 and its packet are preserved as historical evidence. These commands show
+how the candidate was originally produced; they are not active V1 blockers or
+future review requirements:
 
 ```bash
 .venv/bin/python -m validation.dry_runs.reviewer_packet create \
@@ -83,11 +83,11 @@ the code and protocol are ready:
 .venv/bin/python -m validation.dry_runs.verify
 ```
 
-Preparation verification does not run or simulate either required human dry
-run. Completed evidence belongs under `dry_runs/evidence/` and must never
-contain practitioner-owned data or private generated reports.
+Archive verification does not run or simulate human reviews. Completed or
+returned evidence belongs under `dry_runs/evidence/` and must never contain
+private datasets, private row values, or sensitive screenshots.
 
-The reviewer receives only the verified clean packet, never the full working
-repository. The packet excludes existing reports, validation results and
-comparisons, internal project docs, previous evidence, and virtual
-environments.
+The old reviewer packet excluded existing reports, validation results and
+comparisons, internal project docs, previous evidence, tests, examples, and
+virtual environments. Future product development is reviewed internally by
+Drivyaansh and Codex unless Drivyaansh separately requests outside feedback.

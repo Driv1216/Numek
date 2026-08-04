@@ -24,6 +24,29 @@ Missing target labels are tracked separately, excluded from class counts and
 class percentages, and surfaced as a target-label risk. A dataset with no rows
 or no usable target labels is rejected with a clear error.
 
+## Evidence-Only Diagnostics
+
+The report also shows evidence that is deliberately not added to the score:
+
+- the percentage of rows containing missing feature values, with one, two, and
+  three-or-more missing-feature buckets
+- exact duplicate-group counts and largest group size
+- feature-identical groups containing multiple non-missing target labels
+- classification subtype, majority-class baseline, and
+  majority-to-minority ratio
+- per-column non-null and most-common-value shares
+- numeric quartiles, zero and negative rates, and non-finite counts
+
+Feature-identical rows with different labels are review prompts, not automatic
+proof of labeling errors: they may represent repeated entities, time changes,
+or missing distinguishing context. Widespread row-level missingness is also a
+review finding when cell-level averages would otherwise hide its reach. Neither
+finding changes a score or guardrail.
+
+`DataTrust.analyze()` retains its existing `profile`, `scores`, and top-three
+`risks` values and adds the complete ordered `findings` list and sanitized
+report `context`.
+
 The overall reliability score starts with the average sub-score, then applies
 guardrails for high-stakes failure modes. Applied guardrails are returned in
 `scores["guardrails"]` and shown in the HTML report with their explanation and
@@ -53,6 +76,13 @@ Overall risk is derived from the guardrailed score:
 - Leakage detection is token/phrase-aware but remains heuristic in V1. Strong
   and review-only classifications should both be reviewed by a human who knows
   when each field becomes available.
+- The local browser UI accepts comma-delimited CSVs with headers, keeps files
+  only for the running process, and uses a configurable `100 MiB` default file
+  limit. The in-memory pandas representation may be larger than the CSV.
+- PDF output depends on the browser's print/save capability. DataTrust does not
+  generate a separate PDF or Word document.
+- Semantic date checks, fuzzy category matching, missingness-pattern mining,
+  feature-correlation analysis, and automated cleaning are not implemented.
 
 ## Adjacent Tools
 

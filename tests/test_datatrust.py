@@ -105,7 +105,7 @@ def test_python_api_generates_report(tmp_path):
     assert result == str(output)
     html = output.read_text(encoding="utf-8")
     assert "1. Executive Summary" in html
-    assert "6. Appendix" in html
+    assert "8. Technical Appendix" in html
 
 
 def test_cli_generates_html_file(tmp_path):
@@ -301,3 +301,144 @@ def test_single_class_target_has_matching_finding_and_high_risk(tmp_path):
     assert result["risks"][0]["severity"] == "High"
     assert result["scores"]["risk_level"] == "High"
     assert any(item["code"] == "single_target_class" for item in result["scores"]["guardrails"])
+
+
+def test_multiclass_subtype_baseline_and_ratio_are_reported(tmp_path):
+    path = tmp_path / "multiclass.csv"
+    pd.DataFrame(
+        {"feature": range(10), "label": ["a"] * 5 + ["b"] * 3 + ["c"] * 2}
+    ).to_csv(path, index=False)
+
+    profile = profile_dataset(path, target="label", task="classification")
+
+    assert profile["classification_subtype"] == "multiclass"
+    assert profile["majority_class_baseline"] == 50.0
+    assert profile["majority_to_minority_ratio"] == 2.5
+
+
+def test_row_missingness_excludes_target_and_uses_buckets(tmp_path):
+    path = tmp_path / "row-missingness.csv"
+    pd.DataFrame(
+        {
+            "a": [1, None, None, None],
+            "b": [1, 2, None, None],
+            "c": [1, 2, 3, None],
+            "label": [0, None, 1, 0],
+        }
+    ).to_csv(path, index=False)
+
+    profile = profile_dataset(path, target="label", task="classification")
+
+    assert profile["missing_feature_row_count"] == 3
+    assert profile["missing_feature_row_rate"] == 75.0
+    assert profile["rows_with_1_missing_feature"] == 1
+    assert profile["rows_with_2_missing_features"] == 1
+    assert profile["rows_with_3_plus_missing_features"] == 1
+
+
+def test_duplicate_groups_and_conflicting_labels_are_separate(tmp_path):
+    path = tmp_path / "duplicate-evidence.csv"
+    pd.DataFrame(
+        {
+            "feature": [1, 1, 2, 2, 3],
+            "segment": ["a", "a", "b", "b", "c"],
+            "label": [0, 0, 0, 1, 1],
+        }
+    ).to_csv(path, index=False)
+
+    result = DataTrust(str(path), target="label").analyze()
+    profile = result["profile"]
+
+    assert profile["duplicate_rows"] == 1
+    assert profile["duplicate_group_count"] == 1
+    assert profile["largest_duplicate_group_size"] == 2
+    assert profile["conflicting_label_group_count"] == 1
+    assert profile["conflicting_label_row_count"] == 2
+    conflict = next(item for item in result["findings"] if item["code"] == "conflicting_target_labels")
+    assert conflict["severity"] == "Moderate"
+    assert "does not change" in conflict["score_effect"]
+
+
+def test_numeric_summary_handles_non_finite_values(tmp_path):
+    path = tmp_path / "numeric.csv"
+    pd.DataFrame(
+        {"amount": [-2.0, 0.0, 2.0, float("inf"), float("-inf")], "label": [0, 1, 0, 1, 0]}
+    ).to_csv(path, index=False)
+
+    profile = profile_dataset(path, target="label", task="classification")
+    amount = next(column for column in profile["columns"] if column["name"] == "amount")
+
+    assert amount["numeric_summary"]["min"] == -2.0
+    assert amount["numeric_summary"]["median"] == 0.0
+    assert amount["numeric_summary"]["max"] == 2.0
+    assert amount["numeric_summary"]["zero_count"] == 1
+    assert amount["numeric_summary"]["negative_count"] == 1
+    assert amount["numeric_summary"]["non_finite_count"] == 2
+
+
+def test_zero_feature_profile_retains_clear_evidence(tmp_path):
+    path = tmp_path / "target-only.csv"
+    pd.DataFrame({"label": [0, 1, 0, 1]}).to_csv(path, index=False)
+
+    result = DataTrust(str(path), target="label").analyze()
+
+    assert result["profile"]["feature_count"] == 0
+    assert result["profile"]["missing_feature_row_rate"] == 0.0
+    assert any(item["code"] == "no_feature_columns" for item in result["findings"])
+
+
+def test_all_findings_are_exposed_while_risks_stay_top_three(tmp_path):
+    path = make_csv(tmp_path)
+    result = DataTrust(str(path), target="default").analyze()
+
+    assert len(result["risks"]) <= 3
+    assert result["risks"] == result["findings"][:3]
+    assert all(
+        {"code", "evidence", "modeling_impact", "score_effect"}.issubset(item)
+        for item in result["findings"]
+    )
+
+
+def test_new_evidence_keeps_existing_example_scores_stable():
+    result = DataTrust("examples/loan_data.csv", target="default").analyze()
+
+    assert result["scores"]["sub_scores"] == {
+        "completeness": 99.0,
+        "uniqueness": 100.0,
+        "target_balance": 90.0,
+        "feature_usability": 98.67,
+        "leakage_risk": 60.0,
+    }
+    assert result["scores"]["overall"] == 49.0
+
+
+def test_report_has_eight_sections_visuals_print_styles_and_escaped_context(tmp_path):
+    path = make_csv(tmp_path)
+    output = tmp_path / "report.html"
+
+    DataTrust(
+        str(path),
+        target="default",
+        dataset_name="<script>alert(1)</script>",
+        purpose="Review <b>loan</b> readiness",
+    ).generate_report(str(output))
+    html = output.read_text(encoding="utf-8")
+
+    for heading in (
+        "1. Executive Summary",
+        "2. Prioritized Action Plan",
+        "3. Dataset Overview",
+        "4. Missingness Evidence",
+        "5. Target and Label Evidence",
+        "6. Duplicate and Feature Evidence",
+        "7. Scoring, Methodology, and Limitations",
+        "8. Technical Appendix",
+    ):
+        assert heading in html
+    assert "aria-label=\"Horizontal bars showing target class distribution\"" in html
+    assert "aria-label=\"Horizontal bars showing missing percentage by feature\"" in html
+    assert "@media print" in html
+    assert "<script>alert(1)</script>" not in html
+    assert "&lt;script&gt;alert(1)&lt;/script&gt;" in html
+    assert "Review &lt;b&gt;loan&lt;/b&gt; readiness" in html
+    assert str(tmp_path) not in html

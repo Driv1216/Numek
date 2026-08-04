@@ -30,8 +30,11 @@ def verify_manifest(manifest_path: Path, entries_key: str) -> None:
 
 def verify_reports() -> None:
     reports = sorted(REPORT_ROOT.glob("*.html"))
-    if len(reports) != 10:
-        raise AssertionError(f"Expected 10 DataTrust reports, found {len(reports)}.")
+    expected_count = 3 + len(list(MUTATION_ROOT.glob("*.csv")))
+    if len(reports) != expected_count:
+        raise AssertionError(
+            f"Expected {expected_count} DataTrust reports, found {len(reports)}."
+        )
     for report in reports:
         html = report.read_text(encoding="utf-8")
         missing = [section for section in REPORT_SECTIONS if section not in html]
@@ -46,7 +49,10 @@ def verify_results() -> None:
 
     with (RESULT_ROOT / "runtime_measurements.csv").open(encoding="utf-8") as handle:
         timings = list(csv.DictReader(handle))
-    if len(timings) != 10 or not all(row["under_30s"] == "True" for row in timings):
+    expected_count = 3 + len(list(MUTATION_ROOT.glob("*.csv")))
+    if len(timings) != expected_count or not all(
+        row["under_30s"] == "True" for row in timings
+    ):
         raise AssertionError("Runtime measurements are incomplete or exceed the 30s gate.")
 
     with (RESULT_ROOT / "leakage_review.csv").open(encoding="utf-8") as handle:
