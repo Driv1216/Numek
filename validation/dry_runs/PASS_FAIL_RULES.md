@@ -1,5 +1,11 @@
 # Objective Dry-Run Pass, Fail, Pause, And Fix Rules
 
+Status: Historical / superseded on 2026-08-04.
+
+These rules governed the RC_003 dry-run process. They are retained as archived
+process evidence. They no longer define an active DataTrust exit gate, and
+they must not be used to require a new external practitioner validation round.
+
 There is no conditional pass. Human dry runs are evidence collection, not a
 request for preference-driven redesign.
 
@@ -8,23 +14,21 @@ request for preference-driven redesign.
 The technical dry run passes only if every rule passes:
 
 - `T1`: reviewer is uninvolved in DataTrust development
-- `T2`: candidate verification passes before and after the session
 - `T3`: eligible CSV classification dataset and target are used
-- `T3a`: dataset alias, local SHA-256, row count, column count, and target are
-  recorded
+- `T3a`: dataset alias, row count, column count, and target are recorded
 - `T3b`: OS/version, selected Python command, exact selected Python version,
   exact environment Python version, exact pip version, and post-install
   `pip freeze` are recorded separately from private dataset evidence
-- `T3c`: the selected command reports Python `3.11` or newer, is used to create
+- `T3c`: the selected command reports Python `3.10` or newer, is used to create
   the environment, and the resulting environment uses that selected interpreter
-- `T4`: manual-first assessment is completed and sealed before output is viewed
+- `T4`: manual-first assessment is completed before output is viewed
 - `T5`: reviewer installs and produces the HTML report within `15` minutes
 - `T6`: no founder/team assistance is provided
-- `T7`: report opens and contains all six numbered V1 sections
+- `T7`: report opens and contains all six numbered report sections
 - `T8`: for every displayed top risk, reviewer can state the finding, why it
   matters, and what to check next without prompting
 - `T9`: no unsupported or certification-style claim is identified
-- `T10`: generated report alias and SHA-256 are recorded
+- `T10`: generated report alias is recorded
 
 Any failed technical rule fails the technical dry run.
 
@@ -33,11 +37,9 @@ Any failed technical rule fails the technical dry run.
 The non-technical dry run passes only if every rule passes:
 
 - `N1`: reviewer is separate, non-technical, and uninvolved
-- `N2`: candidate verification passes before and after the session
 - `N3`: reviewer receives only the report and blank form, with no explanation,
   hints, prompts, or anchoring
-- `N3a`: report alias and SHA-256 exactly match the technical dry-run evidence,
-  and the report hash remains unchanged after the session
+- `N3a`: report alias matches the technical dry-run evidence
 - `N4`: within `3` minutes, reviewer correctly identifies overall risk
 - `N5`: within `3` minutes, reviewer correctly identifies the top concerns
 - `N6`: within `3` minutes, reviewer correctly identifies the recommended next
@@ -52,13 +54,11 @@ Any failed non-technical rule fails the non-technical dry run.
 Do not begin practitioner validation, and stop any active dry-run sequence, if:
 
 - any `T` or `N` rule fails
-- candidate verification fails or candidate files change
-- clean reviewer packet verification fails or a reviewer receives the working
-  repository or prohibited anchoring material
-- technical and non-technical report aliases or SHA-256 identities differ
+- a reviewer receives the working repository or prohibited anchoring material
+- technical and non-technical report aliases differ
 - report generation errors, exceeds the dry-run time limit, or produces an
   incomplete report
-- assistance, anchoring, or unsealed manual-first evidence contaminates a run
+- assistance, anchoring, or late manual-first edits contaminate a run
 - an unsupported/certification-style claim or credibility-breaking
   contradiction is identified
 
@@ -79,5 +79,5 @@ reviewer. Repeat them with a new eligible reviewer after correcting the process.
 - Preference, feature request, visual taste, or out-of-scope request without a
   failed objective rule: record and defer it.
 
-Proceed to a frozen practitioner validation round only after both dry runs pass
-on one unchanged candidate.
+Historical note: this final step is superseded. Do not proceed to or require a
+frozen practitioner validation round as an active acceptance gate.

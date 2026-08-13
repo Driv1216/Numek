@@ -1,8 +1,10 @@
 # Numek Known Unknowns
 
-Last updated: 2026-06-14
+Last updated: 2026-08-13
 
-These questions require evidence, not more confident opinions.
+These questions require evidence, not more confident opinions. None of these
+questions determines the next product direction or blocks use of the completed
+DataTrust baseline.
 
 ## Do ML Leads Find The Reliability Report Useful?
 
@@ -13,13 +15,14 @@ Why it matters:
 If the report does not fit a real workflow, DataTrust is only an interesting profiler.
 
 Resolution method:
-Have ML/data practitioners run or review DataTrust and explain what they would use, ignore, remove, or forward.
+Collect reactions from ML/data practitioners, target users, advisors, or early
+customers when such conversations naturally happen.
 
 Evidence required:
-At least five detailed reactions, including at least one run on a dataset not created by Numek.
+Detailed reactions about what they would use, ignore, remove, trust, or forward.
 
 Status:
-Unresolved
+Deferred and non-blocking
 
 ## Is Local-First A Selling Point Or Friction?
 
@@ -27,16 +30,20 @@ Current belief:
 Local-first reduces sensitive-data objections, especially in regulated or high-stakes domains.
 
 Why it matters:
-The CLI and local environment setup may create onboarding friction.
+Python installation and local environment setup may still create onboarding
+friction even though the guided browser UI removes most command-line report
+configuration.
 
 Resolution method:
-Compare preferences for CLI, notebook, Docker, local web app, customer-cloud, and hosted upload.
+Observe whether users can install DataTrust, start `datatrust ui`, and complete
+the guided flow; compare that experience with preferences for a notebook,
+Docker, customer-cloud, or hosted upload.
 
 Evidence required:
-Workflow preferences and reasons from at least five target users.
+Workflow preferences and reasons from target users or technical buyers.
 
 Status:
-Unresolved
+Deferred and non-blocking
 
 ## Is The Leakage Heuristic Accurate Enough?
 
@@ -47,13 +54,13 @@ Why it matters:
 Incorrect high-risk leakage warnings can destroy trust in the report.
 
 Resolution method:
-Run DataTrust on multiple public datasets and have flagged columns reviewed by humans.
+Run DataTrust on multiple public or real-world-style datasets and review flagged columns manually.
 
 Evidence required:
 A benchmark containing flagged columns, reviewer judgments, and reasons.
 
 Status:
-Unresolved
+Deferred and non-blocking
 
 ## Do The Scoring Weights And Guardrails Feel Defensible?
 
@@ -61,16 +68,16 @@ Current belief:
 Transparent scoring and leakage guardrails are directionally correct, but current weights are not externally validated.
 
 Why it matters:
-The score is a prominent product output and must align with expert judgment.
+The score is a prominent product output and must align with expert judgment over time.
 
 Resolution method:
-Compare DataTrust scores against human risk assessments and adjacent tools.
+Compare DataTrust scores against internal judgment, public examples, future user feedback, and adjacent tools.
 
 Evidence required:
-At least ten reviewed reports or a smaller benchmark with strong expert review.
+Reviewed reports or report examples showing where the score feels right, too harsh, or too lenient.
 
 Status:
-Unresolved
+Deferred and non-blocking
 
 ## Is Lending-Tech The Best First Customer Segment?
 
@@ -87,24 +94,27 @@ Evidence required:
 Concrete willingness to run the tool and share the report internally.
 
 Status:
-Unresolved
+Deferred and non-blocking
 
-## Is HTML Sufficient Before PDF?
+## Resolved: Native PDF Is Required In The Browser UI
 
-Current belief:
-HTML is sufficient for V1 iteration.
+Decision:
+The local browser UI provides a direct native PDF download generated from the
+canonical HTML report. Browser print/save is no longer the product PDF path.
 
 Why it matters:
-Some stakeholders may require PDF for review or evidence workflows.
+The founder/co-founder product direction calls for a small UI overview and a
+downloadable full PDF report.
 
 Resolution method:
-Ask report reviewers how they would share and archive the report.
+Observe whether the generated PDF fits real sharing and archival workflows.
 
 Evidence required:
-Multiple explicit requests for PDF before changing the V1 requirement.
+Feedback about PDF readability, fidelity, file size, and forwarding behavior.
 
 Status:
-Unresolved
+Resolved for implementation on 2026-08-11; downstream workflow quality remains
+an evidence question, not a product-scope blocker.
 
 ## Should Numek Open-Source The Core?
 
@@ -122,4 +132,3 @@ A deliberate founder decision informed by credible examples and Numek's likely r
 
 Status:
 Unresolved
-

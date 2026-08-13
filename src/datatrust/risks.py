@@ -1,5 +1,7 @@
 from typing import List
 
+from datatrust.wording import agree, be_verb, count_phrase, have_verb
+
 
 def build_findings(profile: dict, scores: dict) -> List[dict]:
     """Build every supported finding in stable priority order."""
@@ -14,7 +16,7 @@ def build_findings(profile: dict, scores: dict) -> List[dict]:
                     "possible_target_leakage",
                     "Possible target leakage",
                     f"Strong outcome-like column names such as {names} may expose information unavailable at prediction time.",
-                    f"{len(profile['strong_leakage_candidates'])} strong name-based candidate(s): {names}.",
+                    f"{count_phrase(len(profile['strong_leakage_candidates']), 'strong name-based candidate')}: {names}.",
                     "Validation performance may look much better than real deployment performance.",
                     "Confirm when each flagged value becomes available and exclude post-outcome fields before training or validation.",
                     "High",
@@ -30,12 +32,12 @@ def build_findings(profile: dict, scores: dict) -> List[dict]:
                 _risk(
                     "missing_target_labels",
                     "Missing target labels",
-                    f"{profile['target_missing_count']} row(s) ({profile['target_missing_rate']}%) have no target label and were excluded from class calculations.",
+                    f"{count_phrase(profile['target_missing_count'], 'row').capitalize()} ({profile['target_missing_rate']}%) {have_verb(profile['target_missing_count'])} no target label and {be_verb(profile['target_missing_count'], past=True)} excluded from class calculations.",
                     f"{profile['labeled_row_count']} of {profile['row_count']} rows have usable labels.",
                     "Training or evaluation may use fewer examples than the dataset row count suggests.",
                     "Resolve, exclude, or separately account for unlabeled rows before model training and evaluation.",
                     severity_from_rate(profile["target_missing_rate"], 0.01, 10),
-                    "Applies the existing missing-target-label guardrail; target rows remain separate from completeness scoring.",
+                    "Applies the missing-target-label guardrail; target rows remain separate from completeness scoring.",
                 ),
             )
         )
@@ -64,8 +66,8 @@ def build_findings(profile: dict, scores: dict) -> List[dict]:
                 _risk(
                     "conflicting_target_labels",
                     "Potentially conflicting target labels",
-                    f"{profile['conflicting_label_group_count']} feature-identical group(s) contain more than one non-missing target label.",
-                    f"{profile['conflicting_label_row_count']} labeled row(s) are included in these groups.",
+                    f"{count_phrase(profile['conflicting_label_group_count'], 'feature-identical group').capitalize()} {agree(profile['conflicting_label_group_count'], 'contains', 'contain')} more than one non-missing target label.",
+                    f"{count_phrase(profile['conflicting_label_row_count'], 'labeled row').capitalize()} {be_verb(profile['conflicting_label_row_count'])} included in these groups.",
                     "Inconsistent labels for identical recorded features can introduce irreducible ambiguity or reveal missing time/entity context.",
                     "Review whether these are label errors, repeated entities over time, target updates, or omitted distinguishing features.",
                     "Moderate",
@@ -85,7 +87,7 @@ def build_findings(profile: dict, scores: dict) -> List[dict]:
                     "severe_feature_missingness",
                     "Severe feature missingness",
                     f"Feature columns with at least 50% missing values include: {names}.",
-                    f"{profile['missing_feature_row_count']} row(s) ({profile['missing_feature_row_rate']}%) contain at least one missing feature.",
+                    f"{count_phrase(profile['missing_feature_row_count'], 'row').capitalize()} ({profile['missing_feature_row_rate']}%) {agree(profile['missing_feature_row_count'], 'contains', 'contain')} at least one missing feature.",
                     "Dropping incomplete rows may reduce the usable sample, while unexamined imputation may distort feature meaning.",
                     "Review each severe column and decide whether to recollect, impute, add an explicit missing indicator, or exclude it.",
                     "High"
@@ -95,7 +97,7 @@ def build_findings(profile: dict, scores: dict) -> List[dict]:
                         if column["name"] in profile["severe_missing_columns"]
                     )
                     else "Moderate",
-                    "Affects feature usability and applies the existing severe-feature-missingness guardrail.",
+                    "Affects feature usability and applies the severe-feature-missingness guardrail.",
                 ),
             )
         )
@@ -112,7 +114,7 @@ def build_findings(profile: dict, scores: dict) -> List[dict]:
                     "Missing inputs can reduce usable sample size or make model behavior depend on the chosen handling strategy.",
                     "Review missingness by column and decide whether values should be imputed, collected again, or excluded.",
                     severity_from_rate(profile["missing_rate"], 10, 25),
-                    "Reduces completeness and may apply the existing severe-dataset-missingness guardrail.",
+                    "Reduces completeness and may apply the severe-dataset-missingness guardrail.",
                 ),
             )
         )
@@ -124,7 +126,7 @@ def build_findings(profile: dict, scores: dict) -> List[dict]:
                 _risk(
                     "widespread_row_missingness",
                     "Widespread row-level missingness",
-                    f"{profile['missing_feature_row_count']} row(s) ({profile['missing_feature_row_rate']}%) contain at least one missing feature even though dataset-wide missingness is lower.",
+                    f"{count_phrase(profile['missing_feature_row_count'], 'row').capitalize()} ({profile['missing_feature_row_rate']}%) {agree(profile['missing_feature_row_count'], 'contains', 'contain')} at least one missing feature even though dataset-wide missingness is lower.",
                     f"Rows with one missing feature: {profile['rows_with_1_missing_feature']}; two: {profile['rows_with_2_missing_features']}; three or more: {profile['rows_with_3_plus_missing_features']}.",
                     "A low cell-level percentage can still affect a large share of training examples.",
                     "Assess whether row deletion or imputation would affect too much of the dataset, and investigate the most affected columns.",
@@ -142,11 +144,11 @@ def build_findings(profile: dict, scores: dict) -> List[dict]:
                     "duplicate_records",
                     "Duplicate records",
                     "Duplicate rows may cause the model to overfit repeated examples or inflate validation confidence.",
-                    f"{profile['duplicate_rows']} repeated row(s) ({profile['duplicate_rate']}%) across {profile['duplicate_group_count']} group(s); largest group: {profile['largest_duplicate_group_size']} rows.",
+                    f"{count_phrase(profile['duplicate_rows'], 'repeated row').capitalize()} ({profile['duplicate_rate']}%) across {count_phrase(profile['duplicate_group_count'], 'group')}; largest group: {count_phrase(profile['largest_duplicate_group_size'], 'row')}.",
                     "Repeated examples can be split across training and validation data and make evaluation appear stronger than it is.",
                     "Deduplicate records or confirm that repeated rows represent legitimate repeated events.",
                     severity_from_rate(profile["duplicate_rate"], 2, 10),
-                    "Reduces uniqueness and may apply the existing severe-duplicates guardrail.",
+                    "Reduces uniqueness and may apply the severe-duplicates guardrail.",
                 ),
             )
         )
@@ -164,7 +166,7 @@ def build_findings(profile: dict, scores: dict) -> List[dict]:
                     "A model may favor the majority class and underperform on less common outcomes.",
                     "Use class-sensitive metrics and consider resampling, weighting, or collecting more minority examples.",
                     severity_from_rate(balance["largest_class_percentage"], 75, 90),
-                    "Reduces the existing target-balance score and may trigger the critical-sub-score guardrail.",
+                    "Reduces the target-balance score and may trigger the critical-sub-score guardrail.",
                 ),
             )
         )
@@ -177,12 +179,12 @@ def build_findings(profile: dict, scores: dict) -> List[dict]:
                 _risk(
                     "constant_fields",
                     "Low-value constant fields",
-                    f"{len(constant_columns)} feature column(s) contain only one observed value.",
+                    f"{count_phrase(len(constant_columns), 'feature column').capitalize()} {agree(len(constant_columns), 'contains', 'contain')} only one observed value.",
                     "Affected fields: " + ", ".join(constant_columns[:3]) + ".",
                     "Constant inputs cannot help a classifier distinguish outcomes.",
                     "Remove constant fields from modeling inputs unless they are required for downstream lineage.",
                     "Moderate",
-                    "Reduces the existing feature-usability score.",
+                    "Reduces the feature-usability score.",
                 ),
             )
         )
@@ -212,12 +214,12 @@ def build_findings(profile: dict, scores: dict) -> List[dict]:
                 _risk(
                     "high_cardinality_categoricals",
                     "High-cardinality categoricals",
-                    f"{len(high_cardinality)} categorical feature(s) have many distinct values relative to row count.",
+                    f"{count_phrase(len(high_cardinality), 'categorical feature').capitalize()} {have_verb(len(high_cardinality))} many distinct values relative to row count.",
                     "Affected fields: " + ", ".join(high_cardinality[:3]) + ".",
                     "Naive encoding may overfit rare values, create unstable feature spaces, or memorize identifiers.",
                     "Check whether these fields are identifiers or need careful encoding before modeling.",
                     "Moderate",
-                    "Reduces the existing feature-usability score.",
+                    "Reduces the feature-usability score.",
                 ),
             )
         )
@@ -234,12 +236,12 @@ def build_findings(profile: dict, scores: dict) -> List[dict]:
                 _risk(
                     "numeric_outlier_concentration",
                     "Numeric outlier concentration",
-                    f"{len(outlier_columns)} numeric feature(s) have notable IQR-based outlier rates.",
+                    f"{count_phrase(len(outlier_columns), 'numeric feature').capitalize()} {have_verb(len(outlier_columns))} notable IQR-based outlier rates.",
                     "Affected fields: " + ", ".join(column["name"] for column in outlier_columns[:3]) + ".",
                     "Extreme values can dominate some model families or indicate collection and unit inconsistencies.",
                     "Inspect the outlier rows and confirm whether they are real edge cases or data entry errors.",
                     "Moderate",
-                    "Reduces the existing feature-usability score at the current outlier thresholds.",
+                    "Reduces the feature-usability score at the current outlier thresholds.",
                 ),
             )
         )
@@ -253,7 +255,7 @@ def build_findings(profile: dict, scores: dict) -> List[dict]:
                     "leakage_review_prompts",
                     "Leakage review prompts",
                     f"Columns such as {names} have generic status or target-related names, but their names alone are not strong leakage evidence.",
-                    f"{len(profile['review_only_leakage_candidates'])} review-only candidate(s): {names}.",
+                    f"{count_phrase(len(profile['review_only_leakage_candidates']), 'review-only candidate')}: {names}.",
                     "If a field is only available after the outcome, offline validation may not represent deployment.",
                     "Confirm when these values become available; this review prompt does not reduce the leakage score or cap the overall score.",
                     "Low",

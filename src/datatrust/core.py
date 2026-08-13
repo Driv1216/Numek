@@ -1,6 +1,9 @@
+import re
 from pathlib import Path
+
+from datatrust.narrative import build_narrative
 from datatrust.profiler import profile_dataset
-from datatrust.renderer import render_html_report
+from datatrust.renderer import write_html_report
 from datatrust.risks import build_findings
 from datatrust.scoring import score_profile
 
@@ -34,31 +37,26 @@ class DataTrust:
 
     def generate_report(self, output_path: str) -> str:
         result = self.analyze()
-        html = render_html_report(
-            result["profile"],
-            result["scores"],
-            result["risks"],
-            result["findings"],
-            result["context"],
-        )
-
-        destination = Path(output_path)
-        destination.parent.mkdir(parents=True, exist_ok=True)
-        destination.write_text(html, encoding="utf-8")
-        return str(destination)
+        return write_html_report(result, output_path)
 
     def analyze(self) -> dict:
         """Return the report data without rendering HTML."""
         profile = profile_dataset(self.dataset_path, self.target, self.task)
         scores = score_profile(profile)
         findings = build_findings(profile, scores)
+        context_name = self.dataset_name
+        if not context_name:
+            context_name = _humanize_fallback_name(
+                Path(self.source_filename or self.dataset_path.name).stem
+            )
         return {
             "profile": profile,
             "scores": scores,
             "risks": findings[:3],
             "findings": findings,
+            "narrative": build_narrative(profile, scores, findings[:3], findings),
             "context": {
-                "dataset_name": self.dataset_name or self.dataset_path.stem,
+                "dataset_name": context_name,
                 "purpose": self.purpose,
                 "source_filename": self.source_filename or self.dataset_path.name,
             },
@@ -74,3 +72,19 @@ def _clean_context_value(value, label: str, maximum_length: int):
     if len(cleaned) > maximum_length:
         raise ValueError(f"{label} must be {maximum_length} characters or fewer.")
     return cleaned
+
+
+def _humanize_fallback_name(value: str) -> str:
+    """Turn a filename stem into a readable title without changing custom names."""
+    chunks = [chunk for chunk in re.split(r"[_\-\s]+", str(value)) if chunk]
+    words = []
+    for chunk in chunks:
+        if re.match(r"^[a-z][A-Z]", chunk):
+            parts = [chunk]
+        else:
+            separated = re.sub(r"(?<=[a-z0-9])(?=[A-Z])", " ", chunk)
+            separated = re.sub(r"(?<=[A-Z])(?=[A-Z][a-z])", " ", separated)
+            parts = separated.split()
+        for part in parts:
+            words.append(part.capitalize() if part.islower() else part)
+    return " ".join(words) or str(value)

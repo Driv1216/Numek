@@ -34,7 +34,7 @@ def main() -> None:
         "evidently_version": evidently.__version__,
         "evidently_runtime_seconds": round(elapsed, 6),
         "datatrust_runtime_seconds": datatrust["runtime_seconds"],
-        "comparison_role": "Internal supporting evidence only; not a V1 pass gate.",
+        "comparison_role": "Internal supporting evidence only; not a product acceptance gate.",
     }
     (OUTPUT_ROOT / "comparison_metadata.json").write_text(
         json.dumps(metadata, indent=2, sort_keys=True) + "\n",
@@ -45,7 +45,7 @@ def main() -> None:
 
 Generated: {metadata["generated_at"]}
 
-This is internal supporting credibility evidence. It is not a V1 pass gate,
+This is internal supporting credibility evidence. It is not a product acceptance gate,
 does not claim superiority, and must not be shown during blinded practitioner
 reviews.
 

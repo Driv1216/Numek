@@ -1,16 +1,22 @@
 # Numek Master Context
 
+Last updated: 2026-08-13
+
 ## Changelog
 
+- **2026-08-13: Completed and accepted the DataTrust baseline.** Recorded the current classification workflow as founder-accepted, removed generic sequential product-version and numbered-phase labels from active project context, and left the next product direction explicitly undecided.
+- **2026-08-13: Hardened target confirmation and narrative presentation.** Added canonical distinct-value guidance, nontechnical advanced-outcome confirmation, minimal-before-concentrated missingness language, a clean-report empty state, and humanized fallback report titles without changing analytical decisions.
+- **2026-08-12: Added explainable target guidance and the layered report.** Replaced the undifferentiated target dropdown with grouped, deterministic choices that never preselect a target; added server-enforced advanced-target acknowledgement, an additive uncapped evidence score, one shared deterministic narrative, and a portrait-to-landscape eight-topic report without changing existing scoring or finding decisions.
+- **2026-08-11: Added the compact result overview and native PDF download.** Replaced the embedded report iframe with a score/risk decision surface, reused existing finding language for the top-three overview, and added cached WeasyPrint PDF conversion from the canonical HTML report. CLI, Python API, scoring, and full-report content remain unchanged.
 - **2026-08-05: Added the local UI and evidence-first report.** Added the loopback-only guided CSV workflow, eight-section report, full action plan, row-level missingness, duplicate-group and conflicting-label evidence, richer numeric/categorical summaries, print-safe visuals, browser Save-as-PDF path, and compatible CLI/Python API extensions. Existing scoring formulas remain unchanged.
 - **2026-08-04: Removed the mandatory external five-practitioner validation gate.** RC_003 technical review is completed and preserved as historical evidence. Product building is now the active priority, with development reviews and acceptance checks handled internally by Drivyaansh and Codex.
 - **2026-08-02: Lowered the active package requirement to Python 3.10+.** Package metadata and active reviewer-facing setup text were changed from Python 3.11+ to Python 3.10+.
 - **2026-06-14: Upgraded the project and validation environments to Python 3.11.** Raised the package minimum to Python 3.11, rebuilt both environments on Python 3.11.15, migrated the isolated comparison to Evidently 0.7.21 and its current DataSummaryPreset API, regenerated validation evidence, and verified the full suite without runtime package changes.
 - **2026-06-14: Completed the reproducible validation corpus.** Prepared three pinned UCI datasets, generated seven controlled mutations and ten timed reports, reviewed every leakage flag, completed an isolated Evidently Adult comparison, and corrected one public-corpus false severe leakage classification.
-- **2026-06-14: Completed DataTrust V1 correctness invariants.** Added separate target-missingness handling, severe column-missingness evidence, strong versus review-only leakage classification, explained score guardrails, deterministic risk priority, and regression coverage for credibility-breaking contradictions.
+- **2026-06-14: Completed DataTrust correctness invariants.** Added separate target-missingness handling, severe column-missingness evidence, strong versus review-only leakage classification, explained score guardrails, deterministic risk priority, and regression coverage for credibility-breaking contradictions.
 - **2026-06-14: Removed dynamic kickoff content.** Removed the stale-prone next-actions list and universal next-chat prompt. Fresh operational context now comes from the living documents and task-specific prompts defined in the collaboration protocol.
 - **2026-06-14: Added the multi-AI operating model.** Established Codex as repo master and technical verifier, created living context documents, and defined how ChatGPT, Claude, Codex, and Drivyaansh collaborate.
-- **2026-06-02: Initial master context version.** Captures the original Numek first draft, the strategy evolution after critique, the DataTrust V1 implementation, current boundaries, credibility strategy, roadmap, and known unknowns.
+- **2026-06-02: Initial master context version.** Captures the original Numek first draft, the strategy evolution after critique, the DataTrust implementation, current boundaries, credibility strategy, roadmap, and known unknowns.
 
 ## One-Page Summary
 
@@ -24,7 +30,7 @@ The long-term thesis is that companies deploying AI into real decisions need evi
 
 The current execution focus is much narrower:
 
-**DataTrust V1:** a local-first Python package and browser UI that generates an HTML dataset reliability report from a CSV.
+**DataTrust:** a local-first Python package and browser UI that generates an HTML dataset reliability report from a CSV.
 
 The first reader is not a regulator directly. The first reader is an **ML/data lead who needs to explain dataset reliability to a non-technical stakeholder** such as a CTO, VP, risk lead, compliance reviewer, or enterprise customer.
 
@@ -80,10 +86,12 @@ The broad company vision stayed intact, but the execution narrowed.
 
 Key changes:
 
-- **From platform to first artifact:** Numek is still a broad AI reliability company, but V1 is only DataTrust.
+- **From platform to first artifact:** Numek is still a broad AI reliability company, while the completed product baseline is DataTrust.
 - **From certificate to report:** "Reliability Certificate" is avoided for now because it implies authority, legal backing, or accreditation we do not yet have. The current language is reliability report, evidence pack, or model/data risk report.
-- **From PDF-first to HTML-first:** HTML is easier to generate, inspect, iterate, and share during V1. PDF export comes later.
-- **From opaque trust score to transparent sub-scores:** a single unexplained 0-100 score is dangerous. V1 uses decomposed sub-scores plus guardrails.
+- **From PDF-first to HTML-first:** HTML is the canonical generated artifact.
+  The local UI now converts the complete HTML report to a native PDF for
+  download, while the CLI and Python API remain HTML-only.
+- **From opaque trust score to transparent sub-scores:** a single unexplained 0-100 score is dangerous. DataTrust uses decomposed sub-scores plus guardrails.
 - **From regulator as first reader to ML/data lead as first reader:** the first product is for a technical lead who needs to justify reliability upward or outward.
 - **From all three pillars at once to DataTrust first:** ConfidenceGuard and HallucinationGuard are future phases, not current implementation targets.
 - **Local-first stayed central:** sensitive data should not need to leave the user's machine.
@@ -111,24 +119,27 @@ The first product is DataTrust because it has the lowest integration friction:
 
 ## What This Is NOT
 
-These boundaries are intentional. They prevent future collaborators, future chats, and future versions of the project from expanding the scope too early.
+These boundaries are intentional. They prevent future collaborators, future chats, and future work from expanding the scope too early.
 
 - **DataTrust is not a data pipeline tool.** It does not move, transform, schedule, or orchestrate data pipelines.
-- **DataTrust is not a monitoring service.** V1 does not watch live production data, emit alerts, or run continuously.
+- **DataTrust is not a monitoring service.** It does not watch live production data, emit alerts, or run continuously.
 - **DataTrust is not a replacement for proper EDA.** It produces reliability evidence, not a complete exploratory data analysis workflow.
 - **DataTrust is not a formal compliance certification.** It does not prove legal compliance, regulatory approval, fairness, safety, or audit clearance.
 - **Numek is not an MLOps platform.** It is not trying to replace MLflow, Arize, Fiddler, WhyLabs, Datadog, or full model operations stacks.
-- **V1 is not a SaaS product.** No hosted dashboard, login system, database, billing, or cloud upload belongs in V1.
-- **V1 is not a PDF/export-heavy workflow.** HTML is the canonical V1 output. PDF export can come later after the report itself is good.
-- **V1 is not ConfidenceGuard or HallucinationGuard.** Those are roadmap items, not current scope.
+- **DataTrust is not a SaaS product.** No hosted dashboard, login system, database, billing, or cloud upload belongs in the current product.
+- **DataTrust is not a broad export workflow.** HTML is the canonical output, and
+  the local browser UI provides one native PDF download path. CLI/API PDF,
+  Word, and additional export formats are not implemented.
+- **DataTrust is not ConfidenceGuard or HallucinationGuard.** Those remain possible future products, not current scope.
 
 The identity boundary is:
 
 **DataTrust turns local dataset checks into stakeholder-readable reliability evidence.**
 
-## Current Product: DataTrust V1
+## Current Product: DataTrust
 
-DataTrust V1 is a local-first Python package that reads a CSV and generates an HTML dataset reliability report.
+DataTrust is a local-first Python package and guided browser UI that reads a
+CSV and generates an HTML dataset reliability report.
 
 ### User
 
@@ -183,20 +194,22 @@ audit.generate_report("examples/report.html")
 ```
 
 The UI runs on loopback, keeps uploads only for the running process, and guides
-the user through target selection, classification subtype confirmation, report
-generation, HTML download, and browser print/save as PDF.
+the user through grouped, explainable target selection with no preselection,
+classification subtype confirmation, report
+generation, a compact score/top-risks overview, full HTML viewing, and native
+PDF download.
 
 The report is the product. The code exists to produce a report that is worth showing.
 
-## V1 Definition Of Done
+## Completed Product Baseline
 
-DataTrust V1 is done when Drivyaansh accepts the current product state after
-Codex verifies the implemented V1 behavior:
+Drivyaansh has accepted the current DataTrust product state after Codex verified
+the implemented behavior:
 
 - the local UI, CLI, and Python API generate a complete HTML report from a CSV
   classification dataset
 - the generated report contains all eight report sections
-- automated tests for implemented V1 behavior pass
+- automated tests for implemented behavior pass
 - public validation reports and controlled mutation checks remain reproducible
   enough for internal confidence
 - product and docs avoid unsupported certification, compliance, fairness,
@@ -206,13 +219,12 @@ Codex verifies the implemented V1 behavior:
 The previous mandatory external five-practitioner validation round was
 superseded on 2026-08-04. RC_003 and its returned technical-review evidence
 remain historical evidence, but external practitioner validation is not an
-active V1 gate or blocker.
+active acceptance gate or blocker.
 
-Anything not required to reach this condition is V2.
+Possible future work remains undecided rather than belonging to a predefined
+sequence. Examples requiring a separate product decision include:
 
-Examples of V2 or later work:
-
-- generated PDF export beyond the browser print/save path
+- PDF output through the CLI or Python API
 - SaaS dashboard
 - live monitoring
 - model calibration
@@ -224,7 +236,7 @@ Examples of V2 or later work:
 
 ## Current Technical State
 
-The current repo contains a working DataTrust V1 package.
+The current repo contains the completed working DataTrust baseline.
 
 Important files:
 
@@ -238,11 +250,15 @@ Important files:
 - `src/datatrust/scoring.py`: sub-scores and guardrails
 - `src/datatrust/risks.py`: plain-language top risk summaries
 - `src/datatrust/renderer.py`: HTML rendering
+- `src/datatrust/pdf.py`: local-only WeasyPrint PDF conversion
 - `src/datatrust/cli.py`: Click-based CLI
+- `src/datatrust/web.py`: loopback-only Flask UI and temporary job lifecycle
 - `src/datatrust/templates/report.html`: report template
+- `src/datatrust/templates/ui.html`: guided local UI template
 - `examples/loan_data.csv`: synthetic lending-style demo dataset
 - `examples/report.html`: generated sample report
 - `tests/test_datatrust.py`: automated tests
+- `tests/test_web.py`: Flask UI workflow and validation tests
 
 Current setup and verification commands:
 
@@ -270,13 +286,14 @@ Current verified test state:
 DataTrust reports have eight sections organized as executive summary, complete
 action plan, and technical evidence.
 
-### 1. Executive Summary
+### 1. Decision Summary
 
-Communicates the overall reliability score, risk level, recommended next action, and top three findings.
+Communicates the uncapped-to-final score path, overall reliability score, risk
+level, recommended next action, and principal findings.
 
 This is the most important section for the non-technical stakeholder.
 
-### 2. Prioritized Action Plan
+### 2. Priority Actions
 
 Shows every supported finding with evidence, possible modeling impact,
 recommended review, and score effect. Evidence-only findings remain visible
@@ -293,25 +310,25 @@ Shows basic dataset condition and composition:
 
 This section answers whether the dataset has obvious structural quality problems.
 
-### 4. Missingness Evidence
-
-Separates cell-level missingness from rows affected by missing features, shows
-one/two/three-plus missing-feature buckets, and charts the most affected
-features. Target missingness remains separate.
-
-### 5. Target and Label Evidence
+### 4. Target and Label Evidence
 
 Shows classification subtype, target distribution, class balance,
 majority-class baseline, and majority-to-minority ratio.
 
 Missing target labels are tracked separately and excluded from class counts.
-Datasets with no usable target labels fail clearly. V1 does not implement true
+Datasets with no usable target labels fail clearly. DataTrust does not implement true
 label-noise detection yet.
+
+### 5. Missingness Evidence
+
+Separates cell-level missingness from rows affected by missing features, shows
+one/two/three-plus missing-feature buckets, and charts the most affected
+features. Target missingness remains separate.
 
 ### 6. Duplicate and Feature Evidence
 
 Shows exact duplicate groups, potentially conflicting target labels, leakage
-review evidence, numeric summaries, and non-numeric feature summaries:
+review evidence, and review-worthy feature summaries:
 
 - constant fields
 - near-constant fields
@@ -328,7 +345,7 @@ This section is crucial because credibility comes from clarity, not from pretend
 
 ### 8. Technical Appendix
 
-Shows detailed per-column metrics:
+Shows the complete numeric and non-numeric profiling tables, including:
 
 - column name
 - role
@@ -338,10 +355,12 @@ Shows detailed per-column metrics:
 - constant and near-constant flags
 - high-cardinality flag
 - outlier rate
+- quartiles, zero/negative/non-finite counts, cardinality, top-value share, and
+  exact missingness
 
 ## Methodology And Scoring
 
-DataTrust V1 uses transparent sub-scores from 0 to 100. Higher is better.
+DataTrust uses transparent sub-scores from 0 to 100. Higher is better.
 
 Current sub-scores:
 
@@ -354,7 +373,10 @@ Current sub-scores:
 - **Leakage Risk:** penalizes strong token/phrase-aware outcome-like candidates;
   generic status or target-related names remain review-only prompts.
 
-The overall reliability score starts with the average sub-score, then applies guardrails for high-stakes failure modes.
+The overall reliability score starts with the average sub-score, exposed as
+`scores["evidence_score"]`, then applies guardrails for high-stakes failure
+modes. The compact result and full report use the same static, deterministic
+narrative templates to explain that score path and the existing evidence.
 
 Applied guardrails are returned in `scores["guardrails"]` and shown in the
 report. Strong leakage, a single-class target, or no feature columns cap the
@@ -376,7 +398,8 @@ Current limitations:
 - no model calibration yet
 - no production monitoring yet
 - no legal or compliance certification
-- no generated PDF or Word document; PDF uses the browser print dialog
+- native PDF is available only through the local browser UI; CLI/API PDF and
+  Word output are not implemented
 - no semantic date, fuzzy category, correlation, or missingness-pattern checks
 - leakage detection is heuristic and must be reviewed by a human
 
@@ -392,7 +415,7 @@ The core credibility question is:
 
 ### Current Credibility Strategy
 
-V1 earns early trust through transparency:
+DataTrust earns trust through transparency:
 
 - transparent sub-scores instead of a black-box trust score
 - methodology section in the report
@@ -433,7 +456,7 @@ The path to stronger credibility should be:
 
 Early credibility comes from glass walls: make the method inspectable before
 asking people to trust the brand. External review can still be useful later,
-but it is no longer a mandatory V1 acceptance process.
+but it is no longer a mandatory acceptance process.
 
 ## Competitor And Adjacent Tool Map
 
@@ -477,7 +500,10 @@ Evidently may tell an ML engineer what happened. DataTrust should tell the ML le
 
 ## Roadmap
 
-### Phase 1: DataTrust V1 Usable Report
+The current DataTrust baseline is complete. No next product direction is
+approved, and the options below are not ordered phases or commitments.
+
+### Completed DataTrust Baseline
 
 Goal: make the current local HTML report credible enough to show to ML/data leads.
 
@@ -489,7 +515,7 @@ Focus:
 - RC_003 technical review **completed and archived as historical evidence**
 - product implementation with internal Drivyaansh + Codex verification
 
-### Phase 2: Stronger Dataset Checks
+### Possible Direction: Stronger Dataset Checks
 
 Add deeper dataset reliability checks:
 
@@ -501,7 +527,7 @@ Add deeper dataset reliability checks:
 - richer outlier interpretation
 - optional Cleanlab-based label issue detection
 
-### Phase 3: Optional Model Prediction Analysis
+### Possible Direction: Model Prediction Analysis
 
 Allow users to provide model predictions or probabilities.
 
@@ -513,9 +539,9 @@ Add:
 - high-confidence wrong predictions
 - threshold sensitivity
 
-This begins the bridge from DataTrust to ConfidenceGuard.
+This could become a bridge from DataTrust to ConfidenceGuard if selected.
 
-### Phase 4: ConfidenceGuard
+### Possible Direction: ConfidenceGuard
 
 Build model reliability and drift functionality.
 
@@ -531,7 +557,7 @@ Potential checks:
 - confidence/accuracy mismatch
 - segment-level reliability
 
-### Phase 5: HallucinationGuard
+### Possible Direction: HallucinationGuard
 
 Build LLM output reliability functionality.
 
@@ -547,7 +573,7 @@ Potential checks:
 - RAG groundedness
 - domain-specific hallucination risk
 
-### Phase 6: Broader Numek Platform
+### Long-Term Possibility: Broader Numek Platform
 
 Only after the first modules prove demand, Numek can become a broader reliability platform.
 
@@ -607,8 +633,11 @@ Known unknowns require evidence, not just decisions.
 
 ### Is local-first a selling point or friction?
 
-- **Why it matters:** local-first protects sensitive data, but CLI/local setup can be inconvenient.
-- **How to resolve:** ask target users whether they prefer CLI, notebook, Docker, local web app, customer-cloud, or hosted upload.
+- **Why it matters:** local-first protects sensitive data, but Python installation
+  and starting the local UI may still be inconvenient.
+- **How to resolve:** observe users installing DataTrust and completing the
+  guided UI flow, then compare it with notebook, Docker, customer-cloud, or
+  hosted-upload preferences.
 - **Evidence needed:** workflow preferences from ML/data leads or technical buyers.
 - **Status:** deferred and non-blocking.
 
@@ -633,12 +662,15 @@ Known unknowns require evidence, not just decisions.
 - **Evidence needed:** concrete evidence of urgency, willingness to run the tool, and willingness to share the report internally.
 - **Status:** deferred and non-blocking.
 
-### Is HTML enough before PDF?
+### Does the native PDF fit stakeholder sharing workflows?
 
-- **Why it matters:** HTML is easier to build, but some stakeholders may expect PDFs.
-- **How to resolve:** ask users whether they would share HTML, screenshot it, export it, or require PDF.
-- **Evidence needed:** user preference from report review sessions.
-- **Status:** deferred and non-blocking.
+- **Why it matters:** direct PDF generation now exists, but actual forwarding,
+  archival, readability, and file-size needs are not externally validated.
+- **How to resolve:** observe target users opening, forwarding, and archiving
+  generated reports.
+- **Evidence needed:** concrete PDF workflow feedback and failure cases.
+- **Status:** implementation direction resolved; workflow quality remains
+  deferred and non-blocking.
 
 ## Open Decisions
 
@@ -646,7 +678,7 @@ Open decisions require choosing a direction.
 
 - **Open-source core vs closed source:** likely open-source core is better for credibility, but the business model must be considered.
 - **Exact first customer segment:** lending-tech vendors, fintech ML teams, NBFC-facing AI vendors, or broader AI SaaS teams.
-- **Cleanlab in V2:** whether to wrap Cleanlab for label-noise detection or keep it as an external recommendation.
+- **Cleanlab integration:** whether to wrap Cleanlab for label-noise detection or keep it as an external recommendation.
 - **Evidently interoperability:** whether DataTrust should import/export Evidently-style artifacts or remain independent.
 - **Report tone:** technical report, risk memo, executive evidence pack, or a hybrid.
 - **Pricing model:** one-time audit, subscription, paid pilots, open-source plus services, or enterprise license.

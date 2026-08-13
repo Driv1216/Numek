@@ -1,4 +1,6 @@
-# DataTrust V1 Validation Corpus
+# DataTrust Validation Corpus
+
+Last updated: 2026-08-13
 
 This workspace is separate from `src/datatrust/`. It prepares public validation
 data, creates deterministic controlled mutations, generates DataTrust reports,
@@ -21,19 +23,19 @@ archive names, and pinned checksums live in `sources.json`.
 From the repository root:
 
 ```bash
-/opt/homebrew/bin/python3.10 -m venv .venv
-.venv/bin/python -m pip install --upgrade pip setuptools wheel
-.venv/bin/python -m pip install --no-build-isolation -e ".[dev]"
-.venv/bin/python -m validation.prepare --download
-.venv/bin/python -m validation.mutate
-.venv/bin/python -m validation.run_validation
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install -e ".[dev]"
+python -m validation.prepare --download
+python -m validation.mutate
+python -m validation.run_validation
 ```
 
 Once archives exist in the ignored `validation/data/raw/` directory, preparation
 can run offline and validates the pinned archive checksums:
 
 ```bash
-.venv/bin/python -m validation.prepare
+python -m validation.prepare
 ```
 
 ## Outputs
@@ -52,16 +54,16 @@ The project and validation environments use Python 3.10 or newer. Evidently is p
 its own environment and is never added to DataTrust runtime dependencies.
 
 ```bash
-/opt/homebrew/bin/python3.10 -m venv validation/.venv-evidently
+python3 -m venv validation/.venv-evidently
 validation/.venv-evidently/bin/python -m pip install --upgrade pip
 validation/.venv-evidently/bin/python -m pip install -r validation/requirements-evidently.txt
 validation/.venv-evidently/bin/python validation/evidently_compare.py
-.venv/bin/python -m validation.verify
+python -m validation.verify
 ```
 
-The comparison is internal supporting evidence only. It is not a V1 pass gate.
+The comparison is internal supporting evidence only. It is not a product acceptance gate.
 
-## Historical Milestone 3 / RC_003 Review Materials
+## Historical RC_003 Review Materials
 
 The separate `dry_runs/` workspace contains the historical RC_003 technical
 review materials: cross-platform reviewer quickstart, manual-first
@@ -71,7 +73,7 @@ allowlist-only clean reviewer packet tooling, and deterministic
 release-candidate identification tooling.
 
 RC_003 and its packet are preserved as historical evidence. These commands show
-how the candidate was originally produced; they are not active V1 blockers or
+how the candidate was originally produced; they are not active blockers or
 future review requirements:
 
 ```bash

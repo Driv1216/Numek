@@ -1,5 +1,10 @@
 # Separate Non-Technical Comprehension Evidence
 
+Status: Historical / superseded on 2026-08-04.
+
+This form was prepared for the old RC_003 dry-run process. The mandatory
+non-technical comprehension dry run is no longer an active acceptance gate.
+
 Give the reviewer only the frozen candidate's generated HTML report and this
 form. Give no verbal explanation of DataTrust, the dataset, or the report.
 
@@ -10,9 +15,7 @@ form. Give no verbal explanation of DataTrust, the dataset, or the report.
   [ ] Yes [ ] No
 - Candidate ID:
 - Exact report alias:
-- Exact report SHA-256:
-- SHA-256 matches the technical dry-run evidence form: [ ] Yes [ ] No
-- Candidate verified before session: [ ] Pass [ ] Fail
+- Report alias matches the technical evidence form: [ ] Yes [ ] No
 - Timer start:
 - Timer stop:
 - Completed within 3 minutes: [ ] Yes [ ] No
@@ -47,8 +50,6 @@ The facilitator scores only after the timer stops, against visible report text.
 | Recommended next action | [ ] Yes [ ] No |  |
 | What the report does not prove | [ ] Yes [ ] No |  |
 
-- Candidate verified after session: [ ] Pass [ ] Fail
-- Report SHA-256 rechecked after session and unchanged: [ ] Yes [ ] No
 - Non-technical dry-run outcome under `PASS_FAIL_RULES.md`: [ ] Pass [ ] Fail
 - Failed rule IDs:
 - Facilitator name/signature:

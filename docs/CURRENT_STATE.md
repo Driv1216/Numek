@@ -1,15 +1,16 @@
 # Numek Current State
 
-Last updated: 2026-08-05
-Current phase: Local UI and evidence-first report implemented; internal acceptance review
-Status: DataTrust generates reports through the local browser UI, CLI, and Python API
+Last updated: 2026-08-13
+Current product baseline: Complete and founder-accepted
+Status: DataTrust generates HTML reports through the local UI, CLI, and Python API, with native PDF download in the UI; no next product direction has been selected
 
 ## Current Objective
 
-Continue building DataTrust as a usable local-first product. Technical review,
-product review, and acceptance review during development are now conducted
-internally by Drivyaansh and Codex unless Drivyaansh explicitly requests a
-separate outside opinion for learning.
+Preserve the completed DataTrust classification workflow as the current product
+baseline. The next product objective is intentionally undecided and will be
+recorded only after Drivyaansh chooses it. Technical review, product review, and
+acceptance review are conducted internally by Drivyaansh and Codex unless
+Drivyaansh explicitly requests a separate outside opinion for learning.
 
 ## What Currently Works
 
@@ -17,9 +18,13 @@ separate outside opinion for learning.
 - Public Python API through `DataTrust`
 - Click-based CLI
 - Loopback-only Flask UI launched with `datatrust ui`
-- Guided upload, target selection, classification subtype confirmation, report
-  preview, HTML download, and browser print-to-PDF flow
+- Guided upload, grouped explainable target selection with no preselection and
+  human-readable server-enforced acknowledgement for advanced choices,
+  concise selector-specific reasons, automatically detected subtype confirmation,
+  compact reliability overview, full HTML report viewing, and native PDF download
 - Process-scoped temporary uploads with a configurable `100 MiB` default limit
+- Editable installation exposes one `datatrust` command with `ui` and `audit`
+  subcommands; a virtual environment is recommended but not required
 - CSV ingestion for classification datasets
 - Dataset profiling for:
   - shape and data types
@@ -45,9 +50,19 @@ separate outside opinion for learning.
   - leakage risk
 - Explained guardrails for strong leakage, missing target labels, severe
   missingness, severe duplicates, and critical sub-scores
+- Additive uncapped `evidence_score` alongside the unchanged guardrailed
+  `overall` score
 - Plain-language top-three risk summaries and complete prioritized findings
-- Jinja-based HTML report with eight sections, two print-safe evidence visuals,
-  and a technical appendix
+- One deterministic narrative shared by the compact result and report
+- Deterministic singular/plural wording across browser, finding, narrative, and
+  guardrail copy without changing diagnostic or scoring behavior
+- Minimal-before-concentrated missingness language with a narrative-only `1%`
+  feature-cell threshold
+- Humanized fallback report titles and an intentional clean-report empty state
+- Layered eight-topic HTML report with stacked finding blocks, portrait decision
+  pages, two print-safe evidence visuals, and a landscape technical appendix
+- WeasyPrint-based PDF conversion from the canonical HTML report, cached inside
+  the active temporary job and restricted to local report resources
 - Synthetic lending-style example dataset
 - Generated example report
 - Automated test suite with profiler, report, CLI, and Flask UI coverage
@@ -76,7 +91,7 @@ PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=src .venv/bin/python -B -m pytest -q -p no:
 Latest verified result:
 
 ```text
-36 passed
+70 passed
 ```
 
 Generate the sample report:
@@ -135,7 +150,12 @@ decision is to move forward with product building and internal verification.
 - Supports classification only
 - Supports CSV input only
 - Local UI is single-user and non-persistent
-- Browser printing is the PDF path; no generated PDF or Word output
+- Native PDF download is available in the browser UI only; CLI and Python API
+  output remain HTML-only, and Word output is not implemented
+- WeasyPrint may require documented native font/rendering prerequisites on
+  some operating systems
+- Development reloading is intentionally disabled; source/template changes
+  require restarting `datatrust ui`
 - Leakage detection is heuristic
 - Leakage classifications still require domain review of feature availability
 - No label-noise detection
@@ -147,11 +167,11 @@ decision is to move forward with product building and internal verification.
 - External product-validation questions remain unresolved, deferred, and
   non-blocking
 
-## Milestone 2 Evidence
+## Validation Corpus Evidence
 
-- UCI German Credit: `1,000 x 21`, report in `0.034377s`
-- UCI Bank Marketing: `45,211 x 17`, report in `0.183144s`
-- UCI Adult: `48,842 x 15`, report in `0.183002s`
+- UCI German Credit: `1,000 x 21`, report in `0.027824s`
+- UCI Bank Marketing: `45,211 x 17`, report in `0.182619s`
+- UCI Adult: `48,842 x 15`, report in `0.184440s`
 - All eleven public and mutation reports contain all eight report sections and complete
   in under `30s`
 - All eight controlled mutation assertions pass, including evidence-only
@@ -163,11 +183,11 @@ decision is to move forward with product building and internal verification.
   isolated Python `3.11.15` validation environment in `0.433635s` and remains
   internal supporting evidence only
 
-## Historical Milestone 3 Evidence
+## Historical Dry-Run Evidence
 
 - Dry-run preparation verifier passed without executing human dry runs
 - Clean Python quickstart installation and CLI report generation were verified
-- Quickstart-generated report contained all six V1 sections
+- Quickstart-generated report contained all six report sections used at that time
 - `DRY_RUN_RC_001` is preserved unchanged as historical candidate record
   SHA-256 `9c7b8d7754557a1dc10694068e297d55c484ea374e40640bf1f111486faf0fe1`
 - `DRY_RUN_RC_002` is preserved unchanged as historical candidate record
@@ -189,7 +209,9 @@ decision is to move forward with product building and internal verification.
 
 ## Immediate Next Task
 
-Founder review of the implemented local UI and upgraded report.
+No next product task has been selected. Do not infer one from the historical
+roadmap, open questions, prior AI proposals, or older chats. The next objective
+begins only after Drivyaansh explicitly chooses it.
 
 For future development, the normal acceptance loop is:
 
@@ -202,19 +224,20 @@ For future development, the normal acceptance loop is:
 Do not schedule or require a five-practitioner external validation round before
 continuing product work.
 
-## V1 Exit Gate
+## Completed Baseline
 
-DataTrust V1 passes when Drivyaansh accepts the current product state after
-Codex verifies:
+Drivyaansh has accepted the current DataTrust classification product state.
+Codex verified that:
 
 - the local UI, CLI, and Python API generate a complete HTML report from a CSV
-  classification dataset
+  classification dataset, and the local UI can download that report as PDF
 - the generated report contains all eight report sections
-- automated tests for implemented V1 behavior pass
+- automated tests for implemented behavior pass
 - public validation reports and controlled mutation checks remain reproducible
   enough for internal confidence
 - unsupported claims are absent from product and docs
 - known limitations are documented clearly
 
 External technical review, external product review, and the former
-five-practitioner validation round are not V1 exit-gate requirements.
+five-practitioner validation round were not acceptance requirements for this
+completed baseline.

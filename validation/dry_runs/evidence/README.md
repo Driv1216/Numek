@@ -1,7 +1,11 @@
 # Returned Dry-Run Evidence
 
-No human dry-run evidence has been collected yet.
+RC_003 technical-review evidence has been returned and is preserved as
+historical evidence.
 
-Store completed, redacted copies here using the naming convention in
-`FACILITATOR_INSTRUCTIONS.md`. Never store practitioner-owned CSVs, private
-reports, screenshots containing private data, or raw sensitive values.
+The old external-review process is superseded. Future product development
+reviews are internal to Drivyaansh and Codex unless Drivyaansh explicitly
+requests outside feedback.
+
+Never store private datasets, private row values, screenshots containing
+private data, or raw sensitive values here.

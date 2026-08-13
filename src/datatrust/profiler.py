@@ -6,6 +6,8 @@ from typing import Dict, List, Optional
 
 import pandas as pd
 
+from datatrust.target_guidance import assess_target_options, assess_target_series
+
 
 STRONG_LEAKAGE_PHRASES = (
     "approved",
@@ -67,6 +69,7 @@ def inspect_csv_dataset(dataset_path: Path, preview_rows: int = 10) -> dict:
         "column_count": int(len(data.columns)),
         "columns": [str(column) for column in data.columns],
         "preview": preview,
+        "target_options": assess_target_options(data),
     }
 
 
@@ -92,6 +95,7 @@ def inspect_classification_target(dataset_path: Path, target: str) -> dict:
         "target_distribution": distribution,
         "class_count": len(distribution),
         "classification_subtype": _classification_subtype(len(distribution)),
+        "suitability": assess_target_series(data[target], target),
     }
 
 
@@ -339,9 +343,9 @@ def _leakage_candidates(columns, target: str) -> List[dict]:
             )
         elif matched_strong or (target_overlap and tokens.intersection(OUTCOME_QUALIFIERS)):
             reason = (
-                f"name contains outcome-like phrase(s): {', '.join(matched_strong)}"
+                f"name contains outcome-like wording: {', '.join(matched_strong)}"
                 if matched_strong
-                else f"name combines target term(s) {', '.join(sorted(target_overlap))} "
+                else f"name combines target terms {', '.join(sorted(target_overlap))} "
                 "with an outcome qualifier"
             )
             candidates.append({"column": column, "classification": "strong", "reason": reason})
@@ -349,7 +353,7 @@ def _leakage_candidates(columns, target: str) -> List[dict]:
             reason = (
                 "generic status-like name; verify when the value becomes available"
                 if tokens.intersection(REVIEW_ONLY_LEAKAGE_TOKENS)
-                else f"name references target term(s) {', '.join(sorted(target_overlap))}"
+                else f"name references target terms {', '.join(sorted(target_overlap))}"
             )
             candidates.append({"column": column, "classification": "review_only", "reason": reason})
     return candidates

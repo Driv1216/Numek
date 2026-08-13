@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-08-04T19:02:06.359735+00:00",
+  "generated_at": "2026-08-12T19:38:14.509391+00:00",
   "mutation_assertions": [
     {
       "detail": "feature_usability: 98.86 -> 95.86; guardrails=['severe_feature_missingness', 'critical_sub_score']",
@@ -77,8 +77,8 @@
       "risks": [
         {
           "code": "conflicting_target_labels",
-          "evidence": "10 labeled row(s) are included in these groups.",
-          "finding": "5 feature-identical group(s) contain more than one non-missing target label.",
+          "evidence": "10 labeled rows are included in these groups.",
+          "finding": "5 feature-identical groups contain more than one non-missing target label.",
           "modeling_impact": "Inconsistent labels for identical recorded features can introduce irreducible ambiguity or reveal missing time/entity context.",
           "recommendation": "Review whether these are label errors, repeated entities over time, target updates, or omitted distinguishing features.",
           "score_effect": "Evidence only; this finding does not change any score or guardrail.",
@@ -91,23 +91,23 @@
           "finding": "The target is dominated by one class, so headline accuracy may hide poor minority-class performance.",
           "modeling_impact": "A model may favor the majority class and underperform on less common outcomes.",
           "recommendation": "Use class-sensitive metrics and consider resampling, weighting, or collecting more minority examples.",
-          "score_effect": "Reduces the existing target-balance score and may trigger the critical-sub-score guardrail.",
+          "score_effect": "Reduces the target-balance score and may trigger the critical-sub-score guardrail.",
           "severity": "Moderate",
           "title": "Target imbalance"
         },
         {
           "code": "numeric_outlier_concentration",
           "evidence": "Affected fields: hours_per_week.",
-          "finding": "1 numeric feature(s) have notable IQR-based outlier rates.",
+          "finding": "1 numeric feature has notable IQR-based outlier rates.",
           "modeling_impact": "Extreme values can dominate some model families or indicate collection and unit inconsistencies.",
           "recommendation": "Inspect the outlier rows and confirm whether they are real edge cases or data entry errors.",
-          "score_effect": "Reduces the existing feature-usability score at the current outlier thresholds.",
+          "score_effect": "Reduces the feature-usability score at the current outlier thresholds.",
           "severity": "Moderate",
           "title": "Numeric outlier concentration"
         }
       ],
       "row_count": 48842,
-      "runtime_seconds": 0.183002,
+      "runtime_seconds": 0.18444,
       "sub_scores": {
         "completeness": 99.12,
         "feature_usability": 98.86,
@@ -154,23 +154,23 @@
           "finding": "The target is dominated by one class, so headline accuracy may hide poor minority-class performance.",
           "modeling_impact": "A model may favor the majority class and underperform on less common outcomes.",
           "recommendation": "Use class-sensitive metrics and consider resampling, weighting, or collecting more minority examples.",
-          "score_effect": "Reduces the existing target-balance score and may trigger the critical-sub-score guardrail.",
+          "score_effect": "Reduces the target-balance score and may trigger the critical-sub-score guardrail.",
           "severity": "Moderate",
           "title": "Target imbalance"
         },
         {
           "code": "numeric_outlier_concentration",
           "evidence": "Affected fields: balance, duration, campaign.",
-          "finding": "3 numeric feature(s) have notable IQR-based outlier rates.",
+          "finding": "3 numeric features have notable IQR-based outlier rates.",
           "modeling_impact": "Extreme values can dominate some model families or indicate collection and unit inconsistencies.",
           "recommendation": "Inspect the outlier rows and confirm whether they are real edge cases or data entry errors.",
-          "score_effect": "Reduces the existing feature-usability score at the current outlier thresholds.",
+          "score_effect": "Reduces the feature-usability score at the current outlier thresholds.",
           "severity": "Moderate",
           "title": "Numeric outlier concentration"
         },
         {
           "code": "leakage_review_prompts",
-          "evidence": "1 review-only candidate(s): previous_campaign_outcome.",
+          "evidence": "1 review-only candidate: previous_campaign_outcome.",
           "finding": "Columns such as previous_campaign_outcome have generic status or target-related names, but their names alone are not strong leakage evidence.",
           "modeling_impact": "If a field is only available after the outcome, offline validation may not represent deployment.",
           "recommendation": "Confirm when these values become available; this review prompt does not reduce the leakage score or cap the overall score.",
@@ -180,7 +180,7 @@
         }
       ],
       "row_count": 45211,
-      "runtime_seconds": 0.183144,
+      "runtime_seconds": 0.182619,
       "sub_scores": {
         "completeness": 100.0,
         "feature_usability": 98.5,
@@ -210,12 +210,12 @@
         {
           "classification": "review_only",
           "column": "credit_history",
-          "reason": "name references target term(s) credit"
+          "reason": "name references target terms credit"
         },
         {
           "classification": "review_only",
           "column": "credit_amount",
-          "reason": "name references target term(s) credit"
+          "reason": "name references target terms credit"
         },
         {
           "classification": "review_only",
@@ -237,16 +237,16 @@
         {
           "code": "numeric_outlier_concentration",
           "evidence": "Affected fields: duration_months, credit_amount.",
-          "finding": "2 numeric feature(s) have notable IQR-based outlier rates.",
+          "finding": "2 numeric features have notable IQR-based outlier rates.",
           "modeling_impact": "Extreme values can dominate some model families or indicate collection and unit inconsistencies.",
           "recommendation": "Inspect the outlier rows and confirm whether they are real edge cases or data entry errors.",
-          "score_effect": "Reduces the existing feature-usability score at the current outlier thresholds.",
+          "score_effect": "Reduces the feature-usability score at the current outlier thresholds.",
           "severity": "Moderate",
           "title": "Numeric outlier concentration"
         },
         {
           "code": "leakage_review_prompts",
-          "evidence": "5 review-only candidate(s): checking_account_status, credit_history, credit_amount.",
+          "evidence": "5 review-only candidates: checking_account_status, credit_history, credit_amount.",
           "finding": "Columns such as checking_account_status, credit_history, credit_amount have generic status or target-related names, but their names alone are not strong leakage evidence.",
           "modeling_impact": "If a field is only available after the outcome, offline validation may not represent deployment.",
           "recommendation": "Confirm when these values become available; this review prompt does not reduce the leakage score or cap the overall score.",
@@ -256,7 +256,7 @@
         }
       ],
       "row_count": 1000,
-      "runtime_seconds": 0.034377,
+      "runtime_seconds": 0.027824,
       "sub_scores": {
         "completeness": 100.0,
         "feature_usability": 99.2,
@@ -300,8 +300,8 @@
       "risks": [
         {
           "code": "conflicting_target_labels",
-          "evidence": "60 labeled row(s) are included in these groups.",
-          "finding": "30 feature-identical group(s) contain more than one non-missing target label.",
+          "evidence": "60 labeled rows are included in these groups.",
+          "finding": "30 feature-identical groups contain more than one non-missing target label.",
           "modeling_impact": "Inconsistent labels for identical recorded features can introduce irreducible ambiguity or reveal missing time/entity context.",
           "recommendation": "Review whether these are label errors, repeated entities over time, target updates, or omitted distinguishing features.",
           "score_effect": "Evidence only; this finding does not change any score or guardrail.",
@@ -314,23 +314,23 @@
           "finding": "The target is dominated by one class, so headline accuracy may hide poor minority-class performance.",
           "modeling_impact": "A model may favor the majority class and underperform on less common outcomes.",
           "recommendation": "Use class-sensitive metrics and consider resampling, weighting, or collecting more minority examples.",
-          "score_effect": "Reduces the existing target-balance score and may trigger the critical-sub-score guardrail.",
+          "score_effect": "Reduces the target-balance score and may trigger the critical-sub-score guardrail.",
           "severity": "Moderate",
           "title": "Target imbalance"
         },
         {
           "code": "numeric_outlier_concentration",
           "evidence": "Affected fields: hours_per_week.",
-          "finding": "1 numeric feature(s) have notable IQR-based outlier rates.",
+          "finding": "1 numeric feature has notable IQR-based outlier rates.",
           "modeling_impact": "Extreme values can dominate some model families or indicate collection and unit inconsistencies.",
           "recommendation": "Inspect the outlier rows and confirm whether they are real edge cases or data entry errors.",
-          "score_effect": "Reduces the existing feature-usability score at the current outlier thresholds.",
+          "score_effect": "Reduces the feature-usability score at the current outlier thresholds.",
           "severity": "Moderate",
           "title": "Numeric outlier concentration"
         }
       ],
       "row_count": 48842,
-      "runtime_seconds": 0.198111,
+      "runtime_seconds": 0.185645,
       "sub_scores": {
         "completeness": 99.12,
         "feature_usability": 98.86,
@@ -375,8 +375,8 @@
       "risks": [
         {
           "code": "conflicting_target_labels",
-          "evidence": "10 labeled row(s) are included in these groups.",
-          "finding": "5 feature-identical group(s) contain more than one non-missing target label.",
+          "evidence": "10 labeled rows are included in these groups.",
+          "finding": "5 feature-identical groups contain more than one non-missing target label.",
           "modeling_impact": "Inconsistent labels for identical recorded features can introduce irreducible ambiguity or reveal missing time/entity context.",
           "recommendation": "Review whether these are label errors, repeated entities over time, target updates, or omitted distinguishing features.",
           "score_effect": "Evidence only; this finding does not change any score or guardrail.",
@@ -389,23 +389,23 @@
           "finding": "The target is dominated by one class, so headline accuracy may hide poor minority-class performance.",
           "modeling_impact": "A model may favor the majority class and underperform on less common outcomes.",
           "recommendation": "Use class-sensitive metrics and consider resampling, weighting, or collecting more minority examples.",
-          "score_effect": "Reduces the existing target-balance score and may trigger the critical-sub-score guardrail.",
+          "score_effect": "Reduces the target-balance score and may trigger the critical-sub-score guardrail.",
           "severity": "Moderate",
           "title": "Target imbalance"
         },
         {
           "code": "constant_fields",
           "evidence": "Affected fields: validation_constant.",
-          "finding": "1 feature column(s) contain only one observed value.",
+          "finding": "1 feature column contains only one observed value.",
           "modeling_impact": "Constant inputs cannot help a classifier distinguish outcomes.",
           "recommendation": "Remove constant fields from modeling inputs unless they are required for downstream lineage.",
-          "score_effect": "Reduces the existing feature-usability score.",
+          "score_effect": "Reduces the feature-usability score.",
           "severity": "Moderate",
           "title": "Low-value constant fields"
         }
       ],
       "row_count": 48842,
-      "runtime_seconds": 0.214474,
+      "runtime_seconds": 0.199209,
       "sub_scores": {
         "completeness": 99.17,
         "feature_usability": 98.13,
@@ -450,8 +450,8 @@
       "risks": [
         {
           "code": "conflicting_target_labels",
-          "evidence": "11 labeled row(s) are included in these groups.",
-          "finding": "5 feature-identical group(s) contain more than one non-missing target label.",
+          "evidence": "11 labeled rows are included in these groups.",
+          "finding": "5 feature-identical groups contain more than one non-missing target label.",
           "modeling_impact": "Inconsistent labels for identical recorded features can introduce irreducible ambiguity or reveal missing time/entity context.",
           "recommendation": "Review whether these are label errors, repeated entities over time, target updates, or omitted distinguishing features.",
           "score_effect": "Evidence only; this finding does not change any score or guardrail.",
@@ -460,11 +460,11 @@
         },
         {
           "code": "duplicate_records",
-          "evidence": "5052 repeated row(s) (9.38%) across 5040 group(s); largest group: 5 rows.",
+          "evidence": "5052 repeated rows (9.38%) across 5040 groups; largest group: 5 rows.",
           "finding": "Duplicate rows may cause the model to overfit repeated examples or inflate validation confidence.",
           "modeling_impact": "Repeated examples can be split across training and validation data and make evaluation appear stronger than it is.",
           "recommendation": "Deduplicate records or confirm that repeated rows represent legitimate repeated events.",
-          "score_effect": "Reduces uniqueness and may apply the existing severe-duplicates guardrail.",
+          "score_effect": "Reduces uniqueness and may apply the severe-duplicates guardrail.",
           "severity": "Moderate",
           "title": "Duplicate records"
         },
@@ -474,13 +474,13 @@
           "finding": "The target is dominated by one class, so headline accuracy may hide poor minority-class performance.",
           "modeling_impact": "A model may favor the majority class and underperform on less common outcomes.",
           "recommendation": "Use class-sensitive metrics and consider resampling, weighting, or collecting more minority examples.",
-          "score_effect": "Reduces the existing target-balance score and may trigger the critical-sub-score guardrail.",
+          "score_effect": "Reduces the target-balance score and may trigger the critical-sub-score guardrail.",
           "severity": "Moderate",
           "title": "Target imbalance"
         }
       ],
       "row_count": 53842,
-      "runtime_seconds": 0.205162,
+      "runtime_seconds": 0.201498,
       "sub_scores": {
         "completeness": 99.11,
         "feature_usability": 98.86,
@@ -531,8 +531,8 @@
       "risks": [
         {
           "code": "conflicting_target_labels",
-          "evidence": "16 labeled row(s) are included in these groups.",
-          "finding": "8 feature-identical group(s) contain more than one non-missing target label.",
+          "evidence": "16 labeled rows are included in these groups.",
+          "finding": "8 feature-identical groups contain more than one non-missing target label.",
           "modeling_impact": "Inconsistent labels for identical recorded features can introduce irreducible ambiguity or reveal missing time/entity context.",
           "recommendation": "Review whether these are label errors, repeated entities over time, target updates, or omitted distinguishing features.",
           "score_effect": "Evidence only; this finding does not change any score or guardrail.",
@@ -541,11 +541,11 @@
         },
         {
           "code": "severe_feature_missingness",
-          "evidence": "48842 row(s) (100.0%) contain at least one missing feature.",
+          "evidence": "48842 rows (100.0%) contain at least one missing feature.",
           "finding": "Feature columns with at least 50% missing values include: workclass.",
           "modeling_impact": "Dropping incomplete rows may reduce the usable sample, while unexamined imputation may distort feature meaning.",
           "recommendation": "Review each severe column and decide whether to recollect, impute, add an explicit missing indicator, or exclude it.",
-          "score_effect": "Affects feature usability and applies the existing severe-feature-missingness guardrail.",
+          "score_effect": "Affects feature usability and applies the severe-feature-missingness guardrail.",
           "severity": "High",
           "title": "Severe feature missingness"
         },
@@ -555,13 +555,13 @@
           "finding": "The target is dominated by one class, so headline accuracy may hide poor minority-class performance.",
           "modeling_impact": "A model may favor the majority class and underperform on less common outcomes.",
           "recommendation": "Use class-sensitive metrics and consider resampling, weighting, or collecting more minority examples.",
-          "score_effect": "Reduces the existing target-balance score and may trigger the critical-sub-score guardrail.",
+          "score_effect": "Reduces the target-balance score and may trigger the critical-sub-score guardrail.",
           "severity": "Moderate",
           "title": "Target imbalance"
         }
       ],
       "row_count": 48842,
-      "runtime_seconds": 0.175739,
+      "runtime_seconds": 0.174474,
       "sub_scores": {
         "completeness": 92.83,
         "feature_usability": 95.86,
@@ -588,7 +588,7 @@
         {
           "cap": 69.0,
           "code": "missing_target_labels",
-          "explanation": "4885 row(s) have missing target labels and were excluded from class calculations."
+          "explanation": "4885 rows have missing target labels and were excluded from class calculations."
         },
         {
           "cap": 69.0,
@@ -612,17 +612,17 @@
         {
           "code": "missing_target_labels",
           "evidence": "43957 of 48842 rows have usable labels.",
-          "finding": "4885 row(s) (10.0%) have no target label and were excluded from class calculations.",
+          "finding": "4885 rows (10.0%) have no target label and were excluded from class calculations.",
           "modeling_impact": "Training or evaluation may use fewer examples than the dataset row count suggests.",
           "recommendation": "Resolve, exclude, or separately account for unlabeled rows before model training and evaluation.",
-          "score_effect": "Applies the existing missing-target-label guardrail; target rows remain separate from completeness scoring.",
+          "score_effect": "Applies the missing-target-label guardrail; target rows remain separate from completeness scoring.",
           "severity": "High",
           "title": "Missing target labels"
         },
         {
           "code": "conflicting_target_labels",
-          "evidence": "10 labeled row(s) are included in these groups.",
-          "finding": "5 feature-identical group(s) contain more than one non-missing target label.",
+          "evidence": "10 labeled rows are included in these groups.",
+          "finding": "5 feature-identical groups contain more than one non-missing target label.",
           "modeling_impact": "Inconsistent labels for identical recorded features can introduce irreducible ambiguity or reveal missing time/entity context.",
           "recommendation": "Review whether these are label errors, repeated entities over time, target updates, or omitted distinguishing features.",
           "score_effect": "Evidence only; this finding does not change any score or guardrail.",
@@ -635,13 +635,13 @@
           "finding": "The target is dominated by one class, so headline accuracy may hide poor minority-class performance.",
           "modeling_impact": "A model may favor the majority class and underperform on less common outcomes.",
           "recommendation": "Use class-sensitive metrics and consider resampling, weighting, or collecting more minority examples.",
-          "score_effect": "Reduces the existing target-balance score and may trigger the critical-sub-score guardrail.",
+          "score_effect": "Reduces the target-balance score and may trigger the critical-sub-score guardrail.",
           "severity": "Moderate",
           "title": "Target imbalance"
         }
       ],
       "row_count": 48842,
-      "runtime_seconds": 0.18742,
+      "runtime_seconds": 0.188079,
       "sub_scores": {
         "completeness": 98.45,
         "feature_usability": 98.86,
@@ -690,8 +690,8 @@
       "risks": [
         {
           "code": "conflicting_target_labels",
-          "evidence": "10 labeled row(s) are included in these groups.",
-          "finding": "5 feature-identical group(s) contain more than one non-missing target label.",
+          "evidence": "10 labeled rows are included in these groups.",
+          "finding": "5 feature-identical groups contain more than one non-missing target label.",
           "modeling_impact": "Inconsistent labels for identical recorded features can introduce irreducible ambiguity or reveal missing time/entity context.",
           "recommendation": "Review whether these are label errors, repeated entities over time, target updates, or omitted distinguishing features.",
           "score_effect": "Evidence only; this finding does not change any score or guardrail.",
@@ -704,23 +704,23 @@
           "finding": "The target is dominated by one class, so headline accuracy may hide poor minority-class performance.",
           "modeling_impact": "A model may favor the majority class and underperform on less common outcomes.",
           "recommendation": "Use class-sensitive metrics and consider resampling, weighting, or collecting more minority examples.",
-          "score_effect": "Reduces the existing target-balance score and may trigger the critical-sub-score guardrail.",
+          "score_effect": "Reduces the target-balance score and may trigger the critical-sub-score guardrail.",
           "severity": "Moderate",
           "title": "Target imbalance"
         },
         {
           "code": "numeric_outlier_concentration",
           "evidence": "Affected fields: hours_per_week.",
-          "finding": "1 numeric feature(s) have notable IQR-based outlier rates.",
+          "finding": "1 numeric feature has notable IQR-based outlier rates.",
           "modeling_impact": "Extreme values can dominate some model families or indicate collection and unit inconsistencies.",
           "recommendation": "Inspect the outlier rows and confirm whether they are real edge cases or data entry errors.",
-          "score_effect": "Reduces the existing feature-usability score at the current outlier thresholds.",
+          "score_effect": "Reduces the feature-usability score at the current outlier thresholds.",
           "severity": "Moderate",
           "title": "Numeric outlier concentration"
         }
       ],
       "row_count": 48842,
-      "runtime_seconds": 0.195958,
+      "runtime_seconds": 0.199331,
       "sub_scores": {
         "completeness": 98.81,
         "feature_usability": 98.93,
@@ -746,7 +746,7 @@
         {
           "cap": 49.0,
           "code": "strong_leakage",
-          "explanation": "Strong outcome-like leakage candidate(s) require review before the dataset can be relied on: post_income_outcome"
+          "explanation": "1 strong outcome-like leakage candidate require review before the dataset can be relied on: post_income_outcome"
         },
         {
           "cap": 69.0,
@@ -763,7 +763,7 @@
         {
           "classification": "strong",
           "column": "post_income_outcome",
-          "reason": "name contains outcome-like phrase(s): outcome"
+          "reason": "name contains outcome-like wording: outcome"
         }
       ],
       "missing_feature_row_rate": 7.41,
@@ -774,7 +774,7 @@
       "risks": [
         {
           "code": "possible_target_leakage",
-          "evidence": "1 strong name-based candidate(s): post_income_outcome.",
+          "evidence": "1 strong name-based candidate: post_income_outcome.",
           "finding": "Strong outcome-like column names such as post_income_outcome may expose information unavailable at prediction time.",
           "modeling_impact": "Validation performance may look much better than real deployment performance.",
           "recommendation": "Confirm when each flagged value becomes available and exclude post-outcome fields before training or validation.",
@@ -788,23 +788,23 @@
           "finding": "The target is dominated by one class, so headline accuracy may hide poor minority-class performance.",
           "modeling_impact": "A model may favor the majority class and underperform on less common outcomes.",
           "recommendation": "Use class-sensitive metrics and consider resampling, weighting, or collecting more minority examples.",
-          "score_effect": "Reduces the existing target-balance score and may trigger the critical-sub-score guardrail.",
+          "score_effect": "Reduces the target-balance score and may trigger the critical-sub-score guardrail.",
           "severity": "Moderate",
           "title": "Target imbalance"
         },
         {
           "code": "numeric_outlier_concentration",
           "evidence": "Affected fields: hours_per_week.",
-          "finding": "1 numeric feature(s) have notable IQR-based outlier rates.",
+          "finding": "1 numeric feature has notable IQR-based outlier rates.",
           "modeling_impact": "Extreme values can dominate some model families or indicate collection and unit inconsistencies.",
           "recommendation": "Inspect the outlier rows and confirm whether they are real edge cases or data entry errors.",
-          "score_effect": "Reduces the existing feature-usability score at the current outlier thresholds.",
+          "score_effect": "Reduces the feature-usability score at the current outlier thresholds.",
           "severity": "Moderate",
           "title": "Numeric outlier concentration"
         }
       ],
       "row_count": 48842,
-      "runtime_seconds": 0.195668,
+      "runtime_seconds": 0.19623,
       "sub_scores": {
         "completeness": 99.17,
         "feature_usability": 98.93,
@@ -851,23 +851,23 @@
           "finding": "The target is dominated by one class, so headline accuracy may hide poor minority-class performance.",
           "modeling_impact": "A model may favor the majority class and underperform on less common outcomes.",
           "recommendation": "Use class-sensitive metrics and consider resampling, weighting, or collecting more minority examples.",
-          "score_effect": "Reduces the existing target-balance score and may trigger the critical-sub-score guardrail.",
+          "score_effect": "Reduces the target-balance score and may trigger the critical-sub-score guardrail.",
           "severity": "High",
           "title": "Target imbalance"
         },
         {
           "code": "numeric_outlier_concentration",
           "evidence": "Affected fields: education_years, hours_per_week.",
-          "finding": "2 numeric feature(s) have notable IQR-based outlier rates.",
+          "finding": "2 numeric features have notable IQR-based outlier rates.",
           "modeling_impact": "Extreme values can dominate some model families or indicate collection and unit inconsistencies.",
           "recommendation": "Inspect the outlier rows and confirm whether they are real edge cases or data entry errors.",
-          "score_effect": "Reduces the existing feature-usability score at the current outlier thresholds.",
+          "score_effect": "Reduces the feature-usability score at the current outlier thresholds.",
           "severity": "Moderate",
           "title": "Numeric outlier concentration"
         },
         {
           "code": "leakage_review_prompts",
-          "evidence": "1 review-only candidate(s): marital_status.",
+          "evidence": "1 review-only candidate: marital_status.",
           "finding": "Columns such as marital_status have generic status or target-related names, but their names alone are not strong leakage evidence.",
           "modeling_impact": "If a field is only available after the outcome, offline validation may not represent deployment.",
           "recommendation": "Confirm when these values become available; this review prompt does not reduce the leakage score or cap the overall score.",
@@ -877,7 +877,7 @@
         }
       ],
       "row_count": 37655,
-      "runtime_seconds": 0.145785,
+      "runtime_seconds": 0.148028,
       "sub_scores": {
         "completeness": 98.98,
         "feature_usability": 97.71,

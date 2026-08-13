@@ -15,7 +15,8 @@ setup(
         "flask>=3.0",
         "jinja2>=3.0",
         "pandas>=1.5",
+        "weasyprint>=69,<70",
     ],
-    extras_require={"dev": ["pytest>=7.0"]},
+    extras_require={"dev": ["pypdf>=6,<7", "pytest>=7.0"]},
     entry_points={"console_scripts": ["datatrust=datatrust.cli:main"]},
 )

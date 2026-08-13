@@ -2,7 +2,7 @@
 
 Generated: 2026-06-14T01:56:19.112560+00:00
 
-This is internal supporting credibility evidence. It is not a V1 pass gate,
+This is internal supporting credibility evidence. It is not a product acceptance gate,
 does not claim superiority, and must not be shown during blinded practitioner
 reviews.
 

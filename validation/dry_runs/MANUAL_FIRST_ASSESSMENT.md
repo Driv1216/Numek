@@ -1,6 +1,6 @@
 # Manual-First Dataset Assessment
 
-Complete and seal this form before seeing any DataTrust output.
+Complete this form before seeing any DataTrust output.
 
 ## Session Identity
 
@@ -19,7 +19,7 @@ Why:
 
 ## Precommitted Important Findings
 
-List only issues you judge important and within DataTrust V1 scope: missingness,
+List only issues you judge important and within the documented DataTrust scope: missingness,
 duplicates, classification target balance, constant or near-constant fields,
 high-cardinality categorical fields, numeric IQR outliers, and heuristic target
 leakage prompts.
@@ -36,9 +36,8 @@ leakage prompts.
 
 Checks performed or intentionally omitted:
 
-## Seal
+## Review Confirmation
 
 - Reviewer signature or typed name:
-- Facilitator received/sealed at:
-- SHA-256 of sealed completed file:
-- No additions were made after sealing: [ ] Confirmed
+- Facilitator received at:
+- No additions were made after DataTrust output was viewed: [ ] Confirmed

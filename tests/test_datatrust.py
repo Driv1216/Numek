@@ -104,7 +104,7 @@ def test_python_api_generates_report(tmp_path):
 
     assert result == str(output)
     html = output.read_text(encoding="utf-8")
-    assert "1. Executive Summary" in html
+    assert "1. Decision Summary" in html
     assert "8. Technical Appendix" in html
 
 
@@ -425,11 +425,11 @@ def test_report_has_eight_sections_visuals_print_styles_and_escaped_context(tmp_
     html = output.read_text(encoding="utf-8")
 
     for heading in (
-        "1. Executive Summary",
-        "2. Prioritized Action Plan",
+        "1. Decision Summary",
+        "2. Priority Actions",
         "3. Dataset Overview",
-        "4. Missingness Evidence",
-        "5. Target and Label Evidence",
+        "4. Target and Label Evidence",
+        "5. Missingness Evidence",
         "6. Duplicate and Feature Evidence",
         "7. Scoring, Methodology, and Limitations",
         "8. Technical Appendix",
@@ -438,7 +438,108 @@ def test_report_has_eight_sections_visuals_print_styles_and_escaped_context(tmp_
     assert "aria-label=\"Horizontal bars showing target class distribution\"" in html
     assert "aria-label=\"Horizontal bars showing missing percentage by feature\"" in html
     assert "@media print" in html
+    assert "@page appendix" in html
+    assert "page: appendix" in html
+    assert "existing guardrails" not in html
+    assert "established DataTrust formulas" not in html
     assert "<script>alert(1)</script>" not in html
     assert "&lt;script&gt;alert(1)&lt;/script&gt;" in html
     assert "Review &lt;b&gt;loan&lt;/b&gt; readiness" in html
     assert str(tmp_path) not in html
+    assert "Feature columns" in html
+    assert "Potential features" not in html
+    assert "Priority actions are ordered by severity" in html
+
+
+def test_report_adds_safe_wrap_points_to_long_camel_case_names(tmp_path):
+    target = "CustomerApprovalOutcomeForInternationalOperations"
+    path = tmp_path / "QuarterlyCustomerApprovalDataset.csv"
+    pd.DataFrame({"feature": [1, 2, 3], target: [0, 1, 0]}).to_csv(
+        path, index=False
+    )
+    output = tmp_path / "report.html"
+
+    DataTrust(str(path), target=target).generate_report(str(output))
+    html = output.read_text(encoding="utf-8")
+
+    assert "Quarterly<wbr>Customer<wbr>Approval<wbr>Dataset" in html
+    assert (
+        "Customer<wbr>Approval<wbr>Outcome<wbr>For<wbr>International<wbr>Operations"
+        in html
+    )
+    assert (
+        "<td>Customer<wbr>Approval<wbr>Outcome<wbr>For<wbr>International<wbr>Operations</td>"
+        in html
+    )
+
+
+def test_fallback_report_names_are_humanized_without_changing_custom_names(tmp_path):
+    data = {"feature": [1, 2, 3, 4], "label": [0, 1, 0, 1]}
+    cases = {
+        "heart.csv": "Heart",
+        "Titanic-Dataset.csv": "Titanic Dataset",
+        "loan_default_data.csv": "Loan Default Data",
+        "COVID19_data.csv": "COVID19 Data",
+    }
+
+    for filename, expected in cases.items():
+        path = tmp_path / filename
+        pd.DataFrame(data).to_csv(path, index=False)
+        result = DataTrust(str(path), target="label").analyze()
+        assert result["context"]["dataset_name"] == expected
+
+    source_path = tmp_path / "dataset.csv"
+    pd.DataFrame(data).to_csv(source_path, index=False)
+    uploaded = DataTrust(
+        str(source_path), target="label", source_filename="OriginalUpload_name.csv"
+    ).analyze()
+    custom = DataTrust(
+        str(source_path), target="label", dataset_name="custom_report_name"
+    ).analyze()
+
+    assert uploaded["context"]["dataset_name"] == "Original Upload Name"
+    assert uploaded["context"]["source_filename"] == "OriginalUpload_name.csv"
+    assert custom["context"]["dataset_name"] == "custom_report_name"
+
+
+def test_clean_report_uses_empty_state_without_removing_compatibility_finding(tmp_path):
+    path = tmp_path / "clean.csv"
+    pd.DataFrame({"feature": [1, 2, 3, 4], "label": [0, 1, 0, 1]}).to_csv(
+        path, index=False
+    )
+    output = tmp_path / "clean-report.html"
+
+    audit = DataTrust(str(path), target="label")
+    result = audit.analyze()
+    audit.generate_report(str(output))
+    html = output.read_text(encoding="utf-8")
+
+    assert [finding["code"] for finding in result["findings"]] == ["no_major_issues"]
+    assert [risk["code"] for risk in result["risks"]] == ["no_major_issues"]
+    assert "No priority actions were generated" in html
+    assert "Passing these checks does not establish fairness" in html
+    assert '<article class="card action-card Low">' not in html
+
+
+def test_generated_findings_use_correct_singular_and_plural_grammar(tmp_path):
+    singular_path = tmp_path / "singular-outlier.csv"
+    pd.DataFrame(
+        {"value": list(range(1, 20)) + [100], "label": [0, 1] * 10}
+    ).to_csv(singular_path, index=False)
+    singular = DataTrust(str(singular_path), target="label").analyze()
+    outlier = next(item for item in singular["findings"] if item["code"] == "numeric_outlier_concentration")
+
+    plural_path = tmp_path / "plural-outlier.csv"
+    pd.DataFrame(
+        {
+            "value_a": list(range(1, 20)) + [100],
+            "value_b": list(range(11, 30)) + [200],
+            "label": [0, 1] * 10,
+        }
+    ).to_csv(plural_path, index=False)
+    plural = DataTrust(str(plural_path), target="label").analyze()
+    plural_outlier = next(item for item in plural["findings"] if item["code"] == "numeric_outlier_concentration")
+
+    assert outlier["finding"].startswith("1 numeric feature has")
+    assert plural_outlier["finding"].startswith("2 numeric features have")
+    assert "feature(s)" not in outlier["finding"] + plural_outlier["finding"]

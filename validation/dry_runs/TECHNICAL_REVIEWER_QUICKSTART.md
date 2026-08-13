@@ -1,12 +1,17 @@
 # Uninvolved Technical Reviewer Quickstart
 
+Status: Historical / superseded on 2026-08-04.
+
+This quickstart was used for the RC_003 technical-review process. It is retained
+as archived evidence, not as an active requirement for future product progress.
+
 ## Your Task
 
 Generate one local DataTrust HTML reliability report from the assigned CSV
 within `15` minutes, without assistance from the Numek founder or team.
 
 Use only the clean reviewer packet. Do not request or inspect the full working
-repository. DataTrust V1 supports CSV classification datasets only.
+repository. DataTrust supports CSV classification datasets only.
 
 Your assignment must state:
 
@@ -22,44 +27,24 @@ Quote every path because directories and filenames may contain spaces.
 
 DataTrust runs locally and does not upload the CSV. Do not send the dataset,
 report, screenshots, row values, or private column contents to the facilitator.
-Record only aliases, dimensions, target, and SHA-256 identities in the evidence
-form.
-
-Before the timed run, record the local dataset's SHA-256:
-
-Windows PowerShell:
-
-```powershell
-(Get-FileHash -Algorithm SHA256 -LiteralPath "<dataset-path>").Hash.ToLower()
-```
-
-macOS:
-
-```bash
-shasum -a 256 "<dataset-path>"
-```
-
-Linux:
-
-```bash
-sha256sum "<dataset-path>"
-```
+Record only aliases, dimensions, target, environment details, commands, errors,
+and feedback in the evidence form.
 
 ## Before The Timed Run
 
 1. Confirm you have not worked on DataTrust or seen its output for this dataset.
 2. Inspect the assigned CSV using your normal local process.
 3. Complete `MANUAL_FIRST_ASSESSMENT.md`.
-4. Give the completed assessment to the facilitator to seal before seeing any
-   DataTrust output.
+4. Give the completed assessment to the facilitator before seeing any DataTrust
+   output.
 
 The manual-first assessment is separate from the `15`-minute install/run timer.
 
 ## Select Python Before Timing
 
-Python `3.11` or newer is required.
+Python `3.10` or newer is required.
 
-Select one installed Python command that reports version `3.11` or newer.
+Select one installed Python command that reports version `3.10` or newer.
 Record the OS/version, selected command, and exact Python version in the
 Environment And Installation Evidence section. Use that same selection to
 create the environment. Do not silently switch interpreters.
@@ -68,28 +53,28 @@ Windows PowerShell examples:
 
 ```powershell
 $PythonExe = "py"
-$PythonArgs = @("-3.11")
+$PythonArgs = @("-3.10")
 & $PythonExe @PythonArgs --version
 ```
 
-Other valid Windows selections may include `@("-3.12")` or a quoted full path
+Other valid Windows selections may include `@("-3.11")`, `@("-3.12")`, or a quoted full path
 to a Python executable. Keep `$PythonExe` and `$PythonArgs` unchanged throughout
 the run.
 
 macOS/Linux examples:
 
 ```bash
-PYTHON_CMD=(python3.11)
+PYTHON_CMD=(python3.10)
 "${PYTHON_CMD[@]}" --version
 ```
 
-Other valid macOS/Linux selections may include `python3.12`, `python3.13`,
+Other valid macOS/Linux selections may include `python3.11`, `python3.12`, `python3.13`,
 `python3`, or a quoted full executable path. Keep `PYTHON_CMD` unchanged
 throughout the run.
 
-If a candidate command is missing or reports Python older than `3.11`, try
+If a candidate command is missing or reports Python older than `3.10`, try
 another installed command before timing. If no installed command reports
-Python `3.11` or newer, stop before the timed run. Record the issue and install
+Python `3.10` or newer, stop before the timed run. Record the issue and install
 a supported Python from https://www.python.org/downloads/ or reschedule.
 
 ## Windows PowerShell Timed Run
@@ -156,36 +141,16 @@ macOS/Linux:
 ```
 
 The environment Python version must match the interpreter selected before
-timing and must be Python `3.11` or newer.
+timing and must be Python `3.10` or newer.
 
 ## Record Private Dataset Evidence
 
-Record dataset alias, local SHA-256, row count, column count, and target in the
-separate Private Dataset Evidence section. Do not include private rows or raw
-values.
+Record dataset alias, row count, column count, and target in the separate
+Private Dataset Evidence section. Do not include private rows or raw values.
 
 ## Record The Generated Report Identity
 
-Record the exact report alias and local SHA-256 before the report is given to
-the separate non-technical reviewer.
-
-Windows PowerShell:
-
-```powershell
-(Get-FileHash -Algorithm SHA256 -LiteralPath "<output-report-path>").Hash.ToLower()
-```
-
-macOS:
-
-```bash
-shasum -a 256 "<output-report-path>"
-```
-
-Linux:
-
-```bash
-sha256sum "<output-report-path>"
-```
+Record the exact report alias and output path.
 
 ## Python API Alternative
 
@@ -204,7 +169,7 @@ audit.generate_report("<output-report-path>")
 Record every error, uncertainty, workaround, and attempted command verbatim.
 The facilitator cannot answer setup or product questions during the timed run.
 
-- If no installed command reports Python `3.11` or newer, stop before timing
+- If no installed command reports Python `3.10` or newer, stop before timing
   and follow the Python instructions above.
 - If the environment Python version differs from the selected interpreter,
   stop and record the mismatch.

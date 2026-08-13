@@ -1,5 +1,10 @@
 # Technical Dry-Run Evidence
 
+Status: Historical / superseded on 2026-08-04.
+
+This form was used for the RC_003 technical-review process. It is retained as
+archived evidence, not as an active requirement for future product progress.
+
 Complete this form for one uninvolved technical reviewer. Do not prefill human
 answers or outcomes.
 
@@ -9,8 +14,6 @@ answers or outcomes.
 - Reviewer role/background:
 - Uninvolved in DataTrust development: [ ] Yes [ ] No
 - Candidate ID:
-- Candidate manifest path:
-- Candidate verified before session: [ ] Pass [ ] Fail
 
 ## Environment And Installation Evidence
 
@@ -25,13 +28,12 @@ answers or outcomes.
 ## Private Dataset Evidence
 
 - Dataset alias only:
-- Local dataset SHA-256:
 - Dataset row count:
 - Dataset column count:
 - Target column:
 - Dataset eligibility confirmed as CSV classification: [ ] Yes [ ] No
-- Sealed manual-first assessment path:
-- Manual-first assessment sealed before output: [ ] Yes [ ] No
+- Manual-first assessment path:
+- Manual-first assessment completed before output: [ ] Yes [ ] No
 
 ## Timed Install And Run
 
@@ -44,10 +46,9 @@ answers or outcomes.
 - Exact commands attempted:
 - Exact errors, questions, uncertainties, and workarounds:
 - Generated report alias:
-- Generated report SHA-256:
 - Measured report-generation runtime, if separately measured:
 - Report opened successfully: [ ] Yes [ ] No
-- All six numbered V1 sections present: [ ] Yes [ ] No
+- All six numbered report sections present: [ ] Yes [ ] No
 
 ## Top-Risk Communication Check
 
@@ -74,11 +75,10 @@ Without facilitator prompts, the reviewer records for every displayed top risk:
 - Facilitator responses were limited to neutral timing/procedure statements:
   [ ] Yes [ ] No
 - Any protocol deviation:
-- Candidate verified after session: [ ] Pass [ ] Fail
 - Environment/version evidence kept separate from private dataset evidence:
   [ ] Yes [ ] No
-- Technical and non-technical sessions reference the same unchanged report
-  SHA-256: [ ] Confirmed [ ] Not confirmed
+- Technical and non-technical sessions reference the same report alias:
+  [ ] Confirmed [ ] Not confirmed
 
 ## Objective Outcome
 

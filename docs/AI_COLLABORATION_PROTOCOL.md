@@ -1,6 +1,6 @@
 # Numek AI Collaboration Protocol
 
-Last updated: 2026-06-14  
+Last updated: 2026-08-13
 Status: Active  
 Owner and final decision-maker: Drivyaansh  
 Repository/documentation steward and technical verifier: Codex
@@ -26,6 +26,12 @@ Propose -> Critique -> Verify -> Decide -> Record -> Build -> Test -> Update Con
 An AI suggestion is not automatically a Numek decision.
 
 Only verified facts and decisions approved by Drivyaansh become canonical project truth.
+
+Living project context uses capability names and explicit statuses such as
+completed, current, proposed, or undecided. Do not introduce generic sequential
+product-version labels into plans, source packets, or future chat context.
+Actual software versions and immutable release identifiers remain unchanged
+when they are technically or historically meaningful.
 
 ## Roles
 
@@ -56,6 +62,11 @@ Codex has access to the working repository and is responsible for:
 - identifying contradictions between docs and implementation
 
 Codex may independently record verified technical facts. Codex must not silently approve strategic decisions on behalf of Drivyaansh.
+
+For DataTrust product development after 2026-08-04, Codex and Drivyaansh
+also form the default internal technical, product, and acceptance-review loop.
+External review is optional learning input only when Drivyaansh explicitly asks
+for it; it is not a standing acceptance gate.
 
 ### ChatGPT App: Product Strategy And Research Partner
 
@@ -110,7 +121,8 @@ For major decisions, all three systems may independently analyze the same proble
 When sources disagree, use this hierarchy:
 
 ```text
-1. Actual repo code, tests, generated artifacts, and verified external evidence
+1. Actual repo code, tests, generated artifacts, preserved historical evidence,
+   and verified review evidence
 2. Drivyaansh's latest explicitly approved decision
 3. CURRENT_STATE.md
 4. DECISIONS.md, ROADMAP.md, and KNOWN_UNKNOWNS.md
@@ -151,7 +163,7 @@ Working assumptions belong in `KNOWN_UNKNOWNS.md` with a resolution method and r
 
 Examples:
 
-- add PDF export
+- add PDF export to the CLI or Python API beyond the approved browser UI path
 - integrate Cleanlab
 - open-source the core
 - target healthcare
@@ -214,7 +226,7 @@ Purpose: stable project constitution, history, company thesis, product identity,
 Update only after major changes, such as:
 
 - company or product thesis changes
-- DataTrust moves from V1 to V2
+- a new product capability or direction is approved
 - a major new phase starts
 - the target user fundamentally changes
 - ConfidenceGuard or HallucinationGuard development begins
@@ -291,7 +303,7 @@ Purpose: current priorities, phase gates, and sequencing.
 
 It should clearly state:
 
-- current phase
+- current product status
 - current objective
 - exit gate
 - immediate priorities
@@ -468,4 +480,3 @@ Weekly review questions:
 - What is the single most important next step?
 
 If the answers are mostly documents and ideas for several weeks, the system is producing motion instead of progress.
-

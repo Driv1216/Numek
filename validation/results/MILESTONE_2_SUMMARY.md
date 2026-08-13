@@ -1,14 +1,16 @@
-# Milestone 2 Validation Summary
+# Validation Corpus Summary
 
-Refreshed and verified on 2026-08-05 after the evidence-first report upgrade.
+Refreshed and verified on 2026-08-13 after the target-guidance, layered-report,
+and deterministic language work. Analytical decisions and the eight report
+sections remain unchanged.
 
 ## Public Corpus
 
 | Dataset | Rows | Columns | DataTrust runtime | Overall | Risk band |
 |---|---:|---:|---:|---:|---|
-| UCI German Credit | 1,000 | 21 | 0.034377s | 91.84 | Low |
-| UCI Bank Marketing | 45,211 | 17 | 0.183144s | 69.0 | Elevated |
-| UCI Adult | 48,842 | 15 | 0.183002s | 69.0 | Elevated |
+| UCI German Credit | 1,000 | 21 | 0.027824s | 91.84 | Low |
+| UCI Bank Marketing | 45,211 | 17 | 0.182619s | 69.0 | Elevated |
+| UCI Adult | 48,842 | 15 | 0.184440s | 69.0 | Elevated |
 
 Every public report contains all eight report sections and generated in under `30s`.
 Prepared CSV and raw archive checksums are recorded in the manifests and
@@ -55,13 +57,13 @@ use Python `3.11.15`.
 
 These values are descriptive, not a performance benchmark. The comparison
 documents overlap, divergence, and DataTrust-specific synthesis without claiming
-superiority. It is internal supporting evidence only and is not a V1 pass gate.
+superiority. It is internal supporting evidence only and is not a product acceptance gate.
 
 ## Verification
 
 ```text
 Validation corpus verification passed.
-36 passed
+70 passed
 ```
 
 Deferred, non-blocking product-validation questions:
@@ -71,5 +73,5 @@ Deferred, non-blocking product-validation questions:
 - external finding-quality, score-defensibility, and shareability reactions
 
 These questions were formerly tied to a mandatory external validation gate.
-That gate was superseded on 2026-08-04 and is no longer required for V1 product
+That gate was superseded on 2026-08-04 and is no longer required for product
 building.

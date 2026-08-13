@@ -1,5 +1,7 @@
 from statistics import mean
 
+from datatrust.wording import count_phrase, have_verb
+
 
 def score_profile(profile: dict) -> dict:
     sub_scores = {
@@ -9,9 +11,11 @@ def score_profile(profile: dict) -> dict:
         "feature_usability": _feature_usability_score(profile["columns"]),
         "leakage_risk": _leakage_score(profile["strong_leakage_candidates"]),
     }
-    overall, guardrails = _apply_guardrails(round(mean(sub_scores.values()), 2), sub_scores, profile)
+    evidence_score = round(mean(sub_scores.values()), 2)
+    overall, guardrails = _apply_guardrails(evidence_score, sub_scores, profile)
     return {
         "sub_scores": sub_scores,
+        "evidence_score": evidence_score,
         "overall": overall,
         "risk_level": _risk_level(overall),
         "recommended_action": _recommended_action(overall),
@@ -99,7 +103,7 @@ def _apply_guardrails(score: float, sub_scores: dict, profile: dict) -> tuple:
             _guardrail(
                 "strong_leakage",
                 49.0,
-                "Strong outcome-like leakage candidate(s) require review before the dataset can be relied on: "
+                f"{count_phrase(len(profile['strong_leakage_candidates']), 'strong outcome-like leakage candidate').capitalize()} require review before the dataset can be relied on: "
                 + ", ".join(profile["strong_leakage_candidates"]),
             )
         )
@@ -108,7 +112,7 @@ def _apply_guardrails(score: float, sub_scores: dict, profile: dict) -> tuple:
             _guardrail(
                 "missing_target_labels",
                 69.0,
-                f"{profile['target_missing_count']} row(s) have missing target labels and were excluded from class calculations.",
+                f"{count_phrase(profile['target_missing_count'], 'row').capitalize()} {have_verb(profile['target_missing_count'])} missing target labels and were excluded from class calculations.",
             )
         )
     if profile["class_balance"]["class_count"] <= 1:

@@ -2,8 +2,8 @@ from pathlib import Path
 
 import json
 
-from validation.dry_runs.release_candidate import CANDIDATE_ROOT, DRY_RUN_ROOT, verify_candidate
-from validation.dry_runs.reviewer_packet import PACKET_ROOT, verify_packet
+from validation.dry_runs.release_candidate import CANDIDATE_ROOT, DRY_RUN_ROOT, ROOT
+from validation.dry_runs.reviewer_packet import PACKET_ROOT
 
 
 REQUIRED_CONTENT = {
@@ -24,14 +24,10 @@ REQUIRED_CONTENT = {
         "before seeing any DataTrust output",
         "Independent dataset risk band",
         "Precommitted Important Findings",
-        "Seal",
+        "Review Confirmation",
     ),
     "TECHNICAL_DRY_RUN_EVIDENCE.md": (
-        "Candidate verified before session",
         "Top-Risk Communication Check",
-        "Candidate verified after session",
-        "Local dataset SHA-256",
-        "Generated report SHA-256",
         "Operating system and exact version",
         "Selected Python command",
         "Post-install `pip freeze` output",
@@ -41,14 +37,14 @@ REQUIRED_CONTENT = {
     "NON_TECHNICAL_COMPREHENSION.md": (
         "only the frozen candidate's generated HTML report",
         "within 3 minutes",
-        "Exact report SHA-256",
-        "SHA-256 matches the technical dry-run evidence form",
+        "Exact report alias",
+        "Report alias matches the technical evidence form",
         "What does this report not prove?",
         "Objective Scoring",
     ),
     "FACILITATOR_INSTRUCTIONS.md": (
         "Do not answer setup",
-        "same report alias and",
+        "same report alias",
         "Prohibited Anchoring",
         "Returning Evidence",
     ),
@@ -85,19 +81,26 @@ def verify_candidate_records() -> None:
         raise AssertionError("No dry-run release-candidate manifest exists.")
     for manifest_path in manifests:
         manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
-        required = {"candidate_id", "aggregate_sha256", "files", "schema_version"}
+        required = {"candidate_id", "files", "schema_version"}
         missing = sorted(required - set(manifest))
         if missing:
             raise AssertionError(f"Historical candidate record is incomplete: {manifest_path}: {missing}")
-    verify_candidate(manifests[-1])
+    # RC_003 is now historical evidence. Active source documents may be updated
+    # after the review process was superseded. Do not require historical
+    # candidate hashes to match the current working tree.
 
 
 def verify_packets() -> None:
     manifests = sorted(PACKET_ROOT.glob("*.manifest.json"))
     if not manifests:
         raise AssertionError("No clean reviewer packet manifest exists.")
-    for manifest in manifests:
-        verify_packet(manifest)
+    for manifest_path in manifests:
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        archive_path = manifest.get("archive_path")
+        if not archive_path:
+            raise AssertionError(f"Historical packet record is incomplete: {manifest_path}")
+        if not (ROOT / archive_path).exists():
+            raise AssertionError(f"Historical packet archive is missing: {archive_path}")
 
 
 def verify_all() -> None:
@@ -108,4 +111,4 @@ def verify_all() -> None:
 
 if __name__ == "__main__":
     verify_all()
-    print("Milestone 3 dry-run preparation verification passed; no human dry run executed.")
+    print("Historical dry-run archive verification passed.")

@@ -21,7 +21,9 @@ from flask import (
 from werkzeug.utils import secure_filename
 
 from datatrust import DataTrust
+from datatrust.pdf import PDFRenderError, render_pdf_report
 from datatrust.profiler import inspect_classification_target, inspect_csv_dataset
+from datatrust.renderer import write_html_report
 
 
 class JobStore:
@@ -175,16 +177,32 @@ def create_app(workspace: Path, max_upload_mib: float = 100) -> Flask:
         if "target_info" not in job:
             flash("Confirm the target before generating the report.", "error")
             return redirect(url_for("configure"))
+        if (
+            job["target_info"]["suitability"]["requires_override"]
+            and request.form.get("advanced_target_ack") != "confirmed"
+        ):
+            flash(
+                "Confirm that you still want to use this advanced choice as the prediction outcome.",
+                "error",
+            )
+            return redirect(url_for("confirm"))
         try:
             report_path = job["directory"] / "report.html"
-            DataTrust(
+            audit = DataTrust(
                 str(job["dataset_path"]),
                 target=job["target"],
                 dataset_name=job["dataset_name"],
                 purpose=job["purpose"],
                 source_filename=job["source_filename"],
-            ).generate_report(str(report_path))
-            job["report_path"] = report_path
+            )
+            result = audit.analyze()
+            write_html_report(result, str(report_path))
+            job.update(
+                {
+                    "report_path": report_path,
+                    "summary": _result_summary(result),
+                }
+            )
         except (FileNotFoundError, ValueError) as exc:
             flash(str(exc), "error")
             return redirect(url_for("confirm"))
@@ -196,6 +214,8 @@ def create_app(workspace: Path, max_upload_mib: float = 100) -> Flask:
         if not job:
             return redirect(url_for("index"))
         if not job.get("report_path", Path()).is_file():
+            return redirect(url_for("confirm"))
+        if "summary" not in job:
             return redirect(url_for("confirm"))
         return render_template("ui.html", stage="result", job=job)
 
@@ -217,6 +237,29 @@ def create_app(workspace: Path, max_upload_mib: float = 100) -> Flask:
             mimetype="text/html",
             as_attachment=True,
             download_name=f"{stem or 'datatrust'}-reliability-report.html",
+        )
+
+    @app.get("/download/pdf")
+    def download_pdf():
+        job = require_job()
+        if not job or not job.get("report_path", Path()).is_file():
+            abort(404)
+
+        pdf_path = job["directory"] / "report.pdf"
+        if not pdf_path.is_file():
+            try:
+                render_pdf_report(job["report_path"], pdf_path)
+            except PDFRenderError as exc:
+                flash(str(exc), "error")
+                return redirect(url_for("result"))
+        job["pdf_path"] = pdf_path
+
+        stem = secure_filename(job.get("dataset_name") or Path(job["source_filename"]).stem)
+        return send_file(
+            pdf_path,
+            mimetype="application/pdf",
+            as_attachment=True,
+            download_name=f"{stem or 'datatrust'}-reliability-report.pdf",
         )
 
     @app.post("/new")
@@ -264,3 +307,28 @@ def run_ui(port: int = 8000, max_upload_mib: float = 100, open_browser: bool = T
 def _source_filename(filename: str) -> str:
     normalized = str(filename).replace("\\", "/")
     return Path(normalized).name[:255] or "dataset.csv"
+
+
+def _result_summary(result: dict) -> dict:
+    risks = [
+        {
+            "title": item["title"],
+            "severity": item["severity"],
+            "finding": item["finding"],
+        }
+        for item in result["risks"][:3]
+    ]
+    narrative = result["narrative"]
+    return {
+        "dataset_name": result["context"]["dataset_name"],
+        "source_filename": result["context"]["source_filename"],
+        "target": result["profile"]["target"],
+        "overall": result["scores"]["overall"],
+        "risk_level": result["scores"]["risk_level"],
+        "recommended_action": result["scores"]["recommended_action"],
+        "overall_assessment": narrative["overall_assessment"],
+        "score_explanation": narrative["score_explanation"],
+        "principal_evidence_summary": narrative["principal_evidence_summary"],
+        "what_this_means": narrative["principal_evidence_summary"],
+        "risks": risks,
+    }

@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>DataTrust Local Report Generator</title>
   <style>
-    :root { color-scheme: light; --ink:#17202d; --muted:#5d6877; --line:#d8e0e9; --panel:#f5f7fa; --accent:#176b87; --bad:#b3261e; }
+    :root { color-scheme: light; --ink:#17202d; --muted:#5d6877; --line:#d8e0e9; --panel:#f5f7fa; --accent:#176b87; --accent-soft:#e7f3f7; --good:#167a4a; --warn:#956200; --bad:#b3261e; }
     * { box-sizing: border-box; }
     body { margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; color:var(--ink); background:#f3f6f9; line-height:1.5; }
     main { max-width:1100px; margin:0 auto; padding:32px 24px 56px; }
@@ -23,6 +23,7 @@
     .drop { border:2px dashed #9fb0bf; background:var(--panel); border-radius:10px; padding:28px; text-align:center; }
     button, .button { display:inline-block; border:0; border-radius:7px; padding:10px 16px; background:var(--accent); color:#fff; font:inherit; font-weight:700; text-decoration:none; cursor:pointer; }
     .button.secondary, button.secondary { background:#e7edf2; color:var(--ink); }
+    .button.tertiary, button.tertiary { background:transparent; color:var(--accent); border:1px solid var(--line); }
     .actions { display:flex; gap:10px; flex-wrap:wrap; margin-top:20px; align-items:center; }
     .grid { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:10px; margin:16px 0; }
     .card { border:1px solid var(--line); border-radius:8px; padding:12px; background:#fff; }
@@ -34,9 +35,40 @@
     th { position:sticky; top:0; background:var(--panel); }
     .flash { padding:12px 14px; margin-bottom:14px; border-radius:8px; background:#fff0ef; border:1px solid #efbbb7; color:var(--bad); }
     .confirm { background:#eaf5f8; border:1px solid #c6e1e8; padding:14px; border-radius:8px; }
-    iframe { width:100%; height:72vh; border:1px solid var(--line); border-radius:8px; background:#fff; }
+    .target-guidance { margin-top:18px; }
+    .target-group { border:1px solid var(--line); border-radius:10px; padding:14px; margin-top:12px; background:#fff; }
+    .target-group h4 { margin:0 0 4px; font-size:16px; }
+    .target-options { display:grid; gap:8px; margin-top:10px; }
+    .target-option { display:grid; grid-template-columns:auto minmax(0,1fr); gap:10px; align-items:start; margin:0; padding:11px 12px; border:1px solid var(--line); border-radius:8px; font-weight:400; cursor:pointer; }
+    .target-option:hover { border-color:#8eacba; background:#f8fbfc; }
+    .target-option input { margin-top:4px; }
+    .target-option strong { display:block; overflow-wrap:anywhere; }
+    .target-option .muted { display:block; margin-top:2px; }
+    .target-option.disabled { cursor:not-allowed; opacity:.65; background:var(--panel); }
+    details.target-group summary { cursor:pointer; font-weight:750; }
+    .warning { background:#fff8e6; border:1px solid #e7cb84; padding:14px; border-radius:8px; margin-top:14px; }
+    .acknowledgement { display:grid; grid-template-columns:auto minmax(0,1fr); gap:10px; align-items:start; margin:14px 0 0; font-weight:650; }
+    .acknowledgement input { margin-top:4px; }
+    .result-heading { display:flex; justify-content:space-between; gap:18px; align-items:flex-start; }
+    .result-summary { display:grid; grid-template-columns:minmax(220px,.8fr) minmax(0,2fr); gap:14px; margin-top:18px; }
+    .score-card { border:1px solid var(--line); border-radius:10px; padding:18px; background:var(--panel); }
+    .score { font-size:44px; line-height:1; font-weight:800; margin:12px 0 8px; }
+    .risk-badge { display:inline-block; border-radius:999px; padding:4px 10px; color:#fff; background:var(--accent); font-size:12px; font-weight:750; }
+    .risk-badge.Low { background:var(--good); }
+    .risk-badge.Moderate, .risk-badge.Elevated { background:var(--warn); }
+    .risk-badge.High { background:var(--bad); }
+    .decision-card { border:1px solid #c9e3eb; border-radius:10px; padding:18px; background:var(--accent-soft); }
+    .decision-card h3 { margin:0 0 6px; font-size:16px; }
+    .decision-card h3 + p { margin-bottom:18px; }
+    .risk-list { display:grid; gap:10px; margin-top:10px; }
+    .risk-card { border:1px solid var(--line); border-left:4px solid var(--accent); border-radius:8px; padding:14px 16px; background:#fff; }
+    .risk-card.High { border-left-color:var(--bad); }
+    .risk-card.Moderate { border-left-color:var(--warn); }
+    .risk-card.Low { border-left-color:var(--good); }
+    .risk-card h4 { margin:0 0 6px; font-size:16px; }
+    .risk-card p { margin:0; }
     form.inline { display:inline; }
-    @media(max-width:760px){ .grid{grid-template-columns:1fr 1fr} main{padding:22px 14px 40px} .panel{padding:18px} }
+    @media(max-width:760px){ .grid{grid-template-columns:1fr 1fr} .result-heading{display:block} .result-summary{grid-template-columns:1fr} main{padding:22px 14px 40px} .panel{padding:18px} }
   </style>
 </head>
 <body>
@@ -81,8 +113,65 @@
     <div class="table-wrap"><table><thead><tr>{% for column in job.inspection.columns %}<th>{{ column }}</th>{% endfor %}</tr></thead><tbody>{% for row in job.inspection.preview %}<tr>{% for column in job.inspection.columns %}<td>{{ row[column] }}</td>{% endfor %}</tr>{% endfor %}</tbody></table></div>
     <form method="post">
       <input type="hidden" name="form_token" value="{{ form_token }}">
-      <label for="target">Target column</label>
-      <select id="target" name="target" required><option value="">Choose the value you want to predict</option>{% for column in job.inspection.columns %}<option value="{{ column }}">{{ column }}</option>{% endfor %}</select>
+      <div class="target-guidance">
+        <h3>What outcome is this dataset meant to predict?</h3>
+        <p class="muted">DataTrust groups structurally plausible choices and explains why. It does not choose or preselect the business outcome.</p>
+
+        {% set outcome_options = job.inspection.target_options | selectattr("group", "equalto", "outcome_word") | list %}
+        {% if outcome_options %}
+        <section class="target-group" aria-labelledby="outcome-word-heading">
+          <h4 id="outcome-word-heading">Outcome-word candidates</h4>
+          <p class="muted">These names contain outcome-style wording and have a small observed value set.</p>
+          <div class="target-options">
+            {% for option in outcome_options %}
+            <label class="target-option">
+              <input type="radio" name="target" value="{{ option.name }}" required>
+              <span><strong>{{ option.name }}</strong><span class="muted">{{ option.observed_distinct_count }} distinct values · {{ option.missing_count }} missing · {{ option.selector_explanation }}</span></span>
+            </label>
+            {% endfor %}
+          </div>
+        </section>
+        {% endif %}
+
+        {% set small_options = job.inspection.target_options | selectattr("group", "equalto", "small_class_set") | list %}
+        {% if small_options %}
+        <section class="target-group" aria-labelledby="small-set-heading">
+          <h4 id="small-set-heading">Other small-set candidates</h4>
+          <p class="muted">These columns have a small observed value set, but their names do not establish the intended outcome.</p>
+          <div class="target-options">
+            {% for option in small_options %}
+            <label class="target-option">
+              <input type="radio" name="target" value="{{ option.name }}" required>
+              <span><strong>{{ option.name }}</strong><span class="muted">{{ option.observed_distinct_count }} distinct values · {{ option.missing_count }} missing · {{ option.selector_explanation }}</span></span>
+            </label>
+            {% endfor %}
+          </div>
+        </section>
+        {% endif %}
+
+        {% set advanced_options = job.inspection.target_options | selectattr("group", "equalto", "advanced") | list %}
+        {% set disabled_options = job.inspection.target_options | selectattr("group", "equalto", "disabled") | list %}
+        {% if advanced_options or disabled_options %}
+        <details class="target-group">
+          <summary>Advanced choices ({{ advanced_options | length }})</summary>
+          <p class="muted">These choices look single-class, identifier-like, continuous, or highly categorical. You can still use one intentionally after an extra confirmation.</p>
+          <div class="target-options">
+            {% for option in advanced_options %}
+            <label class="target-option">
+              <input type="radio" name="target" value="{{ option.name }}" required>
+              <span><strong>{{ option.name }}</strong><span class="muted">{{ option.observed_distinct_count }} distinct values · {{ option.missing_count }} missing · {{ option.selector_explanation }}</span></span>
+            </label>
+            {% endfor %}
+            {% for option in disabled_options %}
+            <label class="target-option disabled">
+              <input type="radio" name="target" value="{{ option.name }}" disabled>
+              <span><strong>{{ option.name }}</strong><span class="muted">Unavailable · {{ option.selector_explanation }}</span></span>
+            </label>
+            {% endfor %}
+          </div>
+        </details>
+        {% endif %}
+      </div>
       <label for="dataset_name">Dataset/report name <span class="muted">(optional, 120 characters)</span></label>
       <input id="dataset_name" name="dataset_name" type="text" maxlength="120" placeholder="Defaults to the filename">
       <label for="purpose">Purpose <span class="muted">(optional, 1,000 characters)</span></label>
@@ -94,7 +183,8 @@
   {% elif stage == "confirm" %}
   <section class="panel">
     <h2>Confirm the analysis</h2>
-    <div class="confirm"><strong>Detected {{ job.target_info.classification_subtype }} classification</strong><br><span class="muted">Based on {{ job.target_info.class_count }} observed target class(es). Missing labels are excluded.</span></div>
+    {% set subtype_labels = {"binary": "Binary", "multiclass": "Multiclass", "single-class": "Single-class"} %}
+    <div class="confirm"><strong>Detected task: {{ subtype_labels[job.target_info.classification_subtype] }} classification</strong><br><span class="muted">Based on {{ job.target_info.class_count }} observed target {{ "class" if job.target_info.class_count == 1 else "classes" }}. Missing labels are excluded.</span></div>
     <div class="grid">
       <div class="card"><div class="label">Dataset</div><div class="metric">{{ job.dataset_name or job.source_filename }}</div></div>
       <div class="card"><div class="label">Target</div><div class="metric">{{ job.target }}</div></div>
@@ -102,20 +192,58 @@
       <div class="card"><div class="label">Missing labels</div><div class="metric">{{ job.target_info.target_missing_count }}</div></div>
     </div>
     <div class="table-wrap"><table><thead><tr><th>Target class</th><th>Rows</th><th>Percentage</th></tr></thead><tbody>{% for item in job.target_info.target_distribution %}<tr><td>{{ item.label }}</td><td>{{ item.count }}</td><td>{{ item.percentage }}%</td></tr>{% endfor %}</tbody></table></div>
-    <form method="post" action="{{ url_for('generate') }}"><input type="hidden" name="form_token" value="{{ form_token }}"><div class="actions"><button type="submit">Generate reliability report</button><a class="button secondary" href="{{ url_for('configure') }}">Change selection</a></div></form>
+    <form method="post" action="{{ url_for('generate') }}">
+      <input type="hidden" name="form_token" value="{{ form_token }}">
+      {% if job.target_info.suitability.requires_override %}
+      <div class="warning">
+        <strong>Review this outcome choice</strong>
+        <p>{{ job.target_info.suitability.explanation }}</p>
+        <label class="acknowledgement"><input type="checkbox" name="advanced_target_ack" value="confirmed" required><span>I still want to use <strong>{{ job.target }}</strong> as the prediction outcome.</span></label>
+      </div>
+      {% endif %}
+      <div class="actions"><button type="submit">Generate reliability report</button><a class="button secondary" href="{{ url_for('configure') }}">Change selection</a></div>
+    </form>
   </section>
 
   {% elif stage == "result" %}
   <section class="panel">
-    <h2>Report ready</h2>
-    <p class="muted">The HTML below is the canonical report. Browser printing provides the Save-as-PDF path.</p>
-    <div class="actions">
-      <a class="button" href="{{ url_for('report') }}" target="_blank" rel="noopener">View report</a>
-      <a class="button secondary" href="{{ url_for('download') }}">Download HTML</a>
-      <button class="secondary" type="button" onclick="document.getElementById('report-frame').contentWindow.focus(); document.getElementById('report-frame').contentWindow.print();">Print / Save as PDF</button>
-      <form class="inline" method="post" action="{{ url_for('new_analysis') }}"><input type="hidden" name="form_token" value="{{ form_token }}"><button class="secondary" type="submit">New analysis</button></form>
+    <div class="result-heading">
+      <div>
+        <h2>Dataset reliability overview</h2>
+        <p class="muted">{{ job.summary.dataset_name }} · Target: {{ job.summary.target }} · Source: {{ job.summary.source_filename }}</p>
+      </div>
     </div>
-    <iframe id="report-frame" title="Generated DataTrust reliability report" src="{{ url_for('report') }}"></iframe>
+    <div class="result-summary">
+      <div class="score-card">
+        <span class="risk-badge {{ job.summary.risk_level }}">{{ job.summary.risk_level }} Risk</span>
+        <div class="score">{{ job.summary.overall }}</div>
+        <div class="label">Overall reliability score</div>
+      </div>
+      <div class="decision-card">
+        <h3>What this means</h3>
+        <p>{{ job.summary.overall_assessment }}</p>
+        <h3>Why this score</h3>
+        <p>{{ job.summary.score_explanation }}</p>
+        <h3>Principal evidence</h3>
+        <p>{{ job.summary.principal_evidence_summary }}</p>
+        <h3>Recommended next action</h3>
+        <p>{{ job.summary.recommended_action }}</p>
+      </div>
+    </div>
+    <h3>Top risks</h3>
+    <div class="risk-list">
+      {% for risk in job.summary.risks %}
+      <article class="risk-card {{ risk.severity }}">
+        <h4>{{ risk.title }} <span class="risk-badge {{ risk.severity }}">{{ risk.severity }}</span></h4>
+        <p>{{ risk.finding }}</p>
+      </article>
+      {% endfor %}
+    </div>
+    <div class="actions">
+      <a class="button" href="{{ url_for('download_pdf') }}">Download PDF</a>
+      <a class="button secondary" href="{{ url_for('report') }}" target="_blank" rel="noopener">View full report</a>
+      <form class="inline" method="post" action="{{ url_for('new_analysis') }}"><input type="hidden" name="form_token" value="{{ form_token }}"><button class="tertiary" type="submit">New analysis</button></form>
+    </div>
   </section>
 
   {% else %}

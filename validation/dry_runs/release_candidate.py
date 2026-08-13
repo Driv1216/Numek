@@ -1,3 +1,10 @@
+"""Historical RC_003 release-candidate archive tooling.
+
+This module preserves the old hash-based candidate process for archive
+reproducibility. It is not part of the current internal DataTrust review
+workflow and must not be treated as a future product acceptance requirement.
+"""
+
 import argparse
 import hashlib
 import json

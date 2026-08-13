@@ -1,20 +1,22 @@
 # Frozen Practitioner Validation Evidence Template
 
-This blank template is prepared during Milestone 3 for the later Milestone 4
-round. Complete one copy per ML/data practitioner.
+Status: Historical / superseded on 2026-08-04.
+
+This blank template was prepared during the archived dry-run process for a later external
+practitioner validation round. That mandatory round has been permanently
+removed from active milestones and exit gates. Retain this file only as
+historical context; do not use it to require new external reviews.
 
 ## Identity And Candidate
 
 - Reviewer ID:
 - Reviewer type: [ ] Warm-network [ ] Independent
 - Candidate ID:
-- Candidate verified before session: [ ] Pass [ ] Fail
-- Candidate verified after session: [ ] Pass [ ] Fail
 - Dataset alias:
 - Practitioner-owned CSV used: [ ] Yes [ ] No
 - Eligible CSV classification dataset: [ ] Yes [ ] No
 - Private data remained local: [ ] Yes [ ] No
-- Sealed manual-first assessment path and SHA-256:
+- Manual-first assessment path:
 
 ## Run And Runtime Gate Evidence
 
@@ -27,7 +29,7 @@ round. Complete one copy per ML/data practitioner.
 
 ## Finding Comparison
 
-Compare against the sealed manual-first assessment. Allowed classifications:
+Compare against the manual-first assessment. Allowed classifications:
 `matched`, `useful additional finding`, `acceptable review prompt`,
 `false positive`, `destructive false positive`, or
 `missed within-scope issue`.

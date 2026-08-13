@@ -29,11 +29,11 @@ PUBLIC_DATASETS = {
 MUTATION_TARGET = "annual_income_over_50k"
 
 REPORT_SECTIONS = [
-    "1. Executive Summary",
-    "2. Prioritized Action Plan",
+    "1. Decision Summary",
+    "2. Priority Actions",
     "3. Dataset Overview",
-    "4. Missingness Evidence",
-    "5. Target and Label Evidence",
+    "4. Target and Label Evidence",
+    "5. Missingness Evidence",
     "6. Duplicate and Feature Evidence",
     "7. Scoring, Methodology, and Limitations",
     "8. Technical Appendix",
