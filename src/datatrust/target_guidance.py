@@ -203,3 +203,32 @@ def _percentage(numerator: int, denominator: int) -> float:
     if denominator <= 0:
         return 0.0
     return round((numerator / denominator) * 100, 2)
+
+
+def assess_regression_target(series, name, kind="unspecified"):
+    """Regression guidance describes observed structure, never chooses intent."""
+    from datatrust.regression import finite_mask, numeric_column
+    numeric = numeric_column(series)
+    finite = series[finite_mask(series)] if numeric else series.iloc[:0]
+    n, distinct = len(finite), int(finite.nunique())
+    tokens = set(column_name_tokens(name))
+    reasons = []
+    if not numeric:
+        reasons.append("numeric_override_required")
+    elif not n:
+        reasons.append("no_finite_observations")
+    else:
+        if tokens & IDENTIFIER_TOKENS:
+            reasons.append("identifier_name")
+        if tokens & {"category", "class", "code"} or 40 <= n and 2 <= distinct <= 20:
+            reasons.append("numeric_category_ambiguity")
+        if distinct == 1:
+            reasons.append("constant_target")
+        if n < 4:
+            reasons.append("limited_observations")
+    return {"name": str(name), "dtype": str(series.dtype), "is_numeric": numeric,
+            "finite_count": n, "distinct_count": distinct, "missing_count": int(series.isna().sum()),
+            "disabled": not numeric or not n, "requires_override": bool(reasons) and numeric and n > 0,
+            "reason_codes": reasons, "declared_kind": kind,
+            "explanation": "Review: " + ", ".join(reason.replace('_', ' ') for reason in reasons) if reasons else "Numerically compatible; observed values do not establish business intent.",
+            "selector_explanation": "Integer-valued observations alone do not establish a count target." if numeric and n and finite.map(lambda v: float(v).is_integer()).all() else "Explicitly confirm the intended numerical outcome."}

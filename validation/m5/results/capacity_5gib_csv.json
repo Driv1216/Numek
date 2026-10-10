@@ -1,0 +1,3234 @@
+{
+  "target_combined_gib": 5.0,
+  "format": "csv",
+  "capacity_guarantee": false,
+  "objective_seconds": 1800,
+  "environment": {
+    "python": "3.11.15",
+    "platform": "macOS-27.0.1-arm64-arm-64bit",
+    "duckdb": "1.5.6",
+    "pyarrow": "25.0.1",
+    "physical_memory": 17179869184
+  },
+  "inputs": [
+    {
+      "source": "reference",
+      "bytes": 2683243383,
+      "rows": 8659208,
+      "columns": 4
+    },
+    {
+      "source": "current",
+      "bytes": 2683243383,
+      "rows": 8659208,
+      "columns": 4
+    }
+  ],
+  "normalized_cells": 17318416,
+  "scope": {
+    "required": "all eligible declared records",
+    "behavior": "default 12 windows, both x measurements; bounded series/comparison/work scopes",
+    "availability": "unknown; no history or evaluation supplied"
+  },
+  "configuration": {
+    "execution": {
+      "backend": "duckdb_local",
+      "max_source_bytes": 5368709120,
+      "max_combined_source_bytes": 8589934592,
+      "max_rows": 10000000,
+      "max_combined_rows": 30000000,
+      "max_columns": 1000,
+      "memory_bytes": 2147483648,
+      "max_rss_bytes": 6442450944,
+      "threads": 2,
+      "batch_bytes": 33554432,
+      "max_record_bytes": 8388608,
+      "workspace_bytes": 68719476736,
+      "free_disk_bytes": 2147483648,
+      "max_seconds": 1800,
+      "result_bytes": 33554432,
+      "scratch_directory": null
+    },
+    "limits": {
+      "max_cells": 100000000,
+      "max_series": 1000000,
+      "behavior_measurements": 32,
+      "detailed_series": 64,
+      "max_windows": 64,
+      "max_folds": 32,
+      "max_comparisons": 2048,
+      "observation_visits": 1000000000,
+      "retained_details": 100,
+      "witnesses": 5,
+      "decoded_batch_bytes": 67108864,
+      "parquet_metadata_bytes": 16777216
+    },
+    "behavior": {
+      "enabled": true,
+      "windows": 12,
+      "explicit_windows": [],
+      "reference_window": 0,
+      "requested_measurements": [],
+      "requested_series": [],
+      "min_support": 100,
+      "missingness_increase": 0.05,
+      "distribution_effect": 0.1,
+      "normalized_w1": 0.25,
+      "flatline_observations": 10,
+      "volatility_support": 100,
+      "volatility_ratio": 2.0,
+      "rate_differences": false,
+      "seasonality": [],
+      "min_cycles": 8,
+      "min_window_cycles": 2,
+      "min_phase_support": 20,
+      "stable_cohort": true,
+      "version": "temporal_investigation_defaults_v1"
+    },
+    "presentation": {
+      "executive_actions": 5,
+      "target_panels": 6,
+      "feature_details": 20,
+      "table_rows": 20,
+      "appendix_rows": 100
+    }
+  },
+  "status": "completed",
+  "execution": {
+    "status": "completed",
+    "backend": "duckdb_local",
+    "engine_version": "1.5.6",
+    "effective_limits": {
+      "backend": "duckdb_local",
+      "max_source_bytes": 5368709120,
+      "max_combined_source_bytes": 8589934592,
+      "max_rows": 10000000,
+      "max_combined_rows": 30000000,
+      "max_columns": 1000,
+      "memory_bytes": 2147483648,
+      "max_rss_bytes": 6442450944,
+      "threads": 2,
+      "batch_bytes": 33554432,
+      "max_record_bytes": 8388608,
+      "workspace_bytes": 68719476736,
+      "free_disk_bytes": 2147483648,
+      "max_seconds": 1800,
+      "result_bytes": 33554432,
+      "scratch_directory": null
+    },
+    "temporal_limits": {
+      "max_cells": 100000000,
+      "max_series": 1000000,
+      "behavior_measurements": 32,
+      "detailed_series": 64,
+      "max_windows": 64,
+      "max_folds": 32,
+      "max_comparisons": 2048,
+      "observation_visits": 1000000000,
+      "retained_details": 100,
+      "witnesses": 5,
+      "decoded_batch_bytes": 67108864,
+      "parquet_metadata_bytes": 16777216
+    },
+    "duration_seconds": 277.74153970801854,
+    "phase_seconds": {
+      "reference:ingestion": 62.96126204097527,
+      "reference:normalization": 33.704539625003235,
+      "current:ingestion": 63.26707670799806,
+      "current:normalization": 34.164049667015206,
+      "required_diagnostics": 14.99880016699899,
+      "availability_history_evaluation": 6.833299994468689e-05,
+      "behavior": 66.43950133299222
+    },
+    "phase_plan": {
+      "sources": [
+        {
+          "source_id": "reference",
+          "compressed_bytes": 2683243383,
+          "format": "csv"
+        },
+        {
+          "source_id": "current",
+          "compressed_bytes": 2683243383,
+          "format": "csv"
+        }
+      ],
+      "estimated_peak_workspace_bytes": 37867397250,
+      "upper_bound": false,
+      "assumptions": [
+        "Variable-width and native decoder allocation are uncertain.",
+        "Sort/join coexistence and cell expansion are reassessed using actual cardinalities."
+      ]
+    },
+    "peak_workspace_bytes": 9908682752,
+    "estimated_peak_workspace_bytes": 37867397250,
+    "planning_estimate_is_upper_bound": false,
+    "ledger": [
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 5979717632,
+        "available_bytes": 212582400000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-52367a6622b19f08825e915f.csv",
+            "bytes": 2690646016
+          },
+          {
+            "file": "source-97b0560280ed60a5a1eaa1bc.csv",
+            "bytes": 2693791744
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 8060928
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 5980524544,
+        "available_bytes": 212582400000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-52367a6622b19f08825e915f.csv",
+            "bytes": 2690646016
+          },
+          {
+            "file": "source-97b0560280ed60a5a1eaa1bc.csv",
+            "bytes": 2693791744
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 8867840
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 5981327360,
+        "available_bytes": 212582400000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-52367a6622b19f08825e915f.csv",
+            "bytes": 2690646016
+          },
+          {
+            "file": "source-97b0560280ed60a5a1eaa1bc.csv",
+            "bytes": 2693791744
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 9670656
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 5982134272,
+        "available_bytes": 212582400000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-52367a6622b19f08825e915f.csv",
+            "bytes": 2690646016
+          },
+          {
+            "file": "source-97b0560280ed60a5a1eaa1bc.csv",
+            "bytes": 2693791744
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 10477568
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 5982941184,
+        "available_bytes": 212582400000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-52367a6622b19f08825e915f.csv",
+            "bytes": 2690646016
+          },
+          {
+            "file": "source-97b0560280ed60a5a1eaa1bc.csv",
+            "bytes": 2693791744
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 11284480
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 5983744000,
+        "available_bytes": 212582400000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-52367a6622b19f08825e915f.csv",
+            "bytes": 2690646016
+          },
+          {
+            "file": "source-97b0560280ed60a5a1eaa1bc.csv",
+            "bytes": 2693791744
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 12087296
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 5984550912,
+        "available_bytes": 212582400000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-52367a6622b19f08825e915f.csv",
+            "bytes": 2690646016
+          },
+          {
+            "file": "source-97b0560280ed60a5a1eaa1bc.csv",
+            "bytes": 2693791744
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 12894208
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 5985357824,
+        "available_bytes": 212582400000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-52367a6622b19f08825e915f.csv",
+            "bytes": 2690646016
+          },
+          {
+            "file": "source-97b0560280ed60a5a1eaa1bc.csv",
+            "bytes": 2693791744
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 13701120
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 5986164736,
+        "available_bytes": 212582400000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-52367a6622b19f08825e915f.csv",
+            "bytes": 2690646016
+          },
+          {
+            "file": "source-97b0560280ed60a5a1eaa1bc.csv",
+            "bytes": 2693791744
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 14508032
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 5986967552,
+        "available_bytes": 212582400000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-52367a6622b19f08825e915f.csv",
+            "bytes": 2690646016
+          },
+          {
+            "file": "source-97b0560280ed60a5a1eaa1bc.csv",
+            "bytes": 2693791744
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 15310848
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 5987774464,
+        "available_bytes": 212582400000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-52367a6622b19f08825e915f.csv",
+            "bytes": 2690646016
+          },
+          {
+            "file": "source-97b0560280ed60a5a1eaa1bc.csv",
+            "bytes": 2693791744
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 16117760
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 5971656704,
+        "available_bytes": 212582400000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-52367a6622b19f08825e915f.csv",
+            "bytes": 2690646016
+          },
+          {
+            "file": "source-97b0560280ed60a5a1eaa1bc.csv",
+            "bytes": 2693791744
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 5972463616,
+        "available_bytes": 212582400000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-52367a6622b19f08825e915f.csv",
+            "bytes": 2690646016
+          },
+          {
+            "file": "source-97b0560280ed60a5a1eaa1bc.csv",
+            "bytes": 2693791744
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 806912
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 5973270528,
+        "available_bytes": 212582400000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-52367a6622b19f08825e915f.csv",
+            "bytes": 2690646016
+          },
+          {
+            "file": "source-97b0560280ed60a5a1eaa1bc.csv",
+            "bytes": 2693791744
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 1613824
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 5974077440,
+        "available_bytes": 212582400000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-52367a6622b19f08825e915f.csv",
+            "bytes": 2690646016
+          },
+          {
+            "file": "source-97b0560280ed60a5a1eaa1bc.csv",
+            "bytes": 2693791744
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 2420736
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 5974880256,
+        "available_bytes": 212582400000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-52367a6622b19f08825e915f.csv",
+            "bytes": 2690646016
+          },
+          {
+            "file": "source-97b0560280ed60a5a1eaa1bc.csv",
+            "bytes": 2693791744
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 3223552
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 5975687168,
+        "available_bytes": 212582400000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-52367a6622b19f08825e915f.csv",
+            "bytes": 2690646016
+          },
+          {
+            "file": "source-97b0560280ed60a5a1eaa1bc.csv",
+            "bytes": 2693791744
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 4030464
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 5976494080,
+        "available_bytes": 212582400000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-52367a6622b19f08825e915f.csv",
+            "bytes": 2690646016
+          },
+          {
+            "file": "source-97b0560280ed60a5a1eaa1bc.csv",
+            "bytes": 2693791744
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 4837376
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 5977300992,
+        "available_bytes": 212582400000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-52367a6622b19f08825e915f.csv",
+            "bytes": 2690646016
+          },
+          {
+            "file": "source-97b0560280ed60a5a1eaa1bc.csv",
+            "bytes": 2693791744
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 5644288
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 5978103808,
+        "available_bytes": 212582400000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-52367a6622b19f08825e915f.csv",
+            "bytes": 2690646016
+          },
+          {
+            "file": "source-97b0560280ed60a5a1eaa1bc.csv",
+            "bytes": 2693791744
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 6447104
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 5978910720,
+        "available_bytes": 212582400000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-52367a6622b19f08825e915f.csv",
+            "bytes": 2690646016
+          },
+          {
+            "file": "source-97b0560280ed60a5a1eaa1bc.csv",
+            "bytes": 2693791744
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 7254016
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 5979717632,
+        "available_bytes": 212582400000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-52367a6622b19f08825e915f.csv",
+            "bytes": 2690646016
+          },
+          {
+            "file": "source-97b0560280ed60a5a1eaa1bc.csv",
+            "bytes": 2693791744
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 8060928
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 5980524544,
+        "available_bytes": 212582400000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-52367a6622b19f08825e915f.csv",
+            "bytes": 2690646016
+          },
+          {
+            "file": "source-97b0560280ed60a5a1eaa1bc.csv",
+            "bytes": 2693791744
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 8867840
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 5981327360,
+        "available_bytes": 212582400000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-52367a6622b19f08825e915f.csv",
+            "bytes": 2690646016
+          },
+          {
+            "file": "source-97b0560280ed60a5a1eaa1bc.csv",
+            "bytes": 2693791744
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 9670656
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 5982134272,
+        "available_bytes": 212582400000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-52367a6622b19f08825e915f.csv",
+            "bytes": 2690646016
+          },
+          {
+            "file": "source-97b0560280ed60a5a1eaa1bc.csv",
+            "bytes": 2693791744
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 10477568
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 5982941184,
+        "available_bytes": 212582400000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-52367a6622b19f08825e915f.csv",
+            "bytes": 2690646016
+          },
+          {
+            "file": "source-97b0560280ed60a5a1eaa1bc.csv",
+            "bytes": 2693791744
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 11284480
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 5983744000,
+        "available_bytes": 212582400000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-52367a6622b19f08825e915f.csv",
+            "bytes": 2690646016
+          },
+          {
+            "file": "source-97b0560280ed60a5a1eaa1bc.csv",
+            "bytes": 2693791744
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 12087296
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 5984550912,
+        "available_bytes": 212582400000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-52367a6622b19f08825e915f.csv",
+            "bytes": 2690646016
+          },
+          {
+            "file": "source-97b0560280ed60a5a1eaa1bc.csv",
+            "bytes": 2693791744
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 12894208
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 5985357824,
+        "available_bytes": 212582400000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-52367a6622b19f08825e915f.csv",
+            "bytes": 2690646016
+          },
+          {
+            "file": "source-97b0560280ed60a5a1eaa1bc.csv",
+            "bytes": 2693791744
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 13701120
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 5986164736,
+        "available_bytes": 212582400000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-52367a6622b19f08825e915f.csv",
+            "bytes": 2690646016
+          },
+          {
+            "file": "source-97b0560280ed60a5a1eaa1bc.csv",
+            "bytes": 2693791744
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 14508032
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 5986967552,
+        "available_bytes": 212582400000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-52367a6622b19f08825e915f.csv",
+            "bytes": 2690646016
+          },
+          {
+            "file": "source-97b0560280ed60a5a1eaa1bc.csv",
+            "bytes": 2693791744
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 15310848
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 5987774464,
+        "available_bytes": 212582400000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-52367a6622b19f08825e915f.csv",
+            "bytes": 2690646016
+          },
+          {
+            "file": "source-97b0560280ed60a5a1eaa1bc.csv",
+            "bytes": 2693791744
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 16117760
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 5971656704,
+        "available_bytes": 212582400000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-52367a6622b19f08825e915f.csv",
+            "bytes": 2690646016
+          },
+          {
+            "file": "source-97b0560280ed60a5a1eaa1bc.csv",
+            "bytes": 2693791744
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 5972463616,
+        "available_bytes": 212582400000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-52367a6622b19f08825e915f.csv",
+            "bytes": 2690646016
+          },
+          {
+            "file": "source-97b0560280ed60a5a1eaa1bc.csv",
+            "bytes": 2693791744
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 806912
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 5973270528,
+        "available_bytes": 212582400000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-52367a6622b19f08825e915f.csv",
+            "bytes": 2690646016
+          },
+          {
+            "file": "source-97b0560280ed60a5a1eaa1bc.csv",
+            "bytes": 2693791744
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 1613824
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 5974077440,
+        "available_bytes": 212582400000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-52367a6622b19f08825e915f.csv",
+            "bytes": 2690646016
+          },
+          {
+            "file": "source-97b0560280ed60a5a1eaa1bc.csv",
+            "bytes": 2693791744
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 2420736
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 5974880256,
+        "available_bytes": 212582400000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-52367a6622b19f08825e915f.csv",
+            "bytes": 2690646016
+          },
+          {
+            "file": "source-97b0560280ed60a5a1eaa1bc.csv",
+            "bytes": 2693791744
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 3223552
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 5975687168,
+        "available_bytes": 212582400000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-52367a6622b19f08825e915f.csv",
+            "bytes": 2690646016
+          },
+          {
+            "file": "source-97b0560280ed60a5a1eaa1bc.csv",
+            "bytes": 2693791744
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 4030464
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 5976494080,
+        "available_bytes": 212582400000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-52367a6622b19f08825e915f.csv",
+            "bytes": 2690646016
+          },
+          {
+            "file": "source-97b0560280ed60a5a1eaa1bc.csv",
+            "bytes": 2693791744
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 4837376
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 5977300992,
+        "available_bytes": 212582400000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-52367a6622b19f08825e915f.csv",
+            "bytes": 2690646016
+          },
+          {
+            "file": "source-97b0560280ed60a5a1eaa1bc.csv",
+            "bytes": 2693791744
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 5644288
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 5978103808,
+        "available_bytes": 212582400000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-52367a6622b19f08825e915f.csv",
+            "bytes": 2690646016
+          },
+          {
+            "file": "source-97b0560280ed60a5a1eaa1bc.csv",
+            "bytes": 2693791744
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 6447104
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 5978910720,
+        "available_bytes": 212582400000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-52367a6622b19f08825e915f.csv",
+            "bytes": 2690646016
+          },
+          {
+            "file": "source-97b0560280ed60a5a1eaa1bc.csv",
+            "bytes": 2693791744
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 7254016
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 5979717632,
+        "available_bytes": 212582400000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-52367a6622b19f08825e915f.csv",
+            "bytes": 2690646016
+          },
+          {
+            "file": "source-97b0560280ed60a5a1eaa1bc.csv",
+            "bytes": 2693791744
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 8060928
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 5980524544,
+        "available_bytes": 212582400000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-52367a6622b19f08825e915f.csv",
+            "bytes": 2690646016
+          },
+          {
+            "file": "source-97b0560280ed60a5a1eaa1bc.csv",
+            "bytes": 2693791744
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 8867840
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 5981327360,
+        "available_bytes": 212582400000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-52367a6622b19f08825e915f.csv",
+            "bytes": 2690646016
+          },
+          {
+            "file": "source-97b0560280ed60a5a1eaa1bc.csv",
+            "bytes": 2693791744
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 9670656
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 5982134272,
+        "available_bytes": 212582400000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-52367a6622b19f08825e915f.csv",
+            "bytes": 2690646016
+          },
+          {
+            "file": "source-97b0560280ed60a5a1eaa1bc.csv",
+            "bytes": 2693791744
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 10477568
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 5982941184,
+        "available_bytes": 212582400000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-52367a6622b19f08825e915f.csv",
+            "bytes": 2690646016
+          },
+          {
+            "file": "source-97b0560280ed60a5a1eaa1bc.csv",
+            "bytes": 2693791744
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 11284480
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 5983744000,
+        "available_bytes": 212582400000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-52367a6622b19f08825e915f.csv",
+            "bytes": 2690646016
+          },
+          {
+            "file": "source-97b0560280ed60a5a1eaa1bc.csv",
+            "bytes": 2693791744
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 12087296
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 5984550912,
+        "available_bytes": 212582400000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-52367a6622b19f08825e915f.csv",
+            "bytes": 2690646016
+          },
+          {
+            "file": "source-97b0560280ed60a5a1eaa1bc.csv",
+            "bytes": 2693791744
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 12894208
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 5985357824,
+        "available_bytes": 212582400000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-52367a6622b19f08825e915f.csv",
+            "bytes": 2690646016
+          },
+          {
+            "file": "source-97b0560280ed60a5a1eaa1bc.csv",
+            "bytes": 2693791744
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 13701120
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 5986164736,
+        "available_bytes": 212582400000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-52367a6622b19f08825e915f.csv",
+            "bytes": 2690646016
+          },
+          {
+            "file": "source-97b0560280ed60a5a1eaa1bc.csv",
+            "bytes": 2693791744
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 14508032
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 5986967552,
+        "available_bytes": 212582400000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-52367a6622b19f08825e915f.csv",
+            "bytes": 2690646016
+          },
+          {
+            "file": "source-97b0560280ed60a5a1eaa1bc.csv",
+            "bytes": 2693791744
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 15310848
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 5987774464,
+        "available_bytes": 212582400000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-52367a6622b19f08825e915f.csv",
+            "bytes": 2690646016
+          },
+          {
+            "file": "source-97b0560280ed60a5a1eaa1bc.csv",
+            "bytes": 2693791744
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 16117760
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 5971656704,
+        "available_bytes": 212582400000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-52367a6622b19f08825e915f.csv",
+            "bytes": 2690646016
+          },
+          {
+            "file": "source-97b0560280ed60a5a1eaa1bc.csv",
+            "bytes": 2693791744
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 5972463616,
+        "available_bytes": 212582400000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-52367a6622b19f08825e915f.csv",
+            "bytes": 2690646016
+          },
+          {
+            "file": "source-97b0560280ed60a5a1eaa1bc.csv",
+            "bytes": 2693791744
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 806912
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 5973270528,
+        "available_bytes": 212582400000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-52367a6622b19f08825e915f.csv",
+            "bytes": 2690646016
+          },
+          {
+            "file": "source-97b0560280ed60a5a1eaa1bc.csv",
+            "bytes": 2693791744
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 1613824
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 5974077440,
+        "available_bytes": 212582400000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-52367a6622b19f08825e915f.csv",
+            "bytes": 2690646016
+          },
+          {
+            "file": "source-97b0560280ed60a5a1eaa1bc.csv",
+            "bytes": 2693791744
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 2420736
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 5974880256,
+        "available_bytes": 212582400000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-52367a6622b19f08825e915f.csv",
+            "bytes": 2690646016
+          },
+          {
+            "file": "source-97b0560280ed60a5a1eaa1bc.csv",
+            "bytes": 2693791744
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 3223552
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 5975687168,
+        "available_bytes": 212582400000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-52367a6622b19f08825e915f.csv",
+            "bytes": 2690646016
+          },
+          {
+            "file": "source-97b0560280ed60a5a1eaa1bc.csv",
+            "bytes": 2693791744
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 4030464
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 5976494080,
+        "available_bytes": 212582400000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-52367a6622b19f08825e915f.csv",
+            "bytes": 2690646016
+          },
+          {
+            "file": "source-97b0560280ed60a5a1eaa1bc.csv",
+            "bytes": 2693791744
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 4837376
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 5977300992,
+        "available_bytes": 212582400000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-52367a6622b19f08825e915f.csv",
+            "bytes": 2690646016
+          },
+          {
+            "file": "source-97b0560280ed60a5a1eaa1bc.csv",
+            "bytes": 2693791744
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 5644288
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 5978103808,
+        "available_bytes": 212582400000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-52367a6622b19f08825e915f.csv",
+            "bytes": 2690646016
+          },
+          {
+            "file": "source-97b0560280ed60a5a1eaa1bc.csv",
+            "bytes": 2693791744
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 6447104
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 5978910720,
+        "available_bytes": 212582400000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-52367a6622b19f08825e915f.csv",
+            "bytes": 2690646016
+          },
+          {
+            "file": "source-97b0560280ed60a5a1eaa1bc.csv",
+            "bytes": 2693791744
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 7254016
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 5979717632,
+        "available_bytes": 212582400000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-52367a6622b19f08825e915f.csv",
+            "bytes": 2690646016
+          },
+          {
+            "file": "source-97b0560280ed60a5a1eaa1bc.csv",
+            "bytes": 2693791744
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 8060928
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 5980524544,
+        "available_bytes": 212582400000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-52367a6622b19f08825e915f.csv",
+            "bytes": 2690646016
+          },
+          {
+            "file": "source-97b0560280ed60a5a1eaa1bc.csv",
+            "bytes": 2693791744
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 8867840
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 5981327360,
+        "available_bytes": 212582400000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-52367a6622b19f08825e915f.csv",
+            "bytes": 2690646016
+          },
+          {
+            "file": "source-97b0560280ed60a5a1eaa1bc.csv",
+            "bytes": 2693791744
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 9670656
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 5982134272,
+        "available_bytes": 212582400000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-52367a6622b19f08825e915f.csv",
+            "bytes": 2690646016
+          },
+          {
+            "file": "source-97b0560280ed60a5a1eaa1bc.csv",
+            "bytes": 2693791744
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 10477568
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 5982941184,
+        "available_bytes": 212582400000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-52367a6622b19f08825e915f.csv",
+            "bytes": 2690646016
+          },
+          {
+            "file": "source-97b0560280ed60a5a1eaa1bc.csv",
+            "bytes": 2693791744
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 11284480
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 5983744000,
+        "available_bytes": 212582400000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-52367a6622b19f08825e915f.csv",
+            "bytes": 2690646016
+          },
+          {
+            "file": "source-97b0560280ed60a5a1eaa1bc.csv",
+            "bytes": 2693791744
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 12087296
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 5984550912,
+        "available_bytes": 212582400000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-52367a6622b19f08825e915f.csv",
+            "bytes": 2690646016
+          },
+          {
+            "file": "source-97b0560280ed60a5a1eaa1bc.csv",
+            "bytes": 2693791744
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 12894208
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 5985357824,
+        "available_bytes": 212582400000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-52367a6622b19f08825e915f.csv",
+            "bytes": 2690646016
+          },
+          {
+            "file": "source-97b0560280ed60a5a1eaa1bc.csv",
+            "bytes": 2693791744
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 13701120
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 5986164736,
+        "available_bytes": 212582400000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-52367a6622b19f08825e915f.csv",
+            "bytes": 2690646016
+          },
+          {
+            "file": "source-97b0560280ed60a5a1eaa1bc.csv",
+            "bytes": 2693791744
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 14508032
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 5986967552,
+        "available_bytes": 212582400000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-52367a6622b19f08825e915f.csv",
+            "bytes": 2690646016
+          },
+          {
+            "file": "source-97b0560280ed60a5a1eaa1bc.csv",
+            "bytes": 2693791744
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 15310848
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 5987774464,
+        "available_bytes": 212582400000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-52367a6622b19f08825e915f.csv",
+            "bytes": 2690646016
+          },
+          {
+            "file": "source-97b0560280ed60a5a1eaa1bc.csv",
+            "bytes": 2693791744
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 16117760
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 5971656704,
+        "available_bytes": 212582400000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-52367a6622b19f08825e915f.csv",
+            "bytes": 2690646016
+          },
+          {
+            "file": "source-97b0560280ed60a5a1eaa1bc.csv",
+            "bytes": 2693791744
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 5972463616,
+        "available_bytes": 212582400000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-52367a6622b19f08825e915f.csv",
+            "bytes": 2690646016
+          },
+          {
+            "file": "source-97b0560280ed60a5a1eaa1bc.csv",
+            "bytes": 2693791744
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 806912
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 5973270528,
+        "available_bytes": 212582400000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-52367a6622b19f08825e915f.csv",
+            "bytes": 2690646016
+          },
+          {
+            "file": "source-97b0560280ed60a5a1eaa1bc.csv",
+            "bytes": 2693791744
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 1613824
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 5974077440,
+        "available_bytes": 212582400000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-52367a6622b19f08825e915f.csv",
+            "bytes": 2690646016
+          },
+          {
+            "file": "source-97b0560280ed60a5a1eaa1bc.csv",
+            "bytes": 2693791744
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 2420736
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 5974880256,
+        "available_bytes": 212582400000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-52367a6622b19f08825e915f.csv",
+            "bytes": 2690646016
+          },
+          {
+            "file": "source-97b0560280ed60a5a1eaa1bc.csv",
+            "bytes": 2693791744
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 3223552
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 5975687168,
+        "available_bytes": 212582400000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-52367a6622b19f08825e915f.csv",
+            "bytes": 2690646016
+          },
+          {
+            "file": "source-97b0560280ed60a5a1eaa1bc.csv",
+            "bytes": 2693791744
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 4030464
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 5976494080,
+        "available_bytes": 212582400000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-52367a6622b19f08825e915f.csv",
+            "bytes": 2690646016
+          },
+          {
+            "file": "source-97b0560280ed60a5a1eaa1bc.csv",
+            "bytes": 2693791744
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 4837376
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 5977300992,
+        "available_bytes": 212582400000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-52367a6622b19f08825e915f.csv",
+            "bytes": 2690646016
+          },
+          {
+            "file": "source-97b0560280ed60a5a1eaa1bc.csv",
+            "bytes": 2693791744
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 5644288
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 5978103808,
+        "available_bytes": 212582400000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-52367a6622b19f08825e915f.csv",
+            "bytes": 2690646016
+          },
+          {
+            "file": "source-97b0560280ed60a5a1eaa1bc.csv",
+            "bytes": 2693791744
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 6447104
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 5978910720,
+        "available_bytes": 212582400000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-52367a6622b19f08825e915f.csv",
+            "bytes": 2690646016
+          },
+          {
+            "file": "source-97b0560280ed60a5a1eaa1bc.csv",
+            "bytes": 2693791744
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 7254016
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 5979717632,
+        "available_bytes": 212582400000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-52367a6622b19f08825e915f.csv",
+            "bytes": 2690646016
+          },
+          {
+            "file": "source-97b0560280ed60a5a1eaa1bc.csv",
+            "bytes": 2693791744
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 8060928
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 5980524544,
+        "available_bytes": 212582400000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-52367a6622b19f08825e915f.csv",
+            "bytes": 2690646016
+          },
+          {
+            "file": "source-97b0560280ed60a5a1eaa1bc.csv",
+            "bytes": 2693791744
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 8867840
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 5981327360,
+        "available_bytes": 212582400000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-52367a6622b19f08825e915f.csv",
+            "bytes": 2690646016
+          },
+          {
+            "file": "source-97b0560280ed60a5a1eaa1bc.csv",
+            "bytes": 2693791744
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 9670656
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 5982134272,
+        "available_bytes": 212582400000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-52367a6622b19f08825e915f.csv",
+            "bytes": 2690646016
+          },
+          {
+            "file": "source-97b0560280ed60a5a1eaa1bc.csv",
+            "bytes": 2693791744
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 10477568
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 5982941184,
+        "available_bytes": 212582400000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-52367a6622b19f08825e915f.csv",
+            "bytes": 2690646016
+          },
+          {
+            "file": "source-97b0560280ed60a5a1eaa1bc.csv",
+            "bytes": 2693791744
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 11284480
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 5983744000,
+        "available_bytes": 212582400000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-52367a6622b19f08825e915f.csv",
+            "bytes": 2690646016
+          },
+          {
+            "file": "source-97b0560280ed60a5a1eaa1bc.csv",
+            "bytes": 2693791744
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 12087296
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 5984550912,
+        "available_bytes": 212582400000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-52367a6622b19f08825e915f.csv",
+            "bytes": 2690646016
+          },
+          {
+            "file": "source-97b0560280ed60a5a1eaa1bc.csv",
+            "bytes": 2693791744
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 12894208
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 5985357824,
+        "available_bytes": 212582400000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-52367a6622b19f08825e915f.csv",
+            "bytes": 2690646016
+          },
+          {
+            "file": "source-97b0560280ed60a5a1eaa1bc.csv",
+            "bytes": 2693791744
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 13701120
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 5986164736,
+        "available_bytes": 212582400000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-52367a6622b19f08825e915f.csv",
+            "bytes": 2690646016
+          },
+          {
+            "file": "source-97b0560280ed60a5a1eaa1bc.csv",
+            "bytes": 2693791744
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 14508032
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 5986967552,
+        "available_bytes": 212582400000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-52367a6622b19f08825e915f.csv",
+            "bytes": 2690646016
+          },
+          {
+            "file": "source-97b0560280ed60a5a1eaa1bc.csv",
+            "bytes": 2693791744
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 15310848
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 5987774464,
+        "available_bytes": 212582400000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-52367a6622b19f08825e915f.csv",
+            "bytes": 2690646016
+          },
+          {
+            "file": "source-97b0560280ed60a5a1eaa1bc.csv",
+            "bytes": 2693791744
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 16117760
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 5988192256,
+        "available_bytes": 212582400000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-52367a6622b19f08825e915f.csv",
+            "bytes": 2690646016
+          },
+          {
+            "file": "source-97b0560280ed60a5a1eaa1bc.csv",
+            "bytes": 2693791744
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 16535552
+          }
+        ]
+      },
+      {
+        "phase": "current: cardinality-based sort/join reservation",
+        "owned_bytes": 6206660608,
+        "available_bytes": 212172800000,
+        "estimated_addition": 1385506048,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 822095872
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-52367a6622b19f08825e915f.csv",
+            "bytes": 2690646016
+          },
+          {
+            "file": "source-97b0560280ed60a5a1eaa1bc.csv",
+            "bytes": 2693791744
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 122880
+          }
+        ]
+      },
+      {
+        "phase": "reference: bounded behavioral investigation",
+        "owned_bytes": 7215284224,
+        "available_bytes": 211353600000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 1828728832
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-52367a6622b19f08825e915f.csv",
+            "bytes": 2690646016
+          },
+          {
+            "file": "source-97b0560280ed60a5a1eaa1bc.csv",
+            "bytes": 2693791744
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 2113536
+          }
+        ]
+      },
+      {
+        "phase": "current: bounded behavioral investigation",
+        "owned_bytes": 8083439616,
+        "available_bytes": 210534400000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 2684366848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-52367a6622b19f08825e915f.csv",
+            "bytes": 2690646016
+          },
+          {
+            "file": "source-97b0560280ed60a5a1eaa1bc.csv",
+            "bytes": 2693791744
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 3162112
+          },
+          {
+            "file": "spill/duckdb_temp_storage_S96K-0.tmp",
+            "bytes": 884736
+          },
+          {
+            "file": "spill/duckdb_temp_storage_S128K-0.tmp",
+            "bytes": 1179648
+          },
+          {
+            "file": "spill/duckdb_temp_storage_S32K-0.tmp",
+            "bytes": 524288
+          },
+          {
+            "file": "spill/duckdb_temp_storage_DEFAULT-0.tmp",
+            "bytes": 6815744
+          },
+          {
+            "file": "spill/duckdb_temp_storage_S160K-0.tmp",
+            "bytes": 819200
+          },
+          {
+            "file": "spill/duckdb_temp_storage_S64K-0.tmp",
+            "bytes": 1245184
+          }
+        ]
+      },
+      {
+        "phase": "completed temporal evidence publication",
+        "owned_bytes": 8083439616,
+        "available_bytes": 210534400000,
+        "estimated_addition": 33554432,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 2684366848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-52367a6622b19f08825e915f.csv",
+            "bytes": 2690646016
+          },
+          {
+            "file": "source-97b0560280ed60a5a1eaa1bc.csv",
+            "bytes": 2693791744
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 3162112
+          },
+          {
+            "file": "spill/duckdb_temp_storage_S96K-0.tmp",
+            "bytes": 884736
+          },
+          {
+            "file": "spill/duckdb_temp_storage_S128K-0.tmp",
+            "bytes": 1179648
+          },
+          {
+            "file": "spill/duckdb_temp_storage_S32K-0.tmp",
+            "bytes": 524288
+          },
+          {
+            "file": "spill/duckdb_temp_storage_DEFAULT-0.tmp",
+            "bytes": 6815744
+          },
+          {
+            "file": "spill/duckdb_temp_storage_S160K-0.tmp",
+            "bytes": 819200
+          },
+          {
+            "file": "spill/duckdb_temp_storage_S64K-0.tmp",
+            "bytes": 1245184
+          }
+        ]
+      }
+    ],
+    "provenance": {
+      "reference": {
+        "sha256": "94f2c22d916d0798e81bdf22c10e3ea42f0c2c90649171b5dd9f27c2e5c1cb48",
+        "source_bytes": 2683243383,
+        "rows": 8659208,
+        "parsing_fingerprint": "5192f86c659085593f43c22b640a8088af3483e82f69250ff71d14a6f6261297",
+        "normalization_fingerprint": "c8663bb9bf50ce2878e39bfe84a6ea9a0e056bbd58f2e3d909ac34cd0d9c542c"
+      },
+      "current": {
+        "sha256": "b25b3131482325950076659701acae7d35d05a7df29847526b0fa23f2a051b55",
+        "source_bytes": 2683243383,
+        "rows": 8659208,
+        "parsing_fingerprint": "b700348217e9264b1ee5d00e589e0bac8a594244c2ccfc41c901294d04e6c962",
+        "normalization_fingerprint": "27d84018cc64b8691dac035b55da49901609fe5d3171b42d18f8816d2113cfb3"
+      }
+    },
+    "timezone_data": {
+      "package": "tzdata",
+      "version": "2026.5",
+      "zones": {}
+    },
+    "warnings": [
+      "Workload budgets are provisional engineering controls, not capacity guarantees or OS quotas.",
+      "Decoded-batch/application retention bounds do not bound native Parquet decoder peaks.",
+      "Sampled RSS supervision can overshoot between samples."
+    ],
+    "peak_worker_rss_bytes": 2923577344,
+    "whole_job_seconds": 278.40290491699125,
+    "peak_spill_bytes": 2022309888,
+    "serialized_bytes": 388614
+  },
+  "coverage": {
+    "computed_aggregate_scope": "Every eligible declared record in required stages; no silent sampling.",
+    "checks": {
+      "t1": {
+        "family": "chronology",
+        "status": "completed",
+        "reason": null,
+        "population": "all eligible declared records"
+      },
+      "t2": {
+        "family": "ordering",
+        "status": "completed",
+        "reason": null,
+        "population": "all eligible declared records"
+      },
+      "t3": {
+        "family": "repetition",
+        "status": "completed",
+        "reason": null,
+        "population": "all eligible declared records"
+      },
+      "t4": {
+        "family": "panel",
+        "status": "completed",
+        "reason": null,
+        "population": "complete entity/observation keys with valid clocks"
+      },
+      "t5": {
+        "family": "continuity",
+        "status": "completed",
+        "reason": null,
+        "population": "all eligible declared records"
+      },
+      "t6": {
+        "family": "chronology",
+        "status": "completed",
+        "reason": null,
+        "population": "all eligible declared records"
+      },
+      "t7": {
+        "family": "ordering",
+        "status": "completed",
+        "reason": null,
+        "population": "all eligible declared records"
+      },
+      "t8": {
+        "family": "repetition",
+        "status": "completed",
+        "reason": null,
+        "population": "all eligible declared records"
+      },
+      "t9": {
+        "family": "panel",
+        "status": "completed",
+        "reason": null,
+        "population": "complete entity/observation keys with valid clocks"
+      },
+      "t10": {
+        "family": "continuity",
+        "status": "completed",
+        "reason": null,
+        "population": "all eligible declared records"
+      },
+      "t11": {
+        "family": "availability_unknown",
+        "status": "blocked",
+        "reason": "No availability evidence for listed features.",
+        "population": "all eligible declared records"
+      },
+      "t12": {
+        "family": "availability_unknown",
+        "status": "blocked",
+        "reason": "No availability evidence for listed features.",
+        "population": "all eligible declared records"
+      },
+      "t13": {
+        "family": "behavior_windows",
+        "status": "completed",
+        "reason": null,
+        "population": "all eligible declared records"
+      },
+      "t14": {
+        "family": "behavior_panel",
+        "status": "completed",
+        "reason": null,
+        "population": "all eligible declared records"
+      },
+      "t15": {
+        "family": "runs",
+        "status": "completed",
+        "reason": null,
+        "population": "all eligible declared records"
+      },
+      "t16": {
+        "family": "volatility",
+        "status": "completed",
+        "reason": null,
+        "population": "all eligible declared records"
+      },
+      "t17": {
+        "family": "behavior_series",
+        "status": "completed",
+        "reason": null,
+        "population": "all eligible declared records"
+      },
+      "t18": {
+        "family": "behavior_scope",
+        "status": "completed",
+        "reason": null,
+        "population": "all eligible declared records"
+      },
+      "t19": {
+        "family": "behavior_windows",
+        "status": "completed",
+        "reason": null,
+        "population": "all eligible declared records"
+      },
+      "t20": {
+        "family": "behavior_panel",
+        "status": "completed",
+        "reason": null,
+        "population": "all eligible declared records"
+      },
+      "t21": {
+        "family": "runs",
+        "status": "completed",
+        "reason": null,
+        "population": "all eligible declared records"
+      },
+      "t22": {
+        "family": "volatility",
+        "status": "completed",
+        "reason": null,
+        "population": "all eligible declared records"
+      },
+      "t23": {
+        "family": "behavior_scope",
+        "status": "completed",
+        "reason": null,
+        "population": "all eligible declared records"
+      }
+    },
+    "unsearched_analytical_scope": [
+      {
+        "selected_measurements": [
+          "x"
+        ],
+        "unsearched_scope": [],
+        "work_observation_visits": 290083642,
+        "comparisons": 1407,
+        "selection": "Requested measurements first, then declaration order. Detail retention can miss behavior-only exceptions.",
+        "defaults_validated_universal_defect_criteria": false
+      },
+      {
+        "selected_measurements": [
+          "x"
+        ],
+        "unsearched_scope": [],
+        "work_observation_visits": 398323748,
+        "comparisons": 1470,
+        "selection": "Requested measurements first, then declaration order. Detail retention can miss behavior-only exceptions.",
+        "defaults_validated_universal_defect_criteria": false
+      }
+    ],
+    "internal_detail_retention_omissions": {
+      "reference:entity_histories": 28,
+      "current:entity_histories": 28,
+      "reference:series_effects": 1244
+    },
+    "presentation_omissions": "Determined independently when rendering. JSON preserves every retained evidence record.",
+    "limits": {
+      "max_cells": 100000000,
+      "max_series": 1000000,
+      "behavior_measurements": 32,
+      "detailed_series": 64,
+      "max_windows": 64,
+      "max_folds": 32,
+      "max_comparisons": 2048,
+      "observation_visits": 1000000000,
+      "retained_details": 100,
+      "witnesses": 5,
+      "decoded_batch_bytes": 67108864,
+      "parquet_metadata_bytes": 16777216
+    },
+    "work_observation_visits": 398323748,
+    "behavior_comparisons": 1470,
+    "representation_equivalence": {
+      "conditions": [
+        "Same observations, explicit missing cells and multiplicities",
+        "Same measurement identities, meanings, units and representations",
+        "Same entity identity, exact clock precision and schedule/lifecycle semantics",
+        "Same feature availability, revision semantics, analytical selections and bounds"
+      ],
+      "excluded": [
+        "physical source row references",
+        "file-order evidence"
+      ],
+      "absent_long_row_equals_null_wide_cell": "Only under an explicit dense-layout expectation; otherwise absence and supplied missing values differ."
+    }
+  },
+  "result_bytes": 388614,
+  "seconds": 278.4723853750038,
+  "objective_met": true
+}

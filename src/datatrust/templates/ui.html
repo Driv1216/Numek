@@ -72,8 +72,9 @@
   </style>
 </head>
 <body>
+  <p style="text-align:center"><a href="/temporal">Temporal Reliability Intelligence</a> · <a href="/m4">Split audit · Version comparison · Advanced local analysis</a></p>
 <main>
-  <header><h1>DataTrust</h1><span class="muted">Local classification dataset review</span></header>
+  <header><h1>DataTrust</h1><span class="muted">Local dataset review</span></header>
   {% with messages = get_flashed_messages(with_categories=true) %}{% for category, message in messages %}<div class="flash" role="alert">{{ message }}</div>{% endfor %}{% endwith %}
 
   {% if stage not in ["result", "error"] %}
@@ -91,10 +92,11 @@
     <p class="muted">Your CSV is processed by this local application and is not sent to DataTrust or a cloud service.</p>
     <form method="post" action="{{ url_for('upload') }}" enctype="multipart/form-data">
       <input type="hidden" name="form_token" value="{{ form_token }}">
+      <label for="mode">Analysis</label><select id="mode" name="mode"><option value="classification">Classification — explicit target</option><option value="regression">Regression — numerical target</option><option value="unlabeled">Unlabeled — profile all columns</option><option value="annotation_classification">Classification with annotation expectations</option><option value="annotation_regression">Regression with annotations / multiple outputs</option><option value="multilabel_classification">Multilabel binary indicators</option><option value="clustering">Clustering readiness</option><option value="anomaly_detection">Anomaly detection readiness</option><option value="role_profile">Profiling with explicit roles</option></select>
       <div class="drop">
         <label for="dataset">Choose one comma-delimited CSV</label>
         <input id="dataset" name="dataset" type="file" accept=".csv,text/csv" required>
-        <p class="muted">Header required · Maximum {{ max_upload_mib }} MiB · Classification only</p>
+        <p class="muted">Header required · Maximum {{ max_upload_mib }} MiB · Classification, regression, or unlabeled profiling</p>
       </div>
       <div class="actions"><button type="submit">Inspect dataset</button></div>
     </form>
@@ -106,13 +108,43 @@
     <div class="grid">
       <div class="card"><div class="label">File</div><div class="metric">{{ job.source_filename }}</div></div>
       <div class="card"><div class="label">Size</div><div class="metric">{{ "%.2f"|format(job.file_size / 1048576) }} MiB</div></div>
-      <div class="card"><div class="label">Rows</div><div class="metric">{{ job.inspection.row_count }}</div></div>
+      <div class="card"><div class="label">{{ 'Preview rows' if job.mode != 'classification' else 'Rows' }}</div><div class="metric">{{ job.inspection.preview_row_count if job.mode != 'classification' else job.inspection.row_count }}</div></div>
       <div class="card"><div class="label">Columns</div><div class="metric">{{ job.inspection.column_count }}</div></div>
     </div>
     <h3>First 10 rows</h3>
+    {% if job.mode != 'classification' %}<p class="muted">Bounded provisional preview. Final types and row counts are determined during full analysis. Names such as label do not establish roles.</p>{% endif %}
     <div class="table-wrap"><table><thead><tr>{% for column in job.inspection.columns %}<th>{{ column }}</th>{% endfor %}</tr></thead><tbody>{% for row in job.inspection.preview %}<tr>{% for column in job.inspection.columns %}<td>{{ row[column] }}</td>{% endfor %}</tr>{% endfor %}</tbody></table></div>
     <form method="post">
       <input type="hidden" name="form_token" value="{{ form_token }}">
+      {% if job.mode != 'classification' %}
+      <h3>CSV interpretation</h3>
+      <label for="encoding">Text encoding</label><input id="encoding" name="encoding" value="{{ job.config.parsing.encoding }}" required>
+      <label for="missing_policy">Missing-value policy</label><select id="missing_policy" name="missing_policy">{% for policy in ['pandas_default','empty_only','custom'] %}<option value="{{ policy }}" {{ 'selected' if job.config.parsing.missing_policy == policy else '' }}>{{ policy }}</option>{% endfor %}</select>
+      <p class="muted">pandas_default recognizes pandas NA tokens. empty_only preserves nonempty tokens, including whitespace and NA. custom recognizes exactly the listed tokens.</p>
+      <label for="na_values">Custom missing tokens (JSON list; custom policy only)</label><textarea id="na_values" name="na_values">{{ job.config.parsing.na_values | tojson }}</textarea>
+      <label for="column_types">Explicit column types (JSON object of resolved names to string or numeric)</label><textarea id="column_types" name="column_types">{{ job.config.parsing.column_types | tojson }}</textarea>
+      <p class="muted">Use string to preserve numeric-looking codes; numeric requires valid conversion. Source data stays unchanged.</p>
+      {% for warning in job.inspection.parsing_warnings %}{% set notice = warning | regression_inspection_notice if job.mode == "regression" else none %}<div class="{{ "confirm" if notice else "warning" }}">{% if notice %}<strong>{{ notice.title }}</strong><p>{{ notice.text }}</p>{% else %}<strong>Parsing review: {{ warning.code }}{% if warning.column %} · {{ warning.column }}{% endif %}</strong><p>{{ warning.interpretation }}</p>{% endif %}</div>{% endfor %}
+      <button class="secondary" name="action" value="preview" type="submit">Refresh parsing preview</button>
+      {% if job.mode == 'regression' %}
+      <input type="hidden" name="regression_options_submitted" value="1"><h3>Which numerical outcome should be reviewed?</h3>
+      <p class="muted">Preview assessments are provisional. Select the intended outcome explicitly; full confirmation verifies numeric compatibility.</p>
+      {% for option in job.inspection.target_options %}
+      <label class="target-option"><input type="radio" name="target" value="{{ option.name }}" {{ 'checked' if job.target == option.name else '' }}><span><strong>{{ option.name }}</strong><span class="muted">{{ option.dtype }} · {{ option.finite_count }} preview finite values · {{ option.explanation }} {{ option.selector_explanation }}</span></span></label>
+      {% endfor %}
+      {% set expectations = job.config.regression.expectations if job.config.regression else none %}
+      <label for="target_kind">Target intent</label><select id="target_kind" name="target_kind">{% for kind in ['unspecified','continuous','count'] %}<option value="{{ kind }}" {{ 'selected' if expectations and expectations.kind == kind else '' }}>{{ kind }}</option>{% endfor %}</select>
+      <p class="muted">Count declares nonnegative integer values. Observed integers alone do not establish count semantics.</p>
+      <label for="target_units">Units (optional, display only)</label><input id="target_units" name="target_units" maxlength="80" value="{{ expectations.units or '' if expectations else '' }}">
+      <label for="target_minimum">Declared inclusive minimum (optional)</label><input id="target_minimum" name="target_minimum" type="number" step="any" value="{{ expectations.minimum if expectations and expectations.minimum is not none else '' }}">
+      <label for="target_maximum">Declared inclusive maximum (optional)</label><input id="target_maximum" name="target_maximum" type="number" step="any" value="{{ expectations.maximum if expectations and expectations.maximum is not none else '' }}">
+      <label><input type="checkbox" name="target_nonnegative" {{ 'checked' if expectations and expectations.nonnegative else '' }}>Require nonnegative values</label>
+      <label><input type="checkbox" name="target_integer" {{ 'checked' if expectations and expectations.integer_required else '' }}>Require integer values</label>
+      <details><summary>Optional feature availability at the intended prediction time</summary><p class="muted">User-declared context; unknown is the default. The selected target's entry is ignored.</p>
+      {% for column in job.inspection.columns %}<label for="availability_{{ loop.index }}">{{ column }}</label><select id="availability_{{ loop.index }}" name="availability_{{ column }}">{% for value in ['unknown','available_at_prediction','unavailable_at_prediction'] %}<option value="{{ value }}" {{ 'selected' if job.config.regression and job.config.regression.feature_availability.get(column) == value else '' }}>{{ value | replace('_',' ') }}</option>{% endfor %}</select>{% endfor %}
+      </details>
+      {% endif %}
+      {% else %}
       <div class="target-guidance">
         <h3>What outcome is this dataset meant to predict?</h3>
         <p class="muted">DataTrust groups structurally plausible choices and explains why. It does not choose or preselect the business outcome.</p>
@@ -172,10 +204,11 @@
         </details>
         {% endif %}
       </div>
+      {% endif %}
       <label for="dataset_name">Dataset/report name <span class="muted">(optional, 120 characters)</span></label>
-      <input id="dataset_name" name="dataset_name" type="text" maxlength="120" placeholder="Defaults to the filename">
+      <input id="dataset_name" name="dataset_name" type="text" maxlength="120" placeholder="Defaults to the filename" value="{{ job.dataset_name or '' }}">
       <label for="purpose">Purpose <span class="muted">(optional, 1,000 characters)</span></label>
-      <textarea id="purpose" name="purpose" maxlength="1000" placeholder="What prediction or decision will this dataset support?"></textarea>
+      <textarea id="purpose" name="purpose" maxlength="1000" placeholder="What prediction or decision will this dataset support?">{{ job.purpose or '' }}</textarea>
       <div class="actions"><button type="submit">Review selection</button><a class="button secondary" href="{{ url_for('index') }}">Back</a></div>
     </form>
   </section>
@@ -183,6 +216,7 @@
   {% elif stage == "confirm" %}
   <section class="panel">
     <h2>Confirm the analysis</h2>
+    {% if job.mode == 'classification' %}
     {% set subtype_labels = {"binary": "Binary", "multiclass": "Multiclass", "single-class": "Single-class"} %}
     <div class="confirm"><strong>Detected task: {{ subtype_labels[job.target_info.classification_subtype] }} classification</strong><br><span class="muted">Based on {{ job.target_info.class_count }} observed target {{ "class" if job.target_info.class_count == 1 else "classes" }}. Missing labels are excluded.</span></div>
     <div class="grid">
@@ -192,9 +226,29 @@
       <div class="card"><div class="label">Missing labels</div><div class="metric">{{ job.target_info.target_missing_count }}</div></div>
     </div>
     <div class="table-wrap"><table><thead><tr><th>Target class</th><th>Rows</th><th>Percentage</th></tr></thead><tbody>{% for item in job.target_info.target_distribution %}<tr><td>{{ item.label }}</td><td>{{ item.count }}</td><td>{{ item.percentage }}%</td></tr>{% endfor %}</tbody></table></div>
+    <p class="muted">Parsing: existing pandas NA/type defaults, UTF-8, comma delimiter, inferred header. Planned checks retain classification profiling, target evidence, conflicts, leakage heuristics, and scoring. Analysis safeguards: {{ job.inspection.limits | tojson }}; the configured upload cap also applies.</p>
+    {% for warning in job.inspection.parsing_warnings %}{% set notice = warning | regression_inspection_notice if job.mode == "regression" else none %}<div class="{{ "confirm" if notice else "warning" }}">{% if notice %}<strong>{{ notice.title }}</strong><p>{{ notice.text }}</p>{% else %}<strong>Parsing review: {{ warning.code }}</strong><p>{{ warning.interpretation }}</p>{% endif %}</div>{% endfor %}
+    {% elif job.mode == 'regression' %}
+    <div class="confirm"><strong>Single-target regression · {{ job.target }}</strong><p>No overall score, sub-scores, or readiness verdict.</p></div>
+    {% set t = job.target_info.statistics %}
+    <div class="grid"><div class="card">Finite targets<strong class="metric">{{ t.finite_count }} / {{ t.row_count }}</strong></div><div class="card">Missing<strong class="metric">{{ t.missing_count }}</strong></div><div class="card">Non-finite<strong class="metric">{{ t.positive_infinity_count + t.negative_infinity_count }}</strong></div><div class="card">Distinct finite values<strong class="metric">{{ t.distinct_count }}</strong></div></div>
+    <p>Observed range: {{ t.min }} to {{ t.max }}. Constraints: {{ job.target_info.constraints.violation_union_count }} violating finite targets. All finite targets remain in distribution evidence.</p>
+    <p>Declared expectations: {{ job.config.regression.expectations.kind }}{% if job.config.regression.expectations.units %} · {{ job.config.regression.expectations.units }}{% endif %}. Feature availability is user-declared context.</p>
+    {% set e=job.config.regression.expectations %}<p>Inclusive minimum: {{ e.minimum if e.minimum is not none else 'Not declared' }}; inclusive maximum: {{ e.maximum if e.maximum is not none else 'Not declared' }}. Nonnegative: {{ e.nonnegative or false }}; integer required: {{ e.integer_required or false }}.</p><p>{{ job.target_info.constraints.violation_union_count }} finite targets violate declared requirements. All finite observations remain in distribution analysis.</p>
+    <p>Planned checks: finite target distributions, declared constraints, qualified arithmetic relationships, exact repetition, repeated-input target variation, feature evidence, and parsing review. Relationship searches have configured work and pool limits.</p>
+    <p>Operational safeguards: {{ job.inspection.limits | tojson }}. Post-load frame measurement and cooperative deadlines are not hard memory or execution guarantees.</p>
+    {% for warning in job.inspection.parsing_warnings %}{% set notice = warning | regression_inspection_notice if job.mode == "regression" else none %}<div class="{{ "confirm" if notice else "warning" }}">{% if notice %}<strong>{{ notice.title }}</strong><p>{{ notice.text }}</p>{% else %}<strong>Parsing review: {{ warning.code }}</strong><p>{{ warning.interpretation }}</p>{% endif %}</div>{% endfor %}
+    {% else %}
+    <div class="confirm"><strong>Unlabeled CSV profiling</strong><p>All columns participate. No overall score, sub-scores, or readiness verdict will be generated.</p></div>
+    <p>Planned checks: schema, cell/column/row missingness, exact duplicates, observed variation, categorical cardinality, finite numeric summaries, eligible 1.5-IQR evidence, and bounded parsing review.</p>
+    <p>Encoding: {{ job.config.parsing.encoding }}. Missing policy: {{ job.config.parsing.missing_policy }}. Tokens: {{ job.config.parsing.na_values | tojson }}. Column overrides: {{ job.config.parsing.column_types | tojson }}.</p>
+    <p>Operational safeguards: {{ job.inspection.limits | tojson }}. Source/header preflight, bounded row read, post-load frame measurement, and cooperative deadlines are safeguards, not hard memory or execution guarantees.</p>
+    {% for warning in job.inspection.parsing_warnings %}{% set notice = warning | regression_inspection_notice if job.mode == "regression" else none %}<div class="{{ "confirm" if notice else "warning" }}">{% if notice %}<strong>{{ notice.title }}</strong><p>{{ notice.text }}</p>{% else %}<strong>Parsing review: {{ warning.code }}</strong><p>{{ warning.interpretation }}</p>{% endif %}</div>{% endfor %}
+    {% endif %}
+    <p class="muted">Token inspection bounds: {{ job.config.fidelity_inspection.max_bytes }} bytes, {{ job.config.fidelity_inspection.max_records }} data records, {{ job.config.fidelity_inspection.max_cells }} comparable cells. Preview inspection is limited to preview rows. Warnings are review prompts; absence within this scope does not establish losslessness.</p>
     <form method="post" action="{{ url_for('generate') }}">
       <input type="hidden" name="form_token" value="{{ form_token }}">
-      {% if job.target_info.suitability.requires_override %}
+      {% if job.mode in ['classification','regression'] and job.target_info.suitability.requires_override %}
       <div class="warning">
         <strong>Review this outcome choice</strong>
         <p>{{ job.target_info.suitability.explanation }}</p>
@@ -210,10 +264,12 @@
     <div class="result-heading">
       <div>
         <h2>Dataset reliability overview</h2>
-        <p class="muted">{{ job.summary.dataset_name }} · Target: {{ job.summary.target }} · Source: {{ job.summary.source_filename }}</p>
+        <p class="muted">{{ job.summary.dataset_name }} · {% if job.mode != 'unlabeled' %}Target: {{ job.summary.target }} · {% else %}All-column profiling · {% endif %}Source: {{ job.summary.source_filename }}</p>
       </div>
     </div>
-    <div class="result-summary">
+    <p class="muted">Analysis status: {{ job.summary.execution.status }} · {{ job.summary.execution.analyzed_rows }} rows · {{ job.summary.execution.analyzed_columns }} columns.</p>
+    {% if job.summary.execution.status == 'partial' %}<div class="warning"><strong>Analysis incomplete</strong> — review unavailable checks; completed evidence remains available.</div>{% endif %}
+    {% if job.mode == 'classification' %}<div class="result-summary">
       <div class="score-card">
         <span class="risk-badge {{ job.summary.risk_level }}">{{ job.summary.risk_level }} Risk</span>
         <div class="score">{{ job.summary.overall }}</div>
@@ -230,7 +286,9 @@
         <p>{{ job.summary.recommended_action }}</p>
       </div>
     </div>
-    <h3>Top risks</h3>
+    {% else %}<div class="decision-card"><h3>Observed evidence</h3><p>{{ job.summary.overall_assessment }}</p><p>{{ job.summary.principal_evidence_summary }}</p><h3>Recommended next action</h3><p>{{ job.summary.recommended_action }}</p></div>{% endif %}
+    <h3>{{ 'Top risks' if job.mode == 'classification' else 'Priority review findings' }}</h3>
+    {% if job.mode == 'regression' and not job.summary.risks %}<p>No review findings were generated by the completed checks. Review parsing and coverage separately.</p>{% endif %}
     <div class="risk-list">
       {% for risk in job.summary.risks %}
       <article class="risk-card {{ risk.severity }}">
@@ -239,9 +297,16 @@
       </article>
       {% endfor %}
     </div>
+    {% if job.mode == 'regression' %}<p>{{ job.summary.scoring.reason }}</p>{% if job.summary.target_statistics %}<p>Finite targets: {{ job.summary.target_statistics.finite_count }} / {{ job.summary.target_statistics.row_count }}.</p>{% endif %}<div class="confirm"><strong>Relationship search: {{ job.summary.coverage.relationship_search.status | replace('_',' ') }}</strong><p>{{ job.summary.coverage.relationship_search.meaning }}</p>{% if job.summary.coverage.relationship_search.status == 'bounded' %}<p>Planned pool/work limits are coverage limitations, not diagnostic failures.</p>{% endif %}</div>{% endif %}
+    <h3>Parsing review and coverage</h3>
+    {% for warning in job.summary.parsing_warnings %}{% set notice = warning | regression_inspection_notice if job.mode == "regression" else none %}<div class="{{ "confirm" if notice else "warning" }}">{% if notice %}<strong>{{ notice.title }}</strong><p>{{ notice.text }}</p>{% else %}<strong>{{ warning.code }}{% if warning.column %} · {{ warning.column }}{% endif %}</strong><p>{{ warning.interpretation }}</p><p class="muted">{{ warning.observed_count }} observed occurrences within bounded inspection; not dataset incidence.</p>{% endif %}</div>{% else %}<p>No parsing warnings observed within the inspected scope. This does not establish losslessness.</p>{% endfor %}
+    <p class="muted">Completed groups: {{ job.summary.coverage.completed_applicable_groups | join(', ') }}. {{ job.summary.coverage.meaning }}</p>
+    {% for check in job.summary.coverage.unavailable_checks %}<p class="muted">{{ check.check_id }} · {{ check.scope }}: {{ check.applicability.value }} / {{ check.execution.value }} — {{ check.reason }}</p>{% endfor %}
     <div class="actions">
       <a class="button" href="{{ url_for('download_pdf') }}">Download PDF</a>
       <a class="button secondary" href="{{ url_for('report') }}" target="_blank" rel="noopener">View full report</a>
+      {% if job.mode != 'classification' %}<a class="button secondary" href="{{ url_for('download') }}">Download HTML</a>{% endif %}
+      <a class="button secondary" href="{{ url_for('download_json') }}">Download JSON</a>
       <form class="inline" method="post" action="{{ url_for('new_analysis') }}"><input type="hidden" name="form_token" value="{{ form_token }}"><button class="tertiary" type="submit">New analysis</button></form>
     </div>
   </section>

@@ -1,0 +1,104 @@
+{
+  "transform": "m5_public_corpus_v1",
+  "pyarrow": "25.0.1",
+  "datasets": [
+    {
+      "name": "bike",
+      "rows": 17379,
+      "raw_sha256": "b70182d0d0508e9abbb79306ce5c0cec34869000f8220175ac83d11dbe845401",
+      "member_sha256": "e03de4ee4ef4dc376ac6e04bf829673c6269e8eba5c60fa121640fa2f829504f",
+      "license": "UCI CC BY 4.0",
+      "source": "https://archive.ics.uci.edu/dataset/275/bike+sharing+dataset",
+      "notes": "Combines supplied dteday and hr without repairing gaps or repeated local hours. Washington DC timezone is an explicit analysis declaration.",
+      "transform": "m5_public_corpus_v1",
+      "prepared": {
+        "bike.csv": {
+          "sha256": "cfa1a75f993cd7392d13e58338da1be4ca593620534dd2d436631bccbde30962",
+          "bytes": 734315
+        }
+      },
+      "manifest_sha256": "570b63aa821ad4f2a871359c7a3d634859dbeba66cfcebf76de287a25be51de2"
+    },
+    {
+      "name": "beijing",
+      "rows": 420768,
+      "members": {
+        "PRSA_Data_20130301-20170228/PRSA_Data_Aotizhongxin_20130301-20170228.csv": "a94fbcfc71708b6ffdc033360163d91efb7f675e496f6b5860929aa96b96351b",
+        "PRSA_Data_20130301-20170228/PRSA_Data_Changping_20130301-20170228.csv": "a2e21402a6d95fb7043f87959e6e3dcbecb957aac356a6f8028a85b047c772e7",
+        "PRSA_Data_20130301-20170228/PRSA_Data_Dingling_20130301-20170228.csv": "3d8dff81f18a80d9f455876a785642bffe1e9b9924ec1e6b7ce8cca790432eeb",
+        "PRSA_Data_20130301-20170228/PRSA_Data_Dongsi_20130301-20170228.csv": "9c0020214425e5ee2a64d42f97a1f632e1d8f6b53ad50edd85a686cc7999f27e",
+        "PRSA_Data_20130301-20170228/PRSA_Data_Guanyuan_20130301-20170228.csv": "59390fee3b032597b387491f5230e7edb90a8558e30217ebd6d9befbe669fbf9",
+        "PRSA_Data_20130301-20170228/PRSA_Data_Gucheng_20130301-20170228.csv": "10ae48801ea55869fee56a48b885fb1127859c130551888d71673f34216ba951",
+        "PRSA_Data_20130301-20170228/PRSA_Data_Huairou_20130301-20170228.csv": "812dcbe848b3ba2c2d25731064797bff803c46eb0c602156a1fa044df136dc26",
+        "PRSA_Data_20130301-20170228/PRSA_Data_Nongzhanguan_20130301-20170228.csv": "572cf87b65ef543cd55d3a711b28474def224a46b0ec3fc8add8aaf13b67a487",
+        "PRSA_Data_20130301-20170228/PRSA_Data_Shunyi_20130301-20170228.csv": "520b59e4ead3b0cfe7f1ed673e30275de8441e999db6f413d5172d2277b8c15a",
+        "PRSA_Data_20130301-20170228/PRSA_Data_Tiantan_20130301-20170228.csv": "0743e34799cf1ee36195b73321b91baa5625276532e7263c588f68cdef3b4daa",
+        "PRSA_Data_20130301-20170228/PRSA_Data_Wanliu_20130301-20170228.csv": "0b1a6d754a07f0def2f55434ddfa3870dcd0063b7f766a6f66b6c11bb05a377a",
+        "PRSA_Data_20130301-20170228/PRSA_Data_Wanshouxigong_20130301-20170228.csv": "ab1d6a356d6997a45f6d657ad47de1e05a4a08d4a7015b38a329a90665ab74d0"
+      },
+      "license": "UCI CC BY 4.0",
+      "source": "https://archive.ics.uci.edu/dataset/501/beijing+multi+site+air+quality+data",
+      "notes": "Stable station/member order. Constructs explicit calendar clock from year/month/day/hour; NA is retained under declared CSV missing-token policy.",
+      "transform": "m5_public_corpus_v1",
+      "prepared": {
+        "beijing.csv": {
+          "sha256": "c95400b68314ff2239611892f068ac8b7dc4710c6f9b6074141a33cf83dc6f01",
+          "bytes": 26030014
+        }
+      },
+      "manifest_sha256": "65352e40f67c057b3184433170fc511956107386a30372975165c255b9396eca"
+    },
+    {
+      "name": "electricity",
+      "rows": 140256,
+      "measurements": 370,
+      "license": "UCI CC BY 4.0",
+      "source": "https://archive.ics.uci.edu/dataset/321/electricityloaddiagrams20112014",
+      "notes": "Semicolon/decimal-comma source converted to flat Parquet doubles, native naive timestamps. Source zeros and aggregated hours are not cleaned or interpreted as defects.",
+      "transform": "m5_public_corpus_v1",
+      "prepared": {
+        "electricity.parquet": {
+          "sha256": "8dfb39eb42f1d513f276bace65d2e46dbfc503a077ca9bbdaa525786c2c4c032",
+          "bytes": 94968062
+        }
+      },
+      "manifest_sha256": "f90c0a19092af019613daad54e7400dcb4ea5db0220b7419077daf6cbacb2f03"
+    },
+    {
+      "name": "retail",
+      "rows": 541909,
+      "xlsx_sha256": "43465a06f2ccf7c8b5bd2892bc7defb52f97487934fe93b16ae4c3936424676d",
+      "license": "UCI CC BY 4.0",
+      "source": "https://archive.ics.uci.edu/dataset/352/online+retail",
+      "notes": "XLSX 1900 calendar converted by exact-decimal nearest-minute rounding to displayed source minute labels; this convention is explicit. No timezone is inferred. Cancellation codes and literal customer identifiers retained.",
+      "transform": "m5_public_corpus_v1",
+      "prepared": {
+        "retail.csv": {
+          "sha256": "930e3443e84ff8a4f440fe8586e05dfac750b909e980d245b01812d091769263",
+          "bytes": 33531183
+        }
+      },
+      "manifest_sha256": "3057ac8035a8df770ca8977f55bef822992730ff9bb2f19aebf47cec18dd6688"
+    },
+    {
+      "name": "alfred",
+      "rows": 2,
+      "history_rows": 7,
+      "license": "Published BEA GDP figures transcribed as facts from the cited official ALFRED archive; presentation reuse rights not asserted.",
+      "source": "https://alfred.stlouisfed.org/docs/alfred_capturing_data.pdf",
+      "notes": "Manual transcription of GDPC1_PCA vintage table from official archived PDF. Missing earlier-quarter vintage entries omitted as absence, not known missing. Release-day uncertainty preserved; completeness unknown.",
+      "transform": "m5_public_corpus_v1",
+      "prepared": {
+        "alfred_history.csv": {
+          "sha256": "e1aad4f4c6bf98e6ec18c466c1361500fbc99e825d80dbe5db5b2b08c95b122f",
+          "bytes": 218
+        },
+        "alfred.csv": {
+          "sha256": "7b09f6aaf42bd461bd38dc9f6a600efe3ddeb7de92bee83583c5051bdddd5567",
+          "bytes": 82
+        }
+      },
+      "manifest_sha256": "2064bcebe33cc3c50c550cf549cfaaa6d7b5162da7ae1588c7720bad4100cd94"
+    }
+  ]
+}

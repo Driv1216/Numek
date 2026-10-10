@@ -1,0 +1,3220 @@
+{
+  "target_combined_gib": 5.0,
+  "format": "parquet",
+  "capacity_guarantee": false,
+  "objective_seconds": 1800,
+  "environment": {
+    "python": "3.11.15",
+    "platform": "macOS-27.0.1-arm64-arm-64bit",
+    "duckdb": "1.5.6",
+    "pyarrow": "25.0.1",
+    "physical_memory": 17179869184
+  },
+  "inputs": [
+    {
+      "source": "reference",
+      "bytes": 91881664,
+      "rows": 8659208,
+      "columns": 4
+    },
+    {
+      "source": "current",
+      "bytes": 91837301,
+      "rows": 8659208,
+      "columns": 4
+    }
+  ],
+  "normalized_cells": 17318416,
+  "scope": {
+    "required": "all eligible declared records",
+    "behavior": "default 12 windows, both x measurements; bounded series/comparison/work scopes",
+    "availability": "unknown; no history or evaluation supplied"
+  },
+  "configuration": {
+    "execution": {
+      "backend": "duckdb_local",
+      "max_source_bytes": 5368709120,
+      "max_combined_source_bytes": 8589934592,
+      "max_rows": 10000000,
+      "max_combined_rows": 30000000,
+      "max_columns": 1000,
+      "memory_bytes": 2147483648,
+      "max_rss_bytes": 6442450944,
+      "threads": 2,
+      "batch_bytes": 33554432,
+      "max_record_bytes": 8388608,
+      "workspace_bytes": 68719476736,
+      "free_disk_bytes": 2147483648,
+      "max_seconds": 1800,
+      "result_bytes": 33554432,
+      "scratch_directory": null
+    },
+    "limits": {
+      "max_cells": 100000000,
+      "max_series": 1000000,
+      "behavior_measurements": 32,
+      "detailed_series": 64,
+      "max_windows": 64,
+      "max_folds": 32,
+      "max_comparisons": 2048,
+      "observation_visits": 1000000000,
+      "retained_details": 100,
+      "witnesses": 5,
+      "decoded_batch_bytes": 67108864,
+      "parquet_metadata_bytes": 16777216
+    },
+    "behavior": {
+      "enabled": true,
+      "windows": 12,
+      "explicit_windows": [],
+      "reference_window": 0,
+      "requested_measurements": [],
+      "requested_series": [],
+      "min_support": 100,
+      "missingness_increase": 0.05,
+      "distribution_effect": 0.1,
+      "normalized_w1": 0.25,
+      "flatline_observations": 10,
+      "volatility_support": 100,
+      "volatility_ratio": 2.0,
+      "rate_differences": false,
+      "seasonality": [],
+      "min_cycles": 8,
+      "min_window_cycles": 2,
+      "min_phase_support": 20,
+      "stable_cohort": true,
+      "version": "temporal_investigation_defaults_v1"
+    },
+    "presentation": {
+      "executive_actions": 5,
+      "target_panels": 6,
+      "feature_details": 20,
+      "table_rows": 20,
+      "appendix_rows": 100
+    }
+  },
+  "status": "completed",
+  "execution": {
+    "status": "completed",
+    "backend": "duckdb_local",
+    "engine_version": "1.5.6",
+    "effective_limits": {
+      "backend": "duckdb_local",
+      "max_source_bytes": 5368709120,
+      "max_combined_source_bytes": 8589934592,
+      "max_rows": 10000000,
+      "max_combined_rows": 30000000,
+      "max_columns": 1000,
+      "memory_bytes": 2147483648,
+      "max_rss_bytes": 6442450944,
+      "threads": 2,
+      "batch_bytes": 33554432,
+      "max_record_bytes": 8388608,
+      "workspace_bytes": 68719476736,
+      "free_disk_bytes": 2147483648,
+      "max_seconds": 1800,
+      "result_bytes": 33554432,
+      "scratch_directory": null
+    },
+    "temporal_limits": {
+      "max_cells": 100000000,
+      "max_series": 1000000,
+      "behavior_measurements": 32,
+      "detailed_series": 64,
+      "max_windows": 64,
+      "max_folds": 32,
+      "max_comparisons": 2048,
+      "observation_visits": 1000000000,
+      "retained_details": 100,
+      "witnesses": 5,
+      "decoded_batch_bytes": 67108864,
+      "parquet_metadata_bytes": 16777216
+    },
+    "duration_seconds": 219.14811837498564,
+    "phase_seconds": {
+      "reference:ingestion": 25.44648524999502,
+      "reference:normalization": 33.3450484170171,
+      "current:ingestion": 27.99136008298956,
+      "current:normalization": 40.07638225000119,
+      "required_diagnostics": 19.89195804198971,
+      "availability_history_evaluation": 0.00010779098374769092,
+      "behavior": 72.29053100000601
+    },
+    "phase_plan": {
+      "sources": [
+        {
+          "source_id": "reference",
+          "compressed_bytes": 91881664,
+          "format": "parquet",
+          "rows": 8659208,
+          "columns": 4,
+          "row_groups": 2559,
+          "uncompressed_chunk_bytes": 177401219,
+          "serialized_footer_bytes": 2490146,
+          "schema": "time: int64\nentity: string\nx: int64\ncontext: string",
+          "decoder_peak_is_bounded": false
+        },
+        {
+          "source_id": "current",
+          "compressed_bytes": 91837301,
+          "format": "parquet",
+          "rows": 8659208,
+          "columns": 4,
+          "row_groups": 2559,
+          "uncompressed_chunk_bytes": 177401219,
+          "serialized_footer_bytes": 2490145,
+          "schema": "time: int64\nentity: string\nx: int64\ncontext: string",
+          "decoder_peak_is_bounded": false
+        }
+      ],
+      "estimated_peak_workspace_bytes": 1550116167,
+      "upper_bound": false,
+      "assumptions": [
+        "Variable-width and native decoder allocation are uncertain.",
+        "Sort/join coexistence and cell expansion are reassessed using actual cardinalities."
+      ]
+    },
+    "peak_workspace_bytes": 4750204928,
+    "estimated_peak_workspace_bytes": 2936307712,
+    "planning_estimate_is_upper_bound": false,
+    "ledger": [
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 786255872,
+        "available_bytes": 217088000000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-current.parquet",
+            "bytes": 91840512
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 15310848
+          },
+          {
+            "file": "source-reference.parquet",
+            "bytes": 91885568
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 787062784,
+        "available_bytes": 217088000000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-current.parquet",
+            "bytes": 91840512
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 16117760
+          },
+          {
+            "file": "source-reference.parquet",
+            "bytes": 91885568
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 770945024,
+        "available_bytes": 217088000000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-current.parquet",
+            "bytes": 91840512
+          },
+          {
+            "file": "source-reference.parquet",
+            "bytes": 91885568
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 771751936,
+        "available_bytes": 217088000000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-current.parquet",
+            "bytes": 91840512
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 806912
+          },
+          {
+            "file": "source-reference.parquet",
+            "bytes": 91885568
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 772558848,
+        "available_bytes": 217088000000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-current.parquet",
+            "bytes": 91840512
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 1613824
+          },
+          {
+            "file": "source-reference.parquet",
+            "bytes": 91885568
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 773365760,
+        "available_bytes": 217088000000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-current.parquet",
+            "bytes": 91840512
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 2420736
+          },
+          {
+            "file": "source-reference.parquet",
+            "bytes": 91885568
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 774168576,
+        "available_bytes": 217088000000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-current.parquet",
+            "bytes": 91840512
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 3223552
+          },
+          {
+            "file": "source-reference.parquet",
+            "bytes": 91885568
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 774975488,
+        "available_bytes": 217088000000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-current.parquet",
+            "bytes": 91840512
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 4030464
+          },
+          {
+            "file": "source-reference.parquet",
+            "bytes": 91885568
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 775782400,
+        "available_bytes": 217088000000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-current.parquet",
+            "bytes": 91840512
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 4837376
+          },
+          {
+            "file": "source-reference.parquet",
+            "bytes": 91885568
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 776589312,
+        "available_bytes": 217088000000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-current.parquet",
+            "bytes": 91840512
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 5644288
+          },
+          {
+            "file": "source-reference.parquet",
+            "bytes": 91885568
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 777392128,
+        "available_bytes": 217088000000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-current.parquet",
+            "bytes": 91840512
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 6447104
+          },
+          {
+            "file": "source-reference.parquet",
+            "bytes": 91885568
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 778199040,
+        "available_bytes": 217088000000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-current.parquet",
+            "bytes": 91840512
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 7254016
+          },
+          {
+            "file": "source-reference.parquet",
+            "bytes": 91885568
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 779005952,
+        "available_bytes": 217088000000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-current.parquet",
+            "bytes": 91840512
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 8060928
+          },
+          {
+            "file": "source-reference.parquet",
+            "bytes": 91885568
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 779812864,
+        "available_bytes": 217088000000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-current.parquet",
+            "bytes": 91840512
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 8867840
+          },
+          {
+            "file": "source-reference.parquet",
+            "bytes": 91885568
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 780615680,
+        "available_bytes": 217088000000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-current.parquet",
+            "bytes": 91840512
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 9670656
+          },
+          {
+            "file": "source-reference.parquet",
+            "bytes": 91885568
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 781422592,
+        "available_bytes": 217088000000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-current.parquet",
+            "bytes": 91840512
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 10477568
+          },
+          {
+            "file": "source-reference.parquet",
+            "bytes": 91885568
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 782229504,
+        "available_bytes": 217088000000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-current.parquet",
+            "bytes": 91840512
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 11284480
+          },
+          {
+            "file": "source-reference.parquet",
+            "bytes": 91885568
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 783032320,
+        "available_bytes": 217088000000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-current.parquet",
+            "bytes": 91840512
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 12087296
+          },
+          {
+            "file": "source-reference.parquet",
+            "bytes": 91885568
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 783839232,
+        "available_bytes": 217088000000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-current.parquet",
+            "bytes": 91840512
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 12894208
+          },
+          {
+            "file": "source-reference.parquet",
+            "bytes": 91885568
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 784646144,
+        "available_bytes": 217088000000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-current.parquet",
+            "bytes": 91840512
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 13701120
+          },
+          {
+            "file": "source-reference.parquet",
+            "bytes": 91885568
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 785453056,
+        "available_bytes": 217088000000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-current.parquet",
+            "bytes": 91840512
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 14508032
+          },
+          {
+            "file": "source-reference.parquet",
+            "bytes": 91885568
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 786255872,
+        "available_bytes": 217088000000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-current.parquet",
+            "bytes": 91840512
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 15310848
+          },
+          {
+            "file": "source-reference.parquet",
+            "bytes": 91885568
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 787062784,
+        "available_bytes": 217088000000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-current.parquet",
+            "bytes": 91840512
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 16117760
+          },
+          {
+            "file": "source-reference.parquet",
+            "bytes": 91885568
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 770945024,
+        "available_bytes": 217088000000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-current.parquet",
+            "bytes": 91840512
+          },
+          {
+            "file": "source-reference.parquet",
+            "bytes": 91885568
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 771751936,
+        "available_bytes": 217088000000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-current.parquet",
+            "bytes": 91840512
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 806912
+          },
+          {
+            "file": "source-reference.parquet",
+            "bytes": 91885568
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 772558848,
+        "available_bytes": 217088000000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-current.parquet",
+            "bytes": 91840512
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 1613824
+          },
+          {
+            "file": "source-reference.parquet",
+            "bytes": 91885568
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 773365760,
+        "available_bytes": 217088000000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-current.parquet",
+            "bytes": 91840512
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 2420736
+          },
+          {
+            "file": "source-reference.parquet",
+            "bytes": 91885568
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 774168576,
+        "available_bytes": 217088000000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-current.parquet",
+            "bytes": 91840512
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 3223552
+          },
+          {
+            "file": "source-reference.parquet",
+            "bytes": 91885568
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 774975488,
+        "available_bytes": 217088000000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-current.parquet",
+            "bytes": 91840512
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 4030464
+          },
+          {
+            "file": "source-reference.parquet",
+            "bytes": 91885568
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 775782400,
+        "available_bytes": 217088000000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-current.parquet",
+            "bytes": 91840512
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 4837376
+          },
+          {
+            "file": "source-reference.parquet",
+            "bytes": 91885568
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 776589312,
+        "available_bytes": 217088000000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-current.parquet",
+            "bytes": 91840512
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 5644288
+          },
+          {
+            "file": "source-reference.parquet",
+            "bytes": 91885568
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 777392128,
+        "available_bytes": 217088000000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-current.parquet",
+            "bytes": 91840512
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 6447104
+          },
+          {
+            "file": "source-reference.parquet",
+            "bytes": 91885568
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 778199040,
+        "available_bytes": 217088000000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-current.parquet",
+            "bytes": 91840512
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 7254016
+          },
+          {
+            "file": "source-reference.parquet",
+            "bytes": 91885568
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 779005952,
+        "available_bytes": 217088000000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-current.parquet",
+            "bytes": 91840512
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 8060928
+          },
+          {
+            "file": "source-reference.parquet",
+            "bytes": 91885568
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 779812864,
+        "available_bytes": 217088000000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-current.parquet",
+            "bytes": 91840512
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 8867840
+          },
+          {
+            "file": "source-reference.parquet",
+            "bytes": 91885568
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 780615680,
+        "available_bytes": 217088000000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-current.parquet",
+            "bytes": 91840512
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 9670656
+          },
+          {
+            "file": "source-reference.parquet",
+            "bytes": 91885568
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 781422592,
+        "available_bytes": 217088000000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-current.parquet",
+            "bytes": 91840512
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 10477568
+          },
+          {
+            "file": "source-reference.parquet",
+            "bytes": 91885568
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 782229504,
+        "available_bytes": 217088000000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-current.parquet",
+            "bytes": 91840512
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 11284480
+          },
+          {
+            "file": "source-reference.parquet",
+            "bytes": 91885568
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 783032320,
+        "available_bytes": 217088000000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-current.parquet",
+            "bytes": 91840512
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 12087296
+          },
+          {
+            "file": "source-reference.parquet",
+            "bytes": 91885568
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 783839232,
+        "available_bytes": 217088000000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-current.parquet",
+            "bytes": 91840512
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 12894208
+          },
+          {
+            "file": "source-reference.parquet",
+            "bytes": 91885568
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 784646144,
+        "available_bytes": 217088000000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-current.parquet",
+            "bytes": 91840512
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 13701120
+          },
+          {
+            "file": "source-reference.parquet",
+            "bytes": 91885568
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 785453056,
+        "available_bytes": 217088000000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-current.parquet",
+            "bytes": 91840512
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 14508032
+          },
+          {
+            "file": "source-reference.parquet",
+            "bytes": 91885568
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 786255872,
+        "available_bytes": 217088000000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-current.parquet",
+            "bytes": 91840512
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 15310848
+          },
+          {
+            "file": "source-reference.parquet",
+            "bytes": 91885568
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 787304448,
+        "available_bytes": 217088000000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-current.parquet",
+            "bytes": 91840512
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 16359424
+          },
+          {
+            "file": "source-reference.parquet",
+            "bytes": 91885568
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 770945024,
+        "available_bytes": 217088000000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-current.parquet",
+            "bytes": 91840512
+          },
+          {
+            "file": "source-reference.parquet",
+            "bytes": 91885568
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 771751936,
+        "available_bytes": 217088000000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-current.parquet",
+            "bytes": 91840512
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 806912
+          },
+          {
+            "file": "source-reference.parquet",
+            "bytes": 91885568
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 772558848,
+        "available_bytes": 217088000000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-current.parquet",
+            "bytes": 91840512
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 1613824
+          },
+          {
+            "file": "source-reference.parquet",
+            "bytes": 91885568
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 773365760,
+        "available_bytes": 217088000000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-current.parquet",
+            "bytes": 91840512
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 2420736
+          },
+          {
+            "file": "source-reference.parquet",
+            "bytes": 91885568
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 774168576,
+        "available_bytes": 217088000000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-current.parquet",
+            "bytes": 91840512
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 3223552
+          },
+          {
+            "file": "source-reference.parquet",
+            "bytes": 91885568
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 774975488,
+        "available_bytes": 217088000000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-current.parquet",
+            "bytes": 91840512
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 4030464
+          },
+          {
+            "file": "source-reference.parquet",
+            "bytes": 91885568
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 775782400,
+        "available_bytes": 217088000000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-current.parquet",
+            "bytes": 91840512
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 4837376
+          },
+          {
+            "file": "source-reference.parquet",
+            "bytes": 91885568
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 776589312,
+        "available_bytes": 217088000000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-current.parquet",
+            "bytes": 91840512
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 5644288
+          },
+          {
+            "file": "source-reference.parquet",
+            "bytes": 91885568
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 777392128,
+        "available_bytes": 217088000000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-current.parquet",
+            "bytes": 91840512
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 6447104
+          },
+          {
+            "file": "source-reference.parquet",
+            "bytes": 91885568
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 778199040,
+        "available_bytes": 217088000000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-current.parquet",
+            "bytes": 91840512
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 7254016
+          },
+          {
+            "file": "source-reference.parquet",
+            "bytes": 91885568
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 779005952,
+        "available_bytes": 217088000000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-current.parquet",
+            "bytes": 91840512
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 8060928
+          },
+          {
+            "file": "source-reference.parquet",
+            "bytes": 91885568
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 779812864,
+        "available_bytes": 217088000000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-current.parquet",
+            "bytes": 91840512
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 8867840
+          },
+          {
+            "file": "source-reference.parquet",
+            "bytes": 91885568
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 780615680,
+        "available_bytes": 217088000000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-current.parquet",
+            "bytes": 91840512
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 9670656
+          },
+          {
+            "file": "source-reference.parquet",
+            "bytes": 91885568
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 781422592,
+        "available_bytes": 217088000000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-current.parquet",
+            "bytes": 91840512
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 10477568
+          },
+          {
+            "file": "source-reference.parquet",
+            "bytes": 91885568
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 782229504,
+        "available_bytes": 217088000000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-current.parquet",
+            "bytes": 91840512
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 11284480
+          },
+          {
+            "file": "source-reference.parquet",
+            "bytes": 91885568
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 783032320,
+        "available_bytes": 217088000000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-current.parquet",
+            "bytes": 91840512
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 12087296
+          },
+          {
+            "file": "source-reference.parquet",
+            "bytes": 91885568
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 783839232,
+        "available_bytes": 217088000000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-current.parquet",
+            "bytes": 91840512
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 12894208
+          },
+          {
+            "file": "source-reference.parquet",
+            "bytes": 91885568
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 784646144,
+        "available_bytes": 217088000000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-current.parquet",
+            "bytes": 91840512
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 13701120
+          },
+          {
+            "file": "source-reference.parquet",
+            "bytes": 91885568
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 785453056,
+        "available_bytes": 217088000000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-current.parquet",
+            "bytes": 91840512
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 14508032
+          },
+          {
+            "file": "source-reference.parquet",
+            "bytes": 91885568
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 786255872,
+        "available_bytes": 217088000000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-current.parquet",
+            "bytes": 91840512
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 15310848
+          },
+          {
+            "file": "source-reference.parquet",
+            "bytes": 91885568
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 787062784,
+        "available_bytes": 217088000000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-current.parquet",
+            "bytes": 91840512
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 16117760
+          },
+          {
+            "file": "source-reference.parquet",
+            "bytes": 91885568
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 770945024,
+        "available_bytes": 217088000000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-current.parquet",
+            "bytes": 91840512
+          },
+          {
+            "file": "source-reference.parquet",
+            "bytes": 91885568
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 771751936,
+        "available_bytes": 217088000000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-current.parquet",
+            "bytes": 91840512
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 806912
+          },
+          {
+            "file": "source-reference.parquet",
+            "bytes": 91885568
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 772558848,
+        "available_bytes": 217088000000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-current.parquet",
+            "bytes": 91840512
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 1613824
+          },
+          {
+            "file": "source-reference.parquet",
+            "bytes": 91885568
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 773365760,
+        "available_bytes": 217088000000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-current.parquet",
+            "bytes": 91840512
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 2420736
+          },
+          {
+            "file": "source-reference.parquet",
+            "bytes": 91885568
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 774168576,
+        "available_bytes": 217088000000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-current.parquet",
+            "bytes": 91840512
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 3223552
+          },
+          {
+            "file": "source-reference.parquet",
+            "bytes": 91885568
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 774975488,
+        "available_bytes": 217088000000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-current.parquet",
+            "bytes": 91840512
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 4030464
+          },
+          {
+            "file": "source-reference.parquet",
+            "bytes": 91885568
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 775782400,
+        "available_bytes": 217088000000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-current.parquet",
+            "bytes": 91840512
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 4837376
+          },
+          {
+            "file": "source-reference.parquet",
+            "bytes": 91885568
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 776589312,
+        "available_bytes": 217088000000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-current.parquet",
+            "bytes": 91840512
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 5644288
+          },
+          {
+            "file": "source-reference.parquet",
+            "bytes": 91885568
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 777392128,
+        "available_bytes": 217088000000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-current.parquet",
+            "bytes": 91840512
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 6447104
+          },
+          {
+            "file": "source-reference.parquet",
+            "bytes": 91885568
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 778199040,
+        "available_bytes": 217088000000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-current.parquet",
+            "bytes": 91840512
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 7254016
+          },
+          {
+            "file": "source-reference.parquet",
+            "bytes": 91885568
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 779005952,
+        "available_bytes": 217088000000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-current.parquet",
+            "bytes": 91840512
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 8060928
+          },
+          {
+            "file": "source-reference.parquet",
+            "bytes": 91885568
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 779812864,
+        "available_bytes": 217088000000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-current.parquet",
+            "bytes": 91840512
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 8867840
+          },
+          {
+            "file": "source-reference.parquet",
+            "bytes": 91885568
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 780615680,
+        "available_bytes": 217088000000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-current.parquet",
+            "bytes": 91840512
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 9670656
+          },
+          {
+            "file": "source-reference.parquet",
+            "bytes": 91885568
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 781422592,
+        "available_bytes": 217088000000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-current.parquet",
+            "bytes": 91840512
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 10477568
+          },
+          {
+            "file": "source-reference.parquet",
+            "bytes": 91885568
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 782229504,
+        "available_bytes": 217088000000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-current.parquet",
+            "bytes": 91840512
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 11284480
+          },
+          {
+            "file": "source-reference.parquet",
+            "bytes": 91885568
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 783032320,
+        "available_bytes": 217088000000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-current.parquet",
+            "bytes": 91840512
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 12087296
+          },
+          {
+            "file": "source-reference.parquet",
+            "bytes": 91885568
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 783839232,
+        "available_bytes": 217088000000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-current.parquet",
+            "bytes": 91840512
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 12894208
+          },
+          {
+            "file": "source-reference.parquet",
+            "bytes": 91885568
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 784646144,
+        "available_bytes": 217088000000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-current.parquet",
+            "bytes": 91840512
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 13701120
+          },
+          {
+            "file": "source-reference.parquet",
+            "bytes": 91885568
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 785453056,
+        "available_bytes": 217088000000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-current.parquet",
+            "bytes": 91840512
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 14508032
+          },
+          {
+            "file": "source-reference.parquet",
+            "bytes": 91885568
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 786255872,
+        "available_bytes": 217088000000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-current.parquet",
+            "bytes": 91840512
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 15310848
+          },
+          {
+            "file": "source-reference.parquet",
+            "bytes": 91885568
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 787062784,
+        "available_bytes": 217088000000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-current.parquet",
+            "bytes": 91840512
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 16117760
+          },
+          {
+            "file": "source-reference.parquet",
+            "bytes": 91885568
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 770945024,
+        "available_bytes": 217088000000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-current.parquet",
+            "bytes": 91840512
+          },
+          {
+            "file": "source-reference.parquet",
+            "bytes": 91885568
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 771751936,
+        "available_bytes": 217088000000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-current.parquet",
+            "bytes": 91840512
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 806912
+          },
+          {
+            "file": "source-reference.parquet",
+            "bytes": 91885568
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 772558848,
+        "available_bytes": 217088000000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-current.parquet",
+            "bytes": 91840512
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 1613824
+          },
+          {
+            "file": "source-reference.parquet",
+            "bytes": 91885568
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 773365760,
+        "available_bytes": 217088000000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-current.parquet",
+            "bytes": 91840512
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 2420736
+          },
+          {
+            "file": "source-reference.parquet",
+            "bytes": 91885568
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 774168576,
+        "available_bytes": 217088000000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-current.parquet",
+            "bytes": 91840512
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 3223552
+          },
+          {
+            "file": "source-reference.parquet",
+            "bytes": 91885568
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 774975488,
+        "available_bytes": 217088000000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-current.parquet",
+            "bytes": 91840512
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 4030464
+          },
+          {
+            "file": "source-reference.parquet",
+            "bytes": 91885568
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 775782400,
+        "available_bytes": 217088000000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-current.parquet",
+            "bytes": 91840512
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 4837376
+          },
+          {
+            "file": "source-reference.parquet",
+            "bytes": 91885568
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 776589312,
+        "available_bytes": 217088000000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-current.parquet",
+            "bytes": 91840512
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 5644288
+          },
+          {
+            "file": "source-reference.parquet",
+            "bytes": 91885568
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 777392128,
+        "available_bytes": 217088000000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-current.parquet",
+            "bytes": 91840512
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 6447104
+          },
+          {
+            "file": "source-reference.parquet",
+            "bytes": 91885568
+          }
+        ]
+      },
+      {
+        "phase": "current: exact clock normalization",
+        "owned_bytes": 777809920,
+        "available_bytes": 217088000000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 587214848
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-current.parquet",
+            "bytes": 91840512
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 6864896
+          },
+          {
+            "file": "source-reference.parquet",
+            "bytes": 91885568
+          }
+        ]
+      },
+      {
+        "phase": "current: cardinality-based sort/join reservation",
+        "owned_bytes": 1030942720,
+        "available_bytes": 217088000000,
+        "estimated_addition": 1385506048,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 822095872
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-current.parquet",
+            "bytes": 91840512
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 7913472
+          },
+          {
+            "file": "source-reference.parquet",
+            "bytes": 91885568
+          },
+          {
+            "file": "spill/duckdb_temp_storage_S192K-0.tmp",
+            "bytes": 589824
+          },
+          {
+            "file": "spill/duckdb_temp_storage_S96K-0.tmp",
+            "bytes": 2457600
+          },
+          {
+            "file": "spill/duckdb_temp_storage_S128K-0.tmp",
+            "bytes": 786432
+          },
+          {
+            "file": "spill/duckdb_temp_storage_S32K-0.tmp",
+            "bytes": 360448
+          },
+          {
+            "file": "spill/duckdb_temp_storage_DEFAULT-0.tmp",
+            "bytes": 11796480
+          },
+          {
+            "file": "spill/duckdb_temp_storage_S160K-0.tmp",
+            "bytes": 491520
+          },
+          {
+            "file": "spill/duckdb_temp_storage_S64K-0.tmp",
+            "bytes": 720896
+          }
+        ]
+      },
+      {
+        "phase": "reference: bounded behavioral investigation",
+        "owned_bytes": 2029236224,
+        "available_bytes": 215040000000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 1845506048
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-current.parquet",
+            "bytes": 91840512
+          },
+          {
+            "file": "source-reference.parquet",
+            "bytes": 91885568
+          }
+        ]
+      },
+      {
+        "phase": "current: bounded behavioral investigation",
+        "owned_bytes": 2902753280,
+        "available_bytes": 214220800000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 2717921280
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-current.parquet",
+            "bytes": 91840512
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 1101824
+          },
+          {
+            "file": "source-reference.parquet",
+            "bytes": 91885568
+          }
+        ]
+      },
+      {
+        "phase": "completed temporal evidence publication",
+        "owned_bytes": 2902753280,
+        "available_bytes": 214220800000,
+        "estimated_addition": 33554432,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 2717921280
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-current.parquet",
+            "bytes": 91840512
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 1101824
+          },
+          {
+            "file": "source-reference.parquet",
+            "bytes": 91885568
+          }
+        ]
+      }
+    ],
+    "provenance": {
+      "reference": {
+        "sha256": "9d8580cb0d54d280dac88aabf5d261e36028f09bdfe68fcee88a3082e147dc6a",
+        "source_bytes": 91881664,
+        "rows": 8659208,
+        "parsing_fingerprint": "17219c982fd8390a8c8389112d2b1f1a645fa2ded06e0d0f51479584b3986f7d",
+        "normalization_fingerprint": "bef72b1bdc5b4c98084911204322f5fc6cec3338774ccd799cda4677e026a81a"
+      },
+      "current": {
+        "sha256": "bd93ab723385c9b43b74e59aebbebeb6d7a2afbfef95dbe4449b0c1952fc3df2",
+        "source_bytes": 91837301,
+        "rows": 8659208,
+        "parsing_fingerprint": "17219c982fd8390a8c8389112d2b1f1a645fa2ded06e0d0f51479584b3986f7d",
+        "normalization_fingerprint": "bef72b1bdc5b4c98084911204322f5fc6cec3338774ccd799cda4677e026a81a"
+      }
+    },
+    "timezone_data": {
+      "package": "tzdata",
+      "version": "2026.5",
+      "zones": {}
+    },
+    "warnings": [
+      "Workload budgets are provisional engineering controls, not capacity guarantees or OS quotas.",
+      "Decoded-batch/application retention bounds do not bound native Parquet decoder peaks.",
+      "Sampled RSS supervision can overshoot between samples."
+    ],
+    "peak_worker_rss_bytes": 2827190272,
+    "whole_job_seconds": 219.66961949999677,
+    "peak_spill_bytes": 2015690752,
+    "serialized_bytes": 383725
+  },
+  "coverage": {
+    "computed_aggregate_scope": "Every eligible declared record in required stages; no silent sampling.",
+    "checks": {
+      "t1": {
+        "family": "chronology",
+        "status": "completed",
+        "reason": null,
+        "population": "all eligible declared records"
+      },
+      "t2": {
+        "family": "ordering",
+        "status": "completed",
+        "reason": null,
+        "population": "all eligible declared records"
+      },
+      "t3": {
+        "family": "repetition",
+        "status": "completed",
+        "reason": null,
+        "population": "all eligible declared records"
+      },
+      "t4": {
+        "family": "panel",
+        "status": "completed",
+        "reason": null,
+        "population": "complete entity/observation keys with valid clocks"
+      },
+      "t5": {
+        "family": "continuity",
+        "status": "completed",
+        "reason": null,
+        "population": "all eligible declared records"
+      },
+      "t6": {
+        "family": "chronology",
+        "status": "completed",
+        "reason": null,
+        "population": "all eligible declared records"
+      },
+      "t7": {
+        "family": "ordering",
+        "status": "completed",
+        "reason": null,
+        "population": "all eligible declared records"
+      },
+      "t8": {
+        "family": "repetition",
+        "status": "completed",
+        "reason": null,
+        "population": "all eligible declared records"
+      },
+      "t9": {
+        "family": "panel",
+        "status": "completed",
+        "reason": null,
+        "population": "complete entity/observation keys with valid clocks"
+      },
+      "t10": {
+        "family": "continuity",
+        "status": "completed",
+        "reason": null,
+        "population": "all eligible declared records"
+      },
+      "t11": {
+        "family": "availability_unknown",
+        "status": "blocked",
+        "reason": "No availability evidence for listed features.",
+        "population": "all eligible declared records"
+      },
+      "t12": {
+        "family": "availability_unknown",
+        "status": "blocked",
+        "reason": "No availability evidence for listed features.",
+        "population": "all eligible declared records"
+      },
+      "t13": {
+        "family": "behavior_windows",
+        "status": "completed",
+        "reason": null,
+        "population": "all eligible declared records"
+      },
+      "t14": {
+        "family": "behavior_panel",
+        "status": "completed",
+        "reason": null,
+        "population": "all eligible declared records"
+      },
+      "t15": {
+        "family": "runs",
+        "status": "completed",
+        "reason": null,
+        "population": "all eligible declared records"
+      },
+      "t16": {
+        "family": "volatility",
+        "status": "completed",
+        "reason": null,
+        "population": "all eligible declared records"
+      },
+      "t17": {
+        "family": "behavior_series",
+        "status": "completed",
+        "reason": null,
+        "population": "all eligible declared records"
+      },
+      "t18": {
+        "family": "behavior_scope",
+        "status": "completed",
+        "reason": null,
+        "population": "all eligible declared records"
+      },
+      "t19": {
+        "family": "behavior_windows",
+        "status": "completed",
+        "reason": null,
+        "population": "all eligible declared records"
+      },
+      "t20": {
+        "family": "behavior_panel",
+        "status": "completed",
+        "reason": null,
+        "population": "all eligible declared records"
+      },
+      "t21": {
+        "family": "runs",
+        "status": "completed",
+        "reason": null,
+        "population": "all eligible declared records"
+      },
+      "t22": {
+        "family": "volatility",
+        "status": "completed",
+        "reason": null,
+        "population": "all eligible declared records"
+      },
+      "t23": {
+        "family": "behavior_scope",
+        "status": "completed",
+        "reason": null,
+        "population": "all eligible declared records"
+      }
+    },
+    "unsearched_analytical_scope": [
+      {
+        "selected_measurements": [
+          "x"
+        ],
+        "unsearched_scope": [],
+        "work_observation_visits": 290083642,
+        "comparisons": 1407,
+        "selection": "Requested measurements first, then declaration order. Detail retention can miss behavior-only exceptions.",
+        "defaults_validated_universal_defect_criteria": false
+      },
+      {
+        "selected_measurements": [
+          "x"
+        ],
+        "unsearched_scope": [],
+        "work_observation_visits": 398323748,
+        "comparisons": 1470,
+        "selection": "Requested measurements first, then declaration order. Detail retention can miss behavior-only exceptions.",
+        "defaults_validated_universal_defect_criteria": false
+      }
+    ],
+    "internal_detail_retention_omissions": {
+      "reference:entity_histories": 28,
+      "current:entity_histories": 28,
+      "reference:series_effects": 1244
+    },
+    "presentation_omissions": "Determined independently when rendering. JSON preserves every retained evidence record.",
+    "limits": {
+      "max_cells": 100000000,
+      "max_series": 1000000,
+      "behavior_measurements": 32,
+      "detailed_series": 64,
+      "max_windows": 64,
+      "max_folds": 32,
+      "max_comparisons": 2048,
+      "observation_visits": 1000000000,
+      "retained_details": 100,
+      "witnesses": 5,
+      "decoded_batch_bytes": 67108864,
+      "parquet_metadata_bytes": 16777216
+    },
+    "work_observation_visits": 398323748,
+    "behavior_comparisons": 1470,
+    "representation_equivalence": {
+      "conditions": [
+        "Same observations, explicit missing cells and multiplicities",
+        "Same measurement identities, meanings, units and representations",
+        "Same entity identity, exact clock precision and schedule/lifecycle semantics",
+        "Same feature availability, revision semantics, analytical selections and bounds"
+      ],
+      "excluded": [
+        "physical source row references",
+        "file-order evidence"
+      ],
+      "absent_long_row_equals_null_wide_cell": "Only under an explicit dense-layout expectation; otherwise absence and supplied missing values differ."
+    }
+  },
+  "result_bytes": 383725,
+  "seconds": 219.7427682080015,
+  "objective_met": true
+}

@@ -1,0 +1,4371 @@
+{
+  "python": "3.11.15",
+  "capacity_guarantee": false,
+  "cases": [
+    {
+      "kind": "short_histories",
+      "configuration": {
+        "execution": {
+          "backend": "duckdb_local",
+          "max_source_bytes": 5368709120,
+          "max_combined_source_bytes": 8589934592,
+          "max_rows": 10000000,
+          "max_combined_rows": 30000000,
+          "max_columns": 1000,
+          "memory_bytes": 2147483648,
+          "max_rss_bytes": 6442450944,
+          "threads": 2,
+          "batch_bytes": 33554432,
+          "max_record_bytes": 8388608,
+          "workspace_bytes": 68719476736,
+          "free_disk_bytes": 2147483648,
+          "max_seconds": 1800,
+          "result_bytes": 33554432,
+          "scratch_directory": null
+        },
+        "limits": {
+          "max_cells": 100000000,
+          "max_series": 1000000,
+          "behavior_measurements": 4,
+          "detailed_series": 64,
+          "max_windows": 64,
+          "max_folds": 32,
+          "max_comparisons": 2048,
+          "observation_visits": 1000000000,
+          "retained_details": 100,
+          "witnesses": 5,
+          "decoded_batch_bytes": 67108864,
+          "parquet_metadata_bytes": 16777216
+        },
+        "behavior": {
+          "enabled": true,
+          "windows": 4,
+          "explicit_windows": [],
+          "reference_window": 0,
+          "requested_measurements": [],
+          "requested_series": [],
+          "min_support": 100,
+          "missingness_increase": 0.05,
+          "distribution_effect": 0.1,
+          "normalized_w1": 0.25,
+          "flatline_observations": 10,
+          "volatility_support": 100,
+          "volatility_ratio": 2.0,
+          "rate_differences": false,
+          "seasonality": [],
+          "min_cycles": 8,
+          "min_window_cycles": 2,
+          "min_phase_support": 20,
+          "stable_cohort": true,
+          "version": "temporal_investigation_defaults_v1"
+        },
+        "presentation": {
+          "executive_actions": 5,
+          "target_panels": 6,
+          "feature_details": 20,
+          "table_rows": 20,
+          "appendix_rows": 100
+        }
+      },
+      "source_bytes": 2168877,
+      "status": "completed",
+      "execution": {
+        "status": "completed",
+        "backend": "duckdb_local",
+        "engine_version": "1.5.6",
+        "effective_limits": {
+          "backend": "duckdb_local",
+          "max_source_bytes": 5368709120,
+          "max_combined_source_bytes": 8589934592,
+          "max_rows": 10000000,
+          "max_combined_rows": 30000000,
+          "max_columns": 1000,
+          "memory_bytes": 2147483648,
+          "max_rss_bytes": 6442450944,
+          "threads": 2,
+          "batch_bytes": 33554432,
+          "max_record_bytes": 8388608,
+          "workspace_bytes": 68719476736,
+          "free_disk_bytes": 2147483648,
+          "max_seconds": 1800,
+          "result_bytes": 33554432,
+          "scratch_directory": null
+        },
+        "temporal_limits": {
+          "max_cells": 100000000,
+          "max_series": 1000000,
+          "behavior_measurements": 4,
+          "detailed_series": 64,
+          "max_windows": 64,
+          "max_folds": 32,
+          "max_comparisons": 2048,
+          "observation_visits": 1000000000,
+          "retained_details": 100,
+          "witnesses": 5,
+          "decoded_batch_bytes": 67108864,
+          "parquet_metadata_bytes": 16777216
+        },
+        "duration_seconds": 1.8960999580158386,
+        "phase_seconds": {
+          "data:ingestion": 0.42444124998291954,
+          "data:normalization": 0.5781577080197167,
+          "required_diagnostics": 0.2859534999879543,
+          "availability_history_evaluation": 1.3417011359706521e-05,
+          "behavior": 0.5973859169753268
+        },
+        "phase_plan": {
+          "sources": [
+            {
+              "source_id": "data",
+              "compressed_bytes": 2168877,
+              "format": "csv"
+            }
+          ],
+          "estimated_peak_workspace_bytes": 536870912,
+          "upper_bound": false,
+          "assumptions": [
+            "Variable-width and native decoder allocation are uncertain.",
+            "Sort/join coexistence and cell expansion are reassessed using actual cardinalities."
+          ]
+        },
+        "peak_workspace_bytes": 24686592,
+        "estimated_peak_workspace_bytes": 536870912,
+        "planning_estimate_is_upper_bound": false,
+        "ledger": [
+          {
+            "phase": "workspace initialized",
+            "owned_bytes": 16384,
+            "available_bytes": 210944000000,
+            "estimated_addition": 0,
+            "files": [
+              {
+                "file": "tokens.duckdb",
+                "bytes": 12288
+              },
+              {
+                "file": "owner.json",
+                "bytes": 4096
+              }
+            ]
+          },
+          {
+            "phase": "data: structural validation",
+            "owned_bytes": 2187264,
+            "available_bytes": 210944000000,
+            "estimated_addition": 4337754,
+            "files": [
+              {
+                "file": "source-3a6eb0790f39ac87c94f3856.csv",
+                "bytes": 2170880
+              },
+              {
+                "file": "tokens.duckdb",
+                "bytes": 12288
+              },
+              {
+                "file": "owner.json",
+                "bytes": 4096
+              }
+            ]
+          },
+          {
+            "phase": "data: token staging",
+            "owned_bytes": 3809280,
+            "available_bytes": 210944000000,
+            "estimated_addition": 0,
+            "files": [
+              {
+                "file": "source-3a6eb0790f39ac87c94f3856.csv",
+                "bytes": 2170880
+              },
+              {
+                "file": "tokens.duckdb",
+                "bytes": 12288
+              },
+              {
+                "file": "owner.json",
+                "bytes": 4096
+              },
+              {
+                "file": "tokens.duckdb.wal",
+                "bytes": 1622016
+              }
+            ]
+          },
+          {
+            "phase": "data: token staging",
+            "owned_bytes": 5165056,
+            "available_bytes": 210944000000,
+            "estimated_addition": 0,
+            "files": [
+              {
+                "file": "source-3a6eb0790f39ac87c94f3856.csv",
+                "bytes": 2170880
+              },
+              {
+                "file": "tokens.duckdb",
+                "bytes": 12288
+              },
+              {
+                "file": "owner.json",
+                "bytes": 4096
+              },
+              {
+                "file": "tokens.duckdb.wal",
+                "bytes": 2977792
+              }
+            ]
+          },
+          {
+            "phase": "data: typed materialization",
+            "owned_bytes": 5165056,
+            "available_bytes": 210944000000,
+            "estimated_addition": 4337754,
+            "files": [
+              {
+                "file": "source-3a6eb0790f39ac87c94f3856.csv",
+                "bytes": 2170880
+              },
+              {
+                "file": "tokens.duckdb",
+                "bytes": 12288
+              },
+              {
+                "file": "owner.json",
+                "bytes": 4096
+              },
+              {
+                "file": "tokens.duckdb.wal",
+                "bytes": 2977792
+              }
+            ]
+          },
+          {
+            "phase": "data: exact clock normalization",
+            "owned_bytes": 9551872,
+            "available_bytes": 210944000000,
+            "estimated_addition": 0,
+            "files": [
+              {
+                "file": "source-3a6eb0790f39ac87c94f3856.csv",
+                "bytes": 2170880
+              },
+              {
+                "file": "tokens.duckdb",
+                "bytes": 12288
+              },
+              {
+                "file": "owner.json",
+                "bytes": 4096
+              },
+              {
+                "file": "tokens.duckdb.wal",
+                "bytes": 7364608
+              }
+            ]
+          },
+          {
+            "phase": "data: exact clock normalization",
+            "owned_bytes": 10358784,
+            "available_bytes": 210944000000,
+            "estimated_addition": 0,
+            "files": [
+              {
+                "file": "source-3a6eb0790f39ac87c94f3856.csv",
+                "bytes": 2170880
+              },
+              {
+                "file": "tokens.duckdb",
+                "bytes": 12288
+              },
+              {
+                "file": "owner.json",
+                "bytes": 4096
+              },
+              {
+                "file": "tokens.duckdb.wal",
+                "bytes": 8171520
+              }
+            ]
+          },
+          {
+            "phase": "data: exact clock normalization",
+            "owned_bytes": 11165696,
+            "available_bytes": 210944000000,
+            "estimated_addition": 0,
+            "files": [
+              {
+                "file": "source-3a6eb0790f39ac87c94f3856.csv",
+                "bytes": 2170880
+              },
+              {
+                "file": "tokens.duckdb",
+                "bytes": 12288
+              },
+              {
+                "file": "owner.json",
+                "bytes": 4096
+              },
+              {
+                "file": "tokens.duckdb.wal",
+                "bytes": 8978432
+              }
+            ]
+          },
+          {
+            "phase": "data: exact clock normalization",
+            "owned_bytes": 11972608,
+            "available_bytes": 210944000000,
+            "estimated_addition": 0,
+            "files": [
+              {
+                "file": "source-3a6eb0790f39ac87c94f3856.csv",
+                "bytes": 2170880
+              },
+              {
+                "file": "tokens.duckdb",
+                "bytes": 12288
+              },
+              {
+                "file": "owner.json",
+                "bytes": 4096
+              },
+              {
+                "file": "tokens.duckdb.wal",
+                "bytes": 9785344
+              }
+            ]
+          },
+          {
+            "phase": "data: exact clock normalization",
+            "owned_bytes": 12775424,
+            "available_bytes": 210944000000,
+            "estimated_addition": 0,
+            "files": [
+              {
+                "file": "source-3a6eb0790f39ac87c94f3856.csv",
+                "bytes": 2170880
+              },
+              {
+                "file": "tokens.duckdb",
+                "bytes": 12288
+              },
+              {
+                "file": "owner.json",
+                "bytes": 4096
+              },
+              {
+                "file": "tokens.duckdb.wal",
+                "bytes": 10588160
+              }
+            ]
+          },
+          {
+            "phase": "data: exact clock normalization",
+            "owned_bytes": 13582336,
+            "available_bytes": 210944000000,
+            "estimated_addition": 0,
+            "files": [
+              {
+                "file": "source-3a6eb0790f39ac87c94f3856.csv",
+                "bytes": 2170880
+              },
+              {
+                "file": "tokens.duckdb",
+                "bytes": 12288
+              },
+              {
+                "file": "owner.json",
+                "bytes": 4096
+              },
+              {
+                "file": "tokens.duckdb.wal",
+                "bytes": 11395072
+              }
+            ]
+          },
+          {
+            "phase": "data: exact clock normalization",
+            "owned_bytes": 13664256,
+            "available_bytes": 210944000000,
+            "estimated_addition": 0,
+            "files": [
+              {
+                "file": "source-3a6eb0790f39ac87c94f3856.csv",
+                "bytes": 2170880
+              },
+              {
+                "file": "tokens.duckdb",
+                "bytes": 12288
+              },
+              {
+                "file": "owner.json",
+                "bytes": 4096
+              },
+              {
+                "file": "tokens.duckdb.wal",
+                "bytes": 11476992
+              }
+            ]
+          },
+          {
+            "phase": "data: cardinality-based sort/join reservation",
+            "owned_bytes": 13737984,
+            "available_bytes": 210944000000,
+            "estimated_addition": 41600000,
+            "files": [
+              {
+                "file": "source-3a6eb0790f39ac87c94f3856.csv",
+                "bytes": 2170880
+              },
+              {
+                "file": "tokens.duckdb",
+                "bytes": 2895872
+              },
+              {
+                "file": "owner.json",
+                "bytes": 4096
+              },
+              {
+                "file": "tokens.duckdb.wal",
+                "bytes": 8667136
+              }
+            ]
+          },
+          {
+            "phase": "data: bounded behavioral investigation",
+            "owned_bytes": 24645632,
+            "available_bytes": 210944000000,
+            "estimated_addition": 0,
+            "files": [
+              {
+                "file": "source-3a6eb0790f39ac87c94f3856.csv",
+                "bytes": 2170880
+              },
+              {
+                "file": "tokens.duckdb",
+                "bytes": 13381632
+              },
+              {
+                "file": "owner.json",
+                "bytes": 4096
+              },
+              {
+                "file": "tokens.duckdb.wal",
+                "bytes": 9089024
+              }
+            ]
+          },
+          {
+            "phase": "completed temporal evidence publication",
+            "owned_bytes": 24686592,
+            "available_bytes": 210944000000,
+            "estimated_addition": 33554432,
+            "files": [
+              {
+                "file": "source-3a6eb0790f39ac87c94f3856.csv",
+                "bytes": 2170880
+              },
+              {
+                "file": "tokens.duckdb",
+                "bytes": 13381632
+              },
+              {
+                "file": "owner.json",
+                "bytes": 4096
+              },
+              {
+                "file": "tokens.duckdb.wal",
+                "bytes": 9129984
+              }
+            ]
+          }
+        ],
+        "provenance": {
+          "data": {
+            "sha256": "ad76e17743de0e4321a7f05c9e3cc7ee9a43cb6e70e91504e675bf3c2a67cd7e",
+            "source_bytes": 2168877,
+            "rows": 100000,
+            "parsing_fingerprint": "dffed1ea8a8cf8535d1d1d049862fc7e00b682a04f5020ce332b4043edfca1ad",
+            "normalization_fingerprint": "3fd53aa058c23ff358b0617104028d177ec3c8d0ee1a6c853660f8e28df1577a"
+          }
+        },
+        "timezone_data": {
+          "package": "tzdata",
+          "version": "2026.5",
+          "zones": {}
+        },
+        "warnings": [
+          "Workload budgets are provisional engineering controls, not capacity guarantees or OS quotas.",
+          "Decoded-batch/application retention bounds do not bound native Parquet decoder peaks.",
+          "Sampled RSS supervision can overshoot between samples."
+        ],
+        "peak_worker_rss_bytes": 301268992,
+        "whole_job_seconds": 2.3722420830163173,
+        "peak_spill_bytes": 0,
+        "serialized_bytes": 151556
+      },
+      "result_bytes": 151556,
+      "coverage": {
+        "computed_aggregate_scope": "Every eligible declared record in required stages; no silent sampling.",
+        "checks": {
+          "t1": {
+            "family": "chronology",
+            "status": "completed",
+            "reason": null,
+            "population": "all eligible declared records"
+          },
+          "t2": {
+            "family": "ordering",
+            "status": "completed",
+            "reason": null,
+            "population": "all eligible declared records"
+          },
+          "t3": {
+            "family": "repetition",
+            "status": "completed",
+            "reason": null,
+            "population": "all eligible declared records"
+          },
+          "t4": {
+            "family": "panel",
+            "status": "completed",
+            "reason": null,
+            "population": "complete entity/observation keys with valid clocks"
+          },
+          "t5": {
+            "family": "continuity",
+            "status": "completed",
+            "reason": null,
+            "population": "all eligible declared records"
+          },
+          "t6": {
+            "family": "availability_unknown",
+            "status": "blocked",
+            "reason": "No availability evidence for listed features.",
+            "population": "all eligible declared records"
+          },
+          "t7": {
+            "family": "behavior_windows",
+            "status": "completed",
+            "reason": null,
+            "population": "all eligible declared records"
+          },
+          "t8": {
+            "family": "behavior_panel",
+            "status": "completed",
+            "reason": null,
+            "population": "all eligible declared records"
+          },
+          "t9": {
+            "family": "runs",
+            "status": "completed",
+            "reason": null,
+            "population": "all eligible declared records"
+          },
+          "t10": {
+            "family": "volatility",
+            "status": "completed",
+            "reason": null,
+            "population": "all eligible declared records"
+          },
+          "t11": {
+            "family": "behavior_series",
+            "status": "completed",
+            "reason": null,
+            "population": "all eligible declared records"
+          },
+          "t12": {
+            "family": "behavior_scope",
+            "status": "completed",
+            "reason": null,
+            "population": "all eligible declared records"
+          }
+        },
+        "unsearched_analytical_scope": [
+          {
+            "selected_measurements": [
+              "x"
+            ],
+            "unsearched_scope": [],
+            "work_observation_visits": 700640,
+            "comparisons": 330,
+            "selection": "Requested measurements first, then declaration order. Detail retention can miss behavior-only exceptions.",
+            "defaults_validated_universal_defect_criteria": false
+          }
+        ],
+        "internal_detail_retention_omissions": {
+          "data:entity_histories": 99900,
+          "data:series_effects": 220
+        },
+        "presentation_omissions": "Determined independently when rendering. JSON preserves every retained evidence record.",
+        "limits": {
+          "max_cells": 100000000,
+          "max_series": 1000000,
+          "behavior_measurements": 4,
+          "detailed_series": 64,
+          "max_windows": 64,
+          "max_folds": 32,
+          "max_comparisons": 2048,
+          "observation_visits": 1000000000,
+          "retained_details": 100,
+          "witnesses": 5,
+          "decoded_batch_bytes": 67108864,
+          "parquet_metadata_bytes": 16777216
+        },
+        "work_observation_visits": 700640,
+        "behavior_comparisons": 330,
+        "representation_equivalence": {
+          "conditions": [
+            "Same observations, explicit missing cells and multiplicities",
+            "Same measurement identities, meanings, units and representations",
+            "Same entity identity, exact clock precision and schedule/lifecycle semantics",
+            "Same feature availability, revision semantics, analytical selections and bounds"
+          ],
+          "excluded": [
+            "physical source row references",
+            "file-order evidence"
+          ],
+          "absent_long_row_equals_null_wide_cell": "Only under an explicit dense-layout expectation; otherwise absence and supplied missing values differ."
+        }
+      },
+      "seconds": 2.463255583017599
+    },
+    {
+      "kind": "skew",
+      "configuration": {
+        "execution": {
+          "backend": "duckdb_local",
+          "max_source_bytes": 5368709120,
+          "max_combined_source_bytes": 8589934592,
+          "max_rows": 10000000,
+          "max_combined_rows": 30000000,
+          "max_columns": 1000,
+          "memory_bytes": 2147483648,
+          "max_rss_bytes": 6442450944,
+          "threads": 2,
+          "batch_bytes": 33554432,
+          "max_record_bytes": 8388608,
+          "workspace_bytes": 68719476736,
+          "free_disk_bytes": 2147483648,
+          "max_seconds": 1800,
+          "result_bytes": 33554432,
+          "scratch_directory": null
+        },
+        "limits": {
+          "max_cells": 100000000,
+          "max_series": 1000000,
+          "behavior_measurements": 4,
+          "detailed_series": 64,
+          "max_windows": 64,
+          "max_folds": 32,
+          "max_comparisons": 2048,
+          "observation_visits": 1000000000,
+          "retained_details": 100,
+          "witnesses": 5,
+          "decoded_batch_bytes": 67108864,
+          "parquet_metadata_bytes": 16777216
+        },
+        "behavior": {
+          "enabled": true,
+          "windows": 4,
+          "explicit_windows": [],
+          "reference_window": 0,
+          "requested_measurements": [],
+          "requested_series": [],
+          "min_support": 100,
+          "missingness_increase": 0.05,
+          "distribution_effect": 0.1,
+          "normalized_w1": 0.25,
+          "flatline_observations": 10,
+          "volatility_support": 100,
+          "volatility_ratio": 2.0,
+          "rate_differences": false,
+          "seasonality": [],
+          "min_cycles": 8,
+          "min_window_cycles": 2,
+          "min_phase_support": 20,
+          "stable_cohort": true,
+          "version": "temporal_investigation_defaults_v1"
+        },
+        "presentation": {
+          "executive_actions": 5,
+          "target_panels": 6,
+          "feature_details": 20,
+          "table_rows": 20,
+          "appendix_rows": 100
+        }
+      },
+      "source_bytes": 1799987,
+      "status": "completed",
+      "execution": {
+        "status": "completed",
+        "backend": "duckdb_local",
+        "engine_version": "1.5.6",
+        "effective_limits": {
+          "backend": "duckdb_local",
+          "max_source_bytes": 5368709120,
+          "max_combined_source_bytes": 8589934592,
+          "max_rows": 10000000,
+          "max_combined_rows": 30000000,
+          "max_columns": 1000,
+          "memory_bytes": 2147483648,
+          "max_rss_bytes": 6442450944,
+          "threads": 2,
+          "batch_bytes": 33554432,
+          "max_record_bytes": 8388608,
+          "workspace_bytes": 68719476736,
+          "free_disk_bytes": 2147483648,
+          "max_seconds": 1800,
+          "result_bytes": 33554432,
+          "scratch_directory": null
+        },
+        "temporal_limits": {
+          "max_cells": 100000000,
+          "max_series": 1000000,
+          "behavior_measurements": 4,
+          "detailed_series": 64,
+          "max_windows": 64,
+          "max_folds": 32,
+          "max_comparisons": 2048,
+          "observation_visits": 1000000000,
+          "retained_details": 100,
+          "witnesses": 5,
+          "decoded_batch_bytes": 67108864,
+          "parquet_metadata_bytes": 16777216
+        },
+        "duration_seconds": 1.7964640420104843,
+        "phase_seconds": {
+          "data:ingestion": 0.39890312499483116,
+          "data:normalization": 0.561248332989635,
+          "required_diagnostics": 0.24001804200815968,
+          "availability_history_evaluation": 1.4874996850267053e-05,
+          "behavior": 0.5861946670047473
+        },
+        "phase_plan": {
+          "sources": [
+            {
+              "source_id": "data",
+              "compressed_bytes": 1799987,
+              "format": "csv"
+            }
+          ],
+          "estimated_peak_workspace_bytes": 536870912,
+          "upper_bound": false,
+          "assumptions": [
+            "Variable-width and native decoder allocation are uncertain.",
+            "Sort/join coexistence and cell expansion are reassessed using actual cardinalities."
+          ]
+        },
+        "peak_workspace_bytes": 21590016,
+        "estimated_peak_workspace_bytes": 536870912,
+        "planning_estimate_is_upper_bound": false,
+        "ledger": [
+          {
+            "phase": "workspace initialized",
+            "owned_bytes": 16384,
+            "available_bytes": 210944000000,
+            "estimated_addition": 0,
+            "files": [
+              {
+                "file": "tokens.duckdb",
+                "bytes": 12288
+              },
+              {
+                "file": "owner.json",
+                "bytes": 4096
+              }
+            ]
+          },
+          {
+            "phase": "data: structural validation",
+            "owned_bytes": 1818624,
+            "available_bytes": 210944000000,
+            "estimated_addition": 3599974,
+            "files": [
+              {
+                "file": "source-3a6eb0790f39ac87c94f3856.csv",
+                "bytes": 1802240
+              },
+              {
+                "file": "tokens.duckdb",
+                "bytes": 12288
+              },
+              {
+                "file": "owner.json",
+                "bytes": 4096
+              }
+            ]
+          },
+          {
+            "phase": "data: token staging",
+            "owned_bytes": 3231744,
+            "available_bytes": 210944000000,
+            "estimated_addition": 0,
+            "files": [
+              {
+                "file": "source-3a6eb0790f39ac87c94f3856.csv",
+                "bytes": 1802240
+              },
+              {
+                "file": "tokens.duckdb",
+                "bytes": 12288
+              },
+              {
+                "file": "owner.json",
+                "bytes": 4096
+              },
+              {
+                "file": "tokens.duckdb.wal",
+                "bytes": 1413120
+              }
+            ]
+          },
+          {
+            "phase": "data: token staging",
+            "owned_bytes": 4427776,
+            "available_bytes": 210944000000,
+            "estimated_addition": 0,
+            "files": [
+              {
+                "file": "source-3a6eb0790f39ac87c94f3856.csv",
+                "bytes": 1802240
+              },
+              {
+                "file": "tokens.duckdb",
+                "bytes": 12288
+              },
+              {
+                "file": "owner.json",
+                "bytes": 4096
+              },
+              {
+                "file": "tokens.duckdb.wal",
+                "bytes": 2609152
+              }
+            ]
+          },
+          {
+            "phase": "data: typed materialization",
+            "owned_bytes": 4427776,
+            "available_bytes": 210944000000,
+            "estimated_addition": 3599974,
+            "files": [
+              {
+                "file": "source-3a6eb0790f39ac87c94f3856.csv",
+                "bytes": 1802240
+              },
+              {
+                "file": "tokens.duckdb",
+                "bytes": 12288
+              },
+              {
+                "file": "owner.json",
+                "bytes": 4096
+              },
+              {
+                "file": "tokens.duckdb.wal",
+                "bytes": 2609152
+              }
+            ]
+          },
+          {
+            "phase": "data: exact clock normalization",
+            "owned_bytes": 8445952,
+            "available_bytes": 210944000000,
+            "estimated_addition": 0,
+            "files": [
+              {
+                "file": "source-3a6eb0790f39ac87c94f3856.csv",
+                "bytes": 1802240
+              },
+              {
+                "file": "tokens.duckdb",
+                "bytes": 12288
+              },
+              {
+                "file": "owner.json",
+                "bytes": 4096
+              },
+              {
+                "file": "tokens.duckdb.wal",
+                "bytes": 6627328
+              }
+            ]
+          },
+          {
+            "phase": "data: exact clock normalization",
+            "owned_bytes": 9252864,
+            "available_bytes": 210944000000,
+            "estimated_addition": 0,
+            "files": [
+              {
+                "file": "source-3a6eb0790f39ac87c94f3856.csv",
+                "bytes": 1802240
+              },
+              {
+                "file": "tokens.duckdb",
+                "bytes": 12288
+              },
+              {
+                "file": "owner.json",
+                "bytes": 4096
+              },
+              {
+                "file": "tokens.duckdb.wal",
+                "bytes": 7434240
+              }
+            ]
+          },
+          {
+            "phase": "data: exact clock normalization",
+            "owned_bytes": 10059776,
+            "available_bytes": 210944000000,
+            "estimated_addition": 0,
+            "files": [
+              {
+                "file": "source-3a6eb0790f39ac87c94f3856.csv",
+                "bytes": 1802240
+              },
+              {
+                "file": "tokens.duckdb",
+                "bytes": 12288
+              },
+              {
+                "file": "owner.json",
+                "bytes": 4096
+              },
+              {
+                "file": "tokens.duckdb.wal",
+                "bytes": 8241152
+              }
+            ]
+          },
+          {
+            "phase": "data: exact clock normalization",
+            "owned_bytes": 10862592,
+            "available_bytes": 210944000000,
+            "estimated_addition": 0,
+            "files": [
+              {
+                "file": "source-3a6eb0790f39ac87c94f3856.csv",
+                "bytes": 1802240
+              },
+              {
+                "file": "tokens.duckdb",
+                "bytes": 12288
+              },
+              {
+                "file": "owner.json",
+                "bytes": 4096
+              },
+              {
+                "file": "tokens.duckdb.wal",
+                "bytes": 9043968
+              }
+            ]
+          },
+          {
+            "phase": "data: exact clock normalization",
+            "owned_bytes": 11669504,
+            "available_bytes": 210944000000,
+            "estimated_addition": 0,
+            "files": [
+              {
+                "file": "source-3a6eb0790f39ac87c94f3856.csv",
+                "bytes": 1802240
+              },
+              {
+                "file": "tokens.duckdb",
+                "bytes": 12288
+              },
+              {
+                "file": "owner.json",
+                "bytes": 4096
+              },
+              {
+                "file": "tokens.duckdb.wal",
+                "bytes": 9850880
+              }
+            ]
+          },
+          {
+            "phase": "data: exact clock normalization",
+            "owned_bytes": 12476416,
+            "available_bytes": 210944000000,
+            "estimated_addition": 0,
+            "files": [
+              {
+                "file": "source-3a6eb0790f39ac87c94f3856.csv",
+                "bytes": 1802240
+              },
+              {
+                "file": "tokens.duckdb",
+                "bytes": 12288
+              },
+              {
+                "file": "owner.json",
+                "bytes": 4096
+              },
+              {
+                "file": "tokens.duckdb.wal",
+                "bytes": 10657792
+              }
+            ]
+          },
+          {
+            "phase": "data: exact clock normalization",
+            "owned_bytes": 12558336,
+            "available_bytes": 210944000000,
+            "estimated_addition": 0,
+            "files": [
+              {
+                "file": "source-3a6eb0790f39ac87c94f3856.csv",
+                "bytes": 1802240
+              },
+              {
+                "file": "tokens.duckdb",
+                "bytes": 12288
+              },
+              {
+                "file": "owner.json",
+                "bytes": 4096
+              },
+              {
+                "file": "tokens.duckdb.wal",
+                "bytes": 10739712
+              }
+            ]
+          },
+          {
+            "phase": "data: cardinality-based sort/join reservation",
+            "owned_bytes": 12369920,
+            "available_bytes": 210944000000,
+            "estimated_addition": 17280256,
+            "files": [
+              {
+                "file": "source-3a6eb0790f39ac87c94f3856.csv",
+                "bytes": 1802240
+              },
+              {
+                "file": "tokens.duckdb",
+                "bytes": 2633728
+              },
+              {
+                "file": "owner.json",
+                "bytes": 4096
+              },
+              {
+                "file": "tokens.duckdb.wal",
+                "bytes": 7929856
+              }
+            ]
+          },
+          {
+            "phase": "data: bounded behavioral investigation",
+            "owned_bytes": 21549056,
+            "available_bytes": 210944000000,
+            "estimated_addition": 0,
+            "files": [
+              {
+                "file": "source-3a6eb0790f39ac87c94f3856.csv",
+                "bytes": 1802240
+              },
+              {
+                "file": "tokens.duckdb",
+                "bytes": 11022336
+              },
+              {
+                "file": "owner.json",
+                "bytes": 4096
+              },
+              {
+                "file": "tokens.duckdb.wal",
+                "bytes": 8720384
+              }
+            ]
+          },
+          {
+            "phase": "completed temporal evidence publication",
+            "owned_bytes": 21590016,
+            "available_bytes": 210944000000,
+            "estimated_addition": 33554432,
+            "files": [
+              {
+                "file": "source-3a6eb0790f39ac87c94f3856.csv",
+                "bytes": 1802240
+              },
+              {
+                "file": "tokens.duckdb",
+                "bytes": 11022336
+              },
+              {
+                "file": "owner.json",
+                "bytes": 4096
+              },
+              {
+                "file": "tokens.duckdb.wal",
+                "bytes": 8761344
+              }
+            ]
+          }
+        ],
+        "provenance": {
+          "data": {
+            "sha256": "9a2409930b3d8e2afab9d985abc83d88257d84c607d3111e352dfe7279670ef1",
+            "source_bytes": 1799987,
+            "rows": 100000,
+            "parsing_fingerprint": "77f74d574a60b1d9ce5800f0be566b71cc0a275381acabeea0c338dfbccda09d",
+            "normalization_fingerprint": "0e9a9cb2e3dbfc8c22107fafd129c47b76bd6f3f299c05490c7e7ec3ea34bab9"
+          }
+        },
+        "timezone_data": {
+          "package": "tzdata",
+          "version": "2026.5",
+          "zones": {}
+        },
+        "warnings": [
+          "Workload budgets are provisional engineering controls, not capacity guarantees or OS quotas.",
+          "Decoded-batch/application retention bounds do not bound native Parquet decoder peaks.",
+          "Sampled RSS supervision can overshoot between samples."
+        ],
+        "peak_worker_rss_bytes": 285966336,
+        "whole_job_seconds": 2.2658197499986272,
+        "peak_spill_bytes": 0,
+        "serialized_bytes": 155866
+      },
+      "result_bytes": 155866,
+      "coverage": {
+        "computed_aggregate_scope": "Every eligible declared record in required stages; no silent sampling.",
+        "checks": {
+          "t1": {
+            "family": "chronology",
+            "status": "completed",
+            "reason": null,
+            "population": "all eligible declared records"
+          },
+          "t2": {
+            "family": "ordering",
+            "status": "completed",
+            "reason": null,
+            "population": "all eligible declared records"
+          },
+          "t3": {
+            "family": "repetition",
+            "status": "completed",
+            "reason": null,
+            "population": "all eligible declared records"
+          },
+          "t4": {
+            "family": "panel",
+            "status": "completed",
+            "reason": null,
+            "population": "complete entity/observation keys with valid clocks"
+          },
+          "t5": {
+            "family": "continuity",
+            "status": "completed",
+            "reason": null,
+            "population": "all eligible declared records"
+          },
+          "t6": {
+            "family": "availability_unknown",
+            "status": "blocked",
+            "reason": "No availability evidence for listed features.",
+            "population": "all eligible declared records"
+          },
+          "t7": {
+            "family": "behavior_windows",
+            "status": "completed",
+            "reason": null,
+            "population": "all eligible declared records"
+          },
+          "t8": {
+            "family": "behavior_panel",
+            "status": "completed",
+            "reason": null,
+            "population": "all eligible declared records"
+          },
+          "t9": {
+            "family": "runs",
+            "status": "completed",
+            "reason": null,
+            "population": "all eligible declared records"
+          },
+          "t10": {
+            "family": "volatility",
+            "status": "completed",
+            "reason": null,
+            "population": "all eligible declared records"
+          },
+          "t11": {
+            "family": "behavior_series",
+            "status": "completed",
+            "reason": null,
+            "population": "all eligible declared records"
+          },
+          "t12": {
+            "family": "behavior_scope",
+            "status": "completed",
+            "reason": null,
+            "population": "all eligible declared records"
+          }
+        },
+        "unsearched_analytical_scope": [
+          {
+            "selected_measurements": [
+              "x"
+            ],
+            "unsearched_scope": [],
+            "work_observation_visits": 940640,
+            "comparisons": 335,
+            "selection": "Requested measurements first, then declaration order. Detail retention can miss behavior-only exceptions.",
+            "defaults_validated_universal_defect_criteria": false
+          }
+        ],
+        "internal_detail_retention_omissions": {
+          "data:entity_histories": 4901,
+          "data:series_effects": 220
+        },
+        "presentation_omissions": "Determined independently when rendering. JSON preserves every retained evidence record.",
+        "limits": {
+          "max_cells": 100000000,
+          "max_series": 1000000,
+          "behavior_measurements": 4,
+          "detailed_series": 64,
+          "max_windows": 64,
+          "max_folds": 32,
+          "max_comparisons": 2048,
+          "observation_visits": 1000000000,
+          "retained_details": 100,
+          "witnesses": 5,
+          "decoded_batch_bytes": 67108864,
+          "parquet_metadata_bytes": 16777216
+        },
+        "work_observation_visits": 940640,
+        "behavior_comparisons": 335,
+        "representation_equivalence": {
+          "conditions": [
+            "Same observations, explicit missing cells and multiplicities",
+            "Same measurement identities, meanings, units and representations",
+            "Same entity identity, exact clock precision and schedule/lifecycle semantics",
+            "Same feature availability, revision semantics, analytical selections and bounds"
+          ],
+          "excluded": [
+            "physical source row references",
+            "file-order evidence"
+          ],
+          "absent_long_row_equals_null_wide_cell": "Only under an explicit dense-layout expectation; otherwise absence and supplied missing values differ."
+        }
+      },
+      "seconds": 2.2951548749988433
+    },
+    {
+      "kind": "wide",
+      "configuration": {
+        "execution": {
+          "backend": "duckdb_local",
+          "max_source_bytes": 5368709120,
+          "max_combined_source_bytes": 8589934592,
+          "max_rows": 10000000,
+          "max_combined_rows": 30000000,
+          "max_columns": 1000,
+          "memory_bytes": 2147483648,
+          "max_rss_bytes": 6442450944,
+          "threads": 2,
+          "batch_bytes": 33554432,
+          "max_record_bytes": 8388608,
+          "workspace_bytes": 68719476736,
+          "free_disk_bytes": 2147483648,
+          "max_seconds": 1800,
+          "result_bytes": 33554432,
+          "scratch_directory": null
+        },
+        "limits": {
+          "max_cells": 100000000,
+          "max_series": 1000000,
+          "behavior_measurements": 4,
+          "detailed_series": 64,
+          "max_windows": 64,
+          "max_folds": 32,
+          "max_comparisons": 2048,
+          "observation_visits": 1000000000,
+          "retained_details": 100,
+          "witnesses": 5,
+          "decoded_batch_bytes": 67108864,
+          "parquet_metadata_bytes": 16777216
+        },
+        "behavior": {
+          "enabled": true,
+          "windows": 4,
+          "explicit_windows": [],
+          "reference_window": 0,
+          "requested_measurements": [],
+          "requested_series": [],
+          "min_support": 100,
+          "missingness_increase": 0.05,
+          "distribution_effect": 0.1,
+          "normalized_w1": 0.25,
+          "flatline_observations": 10,
+          "volatility_support": 100,
+          "volatility_ratio": 2.0,
+          "rate_differences": false,
+          "seasonality": [],
+          "min_cycles": 8,
+          "min_window_cycles": 2,
+          "min_phase_support": 20,
+          "stable_cohort": true,
+          "version": "temporal_investigation_defaults_v1"
+        },
+        "presentation": {
+          "executive_actions": 5,
+          "target_panels": 6,
+          "feature_details": 20,
+          "table_rows": 20,
+          "appendix_rows": 100
+        }
+      },
+      "source_bytes": 3364194,
+      "status": "completed",
+      "execution": {
+        "status": "completed",
+        "backend": "duckdb_local",
+        "engine_version": "1.5.6",
+        "effective_limits": {
+          "backend": "duckdb_local",
+          "max_source_bytes": 5368709120,
+          "max_combined_source_bytes": 8589934592,
+          "max_rows": 10000000,
+          "max_combined_rows": 30000000,
+          "max_columns": 1000,
+          "memory_bytes": 2147483648,
+          "max_rss_bytes": 6442450944,
+          "threads": 2,
+          "batch_bytes": 33554432,
+          "max_record_bytes": 8388608,
+          "workspace_bytes": 68719476736,
+          "free_disk_bytes": 2147483648,
+          "max_seconds": 1800,
+          "result_bytes": 33554432,
+          "scratch_directory": null
+        },
+        "temporal_limits": {
+          "max_cells": 100000000,
+          "max_series": 1000000,
+          "behavior_measurements": 4,
+          "detailed_series": 64,
+          "max_windows": 64,
+          "max_folds": 32,
+          "max_comparisons": 2048,
+          "observation_visits": 1000000000,
+          "retained_details": 100,
+          "witnesses": 5,
+          "decoded_batch_bytes": 67108864,
+          "parquet_metadata_bytes": 16777216
+        },
+        "duration_seconds": 3.8483465000172146,
+        "phase_seconds": {
+          "data:ingestion": 0.9233026249858085,
+          "data:normalization": 1.5625378749973606,
+          "required_diagnostics": 0.8445208749908488,
+          "availability_history_evaluation": 6.345799192786217e-05,
+          "behavior": 0.5064533340046182
+        },
+        "phase_plan": {
+          "sources": [
+            {
+              "source_id": "data",
+              "compressed_bytes": 3364194,
+              "format": "csv"
+            }
+          ],
+          "estimated_peak_workspace_bytes": 536870912,
+          "upper_bound": false,
+          "assumptions": [
+            "Variable-width and native decoder allocation are uncertain.",
+            "Sort/join coexistence and cell expansion are reassessed using actual cardinalities."
+          ]
+        },
+        "peak_workspace_bytes": 46432256,
+        "estimated_peak_workspace_bytes": 536870912,
+        "planning_estimate_is_upper_bound": false,
+        "ledger": [
+          {
+            "phase": "workspace initialized",
+            "owned_bytes": 16384,
+            "available_bytes": 210944000000,
+            "estimated_addition": 0,
+            "files": [
+              {
+                "file": "tokens.duckdb",
+                "bytes": 12288
+              },
+              {
+                "file": "owner.json",
+                "bytes": 4096
+              }
+            ]
+          },
+          {
+            "phase": "data: structural validation",
+            "owned_bytes": 3383296,
+            "available_bytes": 210944000000,
+            "estimated_addition": 6728388,
+            "files": [
+              {
+                "file": "source-3a6eb0790f39ac87c94f3856.csv",
+                "bytes": 3366912
+              },
+              {
+                "file": "tokens.duckdb",
+                "bytes": 12288
+              },
+              {
+                "file": "owner.json",
+                "bytes": 4096
+              }
+            ]
+          },
+          {
+            "phase": "data: token staging",
+            "owned_bytes": 4214784,
+            "available_bytes": 210944000000,
+            "estimated_addition": 0,
+            "files": [
+              {
+                "file": "source-3a6eb0790f39ac87c94f3856.csv",
+                "bytes": 3366912
+              },
+              {
+                "file": "tokens.duckdb",
+                "bytes": 12288
+              },
+              {
+                "file": "owner.json",
+                "bytes": 4096
+              },
+              {
+                "file": "tokens.duckdb.wal",
+                "bytes": 831488
+              }
+            ]
+          },
+          {
+            "phase": "data: token staging",
+            "owned_bytes": 5046272,
+            "available_bytes": 210944000000,
+            "estimated_addition": 0,
+            "files": [
+              {
+                "file": "source-3a6eb0790f39ac87c94f3856.csv",
+                "bytes": 3366912
+              },
+              {
+                "file": "tokens.duckdb",
+                "bytes": 12288
+              },
+              {
+                "file": "owner.json",
+                "bytes": 4096
+              },
+              {
+                "file": "tokens.duckdb.wal",
+                "bytes": 1662976
+              }
+            ]
+          },
+          {
+            "phase": "data: token staging",
+            "owned_bytes": 5877760,
+            "available_bytes": 210944000000,
+            "estimated_addition": 0,
+            "files": [
+              {
+                "file": "source-3a6eb0790f39ac87c94f3856.csv",
+                "bytes": 3366912
+              },
+              {
+                "file": "tokens.duckdb",
+                "bytes": 12288
+              },
+              {
+                "file": "owner.json",
+                "bytes": 4096
+              },
+              {
+                "file": "tokens.duckdb.wal",
+                "bytes": 2494464
+              }
+            ]
+          },
+          {
+            "phase": "data: token staging",
+            "owned_bytes": 6709248,
+            "available_bytes": 210944000000,
+            "estimated_addition": 0,
+            "files": [
+              {
+                "file": "source-3a6eb0790f39ac87c94f3856.csv",
+                "bytes": 3366912
+              },
+              {
+                "file": "tokens.duckdb",
+                "bytes": 12288
+              },
+              {
+                "file": "owner.json",
+                "bytes": 4096
+              },
+              {
+                "file": "tokens.duckdb.wal",
+                "bytes": 3325952
+              }
+            ]
+          },
+          {
+            "phase": "data: token staging",
+            "owned_bytes": 6844416,
+            "available_bytes": 210944000000,
+            "estimated_addition": 0,
+            "files": [
+              {
+                "file": "source-3a6eb0790f39ac87c94f3856.csv",
+                "bytes": 3366912
+              },
+              {
+                "file": "tokens.duckdb",
+                "bytes": 12288
+              },
+              {
+                "file": "owner.json",
+                "bytes": 4096
+              },
+              {
+                "file": "tokens.duckdb.wal",
+                "bytes": 3461120
+              }
+            ]
+          },
+          {
+            "phase": "data: typed materialization",
+            "owned_bytes": 6844416,
+            "available_bytes": 210944000000,
+            "estimated_addition": 7760000,
+            "files": [
+              {
+                "file": "source-3a6eb0790f39ac87c94f3856.csv",
+                "bytes": 3366912
+              },
+              {
+                "file": "tokens.duckdb",
+                "bytes": 12288
+              },
+              {
+                "file": "owner.json",
+                "bytes": 4096
+              },
+              {
+                "file": "tokens.duckdb.wal",
+                "bytes": 3461120
+              }
+            ]
+          },
+          {
+            "phase": "data: exact clock normalization",
+            "owned_bytes": 15155200,
+            "available_bytes": 210944000000,
+            "estimated_addition": 0,
+            "files": [
+              {
+                "file": "source-3a6eb0790f39ac87c94f3856.csv",
+                "bytes": 3366912
+              },
+              {
+                "file": "tokens.duckdb",
+                "bytes": 12288
+              },
+              {
+                "file": "owner.json",
+                "bytes": 4096
+              },
+              {
+                "file": "tokens.duckdb.wal",
+                "bytes": 11771904
+              }
+            ]
+          },
+          {
+            "phase": "data: cardinality-based sort/join reservation",
+            "owned_bytes": 30883840,
+            "available_bytes": 209305600000,
+            "estimated_addition": 153624576,
+            "files": [
+              {
+                "file": "source-3a6eb0790f39ac87c94f3856.csv",
+                "bytes": 3366912
+              },
+              {
+                "file": "tokens.duckdb",
+                "bytes": 14692352
+              },
+              {
+                "file": "owner.json",
+                "bytes": 4096
+              },
+              {
+                "file": "tokens.duckdb.wal",
+                "bytes": 12820480
+              }
+            ]
+          },
+          {
+            "phase": "data: bounded behavioral investigation",
+            "owned_bytes": 33845248,
+            "available_bytes": 208896000000,
+            "estimated_addition": 0,
+            "files": [
+              {
+                "file": "source-3a6eb0790f39ac87c94f3856.csv",
+                "bytes": 3366912
+              },
+              {
+                "file": "tokens.duckdb",
+                "bytes": 26226688
+              },
+              {
+                "file": "owner.json",
+                "bytes": 4096
+              },
+              {
+                "file": "tokens.duckdb.wal",
+                "bytes": 4247552
+              }
+            ]
+          },
+          {
+            "phase": "data: bounded behavioral investigation",
+            "owned_bytes": 38092800,
+            "available_bytes": 208896000000,
+            "estimated_addition": 0,
+            "files": [
+              {
+                "file": "source-3a6eb0790f39ac87c94f3856.csv",
+                "bytes": 3366912
+              },
+              {
+                "file": "tokens.duckdb",
+                "bytes": 26226688
+              },
+              {
+                "file": "owner.json",
+                "bytes": 4096
+              },
+              {
+                "file": "tokens.duckdb.wal",
+                "bytes": 8495104
+              }
+            ]
+          },
+          {
+            "phase": "data: bounded behavioral investigation",
+            "owned_bytes": 42340352,
+            "available_bytes": 208896000000,
+            "estimated_addition": 0,
+            "files": [
+              {
+                "file": "source-3a6eb0790f39ac87c94f3856.csv",
+                "bytes": 3366912
+              },
+              {
+                "file": "tokens.duckdb",
+                "bytes": 26226688
+              },
+              {
+                "file": "owner.json",
+                "bytes": 4096
+              },
+              {
+                "file": "tokens.duckdb.wal",
+                "bytes": 12742656
+              }
+            ]
+          },
+          {
+            "phase": "data: bounded behavioral investigation",
+            "owned_bytes": 35684352,
+            "available_bytes": 208896000000,
+            "estimated_addition": 0,
+            "files": [
+              {
+                "file": "source-3a6eb0790f39ac87c94f3856.csv",
+                "bytes": 3366912
+              },
+              {
+                "file": "tokens.duckdb",
+                "bytes": 31469568
+              },
+              {
+                "file": "owner.json",
+                "bytes": 4096
+              },
+              {
+                "file": "tokens.duckdb.wal",
+                "bytes": 843776
+              }
+            ]
+          },
+          {
+            "phase": "completed temporal evidence publication",
+            "owned_bytes": 38526976,
+            "available_bytes": 208896000000,
+            "estimated_addition": 33554432,
+            "files": [
+              {
+                "file": "source-3a6eb0790f39ac87c94f3856.csv",
+                "bytes": 3366912
+              },
+              {
+                "file": "tokens.duckdb",
+                "bytes": 31469568
+              },
+              {
+                "file": "owner.json",
+                "bytes": 4096
+              },
+              {
+                "file": "tokens.duckdb.wal",
+                "bytes": 3686400
+              }
+            ]
+          }
+        ],
+        "provenance": {
+          "data": {
+            "sha256": "d2382780e14676f04b4fda245d9a3872d065797eebe2942fed59a961b7cc266e",
+            "source_bytes": 3364194,
+            "rows": 10000,
+            "parsing_fingerprint": "b079ad3b6f4543889697680c6591088a9329828969f35458bd19f935e11fc39e",
+            "normalization_fingerprint": "1a745fd4b3e7b4657b30d645e6cc585307123fe148223c2e442ab85bc6cd643c"
+          }
+        },
+        "timezone_data": {
+          "package": "tzdata",
+          "version": "2026.5",
+          "zones": {}
+        },
+        "warnings": [
+          "Workload budgets are provisional engineering controls, not capacity guarantees or OS quotas.",
+          "Decoded-batch/application retention bounds do not bound native Parquet decoder peaks.",
+          "Sampled RSS supervision can overshoot between samples."
+        ],
+        "peak_worker_rss_bytes": 546357248,
+        "whole_job_seconds": 4.307600375002949,
+        "peak_spill_bytes": 0,
+        "serialized_bytes": 278644
+      },
+      "result_bytes": 278644,
+      "coverage": {
+        "computed_aggregate_scope": "Every eligible declared record in required stages; no silent sampling.",
+        "checks": {
+          "t1": {
+            "family": "chronology",
+            "status": "completed",
+            "reason": null,
+            "population": "all eligible declared records"
+          },
+          "t2": {
+            "family": "ordering",
+            "status": "completed",
+            "reason": null,
+            "population": "all eligible declared records"
+          },
+          "t3": {
+            "family": "repetition",
+            "status": "completed",
+            "reason": null,
+            "population": "all eligible declared records"
+          },
+          "t4": {
+            "family": "panel",
+            "status": "completed",
+            "reason": null,
+            "population": "complete entity/observation keys with valid clocks"
+          },
+          "t5": {
+            "family": "continuity",
+            "status": "completed",
+            "reason": null,
+            "population": "all eligible declared records"
+          },
+          "t6": {
+            "family": "availability_unknown",
+            "status": "blocked",
+            "reason": "No availability evidence for listed features.",
+            "population": "all eligible declared records"
+          },
+          "t7": {
+            "family": "behavior_windows",
+            "status": "completed",
+            "reason": null,
+            "population": "all eligible declared records"
+          },
+          "t8": {
+            "family": "behavior_panel",
+            "status": "completed",
+            "reason": null,
+            "population": "all eligible declared records"
+          },
+          "t9": {
+            "family": "runs",
+            "status": "completed",
+            "reason": null,
+            "population": "all eligible declared records"
+          },
+          "t10": {
+            "family": "volatility",
+            "status": "completed",
+            "reason": null,
+            "population": "all eligible declared records"
+          },
+          "t11": {
+            "family": "behavior_windows",
+            "status": "completed",
+            "reason": null,
+            "population": "all eligible declared records"
+          },
+          "t12": {
+            "family": "behavior_panel",
+            "status": "completed",
+            "reason": null,
+            "population": "all eligible declared records"
+          },
+          "t13": {
+            "family": "runs",
+            "status": "completed",
+            "reason": null,
+            "population": "all eligible declared records"
+          },
+          "t14": {
+            "family": "volatility",
+            "status": "completed",
+            "reason": null,
+            "population": "all eligible declared records"
+          },
+          "t15": {
+            "family": "behavior_windows",
+            "status": "completed",
+            "reason": null,
+            "population": "all eligible declared records"
+          },
+          "t16": {
+            "family": "behavior_panel",
+            "status": "completed",
+            "reason": null,
+            "population": "all eligible declared records"
+          },
+          "t17": {
+            "family": "runs",
+            "status": "completed",
+            "reason": null,
+            "population": "all eligible declared records"
+          },
+          "t18": {
+            "family": "volatility",
+            "status": "completed",
+            "reason": null,
+            "population": "all eligible declared records"
+          },
+          "t19": {
+            "family": "behavior_windows",
+            "status": "completed",
+            "reason": null,
+            "population": "all eligible declared records"
+          },
+          "t20": {
+            "family": "behavior_panel",
+            "status": "completed",
+            "reason": null,
+            "population": "all eligible declared records"
+          },
+          "t21": {
+            "family": "runs",
+            "status": "completed",
+            "reason": null,
+            "population": "all eligible declared records"
+          },
+          "t22": {
+            "family": "volatility",
+            "status": "completed",
+            "reason": null,
+            "population": "all eligible declared records"
+          },
+          "t23": {
+            "family": "behavior_series",
+            "status": "completed",
+            "reason": null,
+            "population": "all eligible declared records"
+          },
+          "t24": {
+            "family": "behavior_scope",
+            "status": "completed",
+            "reason": null,
+            "population": "all eligible declared records"
+          }
+        },
+        "unsearched_analytical_scope": [
+          {
+            "selected_measurements": [
+              "x0",
+              "x1",
+              "x2",
+              "x3"
+            ],
+            "unsearched_scope": [
+              "x4",
+              "x5",
+              "x6",
+              "x7",
+              "x8",
+              "x9",
+              "x10",
+              "x11",
+              "x12",
+              "x13",
+              "x14",
+              "x15",
+              "x16",
+              "x17",
+              "x18",
+              "x19",
+              "x20",
+              "x21",
+              "x22",
+              "x23",
+              "x24",
+              "x25",
+              "x26",
+              "x27",
+              "x28",
+              "x29",
+              "x30",
+              "x31",
+              "x32",
+              "x33",
+              "x34",
+              "x35",
+              "x36",
+              "x37",
+              "x38",
+              "x39",
+              "x40",
+              "x41",
+              "x42",
+              "x43",
+              "x44",
+              "x45",
+              "x46",
+              "x47",
+              "x48",
+              "x49",
+              "x50",
+              "x51",
+              "x52",
+              "x53",
+              "x54",
+              "x55",
+              "x56",
+              "x57",
+              "x58",
+              "x59",
+              "x60",
+              "x61",
+              "x62",
+              "x63",
+              "x64",
+              "x65",
+              "x66",
+              "x67",
+              "x68",
+              "x69",
+              "x70",
+              "x71",
+              "x72",
+              "x73",
+              "x74",
+              "x75",
+              "x76",
+              "x77",
+              "x78",
+              "x79",
+              "x80",
+              "x81",
+              "x82",
+              "x83",
+              "x84",
+              "x85",
+              "x86",
+              "x87",
+              "x88",
+              "x89",
+              "x90",
+              "x91",
+              "x92",
+              "x93",
+              "x94",
+              "x95"
+            ],
+            "work_observation_visits": 780000,
+            "comparisons": 80,
+            "selection": "Requested measurements first, then declaration order. Detail retention can miss behavior-only exceptions.",
+            "defaults_validated_universal_defect_criteria": false
+          }
+        ],
+        "internal_detail_retention_omissions": {
+          "data:entity_histories": 0,
+          "data:series_effects": 0
+        },
+        "presentation_omissions": "Determined independently when rendering. JSON preserves every retained evidence record.",
+        "limits": {
+          "max_cells": 100000000,
+          "max_series": 1000000,
+          "behavior_measurements": 4,
+          "detailed_series": 64,
+          "max_windows": 64,
+          "max_folds": 32,
+          "max_comparisons": 2048,
+          "observation_visits": 1000000000,
+          "retained_details": 100,
+          "witnesses": 5,
+          "decoded_batch_bytes": 67108864,
+          "parquet_metadata_bytes": 16777216
+        },
+        "work_observation_visits": 780000,
+        "behavior_comparisons": 80,
+        "representation_equivalence": {
+          "conditions": [
+            "Same observations, explicit missing cells and multiplicities",
+            "Same measurement identities, meanings, units and representations",
+            "Same entity identity, exact clock precision and schedule/lifecycle semantics",
+            "Same feature availability, revision semantics, analytical selections and bounds"
+          ],
+          "excluded": [
+            "physical source row references",
+            "file-order evidence"
+          ],
+          "absent_long_row_equals_null_wide_cell": "Only under an explicit dense-layout expectation; otherwise absence and supplied missing values differ."
+        }
+      },
+      "seconds": 4.3638050419976935
+    },
+    {
+      "kind": "large_gap",
+      "configuration": {
+        "execution": {
+          "backend": "duckdb_local",
+          "max_source_bytes": 5368709120,
+          "max_combined_source_bytes": 8589934592,
+          "max_rows": 10000000,
+          "max_combined_rows": 30000000,
+          "max_columns": 1000,
+          "memory_bytes": 2147483648,
+          "max_rss_bytes": 6442450944,
+          "threads": 2,
+          "batch_bytes": 33554432,
+          "max_record_bytes": 8388608,
+          "workspace_bytes": 68719476736,
+          "free_disk_bytes": 2147483648,
+          "max_seconds": 1800,
+          "result_bytes": 33554432,
+          "scratch_directory": null
+        },
+        "limits": {
+          "max_cells": 100000000,
+          "max_series": 1000000,
+          "behavior_measurements": 4,
+          "detailed_series": 64,
+          "max_windows": 64,
+          "max_folds": 32,
+          "max_comparisons": 2048,
+          "observation_visits": 1000000000,
+          "retained_details": 100,
+          "witnesses": 5,
+          "decoded_batch_bytes": 67108864,
+          "parquet_metadata_bytes": 16777216
+        },
+        "behavior": {
+          "enabled": true,
+          "windows": 4,
+          "explicit_windows": [],
+          "reference_window": 0,
+          "requested_measurements": [],
+          "requested_series": [],
+          "min_support": 100,
+          "missingness_increase": 0.05,
+          "distribution_effect": 0.1,
+          "normalized_w1": 0.25,
+          "flatline_observations": 10,
+          "volatility_support": 100,
+          "volatility_ratio": 2.0,
+          "rate_differences": false,
+          "seasonality": [],
+          "min_cycles": 8,
+          "min_window_cycles": 2,
+          "min_phase_support": 20,
+          "stable_cohort": true,
+          "version": "temporal_investigation_defaults_v1"
+        },
+        "presentation": {
+          "executive_actions": 5,
+          "target_panels": 6,
+          "feature_details": 20,
+          "table_rows": 20,
+          "appendix_rows": 100
+        }
+      },
+      "source_bytes": 33,
+      "status": "completed",
+      "execution": {
+        "status": "completed",
+        "backend": "duckdb_local",
+        "engine_version": "1.5.6",
+        "effective_limits": {
+          "backend": "duckdb_local",
+          "max_source_bytes": 5368709120,
+          "max_combined_source_bytes": 8589934592,
+          "max_rows": 10000000,
+          "max_combined_rows": 30000000,
+          "max_columns": 1000,
+          "memory_bytes": 2147483648,
+          "max_rss_bytes": 6442450944,
+          "threads": 2,
+          "batch_bytes": 33554432,
+          "max_record_bytes": 8388608,
+          "workspace_bytes": 68719476736,
+          "free_disk_bytes": 2147483648,
+          "max_seconds": 1800,
+          "result_bytes": 33554432,
+          "scratch_directory": null
+        },
+        "temporal_limits": {
+          "max_cells": 100000000,
+          "max_series": 1000000,
+          "behavior_measurements": 4,
+          "detailed_series": 64,
+          "max_windows": 64,
+          "max_folds": 32,
+          "max_comparisons": 2048,
+          "observation_visits": 1000000000,
+          "retained_details": 100,
+          "witnesses": 5,
+          "decoded_batch_bytes": 67108864,
+          "parquet_metadata_bytes": 16777216
+        },
+        "duration_seconds": 0.056193708995124325,
+        "phase_seconds": {
+          "data:ingestion": 0.009240084007615224,
+          "data:normalization": 0.004044542001793161,
+          "required_diagnostics": 0.011665041005471721,
+          "availability_history_evaluation": 1.2333010090515018e-05,
+          "behavior": 0.022719790984410793
+        },
+        "phase_plan": {
+          "sources": [
+            {
+              "source_id": "data",
+              "compressed_bytes": 33,
+              "format": "csv"
+            }
+          ],
+          "estimated_peak_workspace_bytes": 536870912,
+          "upper_bound": false,
+          "assumptions": [
+            "Variable-width and native decoder allocation are uncertain.",
+            "Sort/join coexistence and cell expansion are reassessed using actual cardinalities."
+          ]
+        },
+        "peak_workspace_bytes": 40960,
+        "estimated_peak_workspace_bytes": 536870912,
+        "planning_estimate_is_upper_bound": false,
+        "ledger": [
+          {
+            "phase": "workspace initialized",
+            "owned_bytes": 16384,
+            "available_bytes": 208896000000,
+            "estimated_addition": 0,
+            "files": [
+              {
+                "file": "tokens.duckdb",
+                "bytes": 12288
+              },
+              {
+                "file": "owner.json",
+                "bytes": 4096
+              }
+            ]
+          },
+          {
+            "phase": "data: structural validation",
+            "owned_bytes": 20480,
+            "available_bytes": 208896000000,
+            "estimated_addition": 66,
+            "files": [
+              {
+                "file": "source-3a6eb0790f39ac87c94f3856.csv",
+                "bytes": 4096
+              },
+              {
+                "file": "tokens.duckdb",
+                "bytes": 12288
+              },
+              {
+                "file": "owner.json",
+                "bytes": 4096
+              }
+            ]
+          },
+          {
+            "phase": "data: token staging",
+            "owned_bytes": 24576,
+            "available_bytes": 208896000000,
+            "estimated_addition": 0,
+            "files": [
+              {
+                "file": "source-3a6eb0790f39ac87c94f3856.csv",
+                "bytes": 4096
+              },
+              {
+                "file": "tokens.duckdb",
+                "bytes": 12288
+              },
+              {
+                "file": "owner.json",
+                "bytes": 4096
+              },
+              {
+                "file": "tokens.duckdb.wal",
+                "bytes": 4096
+              }
+            ]
+          },
+          {
+            "phase": "data: typed materialization",
+            "owned_bytes": 24576,
+            "available_bytes": 208896000000,
+            "estimated_addition": 66,
+            "files": [
+              {
+                "file": "source-3a6eb0790f39ac87c94f3856.csv",
+                "bytes": 4096
+              },
+              {
+                "file": "tokens.duckdb",
+                "bytes": 12288
+              },
+              {
+                "file": "owner.json",
+                "bytes": 4096
+              },
+              {
+                "file": "tokens.duckdb.wal",
+                "bytes": 4096
+              }
+            ]
+          },
+          {
+            "phase": "data: exact clock normalization",
+            "owned_bytes": 24576,
+            "available_bytes": 208896000000,
+            "estimated_addition": 0,
+            "files": [
+              {
+                "file": "source-3a6eb0790f39ac87c94f3856.csv",
+                "bytes": 4096
+              },
+              {
+                "file": "tokens.duckdb",
+                "bytes": 12288
+              },
+              {
+                "file": "owner.json",
+                "bytes": 4096
+              },
+              {
+                "file": "tokens.duckdb.wal",
+                "bytes": 4096
+              }
+            ]
+          },
+          {
+            "phase": "data: cardinality-based sort/join reservation",
+            "owned_bytes": 24576,
+            "available_bytes": 208896000000,
+            "estimated_addition": 576,
+            "files": [
+              {
+                "file": "source-3a6eb0790f39ac87c94f3856.csv",
+                "bytes": 4096
+              },
+              {
+                "file": "tokens.duckdb",
+                "bytes": 12288
+              },
+              {
+                "file": "owner.json",
+                "bytes": 4096
+              },
+              {
+                "file": "tokens.duckdb.wal",
+                "bytes": 4096
+              }
+            ]
+          },
+          {
+            "phase": "data: bounded behavioral investigation",
+            "owned_bytes": 36864,
+            "available_bytes": 208896000000,
+            "estimated_addition": 0,
+            "files": [
+              {
+                "file": "source-3a6eb0790f39ac87c94f3856.csv",
+                "bytes": 4096
+              },
+              {
+                "file": "tokens.duckdb",
+                "bytes": 12288
+              },
+              {
+                "file": "owner.json",
+                "bytes": 4096
+              },
+              {
+                "file": "tokens.duckdb.wal",
+                "bytes": 16384
+              }
+            ]
+          },
+          {
+            "phase": "completed temporal evidence publication",
+            "owned_bytes": 40960,
+            "available_bytes": 208896000000,
+            "estimated_addition": 33554432,
+            "files": [
+              {
+                "file": "source-3a6eb0790f39ac87c94f3856.csv",
+                "bytes": 4096
+              },
+              {
+                "file": "tokens.duckdb",
+                "bytes": 12288
+              },
+              {
+                "file": "owner.json",
+                "bytes": 4096
+              },
+              {
+                "file": "tokens.duckdb.wal",
+                "bytes": 20480
+              }
+            ]
+          }
+        ],
+        "provenance": {
+          "data": {
+            "sha256": "72c729f58b2ea2f8d6e779a93f5845c8d8b0d5526207200352eea92248c66c2a",
+            "source_bytes": 33,
+            "rows": 2,
+            "parsing_fingerprint": "0a3b377f0e98712ab5caecdd18e3f09f283ada26efbe25026a37e951414accbd",
+            "normalization_fingerprint": "b27add35013a95b776b50a9a188e19d3dd751891516d40cac159aac364e75591"
+          }
+        },
+        "timezone_data": {
+          "package": "tzdata",
+          "version": "2026.5",
+          "zones": {}
+        },
+        "warnings": [
+          "Workload budgets are provisional engineering controls, not capacity guarantees or OS quotas.",
+          "Decoded-batch/application retention bounds do not bound native Parquet decoder peaks.",
+          "Sampled RSS supervision can overshoot between samples."
+        ],
+        "peak_worker_rss_bytes": 155451392,
+        "whole_job_seconds": 0.5048378340143245,
+        "peak_spill_bytes": 0,
+        "serialized_bytes": 61801
+      },
+      "result_bytes": 61801,
+      "coverage": {
+        "computed_aggregate_scope": "Every eligible declared record in required stages; no silent sampling.",
+        "checks": {
+          "t1": {
+            "family": "chronology",
+            "status": "completed",
+            "reason": null,
+            "population": "all eligible declared records"
+          },
+          "t2": {
+            "family": "ordering",
+            "status": "completed",
+            "reason": null,
+            "population": "all eligible declared records"
+          },
+          "t3": {
+            "family": "repetition",
+            "status": "completed",
+            "reason": null,
+            "population": "all eligible declared records"
+          },
+          "t4": {
+            "family": "panel",
+            "status": "completed",
+            "reason": null,
+            "population": "complete entity/observation keys with valid clocks"
+          },
+          "t5": {
+            "family": "continuity",
+            "status": "completed",
+            "reason": null,
+            "population": "all eligible declared records"
+          },
+          "t6": {
+            "family": "availability_unknown",
+            "status": "blocked",
+            "reason": "No availability evidence for listed features.",
+            "population": "all eligible declared records"
+          },
+          "t7": {
+            "family": "behavior_windows",
+            "status": "completed",
+            "reason": null,
+            "population": "all eligible declared records"
+          },
+          "t8": {
+            "family": "behavior_panel",
+            "status": "completed",
+            "reason": null,
+            "population": "all eligible declared records"
+          },
+          "t9": {
+            "family": "runs",
+            "status": "completed",
+            "reason": null,
+            "population": "all eligible declared records"
+          },
+          "t10": {
+            "family": "volatility",
+            "status": "completed",
+            "reason": null,
+            "population": "all eligible declared records"
+          },
+          "t11": {
+            "family": "behavior_series",
+            "status": "completed",
+            "reason": null,
+            "population": "all eligible declared records"
+          },
+          "t12": {
+            "family": "behavior_scope",
+            "status": "completed",
+            "reason": null,
+            "population": "all eligible declared records"
+          }
+        },
+        "unsearched_analytical_scope": [
+          {
+            "selected_measurements": [
+              "x"
+            ],
+            "unsearched_scope": [],
+            "work_observation_visits": 31,
+            "comparisons": 11,
+            "selection": "Requested measurements first, then declaration order. Detail retention can miss behavior-only exceptions.",
+            "defaults_validated_universal_defect_criteria": false
+          }
+        ],
+        "internal_detail_retention_omissions": {
+          "data:entity_histories": 0,
+          "data:series_effects": 0
+        },
+        "presentation_omissions": "Determined independently when rendering. JSON preserves every retained evidence record.",
+        "limits": {
+          "max_cells": 100000000,
+          "max_series": 1000000,
+          "behavior_measurements": 4,
+          "detailed_series": 64,
+          "max_windows": 64,
+          "max_folds": 32,
+          "max_comparisons": 2048,
+          "observation_visits": 1000000000,
+          "retained_details": 100,
+          "witnesses": 5,
+          "decoded_batch_bytes": 67108864,
+          "parquet_metadata_bytes": 16777216
+        },
+        "work_observation_visits": 31,
+        "behavior_comparisons": 11,
+        "representation_equivalence": {
+          "conditions": [
+            "Same observations, explicit missing cells and multiplicities",
+            "Same measurement identities, meanings, units and representations",
+            "Same entity identity, exact clock precision and schedule/lifecycle semantics",
+            "Same feature availability, revision semantics, analytical selections and bounds"
+          ],
+          "excluded": [
+            "physical source row references",
+            "file-order evidence"
+          ],
+          "absent_long_row_equals_null_wide_cell": "Only under an explicit dense-layout expectation; otherwise absence and supplied missing values differ."
+        }
+      },
+      "seconds": 0.5166311670036521
+    },
+    {
+      "kind": "revision_heavy",
+      "configuration": {
+        "execution": {
+          "backend": "duckdb_local",
+          "max_source_bytes": 5368709120,
+          "max_combined_source_bytes": 8589934592,
+          "max_rows": 10000000,
+          "max_combined_rows": 30000000,
+          "max_columns": 1000,
+          "memory_bytes": 2147483648,
+          "max_rss_bytes": 6442450944,
+          "threads": 2,
+          "batch_bytes": 33554432,
+          "max_record_bytes": 8388608,
+          "workspace_bytes": 68719476736,
+          "free_disk_bytes": 2147483648,
+          "max_seconds": 1800,
+          "result_bytes": 33554432,
+          "scratch_directory": null
+        },
+        "limits": {
+          "max_cells": 100000000,
+          "max_series": 1000000,
+          "behavior_measurements": 4,
+          "detailed_series": 64,
+          "max_windows": 64,
+          "max_folds": 32,
+          "max_comparisons": 2048,
+          "observation_visits": 1000000000,
+          "retained_details": 100,
+          "witnesses": 5,
+          "decoded_batch_bytes": 67108864,
+          "parquet_metadata_bytes": 16777216
+        },
+        "behavior": {
+          "enabled": true,
+          "windows": 4,
+          "explicit_windows": [],
+          "reference_window": 0,
+          "requested_measurements": [],
+          "requested_series": [],
+          "min_support": 100,
+          "missingness_increase": 0.05,
+          "distribution_effect": 0.1,
+          "normalized_w1": 0.25,
+          "flatline_observations": 10,
+          "volatility_support": 100,
+          "volatility_ratio": 2.0,
+          "rate_differences": false,
+          "seasonality": [],
+          "min_cycles": 8,
+          "min_window_cycles": 2,
+          "min_phase_support": 20,
+          "stable_cohort": true,
+          "version": "temporal_investigation_defaults_v1"
+        },
+        "presentation": {
+          "executive_actions": 5,
+          "target_panels": 6,
+          "feature_details": 20,
+          "table_rows": 20,
+          "appendix_rows": 100
+        }
+      },
+      "source_bytes": 1799987,
+      "status": "completed",
+      "execution": {
+        "status": "completed",
+        "backend": "duckdb_local",
+        "engine_version": "1.5.6",
+        "effective_limits": {
+          "backend": "duckdb_local",
+          "max_source_bytes": 5368709120,
+          "max_combined_source_bytes": 8589934592,
+          "max_rows": 10000000,
+          "max_combined_rows": 30000000,
+          "max_columns": 1000,
+          "memory_bytes": 2147483648,
+          "max_rss_bytes": 6442450944,
+          "threads": 2,
+          "batch_bytes": 33554432,
+          "max_record_bytes": 8388608,
+          "workspace_bytes": 68719476736,
+          "free_disk_bytes": 2147483648,
+          "max_seconds": 1800,
+          "result_bytes": 33554432,
+          "scratch_directory": null
+        },
+        "temporal_limits": {
+          "max_cells": 100000000,
+          "max_series": 1000000,
+          "behavior_measurements": 4,
+          "detailed_series": 64,
+          "max_windows": 64,
+          "max_folds": 32,
+          "max_comparisons": 2048,
+          "observation_visits": 1000000000,
+          "retained_details": 100,
+          "witnesses": 5,
+          "decoded_batch_bytes": 67108864,
+          "parquet_metadata_bytes": 16777216
+        },
+        "duration_seconds": 3.4873993750079535,
+        "phase_seconds": {
+          "data:ingestion": 0.4029954170109704,
+          "data:normalization": 0.5660083330003545,
+          "history:ingestion": 0.3841237910091877,
+          "required_diagnostics": 0.25860929102054797,
+          "availability_history_evaluation": 1.264206167019438,
+          "behavior": 0.6004275839950424
+        },
+        "phase_plan": {
+          "sources": [
+            {
+              "source_id": "data",
+              "compressed_bytes": 1799987,
+              "format": "csv"
+            },
+            {
+              "source_id": "history",
+              "compressed_bytes": 1279994,
+              "format": "csv"
+            }
+          ],
+          "estimated_peak_workspace_bytes": 536870912,
+          "upper_bound": false,
+          "assumptions": [
+            "Variable-width and native decoder allocation are uncertain.",
+            "Sort/join coexistence and cell expansion are reassessed using actual cardinalities."
+          ]
+        },
+        "peak_workspace_bytes": 27852800,
+        "estimated_peak_workspace_bytes": 536870912,
+        "planning_estimate_is_upper_bound": false,
+        "ledger": [
+          {
+            "phase": "workspace initialized",
+            "owned_bytes": 16384,
+            "available_bytes": 208896000000,
+            "estimated_addition": 0,
+            "files": [
+              {
+                "file": "tokens.duckdb",
+                "bytes": 12288
+              },
+              {
+                "file": "owner.json",
+                "bytes": 4096
+              }
+            ]
+          },
+          {
+            "phase": "data: structural validation",
+            "owned_bytes": 1818624,
+            "available_bytes": 208896000000,
+            "estimated_addition": 3599974,
+            "files": [
+              {
+                "file": "source-3a6eb0790f39ac87c94f3856.csv",
+                "bytes": 1802240
+              },
+              {
+                "file": "tokens.duckdb",
+                "bytes": 12288
+              },
+              {
+                "file": "owner.json",
+                "bytes": 4096
+              }
+            ]
+          },
+          {
+            "phase": "data: token staging",
+            "owned_bytes": 3231744,
+            "available_bytes": 208896000000,
+            "estimated_addition": 0,
+            "files": [
+              {
+                "file": "source-3a6eb0790f39ac87c94f3856.csv",
+                "bytes": 1802240
+              },
+              {
+                "file": "tokens.duckdb",
+                "bytes": 12288
+              },
+              {
+                "file": "owner.json",
+                "bytes": 4096
+              },
+              {
+                "file": "tokens.duckdb.wal",
+                "bytes": 1413120
+              }
+            ]
+          },
+          {
+            "phase": "data: token staging",
+            "owned_bytes": 4427776,
+            "available_bytes": 208486400000,
+            "estimated_addition": 0,
+            "files": [
+              {
+                "file": "source-3a6eb0790f39ac87c94f3856.csv",
+                "bytes": 1802240
+              },
+              {
+                "file": "tokens.duckdb",
+                "bytes": 12288
+              },
+              {
+                "file": "owner.json",
+                "bytes": 4096
+              },
+              {
+                "file": "tokens.duckdb.wal",
+                "bytes": 2609152
+              }
+            ]
+          },
+          {
+            "phase": "data: typed materialization",
+            "owned_bytes": 4427776,
+            "available_bytes": 208486400000,
+            "estimated_addition": 3599974,
+            "files": [
+              {
+                "file": "source-3a6eb0790f39ac87c94f3856.csv",
+                "bytes": 1802240
+              },
+              {
+                "file": "tokens.duckdb",
+                "bytes": 12288
+              },
+              {
+                "file": "owner.json",
+                "bytes": 4096
+              },
+              {
+                "file": "tokens.duckdb.wal",
+                "bytes": 2609152
+              }
+            ]
+          },
+          {
+            "phase": "data: exact clock normalization",
+            "owned_bytes": 8347648,
+            "available_bytes": 208486400000,
+            "estimated_addition": 0,
+            "files": [
+              {
+                "file": "source-3a6eb0790f39ac87c94f3856.csv",
+                "bytes": 1802240
+              },
+              {
+                "file": "tokens.duckdb",
+                "bytes": 12288
+              },
+              {
+                "file": "owner.json",
+                "bytes": 4096
+              },
+              {
+                "file": "tokens.duckdb.wal",
+                "bytes": 6529024
+              }
+            ]
+          },
+          {
+            "phase": "data: exact clock normalization",
+            "owned_bytes": 9150464,
+            "available_bytes": 208486400000,
+            "estimated_addition": 0,
+            "files": [
+              {
+                "file": "source-3a6eb0790f39ac87c94f3856.csv",
+                "bytes": 1802240
+              },
+              {
+                "file": "tokens.duckdb",
+                "bytes": 12288
+              },
+              {
+                "file": "owner.json",
+                "bytes": 4096
+              },
+              {
+                "file": "tokens.duckdb.wal",
+                "bytes": 7331840
+              }
+            ]
+          },
+          {
+            "phase": "data: exact clock normalization",
+            "owned_bytes": 9957376,
+            "available_bytes": 208486400000,
+            "estimated_addition": 0,
+            "files": [
+              {
+                "file": "source-3a6eb0790f39ac87c94f3856.csv",
+                "bytes": 1802240
+              },
+              {
+                "file": "tokens.duckdb",
+                "bytes": 12288
+              },
+              {
+                "file": "owner.json",
+                "bytes": 4096
+              },
+              {
+                "file": "tokens.duckdb.wal",
+                "bytes": 8138752
+              }
+            ]
+          },
+          {
+            "phase": "data: exact clock normalization",
+            "owned_bytes": 10764288,
+            "available_bytes": 208486400000,
+            "estimated_addition": 0,
+            "files": [
+              {
+                "file": "source-3a6eb0790f39ac87c94f3856.csv",
+                "bytes": 1802240
+              },
+              {
+                "file": "tokens.duckdb",
+                "bytes": 12288
+              },
+              {
+                "file": "owner.json",
+                "bytes": 4096
+              },
+              {
+                "file": "tokens.duckdb.wal",
+                "bytes": 8945664
+              }
+            ]
+          },
+          {
+            "phase": "data: exact clock normalization",
+            "owned_bytes": 11571200,
+            "available_bytes": 208486400000,
+            "estimated_addition": 0,
+            "files": [
+              {
+                "file": "source-3a6eb0790f39ac87c94f3856.csv",
+                "bytes": 1802240
+              },
+              {
+                "file": "tokens.duckdb",
+                "bytes": 12288
+              },
+              {
+                "file": "owner.json",
+                "bytes": 4096
+              },
+              {
+                "file": "tokens.duckdb.wal",
+                "bytes": 9752576
+              }
+            ]
+          },
+          {
+            "phase": "data: exact clock normalization",
+            "owned_bytes": 12374016,
+            "available_bytes": 208486400000,
+            "estimated_addition": 0,
+            "files": [
+              {
+                "file": "source-3a6eb0790f39ac87c94f3856.csv",
+                "bytes": 1802240
+              },
+              {
+                "file": "tokens.duckdb",
+                "bytes": 12288
+              },
+              {
+                "file": "owner.json",
+                "bytes": 4096
+              },
+              {
+                "file": "tokens.duckdb.wal",
+                "bytes": 10555392
+              }
+            ]
+          },
+          {
+            "phase": "data: exact clock normalization",
+            "owned_bytes": 12460032,
+            "available_bytes": 208486400000,
+            "estimated_addition": 0,
+            "files": [
+              {
+                "file": "source-3a6eb0790f39ac87c94f3856.csv",
+                "bytes": 1802240
+              },
+              {
+                "file": "tokens.duckdb",
+                "bytes": 12288
+              },
+              {
+                "file": "owner.json",
+                "bytes": 4096
+              },
+              {
+                "file": "tokens.duckdb.wal",
+                "bytes": 10641408
+              }
+            ]
+          },
+          {
+            "phase": "data: cardinality-based sort/join reservation",
+            "owned_bytes": 12107776,
+            "available_bytes": 208486400000,
+            "estimated_addition": 17280256,
+            "files": [
+              {
+                "file": "source-3a6eb0790f39ac87c94f3856.csv",
+                "bytes": 1802240
+              },
+              {
+                "file": "tokens.duckdb",
+                "bytes": 2371584
+              },
+              {
+                "file": "owner.json",
+                "bytes": 4096
+              },
+              {
+                "file": "tokens.duckdb.wal",
+                "bytes": 7929856
+              }
+            ]
+          },
+          {
+            "phase": "history: structural validation",
+            "owned_bytes": 13389824,
+            "available_bytes": 208486400000,
+            "estimated_addition": 2559988,
+            "files": [
+              {
+                "file": "source-3a6eb0790f39ac87c94f3856.csv",
+                "bytes": 1802240
+              },
+              {
+                "file": "tokens.duckdb",
+                "bytes": 2371584
+              },
+              {
+                "file": "owner.json",
+                "bytes": 4096
+              },
+              {
+                "file": "tokens.duckdb.wal",
+                "bytes": 7929856
+              },
+              {
+                "file": "source-259aa8ef98a8b91de574cd90.csv",
+                "bytes": 1282048
+              }
+            ]
+          },
+          {
+            "phase": "history: token staging",
+            "owned_bytes": 14520320,
+            "available_bytes": 208486400000,
+            "estimated_addition": 0,
+            "files": [
+              {
+                "file": "source-3a6eb0790f39ac87c94f3856.csv",
+                "bytes": 1802240
+              },
+              {
+                "file": "tokens.duckdb",
+                "bytes": 2371584
+              },
+              {
+                "file": "owner.json",
+                "bytes": 4096
+              },
+              {
+                "file": "tokens.duckdb.wal",
+                "bytes": 9060352
+              },
+              {
+                "file": "source-259aa8ef98a8b91de574cd90.csv",
+                "bytes": 1282048
+              }
+            ]
+          },
+          {
+            "phase": "history: token staging",
+            "owned_bytes": 15478784,
+            "available_bytes": 208486400000,
+            "estimated_addition": 0,
+            "files": [
+              {
+                "file": "source-3a6eb0790f39ac87c94f3856.csv",
+                "bytes": 1802240
+              },
+              {
+                "file": "tokens.duckdb",
+                "bytes": 2371584
+              },
+              {
+                "file": "owner.json",
+                "bytes": 4096
+              },
+              {
+                "file": "tokens.duckdb.wal",
+                "bytes": 10018816
+              },
+              {
+                "file": "source-259aa8ef98a8b91de574cd90.csv",
+                "bytes": 1282048
+              }
+            ]
+          },
+          {
+            "phase": "history: typed materialization",
+            "owned_bytes": 15478784,
+            "available_bytes": 208486400000,
+            "estimated_addition": 3200000,
+            "files": [
+              {
+                "file": "source-3a6eb0790f39ac87c94f3856.csv",
+                "bytes": 1802240
+              },
+              {
+                "file": "tokens.duckdb",
+                "bytes": 2371584
+              },
+              {
+                "file": "owner.json",
+                "bytes": 4096
+              },
+              {
+                "file": "tokens.duckdb.wal",
+                "bytes": 10018816
+              },
+              {
+                "file": "source-259aa8ef98a8b91de574cd90.csv",
+                "bytes": 1282048
+              }
+            ]
+          },
+          {
+            "phase": "h: revision ordering and selection reservation",
+            "owned_bytes": 9175040,
+            "available_bytes": 210534400000,
+            "estimated_addition": 32000000,
+            "files": [
+              {
+                "file": "source-3a6eb0790f39ac87c94f3856.csv",
+                "bytes": 1802240
+              },
+              {
+                "file": "tokens.duckdb",
+                "bytes": 5517312
+              },
+              {
+                "file": "owner.json",
+                "bytes": 4096
+              },
+              {
+                "file": "tokens.duckdb.wal",
+                "bytes": 569344
+              },
+              {
+                "file": "source-259aa8ef98a8b91de574cd90.csv",
+                "bytes": 1282048
+              }
+            ]
+          },
+          {
+            "phase": "history: exact clock normalization",
+            "owned_bytes": 9981952,
+            "available_bytes": 210534400000,
+            "estimated_addition": 0,
+            "files": [
+              {
+                "file": "source-3a6eb0790f39ac87c94f3856.csv",
+                "bytes": 1802240
+              },
+              {
+                "file": "tokens.duckdb",
+                "bytes": 5517312
+              },
+              {
+                "file": "owner.json",
+                "bytes": 4096
+              },
+              {
+                "file": "tokens.duckdb.wal",
+                "bytes": 1376256
+              },
+              {
+                "file": "source-259aa8ef98a8b91de574cd90.csv",
+                "bytes": 1282048
+              }
+            ]
+          },
+          {
+            "phase": "history: exact clock normalization",
+            "owned_bytes": 10788864,
+            "available_bytes": 210534400000,
+            "estimated_addition": 0,
+            "files": [
+              {
+                "file": "source-3a6eb0790f39ac87c94f3856.csv",
+                "bytes": 1802240
+              },
+              {
+                "file": "tokens.duckdb",
+                "bytes": 5517312
+              },
+              {
+                "file": "owner.json",
+                "bytes": 4096
+              },
+              {
+                "file": "tokens.duckdb.wal",
+                "bytes": 2183168
+              },
+              {
+                "file": "source-259aa8ef98a8b91de574cd90.csv",
+                "bytes": 1282048
+              }
+            ]
+          },
+          {
+            "phase": "history: exact clock normalization",
+            "owned_bytes": 11595776,
+            "available_bytes": 210534400000,
+            "estimated_addition": 0,
+            "files": [
+              {
+                "file": "source-3a6eb0790f39ac87c94f3856.csv",
+                "bytes": 1802240
+              },
+              {
+                "file": "tokens.duckdb",
+                "bytes": 5517312
+              },
+              {
+                "file": "owner.json",
+                "bytes": 4096
+              },
+              {
+                "file": "tokens.duckdb.wal",
+                "bytes": 2990080
+              },
+              {
+                "file": "source-259aa8ef98a8b91de574cd90.csv",
+                "bytes": 1282048
+              }
+            ]
+          },
+          {
+            "phase": "history: exact clock normalization",
+            "owned_bytes": 12398592,
+            "available_bytes": 210534400000,
+            "estimated_addition": 0,
+            "files": [
+              {
+                "file": "source-3a6eb0790f39ac87c94f3856.csv",
+                "bytes": 1802240
+              },
+              {
+                "file": "tokens.duckdb",
+                "bytes": 5517312
+              },
+              {
+                "file": "owner.json",
+                "bytes": 4096
+              },
+              {
+                "file": "tokens.duckdb.wal",
+                "bytes": 3792896
+              },
+              {
+                "file": "source-259aa8ef98a8b91de574cd90.csv",
+                "bytes": 1282048
+              }
+            ]
+          },
+          {
+            "phase": "history: exact clock normalization",
+            "owned_bytes": 13205504,
+            "available_bytes": 210534400000,
+            "estimated_addition": 0,
+            "files": [
+              {
+                "file": "source-3a6eb0790f39ac87c94f3856.csv",
+                "bytes": 1802240
+              },
+              {
+                "file": "tokens.duckdb",
+                "bytes": 5517312
+              },
+              {
+                "file": "owner.json",
+                "bytes": 4096
+              },
+              {
+                "file": "tokens.duckdb.wal",
+                "bytes": 4599808
+              },
+              {
+                "file": "source-259aa8ef98a8b91de574cd90.csv",
+                "bytes": 1282048
+              }
+            ]
+          },
+          {
+            "phase": "history: exact clock normalization",
+            "owned_bytes": 14012416,
+            "available_bytes": 210534400000,
+            "estimated_addition": 0,
+            "files": [
+              {
+                "file": "source-3a6eb0790f39ac87c94f3856.csv",
+                "bytes": 1802240
+              },
+              {
+                "file": "tokens.duckdb",
+                "bytes": 5517312
+              },
+              {
+                "file": "owner.json",
+                "bytes": 4096
+              },
+              {
+                "file": "tokens.duckdb.wal",
+                "bytes": 5406720
+              },
+              {
+                "file": "source-259aa8ef98a8b91de574cd90.csv",
+                "bytes": 1282048
+              }
+            ]
+          },
+          {
+            "phase": "history: exact clock normalization",
+            "owned_bytes": 14094336,
+            "available_bytes": 210534400000,
+            "estimated_addition": 0,
+            "files": [
+              {
+                "file": "source-3a6eb0790f39ac87c94f3856.csv",
+                "bytes": 1802240
+              },
+              {
+                "file": "tokens.duckdb",
+                "bytes": 5517312
+              },
+              {
+                "file": "owner.json",
+                "bytes": 4096
+              },
+              {
+                "file": "tokens.duckdb.wal",
+                "bytes": 5488640
+              },
+              {
+                "file": "source-259aa8ef98a8b91de574cd90.csv",
+                "bytes": 1282048
+              }
+            ]
+          },
+          {
+            "phase": "data: exact clock normalization",
+            "owned_bytes": 14901248,
+            "available_bytes": 210534400000,
+            "estimated_addition": 0,
+            "files": [
+              {
+                "file": "source-3a6eb0790f39ac87c94f3856.csv",
+                "bytes": 1802240
+              },
+              {
+                "file": "tokens.duckdb",
+                "bytes": 5517312
+              },
+              {
+                "file": "owner.json",
+                "bytes": 4096
+              },
+              {
+                "file": "tokens.duckdb.wal",
+                "bytes": 6295552
+              },
+              {
+                "file": "source-259aa8ef98a8b91de574cd90.csv",
+                "bytes": 1282048
+              }
+            ]
+          },
+          {
+            "phase": "data: exact clock normalization",
+            "owned_bytes": 15708160,
+            "available_bytes": 210534400000,
+            "estimated_addition": 0,
+            "files": [
+              {
+                "file": "source-3a6eb0790f39ac87c94f3856.csv",
+                "bytes": 1802240
+              },
+              {
+                "file": "tokens.duckdb",
+                "bytes": 5517312
+              },
+              {
+                "file": "owner.json",
+                "bytes": 4096
+              },
+              {
+                "file": "tokens.duckdb.wal",
+                "bytes": 7102464
+              },
+              {
+                "file": "source-259aa8ef98a8b91de574cd90.csv",
+                "bytes": 1282048
+              }
+            ]
+          },
+          {
+            "phase": "data: exact clock normalization",
+            "owned_bytes": 16510976,
+            "available_bytes": 210534400000,
+            "estimated_addition": 0,
+            "files": [
+              {
+                "file": "source-3a6eb0790f39ac87c94f3856.csv",
+                "bytes": 1802240
+              },
+              {
+                "file": "tokens.duckdb",
+                "bytes": 5517312
+              },
+              {
+                "file": "owner.json",
+                "bytes": 4096
+              },
+              {
+                "file": "tokens.duckdb.wal",
+                "bytes": 7905280
+              },
+              {
+                "file": "source-259aa8ef98a8b91de574cd90.csv",
+                "bytes": 1282048
+              }
+            ]
+          },
+          {
+            "phase": "data: exact clock normalization",
+            "owned_bytes": 17317888,
+            "available_bytes": 210534400000,
+            "estimated_addition": 0,
+            "files": [
+              {
+                "file": "source-3a6eb0790f39ac87c94f3856.csv",
+                "bytes": 1802240
+              },
+              {
+                "file": "tokens.duckdb",
+                "bytes": 5517312
+              },
+              {
+                "file": "owner.json",
+                "bytes": 4096
+              },
+              {
+                "file": "tokens.duckdb.wal",
+                "bytes": 8712192
+              },
+              {
+                "file": "source-259aa8ef98a8b91de574cd90.csv",
+                "bytes": 1282048
+              }
+            ]
+          },
+          {
+            "phase": "data: exact clock normalization",
+            "owned_bytes": 18124800,
+            "available_bytes": 210534400000,
+            "estimated_addition": 0,
+            "files": [
+              {
+                "file": "source-3a6eb0790f39ac87c94f3856.csv",
+                "bytes": 1802240
+              },
+              {
+                "file": "tokens.duckdb",
+                "bytes": 5517312
+              },
+              {
+                "file": "owner.json",
+                "bytes": 4096
+              },
+              {
+                "file": "tokens.duckdb.wal",
+                "bytes": 9519104
+              },
+              {
+                "file": "source-259aa8ef98a8b91de574cd90.csv",
+                "bytes": 1282048
+              }
+            ]
+          },
+          {
+            "phase": "data: exact clock normalization",
+            "owned_bytes": 18931712,
+            "available_bytes": 210534400000,
+            "estimated_addition": 0,
+            "files": [
+              {
+                "file": "source-3a6eb0790f39ac87c94f3856.csv",
+                "bytes": 1802240
+              },
+              {
+                "file": "tokens.duckdb",
+                "bytes": 5517312
+              },
+              {
+                "file": "owner.json",
+                "bytes": 4096
+              },
+              {
+                "file": "tokens.duckdb.wal",
+                "bytes": 10326016
+              },
+              {
+                "file": "source-259aa8ef98a8b91de574cd90.csv",
+                "bytes": 1282048
+              }
+            ]
+          },
+          {
+            "phase": "data: exact clock normalization",
+            "owned_bytes": 19013632,
+            "available_bytes": 210534400000,
+            "estimated_addition": 0,
+            "files": [
+              {
+                "file": "source-3a6eb0790f39ac87c94f3856.csv",
+                "bytes": 1802240
+              },
+              {
+                "file": "tokens.duckdb",
+                "bytes": 5517312
+              },
+              {
+                "file": "owner.json",
+                "bytes": 4096
+              },
+              {
+                "file": "tokens.duckdb.wal",
+                "bytes": 10407936
+              },
+              {
+                "file": "source-259aa8ef98a8b91de574cd90.csv",
+                "bytes": 1282048
+              }
+            ]
+          },
+          {
+            "phase": "data: bounded behavioral investigation",
+            "owned_bytes": 27811840,
+            "available_bytes": 210534400000,
+            "estimated_addition": 0,
+            "files": [
+              {
+                "file": "source-3a6eb0790f39ac87c94f3856.csv",
+                "bytes": 1802240
+              },
+              {
+                "file": "tokens.duckdb",
+                "bytes": 16003072
+              },
+              {
+                "file": "owner.json",
+                "bytes": 4096
+              },
+              {
+                "file": "tokens.duckdb.wal",
+                "bytes": 8720384
+              },
+              {
+                "file": "source-259aa8ef98a8b91de574cd90.csv",
+                "bytes": 1282048
+              }
+            ]
+          },
+          {
+            "phase": "completed temporal evidence publication",
+            "owned_bytes": 27852800,
+            "available_bytes": 210534400000,
+            "estimated_addition": 33554432,
+            "files": [
+              {
+                "file": "source-3a6eb0790f39ac87c94f3856.csv",
+                "bytes": 1802240
+              },
+              {
+                "file": "tokens.duckdb",
+                "bytes": 16003072
+              },
+              {
+                "file": "owner.json",
+                "bytes": 4096
+              },
+              {
+                "file": "tokens.duckdb.wal",
+                "bytes": 8761344
+              },
+              {
+                "file": "source-259aa8ef98a8b91de574cd90.csv",
+                "bytes": 1282048
+              }
+            ]
+          }
+        ],
+        "provenance": {
+          "data": {
+            "sha256": "9a2409930b3d8e2afab9d985abc83d88257d84c607d3111e352dfe7279670ef1",
+            "source_bytes": 1799987,
+            "rows": 100000,
+            "parsing_fingerprint": "f4892aa20be3e86ce607c097acd8b11c7463f1903fc26c3f6988a2be48df53a9",
+            "normalization_fingerprint": "fe5c4bf43d859f949752f3ae925020d48d9cd68f52d57cbf06ba2d73ca744fce"
+          },
+          "history": {
+            "sha256": "19ba56cd72361feeacdbf457692f086d9c897e5540daae8861952685974a34f2",
+            "source_bytes": 1279994,
+            "rows": 100000,
+            "parsing_fingerprint": "9841197da2c1bea16f83a20960660c1da59a04e173563d2e2879ef36cfb31bba",
+            "normalization_fingerprint": "86b2984f6fe5bea3b3792c7232bfc30ff2118eec9396c52f46aee8a1336b1cc9"
+          }
+        },
+        "timezone_data": {
+          "package": "tzdata",
+          "version": "2026.5",
+          "zones": {}
+        },
+        "warnings": [
+          "Workload budgets are provisional engineering controls, not capacity guarantees or OS quotas.",
+          "Decoded-batch/application retention bounds do not bound native Parquet decoder peaks.",
+          "Sampled RSS supervision can overshoot between samples."
+        ],
+        "peak_worker_rss_bytes": 295518208,
+        "whole_job_seconds": 3.9576302919886075,
+        "peak_spill_bytes": 0,
+        "serialized_bytes": 186082
+      },
+      "result_bytes": 186082,
+      "coverage": {
+        "computed_aggregate_scope": "Every eligible declared record in required stages; no silent sampling.",
+        "checks": {
+          "t1": {
+            "family": "chronology",
+            "status": "completed",
+            "reason": null,
+            "population": "all eligible declared records"
+          },
+          "t2": {
+            "family": "ordering",
+            "status": "completed",
+            "reason": null,
+            "population": "all eligible declared records"
+          },
+          "t3": {
+            "family": "repetition",
+            "status": "completed",
+            "reason": null,
+            "population": "all eligible declared records"
+          },
+          "t4": {
+            "family": "panel",
+            "status": "completed",
+            "reason": null,
+            "population": "complete entity/observation keys with valid clocks"
+          },
+          "t5": {
+            "family": "continuity",
+            "status": "completed",
+            "reason": null,
+            "population": "all eligible declared records"
+          },
+          "t6": {
+            "family": "availability_unknown",
+            "status": "completed",
+            "reason": null,
+            "population": "all eligible declared records"
+          },
+          "t7": {
+            "family": "revision_history",
+            "status": "completed",
+            "reason": null,
+            "population": "all eligible declared records"
+          },
+          "t8": {
+            "family": "behavior_windows",
+            "status": "completed",
+            "reason": null,
+            "population": "all eligible declared records"
+          },
+          "t9": {
+            "family": "behavior_panel",
+            "status": "completed",
+            "reason": null,
+            "population": "all eligible declared records"
+          },
+          "t10": {
+            "family": "runs",
+            "status": "completed",
+            "reason": null,
+            "population": "all eligible declared records"
+          },
+          "t11": {
+            "family": "volatility",
+            "status": "completed",
+            "reason": null,
+            "population": "all eligible declared records"
+          },
+          "t12": {
+            "family": "behavior_series",
+            "status": "completed",
+            "reason": null,
+            "population": "all eligible declared records"
+          },
+          "t13": {
+            "family": "behavior_scope",
+            "status": "completed",
+            "reason": null,
+            "population": "all eligible declared records"
+          }
+        },
+        "unsearched_analytical_scope": [
+          {
+            "selected_measurements": [
+              "x"
+            ],
+            "unsearched_scope": [],
+            "work_observation_visits": 940640,
+            "comparisons": 335,
+            "selection": "Requested measurements first, then declaration order. Detail retention can miss behavior-only exceptions.",
+            "defaults_validated_universal_defect_criteria": false
+          }
+        ],
+        "internal_detail_retention_omissions": {
+          "data:entity_histories": 4901,
+          "data:series_effects": 220
+        },
+        "presentation_omissions": "Determined independently when rendering. JSON preserves every retained evidence record.",
+        "limits": {
+          "max_cells": 100000000,
+          "max_series": 1000000,
+          "behavior_measurements": 4,
+          "detailed_series": 64,
+          "max_windows": 64,
+          "max_folds": 32,
+          "max_comparisons": 2048,
+          "observation_visits": 1000000000,
+          "retained_details": 100,
+          "witnesses": 5,
+          "decoded_batch_bytes": 67108864,
+          "parquet_metadata_bytes": 16777216
+        },
+        "work_observation_visits": 940640,
+        "behavior_comparisons": 335,
+        "representation_equivalence": {
+          "conditions": [
+            "Same observations, explicit missing cells and multiplicities",
+            "Same measurement identities, meanings, units and representations",
+            "Same entity identity, exact clock precision and schedule/lifecycle semantics",
+            "Same feature availability, revision semantics, analytical selections and bounds"
+          ],
+          "excluded": [
+            "physical source row references",
+            "file-order evidence"
+          ],
+          "absent_long_row_equals_null_wide_cell": "Only under an explicit dense-layout expectation; otherwise absence and supplied missing values differ."
+        }
+      },
+      "seconds": 3.997625792020699
+    },
+    {
+      "kind": "oversized_dictionary",
+      "configuration": {
+        "execution": {
+          "backend": "duckdb_local",
+          "max_source_bytes": 5368709120,
+          "max_combined_source_bytes": 8589934592,
+          "max_rows": 10000000,
+          "max_combined_rows": 30000000,
+          "max_columns": 1000,
+          "memory_bytes": 2147483648,
+          "max_rss_bytes": 6442450944,
+          "threads": 2,
+          "batch_bytes": 33554432,
+          "max_record_bytes": 8388608,
+          "workspace_bytes": 68719476736,
+          "free_disk_bytes": 2147483648,
+          "max_seconds": 1800,
+          "result_bytes": 33554432,
+          "scratch_directory": null
+        },
+        "limits": {
+          "max_cells": 100000000,
+          "max_series": 1000000,
+          "behavior_measurements": 4,
+          "detailed_series": 64,
+          "max_windows": 64,
+          "max_folds": 32,
+          "max_comparisons": 2048,
+          "observation_visits": 1000000000,
+          "retained_details": 100,
+          "witnesses": 5,
+          "decoded_batch_bytes": 67108864,
+          "parquet_metadata_bytes": 16777216
+        },
+        "behavior": {
+          "enabled": true,
+          "windows": 4,
+          "explicit_windows": [],
+          "reference_window": 0,
+          "requested_measurements": [],
+          "requested_series": [],
+          "min_support": 100,
+          "missingness_increase": 0.05,
+          "distribution_effect": 0.1,
+          "normalized_w1": 0.25,
+          "flatline_observations": 10,
+          "volatility_support": 100,
+          "volatility_ratio": 2.0,
+          "rate_differences": false,
+          "seasonality": [],
+          "min_cycles": 8,
+          "min_window_cycles": 2,
+          "min_phase_support": 20,
+          "stable_cohort": true,
+          "version": "temporal_investigation_defaults_v1"
+        },
+        "presentation": {
+          "executive_actions": 5,
+          "target_panels": 6,
+          "feature_details": 20,
+          "table_rows": 20,
+          "appendix_rows": 100
+        }
+      },
+      "source_bytes": 744,
+      "status": "completed",
+      "execution": {
+        "status": "completed",
+        "backend": "duckdb_local",
+        "engine_version": "1.5.6",
+        "effective_limits": {
+          "backend": "duckdb_local",
+          "max_source_bytes": 5368709120,
+          "max_combined_source_bytes": 8589934592,
+          "max_rows": 10000000,
+          "max_combined_rows": 30000000,
+          "max_columns": 1000,
+          "memory_bytes": 2147483648,
+          "max_rss_bytes": 6442450944,
+          "threads": 2,
+          "batch_bytes": 33554432,
+          "max_record_bytes": 8388608,
+          "workspace_bytes": 68719476736,
+          "free_disk_bytes": 2147483648,
+          "max_seconds": 1800,
+          "result_bytes": 33554432,
+          "scratch_directory": null
+        },
+        "temporal_limits": {
+          "max_cells": 100000000,
+          "max_series": 1000000,
+          "behavior_measurements": 4,
+          "detailed_series": 64,
+          "max_windows": 64,
+          "max_folds": 32,
+          "max_comparisons": 2048,
+          "observation_visits": 1000000000,
+          "retained_details": 100,
+          "witnesses": 5,
+          "decoded_batch_bytes": 67108864,
+          "parquet_metadata_bytes": 16777216
+        },
+        "duration_seconds": 0.18086883297655731,
+        "phase_seconds": {
+          "data:ingestion": 0.05208737499197014,
+          "data:normalization": 0.02277704101288691,
+          "required_diagnostics": 0.033933958009583876,
+          "availability_history_evaluation": 1.3165990822017193e-05,
+          "behavior": 0.06131074999575503
+        },
+        "phase_plan": {
+          "sources": [
+            {
+              "source_id": "data",
+              "compressed_bytes": 744,
+              "format": "parquet",
+              "rows": 128,
+              "columns": 2,
+              "row_groups": 1,
+              "uncompressed_chunk_bytes": 100150,
+              "serialized_footer_bytes": 534,
+              "schema": "time: int64\nx: string",
+              "decoder_peak_is_bounded": false
+            }
+          ],
+          "estimated_peak_workspace_bytes": 536870912,
+          "upper_bound": false,
+          "assumptions": [
+            "Variable-width and native decoder allocation are uncertain.",
+            "Sort/join coexistence and cell expansion are reassessed using actual cardinalities."
+          ]
+        },
+        "peak_workspace_bytes": 70279168,
+        "estimated_peak_workspace_bytes": 536870912,
+        "planning_estimate_is_upper_bound": false,
+        "ledger": [
+          {
+            "phase": "workspace initialized",
+            "owned_bytes": 16384,
+            "available_bytes": 210534400000,
+            "estimated_addition": 0,
+            "files": [
+              {
+                "file": "tokens.duckdb",
+                "bytes": 12288
+              },
+              {
+                "file": "owner.json",
+                "bytes": 4096
+              }
+            ]
+          },
+          {
+            "phase": "data: Parquet ingestion",
+            "owned_bytes": 12824576,
+            "available_bytes": 210534400000,
+            "estimated_addition": 0,
+            "files": [
+              {
+                "file": "tokens.duckdb",
+                "bytes": 12288
+              },
+              {
+                "file": "source-data.parquet",
+                "bytes": 4096
+              },
+              {
+                "file": "owner.json",
+                "bytes": 4096
+              },
+              {
+                "file": "tokens.duckdb.wal",
+                "bytes": 12804096
+              }
+            ]
+          },
+          {
+            "phase": "data: exact clock normalization",
+            "owned_bytes": 13398016,
+            "available_bytes": 210534400000,
+            "estimated_addition": 0,
+            "files": [
+              {
+                "file": "tokens.duckdb",
+                "bytes": 13381632
+              },
+              {
+                "file": "source-data.parquet",
+                "bytes": 4096
+              },
+              {
+                "file": "owner.json",
+                "bytes": 4096
+              },
+              {
+                "file": "tokens.duckdb.wal",
+                "bytes": 8192
+              }
+            ]
+          },
+          {
+            "phase": "data: cardinality-based sort/join reservation",
+            "owned_bytes": 26308608,
+            "available_bytes": 210534400000,
+            "estimated_addition": 20736,
+            "files": [
+              {
+                "file": "tokens.duckdb",
+                "bytes": 13381632
+              },
+              {
+                "file": "source-data.parquet",
+                "bytes": 4096
+              },
+              {
+                "file": "owner.json",
+                "bytes": 4096
+              },
+              {
+                "file": "tokens.duckdb.wal",
+                "bytes": 12918784
+              }
+            ]
+          },
+          {
+            "phase": "data: bounded behavioral investigation",
+            "owned_bytes": 53870592,
+            "available_bytes": 210534400000,
+            "estimated_addition": 0,
+            "files": [
+              {
+                "file": "tokens.duckdb",
+                "bytes": 40644608
+              },
+              {
+                "file": "source-data.parquet",
+                "bytes": 4096
+              },
+              {
+                "file": "owner.json",
+                "bytes": 4096
+              },
+              {
+                "file": "tokens.duckdb.wal",
+                "bytes": 13217792
+              }
+            ]
+          },
+          {
+            "phase": "completed temporal evidence publication",
+            "owned_bytes": 70279168,
+            "available_bytes": 210534400000,
+            "estimated_addition": 33554432,
+            "files": [
+              {
+                "file": "tokens.duckdb",
+                "bytes": 70266880
+              },
+              {
+                "file": "source-data.parquet",
+                "bytes": 4096
+              },
+              {
+                "file": "owner.json",
+                "bytes": 4096
+              },
+              {
+                "file": "tokens.duckdb.wal",
+                "bytes": 4096
+              }
+            ]
+          }
+        ],
+        "provenance": {
+          "data": {
+            "sha256": "a43398d253a863f27003819121c177e88d9ea762f32e8eea3263e8b5595db729",
+            "source_bytes": 744,
+            "rows": 128,
+            "parsing_fingerprint": "b6a468519c0a413a1e13d44b252a3b0851c22065533b639774b38800191aa3ab",
+            "normalization_fingerprint": "8ea59a424985144cd2ecc42374e00a19f7ae13ff81f484273823d67c41e55075"
+          }
+        },
+        "timezone_data": {
+          "package": "tzdata",
+          "version": "2026.5",
+          "zones": {}
+        },
+        "warnings": [
+          "Workload budgets are provisional engineering controls, not capacity guarantees or OS quotas.",
+          "Decoded-batch/application retention bounds do not bound native Parquet decoder peaks.",
+          "Sampled RSS supervision can overshoot between samples."
+        ],
+        "peak_worker_rss_bytes": 355368960,
+        "whole_job_seconds": 0.6312002079794183,
+        "peak_spill_bytes": 0,
+        "serialized_bytes": 54026
+      },
+      "result_bytes": 54026,
+      "coverage": {
+        "computed_aggregate_scope": "Every eligible declared record in required stages; no silent sampling.",
+        "checks": {
+          "t1": {
+            "family": "chronology",
+            "status": "completed",
+            "reason": null,
+            "population": "all eligible declared records"
+          },
+          "t2": {
+            "family": "ordering",
+            "status": "completed",
+            "reason": null,
+            "population": "all eligible declared records"
+          },
+          "t3": {
+            "family": "repetition",
+            "status": "completed",
+            "reason": null,
+            "population": "all eligible declared records"
+          },
+          "t4": {
+            "family": "panel",
+            "status": "completed",
+            "reason": null,
+            "population": "complete entity/observation keys with valid clocks"
+          },
+          "t5": {
+            "family": "continuity",
+            "status": "completed",
+            "reason": null,
+            "population": "all eligible declared records"
+          },
+          "t6": {
+            "family": "availability_unknown",
+            "status": "blocked",
+            "reason": "No availability evidence for listed features.",
+            "population": "all eligible declared records"
+          },
+          "t7": {
+            "family": "behavior_windows",
+            "status": "completed",
+            "reason": null,
+            "population": "all eligible declared records"
+          },
+          "t8": {
+            "family": "behavior_panel",
+            "status": "completed",
+            "reason": null,
+            "population": "all eligible declared records"
+          },
+          "t9": {
+            "family": "runs",
+            "status": "completed",
+            "reason": null,
+            "population": "all eligible declared records"
+          },
+          "t10": {
+            "family": "behavior_series",
+            "status": "completed",
+            "reason": null,
+            "population": "all eligible declared records"
+          },
+          "t11": {
+            "family": "behavior_scope",
+            "status": "completed",
+            "reason": null,
+            "population": "all eligible declared records"
+          }
+        },
+        "unsearched_analytical_scope": [
+          {
+            "selected_measurements": [
+              "x"
+            ],
+            "unsearched_scope": [],
+            "work_observation_visits": 1792,
+            "comparisons": 10,
+            "selection": "Requested measurements first, then declaration order. Detail retention can miss behavior-only exceptions.",
+            "defaults_validated_universal_defect_criteria": false
+          }
+        ],
+        "internal_detail_retention_omissions": {
+          "data:entity_histories": 0,
+          "data:series_effects": 0
+        },
+        "presentation_omissions": "Determined independently when rendering. JSON preserves every retained evidence record.",
+        "limits": {
+          "max_cells": 100000000,
+          "max_series": 1000000,
+          "behavior_measurements": 4,
+          "detailed_series": 64,
+          "max_windows": 64,
+          "max_folds": 32,
+          "max_comparisons": 2048,
+          "observation_visits": 1000000000,
+          "retained_details": 100,
+          "witnesses": 5,
+          "decoded_batch_bytes": 67108864,
+          "parquet_metadata_bytes": 16777216
+        },
+        "work_observation_visits": 1792,
+        "behavior_comparisons": 10,
+        "representation_equivalence": {
+          "conditions": [
+            "Same observations, explicit missing cells and multiplicities",
+            "Same measurement identities, meanings, units and representations",
+            "Same entity identity, exact clock precision and schedule/lifecycle semantics",
+            "Same feature availability, revision semantics, analytical selections and bounds"
+          ],
+          "excluded": [
+            "physical source row references",
+            "file-order evidence"
+          ],
+          "absent_long_row_equals_null_wide_cell": "Only under an explicit dense-layout expectation; otherwise absence and supplied missing values differ."
+        }
+      },
+      "seconds": 0.6426432089938316
+    },
+    {
+      "kind": "decoded_failure",
+      "configuration": {
+        "execution": {
+          "backend": "duckdb_local",
+          "max_source_bytes": 5368709120,
+          "max_combined_source_bytes": 8589934592,
+          "max_rows": 10000000,
+          "max_combined_rows": 30000000,
+          "max_columns": 1000,
+          "memory_bytes": 2147483648,
+          "max_rss_bytes": 6442450944,
+          "threads": 2,
+          "batch_bytes": 33554432,
+          "max_record_bytes": 8388608,
+          "workspace_bytes": 68719476736,
+          "free_disk_bytes": 2147483648,
+          "max_seconds": 1800,
+          "result_bytes": 33554432,
+          "scratch_directory": null
+        },
+        "limits": {
+          "max_cells": 100000000,
+          "max_series": 1000000,
+          "behavior_measurements": 4,
+          "detailed_series": 64,
+          "max_windows": 64,
+          "max_folds": 32,
+          "max_comparisons": 2048,
+          "observation_visits": 1000000000,
+          "retained_details": 100,
+          "witnesses": 5,
+          "decoded_batch_bytes": 1000,
+          "parquet_metadata_bytes": 16777216
+        },
+        "behavior": {
+          "enabled": true,
+          "windows": 4,
+          "explicit_windows": [],
+          "reference_window": 0,
+          "requested_measurements": [],
+          "requested_series": [],
+          "min_support": 100,
+          "missingness_increase": 0.05,
+          "distribution_effect": 0.1,
+          "normalized_w1": 0.25,
+          "flatline_observations": 10,
+          "volatility_support": 100,
+          "volatility_ratio": 2.0,
+          "rate_differences": false,
+          "seasonality": [],
+          "min_cycles": 8,
+          "min_window_cycles": 2,
+          "min_phase_support": 20,
+          "stable_cohort": true,
+          "version": "temporal_investigation_defaults_v1"
+        },
+        "presentation": {
+          "executive_actions": 5,
+          "target_panels": 6,
+          "feature_details": 20,
+          "table_rows": 20,
+          "appendix_rows": 100
+        }
+      },
+      "source_bytes": 744,
+      "status": "failed",
+      "error": "Returned Parquet batch exceeds decoded-byte ceiling; native allocations may precede this check.",
+      "code": "decoded_batch_limit",
+      "execution": {
+        "status": "failed",
+        "peak_worker_rss_bytes": 127254528,
+        "peak_workspace_bytes": 20480,
+        "peak_spill_bytes": 0,
+        "whole_job_seconds": 0.3886692500091158,
+        "max_rss_bytes": 6442450944,
+        "sampled_rss_overshoot_bytes": 0,
+        "completed_result_published": false
+      },
+      "seconds": 0.39146804198389873
+    },
+    {
+      "kind": "rss_failure",
+      "configuration": {
+        "execution": {
+          "backend": "duckdb_local",
+          "max_source_bytes": 5368709120,
+          "max_combined_source_bytes": 8589934592,
+          "max_rows": 10000000,
+          "max_combined_rows": 30000000,
+          "max_columns": 1000,
+          "memory_bytes": 2147483648,
+          "max_rss_bytes": 67108864,
+          "threads": 2,
+          "batch_bytes": 33554432,
+          "max_record_bytes": 8388608,
+          "workspace_bytes": 68719476736,
+          "free_disk_bytes": 2147483648,
+          "max_seconds": 1800,
+          "result_bytes": 33554432,
+          "scratch_directory": null
+        },
+        "limits": {
+          "max_cells": 100000000,
+          "max_series": 1000000,
+          "behavior_measurements": 4,
+          "detailed_series": 64,
+          "max_windows": 64,
+          "max_folds": 32,
+          "max_comparisons": 2048,
+          "observation_visits": 1000000000,
+          "retained_details": 100,
+          "witnesses": 5,
+          "decoded_batch_bytes": 67108864,
+          "parquet_metadata_bytes": 16777216
+        },
+        "behavior": {
+          "enabled": true,
+          "windows": 4,
+          "explicit_windows": [],
+          "reference_window": 0,
+          "requested_measurements": [],
+          "requested_series": [],
+          "min_support": 100,
+          "missingness_increase": 0.05,
+          "distribution_effect": 0.1,
+          "normalized_w1": 0.25,
+          "flatline_observations": 10,
+          "volatility_support": 100,
+          "volatility_ratio": 2.0,
+          "rate_differences": false,
+          "seasonality": [],
+          "min_cycles": 8,
+          "min_window_cycles": 2,
+          "min_phase_support": 20,
+          "stable_cohort": true,
+          "version": "temporal_investigation_defaults_v1"
+        },
+        "presentation": {
+          "executive_actions": 5,
+          "target_panels": 6,
+          "feature_details": 20,
+          "table_rows": 20,
+          "appendix_rows": 100
+        }
+      },
+      "source_bytes": 1799987,
+      "status": "failed",
+      "error": "Worker RSS 77037568 bytes exceeded configured termination threshold 67108864.",
+      "code": "rss_limit",
+      "execution": {
+        "status": "failed",
+        "peak_worker_rss_bytes": 77037568,
+        "peak_workspace_bytes": 0,
+        "peak_spill_bytes": 0,
+        "whole_job_seconds": 0.20726149997790344,
+        "max_rss_bytes": 67108864,
+        "sampled_rss_overshoot_bytes": 9928704,
+        "completed_result_published": false
+      },
+      "seconds": 0.20921495801303536
+    },
+    {
+      "kind": "workspace_failure",
+      "configuration": {
+        "execution": {
+          "backend": "duckdb_local",
+          "max_source_bytes": 5368709120,
+          "max_combined_source_bytes": 8589934592,
+          "max_rows": 10000000,
+          "max_combined_rows": 30000000,
+          "max_columns": 1000,
+          "memory_bytes": 2147483648,
+          "max_rss_bytes": 6442450944,
+          "threads": 2,
+          "batch_bytes": 33554432,
+          "max_record_bytes": 8388608,
+          "workspace_bytes": 33554432,
+          "free_disk_bytes": 2147483648,
+          "max_seconds": 1800,
+          "result_bytes": 33554432,
+          "scratch_directory": null
+        },
+        "limits": {
+          "max_cells": 100000000,
+          "max_series": 1000000,
+          "behavior_measurements": 4,
+          "detailed_series": 64,
+          "max_windows": 64,
+          "max_folds": 32,
+          "max_comparisons": 2048,
+          "observation_visits": 1000000000,
+          "retained_details": 100,
+          "witnesses": 5,
+          "decoded_batch_bytes": 67108864,
+          "parquet_metadata_bytes": 16777216
+        },
+        "behavior": {
+          "enabled": true,
+          "windows": 4,
+          "explicit_windows": [],
+          "reference_window": 0,
+          "requested_measurements": [],
+          "requested_series": [],
+          "min_support": 100,
+          "missingness_increase": 0.05,
+          "distribution_effect": 0.1,
+          "normalized_w1": 0.25,
+          "flatline_observations": 10,
+          "volatility_support": 100,
+          "volatility_ratio": 2.0,
+          "rate_differences": false,
+          "seasonality": [],
+          "min_cycles": 8,
+          "min_window_cycles": 2,
+          "min_phase_support": 20,
+          "stable_cohort": true,
+          "version": "temporal_investigation_defaults_v1"
+        },
+        "presentation": {
+          "executive_actions": 5,
+          "target_panels": 6,
+          "feature_details": 20,
+          "table_rows": 20,
+          "appendix_rows": 100
+        }
+      },
+      "source_bytes": 1799987,
+      "status": "failed",
+      "error": "Estimated peak workspace 536870912 bytes exceeds budget 33554432.",
+      "code": "resource_limit",
+      "execution": {
+        "status": "failed",
+        "peak_worker_rss_bytes": 99024896,
+        "peak_workspace_bytes": 0,
+        "peak_spill_bytes": 0,
+        "whole_job_seconds": 0.36771216700435616,
+        "max_rss_bytes": 6442450944,
+        "sampled_rss_overshoot_bytes": 0,
+        "completed_result_published": false
+      },
+      "seconds": 0.37050537500181235
+    }
+  ]
+}

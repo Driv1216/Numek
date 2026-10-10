@@ -1,696 +1,272 @@
 # Numek Master Context
 
-Last updated: 2026-08-13
-
-## Changelog
-
-- **2026-08-13: Completed and accepted the DataTrust baseline.** Recorded the current classification workflow as founder-accepted, removed generic sequential product-version and numbered-phase labels from active project context, and left the next product direction explicitly undecided.
-- **2026-08-13: Hardened target confirmation and narrative presentation.** Added canonical distinct-value guidance, nontechnical advanced-outcome confirmation, minimal-before-concentrated missingness language, a clean-report empty state, and humanized fallback report titles without changing analytical decisions.
-- **2026-08-12: Added explainable target guidance and the layered report.** Replaced the undifferentiated target dropdown with grouped, deterministic choices that never preselect a target; added server-enforced advanced-target acknowledgement, an additive uncapped evidence score, one shared deterministic narrative, and a portrait-to-landscape eight-topic report without changing existing scoring or finding decisions.
-- **2026-08-11: Added the compact result overview and native PDF download.** Replaced the embedded report iframe with a score/risk decision surface, reused existing finding language for the top-three overview, and added cached WeasyPrint PDF conversion from the canonical HTML report. CLI, Python API, scoring, and full-report content remain unchanged.
-- **2026-08-05: Added the local UI and evidence-first report.** Added the loopback-only guided CSV workflow, eight-section report, full action plan, row-level missingness, duplicate-group and conflicting-label evidence, richer numeric/categorical summaries, print-safe visuals, browser Save-as-PDF path, and compatible CLI/Python API extensions. Existing scoring formulas remain unchanged.
-- **2026-08-04: Removed the mandatory external five-practitioner validation gate.** RC_003 technical review is completed and preserved as historical evidence. Product building is now the active priority, with development reviews and acceptance checks handled internally by Drivyaansh and Codex.
-- **2026-08-02: Lowered the active package requirement to Python 3.10+.** Package metadata and active reviewer-facing setup text were changed from Python 3.11+ to Python 3.10+.
-- **2026-06-14: Upgraded the project and validation environments to Python 3.11.** Raised the package minimum to Python 3.11, rebuilt both environments on Python 3.11.15, migrated the isolated comparison to Evidently 0.7.21 and its current DataSummaryPreset API, regenerated validation evidence, and verified the full suite without runtime package changes.
-- **2026-06-14: Completed the reproducible validation corpus.** Prepared three pinned UCI datasets, generated seven controlled mutations and ten timed reports, reviewed every leakage flag, completed an isolated Evidently Adult comparison, and corrected one public-corpus false severe leakage classification.
-- **2026-06-14: Completed DataTrust correctness invariants.** Added separate target-missingness handling, severe column-missingness evidence, strong versus review-only leakage classification, explained score guardrails, deterministic risk priority, and regression coverage for credibility-breaking contradictions.
-- **2026-06-14: Removed dynamic kickoff content.** Removed the stale-prone next-actions list and universal next-chat prompt. Fresh operational context now comes from the living documents and task-specific prompts defined in the collaboration protocol.
-- **2026-06-14: Added the multi-AI operating model.** Established Codex as repo master and technical verifier, created living context documents, and defined how ChatGPT, Claude, Codex, and Drivyaansh collaborate.
-- **2026-06-02: Initial master context version.** Captures the original Numek first draft, the strategy evolution after critique, the DataTrust implementation, current boundaries, credibility strategy, roadmap, and known unknowns.
-
-## One-Page Summary
-
-Numek is an AI reliability verification company.
-
-The long-term thesis is that companies deploying AI into real decisions need evidence that three things are true:
-
-1. **Data reliability before training:** the data used to train, fine-tune, or evaluate AI is trustworthy enough.
-2. **Model reliability during deployment:** the model's confidence and behavior remain reliable under real-world use.
-3. **Output reliability after generation:** generated answers, especially LLM outputs, are grounded, cited, and not hallucinated.
-
-The current execution focus is much narrower:
-
-**DataTrust:** a local-first Python package and browser UI that generates an HTML dataset reliability report from a CSV.
-
-The first reader is not a regulator directly. The first reader is an **ML/data lead who needs to explain dataset reliability to a non-technical stakeholder** such as a CTO, VP, risk lead, compliance reviewer, or enterprise customer.
-
-The current strategy is:
-
-**Build one credible report first. Grow into the broader AI reliability platform later.**
-
-## Original First Draft Summary
-
-Original source: `docs/Numek info first draft.pdf`
-
-The first draft framed Numek as an AI reliability platform answering two core questions:
-
-- **Before deployment:** is the training or fine-tuning data actually trustworthy?
-- **During/after deployment:** when the model says it is confident, should we believe it?
-
-The draft proposed two original modules:
-
-- **Dataset Quality Explainer:** a pre-deployment dataset audit engine.
-- **Model Confidence Auditor:** a post-deployment confidence calibration and drift auditing layer.
-
-Together, these were framed as a trust verification layer for AI systems. The original language positioned Numek around the question:
-
-> How do I know if my AI is lying to me, and why?
-
-The draft identified high-stakes AI contexts, especially fintech, NBFCs, credit scoring, insurance, HR, and regulated decision systems. It emphasized that companies increasingly need documentation around AI risk, data governance, model behavior, and human oversight.
-
-The original product concept included:
-
-- a dataset trust score
-- data quality explanations
-- calibration metrics
-- drift detection
-- high-confidence wrong prediction detection
-- SHAP-style explanations
-- a combined reliability report or "Reliability Certificate"
-
-The original business model ideas included:
-
-- per-audit pricing
-- monthly SaaS subscription
-- reliability certification
-- compliance consulting
-- white-label reliability verification for AI vendors
-
-The original MVP recommendation was a local Python package that takes a dataset and trained model artifacts, then outputs a report. That core direction still holds, but the current execution has been narrowed further.
-
-The draft also connected the startup to research. It suggested that calibration, label-noise detection, hallucination benchmarking, and domain-specific reliability methods could become publishable work and credibility signals.
-
-## What Changed Since The Draft
-
-The broad company vision stayed intact, but the execution narrowed.
-
-Key changes:
-
-- **From platform to first artifact:** Numek is still a broad AI reliability company, while the completed product baseline is DataTrust.
-- **From certificate to report:** "Reliability Certificate" is avoided for now because it implies authority, legal backing, or accreditation we do not yet have. The current language is reliability report, evidence pack, or model/data risk report.
-- **From PDF-first to HTML-first:** HTML is the canonical generated artifact.
-  The local UI now converts the complete HTML report to a native PDF for
-  download, while the CLI and Python API remain HTML-only.
-- **From opaque trust score to transparent sub-scores:** a single unexplained 0-100 score is dangerous. DataTrust uses decomposed sub-scores plus guardrails.
-- **From regulator as first reader to ML/data lead as first reader:** the first product is for a technical lead who needs to justify reliability upward or outward.
-- **From all three pillars at once to DataTrust first:** ConfidenceGuard and HallucinationGuard are future phases, not current implementation targets.
-- **Local-first stayed central:** sensitive data should not need to leave the user's machine.
-- **Credibility became a central product problem:** because Numek audits trust, Numek itself must earn trust through transparent methodology and evidence.
-
-## Current Company Thesis
-
-Numek is an AI reliability verification layer.
-
-Long-term, Numek maps to the AI lifecycle:
-
-1. **DataTrust:** verifies whether the data is reliable enough to train, fine-tune, or evaluate AI on.
-2. **ConfidenceGuard:** verifies whether the model's confidence, calibration, and behavior remain reliable in real-world deployment.
-3. **HallucinationGuard:** verifies whether generated LLM outputs are grounded, supported, and safe to trust.
-
-The company can be broad, but the first product must stay narrow.
-
-The first product is DataTrust because it has the lowest integration friction:
-
-- a CSV can be audited locally
-- no production logs are required
-- no SaaS upload is required
-- no model endpoint is required
-- the report can become the first demo, sales artifact, and feedback magnet
-
-## What This Is NOT
-
-These boundaries are intentional. They prevent future collaborators, future chats, and future work from expanding the scope too early.
-
-- **DataTrust is not a data pipeline tool.** It does not move, transform, schedule, or orchestrate data pipelines.
-- **DataTrust is not a monitoring service.** It does not watch live production data, emit alerts, or run continuously.
-- **DataTrust is not a replacement for proper EDA.** It produces reliability evidence, not a complete exploratory data analysis workflow.
-- **DataTrust is not a formal compliance certification.** It does not prove legal compliance, regulatory approval, fairness, safety, or audit clearance.
-- **Numek is not an MLOps platform.** It is not trying to replace MLflow, Arize, Fiddler, WhyLabs, Datadog, or full model operations stacks.
-- **DataTrust is not a SaaS product.** No hosted dashboard, login system, database, billing, or cloud upload belongs in the current product.
-- **DataTrust is not a broad export workflow.** HTML is the canonical output, and
-  the local browser UI provides one native PDF download path. CLI/API PDF,
-  Word, and additional export formats are not implemented.
-- **DataTrust is not ConfidenceGuard or HallucinationGuard.** Those remain possible future products, not current scope.
-
-The identity boundary is:
-
-**DataTrust turns local dataset checks into stakeholder-readable reliability evidence.**
-
-## Current Product: DataTrust
-
-DataTrust is a local-first Python package and guided browser UI that reads a
-CSV and generates an HTML dataset reliability report.
-
-### User
-
-The first user is an ML/data lead.
-
-They need to answer:
-
-> Can I explain whether this dataset is reliable enough to use, and can I show that explanation to someone above me who is not deep in the notebook?
-
-### Job To Be Done
-
-The job is not "profile my dataset" in a generic sense.
-
-The job is:
-
-> Help me produce a clear, defensible reliability report that explains the biggest dataset risks and what to do next.
-
-### Input
-
-- CSV dataset
-- target column
-- task type, currently `classification`
-
-### Output
-
-- HTML reliability report
-- executive summary
-- sub-scores
-- top risks
-- methodology and limitations
-- appendix with detailed metrics
-
-### Python API
-
-```python
-from datatrust import DataTrust
-
-audit = DataTrust("examples/loan_data.csv", target="default", task="classification")
-audit.generate_report("examples/report.html")
-```
-
-### CLI
-
-```bash
-.venv/bin/datatrust audit examples/loan_data.csv --target default --task classification --out examples/report.html
-```
-
-### Local browser UI
-
-```bash
-.venv/bin/datatrust ui
-```
-
-The UI runs on loopback, keeps uploads only for the running process, and guides
-the user through grouped, explainable target selection with no preselection,
-classification subtype confirmation, report
-generation, a compact score/top-risks overview, full HTML viewing, and native
-PDF download.
-
-The report is the product. The code exists to produce a report that is worth showing.
-
-## Completed Product Baseline
-
-Drivyaansh has accepted the current DataTrust product state after Codex verified
-the implemented behavior:
-
-- the local UI, CLI, and Python API generate a complete HTML report from a CSV
-  classification dataset
-- the generated report contains all eight report sections
-- automated tests for implemented behavior pass
-- public validation reports and controlled mutation checks remain reproducible
-  enough for internal confidence
-- product and docs avoid unsupported certification, compliance, fairness,
-  label-noise, drift, model-correctness, and legal claims
-- known limitations are documented clearly
-
-The previous mandatory external five-practitioner validation round was
-superseded on 2026-08-04. RC_003 and its returned technical-review evidence
-remain historical evidence, but external practitioner validation is not an
-active acceptance gate or blocker.
-
-Possible future work remains undecided rather than belonging to a predefined
-sequence. Examples requiring a separate product decision include:
-
-- PDF output through the CLI or Python API
-- SaaS dashboard
-- live monitoring
-- model calibration
-- drift detection
-- LLM hallucination detection
-- enterprise auth
-- billing
-- formal certification language
-
-## Current Technical State
-
-The current repo contains the completed working DataTrust baseline.
-
-Important files:
-
-- `README.md`: product overview and usage
-- `METHODOLOGY.md`: scoring details and limitations
-- `pyproject.toml`: modern package metadata
-- `setup.py`: compatibility shim for editable installs
-- `src/datatrust/`: package code
-- `src/datatrust/core.py`: public `DataTrust` class
-- `src/datatrust/profiler.py`: pandas-based dataset profiling
-- `src/datatrust/scoring.py`: sub-scores and guardrails
-- `src/datatrust/risks.py`: plain-language top risk summaries
-- `src/datatrust/renderer.py`: HTML rendering
-- `src/datatrust/pdf.py`: local-only WeasyPrint PDF conversion
-- `src/datatrust/cli.py`: Click-based CLI
-- `src/datatrust/web.py`: loopback-only Flask UI and temporary job lifecycle
-- `src/datatrust/templates/report.html`: report template
-- `src/datatrust/templates/ui.html`: guided local UI template
-- `examples/loan_data.csv`: synthetic lending-style demo dataset
-- `examples/report.html`: generated sample report
-- `tests/test_datatrust.py`: automated tests
-- `tests/test_web.py`: Flask UI workflow and validation tests
-
-Current setup and verification commands:
-
-```bash
-python3 -m venv .venv
-.venv/bin/python -m pip install --upgrade pip setuptools wheel
-.venv/bin/python -m pip install --no-build-isolation -e ".[dev]"
-.venv/bin/python -m pytest -q
-```
-
-Generate the sample report:
-
-```bash
-.venv/bin/datatrust audit examples/loan_data.csv --target default --task classification --out examples/report.html
-```
-
-Current verified test state:
-
-```text
-36 passed
-```
-
-## Report Anatomy
-
-DataTrust reports have eight sections organized as executive summary, complete
-action plan, and technical evidence.
-
-### 1. Decision Summary
-
-Communicates the uncapped-to-final score path, overall reliability score, risk
-level, recommended next action, and principal findings.
-
-This is the most important section for the non-technical stakeholder.
-
-### 2. Priority Actions
-
-Shows every supported finding with evidence, possible modeling impact,
-recommended review, and score effect. Evidence-only findings remain visible
-without changing the score.
-
-### 3. Dataset Overview
-
-Shows basic dataset condition and composition:
-
-- rows
-- columns
-- potential, numeric, and non-numeric features
-- missing-cell and repeated-row rates
-
-This section answers whether the dataset has obvious structural quality problems.
-
-### 4. Target and Label Evidence
-
-Shows classification subtype, target distribution, class balance,
-majority-class baseline, and majority-to-minority ratio.
-
-Missing target labels are tracked separately and excluded from class counts.
-Datasets with no usable target labels fail clearly. DataTrust does not implement true
-label-noise detection yet.
-
-### 5. Missingness Evidence
-
-Separates cell-level missingness from rows affected by missing features, shows
-one/two/three-plus missing-feature buckets, and charts the most affected
-features. Target missingness remains separate.
-
-### 6. Duplicate and Feature Evidence
-
-Shows exact duplicate groups, potentially conflicting target labels, leakage
-review evidence, and review-worthy feature summaries:
-
-- constant fields
-- near-constant fields
-- high-cardinality categoricals
-- numeric quartiles, zero/negative/non-finite counts, and outlier concentration
-- strong leakage candidates that affect scoring and guardrails
-- review-only leakage prompts that do not automatically reduce the score
-
-### 7. Scoring, Methodology, and Limitations
-
-Explains what was checked, how to interpret the report, and what the report does not prove.
-
-This section is crucial because credibility comes from clarity, not from pretending the tool does more than it does.
-
-### 8. Technical Appendix
-
-Shows the complete numeric and non-numeric profiling tables, including:
-
-- column name
-- role
-- type
-- missing rate
-- unique count and rate
-- constant and near-constant flags
-- high-cardinality flag
-- outlier rate
-- quartiles, zero/negative/non-finite counts, cardinality, top-value share, and
-  exact missingness
-
-## Methodology And Scoring
-
-DataTrust uses transparent sub-scores from 0 to 100. Higher is better.
-
-Current sub-scores:
-
-- **Completeness:** penalizes missing cells while severe column-level
-  missingness is surfaced separately.
-- **Uniqueness:** penalizes duplicate rows.
-- **Target Balance:** penalizes severe class imbalance.
-- **Feature Usability:** penalizes severely missing, constant, near-constant,
-  high-cardinality, and outlier-heavy feature columns.
-- **Leakage Risk:** penalizes strong token/phrase-aware outcome-like candidates;
-  generic status or target-related names remain review-only prompts.
-
-The overall reliability score starts with the average sub-score, exposed as
-`scores["evidence_score"]`, then applies guardrails for high-stakes failure
-modes. The compact result and full report use the same static, deterministic
-narrative templates to explain that score path and the existing evidence.
-
-Applied guardrails are returned in `scores["guardrails"]` and shown in the
-report. Strong leakage, a single-class target, or no feature columns cap the
-score at `49`. Missing target labels, severe missingness, severe duplicates, or
-a critical sub-score cap it at `69`.
-
-Risk bands:
-
-- `85-100`: Low risk
-- `70-84`: Moderate risk
-- `50-69`: Elevated risk
-- `0-49`: High risk
-
-Current limitations:
-
-- no label-noise detection yet
-- no drift detection yet
-- no fairness testing yet
-- no model calibration yet
-- no production monitoring yet
-- no legal or compliance certification
-- native PDF is available only through the local browser UI; CLI/API PDF and
-  Word output are not implemented
-- no semantic date, fuzzy category, correlation, or missingness-pattern checks
-- leakage detection is heuristic and must be reviewed by a human
-
-## Credibility Problem
-
-Credibility is not a side issue for Numek. It is central.
-
-Most tools need trust. Numek sells trust. That means every score, report, and recommendation must be defensible.
-
-The core credibility question is:
-
-> Why should an ML lead trust a reliability score from a new tool with no institutional backing?
-
-### Current Credibility Strategy
-
-DataTrust earns trust through transparency:
-
-- transparent sub-scores instead of a black-box trust score
-- methodology section in the report
-- explicit limitations
-- local-first execution so sensitive data does not leave the user's machine
-- simple, inspectable checks
-- guardrails for high-stakes risks such as target leakage
-- code and report structure that can be reviewed
-- internal Drivyaansh + Codex verification during product development
-- RC_003 technical review preserved as historical evidence
-
-### Credibility Still Missing
-
-Numek does not yet have:
-
-- a research paper
-- public benchmarks
-- community validation
-- expert or advisor review
-- pilots with real ML teams
-- comparative studies against adjacent tools
-- evidence that the scoring weights feel correct to domain experts
-
-These are credibility gaps, not current blockers to product building.
-
-### Credibility Milestones
-
-The path to stronger credibility should be:
-
-1. Publish the methodology clearly.
-2. Generate reports on public datasets.
-3. Benchmark findings against known issues or manual review.
-4. Compare outputs with adjacent tools such as Evidently, Cleanlab, Great Expectations, and ydata-profiling.
-5. Get feedback from ML leads on whether findings are useful and accurate.
-6. Publish a technical note or short paper on dataset reliability reporting.
-7. Add expert/advisor review.
-8. Version reports and methodology so old results remain interpretable.
-
-Early credibility comes from glass walls: make the method inspectable before
-asking people to trust the brand. External review can still be useful later,
-but it is no longer a mandatory acceptance process.
-
-## Competitor And Adjacent Tool Map
-
-DataTrust is not alone. The adjacent landscape matters.
-
-### Dataset And Data Quality
-
-- **Cleanlab:** strong open-source/data-centric AI library, especially for label issues and data quality.
-- **Great Expectations:** data validation and expectations framework.
-- **ydata-profiling:** dataset profiling reports.
-- **Evidently:** open-source evaluation, monitoring, data quality, drift, and report generation.
-
-### ML Monitoring And Observability
-
-- **Arize:** model observability, evaluations, monitoring.
-- **Fiddler:** model performance management, explainability, monitoring, governance.
-- **WhyLabs:** data and ML observability, drift, health monitoring.
-
-### LLM Evaluation And Hallucination/Groundedness
-
-- **Ragas:** RAG evaluation framework.
-- **TruLens:** LLM/RAG evaluation and tracing.
-- **Galileo:** LLM evaluation/observability.
-- **Patronus:** LLM evaluation and risk detection.
-
-### DataTrust Differentiation
-
-DataTrust should not claim novelty in every raw metric.
-
-The differentiation is:
-
-- stakeholder-readable reliability evidence
-- local-first execution
-- report-first workflow
-- transparent methodology
-- plain-language synthesis
-- explicit limitations
-- evidence-pack framing for ML leads who need to explain risk upward
-
-Evidently may tell an ML engineer what happened. DataTrust should tell the ML lead what it means, why it matters, and what to do next.
-
-## Roadmap
-
-The current DataTrust baseline is complete. No next product direction is
-approved, and the options below are not ordered phases or commitments.
-
-### Completed DataTrust Baseline
-
-Goal: make the current local HTML report credible enough to show to ML/data leads.
-
-Focus:
-
-- correctness and trust invariants **completed**
-- reproducible three-dataset validation corpus and controlled mutations **completed**
-- internal adjacent-tool comparison as supporting evidence **completed**
-- RC_003 technical review **completed and archived as historical evidence**
-- product implementation with internal Drivyaansh + Codex verification
-
-### Possible Direction: Stronger Dataset Checks
-
-Add deeper dataset reliability checks:
-
-- better leakage detection
-- schema validation
-- suspicious identifiers
-- temporal columns
-- missingness patterns
-- richer outlier interpretation
-- optional Cleanlab-based label issue detection
-
-### Possible Direction: Model Prediction Analysis
-
-Allow users to provide model predictions or probabilities.
-
-Add:
-
-- calibration metrics
-- Brier score
-- reliability curve
-- high-confidence wrong predictions
-- threshold sensitivity
-
-This could become a bridge from DataTrust to ConfidenceGuard if selected.
-
-### Possible Direction: ConfidenceGuard
-
-Build model reliability and drift functionality.
-
-Core question:
-
-> Is the model's confidence still reliable in the real world?
-
-Potential checks:
-
-- drift
-- calibration
-- model performance degradation
-- confidence/accuracy mismatch
-- segment-level reliability
-
-### Possible Direction: HallucinationGuard
-
-Build LLM output reliability functionality.
-
-Core question:
-
-> Is this generated answer grounded in evidence?
-
-Potential checks:
-
-- unsupported claims
-- citation quality
-- contradiction against source documents
-- RAG groundedness
-- domain-specific hallucination risk
-
-### Long-Term Possibility: Broader Numek Platform
-
-Only after the first modules prove demand, Numek can become a broader reliability platform.
-
-Possible later artifacts:
-
-- versioned reliability reports
-- machine-readable report JSON
-- customer-cloud deployment
-- governance evidence packs
-- integrations with model workflows
-- enterprise-facing reliability dashboards
-
-## Research Connection
-
-Numek can support both startup progress and academic/research progress.
-
-The research angle matters because credibility is one of the hardest problems for an AI reliability company. A transparent methodology, public benchmarks, and publishable findings can become both product assets and academic assets.
-
-Possible research questions:
-
-- How should reliability scores for tabular AI datasets be composed and validated?
-- What is the false positive rate of heuristic leakage detection on real-world datasets?
-- How do calibration metrics degrade under distribution shift in financial or lending datasets?
-- Can Cleanlab-style confident learning reliably detect label noise in semi-automated datasets?
-- What makes a reliability report useful to both technical and non-technical stakeholders?
-- How should domain-specific reliability reporting differ in regulated AI contexts?
-
-Possible venues:
-
-- FAccT
-- RecSys workshops
-- FinNLP
-- NeurIPS workshops
-- ICLR workshops
-- ICML workshops
-- ACL/EMNLP workshops for later LLM reliability work
-
-How pilots can become research:
-
-- Run DataTrust on real or realistic datasets.
-- Compare DataTrust findings to manual review.
-- Track where the report catches issues humans miss.
-- Track where it produces false positives.
-- Analyze which report sections users trust or ignore.
-- Turn the methodology and pilot findings into a technical note or workshop paper.
-
-## Known Unknowns
-
-Known unknowns require evidence, not just decisions.
-
-### Do ML leads actually read reliability reports?
-
-- **Why it matters:** if ML leads do not read or share reports, the product needs a different artifact.
-- **How to resolve:** show the report to ML/data leads when useful and ask what they would use, ignore, forward, or remove.
-- **Evidence needed:** detailed reactions from target users, including whether they would share it with a stakeholder.
-- **Status:** deferred and non-blocking.
-
-### Is local-first a selling point or friction?
-
-- **Why it matters:** local-first protects sensitive data, but Python installation
-  and starting the local UI may still be inconvenient.
-- **How to resolve:** observe users installing DataTrust and completing the
-  guided UI flow, then compare it with notebook, Docker, customer-cloud, or
-  hosted-upload preferences.
-- **Evidence needed:** workflow preferences from ML/data leads or technical buyers.
-- **Status:** deferred and non-blocking.
-
-### Is the leakage heuristic acceptable on real data?
-
-- **Why it matters:** false positives can destroy trust if DataTrust flags legitimate columns as dangerous too often.
-- **How to resolve:** test the heuristic on multiple public and real-world-style datasets.
-- **Evidence needed:** a small benchmark of flagged columns reviewed by humans.
-- **Status:** deferred and non-blocking.
-
-### Do scoring weights feel correct to domain experts?
-
-- **Why it matters:** a score that feels wrong will not be trusted, even if the raw checks are useful.
-- **How to resolve:** show score breakdowns to ML leads and ask whether risk levels match their intuition.
-- **Evidence needed:** feedback on reviewed reports or report mockups.
-- **Status:** deferred and non-blocking.
-
-### Is lending-tech the right first customer?
-
-- **Why it matters:** the first segment determines language, report design, metrics, and sales motion.
-- **How to resolve:** compare reactions from lending-tech vendors, fintech ML teams, and broader AI SaaS teams.
-- **Evidence needed:** concrete evidence of urgency, willingness to run the tool, and willingness to share the report internally.
-- **Status:** deferred and non-blocking.
-
-### Does the native PDF fit stakeholder sharing workflows?
-
-- **Why it matters:** direct PDF generation now exists, but actual forwarding,
-  archival, readability, and file-size needs are not externally validated.
-- **How to resolve:** observe target users opening, forwarding, and archiving
-  generated reports.
-- **Evidence needed:** concrete PDF workflow feedback and failure cases.
-- **Status:** implementation direction resolved; workflow quality remains
-  deferred and non-blocking.
-
-## Open Decisions
-
-Open decisions require choosing a direction.
-
-- **Open-source core vs closed source:** likely open-source core is better for credibility, but the business model must be considered.
-- **Exact first customer segment:** lending-tech vendors, fintech ML teams, NBFC-facing AI vendors, or broader AI SaaS teams.
-- **Cleanlab integration:** whether to wrap Cleanlab for label-noise detection or keep it as an external recommendation.
-- **Evidently interoperability:** whether DataTrust should import/export Evidently-style artifacts or remain independent.
-- **Report tone:** technical report, risk memo, executive evidence pack, or a hybrid.
-- **Pricing model:** one-time audit, subscription, paid pilots, open-source plus services, or enterprise license.
-
-## Using This Document
-
-This document provides stable background, project identity, history, and long-term direction. It is not the source for the latest operational state or the next task.
-
-For every new planning or review chat:
-
-- keep this document and `AI_COLLABORATION_PROTOCOL.md` in permanent project sources
-- paste the latest `CURRENT_STATE.md`, `DECISIONS.md`, `ROADMAP.md`, and `KNOWN_UNKNOWNS.md`
-- add a task-specific kickoff prompt using the template in `AI_COLLABORATION_PROTOCOL.md`
-
-The living documents determine where Numek is now. The task-specific prompt determines what the new chat must do next.
+Last updated: 2026-10-11
+
+## Identity And Company Thesis
+
+Numek is an AI reliability verification company. Its thesis is that teams using
+AI for real decisions need inspectable evidence about data before training,
+model behavior during deployment, and generated outputs after generation.
+
+The long-term product vision connects three areas:
+
+- **DataTrust:** dataset reliability for training, fine-tuning, and evaluation.
+- **ConfidenceGuard:** model confidence, calibration, drift, and behavioral reliability.
+- **HallucinationGuard:** grounding, supporting evidence, citations, and contradictions in LLM outputs.
+
+DataTrust is the completed foundation of Numek. ConfidenceGuard and
+HallucinationGuard describe product direction; they are not implemented modules.
+
+## Current Product Posture
+
+Numek has deliberately moved into active, ambitious product expansion beyond
+the completed DataTrust baseline. The expansion architecture and nine-milestone
+direction are approved: shared foundation, regression, advanced/unlabeled tabular,
+deeper tabular diagnostics, time series, text, images, audio, multimodal/specialized
+datasets. M1 implements shared contracts and useful unlabeled CSV profiling. M2 now
+implements single-target regression across Python, CLI, browser, HTML/PDF/JSON,
+with declared expectations, bounded arithmetic relationships, and evidence-based
+review priorities. Regression scoring remains undefined. Later milestones remain
+direction rather than delivered capability. Drivyaansh accepted the M2 functional
+implementation on 2026-10-09; the subsequent narrow report-presentation cleanup
+preserves its analytical behavior. M3 now implements annotation-aware partial
+workflows, multilabel binary indicators, multi-output regression, and conditional
+clustering/anomaly readiness, through the shared CSV engine and every interface.
+New task scores remain undefined. M1–M3, including M3’s understanding gate, are
+accepted. M4 now implements comparative reliability and opt-in scalable local
+analysis. M5 implements temporal reliability intelligence with exact clocks, local CSV/Parquet, coverage, feature-bound timing/revisions, supplied evaluation and configurable behavioral investigation; later modalities remain direction. Internal measurements remain
+scoped engineering evidence, not external validation or capacity guarantees.
+
+Build substantial capabilities when they strengthen the product. Do not keep
+Numek inside the smallest defensible prototype or treat all development beyond
+the baseline as remote. Deeper analysis, stronger UX, model-level reliability,
+new modules, and architectural expansion are real development directions.
+
+Ambition must be accompanied by coherent architecture, tests, verified evidence,
+and transparent limitations. Individual capabilities become commitments through
+explicit product decisions; this direction does not approve every candidate
+feature. Describe implemented, approved, proposed, and unresolved work accurately.
+Current implementation limitations are facts about today's software, not
+permanent future product prohibitions.
+
+Numek must earn credibility for its methods and claims. Reliability reports do
+not establish legal compliance, regulatory approval, fairness, safety, model
+correctness, or certification without appropriate evidence and authority.
+
+## Users, Positioning, And DataTrust's Role
+
+The initial user is an ML/data lead who needs to explain dataset reliability to
+a CTO, VP, risk lead, compliance reviewer, or enterprise customer. The job is to
+produce a clear reliability report explaining important dataset risks, their
+potential modeling impact, and what to investigate next.
+
+DataTrust combines local execution, transparent methodology, prioritized
+findings, plain-language synthesis, and technical evidence in a shareable report.
+It differentiates through interpretation and workflow rather than novelty in
+every underlying metric. Its accepted presentation is a layered hybrid: a fast
+decision surface followed by detailed evidence for technical readers.
+
+Lending-tech vendors and fintech ML teams are initial customer hypotheses, not
+proven market selection. NBFC-facing AI vendors and broader AI SaaS teams also
+remain candidates. The original vision included credit scoring, insurance, HR,
+and other high-stakes decision systems. A regulator is not the initial reader.
+
+DataTrust was selected first because local CSV analysis requires no model
+endpoint, production logs, or hosted infrastructure. That decision established
+a foundation; it does not impose a permanent sequencing restriction on Numek.
+The implemented classification workflow is documented in
+[CURRENT_STATE.md](CURRENT_STATE.md), with technical structure in
+[ARCHITECTURE.md](ARCHITECTURE.md) and usage in [README.md](../README.md).
+
+## Operating Model And Source Of Truth
+
+- **Drivyaansh:** founder, product direction, priorities, and final decisions.
+- **ChatGPT:** product strategy, research, planning, architecture discussion,
+  critique, and implementation planning.
+- **Codex:** repository master, technical planner, implementer, verifier, and
+  documentation maintainer.
+
+The working loop is:
+
+**Drivyaansh + ChatGPT decide/plan → Codex inspects/plans/implements → tests and
+verification → update project context → continue.**
+
+Codex should challenge technically unsound plans, surface risks, and resolve
+factual questions through inspection and evidence. Routine implementation
+judgment remains part of its role; strategic decisions belong to Drivyaansh.
+No separate AI handoff, consensus, or adversarial-review stage is required.
+
+When sources disagree, use this hierarchy:
+
+1. Actual repository code, tests, generated artifacts, and verified evidence.
+2. Drivyaansh's latest explicit decision.
+3. [CURRENT_STATE.md](CURRENT_STATE.md) for present operational truth.
+4. [ARCHITECTURE.md](ARCHITECTURE.md) for technical design.
+5. This document for strategic context and long-term direction.
+
+Documents must not knowingly contradict implementation. A decision to build a
+capability does not mean it already exists. Chats and uploaded sources can be
+stale; inspect the repository and read the relevant core documents when
+starting work. There is no fixed source-upload or kickoff-template ceremony.
+
+After meaningful work, Codex updates current state from verified outcomes,
+architecture when technical structure changes, and master context when major
+strategic decisions or direction change. Preserve useful evidence and identify
+assumptions; AI agreement is not proof. Resolve technical disputes with code,
+research, or a relevant experiment, and preference disputes with Drivyaansh.
+Use sanitized summaries or synthetic examples for cloud planning; keep private
+customer datasets, credentials, personal information, and sensitive proprietary
+material out of shared planning sources unless explicitly authorized.
+
+## Major Decisions And Their Rationale
+
+| Date | Decision and continuing significance |
+|---|---|
+| 2026-06-02 | **DataTrust first.** Chosen for low integration friction over building all three areas at once or starting with model monitoring/LLM analysis. The foundation is now complete; future sequencing follows the new expansion direction. |
+| 2026-06-02 | **Local-first execution.** Avoided sensitive-data upload objections and premature hosted infrastructure. Local deployment is implemented; onboarding and customer evidence may justify additional deployment modes. |
+| 2026-06-02 | **Canonical HTML reports.** Enabled quick inspection and iteration over PDF-first or simultaneous format implementations. UI PDF was subsequently approved and implemented; HTML remains canonical. |
+| 2026-06-02 | **Transparent sub-scores and explained guardrails.** Chosen over an opaque score or raw metrics without synthesis so severe risks cannot be concealed by healthy averages. Methodology may evolve with benchmark or expert evidence. |
+| 2026-06-02 | **Reliability report rather than certificate.** Certification language was rejected because Numek lacks the implied institutional/legal authority. Revisit only with appropriate standards alignment, accreditation, institutional backing, or legal review. |
+| 2026-06-14 | **Repository documentation as durable memory.** Chosen over relying on chat memory or rewriting strategy after every minor change. The three-document system now carries this principle. |
+| 2026-08-04 | **Remove mandatory external practitioner review.** Product building and internal verification take priority. External discovery, advisory review, and pilots can provide learning when chosen; they are not standing acceptance gates. This did not resolve external product-validation questions. |
+| 2026-08-05 to 2026-08-13 | **Improve evidence and product presentation while preserving validated analysis.** Added guided UI, richer findings, native UI PDF, explainable target choice, deterministic narrative, and the layered report. Technical rationale and compatibility decisions are recorded in architecture. |
+| 2026-08-13 | **Accept the completed DataTrust classification baseline.** Describe ongoing work by capability and status rather than generic sequential product-version labels. Preserve real package versions and immutable candidate IDs. The then-unselected expansion direction is historical, superseded by the decision below. |
+| 2026-10-07 | **Active expansion and simpler operation.** Deliberately develop beyond DataTrust with Drivyaansh, ChatGPT, and Codex; consolidate context into three documents and retain useful technical history. Individual next capabilities and sequencing still require deliberate selection. |
+| 2026-10-09 | **Approve DataTrust expansion architecture and nine-milestone direction; implement M1.** Shared contracts and useful unlabeled CSV profiling precede regression and broader tasks/modalities. Preserve classification and historical evidence, disclose parsing/coverage/resources, and keep unlabeled scoring undefined. HTML/PDF/JSON share completed evidence across Python, CLI, and UI. Internal verification remains distinct from external method validity and customer usefulness. |
+
+| 2026-10-09 | **Implement the approved DataTrust M2 regression plan.** One shared engine; explicit numerical outcome, optional target/availability declarations, substantial finite distributions and constraints, bounded copy/affine/sum evidence, repeated-input variation, consolidated actions, and canonical exports. Small/sparse relationships stay technical; planned bounds are coverage limitations; ordinary precision is descriptive. Preserve classification scores, M1 parsing/resource/artifact contracts and historical evidence. No regression score or prediction-performance scope. |
+| 2026-10-09 | **Implement the revised M3 plan.** Explicit roles, orthogonal annotation expectation/observation/status, unknown defaults for new workflows, effective-semantic compatibility, multilabel and joint numerical evidence, conditional unsupervised representation, bounded resources, compact canonical reports, and independent validation. Preserve classification/M1/M2 and historical artifacts; no new score, modeling, generalized split analysis, or modality framework. |
+
+## Broad Development Direction
+
+The approved sequence now focuses on DataTrust expansion before ConfidenceGuard.
+The following broader company directions remain useful context; they are not
+additional M1 scope or implemented capabilities:
+
+- **Deeper dataset analysis:** stronger leakage review, schema checks,
+  suspicious identifiers, temporal evidence, missingness patterns, richer
+  outlier interpretation, and label-issue analysis where suitable evidence is available.
+- **Stronger product UX and workflows:** clearer analysis-to-action experiences,
+  additional task/input/export support, reproducible reports, and deployment
+  options that address real user needs.
+- **Model-level reliability:** predictions or probabilities as inputs,
+  calibration, Brier scores, reliability diagrams, high-confidence errors,
+  threshold sensitivity, and segment-level reliability.
+- **ConfidenceGuard:** model behavior, drift, degradation, and confidence/accuracy
+  mismatch, building on justified model-analysis capabilities.
+- **HallucinationGuard:** groundedness, unsupported claims, citation quality,
+  source contradictions, and domain-specific LLM reliability.
+- **Broader platform architecture:** reusable reliability evidence, versioned
+  reports, machine-readable output, integrations, customer-cloud deployment,
+  dashboards, and governance evidence workflows when justified.
+
+Customer discovery and credibility research can inform capability design
+alongside engineering. Neither is an automatic prerequisite for every expansion.
+
+## Credibility, Research, And Adjacent Tools
+
+The foundation includes inspectable methodology, correctness/guardrail tests,
+three public UCI datasets, eight controlled mutations, a reviewed leakage ledger,
+an internal Evidently comparison, and founder-accepted historical RC_003 review.
+See [validation documentation](../validation/README.md) and the
+[corpus summary](../validation/results/MILESTONE_2_SUMMARY.md).
+
+These are internal supporting evidence, not independent market validation or a
+performance superiority benchmark. Publicly published benchmarks, a research
+paper, broader expert/community validation, real-team pilots, and external
+scoring-defensibility evidence remain credibility opportunities.
+
+Research should strengthen the product: assess composite scores against manual
+review, measure leakage false positives, study calibration under distribution
+shift, evaluate label-issue methods, and observe how technical and nontechnical
+readers use reports. Domain-specific reliability in lending and other high-stakes
+contexts can connect pilots to technical notes, datasets, benchmarks, or papers.
+Historical venue candidates include FAccT, RecSys workshops, FinNLP,
+NeurIPS/ICLR/ICML workshops, and later ACL/EMNLP workshops for LLM work; these
+are research interests, not publication commitments or confirmed opportunities.
+
+The project has considered Cleanlab, Great Expectations, ydata-profiling, and
+Evidently for dataset work; Arize, Fiddler, and WhyLabs for model observability;
+and Ragas, TruLens, Galileo, and Patronus for LLM evaluation. This is contextual
+positioning, not a current competitive assessment. Verify external capabilities
+before selecting integrations or making comparative claims. Numek's ambition
+can broaden while maintaining explicit interfaces and evidence-based differentiation.
+
+## Unresolved Product Questions
+
+These questions remain open and can guide experiments without reinstating a
+mandatory external-validation gate. The expansion direction is already approved.
+
+| Question / current hypothesis | Why it matters and evidence needed |
+|---|---|
+| **Do ML/data leads use and share the report?** A stakeholder-readable artifact may fill a real workflow gap. | Collect detailed reactions about what readers use, ignore, trust, remove, or forward; measure whether the artifact supports actual decisions. The layered report is implemented, while external usefulness remains unverified. |
+| **Is local-first a benefit or onboarding friction?** Sensitive-data concerns favor local execution. | Observe installation and the guided flow; compare notebook, Docker, customer-cloud, and hosted preferences with reasons from target users. |
+| **Is the leakage heuristic accurate enough across domains?** Outcome-name checks can produce false positives. | Benchmark flagged columns against human judgments and feature-availability context, retaining reasons for false positives and missed issues. |
+| **Are scores and guardrails defensible?** Transparent methods are promising but lack external validation. | Compare internal judgments, public examples, adjacent tools, and expert/user reactions; record where scores seem too harsh or lenient. |
+| **Which first customer segment has urgency?** Lending-tech may adopt faster than traditional NBFCs. | Compare lending vendors, fintech teams, NBFC-facing vendors, and broader AI SaaS teams using concrete willingness to run and internally share the tool. |
+| **Does native PDF fit sharing and archival?** Implementation was resolved on 2026-08-11. | Observe readability, fidelity, file size, opening, forwarding, and archival failures; implementation alone does not establish workflow quality. |
+| **Open-source or closed core?** An open core may help inspection and adoption. | Compare credible business models and monetization consequences, then make an explicit founder decision; current repository visibility is not established here. |
+| **Integrations and business model?** Cleanlab and Evidently interoperability may strengthen Numek. | Choose integration scope deliberately; label-issue methods need appropriate prediction evidence. Pricing options include audits, subscriptions, pilots, services, enterprise licensing, consulting, and white-label workflows; none is selected. |
+
+## Historical Context And Evidence
+
+The original draft proposed a Dataset Quality Explainer and Model Confidence
+Auditor, combined into a trust verification layer. It included calibration,
+drift, high-confidence errors, SHAP-style explanations, dataset trust scores,
+and a combined “Reliability Certificate.” The master context historically
+referenced `docs/Numek info first draft.pdf`; that PDF is absent from this
+checkout. This summary preserves the prior documented history, not a newly
+verified reading of the original source.
+
+Execution initially narrowed to local DataTrust and report-first credibility.
+Certificate language became reliability-report language. HTML became canonical;
+UI PDF followed later. These choices explain the foundation's development and
+do not keep today's product direction confined to its original scope.
+
+Important milestones:
+
+- **2026-06-14:** completed correctness invariants and the initial reproducible
+  public corpus/comparison, including the evidence-backed correction that
+  `previous_campaign_outcome` is review-only. The initial corpus had seven
+  mutations and ten reports; the current corpus has eight and eleven.
+- **2026-06-14 and 2026-08-02:** validation environments moved to Python 3.11.15
+  and Evidently 0.7.21; package minimum later became Python 3.10+.
+- **2026-08-04:** accepted RC_003 technical review and superseded the earlier
+  frozen all-gates-pass round involving five practitioners and a separate
+  nontechnical reader. Historical forms, candidate IDs, hashes, and packets
+  remain evidence, not active release requirements.
+- **2026-08-05 to 2026-08-13:** expanded the CLI/API foundation into a guided
+  browser workflow, richer evidence, native PDF, target guidance, deterministic
+  language, and the current eight-topic report; accepted the completed baseline.
+- **2026-10-07:** completed context consolidation and adopted active expansion.
+  The previous multi-AI coordination process is superseded.
+
+[Historical review originals](history/reviews/README.md) retain useful technical
+reasoning. [Dry-run evidence](../validation/dry_runs/README.md) remains in its
+original workspace. Its earlier six-section reports describe that historical
+implementation, not the current eight-topic report.
+
+The [returned-review summary](../validation/dry_runs/evidence/RC003_TECHNICAL_REVIEW_SUMMARY.md)
+records mismatched informal candidate identifiers and blank historical hash
+fields; it is founder-accepted review evidence rather than a formally sealed
+protocol result. The two returned HTML reports were inspected from local
+Downloads paths and summarized, not copied into the repository. Do not imply
+those files are repository artifacts or require a new external review because
+of these historical caveats.
+
+## M4 settled decisions (2026-10-10)
+
+The user authorized implementation of split audits, version comparisons and advanced
+single-dataset analysis on one DuckDB path. Explicit identifiers and group/identity
+keys preserve lexical identity by default. Full accepted task-family support remains
+distinct from exhaustive analytical search, with bounded work and explicit coverage.
+Per-source and combined limits both apply; disk planning estimates and a monitored
+64 GiB workspace ceiling govern owned storage. Performance targets are measured
+engineering objectives. Default pandas contracts remain frozen; replacement of the
+default engine and guaranteed capacity claims are deferred. See the current state,
+architecture, methodology and M4 validation evidence for delivered scope.
+
+
+## M5 implementation handoff — 2026-10-11
+
+The approved Temporal Reliability Intelligence scope is implemented through temporal-specific contracts, exact clocks, schedule/lifecycle/panel populations, feature-bound timing and revision states, maturity, supplied evaluation plans, configurable behavior and local Python/CLI/browser/report experiences. See [M5 implementation](M5_TEMPORAL_RELIABILITY.md). Existing M1–M4 input contracts and analytical policy are preserved; no founder decision or additional acceptance ceremony is required for this implementation. Resource budgets and threshold defaults are provisional. Verification follows the repository skill, with new evidence in validation/m5 and historical M4 execution/source-only records left distinct.

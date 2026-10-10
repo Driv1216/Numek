@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Bounded — DataTrust Regression Reliability</title><style>
+    :root {
+      color-scheme: light;
+      --ink: #17202d;
+      --muted: #5d6877;
+      --line: #d8e0e9;
+      --panel: #f5f7fa;
+      --accent: #176b87;
+      --accent-soft: #e7f3f7;
+      --good: #167a4a;
+      --warn: #956200;
+      --bad: #b3261e;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--ink);
+      background: #fff;
+      line-height: 1.5;
+    }
+    main { max-width: 1160px; margin: 0 auto; padding: 42px 28px 68px; }
+    header { border-bottom: 2px solid var(--line); padding-bottom: 24px; margin-bottom: 28px; }
+    h1 { font-size: 34px; margin: 0 0 6px; line-height: 1.2; overflow-wrap: break-word; }
+    h2 { font-size: 23px; margin: 38px 0 14px; padding-top: 4px; }
+    h3 { font-size: 17px; margin: 0 0 8px; }
+    h4 { font-size: 14px; margin: 0 0 5px; }
+    p { margin: 0 0 10px; }
+    table { width: 100%; border-collapse: collapse; margin: 12px 0 0; font-size: 13px; }
+    th, td { border-bottom: 1px solid var(--line); padding: 9px 8px; text-align: left; vertical-align: top; }
+    th { color: var(--muted); font-weight: 680; background: var(--panel); }
+    .table-wrap { overflow-x: auto; }
+    .meta, .small, .section-note { color: var(--muted); font-size: 13px; }
+    .purpose { max-width: 820px; margin-top: 10px; }
+    .grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+    .grid.three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .score-grid { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 12px; }
+    .card { border: 1px solid var(--line); border-radius: 9px; padding: 14px; background: #fff; }
+    .metric { font-size: 26px; font-weight: 760; margin-top: 4px; overflow-wrap: break-word; word-break: normal; }
+    .metric.name { font-size: 22px; }
+    .target-card { grid-column: span 2; }
+    .label { color: var(--muted); font-size: 12px; letter-spacing: .02em; text-transform: uppercase; }
+    .decision-layout { display: grid; grid-template-columns: minmax(205px, .8fr) minmax(0, 2fr); gap: 16px; align-items: stretch; }
+    .decision-card { background: var(--accent-soft); border-color: #c9e3eb; }
+    .score { font-size: 44px; line-height: 1; font-weight: 800; margin: 12px 0 8px; }
+    .risk-badge {
+      display: inline-block;
+      border-radius: 999px;
+      padding: 4px 10px;
+      font-size: 12px;
+      font-weight: 750;
+      color: #fff;
+      background: var(--accent);
+    }
+    .risk-badge.Low { background: var(--good); }
+    .risk-badge.Moderate, .risk-badge.Elevated { background: var(--warn); }
+    .risk-badge.High { background: var(--bad); }
+    .risk-list { display: grid; gap: 12px; margin-top: 14px; }
+    .summary-risks.count-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .summary-risks.count-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .risk-card { border-left: 4px solid var(--accent); }
+    .risk-card.High { border-left-color: var(--bad); }
+    .risk-card.Moderate { border-left-color: var(--warn); }
+    .risk-card.Low { border-left-color: var(--good); }
+    .action-list { display: grid; gap: 14px; }
+    .action-card { border-left: 5px solid var(--accent); padding: 16px 18px; }
+    .action-card.High { border-left-color: var(--bad); }
+    .action-card.Moderate { border-left-color: var(--warn); }
+    .action-card.Low { border-left-color: var(--good); }
+    .clean-state { border-left: 5px solid var(--good); background: #f3faf6; padding: 18px; }
+    .action-heading { display: flex; gap: 10px; justify-content: space-between; align-items: flex-start; }
+    .action-details { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-top: 12px; }
+    .action-details div { border-top: 1px solid var(--line); padding-top: 9px; }
+    .chart { display: grid; gap: 9px; margin-top: 14px; }
+    .bar-row { display: grid; grid-template-columns: minmax(120px, 220px) 1fr 86px; gap: 10px; align-items: center; }
+    .bar-label { font-size: 13px; overflow-wrap: break-word; }
+    .bar-track { height: 13px; border-radius: 999px; background: #e8edf2; overflow: hidden; }
+    .bar { min-width: 2px; height: 100%; border-radius: inherit; background: var(--accent); }
+    .bar.missing { background: var(--warn); }
+    .bar-value { color: var(--muted); font-size: 12px; text-align: right; }
+    .callout { background: var(--accent-soft); border: 1px solid #c9e3eb; border-radius: 9px; padding: 14px; }
+    .interpretation { margin-bottom: 16px; }
+    .section-note { margin-bottom: 12px; }
+    .nowrap { white-space: nowrap; }
+    .appendix-section { page: appendix; }
+    @page {
+      size: A4 portrait;
+      margin: 14mm 12mm 18mm;
+      @bottom-left { content: "DataTrust Reliability Report"; color: #5d6877; font-size: 8pt; }
+      @bottom-right { content: "Page " counter(page) " of " counter(pages); color: #5d6877; font-size: 8pt; }
+    }
+    @page appendix {
+      size: A4 landscape;
+      margin: 12mm 12mm 16mm;
+      @bottom-left { content: "DataTrust Technical Appendix"; color: #5d6877; font-size: 8pt; }
+      @bottom-right { content: "Page " counter(page) " of " counter(pages); color: #5d6877; font-size: 8pt; }
+    }
+    @media (max-width: 860px) {
+      .grid, .grid.three, .score-grid, .decision-layout, .action-details { grid-template-columns: 1fr; }
+      .target-card { grid-column: auto; }
+      .bar-row { grid-template-columns: 110px 1fr 70px; }
+      main { padding: 28px 18px 48px; }
+    }
+    @media print {
+      body { font-size: 10pt; }
+      main { max-width: none; padding: 0; }
+      p { orphans: 3; widows: 3; }
+      h1 { font-size: 24pt; }
+      h2 { break-after: avoid; font-size: 16pt; margin-top: 22px; }
+      .card, .callout, .bar-row, .action-card, tr { break-inside: avoid; }
+      .table-wrap { overflow: visible; }
+      table { font-size: 8.5pt; }
+      thead { display: table-header-group; }
+      th, td { overflow-wrap: break-word; word-break: normal; white-space: normal; }
+      .compact-table { break-inside: avoid; }
+      .leakage-table { table-layout: fixed; font-size: 7.8pt; }
+      .leakage-table th, .leakage-table td { padding: 5px 4px; }
+      .leakage-table th:nth-child(1), .leakage-table td:nth-child(1) { width: 18%; }
+      .leakage-table th:nth-child(2), .leakage-table td:nth-child(2) { width: 20%; }
+      .leakage-table th:nth-child(3), .leakage-table td:nth-child(3) { width: 42%; }
+      .leakage-table th:nth-child(4), .leakage-table td:nth-child(4) { width: 20%; }
+      .appendix-table, .wide-table { table-layout: fixed; font-size: 7.4pt; }
+      .appendix-table th, .appendix-table td, .wide-table th, .wide-table td { padding: 5px 4px; }
+      .appendix-table th:first-child, .appendix-table td:first-child { width: 13%; }
+      .wide-table th:first-child, .wide-table td:first-child { width: 14%; }
+      .action-section, .feature-section, .methodology-section, .appendix-section { break-before: page; }
+      .summary-risks .risk-card { padding: 10px 12px; font-size: 8.7pt; }
+      .summary-risks .risk-card h3 { font-size: 10pt; }
+      th { color: #333; }
+      a { color: inherit; text-decoration: none; }
+    }
+  
+td, th { overflow-wrap:anywhere; } .check-table,.evidence-table {table-layout:fixed} .check-table th:first-child {width:28%} .check-table th:nth-child(2),.check-table th:nth-child(3){width:13%} .evidence-table th:first-child{width:24%} .incomplete{border:2px solid #b3261e;padding:18px;margin:16px 0} .chart{width:100%;max-height:240px} .coverage-segment{display:inline-block;padding:8px;color:#fff;background:#285a8e} .technical-table{font-size:9pt} .scope{border-left:4px solid #285a8e;padding:10px 14px;background:#f2f6fa} @media print{h2,h3{break-after:avoid}.chart{break-inside:avoid}.technical-table{font-size:8pt} td,th{padding:5px}.regression-methods{break-inside:avoid}.action-card{padding:12px}}
+</style></head><body><main>
+<header><p class="meta">DataTrust · Single-target regression · 2026-10-09T11:18:50.020185+00:00</p><h1>Bounded</h1><p>Source: sum.csv · Target: outcome</p></header>
+<section><h2>1. Regression Review Summary</h2><p>Regression dataset evidence is available for review. Priorities describe investigation needs, not a score or readiness verdict.</p><p>100 of 100 targets are finite, with 100 distinct finite values.</p><div class="grid"><div class="card">Rows<div class="metric">100</div></div><div class="card">Feature inputs<div class="metric">2</div></div><div class="card">Review findings<div class="metric">0</div></div><div class="card">Finite targets<div class="metric">100</div></div></div><p>No validated scoring policy is defined for regression reliability.</p><p>Review priorities are investigation needs, not risk bands or a readiness verdict.</p><div class="scope"><strong>Relationship coverage: bounded</strong><p>No observed relationship means only none verified in the searched scope; unsearched relationships are unknown.</p><p>Configured pool/work limits intentionally bounded this search; this is separate from diagnostic failure.</p></div></section>
+<section><h2>2. Priority Review Actions</h2><div class="action-list"><div class="clean-state">No regression findings were generated by completed checks. Review parsing warnings, unavailable checks, and bounded searches separately.</div></div></section>
+<section><h2>3. Dataset, Target, and Declared Expectations</h2><p>Target selected explicitly: <strong>outcome</strong>. Target intent: unspecified. Integer-valued observations do not independently establish count semantics.</p><table><thead><tr><th>User-declared expectation</th><th>Value</th></tr></thead><tbody><tr><td>kind</td><td>unspecified</td></tr><tr><td>minimum</td><td>Not set</td></tr><tr><td>maximum</td><td>Not set</td></tr><tr><td>nonnegative</td><td>Not set</td></tr><tr><td>integer required</td><td>Not set</td></tr><tr><td>units</td><td>Not set</td></tr></tbody></table><p>Units are display context; no unit conversion or semantic validity is inferred.</p><table><thead><tr><th>Column</th><th>Role</th><th>Parsed dtype</th><th>Observed values</th></tr></thead><tbody><tr><td>a</td><td>feature</td><td>float64</td><td>100 / 100</td></tr><tr><td>b</td><td>feature</td><td>float64</td><td>100 / 100</td></tr><tr><td>outcome</td><td>target</td><td>float64</td><td>100 / 100</td></tr></tbody></table><p>Parsing: Pandas default missing tokens; utf-8. All evidence concerns the parsed interpretation.</p></section>
+<section><h2>4. Target Coverage and Distribution</h2><p>All-row coverage: 100 finite, 0 missing, 0 positive infinity, 0 negative infinity.</p><div role="img" aria-label="Target coverage" style="display:flex;height:20px;background:#edf1f5"><span style="background:#285a8e;width:100.0%" title="Finite 100"></span><span style="background:#b38b28;width:0.0%" title="Missing 0"></span><span style="background:#b3261e;width:0.0%" title="Non-finite 0"></span></div><p>Distribution population: finite targets, including declared constraint violations. Units: Not declared.</p><table><thead><tr><th>Measurement</th><th>Finite-target evidence</th></tr></thead><tbody><tr><td>min</td><td>0</td></tr><tr><td>max</td><td>99</td></tr><tr><td>mean</td><td>49.5</td></tr><tr><td>sample std</td><td>29.011492</td></tr><tr><td>distinct count</td><td>100</td></tr><tr><td>zero count</td><td>1</td></tr><tr><td>negative count</td><td>0</td></tr><tr><td>integer count</td><td>100</td></tr><tr><td>non integer count</td><td>0</td></tr><tr><td>iqr</td><td>49.5</td></tr><tr><td>central 90 span</td><td>89.1</td></tr><tr><td>bowley skewness</td><td>0</td></tr><tr><td>modal share</td><td>1</td></tr></tbody></table><div class="scope"><strong>Quantile strip</strong><svg viewBox="0 0 640 90" role="img" aria-label="Finite-target quantiles: central box Q1 to Q3, median marker, P5 to P95 whiskers" style="width:100%"><line x1="59.0" y1="38" x2="581.0" y2="38" stroke="#285a8e" stroke-width="2"/><rect x="175.0" y="20" width="290.0" height="36" fill="#c8d9eb" stroke="#285a8e"/><line x1="320.0" y1="20" x2="320.0" y2="56" stroke="#163857" stroke-width="3"/><line x1="59.0" y1="29" x2="59.0" y2="47" stroke="#285a8e"/><line x1="581.0" y1="29" x2="581.0" y2="47" stroke="#285a8e"/><text x="30" y="80" font-size="12">0</text><text x="610" y="80" font-size="12" text-anchor="end">99</text></svg><p>P1 0.99 · P5 4.95 · Q1 24.75 · Median 49.5 · Q3 74.25 · P95 94.05 · P99 98.01</p></div><h3>Finite target distribution</h3><svg class="chart" viewBox="0 0 640 240" role="img" aria-label="Histogram of finite target observations"><line x1="30" y1="210" x2="610" y2="210" stroke="#526275"/><rect x="30.0" y="30.0" width="98.6" height="180.0" fill="#285a8e"><title>0.0 to 19.8: 20 observations</title></rect><rect x="146.0" y="30.0" width="98.6" height="180.0" fill="#285a8e"><title>19.8 to 39.6: 20 observations</title></rect><rect x="262.0" y="30.0" width="98.6" height="180.0" fill="#285a8e"><title>39.6 to 59.400000000000006: 20 observations</title></rect><rect x="378.0" y="30.0" width="98.6" height="180.0" fill="#285a8e"><title>59.400000000000006 to 79.2: 20 observations</title></rect><rect x="494.0" y="30.0" width="98.6" height="180.0" fill="#285a8e"><title>79.2 to 99.0: 20 observations</title></rect><text x="30" y="232" font-size="12">0</text><text x="610" y="232" text-anchor="end" font-size="12">99</text></svg><p>freedman diaconis capped 40; counts total 100 finite observations. Bin counts and interval definitions appear in the appendix.</p><p>1.5-IQR candidates: 0 lower, 0 upper, of 100 finite values. These are review candidates, not established errors.</p><h3>Declared constraints</h3><p>0 finite targets violate at least one declared requirement; 100 satisfy the declared constraints. No observations were removed.</p><table><thead><tr><th>User-declared rule</th><th>Violations / finite population</th></tr></thead><tbody><tr><td colspan="2">No numerical constraints declared.</td></tr></tbody></table><h3>Concentration and numerical representation</h3><p>Most-common-value share: 1% of finite targets. Boundary concentration does not establish clipping or saturation.</p><table><thead><tr><th>Boundary</th><th>Value</th><th>Count / finite share</th></tr></thead><tbody><tr><td>observed minimum</td><td>0</td><td>1 / 1%</td></tr><tr><td>observed maximum</td><td>99</td><td>1 / 1%</td></tr></tbody></table><p>Numerical representation: completed. Coarsest observed aligned grid: 1. Ordinary integer or fixed-decimal representation is descriptive and generates no rounding action.</p></section>
+<section><h2>5. Target Relationships and Feature Availability</h2><p>Small or sparse relationships remain qualified technical evidence. No relationship conclusion covers unsearched candidates.</p><p>Actions require at least 30 finite overlapping rows, five distinct targets, 80% finite-target coverage, and complete numerical verification. Availability is user-declared or unknown; observed algebra does not prove leakage or actual model use.</p><table><thead><tr><th>Feature</th><th>User-declared availability</th></tr></thead><tbody><tr><td>a</td><td>unknown</td></tr><tr><td>b</td><td>unknown</td></tr></tbody></table><h3>Distinct relationship groups</h3><p>No relationship groups were verified in the searched scope. Unsearched candidates remain unknown.</p><h3>Qualified technical relationship evidence</h3><table><thead><tr><th>Observed relationship</th><th>Support and finite-target coverage</th><th>Interpretation</th></tr></thead><tbody></tbody></table></section>
+<section><h2>6. Missingness, Repetition, and Feature Evidence</h2><p>0 parsed cells missing (0.0%). Rows with missing features: 0 / 100. Target coverage is reported separately.</p><div><strong>a</strong> · 0 missing (0.0%)<div style="height:8px;background:#e6edf4"><div style="height:8px;background:#285a8e;width:0.0%"></div></div></div><div><strong>b</strong> · 0 missing (0.0%)<div style="height:8px;background:#e6edf4"><div style="height:8px;background:#285a8e;width:0.0%"></div></div></div><p>Exact repetition and target variation within repeated inputs require context; automatic deduplication or label-error conclusions are not warranted.</p><p>0 repeated rows beyond each first occurrence; 0 exact groups; 0 participating rows.</p><p>Repeated-input groups: 0; varying-target groups: 0; varying-target rows: 0.</p><table><thead><tr><th>Example group rows / distinct targets</th><th>Target extrema / span</th></tr></thead><tbody></tbody></table></section>
+<section class="regression-methods"><h2>7. Coverage, Methods, Scoring Availability, and Limitations</h2><p>No validated scoring policy is defined for regression reliability.</p><p>Coverage describes these checks, not a percentage of universal reliability.</p><p>Numerical shape, rounding, extremes, and repetition can be legitimate. Constraints apply only to declarations. Name cues and algebraic identities do not establish feature availability, causal direction, leakage, or label error. No cleaning, model training, prediction evaluation, or monitoring occurs.</p><p>Relationship search: bounded. 2 eligible numerical columns; 1 selected for pairs; 4 candidates; 4 fully verified; 0 planned work skips; 0 unfinished candidates after interruption/failure.</p><p>Configured relation limits: Max single comparisons: 20000000; Max pair comparisons: 20000000; Max pair features: 1; Max screen rows: 512. Consumed comparisons: Single: 400; Pair: 0.</p><p>Selected pair columns: a.</p><p>Excluded from pair pool: b · planned pool limit.</p><p>Support thresholds are internally tested interpretation rules, not externally validated reliability cutoffs.</p></section>
+<section class="appendix-section"><h2>8. Technical Appendix</h2><style>.analysis-disclosure td, .analysis-disclosure th, .analysis-disclosure .digest { overflow-wrap: anywhere; } .analysis-disclosure table { table-layout: fixed; } .analysis-disclosure .callout { margin: 12px 0; } .analysis-disclosure .limit-table th:first-child { width: 60%; } @media print { .analysis-disclosure h3, .analysis-disclosure h4 { break-after: avoid; } }</style>
+<div class="analysis-disclosure">
+  <h3>Parsing, execution, and coverage disclosure</h3>
+  <p>Parser: pandas.read_csv / pandas 3.0.3. Comma delimiter, inferred header, blank lines skipped. Encoding: utf-8. Missing policy: Pandas default missing tokens. Source values were not rewritten.</p>
+  <p>Custom missing tokens: None configured; explicit column types: None configured.</p>
+  <p>Source SHA-256: <span class="digest">4237658b1e60f9387bf5800680978cdb317f4412f050da8a9afd5c28e76e93ad</span>. Method: tabular_regression_v1.</p>
+  <p>Token inspection: 3822 bytes, 100 data records, 300 comparable cells; stopping reason: End of source. Alignment confirmed: Yes.</p>
+  <p class="section-note">Interpretation review warnings are separate from data findings and scoring. Counts describe only inspected source tokens and are never extrapolated to the dataset. No warnings observed does not establish losslessness.</p>
+<p>No parsing warnings observed within the inspected scope.</p>  <h4>Operational safeguards</h4>
+  <p>Source/header preflight, bounded row read, post-load frame measurement, cooperative stage deadlines; no hard memory or execution guarantee.</p>
+  <p>Backend: Pandas in memory; frame: 2532 bytes; elapsed: 0.021651 seconds.</p>
+  <table class="limit-table"><thead><tr><th>Configured safeguard</th><th>Limit</th></tr></thead><tbody>
+<tr><td>Maximum source size</td><td>104857600 bytes</td></tr><tr><td>Maximum rows</td><td>1000000</td></tr><tr><td>Maximum columns</td><td>1000</td></tr><tr><td>Maximum loaded frame size</td><td>536870912 bytes</td></tr><tr><td>Cooperative elapsed-time limit</td><td>Not set</td></tr>  </tbody></table>
+  <h4>Check applicability and execution</h4>
+  <table class="check-table"><thead><tr><th>Check / scope</th><th>Applicable</th><th>Execution</th><th>Reason / exclusions</th></tr></thead><tbody>
+<tr><td>schema · dataset</td><td>applicable</td><td>completed</td><td>No exclusions</td></tr><tr><td>missingness · dataset</td><td>applicable</td><td>completed</td><td>No exclusions</td></tr><tr><td>column variation · dataset</td><td>applicable</td><td>completed</td><td>No exclusions</td></tr><tr><td>categorical cardinality · dataset</td><td>not applicable</td><td>not run</td><td>No nonnumeric input columns.</td></tr><tr><td>feature missingness · dataset</td><td>applicable</td><td>completed</td><td>No exclusions</td></tr><tr><td>exact duplicates · dataset</td><td>applicable</td><td>completed</td><td>No exclusions</td></tr><tr><td>numeric summary · a</td><td>applicable</td><td>completed</td><td>No exclusions</td></tr><tr><td>numeric outliers · a</td><td>applicable</td><td>completed</td><td>Exclusions: Missing values: 0; Non finite values: 0</td></tr><tr><td>numeric summary · b</td><td>applicable</td><td>completed</td><td>No exclusions</td></tr><tr><td>numeric outliers · b</td><td>applicable</td><td>completed</td><td>Exclusions: Missing values: 0; Non finite values: 0</td></tr><tr><td>regression target · outcome</td><td>applicable</td><td>completed</td><td>No exclusions</td></tr><tr><td>regression sample std · outcome</td><td>applicable</td><td>completed</td><td>No exclusions</td></tr><tr><td>regression extremes · outcome</td><td>applicable</td><td>completed</td><td>No exclusions</td></tr><tr><td>regression bowley skewness · outcome</td><td>applicable</td><td>completed</td><td>No exclusions</td></tr><tr><td>regression histogram · outcome</td><td>applicable</td><td>completed</td><td>No exclusions</td></tr><tr><td>regression rounding · outcome</td><td>applicable</td><td>completed</td><td>No exclusions</td></tr><tr><td>regression constraints · dataset</td><td>not applicable</td><td>not run</td><td>No numerical constraints declared.</td></tr><tr><td>regression relationships · dataset</td><td>applicable</td><td>completed</td><td>No exclusions</td></tr><tr><td>regression names · dataset</td><td>applicable</td><td>completed</td><td>No exclusions</td></tr><tr><td>regression repeated inputs · dataset</td><td>applicable</td><td>completed</td><td>No exclusions</td></tr><tr><td>regression availability · dataset</td><td>applicable</td><td>completed</td><td>No exclusions</td></tr><tr><td>classification target · dataset</td><td>not applicable</td><td>not run</td><td>Regression uses numerical target evidence and no classification scores.</td></tr><tr><td>label conflicts · dataset</td><td>not applicable</td><td>not run</td><td>Regression uses numerical target evidence and no classification scores.</td></tr><tr><td>target leakage · dataset</td><td>not applicable</td><td>not run</td><td>Regression uses numerical target evidence and no classification scores.</td></tr><tr><td>classification scoring · dataset</td><td>not applicable</td><td>not run</td><td>Regression uses numerical target evidence and no classification scores.</td></tr><tr><td>parsing fidelity · dataset</td><td>applicable</td><td>completed</td><td>No exclusions</td></tr>  </tbody></table>
+  <p>Coverage describes these checks, not a percentage of universal reliability.</p>
+  <p>Unsupported: semantic typing; missingness patterns; split/reference comparisons; model performance; non-tabular modalities.</p>
+  <p class="section-note">Deterministic fixtures and corpus regression checks provide internal methodology validation. They do not establish external method validity or customer usefulness. Prediction and model-performance analysis belong to ConfidenceGuard.</p>
+</div><h3>Resolved source headers</h3><table><thead><tr><th>Source position</th><th>Original header</th><th>Resolved name</th></tr></thead><tbody><tr><td>1</td><td>a</td><td>a</td></tr><tr><td>2</td><td>b</td><td>b</td></tr><tr><td>3</td><td>outcome</td><td>outcome</td></tr></tbody></table><h3>Relationship search ledger</h3><table class="technical-table"><thead><tr><th>Method / columns</th><th>Status / reason</th><th>Screened / verified rows</th></tr></thead><tbody><tr><td>exact copy · a</td><td>verified no relationship</td><td>0 / 100</td></tr><tr><td>exact copy · b</td><td>verified no relationship</td><td>0 / 100</td></tr><tr><td>affine identity · a</td><td>verified no relationship</td><td>0 / 100</td></tr><tr><td>affine identity · b</td><td>verified no relationship</td><td>0 / 100</td></tr></tbody></table><h3>Histogram count table</h3><table><thead><tr><th>Lower</th><th>Upper</th><th>Count</th></tr></thead><tbody><tr><td>0</td><td>19.8</td><td>20</td></tr><tr><td>19.8</td><td>39.6</td><td>20</td></tr><tr><td>39.6</td><td>59.4</td><td>20</td></tr><tr><td>59.4</td><td>79.2</td><td>20</td></tr><tr><td>79.2</td><td>99</td><td>20</td></tr></tbody></table><p>left closed, right open; final bin includes maximum</p><h3>Grid alignment evidence</h3><table><thead><tr><th>Step</th><th>Status</th><th>Aligned / finite share</th></tr></thead><tbody><tr><td>1.0</td><td>completed </td><td>100 / 100</td></tr><tr><td>0.1</td><td>completed </td><td>100 / 100</td></tr><tr><td>0.01</td><td>completed </td><td>100 / 100</td></tr><tr><td>0.001</td><td>completed </td><td>100 / 100</td></tr></tbody></table><h3>Feature numerical evidence</h3><table><thead><tr><th>Feature</th><th>Finite summary</th><th>IQR evidence</th></tr></thead><tbody><tr><td>a · 100 distinct</td><td>Finite 100; min 0; median 7.035534; max 9.949874</td><td>0</td></tr><tr><td>b · 99 distinct</td><td>Finite 100; min 0; median 42.464466; max 89.050126</td><td>0</td></tr></tbody></table>
+<h3>Evidence references</h3><table class="evidence-table"><thead><tr><th>Evidence ID</th><th>Population / denominator</th><th>Method / measurements</th></tr></thead><tbody><tr><td>schema.0</td><td>parsed records / 100</td><td>deterministic; /parsing/header_mapping, /profile/row_count, /profile/column_count</td></tr><tr><td>missingness.1</td><td>all parsed cells / 300</td><td>deterministic; /profile/missing_cells, /profile/missing_rate, /profile/missing_feature_row_rate</td></tr><tr><td>column_variation.2</td><td>all parsed columns / 3</td><td>deterministic; /profile/columns</td></tr><tr><td>categorical_cardinality.3</td><td>nonnumeric parsed columns / 0</td><td>deterministic; /profile/columns</td></tr><tr><td>feature_missingness.4</td><td>parsed feature cells / 200</td><td>deterministic; /profile/missing_feature_cells, /profile/missing_feature_cell_rate, /profile/missing_feature_row_rate</td></tr><tr><td>exact_duplicates.5</td><td>all parsed rows / 100</td><td>deterministic; /profile/duplicate_rows, /profile/duplicate_group_count, /profile/rows_in_duplicate_groups</td></tr><tr><td>numeric_summary.6</td><td>finite values; zero/negative/non-finite rates use total rows / 100</td><td>Finite-value descriptive statistics; /profile/columns/0/numeric_summary, /profile/columns/0/finite_count</td></tr><tr><td>numeric_outliers.7</td><td>finite numeric observations / 100</td><td>Finite-value 1.5-IQR fences; /profile/columns/0/outlier_count, /profile/columns/0/outlier_rate</td></tr><tr><td>numeric_summary.8</td><td>finite values; zero/negative/non-finite rates use total rows / 100</td><td>Finite-value descriptive statistics; /profile/columns/1/numeric_summary, /profile/columns/1/finite_count</td></tr><tr><td>numeric_outliers.9</td><td>finite numeric observations / 100</td><td>Finite-value 1.5-IQR fences; /profile/columns/1/outlier_count, /profile/columns/1/outlier_rate</td></tr><tr><td>regression_target.10</td><td>finite targets; coverage uses all parsed rows / 100</td><td>finite regression distribution; /profile/regression/target_statistics</td></tr><tr><td>regression_sample_std.11</td><td>finite targets / 100</td><td>deterministic; /profile/regression/target_statistics/sample_std</td></tr><tr><td>regression_extremes.12</td><td>finite targets / 100</td><td>deterministic; /profile/regression/target_statistics/extremes</td></tr><tr><td>regression_bowley_skewness.13</td><td>finite targets / 100</td><td>deterministic; /profile/regression/target_statistics/bowley_skewness</td></tr><tr><td>regression_histogram.14</td><td>finite targets / 100</td><td>deterministic; /profile/regression/target_statistics/histogram</td></tr><tr><td>regression_rounding.15</td><td>finite targets / 100</td><td>deterministic; /profile/regression/target_statistics/rounding</td></tr><tr><td>regression_relationships.16</td><td>eligible numerical features; explicitly bounded candidate search / not applicable</td><td>bounded arithmetic identities; /profile/regression/search</td></tr><tr><td>regression_names.17</td><td>feature names; contextual cues only / 2</td><td>deterministic; /profile/regression/name_candidates</td></tr><tr><td>regression_repeated_inputs.18</td><td>finite targets grouped by exact feature values / 100</td><td>deterministic; /profile/regression/repeated_inputs</td></tr><tr><td>regression_availability.19</td><td>user-declared feature context / 2</td><td>deterministic; /profile/regression/feature_availability</td></tr><tr><td>parsing_fidelity.20</td><td>bounded source prefix / 300</td><td>bounded source token comparison; /parsing/fidelity_inspection, /parsing_warnings</td></tr></tbody></table></section>
+</main></body></html>

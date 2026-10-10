@@ -1,0 +1,3438 @@
+{
+  "spec": {
+    "inputs": [
+      {
+        "id": "alfred",
+        "source": {
+          "path": "alfred.csv",
+          "format": "csv",
+          "dataset_name": null,
+          "purpose": null,
+          "source_filename": null,
+          "parsing": {
+            "encoding": "utf-8",
+            "missing_policy": "pandas_default",
+            "na_values": [],
+            "column_types": {},
+            "column_missing_policies": {}
+          }
+        },
+        "temporal": {
+          "clock": {
+            "column": "observation_date",
+            "kind": "civil_date",
+            "encoding": "iso",
+            "format": null,
+            "epoch_unit": null,
+            "timezone": null,
+            "timezone_column": null,
+            "ambiguity": "unresolved",
+            "fold_column": null,
+            "date_convention": null
+          },
+          "measurements": [
+            {
+              "name": "value",
+              "column": null,
+              "representation": "quantitative",
+              "unit": "percent annualized change",
+              "meaning": "GDPC1_PCA",
+              "past_observation": false
+            }
+          ],
+          "observation": "measurement",
+          "layout": "wide",
+          "entity_columns": [],
+          "observation_keys": [
+            "observation_date"
+          ],
+          "measurement_column": null,
+          "value_column": null,
+          "schedule": {
+            "kind": "none",
+            "cadence_ns": null,
+            "anchor": null,
+            "civil_unit": null,
+            "timezone": null,
+            "month_end": "skip",
+            "source_id": null,
+            "time_column": null,
+            "entity_columns": [],
+            "measurement_column": null,
+            "expectation": "required_record",
+            "collection_status_column": null,
+            "collection_active_values": [
+              "active"
+            ]
+          },
+          "active_intervals": [],
+          "unique_observations": false,
+          "source_order_is_arrival": false,
+          "dense_long": false,
+          "assessment_time": null,
+          "max_adjacency_ns": null,
+          "required_lookback_ns": null
+        },
+        "role": "dataset",
+        "task": {
+          "kind": "dataset_profile",
+          "target": null,
+          "targets": [],
+          "feature_columns": null,
+          "metadata_columns": [],
+          "group_columns": []
+        },
+        "config": {
+          "parsing": {
+            "encoding": "utf-8",
+            "missing_policy": "pandas_default",
+            "na_values": [],
+            "column_types": {},
+            "column_missing_policies": {}
+          },
+          "fidelity_inspection": {
+            "max_bytes": 1048576,
+            "max_records": 200,
+            "max_cells": 20000
+          },
+          "limits": null,
+          "regression": null,
+          "annotations": null,
+          "features": {
+            "semantic_types": {},
+            "scale_sensitive": null
+          },
+          "multilabel": null,
+          "diagnostics": {
+            "max_multilabel_pair_targets": 32,
+            "max_output_pair_targets": 32,
+            "max_multilabel_comparisons": 20000000,
+            "max_output_comparisons": 20000000,
+            "max_cohort_comparisons": 20000000,
+            "max_patterns": 10000,
+            "max_examples": 5
+          },
+          "presentation": {
+            "executive_actions": 5,
+            "target_panels": 6,
+            "feature_details": 20,
+            "table_rows": 20,
+            "appendix_rows": 100
+          },
+          "execution": null,
+          "advanced": null
+        }
+      },
+      {
+        "id": "history",
+        "source": {
+          "path": "alfred_history.csv",
+          "format": "csv",
+          "dataset_name": null,
+          "purpose": null,
+          "source_filename": null,
+          "parsing": {
+            "encoding": "utf-8",
+            "missing_policy": "pandas_default",
+            "na_values": [],
+            "column_types": {},
+            "column_missing_policies": {}
+          }
+        },
+        "temporal": null,
+        "role": "history",
+        "task": {
+          "kind": "dataset_profile",
+          "target": null,
+          "targets": [],
+          "feature_columns": null,
+          "metadata_columns": [],
+          "group_columns": []
+        },
+        "config": {
+          "parsing": {
+            "encoding": "utf-8",
+            "missing_policy": "pandas_default",
+            "na_values": [],
+            "column_types": {},
+            "column_missing_policies": {}
+          },
+          "fidelity_inspection": {
+            "max_bytes": 1048576,
+            "max_records": 200,
+            "max_cells": 20000
+          },
+          "limits": null,
+          "regression": null,
+          "annotations": null,
+          "features": {
+            "semantic_types": {},
+            "scale_sensitive": null
+          },
+          "multilabel": null,
+          "diagnostics": {
+            "max_multilabel_pair_targets": 32,
+            "max_output_pair_targets": 32,
+            "max_multilabel_comparisons": 20000000,
+            "max_output_comparisons": 20000000,
+            "max_cohort_comparisons": 20000000,
+            "max_patterns": 10000,
+            "max_examples": 5
+          },
+          "presentation": {
+            "executive_actions": 5,
+            "target_panels": 6,
+            "feature_details": 20,
+            "table_rows": 20,
+            "appendix_rows": 100
+          },
+          "execution": null,
+          "advanced": null
+        }
+      }
+    ],
+    "availability": [],
+    "histories": [
+      {
+        "id": "archived-vintages",
+        "source_id": "alfred",
+        "history_source_id": "history",
+        "features": [
+          "value"
+        ],
+        "observation_keys": [
+          "observation_date"
+        ],
+        "history_keys": [
+          "observation_date"
+        ],
+        "value_columns": {
+          "value": "value"
+        },
+        "availability": {
+          "column": "vintage_date",
+          "kind": "civil_date",
+          "encoding": "iso",
+          "format": null,
+          "epoch_unit": null,
+          "timezone": null,
+          "timezone_column": null,
+          "ambiguity": "unresolved",
+          "fold_column": null,
+          "date_convention": null
+        },
+        "cutoff": {
+          "column": "cutoff",
+          "kind": "civil_date",
+          "encoding": "iso",
+          "format": null,
+          "epoch_unit": null,
+          "timezone": null,
+          "timezone_column": null,
+          "ambiguity": "unresolved",
+          "fold_column": null,
+          "date_convention": null
+        },
+        "value_units": {},
+        "revision_id_column": null,
+        "selected_revision_id_column": null,
+        "tie_order_column": null,
+        "tie_order_meaning": null,
+        "state_column": null,
+        "state_values": {
+          "valid": "valid",
+          "known_missing": "known_missing",
+          "retracted": "retracted",
+          "unknown": "unknown"
+        },
+        "null_semantics": "unknown",
+        "completeness": "unknown",
+        "coverage_start": null,
+        "coverage_end": null,
+        "initial_creation_included": false,
+        "baseline_time": null,
+        "latest_available_required": false,
+        "absolute_tolerance": null,
+        "relative_tolerance": null
+      }
+    ],
+    "maturity": [],
+    "evaluation": {
+      "folds": []
+    },
+    "dataset_name": "alfred",
+    "purpose": "Official archived five-vintage extract. Availability is known only at civil-day granularity; no intraday or complete-history assurance."
+  },
+  "profile": {
+    "sources": {
+      "alfred": {
+        "role": "dataset",
+        "rows": 2,
+        "columns": [
+          "observation_date",
+          "value",
+          "cutoff"
+        ],
+        "source": {
+          "sha256": "7b09f6aaf42bd461bd38dc9f6a600efe3ddeb7de92bee83583c5051bdddd5567",
+          "bytes": 82,
+          "filename": "alfred.csv"
+        },
+        "base_task": {
+          "kind": "dataset_profile",
+          "target": null,
+          "targets": [],
+          "feature_columns": null,
+          "metadata_columns": [],
+          "group_columns": []
+        },
+        "auxiliary": false,
+        "normalized_cells": 2,
+        "distinct_series": 1,
+        "temporal": {
+          "clock": {
+            "column": "observation_date",
+            "kind": "civil_date",
+            "encoding": "iso",
+            "format": null,
+            "epoch_unit": null,
+            "timezone": null,
+            "timezone_column": null,
+            "ambiguity": "unresolved",
+            "fold_column": null,
+            "date_convention": null
+          },
+          "measurements": [
+            {
+              "name": "value",
+              "column": null,
+              "representation": "quantitative",
+              "unit": "percent annualized change",
+              "meaning": "GDPC1_PCA",
+              "past_observation": false
+            }
+          ],
+          "observation": "measurement",
+          "layout": "wide",
+          "entity_columns": [],
+          "observation_keys": [
+            "observation_date"
+          ],
+          "measurement_column": null,
+          "value_column": null,
+          "schedule": {
+            "kind": "none",
+            "cadence_ns": null,
+            "anchor": null,
+            "civil_unit": null,
+            "timezone": null,
+            "month_end": "skip",
+            "source_id": null,
+            "time_column": null,
+            "entity_columns": [],
+            "measurement_column": null,
+            "expectation": "required_record",
+            "collection_status_column": null,
+            "collection_active_values": [
+              "active"
+            ]
+          },
+          "active_intervals": [],
+          "unique_observations": false,
+          "source_order_is_arrival": false,
+          "dense_long": false,
+          "assessment_time": null,
+          "max_adjacency_ns": null,
+          "required_lookback_ns": null
+        }
+      },
+      "history": {
+        "role": "history",
+        "rows": 7,
+        "columns": [
+          "observation_date",
+          "value",
+          "vintage_date"
+        ],
+        "source": {
+          "sha256": "e1aad4f4c6bf98e6ec18c466c1361500fbc99e825d80dbe5db5b2b08c95b122f",
+          "bytes": 218,
+          "filename": "alfred_history.csv"
+        },
+        "base_task": {
+          "kind": "dataset_profile",
+          "target": null,
+          "targets": [],
+          "feature_columns": null,
+          "metadata_columns": [],
+          "group_columns": []
+        },
+        "auxiliary": true
+      }
+    }
+  },
+  "declarations": {
+    "declarations": {
+      "inputs": [
+        {
+          "id": "alfred",
+          "source": {
+            "path": "/Users/drivyaanshyadav/Desktop/Numek/validation/m5/data/prepared/alfred.csv",
+            "format": "csv",
+            "dataset_name": null,
+            "purpose": null,
+            "source_filename": null,
+            "parsing": {
+              "encoding": "utf-8",
+              "missing_policy": "pandas_default",
+              "na_values": [],
+              "column_types": {},
+              "column_missing_policies": {}
+            }
+          },
+          "temporal": {
+            "clock": {
+              "column": "observation_date",
+              "kind": "civil_date",
+              "encoding": "iso",
+              "format": null,
+              "epoch_unit": null,
+              "timezone": null,
+              "timezone_column": null,
+              "ambiguity": "unresolved",
+              "fold_column": null,
+              "date_convention": null
+            },
+            "measurements": [
+              {
+                "name": "value",
+                "column": null,
+                "representation": "quantitative",
+                "unit": "percent annualized change",
+                "meaning": "GDPC1_PCA",
+                "past_observation": false
+              }
+            ],
+            "observation": "measurement",
+            "layout": "wide",
+            "entity_columns": [],
+            "observation_keys": [
+              "observation_date"
+            ],
+            "measurement_column": null,
+            "value_column": null,
+            "schedule": {
+              "kind": "none",
+              "cadence_ns": null,
+              "anchor": null,
+              "civil_unit": null,
+              "timezone": null,
+              "month_end": "skip",
+              "source_id": null,
+              "time_column": null,
+              "entity_columns": [],
+              "measurement_column": null,
+              "expectation": "required_record",
+              "collection_status_column": null,
+              "collection_active_values": [
+                "active"
+              ]
+            },
+            "active_intervals": [],
+            "unique_observations": false,
+            "source_order_is_arrival": false,
+            "dense_long": false,
+            "assessment_time": null,
+            "max_adjacency_ns": null,
+            "required_lookback_ns": null
+          },
+          "role": "dataset",
+          "task": {
+            "kind": "dataset_profile",
+            "target": null,
+            "targets": [],
+            "feature_columns": null,
+            "metadata_columns": [],
+            "group_columns": []
+          },
+          "config": {
+            "parsing": {
+              "encoding": "utf-8",
+              "missing_policy": "pandas_default",
+              "na_values": [],
+              "column_types": {},
+              "column_missing_policies": {}
+            },
+            "fidelity_inspection": {
+              "max_bytes": 1048576,
+              "max_records": 200,
+              "max_cells": 20000
+            },
+            "limits": null,
+            "regression": null,
+            "annotations": null,
+            "features": {
+              "semantic_types": {},
+              "scale_sensitive": null
+            },
+            "multilabel": null,
+            "diagnostics": {
+              "max_multilabel_pair_targets": 32,
+              "max_output_pair_targets": 32,
+              "max_multilabel_comparisons": 20000000,
+              "max_output_comparisons": 20000000,
+              "max_cohort_comparisons": 20000000,
+              "max_patterns": 10000,
+              "max_examples": 5
+            },
+            "presentation": {
+              "executive_actions": 5,
+              "target_panels": 6,
+              "feature_details": 20,
+              "table_rows": 20,
+              "appendix_rows": 100
+            },
+            "execution": null,
+            "advanced": null
+          }
+        },
+        {
+          "id": "history",
+          "source": {
+            "path": "/Users/drivyaanshyadav/Desktop/Numek/validation/m5/data/prepared/alfred_history.csv",
+            "format": "csv",
+            "dataset_name": null,
+            "purpose": null,
+            "source_filename": null,
+            "parsing": {
+              "encoding": "utf-8",
+              "missing_policy": "pandas_default",
+              "na_values": [],
+              "column_types": {},
+              "column_missing_policies": {}
+            }
+          },
+          "temporal": null,
+          "role": "history",
+          "task": {
+            "kind": "dataset_profile",
+            "target": null,
+            "targets": [],
+            "feature_columns": null,
+            "metadata_columns": [],
+            "group_columns": []
+          },
+          "config": {
+            "parsing": {
+              "encoding": "utf-8",
+              "missing_policy": "pandas_default",
+              "na_values": [],
+              "column_types": {},
+              "column_missing_policies": {}
+            },
+            "fidelity_inspection": {
+              "max_bytes": 1048576,
+              "max_records": 200,
+              "max_cells": 20000
+            },
+            "limits": null,
+            "regression": null,
+            "annotations": null,
+            "features": {
+              "semantic_types": {},
+              "scale_sensitive": null
+            },
+            "multilabel": null,
+            "diagnostics": {
+              "max_multilabel_pair_targets": 32,
+              "max_output_pair_targets": 32,
+              "max_multilabel_comparisons": 20000000,
+              "max_output_comparisons": 20000000,
+              "max_cohort_comparisons": 20000000,
+              "max_patterns": 10000,
+              "max_examples": 5
+            },
+            "presentation": {
+              "executive_actions": 5,
+              "target_panels": 6,
+              "feature_details": 20,
+              "table_rows": 20,
+              "appendix_rows": 100
+            },
+            "execution": null,
+            "advanced": null
+          }
+        }
+      ],
+      "availability": [],
+      "histories": [
+        {
+          "id": "archived-vintages",
+          "source_id": "alfred",
+          "history_source_id": "history",
+          "features": [
+            "value"
+          ],
+          "observation_keys": [
+            "observation_date"
+          ],
+          "history_keys": [
+            "observation_date"
+          ],
+          "value_columns": {
+            "value": "value"
+          },
+          "availability": {
+            "column": "vintage_date",
+            "kind": "civil_date",
+            "encoding": "iso",
+            "format": null,
+            "epoch_unit": null,
+            "timezone": null,
+            "timezone_column": null,
+            "ambiguity": "unresolved",
+            "fold_column": null,
+            "date_convention": null
+          },
+          "cutoff": {
+            "column": "cutoff",
+            "kind": "civil_date",
+            "encoding": "iso",
+            "format": null,
+            "epoch_unit": null,
+            "timezone": null,
+            "timezone_column": null,
+            "ambiguity": "unresolved",
+            "fold_column": null,
+            "date_convention": null
+          },
+          "value_units": {},
+          "revision_id_column": null,
+          "selected_revision_id_column": null,
+          "tie_order_column": null,
+          "tie_order_meaning": null,
+          "state_column": null,
+          "state_values": {
+            "valid": "valid",
+            "known_missing": "known_missing",
+            "retracted": "retracted",
+            "unknown": "unknown"
+          },
+          "null_semantics": "unknown",
+          "completeness": "unknown",
+          "coverage_start": null,
+          "coverage_end": null,
+          "initial_creation_included": false,
+          "baseline_time": null,
+          "latest_available_required": false,
+          "absolute_tolerance": null,
+          "relative_tolerance": null
+        }
+      ],
+      "maturity": [],
+      "evaluation": {
+        "folds": []
+      },
+      "dataset_name": "alfred",
+      "purpose": "Official archived five-vintage extract. Availability is known only at civil-day granularity; no intraday or complete-history assurance."
+    },
+    "configuration": {
+      "execution": {
+        "backend": "duckdb_local",
+        "max_source_bytes": 5368709120,
+        "max_combined_source_bytes": 8589934592,
+        "max_rows": 10000000,
+        "max_combined_rows": 30000000,
+        "max_columns": 1000,
+        "memory_bytes": 2147483648,
+        "max_rss_bytes": 6442450944,
+        "threads": 2,
+        "batch_bytes": 33554432,
+        "max_record_bytes": 8388608,
+        "workspace_bytes": 68719476736,
+        "free_disk_bytes": 2147483648,
+        "max_seconds": 1800,
+        "result_bytes": 33554432,
+        "scratch_directory": null
+      },
+      "limits": {
+        "max_cells": 100000000,
+        "max_series": 1000000,
+        "behavior_measurements": 8,
+        "detailed_series": 16,
+        "max_windows": 64,
+        "max_folds": 32,
+        "max_comparisons": 2048,
+        "observation_visits": 1000000000,
+        "retained_details": 100,
+        "witnesses": 5,
+        "decoded_batch_bytes": 67108864,
+        "parquet_metadata_bytes": 16777216
+      },
+      "behavior": {
+        "enabled": true,
+        "windows": 12,
+        "explicit_windows": [],
+        "reference_window": 0,
+        "requested_measurements": [],
+        "requested_series": [],
+        "multivariate_pairs": [],
+        "min_support": 100,
+        "missingness_increase": 0.05,
+        "distribution_effect": 0.1,
+        "normalized_w1": 0.25,
+        "flatline_observations": 10,
+        "volatility_support": 100,
+        "volatility_ratio": 2.0,
+        "rate_differences": false,
+        "seasonality": [],
+        "min_cycles": 8,
+        "min_window_cycles": 2,
+        "min_phase_support": 20,
+        "stable_cohort": true,
+        "version": "temporal_investigation_defaults_v1"
+      },
+      "presentation": {
+        "executive_actions": 5,
+        "target_panels": 6,
+        "feature_details": 20,
+        "table_rows": 20,
+        "appendix_rows": 100
+      }
+    },
+    "timezone_data": {
+      "package": "tzdata",
+      "version": "2026.5",
+      "zones": {}
+    },
+    "availability_unknown": {
+      "alfred": []
+    },
+    "budgets_are_provisional": true
+  },
+  "parsing": {
+    "alfred": {
+      "policy": "scalable_csv_v1",
+      "base_task_policy": "dataset_profile_v1",
+      "options": {
+        "encoding": "utf-8",
+        "missing_policy": "pandas_default",
+        "na_values": [],
+        "column_types": {
+          "cutoff": "string",
+          "observation_date": "string"
+        },
+        "column_missing_policies": {
+          "observation_date": {
+            "missing_policy": "pandas_default",
+            "na_values": []
+          },
+          "cutoff": {
+            "missing_policy": "pandas_default",
+            "na_values": []
+          }
+        }
+      },
+      "representations": {
+        "observation_date": {
+          "representation": "VARCHAR",
+          "origin": "explicit_parsing",
+          "missing_policy": "pandas_default",
+          "na_values": []
+        },
+        "value": {
+          "representation": "DOUBLE",
+          "origin": "whole_column_inference",
+          "missing_policy": "pandas_default",
+          "na_values": []
+        },
+        "cutoff": {
+          "representation": "VARCHAR",
+          "origin": "explicit_parsing",
+          "missing_policy": "pandas_default",
+          "na_values": []
+        }
+      },
+      "fingerprint": "4e92928fc5372311137a4986ca9c8e1b3d1de8bc9cb94855c54a5bc25bb32d58",
+      "logical_token_sha256": "03cb7616e5fc94426aaed1d461d91a1021f92f746b540dfde95baef1045ac2b8",
+      "header_mapping": [
+        {
+          "position": 1,
+          "original": "observation_date",
+          "resolved": "observation_date"
+        },
+        {
+          "position": 2,
+          "original": "value",
+          "resolved": "value"
+        },
+        {
+          "position": 3,
+          "original": "cutoff",
+          "resolved": "cutoff"
+        }
+      ],
+      "temporal_fingerprint": "9ae40f32947df2eb3049d4a477fab0ca82511e91668c555e2563e495e62109ef"
+    },
+    "history": {
+      "policy": "scalable_csv_v1",
+      "base_task_policy": "dataset_profile_v1",
+      "options": {
+        "encoding": "utf-8",
+        "missing_policy": "pandas_default",
+        "na_values": [],
+        "column_types": {
+          "observation_date": "string",
+          "vintage_date": "string"
+        },
+        "column_missing_policies": {
+          "vintage_date": {
+            "missing_policy": "pandas_default",
+            "na_values": []
+          }
+        }
+      },
+      "representations": {
+        "observation_date": {
+          "representation": "VARCHAR",
+          "origin": "explicit_parsing",
+          "missing_policy": "empty_only",
+          "na_values": []
+        },
+        "value": {
+          "representation": "DOUBLE",
+          "origin": "whole_column_inference",
+          "missing_policy": "pandas_default",
+          "na_values": []
+        },
+        "vintage_date": {
+          "representation": "VARCHAR",
+          "origin": "explicit_parsing",
+          "missing_policy": "pandas_default",
+          "na_values": []
+        }
+      },
+      "fingerprint": "2f6f10d1a5ff44cf40807eff0cef3b07383360a9b3f342761416373498ed7e58",
+      "logical_token_sha256": "e6d0fd9601e2145b66552f267f09290b8ce41a5ee718cd5b3d4156fa20f7ca3b",
+      "header_mapping": [
+        {
+          "position": 1,
+          "original": "observation_date",
+          "resolved": "observation_date"
+        },
+        {
+          "position": 2,
+          "original": "value",
+          "resolved": "value"
+        },
+        {
+          "position": 3,
+          "original": "vintage_date",
+          "resolved": "vintage_date"
+        }
+      ],
+      "temporal_fingerprint": "8913009bc823a232915c4cf89afc57bba4d28cdb9289cf48b6fde433ac377f97"
+    }
+  },
+  "checks": [
+    {
+      "check_id": "t1:chronology",
+      "applicability": "applicable",
+      "execution": "completed",
+      "reason": null,
+      "evidence_refs": [
+        "t1"
+      ],
+      "version": "temporal_reliability_v1"
+    },
+    {
+      "check_id": "t2:ordering",
+      "applicability": "applicable",
+      "execution": "completed",
+      "reason": null,
+      "evidence_refs": [
+        "t2"
+      ],
+      "version": "temporal_reliability_v1"
+    },
+    {
+      "check_id": "t3:repetition",
+      "applicability": "applicable",
+      "execution": "completed",
+      "reason": null,
+      "evidence_refs": [
+        "t3"
+      ],
+      "version": "temporal_reliability_v1"
+    },
+    {
+      "check_id": "t4:panel",
+      "applicability": "applicable",
+      "execution": "completed",
+      "reason": null,
+      "evidence_refs": [
+        "t4"
+      ],
+      "version": "temporal_reliability_v1"
+    },
+    {
+      "check_id": "t5:continuity",
+      "applicability": "applicable",
+      "execution": "completed",
+      "reason": null,
+      "evidence_refs": [
+        "t5"
+      ],
+      "version": "temporal_reliability_v1"
+    },
+    {
+      "check_id": "t6:availability_unknown",
+      "applicability": "applicable",
+      "execution": "completed",
+      "reason": null,
+      "evidence_refs": [
+        "t6"
+      ],
+      "version": "temporal_reliability_v1"
+    },
+    {
+      "check_id": "t7:revision_history",
+      "applicability": "applicable",
+      "execution": "completed",
+      "reason": null,
+      "evidence_refs": [
+        "t7"
+      ],
+      "version": "temporal_reliability_v1"
+    },
+    {
+      "check_id": "t8:behavior_windows",
+      "applicability": "applicable",
+      "execution": "completed",
+      "reason": null,
+      "evidence_refs": [
+        "t8"
+      ],
+      "version": "temporal_reliability_v1"
+    },
+    {
+      "check_id": "t9:behavior_panel",
+      "applicability": "applicable",
+      "execution": "completed",
+      "reason": null,
+      "evidence_refs": [
+        "t9"
+      ],
+      "version": "temporal_reliability_v1"
+    },
+    {
+      "check_id": "t10:runs",
+      "applicability": "applicable",
+      "execution": "completed",
+      "reason": null,
+      "evidence_refs": [
+        "t10"
+      ],
+      "version": "temporal_reliability_v1"
+    },
+    {
+      "check_id": "t11:volatility",
+      "applicability": "applicable",
+      "execution": "completed",
+      "reason": null,
+      "evidence_refs": [
+        "t11"
+      ],
+      "version": "temporal_reliability_v1"
+    },
+    {
+      "check_id": "t12:behavior_series",
+      "applicability": "applicable",
+      "execution": "completed",
+      "reason": null,
+      "evidence_refs": [
+        "t12"
+      ],
+      "version": "temporal_reliability_v1"
+    },
+    {
+      "check_id": "t13:behavior_scope",
+      "applicability": "applicable",
+      "execution": "completed",
+      "reason": null,
+      "evidence_refs": [
+        "t13"
+      ],
+      "version": "temporal_reliability_v1"
+    }
+  ],
+  "evidence": [
+    {
+      "id": "t1",
+      "check_id": "chronology",
+      "source_ids": [
+        "alfred"
+      ],
+      "measurement": null,
+      "entity": null,
+      "clock": {
+        "column": "observation_date",
+        "kind": "civil_date",
+        "encoding": "iso",
+        "format": null,
+        "epoch_unit": null,
+        "timezone": null,
+        "timezone_column": null,
+        "ambiguity": "unresolved",
+        "fold_column": null,
+        "date_convention": null
+      },
+      "population": "all eligible declared records",
+      "data": {
+        "rows": 2,
+        "cells": 2,
+        "declared_dense_missing_cells": 0,
+        "clock": {
+          "column": "observation_date",
+          "kind": "civil_date",
+          "encoding": "iso",
+          "format": null,
+          "epoch_unit": null,
+          "timezone": null,
+          "timezone_column": null,
+          "ambiguity": "unresolved",
+          "fold_column": null,
+          "date_convention": null
+        },
+        "parse_states": {
+          "valid": 2
+        },
+        "precision_counts": {
+          "day": 2
+        },
+        "value_states": [
+          {
+            "measurement": "value",
+            "state": "valid",
+            "cells": 2
+          }
+        ],
+        "missing_entity_cells": 0,
+        "incomplete_observation_keys": 0,
+        "observation_meaning": "measurement",
+        "clock_units": "civil days",
+        "exact_ticks": true
+      },
+      "exclusions": {
+        "entity_checks": 0
+      },
+      "requirement": null,
+      "assumption_dependencies": [],
+      "witnesses": [],
+      "source_references": [
+        {
+          "source_id": "alfred",
+          "sha256": "7b09f6aaf42bd461bd38dc9f6a600efe3ddeb7de92bee83583c5051bdddd5567",
+          "source_bytes": 82,
+          "rows": 2,
+          "parsing_fingerprint": "4e92928fc5372311137a4986ca9c8e1b3d1de8bc9cb94855c54a5bc25bb32d58",
+          "normalization_fingerprint": "9ae40f32947df2eb3049d4a477fab0ca82511e91668c555e2563e495e62109ef"
+        }
+      ]
+    },
+    {
+      "id": "t2",
+      "check_id": "ordering",
+      "source_ids": [
+        "alfred"
+      ],
+      "measurement": null,
+      "entity": null,
+      "clock": null,
+      "population": "all eligible declared records",
+      "data": {
+        "adjacent_backward_cells": 0,
+        "affected_row_union": 0,
+        "affected_entities": 0,
+        "largest_backward_step_ticks": null,
+        "arrival_order_declared": false
+      },
+      "exclusions": {},
+      "requirement": null,
+      "assumption_dependencies": [],
+      "witnesses": [],
+      "source_references": [
+        {
+          "source_id": "alfred",
+          "sha256": "7b09f6aaf42bd461bd38dc9f6a600efe3ddeb7de92bee83583c5051bdddd5567",
+          "source_bytes": 82,
+          "rows": 2,
+          "parsing_fingerprint": "4e92928fc5372311137a4986ca9c8e1b3d1de8bc9cb94855c54a5bc25bb32d58",
+          "normalization_fingerprint": "9ae40f32947df2eb3049d4a477fab0ca82511e91668c555e2563e495e62109ef"
+        }
+      ]
+    },
+    {
+      "id": "t3",
+      "check_id": "repetition",
+      "source_ids": [
+        "alfred"
+      ],
+      "measurement": null,
+      "entity": null,
+      "clock": null,
+      "population": "all eligible declared records",
+      "data": {
+        "additional_observations": 0,
+        "identical_repeated_identities": 0,
+        "conflicting_simultaneous_identities": 0,
+        "conflicting_cells": 0,
+        "uniqueness_required": false,
+        "event_identity_declared": true
+      },
+      "exclusions": {},
+      "requirement": null,
+      "assumption_dependencies": [],
+      "witnesses": [],
+      "source_references": [
+        {
+          "source_id": "alfred",
+          "sha256": "7b09f6aaf42bd461bd38dc9f6a600efe3ddeb7de92bee83583c5051bdddd5567",
+          "source_bytes": 82,
+          "rows": 2,
+          "parsing_fingerprint": "4e92928fc5372311137a4986ca9c8e1b3d1de8bc9cb94855c54a5bc25bb32d58",
+          "normalization_fingerprint": "9ae40f32947df2eb3049d4a477fab0ca82511e91668c555e2563e495e62109ef"
+        }
+      ]
+    },
+    {
+      "id": "t4",
+      "check_id": "panel",
+      "source_ids": [
+        "alfred"
+      ],
+      "measurement": null,
+      "entity": null,
+      "clock": null,
+      "population": "complete entity/observation keys with valid clocks",
+      "data": {
+        "distinct_entities": 1,
+        "distinct_series": 1,
+        "history_counts": {
+          "min": 2,
+          "max": 2,
+          "entity_weighted_mean": 2.0
+        },
+        "history_length_bins": [
+          {
+            "observations": 2,
+            "series": 1
+          }
+        ],
+        "retained_histories": [
+          {
+            "entity": [],
+            "measurement": "value",
+            "observations": 2,
+            "cells": 2,
+            "first_tick": "14610",
+            "last_tick": "14700",
+            "span_ticks": "90"
+          }
+        ],
+        "observed_first_tick": "14610",
+        "observed_last_tick": "14700",
+        "observed_entry_exit_is_lifecycle": false
+      },
+      "exclusions": {},
+      "requirement": null,
+      "assumption_dependencies": [],
+      "witnesses": [],
+      "source_references": [
+        {
+          "source_id": "alfred",
+          "sha256": "7b09f6aaf42bd461bd38dc9f6a600efe3ddeb7de92bee83583c5051bdddd5567",
+          "source_bytes": 82,
+          "rows": 2,
+          "parsing_fingerprint": "4e92928fc5372311137a4986ca9c8e1b3d1de8bc9cb94855c54a5bc25bb32d58",
+          "normalization_fingerprint": "9ae40f32947df2eb3049d4a477fab0ca82511e91668c555e2563e495e62109ef"
+        }
+      ]
+    },
+    {
+      "id": "t5",
+      "check_id": "continuity",
+      "source_ids": [
+        "alfred"
+      ],
+      "measurement": null,
+      "entity": null,
+      "clock": null,
+      "population": "all eligible declared records",
+      "data": {
+        "schedule": "none",
+        "inter_observation_distances": {
+          "count": 1,
+          "minimum_ticks": "90",
+          "maximum_ticks": "90"
+        },
+        "expected_records": null,
+        "leading_trailing_completeness": "unknown",
+        "timeline": [
+          {
+            "bin": 0,
+            "start_tick": "14610",
+            "end_tick": "14617",
+            "supplied_cells": 1,
+            "supplied_missing_cells": 0,
+            "invalid_or_nonfinite_cells": 0,
+            "expected_slots_or_opportunities": null,
+            "occupied_slots": null,
+            "absent_slots_or_opportunities": null,
+            "outside_expectation_period": null
+          },
+          {
+            "bin": 1,
+            "start_tick": "14617",
+            "end_tick": "14625",
+            "supplied_cells": 0,
+            "supplied_missing_cells": 0,
+            "invalid_or_nonfinite_cells": 0,
+            "expected_slots_or_opportunities": null,
+            "occupied_slots": null,
+            "absent_slots_or_opportunities": null,
+            "outside_expectation_period": null
+          },
+          {
+            "bin": 2,
+            "start_tick": "14625",
+            "end_tick": "14632",
+            "supplied_cells": 0,
+            "supplied_missing_cells": 0,
+            "invalid_or_nonfinite_cells": 0,
+            "expected_slots_or_opportunities": null,
+            "occupied_slots": null,
+            "absent_slots_or_opportunities": null,
+            "outside_expectation_period": null
+          },
+          {
+            "bin": 3,
+            "start_tick": "14632",
+            "end_tick": "14640",
+            "supplied_cells": 0,
+            "supplied_missing_cells": 0,
+            "invalid_or_nonfinite_cells": 0,
+            "expected_slots_or_opportunities": null,
+            "occupied_slots": null,
+            "absent_slots_or_opportunities": null,
+            "outside_expectation_period": null
+          },
+          {
+            "bin": 4,
+            "start_tick": "14640",
+            "end_tick": "14647",
+            "supplied_cells": 0,
+            "supplied_missing_cells": 0,
+            "invalid_or_nonfinite_cells": 0,
+            "expected_slots_or_opportunities": null,
+            "occupied_slots": null,
+            "absent_slots_or_opportunities": null,
+            "outside_expectation_period": null
+          },
+          {
+            "bin": 5,
+            "start_tick": "14647",
+            "end_tick": "14655",
+            "supplied_cells": 0,
+            "supplied_missing_cells": 0,
+            "invalid_or_nonfinite_cells": 0,
+            "expected_slots_or_opportunities": null,
+            "occupied_slots": null,
+            "absent_slots_or_opportunities": null,
+            "outside_expectation_period": null
+          },
+          {
+            "bin": 6,
+            "start_tick": "14655",
+            "end_tick": "14663",
+            "supplied_cells": 0,
+            "supplied_missing_cells": 0,
+            "invalid_or_nonfinite_cells": 0,
+            "expected_slots_or_opportunities": null,
+            "occupied_slots": null,
+            "absent_slots_or_opportunities": null,
+            "outside_expectation_period": null
+          },
+          {
+            "bin": 7,
+            "start_tick": "14663",
+            "end_tick": "14670",
+            "supplied_cells": 0,
+            "supplied_missing_cells": 0,
+            "invalid_or_nonfinite_cells": 0,
+            "expected_slots_or_opportunities": null,
+            "occupied_slots": null,
+            "absent_slots_or_opportunities": null,
+            "outside_expectation_period": null
+          },
+          {
+            "bin": 8,
+            "start_tick": "14670",
+            "end_tick": "14678",
+            "supplied_cells": 0,
+            "supplied_missing_cells": 0,
+            "invalid_or_nonfinite_cells": 0,
+            "expected_slots_or_opportunities": null,
+            "occupied_slots": null,
+            "absent_slots_or_opportunities": null,
+            "outside_expectation_period": null
+          },
+          {
+            "bin": 9,
+            "start_tick": "14678",
+            "end_tick": "14685",
+            "supplied_cells": 0,
+            "supplied_missing_cells": 0,
+            "invalid_or_nonfinite_cells": 0,
+            "expected_slots_or_opportunities": null,
+            "occupied_slots": null,
+            "absent_slots_or_opportunities": null,
+            "outside_expectation_period": null
+          },
+          {
+            "bin": 10,
+            "start_tick": "14685",
+            "end_tick": "14693",
+            "supplied_cells": 0,
+            "supplied_missing_cells": 0,
+            "invalid_or_nonfinite_cells": 0,
+            "expected_slots_or_opportunities": null,
+            "occupied_slots": null,
+            "absent_slots_or_opportunities": null,
+            "outside_expectation_period": null
+          },
+          {
+            "bin": 11,
+            "start_tick": "14693",
+            "end_tick": "14701",
+            "supplied_cells": 1,
+            "supplied_missing_cells": 0,
+            "invalid_or_nonfinite_cells": 0,
+            "expected_slots_or_opportunities": null,
+            "occupied_slots": null,
+            "absent_slots_or_opportunities": null,
+            "outside_expectation_period": null
+          }
+        ]
+      },
+      "exclusions": {},
+      "requirement": null,
+      "assumption_dependencies": [],
+      "witnesses": [],
+      "source_references": [
+        {
+          "source_id": "alfred",
+          "sha256": "7b09f6aaf42bd461bd38dc9f6a600efe3ddeb7de92bee83583c5051bdddd5567",
+          "source_bytes": 82,
+          "rows": 2,
+          "parsing_fingerprint": "4e92928fc5372311137a4986ca9c8e1b3d1de8bc9cb94855c54a5bc25bb32d58",
+          "normalization_fingerprint": "9ae40f32947df2eb3049d4a477fab0ca82511e91668c555e2563e495e62109ef"
+        }
+      ]
+    },
+    {
+      "id": "t6",
+      "check_id": "availability_unknown",
+      "source_ids": [
+        "alfred"
+      ],
+      "measurement": null,
+      "entity": null,
+      "clock": null,
+      "population": "all eligible declared records",
+      "data": {
+        "features": [],
+        "meaning": "Undeclared availability remains unknown; no timestamp inheritance."
+      },
+      "exclusions": {},
+      "requirement": null,
+      "assumption_dependencies": [],
+      "witnesses": [],
+      "source_references": [
+        {
+          "source_id": "alfred",
+          "sha256": "7b09f6aaf42bd461bd38dc9f6a600efe3ddeb7de92bee83583c5051bdddd5567",
+          "source_bytes": 82,
+          "rows": 2,
+          "parsing_fingerprint": "4e92928fc5372311137a4986ca9c8e1b3d1de8bc9cb94855c54a5bc25bb32d58",
+          "normalization_fingerprint": "9ae40f32947df2eb3049d4a477fab0ca82511e91668c555e2563e495e62109ef"
+        }
+      ]
+    },
+    {
+      "id": "t7",
+      "check_id": "revision_history",
+      "source_ids": [
+        "alfred",
+        "history"
+      ],
+      "measurement": "value",
+      "entity": null,
+      "clock": null,
+      "population": "all eligible declared records",
+      "data": {
+        "history_binding": {
+          "id": "archived-vintages",
+          "source_id": "alfred",
+          "history_source_id": "history",
+          "features": [
+            "value"
+          ],
+          "observation_keys": [
+            "observation_date"
+          ],
+          "history_keys": [
+            "observation_date"
+          ],
+          "value_columns": {
+            "value": "value"
+          },
+          "availability": {
+            "column": "vintage_date",
+            "kind": "civil_date",
+            "encoding": "iso",
+            "format": null,
+            "epoch_unit": null,
+            "timezone": null,
+            "timezone_column": null,
+            "ambiguity": "unresolved",
+            "fold_column": null,
+            "date_convention": null
+          },
+          "cutoff": {
+            "column": "cutoff",
+            "kind": "civil_date",
+            "encoding": "iso",
+            "format": null,
+            "epoch_unit": null,
+            "timezone": null,
+            "timezone_column": null,
+            "ambiguity": "unresolved",
+            "fold_column": null,
+            "date_convention": null
+          },
+          "value_units": {},
+          "revision_id_column": null,
+          "selected_revision_id_column": null,
+          "tie_order_column": null,
+          "tie_order_meaning": null,
+          "state_column": null,
+          "state_values": {
+            "valid": "valid",
+            "known_missing": "known_missing",
+            "retracted": "retracted",
+            "unknown": "unknown"
+          },
+          "null_semantics": "unknown",
+          "completeness": "unknown",
+          "coverage_start": null,
+          "coverage_end": null,
+          "initial_creation_included": false,
+          "baseline_time": null,
+          "latest_available_required": false,
+          "absolute_tolerance": null,
+          "relative_tolerance": null
+        },
+        "feature": "value",
+        "feature_unit": "percent annualized change",
+        "history_unit": "percent annualized change",
+        "unit_assumption": "Bound history values share the feature unit unless explicitly declared otherwise.",
+        "comparison_states": {
+          "agreement": 2
+        },
+        "complete_history_inconsistencies": 0,
+        "qualified_history_inconsistencies": 0,
+        "no_eligible_complete": 0,
+        "no_eligible_incomplete": 0,
+        "later_value_match_candidates": 0,
+        "unassignable_history_rows": 0,
+        "agreement_meaning": "Agreement within supplied coverage; not proof of production point-in-time correctness.",
+        "tie_order_representation": null,
+        "baseline_meaning": null
+      },
+      "exclusions": {},
+      "requirement": null,
+      "assumption_dependencies": [
+        "archived-vintages:coverage"
+      ],
+      "witnesses": [],
+      "source_references": [
+        {
+          "source_id": "alfred",
+          "sha256": "7b09f6aaf42bd461bd38dc9f6a600efe3ddeb7de92bee83583c5051bdddd5567",
+          "source_bytes": 82,
+          "rows": 2,
+          "parsing_fingerprint": "4e92928fc5372311137a4986ca9c8e1b3d1de8bc9cb94855c54a5bc25bb32d58",
+          "normalization_fingerprint": "9ae40f32947df2eb3049d4a477fab0ca82511e91668c555e2563e495e62109ef"
+        },
+        {
+          "source_id": "history",
+          "sha256": "e1aad4f4c6bf98e6ec18c466c1361500fbc99e825d80dbe5db5b2b08c95b122f",
+          "source_bytes": 218,
+          "rows": 7,
+          "parsing_fingerprint": "2f6f10d1a5ff44cf40807eff0cef3b07383360a9b3f342761416373498ed7e58",
+          "normalization_fingerprint": "8913009bc823a232915c4cf89afc57bba4d28cdb9289cf48b6fde433ac377f97"
+        }
+      ]
+    },
+    {
+      "id": "t8",
+      "check_id": "behavior_windows",
+      "source_ids": [
+        "alfred"
+      ],
+      "measurement": "value",
+      "entity": null,
+      "clock": null,
+      "population": "all eligible declared records",
+      "data": {
+        "measurement": "value",
+        "unit": "percent annualized change",
+        "windows": [
+          {
+            "window_id": 0,
+            "start_tick": "14610",
+            "end_tick": "14617",
+            "cells": 1,
+            "missing": 0,
+            "invalid": 0,
+            "nonfinite": 0,
+            "finite": 1,
+            "entities": 1,
+            "missing_rate": 0.0,
+            "quantiles": [
+              3.7,
+              3.7,
+              3.7,
+              3.7,
+              3.7,
+              3.7,
+              3.7
+            ],
+            "iqr": 0.0
+          },
+          {
+            "window_id": 1,
+            "start_tick": "14617",
+            "end_tick": "14625",
+            "cells": 0,
+            "missing": 0,
+            "invalid": 0,
+            "nonfinite": 0,
+            "finite": 0,
+            "entities": 0,
+            "missing_rate": null,
+            "quantiles": null,
+            "iqr": null
+          },
+          {
+            "window_id": 2,
+            "start_tick": "14625",
+            "end_tick": "14632",
+            "cells": 0,
+            "missing": 0,
+            "invalid": 0,
+            "nonfinite": 0,
+            "finite": 0,
+            "entities": 0,
+            "missing_rate": null,
+            "quantiles": null,
+            "iqr": null
+          },
+          {
+            "window_id": 3,
+            "start_tick": "14632",
+            "end_tick": "14640",
+            "cells": 0,
+            "missing": 0,
+            "invalid": 0,
+            "nonfinite": 0,
+            "finite": 0,
+            "entities": 0,
+            "missing_rate": null,
+            "quantiles": null,
+            "iqr": null
+          },
+          {
+            "window_id": 4,
+            "start_tick": "14640",
+            "end_tick": "14647",
+            "cells": 0,
+            "missing": 0,
+            "invalid": 0,
+            "nonfinite": 0,
+            "finite": 0,
+            "entities": 0,
+            "missing_rate": null,
+            "quantiles": null,
+            "iqr": null
+          },
+          {
+            "window_id": 5,
+            "start_tick": "14647",
+            "end_tick": "14655",
+            "cells": 0,
+            "missing": 0,
+            "invalid": 0,
+            "nonfinite": 0,
+            "finite": 0,
+            "entities": 0,
+            "missing_rate": null,
+            "quantiles": null,
+            "iqr": null
+          },
+          {
+            "window_id": 6,
+            "start_tick": "14655",
+            "end_tick": "14663",
+            "cells": 0,
+            "missing": 0,
+            "invalid": 0,
+            "nonfinite": 0,
+            "finite": 0,
+            "entities": 0,
+            "missing_rate": null,
+            "quantiles": null,
+            "iqr": null
+          },
+          {
+            "window_id": 7,
+            "start_tick": "14663",
+            "end_tick": "14670",
+            "cells": 0,
+            "missing": 0,
+            "invalid": 0,
+            "nonfinite": 0,
+            "finite": 0,
+            "entities": 0,
+            "missing_rate": null,
+            "quantiles": null,
+            "iqr": null
+          },
+          {
+            "window_id": 8,
+            "start_tick": "14670",
+            "end_tick": "14678",
+            "cells": 0,
+            "missing": 0,
+            "invalid": 0,
+            "nonfinite": 0,
+            "finite": 0,
+            "entities": 0,
+            "missing_rate": null,
+            "quantiles": null,
+            "iqr": null
+          },
+          {
+            "window_id": 9,
+            "start_tick": "14678",
+            "end_tick": "14685",
+            "cells": 0,
+            "missing": 0,
+            "invalid": 0,
+            "nonfinite": 0,
+            "finite": 0,
+            "entities": 0,
+            "missing_rate": null,
+            "quantiles": null,
+            "iqr": null
+          },
+          {
+            "window_id": 10,
+            "start_tick": "14685",
+            "end_tick": "14693",
+            "cells": 0,
+            "missing": 0,
+            "invalid": 0,
+            "nonfinite": 0,
+            "finite": 0,
+            "entities": 0,
+            "missing_rate": null,
+            "quantiles": null,
+            "iqr": null
+          },
+          {
+            "window_id": 11,
+            "start_tick": "14693",
+            "end_tick": "14701",
+            "cells": 1,
+            "missing": 0,
+            "invalid": 0,
+            "nonfinite": 0,
+            "finite": 1,
+            "entities": 1,
+            "missing_rate": 0.0,
+            "quantiles": [
+              1.6,
+              1.6,
+              1.6,
+              1.6,
+              1.6,
+              1.6,
+              1.6
+            ],
+            "iqr": 0.0
+          }
+        ],
+        "comparisons": [
+          {
+            "reference_window": 0,
+            "comparison_window": 1,
+            "reference_support": 1,
+            "comparison_support": 0,
+            "reference_iqr": 0.0,
+            "reference_span": [
+              "14610",
+              "14617"
+            ],
+            "reference_entities": 1,
+            "comparison_entities": 0,
+            "unit": "percent annualized change",
+            "thresholds_are_investigation_defaults": true,
+            "missingness_change": null,
+            "missingness_review": false,
+            "distribution_block": "empty_finite_population"
+          },
+          {
+            "reference_window": 1,
+            "comparison_window": 2,
+            "reference_support": 0,
+            "comparison_support": 0,
+            "reference_iqr": null,
+            "reference_span": [
+              "14617",
+              "14625"
+            ],
+            "reference_entities": 0,
+            "comparison_entities": 0,
+            "unit": "percent annualized change",
+            "thresholds_are_investigation_defaults": true,
+            "missingness_change": null,
+            "missingness_review": false,
+            "distribution_block": "empty_finite_population"
+          },
+          {
+            "reference_window": 2,
+            "comparison_window": 3,
+            "reference_support": 0,
+            "comparison_support": 0,
+            "reference_iqr": null,
+            "reference_span": [
+              "14625",
+              "14632"
+            ],
+            "reference_entities": 0,
+            "comparison_entities": 0,
+            "unit": "percent annualized change",
+            "thresholds_are_investigation_defaults": true,
+            "missingness_change": null,
+            "missingness_review": false,
+            "distribution_block": "empty_finite_population"
+          },
+          {
+            "reference_window": 3,
+            "comparison_window": 4,
+            "reference_support": 0,
+            "comparison_support": 0,
+            "reference_iqr": null,
+            "reference_span": [
+              "14632",
+              "14640"
+            ],
+            "reference_entities": 0,
+            "comparison_entities": 0,
+            "unit": "percent annualized change",
+            "thresholds_are_investigation_defaults": true,
+            "missingness_change": null,
+            "missingness_review": false,
+            "distribution_block": "empty_finite_population"
+          },
+          {
+            "reference_window": 4,
+            "comparison_window": 5,
+            "reference_support": 0,
+            "comparison_support": 0,
+            "reference_iqr": null,
+            "reference_span": [
+              "14640",
+              "14647"
+            ],
+            "reference_entities": 0,
+            "comparison_entities": 0,
+            "unit": "percent annualized change",
+            "thresholds_are_investigation_defaults": true,
+            "missingness_change": null,
+            "missingness_review": false,
+            "distribution_block": "empty_finite_population"
+          },
+          {
+            "reference_window": 5,
+            "comparison_window": 6,
+            "reference_support": 0,
+            "comparison_support": 0,
+            "reference_iqr": null,
+            "reference_span": [
+              "14647",
+              "14655"
+            ],
+            "reference_entities": 0,
+            "comparison_entities": 0,
+            "unit": "percent annualized change",
+            "thresholds_are_investigation_defaults": true,
+            "missingness_change": null,
+            "missingness_review": false,
+            "distribution_block": "empty_finite_population"
+          },
+          {
+            "reference_window": 6,
+            "comparison_window": 7,
+            "reference_support": 0,
+            "comparison_support": 0,
+            "reference_iqr": null,
+            "reference_span": [
+              "14655",
+              "14663"
+            ],
+            "reference_entities": 0,
+            "comparison_entities": 0,
+            "unit": "percent annualized change",
+            "thresholds_are_investigation_defaults": true,
+            "missingness_change": null,
+            "missingness_review": false,
+            "distribution_block": "empty_finite_population"
+          },
+          {
+            "reference_window": 7,
+            "comparison_window": 8,
+            "reference_support": 0,
+            "comparison_support": 0,
+            "reference_iqr": null,
+            "reference_span": [
+              "14663",
+              "14670"
+            ],
+            "reference_entities": 0,
+            "comparison_entities": 0,
+            "unit": "percent annualized change",
+            "thresholds_are_investigation_defaults": true,
+            "missingness_change": null,
+            "missingness_review": false,
+            "distribution_block": "empty_finite_population"
+          },
+          {
+            "reference_window": 8,
+            "comparison_window": 9,
+            "reference_support": 0,
+            "comparison_support": 0,
+            "reference_iqr": null,
+            "reference_span": [
+              "14670",
+              "14678"
+            ],
+            "reference_entities": 0,
+            "comparison_entities": 0,
+            "unit": "percent annualized change",
+            "thresholds_are_investigation_defaults": true,
+            "missingness_change": null,
+            "missingness_review": false,
+            "distribution_block": "empty_finite_population"
+          },
+          {
+            "reference_window": 9,
+            "comparison_window": 10,
+            "reference_support": 0,
+            "comparison_support": 0,
+            "reference_iqr": null,
+            "reference_span": [
+              "14678",
+              "14685"
+            ],
+            "reference_entities": 0,
+            "comparison_entities": 0,
+            "unit": "percent annualized change",
+            "thresholds_are_investigation_defaults": true,
+            "missingness_change": null,
+            "missingness_review": false,
+            "distribution_block": "empty_finite_population"
+          },
+          {
+            "reference_window": 10,
+            "comparison_window": 11,
+            "reference_support": 0,
+            "comparison_support": 1,
+            "reference_iqr": null,
+            "reference_span": [
+              "14685",
+              "14693"
+            ],
+            "reference_entities": 0,
+            "comparison_entities": 1,
+            "unit": "percent annualized change",
+            "thresholds_are_investigation_defaults": true,
+            "missingness_change": null,
+            "missingness_review": false,
+            "distribution_block": "empty_finite_population"
+          },
+          {
+            "reference_window": 0,
+            "comparison_window": 2,
+            "reference_support": 1,
+            "comparison_support": 0,
+            "reference_iqr": 0.0,
+            "reference_span": [
+              "14610",
+              "14617"
+            ],
+            "reference_entities": 1,
+            "comparison_entities": 0,
+            "unit": "percent annualized change",
+            "thresholds_are_investigation_defaults": true,
+            "missingness_change": null,
+            "missingness_review": false,
+            "distribution_block": "empty_finite_population"
+          },
+          {
+            "reference_window": 0,
+            "comparison_window": 3,
+            "reference_support": 1,
+            "comparison_support": 0,
+            "reference_iqr": 0.0,
+            "reference_span": [
+              "14610",
+              "14617"
+            ],
+            "reference_entities": 1,
+            "comparison_entities": 0,
+            "unit": "percent annualized change",
+            "thresholds_are_investigation_defaults": true,
+            "missingness_change": null,
+            "missingness_review": false,
+            "distribution_block": "empty_finite_population"
+          },
+          {
+            "reference_window": 0,
+            "comparison_window": 4,
+            "reference_support": 1,
+            "comparison_support": 0,
+            "reference_iqr": 0.0,
+            "reference_span": [
+              "14610",
+              "14617"
+            ],
+            "reference_entities": 1,
+            "comparison_entities": 0,
+            "unit": "percent annualized change",
+            "thresholds_are_investigation_defaults": true,
+            "missingness_change": null,
+            "missingness_review": false,
+            "distribution_block": "empty_finite_population"
+          },
+          {
+            "reference_window": 0,
+            "comparison_window": 5,
+            "reference_support": 1,
+            "comparison_support": 0,
+            "reference_iqr": 0.0,
+            "reference_span": [
+              "14610",
+              "14617"
+            ],
+            "reference_entities": 1,
+            "comparison_entities": 0,
+            "unit": "percent annualized change",
+            "thresholds_are_investigation_defaults": true,
+            "missingness_change": null,
+            "missingness_review": false,
+            "distribution_block": "empty_finite_population"
+          },
+          {
+            "reference_window": 0,
+            "comparison_window": 6,
+            "reference_support": 1,
+            "comparison_support": 0,
+            "reference_iqr": 0.0,
+            "reference_span": [
+              "14610",
+              "14617"
+            ],
+            "reference_entities": 1,
+            "comparison_entities": 0,
+            "unit": "percent annualized change",
+            "thresholds_are_investigation_defaults": true,
+            "missingness_change": null,
+            "missingness_review": false,
+            "distribution_block": "empty_finite_population"
+          },
+          {
+            "reference_window": 0,
+            "comparison_window": 7,
+            "reference_support": 1,
+            "comparison_support": 0,
+            "reference_iqr": 0.0,
+            "reference_span": [
+              "14610",
+              "14617"
+            ],
+            "reference_entities": 1,
+            "comparison_entities": 0,
+            "unit": "percent annualized change",
+            "thresholds_are_investigation_defaults": true,
+            "missingness_change": null,
+            "missingness_review": false,
+            "distribution_block": "empty_finite_population"
+          },
+          {
+            "reference_window": 0,
+            "comparison_window": 8,
+            "reference_support": 1,
+            "comparison_support": 0,
+            "reference_iqr": 0.0,
+            "reference_span": [
+              "14610",
+              "14617"
+            ],
+            "reference_entities": 1,
+            "comparison_entities": 0,
+            "unit": "percent annualized change",
+            "thresholds_are_investigation_defaults": true,
+            "missingness_change": null,
+            "missingness_review": false,
+            "distribution_block": "empty_finite_population"
+          },
+          {
+            "reference_window": 0,
+            "comparison_window": 9,
+            "reference_support": 1,
+            "comparison_support": 0,
+            "reference_iqr": 0.0,
+            "reference_span": [
+              "14610",
+              "14617"
+            ],
+            "reference_entities": 1,
+            "comparison_entities": 0,
+            "unit": "percent annualized change",
+            "thresholds_are_investigation_defaults": true,
+            "missingness_change": null,
+            "missingness_review": false,
+            "distribution_block": "empty_finite_population"
+          },
+          {
+            "reference_window": 0,
+            "comparison_window": 10,
+            "reference_support": 1,
+            "comparison_support": 0,
+            "reference_iqr": 0.0,
+            "reference_span": [
+              "14610",
+              "14617"
+            ],
+            "reference_entities": 1,
+            "comparison_entities": 0,
+            "unit": "percent annualized change",
+            "thresholds_are_investigation_defaults": true,
+            "missingness_change": null,
+            "missingness_review": false,
+            "distribution_block": "empty_finite_population"
+          },
+          {
+            "reference_window": 0,
+            "comparison_window": 11,
+            "reference_support": 1,
+            "comparison_support": 1,
+            "reference_iqr": 0.0,
+            "reference_span": [
+              "14610",
+              "14617"
+            ],
+            "reference_entities": 1,
+            "comparison_entities": 1,
+            "unit": "percent annualized change",
+            "thresholds_are_investigation_defaults": true,
+            "missingness_change": 0.0,
+            "missingness_review": false,
+            "cdf_distance": 1.0,
+            "wasserstein_1": 2.1,
+            "normalized_w1": null,
+            "normalization_block": "zero_or_unsafe_reference_iqr",
+            "distribution_review": false,
+            "below_support_descriptive_only": true
+          }
+        ],
+        "reference_window": 0,
+        "reference_was_replaced": false,
+        "investigation_defaults": {
+          "enabled": true,
+          "windows": 12,
+          "explicit_windows": [],
+          "reference_window": 0,
+          "requested_measurements": [],
+          "requested_series": [],
+          "multivariate_pairs": [],
+          "min_support": 100,
+          "missingness_increase": 0.05,
+          "distribution_effect": 0.1,
+          "normalized_w1": 0.25,
+          "flatline_observations": 10,
+          "volatility_support": 100,
+          "volatility_ratio": 2.0,
+          "rate_differences": false,
+          "seasonality": [],
+          "min_cycles": 8,
+          "min_window_cycles": 2,
+          "min_phase_support": 20,
+          "stable_cohort": true,
+          "version": "temporal_investigation_defaults_v1"
+        },
+        "comparison_search_bounded": false,
+        "empty_denominators_are_unavailable": true,
+        "interpretation": "Observed effects are descriptive investigation evidence, not validated universal defects, changepoints, concept drift, or model performance."
+      },
+      "exclusions": {},
+      "requirement": null,
+      "assumption_dependencies": [],
+      "witnesses": [],
+      "source_references": [
+        {
+          "source_id": "alfred",
+          "sha256": "7b09f6aaf42bd461bd38dc9f6a600efe3ddeb7de92bee83583c5051bdddd5567",
+          "source_bytes": 82,
+          "rows": 2,
+          "parsing_fingerprint": "4e92928fc5372311137a4986ca9c8e1b3d1de8bc9cb94855c54a5bc25bb32d58",
+          "normalization_fingerprint": "9ae40f32947df2eb3049d4a477fab0ca82511e91668c555e2563e495e62109ef"
+        }
+      ]
+    },
+    {
+      "id": "t9",
+      "check_id": "behavior_panel",
+      "source_ids": [
+        "alfred"
+      ],
+      "measurement": "value",
+      "entity": null,
+      "clock": null,
+      "population": "all eligible declared records",
+      "data": {
+        "measurement": "value",
+        "population_mix": [
+          {
+            "reference_window": 0,
+            "comparison_window": 11,
+            "total_variation": 0.0,
+            "union_vocabulary": 1,
+            "new_category_mass": 0.0,
+            "disappearing_category_mass": 0.0
+          }
+        ],
+        "stable_entities": 0,
+        "stable_cohort_effects": [],
+        "qualification": "Stable cohort conditions on survival across every declared window_id; it can omit entrants, exits and behavior-only problems. Pooled stable-cohort effects are not per-entity causal effects."
+      },
+      "exclusions": {},
+      "requirement": null,
+      "assumption_dependencies": [],
+      "witnesses": [],
+      "source_references": [
+        {
+          "source_id": "alfred",
+          "sha256": "7b09f6aaf42bd461bd38dc9f6a600efe3ddeb7de92bee83583c5051bdddd5567",
+          "source_bytes": 82,
+          "rows": 2,
+          "parsing_fingerprint": "4e92928fc5372311137a4986ca9c8e1b3d1de8bc9cb94855c54a5bc25bb32d58",
+          "normalization_fingerprint": "9ae40f32947df2eb3049d4a477fab0ca82511e91668c555e2563e495e62109ef"
+        }
+      ]
+    },
+    {
+      "id": "t10",
+      "check_id": "runs",
+      "source_ids": [
+        "alfred"
+      ],
+      "measurement": "value",
+      "entity": null,
+      "clock": null,
+      "population": "all eligible declared records",
+      "data": {
+        "measurement": "value",
+        "exact_repetition_runs": 0,
+        "participating_observations": 0,
+        "longest_repetition": null,
+        "missing_state_runs": 0,
+        "longest_missing_state_run": null,
+        "continuity_established": false,
+        "valid_observations": 2,
+        "distinct_valid_values": 2,
+        "candidate_threshold": 10,
+        "scope": "consecutive observations",
+        "globally_constant_descriptive": false
+      },
+      "exclusions": {},
+      "requirement": null,
+      "assumption_dependencies": [],
+      "witnesses": [
+        {
+          "entity": "[]",
+          "first_tick": "14610",
+          "last_tick": "14610",
+          "observations": 1,
+          "state": "valid"
+        },
+        {
+          "entity": "[]",
+          "first_tick": "14700",
+          "last_tick": "14700",
+          "observations": 1,
+          "state": "valid"
+        }
+      ],
+      "source_references": [
+        {
+          "source_id": "alfred",
+          "sha256": "7b09f6aaf42bd461bd38dc9f6a600efe3ddeb7de92bee83583c5051bdddd5567",
+          "source_bytes": 82,
+          "rows": 2,
+          "parsing_fingerprint": "4e92928fc5372311137a4986ca9c8e1b3d1de8bc9cb94855c54a5bc25bb32d58",
+          "normalization_fingerprint": "9ae40f32947df2eb3049d4a477fab0ca82511e91668c555e2563e495e62109ef"
+        }
+      ]
+    },
+    {
+      "id": "t11",
+      "check_id": "volatility",
+      "source_ids": [
+        "alfred"
+      ],
+      "measurement": "value",
+      "entity": null,
+      "clock": null,
+      "population": "all eligible declared records",
+      "data": {
+        "measurement": "value",
+        "definition": "IQR of eligible consecutive differences",
+        "windows": [
+          {
+            "window_id": 0,
+            "differences": 0,
+            "dispersion": null,
+            "reference_window": 0,
+            "ratio": null,
+            "review": false,
+            "block": "zero_or_unsafe_reference_dispersion"
+          },
+          {
+            "window_id": 1,
+            "differences": 0,
+            "dispersion": null,
+            "reference_window": 0,
+            "ratio": null,
+            "review": false,
+            "block": "zero_or_unsafe_reference_dispersion"
+          },
+          {
+            "window_id": 2,
+            "differences": 0,
+            "dispersion": null,
+            "reference_window": 0,
+            "ratio": null,
+            "review": false,
+            "block": "zero_or_unsafe_reference_dispersion"
+          },
+          {
+            "window_id": 3,
+            "differences": 0,
+            "dispersion": null,
+            "reference_window": 0,
+            "ratio": null,
+            "review": false,
+            "block": "zero_or_unsafe_reference_dispersion"
+          },
+          {
+            "window_id": 4,
+            "differences": 0,
+            "dispersion": null,
+            "reference_window": 0,
+            "ratio": null,
+            "review": false,
+            "block": "zero_or_unsafe_reference_dispersion"
+          },
+          {
+            "window_id": 5,
+            "differences": 0,
+            "dispersion": null,
+            "reference_window": 0,
+            "ratio": null,
+            "review": false,
+            "block": "zero_or_unsafe_reference_dispersion"
+          },
+          {
+            "window_id": 6,
+            "differences": 0,
+            "dispersion": null,
+            "reference_window": 0,
+            "ratio": null,
+            "review": false,
+            "block": "zero_or_unsafe_reference_dispersion"
+          },
+          {
+            "window_id": 7,
+            "differences": 0,
+            "dispersion": null,
+            "reference_window": 0,
+            "ratio": null,
+            "review": false,
+            "block": "zero_or_unsafe_reference_dispersion"
+          },
+          {
+            "window_id": 8,
+            "differences": 0,
+            "dispersion": null,
+            "reference_window": 0,
+            "ratio": null,
+            "review": false,
+            "block": "zero_or_unsafe_reference_dispersion"
+          },
+          {
+            "window_id": 9,
+            "differences": 0,
+            "dispersion": null,
+            "reference_window": 0,
+            "ratio": null,
+            "review": false,
+            "block": "zero_or_unsafe_reference_dispersion"
+          },
+          {
+            "window_id": 10,
+            "differences": 0,
+            "dispersion": null,
+            "reference_window": 0,
+            "ratio": null,
+            "review": false,
+            "block": "zero_or_unsafe_reference_dispersion"
+          },
+          {
+            "window_id": 11,
+            "differences": 0,
+            "dispersion": null,
+            "reference_window": 0,
+            "ratio": null,
+            "review": false,
+            "block": "zero_or_unsafe_reference_dispersion"
+          }
+        ],
+        "continuity_established": false
+      },
+      "exclusions": {},
+      "requirement": null,
+      "assumption_dependencies": [],
+      "witnesses": [],
+      "source_references": [
+        {
+          "source_id": "alfred",
+          "sha256": "7b09f6aaf42bd461bd38dc9f6a600efe3ddeb7de92bee83583c5051bdddd5567",
+          "source_bytes": 82,
+          "rows": 2,
+          "parsing_fingerprint": "4e92928fc5372311137a4986ca9c8e1b3d1de8bc9cb94855c54a5bc25bb32d58",
+          "normalization_fingerprint": "9ae40f32947df2eb3049d4a477fab0ca82511e91668c555e2563e495e62109ef"
+        }
+      ]
+    },
+    {
+      "id": "t12",
+      "check_id": "behavior_series",
+      "source_ids": [
+        "alfred"
+      ],
+      "measurement": null,
+      "entity": null,
+      "clock": null,
+      "population": "all eligible declared records",
+      "data": {
+        "selected_series": 1,
+        "compared_series_windows": 21,
+        "investigation_candidates": 0,
+        "details": [
+          {
+            "entity": [],
+            "measurement": "value",
+            "reference_window": 0,
+            "comparison_window": 1,
+            "reference_cells": 1,
+            "comparison_cells": 0,
+            "missingness_change": null,
+            "cdf": null,
+            "w1": null,
+            "reference_iqr": 0.0,
+            "normalized_w1": null,
+            "tv": null,
+            "investigation_candidate": false,
+            "selection": "coverage concerns, support, canonical identity",
+            "unsafe_numeric_comparison": false
+          },
+          {
+            "entity": [],
+            "measurement": "value",
+            "reference_window": 0,
+            "comparison_window": 2,
+            "reference_cells": 1,
+            "comparison_cells": 0,
+            "missingness_change": null,
+            "cdf": null,
+            "w1": null,
+            "reference_iqr": 0.0,
+            "normalized_w1": null,
+            "tv": null,
+            "investigation_candidate": false,
+            "selection": "coverage concerns, support, canonical identity",
+            "unsafe_numeric_comparison": false
+          },
+          {
+            "entity": [],
+            "measurement": "value",
+            "reference_window": 0,
+            "comparison_window": 3,
+            "reference_cells": 1,
+            "comparison_cells": 0,
+            "missingness_change": null,
+            "cdf": null,
+            "w1": null,
+            "reference_iqr": 0.0,
+            "normalized_w1": null,
+            "tv": null,
+            "investigation_candidate": false,
+            "selection": "coverage concerns, support, canonical identity",
+            "unsafe_numeric_comparison": false
+          },
+          {
+            "entity": [],
+            "measurement": "value",
+            "reference_window": 0,
+            "comparison_window": 4,
+            "reference_cells": 1,
+            "comparison_cells": 0,
+            "missingness_change": null,
+            "cdf": null,
+            "w1": null,
+            "reference_iqr": 0.0,
+            "normalized_w1": null,
+            "tv": null,
+            "investigation_candidate": false,
+            "selection": "coverage concerns, support, canonical identity",
+            "unsafe_numeric_comparison": false
+          },
+          {
+            "entity": [],
+            "measurement": "value",
+            "reference_window": 0,
+            "comparison_window": 5,
+            "reference_cells": 1,
+            "comparison_cells": 0,
+            "missingness_change": null,
+            "cdf": null,
+            "w1": null,
+            "reference_iqr": 0.0,
+            "normalized_w1": null,
+            "tv": null,
+            "investigation_candidate": false,
+            "selection": "coverage concerns, support, canonical identity",
+            "unsafe_numeric_comparison": false
+          },
+          {
+            "entity": [],
+            "measurement": "value",
+            "reference_window": 0,
+            "comparison_window": 6,
+            "reference_cells": 1,
+            "comparison_cells": 0,
+            "missingness_change": null,
+            "cdf": null,
+            "w1": null,
+            "reference_iqr": 0.0,
+            "normalized_w1": null,
+            "tv": null,
+            "investigation_candidate": false,
+            "selection": "coverage concerns, support, canonical identity",
+            "unsafe_numeric_comparison": false
+          },
+          {
+            "entity": [],
+            "measurement": "value",
+            "reference_window": 0,
+            "comparison_window": 7,
+            "reference_cells": 1,
+            "comparison_cells": 0,
+            "missingness_change": null,
+            "cdf": null,
+            "w1": null,
+            "reference_iqr": 0.0,
+            "normalized_w1": null,
+            "tv": null,
+            "investigation_candidate": false,
+            "selection": "coverage concerns, support, canonical identity",
+            "unsafe_numeric_comparison": false
+          },
+          {
+            "entity": [],
+            "measurement": "value",
+            "reference_window": 0,
+            "comparison_window": 8,
+            "reference_cells": 1,
+            "comparison_cells": 0,
+            "missingness_change": null,
+            "cdf": null,
+            "w1": null,
+            "reference_iqr": 0.0,
+            "normalized_w1": null,
+            "tv": null,
+            "investigation_candidate": false,
+            "selection": "coverage concerns, support, canonical identity",
+            "unsafe_numeric_comparison": false
+          },
+          {
+            "entity": [],
+            "measurement": "value",
+            "reference_window": 0,
+            "comparison_window": 9,
+            "reference_cells": 1,
+            "comparison_cells": 0,
+            "missingness_change": null,
+            "cdf": null,
+            "w1": null,
+            "reference_iqr": 0.0,
+            "normalized_w1": null,
+            "tv": null,
+            "investigation_candidate": false,
+            "selection": "coverage concerns, support, canonical identity",
+            "unsafe_numeric_comparison": false
+          },
+          {
+            "entity": [],
+            "measurement": "value",
+            "reference_window": 0,
+            "comparison_window": 10,
+            "reference_cells": 1,
+            "comparison_cells": 0,
+            "missingness_change": null,
+            "cdf": null,
+            "w1": null,
+            "reference_iqr": 0.0,
+            "normalized_w1": null,
+            "tv": null,
+            "investigation_candidate": false,
+            "selection": "coverage concerns, support, canonical identity",
+            "unsafe_numeric_comparison": false
+          },
+          {
+            "entity": [],
+            "measurement": "value",
+            "reference_window": 0,
+            "comparison_window": 11,
+            "reference_cells": 1,
+            "comparison_cells": 1,
+            "missingness_change": 0.0,
+            "cdf": 1.0,
+            "w1": 2.1,
+            "reference_iqr": 0.0,
+            "normalized_w1": null,
+            "tv": null,
+            "investigation_candidate": false,
+            "selection": "coverage concerns, support, canonical identity",
+            "unsafe_numeric_comparison": false
+          },
+          {
+            "entity": [],
+            "measurement": "value",
+            "reference_window": 1,
+            "comparison_window": 2,
+            "reference_cells": 0,
+            "comparison_cells": 0,
+            "missingness_change": null,
+            "cdf": null,
+            "w1": null,
+            "reference_iqr": null,
+            "normalized_w1": null,
+            "tv": null,
+            "investigation_candidate": false,
+            "selection": "coverage concerns, support, canonical identity",
+            "unsafe_numeric_comparison": false
+          },
+          {
+            "entity": [],
+            "measurement": "value",
+            "reference_window": 2,
+            "comparison_window": 3,
+            "reference_cells": 0,
+            "comparison_cells": 0,
+            "missingness_change": null,
+            "cdf": null,
+            "w1": null,
+            "reference_iqr": null,
+            "normalized_w1": null,
+            "tv": null,
+            "investigation_candidate": false,
+            "selection": "coverage concerns, support, canonical identity",
+            "unsafe_numeric_comparison": false
+          },
+          {
+            "entity": [],
+            "measurement": "value",
+            "reference_window": 3,
+            "comparison_window": 4,
+            "reference_cells": 0,
+            "comparison_cells": 0,
+            "missingness_change": null,
+            "cdf": null,
+            "w1": null,
+            "reference_iqr": null,
+            "normalized_w1": null,
+            "tv": null,
+            "investigation_candidate": false,
+            "selection": "coverage concerns, support, canonical identity",
+            "unsafe_numeric_comparison": false
+          },
+          {
+            "entity": [],
+            "measurement": "value",
+            "reference_window": 4,
+            "comparison_window": 5,
+            "reference_cells": 0,
+            "comparison_cells": 0,
+            "missingness_change": null,
+            "cdf": null,
+            "w1": null,
+            "reference_iqr": null,
+            "normalized_w1": null,
+            "tv": null,
+            "investigation_candidate": false,
+            "selection": "coverage concerns, support, canonical identity",
+            "unsafe_numeric_comparison": false
+          },
+          {
+            "entity": [],
+            "measurement": "value",
+            "reference_window": 5,
+            "comparison_window": 6,
+            "reference_cells": 0,
+            "comparison_cells": 0,
+            "missingness_change": null,
+            "cdf": null,
+            "w1": null,
+            "reference_iqr": null,
+            "normalized_w1": null,
+            "tv": null,
+            "investigation_candidate": false,
+            "selection": "coverage concerns, support, canonical identity",
+            "unsafe_numeric_comparison": false
+          },
+          {
+            "entity": [],
+            "measurement": "value",
+            "reference_window": 6,
+            "comparison_window": 7,
+            "reference_cells": 0,
+            "comparison_cells": 0,
+            "missingness_change": null,
+            "cdf": null,
+            "w1": null,
+            "reference_iqr": null,
+            "normalized_w1": null,
+            "tv": null,
+            "investigation_candidate": false,
+            "selection": "coverage concerns, support, canonical identity",
+            "unsafe_numeric_comparison": false
+          },
+          {
+            "entity": [],
+            "measurement": "value",
+            "reference_window": 7,
+            "comparison_window": 8,
+            "reference_cells": 0,
+            "comparison_cells": 0,
+            "missingness_change": null,
+            "cdf": null,
+            "w1": null,
+            "reference_iqr": null,
+            "normalized_w1": null,
+            "tv": null,
+            "investigation_candidate": false,
+            "selection": "coverage concerns, support, canonical identity",
+            "unsafe_numeric_comparison": false
+          },
+          {
+            "entity": [],
+            "measurement": "value",
+            "reference_window": 8,
+            "comparison_window": 9,
+            "reference_cells": 0,
+            "comparison_cells": 0,
+            "missingness_change": null,
+            "cdf": null,
+            "w1": null,
+            "reference_iqr": null,
+            "normalized_w1": null,
+            "tv": null,
+            "investigation_candidate": false,
+            "selection": "coverage concerns, support, canonical identity",
+            "unsafe_numeric_comparison": false
+          },
+          {
+            "entity": [],
+            "measurement": "value",
+            "reference_window": 9,
+            "comparison_window": 10,
+            "reference_cells": 0,
+            "comparison_cells": 0,
+            "missingness_change": null,
+            "cdf": null,
+            "w1": null,
+            "reference_iqr": null,
+            "normalized_w1": null,
+            "tv": null,
+            "investigation_candidate": false,
+            "selection": "coverage concerns, support, canonical identity",
+            "unsafe_numeric_comparison": false
+          },
+          {
+            "entity": [],
+            "measurement": "value",
+            "reference_window": 10,
+            "comparison_window": 11,
+            "reference_cells": 0,
+            "comparison_cells": 1,
+            "missingness_change": null,
+            "cdf": null,
+            "w1": null,
+            "reference_iqr": null,
+            "normalized_w1": null,
+            "tv": null,
+            "investigation_candidate": false,
+            "selection": "coverage concerns, support, canonical identity",
+            "unsafe_numeric_comparison": false
+          }
+        ],
+        "retention_omissions": 0,
+        "unsearched_window_pairs": 0,
+        "selection_bias": "Requested scope first; other series chosen by coverage concerns/support/canonical identity. Other behavior-only issues may be missed."
+      },
+      "exclusions": {},
+      "requirement": null,
+      "assumption_dependencies": [],
+      "witnesses": [],
+      "source_references": [
+        {
+          "source_id": "alfred",
+          "sha256": "7b09f6aaf42bd461bd38dc9f6a600efe3ddeb7de92bee83583c5051bdddd5567",
+          "source_bytes": 82,
+          "rows": 2,
+          "parsing_fingerprint": "4e92928fc5372311137a4986ca9c8e1b3d1de8bc9cb94855c54a5bc25bb32d58",
+          "normalization_fingerprint": "9ae40f32947df2eb3049d4a477fab0ca82511e91668c555e2563e495e62109ef"
+        }
+      ]
+    },
+    {
+      "id": "t13",
+      "check_id": "behavior_scope",
+      "source_ids": [
+        "alfred"
+      ],
+      "measurement": null,
+      "entity": null,
+      "clock": null,
+      "population": "all eligible declared records",
+      "data": {
+        "selected_measurements": [
+          "value"
+        ],
+        "unsearched_scope": [],
+        "work_observation_visits": 103,
+        "comparisons": 43,
+        "selection": "Requested measurements first, then declaration order. Detail retention can miss behavior-only exceptions.",
+        "defaults_validated_universal_defect_criteria": false
+      },
+      "exclusions": {},
+      "requirement": null,
+      "assumption_dependencies": [],
+      "witnesses": [],
+      "source_references": [
+        {
+          "source_id": "alfred",
+          "sha256": "7b09f6aaf42bd461bd38dc9f6a600efe3ddeb7de92bee83583c5051bdddd5567",
+          "source_bytes": 82,
+          "rows": 2,
+          "parsing_fingerprint": "4e92928fc5372311137a4986ca9c8e1b3d1de8bc9cb94855c54a5bc25bb32d58",
+          "normalization_fingerprint": "9ae40f32947df2eb3049d4a477fab0ca82511e91668c555e2563e495e62109ef"
+        }
+      ]
+    }
+  ],
+  "findings": [],
+  "narrative": {
+    "summary": "0 evidence-qualified finding(s) across 2 supplied source(s). Required stages completed over eligible records; behavioral search scope is disclosed separately.",
+    "actions": [],
+    "limitations": [
+      "No composite score or universal readiness verdict.",
+      "Investigation defaults are not validated defect criteria.",
+      "Supplied evidence does not prove what a production pipeline consumed."
+    ]
+  },
+  "coverage": {
+    "computed_aggregate_scope": "Every eligible declared record in required stages; no silent sampling.",
+    "checks": {
+      "t1": {
+        "family": "chronology",
+        "status": "completed",
+        "reason": null,
+        "population": "all eligible declared records"
+      },
+      "t2": {
+        "family": "ordering",
+        "status": "completed",
+        "reason": null,
+        "population": "all eligible declared records"
+      },
+      "t3": {
+        "family": "repetition",
+        "status": "completed",
+        "reason": null,
+        "population": "all eligible declared records"
+      },
+      "t4": {
+        "family": "panel",
+        "status": "completed",
+        "reason": null,
+        "population": "complete entity/observation keys with valid clocks"
+      },
+      "t5": {
+        "family": "continuity",
+        "status": "completed",
+        "reason": null,
+        "population": "all eligible declared records"
+      },
+      "t6": {
+        "family": "availability_unknown",
+        "status": "completed",
+        "reason": null,
+        "population": "all eligible declared records"
+      },
+      "t7": {
+        "family": "revision_history",
+        "status": "completed",
+        "reason": null,
+        "population": "all eligible declared records"
+      },
+      "t8": {
+        "family": "behavior_windows",
+        "status": "completed",
+        "reason": null,
+        "population": "all eligible declared records"
+      },
+      "t9": {
+        "family": "behavior_panel",
+        "status": "completed",
+        "reason": null,
+        "population": "all eligible declared records"
+      },
+      "t10": {
+        "family": "runs",
+        "status": "completed",
+        "reason": null,
+        "population": "all eligible declared records"
+      },
+      "t11": {
+        "family": "volatility",
+        "status": "completed",
+        "reason": null,
+        "population": "all eligible declared records"
+      },
+      "t12": {
+        "family": "behavior_series",
+        "status": "completed",
+        "reason": null,
+        "population": "all eligible declared records"
+      },
+      "t13": {
+        "family": "behavior_scope",
+        "status": "completed",
+        "reason": null,
+        "population": "all eligible declared records"
+      }
+    },
+    "unsearched_analytical_scope": [
+      {
+        "selected_measurements": [
+          "value"
+        ],
+        "unsearched_scope": [],
+        "work_observation_visits": 103,
+        "comparisons": 43,
+        "selection": "Requested measurements first, then declaration order. Detail retention can miss behavior-only exceptions.",
+        "defaults_validated_universal_defect_criteria": false
+      }
+    ],
+    "internal_detail_retention_omissions": {
+      "alfred:entity_histories": 0,
+      "alfred:series_effects": 0
+    },
+    "presentation_omissions": "Determined independently when rendering. JSON preserves every retained evidence record.",
+    "limits": {
+      "max_cells": 100000000,
+      "max_series": 1000000,
+      "behavior_measurements": 8,
+      "detailed_series": 16,
+      "max_windows": 64,
+      "max_folds": 32,
+      "max_comparisons": 2048,
+      "observation_visits": 1000000000,
+      "retained_details": 100,
+      "witnesses": 5,
+      "decoded_batch_bytes": 67108864,
+      "parquet_metadata_bytes": 16777216
+    },
+    "work_observation_visits": 103,
+    "behavior_comparisons": 43,
+    "representation_equivalence": {
+      "conditions": [
+        "Same observations, explicit missing cells and multiplicities",
+        "Same measurement identities, meanings, units and representations",
+        "Same entity identity, exact clock precision and schedule/lifecycle semantics",
+        "Same feature availability, revision semantics, analytical selections and bounds"
+      ],
+      "excluded": [
+        "physical source row references",
+        "file-order evidence"
+      ],
+      "absent_long_row_equals_null_wide_cell": "Only under an explicit dense-layout expectation; otherwise absence and supplied missing values differ."
+    }
+  },
+  "execution": {
+    "status": "completed",
+    "backend": "duckdb_local",
+    "engine_version": "1.5.6",
+    "effective_limits": {
+      "backend": "duckdb_local",
+      "max_source_bytes": 5368709120,
+      "max_combined_source_bytes": 8589934592,
+      "max_rows": 10000000,
+      "max_combined_rows": 30000000,
+      "max_columns": 1000,
+      "memory_bytes": 2147483648,
+      "max_rss_bytes": 6442450944,
+      "threads": 2,
+      "batch_bytes": 33554432,
+      "max_record_bytes": 8388608,
+      "workspace_bytes": 68719476736,
+      "free_disk_bytes": 2147483648,
+      "max_seconds": 1800,
+      "result_bytes": 33554432,
+      "scratch_directory": null
+    },
+    "temporal_limits": {
+      "max_cells": 100000000,
+      "max_series": 1000000,
+      "behavior_measurements": 8,
+      "detailed_series": 16,
+      "max_windows": 64,
+      "max_folds": 32,
+      "max_comparisons": 2048,
+      "observation_visits": 1000000000,
+      "retained_details": 100,
+      "witnesses": 5,
+      "decoded_batch_bytes": 67108864,
+      "parquet_metadata_bytes": 16777216
+    },
+    "duration_seconds": 0.06092099999659695,
+    "phase_seconds": {
+      "alfred:ingestion": 0.007457958010490984,
+      "alfred:normalization": 0.0038581250119023025,
+      "history:ingestion": 0.0040934169956017286,
+      "required_diagnostics": 0.005829625006299466,
+      "availability_history_evaluation": 0.008202707977034152,
+      "behavior": 0.024797792022582144
+    },
+    "phase_plan": {
+      "sources": [
+        {
+          "source_id": "alfred",
+          "compressed_bytes": 82,
+          "format": "csv"
+        },
+        {
+          "source_id": "history",
+          "compressed_bytes": 218,
+          "format": "csv"
+        }
+      ],
+      "estimated_peak_workspace_bytes": 536870912,
+      "upper_bound": false,
+      "assumptions": [
+        "Variable-width and native decoder allocation are uncertain.",
+        "Sort/join coexistence and cell expansion are reassessed using actual cardinalities."
+      ]
+    },
+    "peak_workspace_bytes": 57344,
+    "estimated_peak_workspace_bytes": 536870912,
+    "planning_estimate_is_upper_bound": false,
+    "ledger": [
+      {
+        "phase": "workspace initialized",
+        "owned_bytes": 16384,
+        "available_bytes": 222822400000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 12288
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          }
+        ]
+      },
+      {
+        "phase": "alfred: structural validation",
+        "owned_bytes": 20480,
+        "available_bytes": 222822400000,
+        "estimated_addition": 164,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 12288
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "source-7b2b547ab5377906300c69cd.csv",
+            "bytes": 4096
+          }
+        ]
+      },
+      {
+        "phase": "alfred: token staging",
+        "owned_bytes": 24576,
+        "available_bytes": 222822400000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 12288
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 4096
+          },
+          {
+            "file": "source-7b2b547ab5377906300c69cd.csv",
+            "bytes": 4096
+          }
+        ]
+      },
+      {
+        "phase": "alfred: typed materialization",
+        "owned_bytes": 24576,
+        "available_bytes": 222822400000,
+        "estimated_addition": 164,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 12288
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 4096
+          },
+          {
+            "file": "source-7b2b547ab5377906300c69cd.csv",
+            "bytes": 4096
+          }
+        ]
+      },
+      {
+        "phase": "alfred: exact clock normalization",
+        "owned_bytes": 24576,
+        "available_bytes": 222822400000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 12288
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 4096
+          },
+          {
+            "file": "source-7b2b547ab5377906300c69cd.csv",
+            "bytes": 4096
+          }
+        ]
+      },
+      {
+        "phase": "alfred: bounded measurement-cell materialization",
+        "owned_bytes": 24576,
+        "available_bytes": 222822400000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 12288
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 4096
+          },
+          {
+            "file": "source-7b2b547ab5377906300c69cd.csv",
+            "bytes": 4096
+          }
+        ]
+      },
+      {
+        "phase": "alfred: bounded exact identity/tie aggregation",
+        "owned_bytes": 24576,
+        "available_bytes": 222822400000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 12288
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 4096
+          },
+          {
+            "file": "source-7b2b547ab5377906300c69cd.csv",
+            "bytes": 4096
+          }
+        ]
+      },
+      {
+        "phase": "alfred: cardinality-based sort/join reservation",
+        "owned_bytes": 24576,
+        "available_bytes": 222822400000,
+        "estimated_addition": 576,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 12288
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 4096
+          },
+          {
+            "file": "source-7b2b547ab5377906300c69cd.csv",
+            "bytes": 4096
+          }
+        ]
+      },
+      {
+        "phase": "history: structural validation",
+        "owned_bytes": 28672,
+        "available_bytes": 222822400000,
+        "estimated_addition": 436,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 12288
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 4096
+          },
+          {
+            "file": "source-259aa8ef98a8b91de574cd90.csv",
+            "bytes": 4096
+          },
+          {
+            "file": "source-7b2b547ab5377906300c69cd.csv",
+            "bytes": 4096
+          }
+        ]
+      },
+      {
+        "phase": "history: token staging",
+        "owned_bytes": 28672,
+        "available_bytes": 222822400000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 12288
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 4096
+          },
+          {
+            "file": "source-259aa8ef98a8b91de574cd90.csv",
+            "bytes": 4096
+          },
+          {
+            "file": "source-7b2b547ab5377906300c69cd.csv",
+            "bytes": 4096
+          }
+        ]
+      },
+      {
+        "phase": "history: typed materialization",
+        "owned_bytes": 28672,
+        "available_bytes": 222822400000,
+        "estimated_addition": 436,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 12288
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 4096
+          },
+          {
+            "file": "source-259aa8ef98a8b91de574cd90.csv",
+            "bytes": 4096
+          },
+          {
+            "file": "source-7b2b547ab5377906300c69cd.csv",
+            "bytes": 4096
+          }
+        ]
+      },
+      {
+        "phase": "archived-vintages: revision ordering and selection reservation",
+        "owned_bytes": 36864,
+        "available_bytes": 222822400000,
+        "estimated_addition": 1760,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 12288
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 12288
+          },
+          {
+            "file": "source-259aa8ef98a8b91de574cd90.csv",
+            "bytes": 4096
+          },
+          {
+            "file": "source-7b2b547ab5377906300c69cd.csv",
+            "bytes": 4096
+          }
+        ]
+      },
+      {
+        "phase": "history: exact clock normalization",
+        "owned_bytes": 36864,
+        "available_bytes": 222822400000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 12288
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 12288
+          },
+          {
+            "file": "source-259aa8ef98a8b91de574cd90.csv",
+            "bytes": 4096
+          },
+          {
+            "file": "source-7b2b547ab5377906300c69cd.csv",
+            "bytes": 4096
+          }
+        ]
+      },
+      {
+        "phase": "alfred: exact clock normalization",
+        "owned_bytes": 36864,
+        "available_bytes": 222822400000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 12288
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 12288
+          },
+          {
+            "file": "source-259aa8ef98a8b91de574cd90.csv",
+            "bytes": 4096
+          },
+          {
+            "file": "source-7b2b547ab5377906300c69cd.csv",
+            "bytes": 4096
+          }
+        ]
+      },
+      {
+        "phase": "alfred: bounded behavioral investigation",
+        "owned_bytes": 49152,
+        "available_bytes": 222822400000,
+        "estimated_addition": 0,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 12288
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 24576
+          },
+          {
+            "file": "source-259aa8ef98a8b91de574cd90.csv",
+            "bytes": 4096
+          },
+          {
+            "file": "source-7b2b547ab5377906300c69cd.csv",
+            "bytes": 4096
+          }
+        ]
+      },
+      {
+        "phase": "completed temporal evidence publication",
+        "owned_bytes": 57344,
+        "available_bytes": 222822400000,
+        "estimated_addition": 33554432,
+        "files": [
+          {
+            "file": "tokens.duckdb",
+            "bytes": 12288
+          },
+          {
+            "file": "owner.json",
+            "bytes": 4096
+          },
+          {
+            "file": "tokens.duckdb.wal",
+            "bytes": 32768
+          },
+          {
+            "file": "source-259aa8ef98a8b91de574cd90.csv",
+            "bytes": 4096
+          },
+          {
+            "file": "source-7b2b547ab5377906300c69cd.csv",
+            "bytes": 4096
+          }
+        ]
+      }
+    ],
+    "provenance": {
+      "alfred": {
+        "sha256": "7b09f6aaf42bd461bd38dc9f6a600efe3ddeb7de92bee83583c5051bdddd5567",
+        "source_bytes": 82,
+        "rows": 2,
+        "parsing_fingerprint": "4e92928fc5372311137a4986ca9c8e1b3d1de8bc9cb94855c54a5bc25bb32d58",
+        "normalization_fingerprint": "9ae40f32947df2eb3049d4a477fab0ca82511e91668c555e2563e495e62109ef"
+      },
+      "history": {
+        "sha256": "e1aad4f4c6bf98e6ec18c466c1361500fbc99e825d80dbe5db5b2b08c95b122f",
+        "source_bytes": 218,
+        "rows": 7,
+        "parsing_fingerprint": "2f6f10d1a5ff44cf40807eff0cef3b07383360a9b3f342761416373498ed7e58",
+        "normalization_fingerprint": "8913009bc823a232915c4cf89afc57bba4d28cdb9289cf48b6fde433ac377f97"
+      }
+    },
+    "timezone_data": {
+      "package": "tzdata",
+      "version": "2026.5",
+      "zones": {}
+    },
+    "warnings": [
+      "Workload budgets are provisional engineering controls, not capacity guarantees or OS quotas.",
+      "Decoded-batch/application retention bounds do not bound native Parquet decoder peaks.",
+      "Sampled RSS supervision can overshoot between samples."
+    ],
+    "peak_worker_rss_bytes": 159350784,
+    "whole_job_seconds": 0.41111462499247864,
+    "peak_spill_bytes": 0,
+    "serialized_bytes": 104803
+  },
+  "context": {
+    "dataset_name": "alfred",
+    "purpose": "Official archived five-vintage extract. Availability is known only at civil-day granularity; no intraday or complete-history assurance.",
+    "presentation": {
+      "executive_actions": 5,
+      "target_panels": 6,
+      "feature_details": 20,
+      "table_rows": 20,
+      "appendix_rows": 100
+    }
+  },
+  "generated_at": "2026-10-10T21:28:02.208682+00:00",
+  "schema_version": "1.4",
+  "methodology_id": "temporal_reliability_v1",
+  "parsing_warnings": []
+}

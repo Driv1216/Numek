@@ -1,0 +1,264 @@
+{
+  "inputs": [
+    {
+      "id": "alfred",
+      "source": {
+        "path": "../data/prepared/alfred.csv",
+        "format": "csv",
+        "dataset_name": null,
+        "purpose": null,
+        "source_filename": null,
+        "parsing": {
+          "encoding": "utf-8",
+          "missing_policy": "pandas_default",
+          "na_values": [],
+          "column_types": {},
+          "column_missing_policies": {}
+        }
+      },
+      "temporal": {
+        "clock": {
+          "column": "observation_date",
+          "kind": "civil_date",
+          "encoding": "iso",
+          "format": null,
+          "epoch_unit": null,
+          "timezone": null,
+          "timezone_column": null,
+          "ambiguity": "unresolved",
+          "fold_column": null,
+          "date_convention": null
+        },
+        "measurements": [
+          {
+            "name": "value",
+            "column": null,
+            "representation": "quantitative",
+            "unit": "percent annualized change",
+            "meaning": "GDPC1_PCA",
+            "past_observation": false
+          }
+        ],
+        "observation": "measurement",
+        "layout": "wide",
+        "entity_columns": [],
+        "observation_keys": [
+          "observation_date"
+        ],
+        "measurement_column": null,
+        "value_column": null,
+        "schedule": {
+          "kind": "none",
+          "cadence_ns": null,
+          "anchor": null,
+          "civil_unit": null,
+          "timezone": null,
+          "month_end": "skip",
+          "source_id": null,
+          "time_column": null,
+          "entity_columns": [],
+          "measurement_column": null,
+          "expectation": "required_record",
+          "collection_status_column": null,
+          "collection_active_values": [
+            "active"
+          ]
+        },
+        "active_intervals": [],
+        "unique_observations": false,
+        "source_order_is_arrival": false,
+        "dense_long": false,
+        "assessment_time": null,
+        "max_adjacency_ns": null,
+        "required_lookback_ns": null
+      },
+      "role": "dataset",
+      "task": {
+        "kind": "dataset_profile",
+        "target": null,
+        "targets": [],
+        "feature_columns": null,
+        "metadata_columns": [],
+        "group_columns": []
+      },
+      "config": {
+        "parsing": {
+          "encoding": "utf-8",
+          "missing_policy": "pandas_default",
+          "na_values": [],
+          "column_types": {},
+          "column_missing_policies": {}
+        },
+        "fidelity_inspection": {
+          "max_bytes": 1048576,
+          "max_records": 200,
+          "max_cells": 20000
+        },
+        "limits": null,
+        "regression": null,
+        "annotations": null,
+        "features": {
+          "semantic_types": {},
+          "scale_sensitive": null
+        },
+        "multilabel": null,
+        "diagnostics": {
+          "max_multilabel_pair_targets": 32,
+          "max_output_pair_targets": 32,
+          "max_multilabel_comparisons": 20000000,
+          "max_output_comparisons": 20000000,
+          "max_cohort_comparisons": 20000000,
+          "max_patterns": 10000,
+          "max_examples": 5
+        },
+        "presentation": {
+          "executive_actions": 5,
+          "target_panels": 6,
+          "feature_details": 20,
+          "table_rows": 20,
+          "appendix_rows": 100
+        },
+        "execution": null,
+        "advanced": null
+      }
+    },
+    {
+      "id": "history",
+      "source": {
+        "path": "../data/prepared/alfred_history.csv",
+        "format": "csv",
+        "dataset_name": null,
+        "purpose": null,
+        "source_filename": null,
+        "parsing": {
+          "encoding": "utf-8",
+          "missing_policy": "pandas_default",
+          "na_values": [],
+          "column_types": {},
+          "column_missing_policies": {}
+        }
+      },
+      "temporal": null,
+      "role": "history",
+      "task": {
+        "kind": "dataset_profile",
+        "target": null,
+        "targets": [],
+        "feature_columns": null,
+        "metadata_columns": [],
+        "group_columns": []
+      },
+      "config": {
+        "parsing": {
+          "encoding": "utf-8",
+          "missing_policy": "pandas_default",
+          "na_values": [],
+          "column_types": {},
+          "column_missing_policies": {}
+        },
+        "fidelity_inspection": {
+          "max_bytes": 1048576,
+          "max_records": 200,
+          "max_cells": 20000
+        },
+        "limits": null,
+        "regression": null,
+        "annotations": null,
+        "features": {
+          "semantic_types": {},
+          "scale_sensitive": null
+        },
+        "multilabel": null,
+        "diagnostics": {
+          "max_multilabel_pair_targets": 32,
+          "max_output_pair_targets": 32,
+          "max_multilabel_comparisons": 20000000,
+          "max_output_comparisons": 20000000,
+          "max_cohort_comparisons": 20000000,
+          "max_patterns": 10000,
+          "max_examples": 5
+        },
+        "presentation": {
+          "executive_actions": 5,
+          "target_panels": 6,
+          "feature_details": 20,
+          "table_rows": 20,
+          "appendix_rows": 100
+        },
+        "execution": null,
+        "advanced": null
+      }
+    }
+  ],
+  "availability": [],
+  "histories": [
+    {
+      "id": "archived-vintages",
+      "source_id": "alfred",
+      "history_source_id": "history",
+      "features": [
+        "value"
+      ],
+      "observation_keys": [
+        "observation_date"
+      ],
+      "history_keys": [
+        "observation_date"
+      ],
+      "value_columns": {
+        "value": "value"
+      },
+      "availability": {
+        "column": "vintage_date",
+        "kind": "civil_date",
+        "encoding": "iso",
+        "format": null,
+        "epoch_unit": null,
+        "timezone": null,
+        "timezone_column": null,
+        "ambiguity": "unresolved",
+        "fold_column": null,
+        "date_convention": null
+      },
+      "cutoff": {
+        "column": "cutoff",
+        "kind": "civil_date",
+        "encoding": "iso",
+        "format": null,
+        "epoch_unit": null,
+        "timezone": null,
+        "timezone_column": null,
+        "ambiguity": "unresolved",
+        "fold_column": null,
+        "date_convention": null
+      },
+      "value_units": {},
+      "revision_id_column": null,
+      "selected_revision_id_column": null,
+      "tie_order_column": null,
+      "tie_order_meaning": null,
+      "state_column": null,
+      "state_values": {
+        "valid": "valid",
+        "known_missing": "known_missing",
+        "retracted": "retracted",
+        "unknown": "unknown"
+      },
+      "null_semantics": "unknown",
+      "completeness": "unknown",
+      "coverage_start": null,
+      "coverage_end": null,
+      "initial_creation_included": false,
+      "baseline_time": null,
+      "latest_available_required": false,
+      "absolute_tolerance": null,
+      "relative_tolerance": null
+    }
+  ],
+  "maturity": [],
+  "evaluation": {
+    "folds": []
+  },
+  "dataset_name": "alfred",
+  "purpose": "Official archived five-vintage extract. Availability is known only at civil-day granularity; no intraday or complete-history assurance."
+}

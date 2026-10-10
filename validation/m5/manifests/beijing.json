@@ -1,0 +1,198 @@
+{
+  "inputs": [
+    {
+      "id": "beijing",
+      "source": {
+        "path": "../data/prepared/beijing.csv",
+        "format": "csv",
+        "dataset_name": null,
+        "purpose": null,
+        "source_filename": null,
+        "parsing": {
+          "encoding": "utf-8",
+          "missing_policy": "pandas_default",
+          "na_values": [],
+          "column_types": {},
+          "column_missing_policies": {}
+        }
+      },
+      "temporal": {
+        "clock": {
+          "column": "time",
+          "kind": "instant",
+          "encoding": "iso",
+          "format": null,
+          "epoch_unit": null,
+          "timezone": "Asia/Shanghai",
+          "timezone_column": null,
+          "ambiguity": "unresolved",
+          "fold_column": null,
+          "date_convention": null
+        },
+        "measurements": [
+          {
+            "name": "PM2.5",
+            "column": null,
+            "representation": "quantitative",
+            "unit": "ug/m3",
+            "meaning": null,
+            "past_observation": false
+          },
+          {
+            "name": "PM10",
+            "column": null,
+            "representation": "quantitative",
+            "unit": "ug/m3",
+            "meaning": null,
+            "past_observation": false
+          },
+          {
+            "name": "TEMP",
+            "column": null,
+            "representation": "quantitative",
+            "unit": null,
+            "meaning": null,
+            "past_observation": false
+          },
+          {
+            "name": "PRES",
+            "column": null,
+            "representation": "quantitative",
+            "unit": null,
+            "meaning": null,
+            "past_observation": false
+          },
+          {
+            "name": "DEWP",
+            "column": null,
+            "representation": "quantitative",
+            "unit": null,
+            "meaning": null,
+            "past_observation": false
+          },
+          {
+            "name": "RAIN",
+            "column": null,
+            "representation": "quantitative",
+            "unit": null,
+            "meaning": null,
+            "past_observation": false
+          },
+          {
+            "name": "WSPM",
+            "column": null,
+            "representation": "quantitative",
+            "unit": null,
+            "meaning": null,
+            "past_observation": false
+          },
+          {
+            "name": "wd",
+            "column": null,
+            "representation": "categorical",
+            "unit": null,
+            "meaning": null,
+            "past_observation": false
+          }
+        ],
+        "observation": "measurement",
+        "layout": "wide",
+        "entity_columns": [
+          "station"
+        ],
+        "observation_keys": [],
+        "measurement_column": null,
+        "value_column": null,
+        "schedule": {
+          "kind": "fixed",
+          "cadence_ns": "3600000000000",
+          "anchor": "2013-03-01T00:00:00+08:00",
+          "civil_unit": null,
+          "timezone": null,
+          "month_end": "skip",
+          "source_id": null,
+          "time_column": null,
+          "entity_columns": [],
+          "measurement_column": null,
+          "expectation": "required_record",
+          "collection_status_column": null,
+          "collection_active_values": [
+            "active"
+          ]
+        },
+        "active_intervals": [
+          {
+            "start": "2013-03-01T00:00:00+08:00",
+            "end": "2017-03-01T00:00:00+08:00",
+            "entity": [],
+            "measurement": null,
+            "closed": "left"
+          }
+        ],
+        "unique_observations": false,
+        "source_order_is_arrival": false,
+        "dense_long": false,
+        "assessment_time": null,
+        "max_adjacency_ns": null,
+        "required_lookback_ns": null
+      },
+      "role": "dataset",
+      "task": {
+        "kind": "dataset_profile",
+        "target": null,
+        "targets": [],
+        "feature_columns": null,
+        "metadata_columns": [],
+        "group_columns": []
+      },
+      "config": {
+        "parsing": {
+          "encoding": "utf-8",
+          "missing_policy": "pandas_default",
+          "na_values": [],
+          "column_types": {},
+          "column_missing_policies": {}
+        },
+        "fidelity_inspection": {
+          "max_bytes": 1048576,
+          "max_records": 200,
+          "max_cells": 20000
+        },
+        "limits": null,
+        "regression": null,
+        "annotations": null,
+        "features": {
+          "semantic_types": {},
+          "scale_sensitive": null
+        },
+        "multilabel": null,
+        "diagnostics": {
+          "max_multilabel_pair_targets": 32,
+          "max_output_pair_targets": 32,
+          "max_multilabel_comparisons": 20000000,
+          "max_output_comparisons": 20000000,
+          "max_cohort_comparisons": 20000000,
+          "max_patterns": 10000,
+          "max_examples": 5
+        },
+        "presentation": {
+          "executive_actions": 5,
+          "target_panels": 6,
+          "feature_details": 20,
+          "table_rows": 20,
+          "appendix_rows": 100
+        },
+        "execution": null,
+        "advanced": null
+      }
+    }
+  ],
+  "availability": [],
+  "histories": [],
+  "maturity": [],
+  "evaluation": {
+    "folds": []
+  },
+  "dataset_name": "beijing",
+  "purpose": "Full twelve-station hourly panel. Supplied NA measurements remain missing cells, distinct from absent records."
+}

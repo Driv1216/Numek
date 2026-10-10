@@ -1,0 +1,1968 @@
+{
+  "clean": {
+    "raw": "value,flag\n1,True\n2,False\n3,True\n4,False\n",
+    "result": {
+      "profile": {
+        "row_count": 4,
+        "column_count": 2,
+        "feature_count": 2,
+        "numeric_feature_count": 1,
+        "non_numeric_feature_count": 1,
+        "missing_cells": 0,
+        "missing_rate": 0.0,
+        "missing_feature_row_count": 0,
+        "missing_feature_row_rate": 0.0,
+        "rows_with_1_missing_feature": 0,
+        "rows_with_2_missing_features": 0,
+        "rows_with_3_plus_missing_features": 0,
+        "columns": [
+          {
+            "name": "value",
+            "dtype": "int64",
+            "role": "feature",
+            "is_numeric": true,
+            "missing_count": 0,
+            "missing_rate": 0.0,
+            "non_null_count": 4,
+            "unique_count": 4,
+            "unique_rate": 100.0,
+            "constant": false,
+            "near_constant": false,
+            "high_cardinality": false,
+            "top_value": "1",
+            "top_value_count": 1,
+            "top_value_rate": 25.0,
+            "top_value_hidden": false,
+            "top_value_is_missing": false,
+            "outlier_count": 0,
+            "outlier_rate": 0.0,
+            "numeric_summary": {
+              "min": 1,
+              "q1": 1.75,
+              "median": 2.5,
+              "q3": 3.25,
+              "max": 4,
+              "zero_count": 0,
+              "zero_rate": 0.0,
+              "negative_count": 0,
+              "negative_rate": 0.0,
+              "non_finite_count": 0,
+              "non_finite_rate": 0.0
+            },
+            "finite_count": 4,
+            "outlier_denominator": 4,
+            "outlier_method": "finite_1.5_iqr",
+            "outlier_unavailable_reason": null
+          },
+          {
+            "name": "flag",
+            "dtype": "bool",
+            "role": "feature",
+            "is_numeric": false,
+            "missing_count": 0,
+            "missing_rate": 0.0,
+            "non_null_count": 4,
+            "unique_count": 2,
+            "unique_rate": 50.0,
+            "constant": false,
+            "near_constant": false,
+            "high_cardinality": false,
+            "top_value": "True",
+            "top_value_count": 2,
+            "top_value_rate": 50.0,
+            "top_value_hidden": false,
+            "top_value_is_missing": false,
+            "outlier_count": 0,
+            "outlier_rate": 0.0,
+            "numeric_summary": null
+          }
+        ],
+        "severe_missing_columns": [],
+        "duplicate_rows": 0,
+        "duplicate_rate": 0.0,
+        "duplicate_group_count": 0,
+        "largest_duplicate_group_size": 0,
+        "rows_in_duplicate_groups": 0,
+        "duplicate_row_examples": []
+      },
+      "checks": [
+        {
+          "check_id": "schema",
+          "applicability": "applicable",
+          "execution": "completed",
+          "scope": "dataset",
+          "reason": null,
+          "evidence_refs": [
+            "schema.0"
+          ],
+          "exclusions": [],
+          "version": "1"
+        },
+        {
+          "check_id": "missingness",
+          "applicability": "applicable",
+          "execution": "completed",
+          "scope": "dataset",
+          "reason": null,
+          "evidence_refs": [
+            "missingness.1"
+          ],
+          "exclusions": [],
+          "version": "1"
+        },
+        {
+          "check_id": "column_variation",
+          "applicability": "applicable",
+          "execution": "completed",
+          "scope": "dataset",
+          "reason": null,
+          "evidence_refs": [
+            "column_variation.2"
+          ],
+          "exclusions": [],
+          "version": "1"
+        },
+        {
+          "check_id": "categorical_cardinality",
+          "applicability": "applicable",
+          "execution": "completed",
+          "scope": "dataset",
+          "reason": null,
+          "evidence_refs": [
+            "categorical_cardinality.3"
+          ],
+          "exclusions": [],
+          "version": "1"
+        },
+        {
+          "check_id": "exact_duplicates",
+          "applicability": "applicable",
+          "execution": "completed",
+          "scope": "dataset",
+          "reason": null,
+          "evidence_refs": [
+            "exact_duplicates.4"
+          ],
+          "exclusions": [],
+          "version": "1"
+        },
+        {
+          "check_id": "numeric_summary",
+          "applicability": "applicable",
+          "execution": "completed",
+          "scope": "value",
+          "reason": null,
+          "evidence_refs": [
+            "numeric_summary.5"
+          ],
+          "exclusions": [],
+          "version": "1"
+        },
+        {
+          "check_id": "numeric_outliers",
+          "applicability": "applicable",
+          "execution": "completed",
+          "scope": "value",
+          "reason": null,
+          "evidence_refs": [
+            "numeric_outliers.6"
+          ],
+          "exclusions": [
+            {
+              "missing_values": 0,
+              "non_finite_values": 0
+            }
+          ],
+          "version": "1"
+        },
+        {
+          "check_id": "classification_target",
+          "applicability": "not_applicable",
+          "execution": "not_run",
+          "scope": "dataset",
+          "reason": "No target selected; general dataset profiling.",
+          "evidence_refs": [],
+          "exclusions": [],
+          "version": "1"
+        },
+        {
+          "check_id": "label_conflicts",
+          "applicability": "not_applicable",
+          "execution": "not_run",
+          "scope": "dataset",
+          "reason": "No target selected; general dataset profiling.",
+          "evidence_refs": [],
+          "exclusions": [],
+          "version": "1"
+        },
+        {
+          "check_id": "target_leakage",
+          "applicability": "not_applicable",
+          "execution": "not_run",
+          "scope": "dataset",
+          "reason": "No target selected; general dataset profiling.",
+          "evidence_refs": [],
+          "exclusions": [],
+          "version": "1"
+        },
+        {
+          "check_id": "classification_scoring",
+          "applicability": "not_applicable",
+          "execution": "not_run",
+          "scope": "dataset",
+          "reason": "No target selected; general dataset profiling.",
+          "evidence_refs": [],
+          "exclusions": [],
+          "version": "1"
+        },
+        {
+          "check_id": "parsing_fidelity",
+          "applicability": "applicable",
+          "execution": "completed",
+          "scope": "dataset",
+          "reason": null,
+          "evidence_refs": [
+            "parsing_fidelity.7"
+          ],
+          "exclusions": [],
+          "version": "1"
+        }
+      ],
+      "evidence": [
+        {
+          "id": "schema.0",
+          "check_id": "schema",
+          "measurement_refs": [
+            "/parsing/header_mapping",
+            "/profile/row_count",
+            "/profile/column_count"
+          ],
+          "population": "parsed records",
+          "denominator": 4,
+          "affected_count": null,
+          "affected_columns": [],
+          "row_refs": [],
+          "method": "deterministic",
+          "thresholds": {}
+        },
+        {
+          "id": "missingness.1",
+          "check_id": "missingness",
+          "measurement_refs": [
+            "/profile/missing_cells",
+            "/profile/missing_rate",
+            "/profile/missing_feature_row_rate"
+          ],
+          "population": "all parsed cells",
+          "denominator": 8,
+          "affected_count": 0,
+          "affected_columns": [],
+          "row_refs": [],
+          "method": "deterministic",
+          "thresholds": {}
+        },
+        {
+          "id": "column_variation.2",
+          "check_id": "column_variation",
+          "measurement_refs": [
+            "/profile/columns"
+          ],
+          "population": "all parsed columns",
+          "denominator": 2,
+          "affected_count": null,
+          "affected_columns": [],
+          "row_refs": [],
+          "method": "deterministic",
+          "thresholds": {}
+        },
+        {
+          "id": "categorical_cardinality.3",
+          "check_id": "categorical_cardinality",
+          "measurement_refs": [
+            "/profile/columns"
+          ],
+          "population": "nonnumeric parsed columns",
+          "denominator": 1,
+          "affected_count": null,
+          "affected_columns": [],
+          "row_refs": [],
+          "method": "deterministic",
+          "thresholds": {}
+        },
+        {
+          "id": "exact_duplicates.4",
+          "check_id": "exact_duplicates",
+          "measurement_refs": [
+            "/profile/duplicate_rows",
+            "/profile/duplicate_group_count",
+            "/profile/rows_in_duplicate_groups"
+          ],
+          "population": "all parsed rows",
+          "denominator": 4,
+          "affected_count": 0,
+          "affected_columns": [],
+          "row_refs": [],
+          "method": "deterministic",
+          "thresholds": {}
+        },
+        {
+          "id": "numeric_summary.5",
+          "check_id": "numeric_summary",
+          "measurement_refs": [
+            "/profile/columns/0/numeric_summary",
+            "/profile/columns/0/finite_count"
+          ],
+          "population": "finite values; zero/negative/non-finite rates use total rows",
+          "denominator": 4,
+          "affected_count": null,
+          "affected_columns": [
+            "value"
+          ],
+          "row_refs": [],
+          "method": "finite_descriptive",
+          "thresholds": {}
+        },
+        {
+          "id": "numeric_outliers.6",
+          "check_id": "numeric_outliers",
+          "measurement_refs": [
+            "/profile/columns/0/outlier_count",
+            "/profile/columns/0/outlier_rate"
+          ],
+          "population": "finite numeric observations",
+          "denominator": 4,
+          "affected_count": 0,
+          "affected_columns": [
+            "value"
+          ],
+          "row_refs": [],
+          "method": "finite_1.5_iqr",
+          "thresholds": {
+            "review_rate": 5
+          }
+        },
+        {
+          "id": "parsing_fidelity.7",
+          "check_id": "parsing_fidelity",
+          "measurement_refs": [
+            "/parsing/fidelity_inspection",
+            "/parsing_warnings"
+          ],
+          "population": "bounded source prefix",
+          "denominator": 8,
+          "affected_count": null,
+          "affected_columns": [],
+          "row_refs": [],
+          "method": "bounded_source_token_comparison",
+          "thresholds": {}
+        }
+      ],
+      "findings": [],
+      "narrative": {
+        "overall_assessment": "General dataset profiling summarizes observed input evidence. No overall scoring policy is defined for unlabeled profiling.",
+        "principal_evidence_summary": "No data-profile review findings were generated by the completed M1 checks. Parsing warnings and coverage require separate review.",
+        "recommended_action": "Review parsing disclosures, unavailable checks, and the intended data use before drawing broader conclusions.",
+        "missingness_interpretation": "No missing feature values were detected by the current null-value checks.",
+        "duplicate_interpretation": "0 repeated rows beyond each group's first occurrence; legitimate repetition is possible.",
+        "finding_count": 0
+      },
+      "scoring": {
+        "status": "not_defined",
+        "values": null,
+        "reason": "No validated scoring policy is defined for unlabeled profiling."
+      },
+      "parsing": {
+        "options": {
+          "encoding": "utf-8",
+          "missing_policy": "pandas_default",
+          "na_values": [],
+          "column_types": {}
+        },
+        "pandas_version": "3.0.3",
+        "parser": "pandas.read_csv",
+        "delimiter": ",",
+        "header": "infer",
+        "skip_blank_lines": true,
+        "dtypes": {
+          "value": "int64",
+          "flag": "bool"
+        },
+        "provisional_types": false,
+        "header_mapping": [
+          {
+            "position": 1,
+            "original": "value",
+            "resolved": "value"
+          },
+          {
+            "position": 2,
+            "original": "flag",
+            "resolved": "flag"
+          }
+        ],
+        "fidelity_inspection": {
+          "bytes_inspected": 41,
+          "records_inspected": 4,
+          "cells_retained": 8,
+          "complete": true,
+          "stopping_reason": "eof",
+          "comparable_cells": 8,
+          "alignment_confirmed": true,
+          "counts_are_dataset_incidence": false
+        },
+        "inspection_limits": {
+          "max_bytes": 1048576,
+          "max_records": 200,
+          "max_cells": 20000
+        },
+        "fingerprint": "a6ab7593198d76ea5e226874dcf45f211f48a7099eb93547f36fe0c9e3aa3700",
+        "inference_caution": "NA-like tokens may become missing; numeric-looking codes may lose leading zeros. No source values were rewritten.",
+        "source_sha256": "685346e66621b2b99364ce22f2d29caf26d4f62af41e946bd3b344bef5a72b5b"
+      },
+      "parsing_warnings": []
+    },
+    "html_sha256": "15ebbd02b4f15f3b5055b0793d72258b01a1ae7a3b968fcd42a0d8ab6ab52839"
+  },
+  "mixed": {
+    "raw": "identifier,value,empty,constant\n001,1,,same\n001,1,,same\n002,inf,,same\n003,,,same\n004,-2,,same\n",
+    "result": {
+      "profile": {
+        "row_count": 5,
+        "column_count": 4,
+        "feature_count": 4,
+        "numeric_feature_count": 3,
+        "non_numeric_feature_count": 1,
+        "missing_cells": 6,
+        "missing_rate": 30.0,
+        "missing_feature_row_count": 5,
+        "missing_feature_row_rate": 100.0,
+        "rows_with_1_missing_feature": 4,
+        "rows_with_2_missing_features": 1,
+        "rows_with_3_plus_missing_features": 0,
+        "columns": [
+          {
+            "name": "identifier",
+            "dtype": "int64",
+            "role": "feature",
+            "is_numeric": true,
+            "missing_count": 0,
+            "missing_rate": 0.0,
+            "non_null_count": 5,
+            "unique_count": 4,
+            "unique_rate": 80.0,
+            "constant": false,
+            "near_constant": false,
+            "high_cardinality": false,
+            "top_value": "1",
+            "top_value_count": 2,
+            "top_value_rate": 40.0,
+            "top_value_hidden": false,
+            "top_value_is_missing": false,
+            "outlier_count": 0,
+            "outlier_rate": 0.0,
+            "numeric_summary": {
+              "min": 1,
+              "q1": 1.0,
+              "median": 2.0,
+              "q3": 3.0,
+              "max": 4,
+              "zero_count": 0,
+              "zero_rate": 0.0,
+              "negative_count": 0,
+              "negative_rate": 0.0,
+              "non_finite_count": 0,
+              "non_finite_rate": 0.0
+            },
+            "finite_count": 5,
+            "outlier_denominator": 5,
+            "outlier_method": "finite_1.5_iqr",
+            "outlier_unavailable_reason": null
+          },
+          {
+            "name": "value",
+            "dtype": "float64",
+            "role": "feature",
+            "is_numeric": true,
+            "missing_count": 1,
+            "missing_rate": 20.0,
+            "non_null_count": 4,
+            "unique_count": 3,
+            "unique_rate": 60.0,
+            "constant": false,
+            "near_constant": false,
+            "high_cardinality": false,
+            "top_value": "1.0",
+            "top_value_count": 2,
+            "top_value_rate": 40.0,
+            "top_value_hidden": false,
+            "top_value_is_missing": false,
+            "outlier_count": null,
+            "outlier_rate": null,
+            "numeric_summary": {
+              "min": -2.0,
+              "q1": -0.5,
+              "median": 1.0,
+              "q3": 1.0,
+              "max": 1.0,
+              "zero_count": 0,
+              "zero_rate": 0.0,
+              "negative_count": 1,
+              "negative_rate": 20.0,
+              "non_finite_count": 1,
+              "non_finite_rate": 20.0
+            },
+            "finite_count": 3,
+            "outlier_denominator": 3,
+            "outlier_method": "finite_1.5_iqr",
+            "outlier_unavailable_reason": "insufficient_finite_observations"
+          },
+          {
+            "name": "empty",
+            "dtype": "float64",
+            "role": "feature",
+            "is_numeric": true,
+            "missing_count": 5,
+            "missing_rate": 100.0,
+            "non_null_count": 0,
+            "unique_count": 0,
+            "unique_rate": 0.0,
+            "constant": true,
+            "near_constant": false,
+            "high_cardinality": false,
+            "top_value": null,
+            "top_value_count": 5,
+            "top_value_rate": 100.0,
+            "top_value_hidden": false,
+            "top_value_is_missing": true,
+            "outlier_count": null,
+            "outlier_rate": null,
+            "numeric_summary": {
+              "min": null,
+              "q1": null,
+              "median": null,
+              "q3": null,
+              "max": null,
+              "zero_count": 0,
+              "zero_rate": 0.0,
+              "negative_count": 0,
+              "negative_rate": 0.0,
+              "non_finite_count": 0,
+              "non_finite_rate": 0.0
+            },
+            "finite_count": 0,
+            "outlier_denominator": 0,
+            "outlier_method": "finite_1.5_iqr",
+            "outlier_unavailable_reason": "insufficient_finite_observations"
+          },
+          {
+            "name": "constant",
+            "dtype": "str",
+            "role": "feature",
+            "is_numeric": false,
+            "missing_count": 0,
+            "missing_rate": 0.0,
+            "non_null_count": 5,
+            "unique_count": 1,
+            "unique_rate": 20.0,
+            "constant": true,
+            "near_constant": false,
+            "high_cardinality": false,
+            "top_value": "same",
+            "top_value_count": 5,
+            "top_value_rate": 100.0,
+            "top_value_hidden": false,
+            "top_value_is_missing": false,
+            "outlier_count": 0,
+            "outlier_rate": 0.0,
+            "numeric_summary": null
+          }
+        ],
+        "severe_missing_columns": [
+          "empty"
+        ],
+        "duplicate_rows": 1,
+        "duplicate_rate": 20.0,
+        "duplicate_group_count": 1,
+        "largest_duplicate_group_size": 2,
+        "rows_in_duplicate_groups": 2,
+        "duplicate_row_examples": [
+          1,
+          2
+        ]
+      },
+      "checks": [
+        {
+          "check_id": "schema",
+          "applicability": "applicable",
+          "execution": "completed",
+          "scope": "dataset",
+          "reason": null,
+          "evidence_refs": [
+            "schema.0"
+          ],
+          "exclusions": [],
+          "version": "1"
+        },
+        {
+          "check_id": "missingness",
+          "applicability": "applicable",
+          "execution": "completed",
+          "scope": "dataset",
+          "reason": null,
+          "evidence_refs": [
+            "missingness.1"
+          ],
+          "exclusions": [],
+          "version": "1"
+        },
+        {
+          "check_id": "column_variation",
+          "applicability": "applicable",
+          "execution": "completed",
+          "scope": "dataset",
+          "reason": null,
+          "evidence_refs": [
+            "column_variation.2"
+          ],
+          "exclusions": [],
+          "version": "1"
+        },
+        {
+          "check_id": "categorical_cardinality",
+          "applicability": "applicable",
+          "execution": "completed",
+          "scope": "dataset",
+          "reason": null,
+          "evidence_refs": [
+            "categorical_cardinality.3"
+          ],
+          "exclusions": [],
+          "version": "1"
+        },
+        {
+          "check_id": "exact_duplicates",
+          "applicability": "applicable",
+          "execution": "completed",
+          "scope": "dataset",
+          "reason": null,
+          "evidence_refs": [
+            "exact_duplicates.4"
+          ],
+          "exclusions": [],
+          "version": "1"
+        },
+        {
+          "check_id": "numeric_summary",
+          "applicability": "applicable",
+          "execution": "completed",
+          "scope": "identifier",
+          "reason": null,
+          "evidence_refs": [
+            "numeric_summary.5"
+          ],
+          "exclusions": [],
+          "version": "1"
+        },
+        {
+          "check_id": "numeric_outliers",
+          "applicability": "applicable",
+          "execution": "completed",
+          "scope": "identifier",
+          "reason": null,
+          "evidence_refs": [
+            "numeric_outliers.6"
+          ],
+          "exclusions": [
+            {
+              "missing_values": 0,
+              "non_finite_values": 0
+            }
+          ],
+          "version": "1"
+        },
+        {
+          "check_id": "numeric_summary",
+          "applicability": "applicable",
+          "execution": "completed",
+          "scope": "value",
+          "reason": null,
+          "evidence_refs": [
+            "numeric_summary.7"
+          ],
+          "exclusions": [],
+          "version": "1"
+        },
+        {
+          "check_id": "numeric_outliers",
+          "applicability": "blocked",
+          "execution": "not_run",
+          "scope": "value",
+          "reason": "insufficient_finite_observations",
+          "evidence_refs": [],
+          "exclusions": [],
+          "version": "1"
+        },
+        {
+          "check_id": "numeric_summary",
+          "applicability": "applicable",
+          "execution": "completed",
+          "scope": "empty",
+          "reason": null,
+          "evidence_refs": [
+            "numeric_summary.8"
+          ],
+          "exclusions": [],
+          "version": "1"
+        },
+        {
+          "check_id": "numeric_outliers",
+          "applicability": "blocked",
+          "execution": "not_run",
+          "scope": "empty",
+          "reason": "insufficient_finite_observations",
+          "evidence_refs": [],
+          "exclusions": [],
+          "version": "1"
+        },
+        {
+          "check_id": "classification_target",
+          "applicability": "not_applicable",
+          "execution": "not_run",
+          "scope": "dataset",
+          "reason": "No target selected; general dataset profiling.",
+          "evidence_refs": [],
+          "exclusions": [],
+          "version": "1"
+        },
+        {
+          "check_id": "label_conflicts",
+          "applicability": "not_applicable",
+          "execution": "not_run",
+          "scope": "dataset",
+          "reason": "No target selected; general dataset profiling.",
+          "evidence_refs": [],
+          "exclusions": [],
+          "version": "1"
+        },
+        {
+          "check_id": "target_leakage",
+          "applicability": "not_applicable",
+          "execution": "not_run",
+          "scope": "dataset",
+          "reason": "No target selected; general dataset profiling.",
+          "evidence_refs": [],
+          "exclusions": [],
+          "version": "1"
+        },
+        {
+          "check_id": "classification_scoring",
+          "applicability": "not_applicable",
+          "execution": "not_run",
+          "scope": "dataset",
+          "reason": "No target selected; general dataset profiling.",
+          "evidence_refs": [],
+          "exclusions": [],
+          "version": "1"
+        },
+        {
+          "check_id": "parsing_fidelity",
+          "applicability": "applicable",
+          "execution": "completed",
+          "scope": "dataset",
+          "reason": null,
+          "evidence_refs": [
+            "parsing_fidelity.9"
+          ],
+          "exclusions": [],
+          "version": "1"
+        }
+      ],
+      "evidence": [
+        {
+          "id": "schema.0",
+          "check_id": "schema",
+          "measurement_refs": [
+            "/parsing/header_mapping",
+            "/profile/row_count",
+            "/profile/column_count"
+          ],
+          "population": "parsed records",
+          "denominator": 5,
+          "affected_count": null,
+          "affected_columns": [],
+          "row_refs": [],
+          "method": "deterministic",
+          "thresholds": {}
+        },
+        {
+          "id": "missingness.1",
+          "check_id": "missingness",
+          "measurement_refs": [
+            "/profile/missing_cells",
+            "/profile/missing_rate",
+            "/profile/missing_feature_row_rate"
+          ],
+          "population": "all parsed cells",
+          "denominator": 20,
+          "affected_count": 6,
+          "affected_columns": [],
+          "row_refs": [],
+          "method": "deterministic",
+          "thresholds": {}
+        },
+        {
+          "id": "column_variation.2",
+          "check_id": "column_variation",
+          "measurement_refs": [
+            "/profile/columns"
+          ],
+          "population": "all parsed columns",
+          "denominator": 4,
+          "affected_count": null,
+          "affected_columns": [],
+          "row_refs": [],
+          "method": "deterministic",
+          "thresholds": {}
+        },
+        {
+          "id": "categorical_cardinality.3",
+          "check_id": "categorical_cardinality",
+          "measurement_refs": [
+            "/profile/columns"
+          ],
+          "population": "nonnumeric parsed columns",
+          "denominator": 1,
+          "affected_count": null,
+          "affected_columns": [],
+          "row_refs": [],
+          "method": "deterministic",
+          "thresholds": {}
+        },
+        {
+          "id": "exact_duplicates.4",
+          "check_id": "exact_duplicates",
+          "measurement_refs": [
+            "/profile/duplicate_rows",
+            "/profile/duplicate_group_count",
+            "/profile/rows_in_duplicate_groups"
+          ],
+          "population": "all parsed rows",
+          "denominator": 5,
+          "affected_count": 1,
+          "affected_columns": [],
+          "row_refs": [
+            {
+              "source_sha256": "ba33bfcb8405612b293451fec67e3dd202a5d73b7c9ed5a4dbf99c5fc0d25ad9",
+              "parsing_fingerprint": "cd58c921fc1cc98610f64c0e04c2244df50bc0455c3f0ac2a46e1bfddc3de530",
+              "parsed_row": 1
+            },
+            {
+              "source_sha256": "ba33bfcb8405612b293451fec67e3dd202a5d73b7c9ed5a4dbf99c5fc0d25ad9",
+              "parsing_fingerprint": "cd58c921fc1cc98610f64c0e04c2244df50bc0455c3f0ac2a46e1bfddc3de530",
+              "parsed_row": 2
+            }
+          ],
+          "method": "deterministic",
+          "thresholds": {}
+        },
+        {
+          "id": "numeric_summary.5",
+          "check_id": "numeric_summary",
+          "measurement_refs": [
+            "/profile/columns/0/numeric_summary",
+            "/profile/columns/0/finite_count"
+          ],
+          "population": "finite values; zero/negative/non-finite rates use total rows",
+          "denominator": 5,
+          "affected_count": null,
+          "affected_columns": [
+            "identifier"
+          ],
+          "row_refs": [],
+          "method": "finite_descriptive",
+          "thresholds": {}
+        },
+        {
+          "id": "numeric_outliers.6",
+          "check_id": "numeric_outliers",
+          "measurement_refs": [
+            "/profile/columns/0/outlier_count",
+            "/profile/columns/0/outlier_rate"
+          ],
+          "population": "finite numeric observations",
+          "denominator": 5,
+          "affected_count": 0,
+          "affected_columns": [
+            "identifier"
+          ],
+          "row_refs": [],
+          "method": "finite_1.5_iqr",
+          "thresholds": {
+            "review_rate": 5
+          }
+        },
+        {
+          "id": "numeric_summary.7",
+          "check_id": "numeric_summary",
+          "measurement_refs": [
+            "/profile/columns/1/numeric_summary",
+            "/profile/columns/1/finite_count"
+          ],
+          "population": "finite values; zero/negative/non-finite rates use total rows",
+          "denominator": 5,
+          "affected_count": null,
+          "affected_columns": [
+            "value"
+          ],
+          "row_refs": [],
+          "method": "finite_descriptive",
+          "thresholds": {}
+        },
+        {
+          "id": "numeric_summary.8",
+          "check_id": "numeric_summary",
+          "measurement_refs": [
+            "/profile/columns/2/numeric_summary",
+            "/profile/columns/2/finite_count"
+          ],
+          "population": "finite values; zero/negative/non-finite rates use total rows",
+          "denominator": 5,
+          "affected_count": null,
+          "affected_columns": [
+            "empty"
+          ],
+          "row_refs": [],
+          "method": "finite_descriptive",
+          "thresholds": {}
+        },
+        {
+          "id": "parsing_fidelity.9",
+          "check_id": "parsing_fidelity",
+          "measurement_refs": [
+            "/parsing/fidelity_inspection",
+            "/parsing_warnings"
+          ],
+          "population": "bounded source prefix",
+          "denominator": 20,
+          "affected_count": null,
+          "affected_columns": [],
+          "row_refs": [],
+          "method": "bounded_source_token_comparison",
+          "thresholds": {}
+        }
+      ],
+      "findings": [
+        {
+          "code": "fully_missing_columns",
+          "title": "Fully missing columns",
+          "finding": "1 column contains no observed values.",
+          "evidence": "empty",
+          "recommendation": "Confirm whether these fields were expected; investigate collection or parsing before choosing how to handle them.",
+          "severity": "High",
+          "modeling_impact": "These fields provide no observed input information in this dataset.",
+          "evidence_type": "review_observation",
+          "evidence_refs": [
+            "missingness.1"
+          ]
+        },
+        {
+          "code": "dataset_missingness",
+          "title": "Dataset-wide missingness",
+          "finding": "30.0% of parsed cells are missing.",
+          "evidence": "6 missing cells; 100.0% of rows are affected.",
+          "recommendation": "Review missingness by column and row; avoid assuming row deletion or imputation is appropriate.",
+          "severity": "High",
+          "modeling_impact": "Cell-level averages can hide uneven coverage across records.",
+          "evidence_type": "review_observation",
+          "evidence_refs": [
+            "missingness.1"
+          ]
+        },
+        {
+          "code": "duplicate_records",
+          "title": "Exact repeated records",
+          "finding": "1 rows repeat an earlier complete parsed row (20.0%).",
+          "evidence": "1 groups; 2 participating rows; largest group 2.",
+          "recommendation": "Review whether repetition represents valid repeated events, deliberate weighting, or unintended copying. Do not automatically deduplicate.",
+          "severity": "High",
+          "modeling_impact": "Repetition changes effective coverage and may matter to later dataset splitting.",
+          "evidence_type": "review_observation",
+          "evidence_refs": [
+            "exact_duplicates.4"
+          ]
+        },
+        {
+          "code": "non_finite_values",
+          "title": "Non-finite numeric values",
+          "finding": "Some numeric fields contain infinity values.",
+          "evidence": "value: 1 values",
+          "recommendation": "Confirm whether infinities represent intended sentinels or arithmetic/collection issues and whether downstream tools accept them.",
+          "severity": "High",
+          "modeling_impact": "Non-finite values may be incompatible with downstream calculations; their origin is not established by this check.",
+          "evidence_type": "review_observation",
+          "evidence_refs": [
+            "numeric_summary.5",
+            "numeric_summary.7",
+            "numeric_summary.8"
+          ]
+        },
+        {
+          "code": "constant_fields",
+          "title": "Observed constant fields",
+          "finding": "1 column meets the observed constant fields review rule.",
+          "evidence": "constant: 1 observed values, 100.0% top share",
+          "recommendation": "Confirm whether constants are expected metadata or intended variable inputs; remove nothing automatically.",
+          "severity": "Moderate",
+          "modeling_impact": "Observed distributions need interpretation against the intended data use; rarity or cardinality alone is not a defect.",
+          "evidence_type": "review_observation",
+          "evidence_refs": [
+            "column_variation.2"
+          ]
+        }
+      ],
+      "narrative": {
+        "overall_assessment": "General dataset profiling summarizes observed input evidence. No overall scoring policy is defined for unlabeled profiling.",
+        "principal_evidence_summary": "1 column contains no observed values.",
+        "recommended_action": "Confirm whether these fields were expected; investigate collection or parsing before choosing how to handle them.",
+        "missingness_interpretation": "Missingness is concentrated in empty, which accounts for 83.33% of all missing feature cells. 100.0% of rows contain at least one missing feature.",
+        "duplicate_interpretation": "1 repeated rows beyond each group's first occurrence; legitimate repetition is possible.",
+        "finding_count": 5
+      },
+      "scoring": {
+        "status": "not_defined",
+        "values": null,
+        "reason": "No validated scoring policy is defined for unlabeled profiling."
+      },
+      "parsing": {
+        "options": {
+          "encoding": "utf-8",
+          "missing_policy": "pandas_default",
+          "na_values": [],
+          "column_types": {}
+        },
+        "pandas_version": "3.0.3",
+        "parser": "pandas.read_csv",
+        "delimiter": ",",
+        "header": "infer",
+        "skip_blank_lines": true,
+        "dtypes": {
+          "identifier": "int64",
+          "value": "float64",
+          "empty": "float64",
+          "constant": "str"
+        },
+        "provisional_types": false,
+        "header_mapping": [
+          {
+            "position": 1,
+            "original": "identifier",
+            "resolved": "identifier"
+          },
+          {
+            "position": 2,
+            "original": "value",
+            "resolved": "value"
+          },
+          {
+            "position": 3,
+            "original": "empty",
+            "resolved": "empty"
+          },
+          {
+            "position": 4,
+            "original": "constant",
+            "resolved": "constant"
+          }
+        ],
+        "fidelity_inspection": {
+          "bytes_inspected": 94,
+          "records_inspected": 5,
+          "cells_retained": 20,
+          "complete": true,
+          "stopping_reason": "eof",
+          "comparable_cells": 20,
+          "alignment_confirmed": true,
+          "counts_are_dataset_incidence": false
+        },
+        "inspection_limits": {
+          "max_bytes": 1048576,
+          "max_records": 200,
+          "max_cells": 20000
+        },
+        "fingerprint": "cd58c921fc1cc98610f64c0e04c2244df50bc0455c3f0ac2a46e1bfddc3de530",
+        "inference_caution": "NA-like tokens may become missing; numeric-looking codes may lose leading zeros. No source values were rewritten.",
+        "source_sha256": "ba33bfcb8405612b293451fec67e3dd202a5d73b7c9ed5a4dbf99c5fc0d25ad9"
+      },
+      "parsing_warnings": [
+        {
+          "code": "leading_zero_numeric_conversion",
+          "column": "identifier",
+          "header_position": null,
+          "interpretation": "Source tokens with leading zeros became numbers, losing their original textual representation.",
+          "observed_count": 5,
+          "row_refs": [
+            {
+              "source_sha256": "ba33bfcb8405612b293451fec67e3dd202a5d73b7c9ed5a4dbf99c5fc0d25ad9",
+              "parsing_fingerprint": "cd58c921fc1cc98610f64c0e04c2244df50bc0455c3f0ac2a46e1bfddc3de530",
+              "parsed_row": 1
+            },
+            {
+              "source_sha256": "ba33bfcb8405612b293451fec67e3dd202a5d73b7c9ed5a4dbf99c5fc0d25ad9",
+              "parsing_fingerprint": "cd58c921fc1cc98610f64c0e04c2244df50bc0455c3f0ac2a46e1bfddc3de530",
+              "parsed_row": 2
+            },
+            {
+              "source_sha256": "ba33bfcb8405612b293451fec67e3dd202a5d73b7c9ed5a4dbf99c5fc0d25ad9",
+              "parsing_fingerprint": "cd58c921fc1cc98610f64c0e04c2244df50bc0455c3f0ac2a46e1bfddc3de530",
+              "parsed_row": 3
+            },
+            {
+              "source_sha256": "ba33bfcb8405612b293451fec67e3dd202a5d73b7c9ed5a4dbf99c5fc0d25ad9",
+              "parsing_fingerprint": "cd58c921fc1cc98610f64c0e04c2244df50bc0455c3f0ac2a46e1bfddc3de530",
+              "parsed_row": 4
+            },
+            {
+              "source_sha256": "ba33bfcb8405612b293451fec67e3dd202a5d73b7c9ed5a4dbf99c5fc0d25ad9",
+              "parsing_fingerprint": "cd58c921fc1cc98610f64c0e04c2244df50bc0455c3f0ac2a46e1bfddc3de530",
+              "parsed_row": 5
+            }
+          ],
+          "setting": "inference",
+          "evidence_type": "interpretation_review_warning",
+          "recommendation": "Confirm this interpretation matches the source meaning; use an explicit parsing override where appropriate.",
+          "scope": "bounded source inspection; counts are not dataset-wide incidence",
+          "inspected_population": {
+            "bytes_inspected": 94,
+            "records_inspected": 5,
+            "cells_retained": 20,
+            "complete": true,
+            "stopping_reason": "eof",
+            "comparable_cells": 20,
+            "alignment_confirmed": true,
+            "counts_are_dataset_incidence": false
+          }
+        }
+      ]
+    },
+    "html_sha256": "d0eb06a0df987d6857b36b80fb252e6736524d307812f7e6b8bc89c96463292f"
+  },
+  "known": {
+    "raw": "identifier,value,category,empty,constant\n001,0,a,,same\n002,-1,a,,same\n003,1,b,,same\n004,2,b,,same\n005,3,c,,same\n006,4,c,,same\n007,5,d,,same\n008,6,d,,same\n009,7,e,,same\n010,100,e,,same\n010,100,e,,same\n011,inf,NA,,same\n",
+    "result": {
+      "profile": {
+        "row_count": 12,
+        "column_count": 5,
+        "feature_count": 5,
+        "numeric_feature_count": 3,
+        "non_numeric_feature_count": 2,
+        "missing_cells": 13,
+        "missing_rate": 21.67,
+        "missing_feature_row_count": 12,
+        "missing_feature_row_rate": 100.0,
+        "rows_with_1_missing_feature": 11,
+        "rows_with_2_missing_features": 1,
+        "rows_with_3_plus_missing_features": 0,
+        "columns": [
+          {
+            "name": "identifier",
+            "dtype": "int64",
+            "role": "feature",
+            "is_numeric": true,
+            "missing_count": 0,
+            "missing_rate": 0.0,
+            "non_null_count": 12,
+            "unique_count": 11,
+            "unique_rate": 91.67,
+            "constant": false,
+            "near_constant": false,
+            "high_cardinality": false,
+            "top_value": "10",
+            "top_value_count": 2,
+            "top_value_rate": 16.67,
+            "top_value_hidden": false,
+            "top_value_is_missing": false,
+            "outlier_count": 0,
+            "outlier_rate": 0.0,
+            "numeric_summary": {
+              "min": 1,
+              "q1": 3.75,
+              "median": 6.5,
+              "q3": 9.25,
+              "max": 11,
+              "zero_count": 0,
+              "zero_rate": 0.0,
+              "negative_count": 0,
+              "negative_rate": 0.0,
+              "non_finite_count": 0,
+              "non_finite_rate": 0.0
+            },
+            "finite_count": 12,
+            "outlier_denominator": 12,
+            "outlier_method": "finite_1.5_iqr",
+            "outlier_unavailable_reason": null
+          },
+          {
+            "name": "value",
+            "dtype": "float64",
+            "role": "feature",
+            "is_numeric": true,
+            "missing_count": 0,
+            "missing_rate": 0.0,
+            "non_null_count": 12,
+            "unique_count": 11,
+            "unique_rate": 91.67,
+            "constant": false,
+            "near_constant": false,
+            "high_cardinality": false,
+            "top_value": "100.0",
+            "top_value_count": 2,
+            "top_value_rate": 16.67,
+            "top_value_hidden": false,
+            "top_value_is_missing": false,
+            "outlier_count": 2,
+            "outlier_rate": 18.18,
+            "numeric_summary": {
+              "min": -1.0,
+              "q1": 1.5,
+              "median": 4.0,
+              "q3": 6.5,
+              "max": 100.0,
+              "zero_count": 1,
+              "zero_rate": 8.33,
+              "negative_count": 1,
+              "negative_rate": 8.33,
+              "non_finite_count": 1,
+              "non_finite_rate": 8.33
+            },
+            "finite_count": 11,
+            "outlier_denominator": 11,
+            "outlier_method": "finite_1.5_iqr",
+            "outlier_unavailable_reason": null
+          },
+          {
+            "name": "category",
+            "dtype": "str",
+            "role": "feature",
+            "is_numeric": false,
+            "missing_count": 1,
+            "missing_rate": 8.33,
+            "non_null_count": 11,
+            "unique_count": 5,
+            "unique_rate": 41.67,
+            "constant": false,
+            "near_constant": false,
+            "high_cardinality": false,
+            "top_value": "e",
+            "top_value_count": 3,
+            "top_value_rate": 25.0,
+            "top_value_hidden": false,
+            "top_value_is_missing": false,
+            "outlier_count": 0,
+            "outlier_rate": 0.0,
+            "numeric_summary": null
+          },
+          {
+            "name": "empty",
+            "dtype": "float64",
+            "role": "feature",
+            "is_numeric": true,
+            "missing_count": 12,
+            "missing_rate": 100.0,
+            "non_null_count": 0,
+            "unique_count": 0,
+            "unique_rate": 0.0,
+            "constant": true,
+            "near_constant": false,
+            "high_cardinality": false,
+            "top_value": null,
+            "top_value_count": 12,
+            "top_value_rate": 100.0,
+            "top_value_hidden": false,
+            "top_value_is_missing": true,
+            "outlier_count": null,
+            "outlier_rate": null,
+            "numeric_summary": {
+              "min": null,
+              "q1": null,
+              "median": null,
+              "q3": null,
+              "max": null,
+              "zero_count": 0,
+              "zero_rate": 0.0,
+              "negative_count": 0,
+              "negative_rate": 0.0,
+              "non_finite_count": 0,
+              "non_finite_rate": 0.0
+            },
+            "finite_count": 0,
+            "outlier_denominator": 0,
+            "outlier_method": "finite_1.5_iqr",
+            "outlier_unavailable_reason": "insufficient_finite_observations"
+          },
+          {
+            "name": "constant",
+            "dtype": "str",
+            "role": "feature",
+            "is_numeric": false,
+            "missing_count": 0,
+            "missing_rate": 0.0,
+            "non_null_count": 12,
+            "unique_count": 1,
+            "unique_rate": 8.33,
+            "constant": true,
+            "near_constant": false,
+            "high_cardinality": false,
+            "top_value": "same",
+            "top_value_count": 12,
+            "top_value_rate": 100.0,
+            "top_value_hidden": false,
+            "top_value_is_missing": false,
+            "outlier_count": 0,
+            "outlier_rate": 0.0,
+            "numeric_summary": null
+          }
+        ],
+        "severe_missing_columns": [
+          "empty"
+        ],
+        "duplicate_rows": 1,
+        "duplicate_rate": 8.33,
+        "duplicate_group_count": 1,
+        "largest_duplicate_group_size": 2,
+        "rows_in_duplicate_groups": 2,
+        "duplicate_row_examples": [
+          10,
+          11
+        ]
+      },
+      "checks": [
+        {
+          "check_id": "schema",
+          "applicability": "applicable",
+          "execution": "completed",
+          "scope": "dataset",
+          "reason": null,
+          "evidence_refs": [
+            "schema.0"
+          ],
+          "exclusions": [],
+          "version": "1"
+        },
+        {
+          "check_id": "missingness",
+          "applicability": "applicable",
+          "execution": "completed",
+          "scope": "dataset",
+          "reason": null,
+          "evidence_refs": [
+            "missingness.1"
+          ],
+          "exclusions": [],
+          "version": "1"
+        },
+        {
+          "check_id": "column_variation",
+          "applicability": "applicable",
+          "execution": "completed",
+          "scope": "dataset",
+          "reason": null,
+          "evidence_refs": [
+            "column_variation.2"
+          ],
+          "exclusions": [],
+          "version": "1"
+        },
+        {
+          "check_id": "categorical_cardinality",
+          "applicability": "applicable",
+          "execution": "completed",
+          "scope": "dataset",
+          "reason": null,
+          "evidence_refs": [
+            "categorical_cardinality.3"
+          ],
+          "exclusions": [],
+          "version": "1"
+        },
+        {
+          "check_id": "exact_duplicates",
+          "applicability": "applicable",
+          "execution": "completed",
+          "scope": "dataset",
+          "reason": null,
+          "evidence_refs": [
+            "exact_duplicates.4"
+          ],
+          "exclusions": [],
+          "version": "1"
+        },
+        {
+          "check_id": "numeric_summary",
+          "applicability": "applicable",
+          "execution": "completed",
+          "scope": "identifier",
+          "reason": null,
+          "evidence_refs": [
+            "numeric_summary.5"
+          ],
+          "exclusions": [],
+          "version": "1"
+        },
+        {
+          "check_id": "numeric_outliers",
+          "applicability": "applicable",
+          "execution": "completed",
+          "scope": "identifier",
+          "reason": null,
+          "evidence_refs": [
+            "numeric_outliers.6"
+          ],
+          "exclusions": [
+            {
+              "missing_values": 0,
+              "non_finite_values": 0
+            }
+          ],
+          "version": "1"
+        },
+        {
+          "check_id": "numeric_summary",
+          "applicability": "applicable",
+          "execution": "completed",
+          "scope": "value",
+          "reason": null,
+          "evidence_refs": [
+            "numeric_summary.7"
+          ],
+          "exclusions": [],
+          "version": "1"
+        },
+        {
+          "check_id": "numeric_outliers",
+          "applicability": "applicable",
+          "execution": "completed",
+          "scope": "value",
+          "reason": null,
+          "evidence_refs": [
+            "numeric_outliers.8"
+          ],
+          "exclusions": [
+            {
+              "missing_values": 0,
+              "non_finite_values": 1
+            }
+          ],
+          "version": "1"
+        },
+        {
+          "check_id": "numeric_summary",
+          "applicability": "applicable",
+          "execution": "completed",
+          "scope": "empty",
+          "reason": null,
+          "evidence_refs": [
+            "numeric_summary.9"
+          ],
+          "exclusions": [],
+          "version": "1"
+        },
+        {
+          "check_id": "numeric_outliers",
+          "applicability": "blocked",
+          "execution": "not_run",
+          "scope": "empty",
+          "reason": "insufficient_finite_observations",
+          "evidence_refs": [],
+          "exclusions": [],
+          "version": "1"
+        },
+        {
+          "check_id": "classification_target",
+          "applicability": "not_applicable",
+          "execution": "not_run",
+          "scope": "dataset",
+          "reason": "No target selected; general dataset profiling.",
+          "evidence_refs": [],
+          "exclusions": [],
+          "version": "1"
+        },
+        {
+          "check_id": "label_conflicts",
+          "applicability": "not_applicable",
+          "execution": "not_run",
+          "scope": "dataset",
+          "reason": "No target selected; general dataset profiling.",
+          "evidence_refs": [],
+          "exclusions": [],
+          "version": "1"
+        },
+        {
+          "check_id": "target_leakage",
+          "applicability": "not_applicable",
+          "execution": "not_run",
+          "scope": "dataset",
+          "reason": "No target selected; general dataset profiling.",
+          "evidence_refs": [],
+          "exclusions": [],
+          "version": "1"
+        },
+        {
+          "check_id": "classification_scoring",
+          "applicability": "not_applicable",
+          "execution": "not_run",
+          "scope": "dataset",
+          "reason": "No target selected; general dataset profiling.",
+          "evidence_refs": [],
+          "exclusions": [],
+          "version": "1"
+        },
+        {
+          "check_id": "parsing_fidelity",
+          "applicability": "applicable",
+          "execution": "completed",
+          "scope": "dataset",
+          "reason": null,
+          "evidence_refs": [
+            "parsing_fidelity.10"
+          ],
+          "exclusions": [],
+          "version": "1"
+        }
+      ],
+      "evidence": [
+        {
+          "id": "schema.0",
+          "check_id": "schema",
+          "measurement_refs": [
+            "/parsing/header_mapping",
+            "/profile/row_count",
+            "/profile/column_count"
+          ],
+          "population": "parsed records",
+          "denominator": 12,
+          "affected_count": null,
+          "affected_columns": [],
+          "row_refs": [],
+          "method": "deterministic",
+          "thresholds": {}
+        },
+        {
+          "id": "missingness.1",
+          "check_id": "missingness",
+          "measurement_refs": [
+            "/profile/missing_cells",
+            "/profile/missing_rate",
+            "/profile/missing_feature_row_rate"
+          ],
+          "population": "all parsed cells",
+          "denominator": 60,
+          "affected_count": 13,
+          "affected_columns": [],
+          "row_refs": [],
+          "method": "deterministic",
+          "thresholds": {}
+        },
+        {
+          "id": "column_variation.2",
+          "check_id": "column_variation",
+          "measurement_refs": [
+            "/profile/columns"
+          ],
+          "population": "all parsed columns",
+          "denominator": 5,
+          "affected_count": null,
+          "affected_columns": [],
+          "row_refs": [],
+          "method": "deterministic",
+          "thresholds": {}
+        },
+        {
+          "id": "categorical_cardinality.3",
+          "check_id": "categorical_cardinality",
+          "measurement_refs": [
+            "/profile/columns"
+          ],
+          "population": "nonnumeric parsed columns",
+          "denominator": 2,
+          "affected_count": null,
+          "affected_columns": [],
+          "row_refs": [],
+          "method": "deterministic",
+          "thresholds": {}
+        },
+        {
+          "id": "exact_duplicates.4",
+          "check_id": "exact_duplicates",
+          "measurement_refs": [
+            "/profile/duplicate_rows",
+            "/profile/duplicate_group_count",
+            "/profile/rows_in_duplicate_groups"
+          ],
+          "population": "all parsed rows",
+          "denominator": 12,
+          "affected_count": 1,
+          "affected_columns": [],
+          "row_refs": [
+            {
+              "source_sha256": "b6e49150e658449dd310181bbf6ea06585434d0d20d4d00a36320c747cf1f59e",
+              "parsing_fingerprint": "8155bf51aa6df0e57458c4a0ca3a8217645f2161824f921dc813e1a2d2bf2685",
+              "parsed_row": 10
+            },
+            {
+              "source_sha256": "b6e49150e658449dd310181bbf6ea06585434d0d20d4d00a36320c747cf1f59e",
+              "parsing_fingerprint": "8155bf51aa6df0e57458c4a0ca3a8217645f2161824f921dc813e1a2d2bf2685",
+              "parsed_row": 11
+            }
+          ],
+          "method": "deterministic",
+          "thresholds": {}
+        },
+        {
+          "id": "numeric_summary.5",
+          "check_id": "numeric_summary",
+          "measurement_refs": [
+            "/profile/columns/0/numeric_summary",
+            "/profile/columns/0/finite_count"
+          ],
+          "population": "finite values; zero/negative/non-finite rates use total rows",
+          "denominator": 12,
+          "affected_count": null,
+          "affected_columns": [
+            "identifier"
+          ],
+          "row_refs": [],
+          "method": "finite_descriptive",
+          "thresholds": {}
+        },
+        {
+          "id": "numeric_outliers.6",
+          "check_id": "numeric_outliers",
+          "measurement_refs": [
+            "/profile/columns/0/outlier_count",
+            "/profile/columns/0/outlier_rate"
+          ],
+          "population": "finite numeric observations",
+          "denominator": 12,
+          "affected_count": 0,
+          "affected_columns": [
+            "identifier"
+          ],
+          "row_refs": [],
+          "method": "finite_1.5_iqr",
+          "thresholds": {
+            "review_rate": 5
+          }
+        },
+        {
+          "id": "numeric_summary.7",
+          "check_id": "numeric_summary",
+          "measurement_refs": [
+            "/profile/columns/1/numeric_summary",
+            "/profile/columns/1/finite_count"
+          ],
+          "population": "finite values; zero/negative/non-finite rates use total rows",
+          "denominator": 12,
+          "affected_count": null,
+          "affected_columns": [
+            "value"
+          ],
+          "row_refs": [],
+          "method": "finite_descriptive",
+          "thresholds": {}
+        },
+        {
+          "id": "numeric_outliers.8",
+          "check_id": "numeric_outliers",
+          "measurement_refs": [
+            "/profile/columns/1/outlier_count",
+            "/profile/columns/1/outlier_rate"
+          ],
+          "population": "finite numeric observations",
+          "denominator": 11,
+          "affected_count": 2,
+          "affected_columns": [
+            "value"
+          ],
+          "row_refs": [],
+          "method": "finite_1.5_iqr",
+          "thresholds": {
+            "review_rate": 5
+          }
+        },
+        {
+          "id": "numeric_summary.9",
+          "check_id": "numeric_summary",
+          "measurement_refs": [
+            "/profile/columns/3/numeric_summary",
+            "/profile/columns/3/finite_count"
+          ],
+          "population": "finite values; zero/negative/non-finite rates use total rows",
+          "denominator": 12,
+          "affected_count": null,
+          "affected_columns": [
+            "empty"
+          ],
+          "row_refs": [],
+          "method": "finite_descriptive",
+          "thresholds": {}
+        },
+        {
+          "id": "parsing_fidelity.10",
+          "check_id": "parsing_fidelity",
+          "measurement_refs": [
+            "/parsing/fidelity_inspection",
+            "/parsing_warnings"
+          ],
+          "population": "bounded source prefix",
+          "denominator": 60,
+          "affected_count": null,
+          "affected_columns": [],
+          "row_refs": [],
+          "method": "bounded_source_token_comparison",
+          "thresholds": {}
+        }
+      ],
+      "findings": [
+        {
+          "code": "fully_missing_columns",
+          "title": "Fully missing columns",
+          "finding": "1 column contains no observed values.",
+          "evidence": "empty",
+          "recommendation": "Confirm whether these fields were expected; investigate collection or parsing before choosing how to handle them.",
+          "severity": "High",
+          "modeling_impact": "These fields provide no observed input information in this dataset.",
+          "evidence_type": "review_observation",
+          "evidence_refs": [
+            "missingness.1"
+          ]
+        },
+        {
+          "code": "non_finite_values",
+          "title": "Non-finite numeric values",
+          "finding": "Some numeric fields contain infinity values.",
+          "evidence": "value: 1 values",
+          "recommendation": "Confirm whether infinities represent intended sentinels or arithmetic/collection issues and whether downstream tools accept them.",
+          "severity": "High",
+          "modeling_impact": "Non-finite values may be incompatible with downstream calculations; their origin is not established by this check.",
+          "evidence_type": "review_observation",
+          "evidence_refs": [
+            "numeric_summary.5",
+            "numeric_summary.7",
+            "numeric_summary.9"
+          ]
+        },
+        {
+          "code": "dataset_missingness",
+          "title": "Dataset-wide missingness",
+          "finding": "21.67% of parsed cells are missing.",
+          "evidence": "13 missing cells; 100.0% of rows are affected.",
+          "recommendation": "Review missingness by column and row; avoid assuming row deletion or imputation is appropriate.",
+          "severity": "Moderate",
+          "modeling_impact": "Cell-level averages can hide uneven coverage across records.",
+          "evidence_type": "review_observation",
+          "evidence_refs": [
+            "missingness.1"
+          ]
+        },
+        {
+          "code": "duplicate_records",
+          "title": "Exact repeated records",
+          "finding": "1 rows repeat an earlier complete parsed row (8.33%).",
+          "evidence": "1 groups; 2 participating rows; largest group 2.",
+          "recommendation": "Review whether repetition represents valid repeated events, deliberate weighting, or unintended copying. Do not automatically deduplicate.",
+          "severity": "Moderate",
+          "modeling_impact": "Repetition changes effective coverage and may matter to later dataset splitting.",
+          "evidence_type": "review_observation",
+          "evidence_refs": [
+            "exact_duplicates.4"
+          ]
+        },
+        {
+          "code": "constant_fields",
+          "title": "Observed constant fields",
+          "finding": "1 column meets the observed constant fields review rule.",
+          "evidence": "constant: 1 observed values, 100.0% top share",
+          "recommendation": "Confirm whether constants are expected metadata or intended variable inputs; remove nothing automatically.",
+          "severity": "Moderate",
+          "modeling_impact": "Observed distributions need interpretation against the intended data use; rarity or cardinality alone is not a defect.",
+          "evidence_type": "review_observation",
+          "evidence_refs": [
+            "column_variation.2"
+          ]
+        },
+        {
+          "code": "numeric_outlier_concentration",
+          "title": "IQR review candidates",
+          "finding": "Some fields have at least 5% of finite values outside the 1.5-IQR fences.",
+          "evidence": "value: 2 of 11 finite values (18.18%)",
+          "recommendation": "Review distributions, units, and legitimate rare observations. Skew or an IQR flag does not prove a data error.",
+          "severity": "Moderate",
+          "modeling_impact": "Extreme observations can influence some analyses; this check does not establish task suitability.",
+          "evidence_type": "review_observation",
+          "evidence_refs": [
+            "numeric_outliers.6",
+            "numeric_outliers.8"
+          ]
+        }
+      ],
+      "narrative": {
+        "overall_assessment": "General dataset profiling summarizes observed input evidence. No overall scoring policy is defined for unlabeled profiling.",
+        "principal_evidence_summary": "1 column contains no observed values.",
+        "recommended_action": "Confirm whether these fields were expected; investigate collection or parsing before choosing how to handle them.",
+        "missingness_interpretation": "Missingness is concentrated in empty, which accounts for 92.31% of all missing feature cells. 100.0% of rows contain at least one missing feature.",
+        "duplicate_interpretation": "1 repeated rows beyond each group's first occurrence; legitimate repetition is possible.",
+        "finding_count": 6
+      },
+      "scoring": {
+        "status": "not_defined",
+        "values": null,
+        "reason": "No validated scoring policy is defined for unlabeled profiling."
+      },
+      "parsing": {
+        "options": {
+          "encoding": "utf-8",
+          "missing_policy": "pandas_default",
+          "na_values": [],
+          "column_types": {}
+        },
+        "pandas_version": "3.0.3",
+        "parser": "pandas.read_csv",
+        "delimiter": ",",
+        "header": "infer",
+        "skip_blank_lines": true,
+        "dtypes": {
+          "identifier": "int64",
+          "value": "float64",
+          "category": "str",
+          "empty": "float64",
+          "constant": "str"
+        },
+        "provisional_types": false,
+        "header_mapping": [
+          {
+            "position": 1,
+            "original": "identifier",
+            "resolved": "identifier"
+          },
+          {
+            "position": 2,
+            "original": "value",
+            "resolved": "value"
+          },
+          {
+            "position": 3,
+            "original": "category",
+            "resolved": "category"
+          },
+          {
+            "position": 4,
+            "original": "empty",
+            "resolved": "empty"
+          },
+          {
+            "position": 5,
+            "original": "constant",
+            "resolved": "constant"
+          }
+        ],
+        "fidelity_inspection": {
+          "bytes_inspected": 217,
+          "records_inspected": 12,
+          "cells_retained": 60,
+          "complete": true,
+          "stopping_reason": "eof",
+          "comparable_cells": 60,
+          "alignment_confirmed": true,
+          "counts_are_dataset_incidence": false
+        },
+        "inspection_limits": {
+          "max_bytes": 1048576,
+          "max_records": 200,
+          "max_cells": 20000
+        },
+        "fingerprint": "8155bf51aa6df0e57458c4a0ca3a8217645f2161824f921dc813e1a2d2bf2685",
+        "inference_caution": "NA-like tokens may become missing; numeric-looking codes may lose leading zeros. No source values were rewritten.",
+        "source_sha256": "b6e49150e658449dd310181bbf6ea06585434d0d20d4d00a36320c747cf1f59e"
+      },
+      "parsing_warnings": [
+        {
+          "code": "leading_zero_numeric_conversion",
+          "column": "identifier",
+          "header_position": null,
+          "interpretation": "Source tokens with leading zeros became numbers, losing their original textual representation.",
+          "observed_count": 12,
+          "row_refs": [
+            {
+              "source_sha256": "b6e49150e658449dd310181bbf6ea06585434d0d20d4d00a36320c747cf1f59e",
+              "parsing_fingerprint": "8155bf51aa6df0e57458c4a0ca3a8217645f2161824f921dc813e1a2d2bf2685",
+              "parsed_row": 1
+            },
+            {
+              "source_sha256": "b6e49150e658449dd310181bbf6ea06585434d0d20d4d00a36320c747cf1f59e",
+              "parsing_fingerprint": "8155bf51aa6df0e57458c4a0ca3a8217645f2161824f921dc813e1a2d2bf2685",
+              "parsed_row": 2
+            },
+            {
+              "source_sha256": "b6e49150e658449dd310181bbf6ea06585434d0d20d4d00a36320c747cf1f59e",
+              "parsing_fingerprint": "8155bf51aa6df0e57458c4a0ca3a8217645f2161824f921dc813e1a2d2bf2685",
+              "parsed_row": 3
+            },
+            {
+              "source_sha256": "b6e49150e658449dd310181bbf6ea06585434d0d20d4d00a36320c747cf1f59e",
+              "parsing_fingerprint": "8155bf51aa6df0e57458c4a0ca3a8217645f2161824f921dc813e1a2d2bf2685",
+              "parsed_row": 4
+            },
+            {
+              "source_sha256": "b6e49150e658449dd310181bbf6ea06585434d0d20d4d00a36320c747cf1f59e",
+              "parsing_fingerprint": "8155bf51aa6df0e57458c4a0ca3a8217645f2161824f921dc813e1a2d2bf2685",
+              "parsed_row": 5
+            }
+          ],
+          "setting": "inference",
+          "evidence_type": "interpretation_review_warning",
+          "recommendation": "Confirm this interpretation matches the source meaning; use an explicit parsing override where appropriate.",
+          "scope": "bounded source inspection; counts are not dataset-wide incidence",
+          "inspected_population": {
+            "bytes_inspected": 217,
+            "records_inspected": 12,
+            "cells_retained": 60,
+            "complete": true,
+            "stopping_reason": "eof",
+            "comparable_cells": 60,
+            "alignment_confirmed": true,
+            "counts_are_dataset_incidence": false
+          }
+        },
+        {
+          "code": "nonempty_token_as_missing",
+          "column": "category",
+          "header_position": null,
+          "interpretation": "Nonempty source tokens became missing values under the selected missing-value policy.",
+          "observed_count": 1,
+          "row_refs": [
+            {
+              "source_sha256": "b6e49150e658449dd310181bbf6ea06585434d0d20d4d00a36320c747cf1f59e",
+              "parsing_fingerprint": "8155bf51aa6df0e57458c4a0ca3a8217645f2161824f921dc813e1a2d2bf2685",
+              "parsed_row": 12
+            }
+          ],
+          "setting": "pandas_default",
+          "evidence_type": "interpretation_review_warning",
+          "recommendation": "Confirm this interpretation matches the source meaning; use an explicit parsing override where appropriate.",
+          "scope": "bounded source inspection; counts are not dataset-wide incidence",
+          "inspected_population": {
+            "bytes_inspected": 217,
+            "records_inspected": 12,
+            "cells_retained": 60,
+            "complete": true,
+            "stopping_reason": "eof",
+            "comparable_cells": 60,
+            "alignment_confirmed": true,
+            "counts_are_dataset_incidence": false
+          }
+        }
+      ]
+    },
+    "html_sha256": "9a8149db183df52c60240cbaf0a3000cae555fc3f2f172d5adbd4598206e5673"
+  }
+}

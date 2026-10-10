@@ -15,8 +15,12 @@ setup(
         "flask>=3.0",
         "jinja2>=3.0",
         "pandas>=1.5",
+        "numpy>=1.23",
         "weasyprint>=69,<70",
+        "duckdb>=1.5.6,<1.6",
+        "psutil>=5.9",
+        "tzdata>=2025.2",
     ],
-    extras_require={"dev": ["pypdf>=6,<7", "pytest>=7.0"]},
+    extras_require={"parquet": ["pyarrow>=19,<26"], "dev": ["pypdf>=6,<7", "pytest>=7.0"], "statistics": ["scipy>=1.10,<2"]},
     entry_points={"console_scripts": ["datatrust=datatrust.cli:main"]},
 )

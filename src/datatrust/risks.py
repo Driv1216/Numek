@@ -330,3 +330,184 @@ def _risk(
 
 def _severity_rank(severity: str) -> int:
     return {"Low": 1, "Moderate": 2, "High": 3}.get(severity, 0)
+
+
+def build_unlabeled_findings(profile: dict) -> List[dict]:
+    """Evidence-based review priorities, with no scoring or readiness verdict."""
+    findings = []
+    columns = profile["columns"]
+
+    def add(code, title, fact, evidence, recommendation, severity, check_id, impact):
+        findings.append({"code": code, "title": title, "finding": fact, "evidence": evidence,
+                         "recommendation": recommendation, "severity": severity,
+                         "modeling_impact": impact, "evidence_type": "review_observation",
+                         "check_id": check_id})
+
+    empty = [c for c in columns if c["unique_count"] == 0]
+    if empty:
+        add("fully_missing_columns", "Fully missing columns", f"{count_phrase(len(empty), 'column')} {agree(len(empty), 'contains', 'contain')} no observed values.",
+            ", ".join(c["name"] for c in empty), "Confirm whether these fields were expected; investigate collection or parsing before choosing how to handle them.",
+            "High", "missingness", "These fields provide no observed input information in this dataset.")
+    missing = [c for c in columns if c["unique_count"] > 0 and c["missing_rate"] >= 25]
+    if missing:
+        add("column_missingness", "Substantial column missingness", "Some columns have at least 25% missing values.",
+            "; ".join(f"{c['name']}: {c['missing_count']} of {profile['row_count']} rows ({c['missing_rate']}%)" for c in missing),
+            "Confirm the selected missing-value policy and investigate collection coverage before imputing or excluding values.",
+            "High" if any(c["missing_rate"] >= 50 for c in missing) else "Moderate", "missingness", "Missing inputs can reduce usable coverage or make analysis sensitive to handling choices.")
+    if profile["missing_rate"] >= 10:
+        add("dataset_missingness", "Dataset-wide missingness", f"{profile['missing_rate']}% of parsed cells are missing.",
+            f"{profile['missing_cells']} missing cells; {profile['missing_feature_row_rate']}% of rows are affected.",
+            "Review missingness by column and row; avoid assuming row deletion or imputation is appropriate.",
+            "High" if profile["missing_rate"] >= 25 else "Moderate", "missingness", "Cell-level averages can hide uneven coverage across records.")
+    elif not empty and not missing and profile["missing_feature_row_rate"] >= 25:
+        add("widespread_row_missingness", "Widespread row missingness", f"{profile['missing_feature_row_rate']}% of rows contain missing inputs.",
+            f"{profile['missing_feature_row_count']} of {profile['row_count']} rows; one/two/three-plus missing-column buckets are reported.",
+            "Assess row-level reach before choosing any missing-value handling strategy.",
+            "High" if profile["missing_feature_row_rate"] >= 50 else "Moderate", "missingness", "A low cell-level rate may still affect many records.")
+    rate = profile["duplicate_rate"]
+    if rate is not None and profile["duplicate_rows"]:
+        add("duplicate_records", "Exact repeated records", f"{profile['duplicate_rows']} rows repeat an earlier complete parsed row ({rate}%).",
+            f"{profile['duplicate_group_count']} groups; {profile['rows_in_duplicate_groups']} participating rows; largest group {profile['largest_duplicate_group_size']}.",
+            "Review whether repetition represents valid repeated events, deliberate weighting, or unintended copying. Do not automatically deduplicate.",
+            "High" if rate >= 10 else "Moderate" if rate >= 2 else "Low", "exact_duplicates", "Repetition changes effective coverage and may matter to later dataset splitting.")
+    for flag, code, title, predicate, advice in (
+        ("constant", "constant_fields", "Observed constant fields", lambda c: c["unique_count"] == 1,
+         "Confirm whether constants are expected metadata or intended variable inputs; remove nothing automatically."),
+        ("near_constant", "near_constant_fields", "Near-constant fields", lambda c: not c["top_value_is_missing"],
+         "Review whether rare values are legitimate and important before changing these fields."),
+        ("high_cardinality", "high_cardinality_categoricals", "High-cardinality text or categories", lambda c: True,
+         "Check whether these fields are identifiers, free text, or categories requiring deliberate encoding."),
+    ):
+        affected = [c for c in columns if c[flag] and predicate(c)]
+        if affected:
+            add(code, title, f"{count_phrase(len(affected), 'column')} {agree(len(affected), 'meets', 'meet')} the {title.lower()} review rule.",
+                "; ".join(f"{c['name']}: {c['unique_count']} observed values, {c['top_value_rate']}% top share" for c in affected),
+                advice, "Moderate" if code == "constant_fields" else "Low",
+                "categorical_cardinality" if flag == "high_cardinality" else "column_variation",
+                "Observed distributions need interpretation against the intended data use; rarity or cardinality alone is not a defect.")
+    nonfinite = [c for c in columns if c.get("numeric_summary") and c["numeric_summary"]["non_finite_count"]]
+    if nonfinite:
+        add("non_finite_values", "Non-finite numeric values", "Some numeric fields contain infinity values.",
+            "; ".join(f"{c['name']}: {c['numeric_summary']['non_finite_count']} values" for c in nonfinite),
+            "Confirm whether infinities represent intended sentinels or arithmetic/collection issues and whether downstream tools accept them.",
+            "High", "numeric_summary", "Non-finite values may be incompatible with downstream calculations; their origin is not established by this check.")
+    outliers = [c for c in columns if c.get("outlier_rate") is not None and c["outlier_rate"] >= 5]
+    if outliers:
+        add("numeric_outlier_concentration", "IQR review candidates", "Some fields have at least 5% of finite values outside the 1.5-IQR fences.",
+            "; ".join(f"{c['name']}: {c['outlier_count']} of {c['outlier_denominator']} finite values ({c['outlier_rate']}%)" for c in outliers),
+            "Review distributions, units, and legitimate rare observations. Skew or an IQR flag does not prove a data error.",
+            "Moderate", "numeric_outliers", "Extreme observations can influence some analyses; this check does not establish task suitability.")
+    findings.sort(key=lambda item: -_severity_rank(item["severity"]))
+    return findings
+
+
+def build_regression_findings(profile):
+    """Regression priorities; weak relationships and representation never escalate."""
+    feature_profile = dict(profile, columns=[c for c in profile['columns'] if c['role'] == 'feature'],
+                           missing_cells=profile['missing_feature_cells'], missing_rate=profile['missing_feature_cell_rate'])
+    findings = build_unlabeled_findings(feature_profile)
+    for finding in findings:
+        if finding['check_id'] == 'missingness':
+            finding['check_id'] = 'feature_missingness'
+    r = profile['regression']
+    t = r['target_statistics']
+    base = '/profile/regression/'
+
+    def add(code, title, fact, detail, advice, priority, paths, evidence_type='contextual_review'):
+        findings.append({'code': code, 'title': title, 'finding': fact, 'evidence': detail,
+            'recommendation': advice, 'severity': priority, 'modeling_impact': 'This evidence informs dataset interpretation before model training.',
+            'evidence_type': evidence_type, 'measurement_paths': paths})
+
+    if t:
+        path = [base + 'target_statistics']
+        if t['missing_count']:
+            add('regression_missing_targets','Missing numerical targets',f"{t['missing_count']} of {t['row_count']} targets are missing.",
+                'Finite and missing populations are reported separately.', 'Review collection coverage and the selected missing-token policy; exclude nothing automatically.',
+                'High' if t['missing_count']/t['row_count'] >= .25 else 'Moderate',path,'observed_fact')
+        nonfinite = t['positive_infinity_count'] + t['negative_infinity_count']
+        if nonfinite:
+            add('regression_nonfinite_targets','Non-finite numerical targets',f'{nonfinite} targets contain infinity values.',
+                f"Positive infinity: {t['positive_infinity_count']}; negative infinity: {t['negative_infinity_count']}.",
+                'Investigate arithmetic, collection, or sentinel conventions; these values are excluded from finite distributions.', 'High',path,'observed_fact')
+        if t['distinct_count'] == 1:
+            add('regression_constant_target','Observed constant target','Only one distinct finite target value is represented.',
+                f"{t['finite_count']} finite observations.",'Confirm the intended outcome and whether collection or selection explains the absent variation.', 'High',path)
+        if t['finite_count'] < 4:
+            add('regression_limited_observations','Limited finite target observations',f"Only {t['finite_count']} finite target observations are available.",
+                'Methods requiring more support are blocked; no universal training-size threshold is implied.', 'Review collection scope and unavailable methods.', 'Moderate',path)
+        if t['precision_reason']:
+            add('regression_precision_review','Numerical precision limits','Some floating-point statistics or relationships cannot safely resolve the observed target values.',
+                t['precision_reason'],'Review source precision and representation; exact counts and extrema remain available.', 'Moderate',path)
+        candidates = [b for b in t['boundary_concentration'] if b['review_candidate']]
+        if t['distinct_count'] > 1 and (t['finite_count'] >= 20 and (t['modal_share'] >= 95 or t['iqr'] == 0) or candidates):
+            add('regression_target_concentration','Target concentration review','Finite targets concentrate at a common value or boundary.',
+                f"Most-common-value share: {t['modal_share']:.2f}%; boundary candidates: {len(candidates)}.",
+                'Review legitimate point masses, measurement limits, or collection rules; concentration does not establish clipping or an error.', 'Low',path)
+        if t['extremes'] and t['extremes']['rate'] >= 5:
+            e=t['extremes']
+            add('regression_target_extremes','Extreme target review candidates',f"{e['count']} of {e['denominator']} finite targets exceed 1.5-IQR fences.",
+                f"Lower: {e['lower_count']}; upper: {e['upper_count']}.", 'Review units and legitimate tails; an IQR flag does not prove a bad observation.', 'Low',path)
+    constraints = r['constraints']
+    if constraints and constraints['violation_union_count']:
+        add('regression_declared_constraints','Declared target constraint violations',f"{constraints['violation_union_count']} finite targets violate at least one user-declared requirement.",
+            '; '.join(f"{v['rule']}: {v['count']}" for v in constraints['rules']),
+            'Confirm the declaration and investigate violating observations; no values were removed.', 'High',[base+'constraints'],'declared_constraint_violation')
+    unavailable = [c for c,v in r['feature_availability'].items() if v == 'unavailable_at_prediction']
+    if unavailable:
+        add('regression_declared_availability','Columns declared unavailable at prediction time',f"{count_phrase(len(unavailable), 'feature column')} {agree(len(unavailable), 'is', 'are')} declared unavailable at the intended prediction time.",
+            ', '.join(unavailable),'Verify the intended input set and collection timing. This declaration does not establish actual model use or leakage.', 'High',[base+'feature_availability'],'user_declared_context')
+    search = r['search']
+    cues = r['name_candidates'] if search else []
+    if cues:
+        add('regression_name_review','Target-related feature names','Some feature names warrant an availability review.',
+            ', '.join(c['column'] for c in cues),'Confirm availability and provenance; names alone do not establish leakage, including historical fields.', 'Low',[base+'name_candidates'])
+    for availability in ('unavailable_at_prediction','unknown'):
+        selected = [(i,g) for i,g in enumerate(r['relationship_groups']) if g['action_eligible'] and g['availability'] == availability]
+        if selected:
+            add('regression_relationships_'+availability,'Supported target relationships',f"{count_phrase(len(selected), 'distinct target relationship')} {agree(len(selected), 'meets', 'meet')} the support and coverage requirements.",
+                '; '.join(g['expression'] for _,g in selected),
+                'Verify feature availability and derivation against the intended prediction time; observed algebra alone does not prove leakage.',
+                'High' if availability == 'unavailable_at_prediction' else 'Moderate', [base+f'relationship_groups/{i}' for i,_ in selected])
+    repeated=r['repeated_inputs']
+    if repeated and repeated['varying_group_count']:
+        add('regression_repeated_input_variation','Target variation within repeated inputs',f"{count_phrase(repeated['varying_group_count'], 'feature-identical group')} {agree(repeated['varying_group_count'], 'contains', 'contain')} varying finite targets.",
+            f"{repeated['varying_rows']} participating rows.", 'Review repeated measurements, stochastic outcomes, omitted context, and recording precision; contradictory labels are not established.', 'Low',[base+'repeated_inputs'])
+    if not profile['feature_count']:
+        add('regression_no_features','No feature inputs','The dataset contains only the selected target.', 'Feature checks are not applicable.',
+            'Confirm whether feature inputs were intended; target evidence remains available.', 'Moderate',['/profile/feature_count'])
+    for finding in findings:
+        code = finding['code']
+        if code.startswith('regression_relationships_'):
+            finding['population'] = {'name': 'fully verified relationship overlap scopes', 'denominator': None, 'detail': 'Each witness reports its own overlap and finite-target coverage.'}
+            finding['limitations'] = 'Observed identities and supplied availability do not establish actual model use, independent provenance, or leakage.'
+            finding['modeling_impact'] = 'An outcome-derived field unavailable at the intended prediction time may invalidate the intended feature set.'
+        elif code in {'regression_declared_availability','regression_name_review'}:
+            finding['population'] = {'name': 'feature columns', 'denominator': profile['feature_count']}
+            finding['limitations'] = 'Feature timing is user-declared or unknown; names alone do not establish availability or leakage.'
+            finding['modeling_impact'] = 'Collection timing can determine whether a proposed feature is usable for the intended outcome.'
+        elif code.startswith('regression_'):
+            all_rows = code in {'regression_missing_targets','regression_nonfinite_targets'}
+            finding['population'] = {'name': 'all parsed rows' if all_rows else 'finite targets', 'denominator': profile['row_count'] if all_rows else int(t['finite_count']) if t else None}
+            finding['limitations'] = ('Requirements are user-declared; violations do not independently verify the declaration.' if code == 'regression_declared_constraints' else
+                'Repeated measurements, stochastic outcomes, omitted context, and recording precision can explain variation; contradictory labels are not established.' if code == 'regression_repeated_input_variation' else
+                'Distribution/precision/support observations need context; these rules do not prove recording error or define a training sample requirement.')
+            finding['modeling_impact'] = ('Absent or infinite outcomes reduce the population available for numerical outcome analysis.' if all_rows else
+                'Declared violations may make observations incompatible with the intended outcome definition.' if code == 'regression_declared_constraints' else
+                'Observed variation, support, or repeated-input behavior can affect interpretation of the intended outcome.')
+        else:
+            check_id = finding['check_id']
+            if check_id == 'exact_duplicates':
+                finding['population'] = {'name': 'all complete parsed rows, including the target and nulls', 'denominator': profile['row_count']}
+            elif check_id == 'feature_missingness':
+                finding['population'] = {'name': 'parsed feature cells', 'denominator': profile['row_count'] * profile['feature_count'], 'detail': 'Row-level reach is separately reported using all parsed rows.'}
+            elif check_id in {'numeric_summary', 'numeric_outliers'}:
+                finding['population'] = {'name': 'finite values by affected feature', 'denominator': None, 'detail': 'Each referenced column retains its own finite denominator; infinity counts use all parsed rows.'}
+                finding['measurement_paths'] = []
+                for i, c in enumerate(profile['columns']):
+                    if c['role'] == 'feature' and (check_id == 'numeric_outliers' and c.get('outlier_rate') is not None and c['outlier_rate'] >= 5 or check_id == 'numeric_summary' and c.get('numeric_summary') and c['numeric_summary']['non_finite_count']):
+                        finding['measurement_paths'].append(f'/profile/columns/{i}/' + ('outlier_count' if check_id == 'numeric_outliers' else 'numeric_summary'))
+                finding.pop('check_id')
+            else:
+                finding['population'] = {'name': 'feature columns', 'denominator': profile['feature_count']}
+            finding['limitations'] = 'These shared structural observations require context; rarity, repetition, and IQR candidates alone do not prove errors.'
+    return sorted(findings,key=lambda f: -_severity_rank(f['severity']))

@@ -1,4 +1,5 @@
 import math
+from itertools import islice
 import re
 import warnings
 from pathlib import Path
@@ -31,25 +32,9 @@ PRIOR_CONTEXT_TOKENS = {"historical", "past", "prior", "previous"}
 def load_csv_dataset(
     dataset_path: Path, *, usecols: Optional[List[str]] = None, nrows: Optional[int] = None
 ) -> pd.DataFrame:
-    """Read a CSV and translate parser/filesystem failures into product errors."""
-    path = Path(dataset_path)
-    if not path.exists():
-        raise FileNotFoundError(f"Dataset not found: {path}")
-    if not path.is_file():
-        raise ValueError(f"Dataset path is not a file: {path}")
-
-    try:
-        return pd.read_csv(path, usecols=usecols, nrows=nrows)
-    except pd.errors.EmptyDataError as exc:
-        raise ValueError("Dataset is empty and cannot be analyzed.") from exc
-    except pd.errors.ParserError as exc:
-        raise ValueError("CSV could not be parsed as a comma-delimited file with a header.") from exc
-    except UnicodeDecodeError as exc:
-        raise ValueError("CSV must use a text encoding that pandas can read (UTF-8 recommended).") from exc
-    except PermissionError as exc:
-        raise ValueError(f"Dataset cannot be read: {path}") from exc
-    except OSError as exc:
-        raise ValueError(f"Dataset could not be read: {exc}") from exc
+    """Compatibility wrapper for the shared CSV loader."""
+    from datatrust.ingestion import read_csv
+    return read_csv(dataset_path, usecols=usecols, nrows=nrows)
 
 
 def inspect_csv_dataset(dataset_path: Path, preview_rows: int = 10) -> dict:
@@ -103,7 +88,10 @@ def profile_dataset(dataset_path: Path, target: str, task: str) -> dict:
     if task != "classification":
         raise ValueError("DataTrust supports task='classification' only.")
 
-    data = load_csv_dataset(dataset_path)
+    return profile_classification_frame(load_csv_dataset(dataset_path), dataset_path, target, task)
+
+
+def profile_classification_frame(data: pd.DataFrame, dataset_path: Path, target: str, task="classification") -> dict:
     if target not in data.columns:
         raise ValueError(f"Target column '{target}' was not found in the dataset.")
 
@@ -118,9 +106,10 @@ def profile_dataset(dataset_path: Path, target: str, task: str) -> dict:
 
     column_count = int(len(data.columns))
     feature_names = [column for column in data.columns if column != target]
-    duplicate_rows = int(data.duplicated().sum())
+    exact = exact_duplicate_evidence(data)
+    duplicate_rows = exact["duplicate_rows"]
     duplicate_rate = _safe_percentage(duplicate_rows, row_count)
-    duplicate_details = _duplicate_details(data, feature_names, target)
+    duplicate_details = _duplicate_details(data, feature_names, target, exact=exact)
 
     columns = [_profile_column(data, column, target) for column in data.columns]
     feature_columns = [column for column in columns if column["role"] == "feature"]
@@ -185,7 +174,7 @@ def profile_dataset(dataset_path: Path, target: str, task: str) -> dict:
     }
 
 
-def _profile_column(data: pd.DataFrame, column: str, target: str) -> Dict[str, object]:
+def _profile_column(data: pd.DataFrame, column: str, target: str, *, include_numeric=True) -> Dict[str, object]:
     series = data[column]
     row_count = max(len(series), 1)
     missing_count = int(series.isna().sum())
@@ -197,8 +186,8 @@ def _profile_column(data: pd.DataFrame, column: str, target: str) -> Dict[str, o
     non_null = series.dropna()
 
     is_numeric = bool(pd.api.types.is_numeric_dtype(series))
-    numeric_summary = _numeric_summary(non_null, row_count) if is_numeric else None
-    outlier_count = _numeric_outliers(non_null) if is_numeric else 0
+    numeric_summary = _numeric_summary(non_null, row_count) if is_numeric and include_numeric else None
+    outlier_count = _numeric_outliers(non_null) if is_numeric and include_numeric else 0
     outlier_rate = round((outlier_count / row_count) * 100, 2)
 
     constant = unique_count <= 1
@@ -256,15 +245,10 @@ def _feature_row_missingness(data: pd.DataFrame, feature_names: list) -> dict:
     }
 
 
-def _duplicate_details(data: pd.DataFrame, feature_names: list, target: str) -> dict:
-    repeated = data[data.duplicated(keep=False)]
-    if repeated.empty:
-        duplicate_group_count = 0
-        largest_duplicate_group_size = 0
-    else:
-        group_sizes = repeated.value_counts(dropna=False)
-        duplicate_group_count = int(len(group_sizes))
-        largest_duplicate_group_size = int(group_sizes.max())
+def _duplicate_details(data: pd.DataFrame, feature_names: list, target: str, *, exact=None) -> dict:
+    exact = exact if exact is not None else exact_duplicate_evidence(data)
+    duplicate_group_count = exact["duplicate_group_count"]
+    largest_duplicate_group_size = exact["largest_duplicate_group_size"]
 
     conflicting_group_count = 0
     conflicting_row_count = 0
@@ -451,3 +435,72 @@ def _safe_percentage(numerator: int, denominator: int) -> float:
     if denominator <= 0:
         return 0.0
     return round((numerator / denominator) * 100, 2)
+
+
+def exact_duplicate_evidence(data: pd.DataFrame) -> dict:
+    """All-column exact identity; repeated count excludes each group's first row."""
+    repeated_mask = data.duplicated(keep=False)
+    repeated = data[repeated_mask]
+    sizes = repeated.value_counts(dropna=False) if not repeated.empty else None
+    extra_count = int(data.duplicated().sum())
+    return {
+        "duplicate_rows": extra_count,
+        "duplicate_rate": _safe_percentage(extra_count, len(data)),
+        "duplicate_group_count": int(len(sizes)) if sizes is not None else 0,
+        "largest_duplicate_group_size": int(sizes.max()) if sizes is not None else 0,
+        "rows_in_duplicate_groups": int(repeated_mask.sum()),
+        "duplicate_row_examples": list(islice((i + 1 for i, repeated in enumerate(repeated_mask) if repeated), 5)),
+    }
+
+
+def profile_unlabeled_frame(data: pd.DataFrame, dataset_path: Path) -> dict:
+    """Required structural/variation evidence; optional numeric/duplicate checks follow."""
+    return profile_tabular_frame(data, dataset_path)
+
+
+def profile_tabular_frame(data: pd.DataFrame, dataset_path: Path, target=None, *, resolved_roles=None) -> dict:
+    """Shared structure, with an explicit optional target role; no interpretation."""
+    rows = len(data)
+    if not rows:
+        raise ValueError("Dataset is empty and cannot be analyzed.")
+    names = list(data.columns)
+    features = [name for name in names if name != target] if resolved_roles is None else [name for name in names if resolved_roles[name] == "feature"]
+    columns = [_profile_column(data, name, target, include_numeric=False) for name in names]
+    if resolved_roles is not None:
+        for column in columns:
+            column["role"] = resolved_roles[column["name"]]
+    # Booleans are categorical evidence in general profiling; quantile arithmetic
+    # on booleans is not meaningful. The classification policy stays unchanged.
+    for column in columns:
+        if pd.api.types.is_bool_dtype(data[column["name"]]):
+            column["is_numeric"] = False
+    numeric_count = sum(column["is_numeric"] for column in columns if column["role"] == "feature")
+    return {
+        "dataset_path": str(dataset_path),
+        "row_count": rows, "column_count": len(names), "feature_count": len(features),
+        "numeric_feature_count": numeric_count, "non_numeric_feature_count": len(features) - numeric_count,
+        "missing_cells": int(data.isna().sum().sum()),
+        "missing_rate": round(int(data.isna().sum().sum()) / (rows * len(names)) * 100, 2),
+        **_feature_row_missingness(data, features),
+        "columns": columns,
+        "severe_missing_columns": [c["name"] for c in columns if c["role"] == "feature" and c["missing_rate"] >= 50],
+        "duplicate_rows": None, "duplicate_rate": None, "duplicate_group_count": None,
+        "largest_duplicate_group_size": None, "rows_in_duplicate_groups": None, "duplicate_row_examples": [],
+    }
+
+
+def finite_numeric_evidence(series: pd.Series) -> dict:
+    """Shared descriptive statistics; finite-only IQR for unlabeled profiling."""
+    summary = _numeric_summary(series.dropna(), len(series))
+    finite = series.dropna().map(lambda v: float(v))
+    finite = finite[finite.map(math.isfinite)]
+    count = len(finite)
+    reason = "insufficient_finite_observations" if count < 4 else None
+    if reason is None and finite.quantile(.75) == finite.quantile(.25):
+        reason = "zero_iqr"
+    outliers = _numeric_outliers(finite) if reason is None else None
+    return {"numeric_summary": summary, "finite_count": count,
+            "outlier_count": outliers,
+            "outlier_rate": _safe_percentage(outliers, count) if outliers is not None else None,
+            "outlier_denominator": count, "outlier_method": "finite_1.5_iqr",
+            "outlier_unavailable_reason": reason}
