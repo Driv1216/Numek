@@ -37,5 +37,9 @@ The ledger keeps current source hashes, executed commands, retained corpus hashe
 The evidence ledger retains the source hashes from its recorded verification.
 Ten M5 source/test files in this checkpoint differ from those hashes, so the
 recorded runs do not establish verification of every change in this snapshot.
+The later [M5 correction record](../../docs/history/M5_SOURCE_REVIEW_CORRECTIONS_2026_10_11.md)
+covers those changes with **22 focused tests passed**; its recorded source/test
+hashes match this checkpoint. Earlier corpus, PDF and capacity evidence retains
+its original scope.
 No complete suite was rerun for this push; the request to stop repetitive
 testing remains in effect. The existing evidence is preserved as recorded.
