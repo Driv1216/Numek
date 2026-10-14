@@ -1,0 +1,3650 @@
+{
+  "model": {
+    "model": "facebook/dinov2-base",
+    "network": "disabled",
+    "model_directory_outside_dataset_root": true,
+    "coverage": {
+      "families": {
+        "inventory": {
+          "required_occurrences": 128,
+          "inventory_complete": true
+        },
+        "visual_quality": {
+          "eligible": 67,
+          "examined": 67,
+          "ineligible": 61
+        },
+        "visual_extremes": {
+          "eligible": 67,
+          "maximum_examples_per_metric_end": 5
+        },
+        "annotations": {
+          "occurrences_examined": 128,
+          "segmentation_raster_work": 0,
+          "segmentation_raster_limit": 100000000,
+          "topology_and_semantic_correctness": "not assessed"
+        },
+        "exact_duplicates_bytes": {
+          "representation": "bytes",
+          "eligible_occurrences": 128,
+          "group_detail_omissions": 0
+        },
+        "exact_duplicates_native": {
+          "representation": "native",
+          "eligible_occurrences": 128,
+          "group_detail_omissions": 0
+        },
+        "exact_duplicates_oriented": {
+          "representation": "oriented",
+          "eligible_occurrences": 128,
+          "group_detail_omissions": 0
+        },
+        "annotation_disagreement": {
+          "variant_comparisons_are_bounded": true
+        },
+        "near_duplicates": {
+          "indexed_rasters": 67,
+          "partition_entries": 469,
+          "saturated_buckets": 0,
+          "posting_visits": 1012,
+          "posting_rows_loaded": 469,
+          "posting_cache_limit_bytes": 33554432,
+          "hamming_comparisons": 74,
+          "pair_populations": [
+            {
+              "split": "split_e9da8d9c4de7c6e7d159c767",
+              "query_population": 67,
+              "reference_population": 67,
+              "queries_started": 67,
+              "queries_completed": 67,
+              "posting_visits": 1012,
+              "hamming_comparisons": 74,
+              "qualifying_emissions": 0,
+              "posting_saturation_visits": 0,
+              "scope": "within_split"
+            }
+          ],
+          "cross_split_queries_complete": true,
+          "cross_split_stop_reason": null,
+          "stop_reason": "examined_scope_completed",
+          "detail_omissions": 0,
+          "absence_claim": "examined scope only; capped postings do not establish global absence"
+        },
+        "embeddings": {
+          "selected": 32,
+          "embedded": 32,
+          "excluded": 0,
+          "unattempted": 0,
+          "selection_purposes": {
+            "discovery_reference": 24,
+            "discovery": 8
+          },
+          "cosine_comparisons": 496,
+          "encoded_query_population": 32,
+          "queries_started": 32,
+          "queries_completed": 32,
+          "qualifying_review_pairs": 0,
+          "retained_review_pairs": 0,
+          "suggestions_per_query": 3,
+          "stop_reason": "selected_population_completed",
+          "reference_pool_complete": false,
+          "absence_claim": "selected encoded reference pool only",
+          "populations": [
+            {
+              "source": "source_1",
+              "split": "split_e9da8d9c4de7c6e7d159c767",
+              "eligible_rasters": 67,
+              "selected_rasters": 32,
+              "encoded_rasters": 32
+            }
+          ]
+        }
+      },
+      "required_population": "complete inventoried and applicable supplied populations within hard limits",
+      "retained_examples_are_bounded": true
+    },
+    "execution": {
+      "status": "completed",
+      "backend": "duckdb_local",
+      "effective_limits": {
+        "backend": "duckdb_local",
+        "max_source_bytes": 1073741824,
+        "max_combined_source_bytes": 4294967296,
+        "max_rows": 10000000,
+        "max_combined_rows": 30000000,
+        "max_columns": 1000,
+        "memory_bytes": 2147483648,
+        "max_rss_bytes": 6442450944,
+        "threads": 2,
+        "batch_bytes": 33554432,
+        "max_record_bytes": 8388608,
+        "workspace_bytes": 68719476736,
+        "free_disk_bytes": 2147483648,
+        "max_seconds": 1799.8533878749586,
+        "result_bytes": 33554432
+      },
+      "image_limits": {
+        "assets": 100000,
+        "occurrences": 1000000,
+        "annotations": 10000000,
+        "pixels_per_asset": 32000000,
+        "decode_bytes": 536870912,
+        "decoded_pixels": 100000000000,
+        "polygon_vertices": 10000000,
+        "rle_runs": 10000000,
+        "segmentation_pixels": 100000000,
+        "posting_visits": 100000000,
+        "hamming_comparisons": 50000000,
+        "bucket_entries": 1024,
+        "candidate_pairs": 250000,
+        "embedding_images": 32,
+        "cosine_pairs": 25000000,
+        "details": 20,
+        "witnesses": 5,
+        "private_bytes": 67108864
+      },
+      "image_source_limits": {
+        "media_per_input_bytes": 68719476736,
+        "combined_media_bytes": 137438953472,
+        "asset_capture_bytes": 134217728
+      },
+      "duration_seconds": 1.1528163340408355,
+      "peak_workspace_bytes": 536576,
+      "estimated_peak_workspace_bytes": 268811456,
+      "capture_read_bytes": 20512301,
+      "initial_hash_seconds": 0.090034959546756,
+      "corpus_copied": false,
+      "publication_policy": "required_core_atomic_optional_model_isolated",
+      "warnings": [
+        "Sampled resource controls can overshoot.",
+        "Capacity and calibrated recall are measured claims for recorded workloads only."
+      ],
+      "peak_worker_rss_bytes": 821313536,
+      "whole_job_seconds": 8.044754625007045,
+      "peak_spill_bytes": 0,
+      "serialized_bytes": 27232,
+      "model_execution": {
+        "status": "completed",
+        "backend": "offline_cpu",
+        "effective_limits": {
+          "backend": "duckdb_local",
+          "max_source_bytes": 1073741824,
+          "max_combined_source_bytes": 4294967296,
+          "max_rows": 10000000,
+          "max_combined_rows": 30000000,
+          "max_columns": 1000,
+          "memory_bytes": 2147483648,
+          "max_rss_bytes": 6442450944,
+          "threads": 2,
+          "batch_bytes": 33554432,
+          "max_record_bytes": 8388608,
+          "workspace_bytes": 68719476736,
+          "free_disk_bytes": 2147483648,
+          "max_seconds": 615,
+          "result_bytes": 33554432,
+          "scratch_directory": null
+        },
+        "peak_workspace_bytes": 0,
+        "duration_seconds": 5.142367833992466,
+        "read_bytes": 5077593,
+        "inference_seconds": 1.95043533295393,
+        "allocated_seconds": 600,
+        "peak_worker_rss_bytes": 821313536,
+        "whole_job_seconds": 5.866341500019189,
+        "peak_spill_bytes": 0,
+        "serialized_bytes": 3845
+      },
+      "final_verification_bytes": 366859590,
+      "final_verification_seconds": 0.1391326660523191,
+      "core_execution": {
+        "status": "completed",
+        "backend": "duckdb_local",
+        "effective_limits": {
+          "backend": "duckdb_local",
+          "max_source_bytes": 1073741824,
+          "max_combined_source_bytes": 4294967296,
+          "max_rows": 10000000,
+          "max_combined_rows": 30000000,
+          "max_columns": 1000,
+          "memory_bytes": 2147483648,
+          "max_rss_bytes": 6442450944,
+          "threads": 2,
+          "batch_bytes": 33554432,
+          "max_record_bytes": 8388608,
+          "workspace_bytes": 68719476736,
+          "free_disk_bytes": 2147483648,
+          "max_seconds": 1799.8533878749586,
+          "result_bytes": 33554432
+        },
+        "image_limits": {
+          "assets": 100000,
+          "occurrences": 1000000,
+          "annotations": 10000000,
+          "pixels_per_asset": 32000000,
+          "decode_bytes": 536870912,
+          "decoded_pixels": 100000000000,
+          "polygon_vertices": 10000000,
+          "rle_runs": 10000000,
+          "segmentation_pixels": 100000000,
+          "posting_visits": 100000000,
+          "hamming_comparisons": 50000000,
+          "bucket_entries": 1024,
+          "candidate_pairs": 250000,
+          "embedding_images": 32,
+          "cosine_pairs": 25000000,
+          "details": 20,
+          "witnesses": 5,
+          "private_bytes": 67108864
+        },
+        "image_source_limits": {
+          "media_per_input_bytes": 68719476736,
+          "combined_media_bytes": 137438953472,
+          "asset_capture_bytes": 134217728
+        },
+        "duration_seconds": 1.1528163340408355,
+        "peak_workspace_bytes": 536576,
+        "estimated_peak_workspace_bytes": 268811456,
+        "capture_read_bytes": 20512301,
+        "initial_hash_seconds": 0.090034959546756,
+        "corpus_copied": false,
+        "publication_policy": "required_core_atomic_optional_model_isolated",
+        "warnings": [
+          "Sampled resource controls can overshoot.",
+          "Capacity and calibrated recall are measured claims for recorded workloads only."
+        ],
+        "peak_worker_rss_bytes": 169148416,
+        "whole_job_seconds": 1.5262938330415636,
+        "peak_spill_bytes": 0,
+        "serialized_bytes": 23421
+      }
+    },
+    "pdf": "results/release/reports/model_release/review.pdf"
+  },
+  "partial": {
+    "fault": "injected isolated worker termination; real core and final verification",
+    "execution": {
+      "status": "partial",
+      "backend": "duckdb_local",
+      "effective_limits": {
+        "backend": "duckdb_local",
+        "max_source_bytes": 1073741824,
+        "max_combined_source_bytes": 4294967296,
+        "max_rows": 10000000,
+        "max_combined_rows": 30000000,
+        "max_columns": 1000,
+        "memory_bytes": 2147483648,
+        "max_rss_bytes": 6442450944,
+        "threads": 2,
+        "batch_bytes": 33554432,
+        "max_record_bytes": 8388608,
+        "workspace_bytes": 68719476736,
+        "free_disk_bytes": 2147483648,
+        "max_seconds": 1799.8743518330157,
+        "result_bytes": 33554432
+      },
+      "image_limits": {
+        "assets": 100000,
+        "occurrences": 1000000,
+        "annotations": 10000000,
+        "pixels_per_asset": 32000000,
+        "decode_bytes": 536870912,
+        "decoded_pixels": 100000000000,
+        "polygon_vertices": 10000000,
+        "rle_runs": 10000000,
+        "segmentation_pixels": 100000000,
+        "posting_visits": 100000000,
+        "hamming_comparisons": 50000000,
+        "bucket_entries": 1024,
+        "candidate_pairs": 250000,
+        "embedding_images": 32,
+        "cosine_pairs": 25000000,
+        "details": 20,
+        "witnesses": 5,
+        "private_bytes": 67108864
+      },
+      "image_source_limits": {
+        "media_per_input_bytes": 68719476736,
+        "combined_media_bytes": 137438953472,
+        "asset_capture_bytes": 134217728
+      },
+      "duration_seconds": 0.8041186250047758,
+      "peak_workspace_bytes": 487424,
+      "estimated_peak_workspace_bytes": 268811456,
+      "capture_read_bytes": 20512301,
+      "initial_hash_seconds": 0.016557956929318607,
+      "corpus_copied": false,
+      "publication_policy": "required_core_atomic_optional_model_isolated",
+      "warnings": [
+        "Sampled resource controls can overshoot.",
+        "Capacity and calibrated recall are measured claims for recorded workloads only."
+      ],
+      "peak_worker_rss_bytes": 173637632,
+      "whole_job_seconds": 1.8218319169827737,
+      "peak_spill_bytes": 0,
+      "serialized_bytes": 24121,
+      "model_failure": {
+        "code": "worker_terminated",
+        "completed_model_result_published": false
+      },
+      "final_verification_bytes": 366859590,
+      "final_verification_seconds": 0.1433671250124462,
+      "core_execution": {
+        "status": "completed",
+        "backend": "duckdb_local",
+        "effective_limits": {
+          "backend": "duckdb_local",
+          "max_source_bytes": 1073741824,
+          "max_combined_source_bytes": 4294967296,
+          "max_rows": 10000000,
+          "max_combined_rows": 30000000,
+          "max_columns": 1000,
+          "memory_bytes": 2147483648,
+          "max_rss_bytes": 6442450944,
+          "threads": 2,
+          "batch_bytes": 33554432,
+          "max_record_bytes": 8388608,
+          "workspace_bytes": 68719476736,
+          "free_disk_bytes": 2147483648,
+          "max_seconds": 1799.8743518330157,
+          "result_bytes": 33554432
+        },
+        "image_limits": {
+          "assets": 100000,
+          "occurrences": 1000000,
+          "annotations": 10000000,
+          "pixels_per_asset": 32000000,
+          "decode_bytes": 536870912,
+          "decoded_pixels": 100000000000,
+          "polygon_vertices": 10000000,
+          "rle_runs": 10000000,
+          "segmentation_pixels": 100000000,
+          "posting_visits": 100000000,
+          "hamming_comparisons": 50000000,
+          "bucket_entries": 1024,
+          "candidate_pairs": 250000,
+          "embedding_images": 32,
+          "cosine_pairs": 25000000,
+          "details": 20,
+          "witnesses": 5,
+          "private_bytes": 67108864
+        },
+        "image_source_limits": {
+          "media_per_input_bytes": 68719476736,
+          "combined_media_bytes": 137438953472,
+          "asset_capture_bytes": 134217728
+        },
+        "duration_seconds": 0.8041186250047758,
+        "peak_workspace_bytes": 487424,
+        "estimated_peak_workspace_bytes": 268811456,
+        "capture_read_bytes": 20512301,
+        "initial_hash_seconds": 0.016557956929318607,
+        "corpus_copied": false,
+        "publication_policy": "required_core_atomic_optional_model_isolated",
+        "warnings": [
+          "Sampled resource controls can overshoot.",
+          "Capacity and calibrated recall are measured claims for recorded workloads only."
+        ],
+        "peak_worker_rss_bytes": 173637632,
+        "whole_job_seconds": 1.1899959999718703,
+        "peak_spill_bytes": 0,
+        "serialized_bytes": 23424
+      }
+    },
+    "pdf": "results/release/reports/partial/review.pdf"
+  },
+  "bounded": {
+    "coverage": {
+      "families": {
+        "inventory": {
+          "required_occurrences": 128,
+          "inventory_complete": true
+        },
+        "visual_quality": {
+          "eligible": 67,
+          "examined": 67,
+          "ineligible": 61
+        },
+        "visual_extremes": {
+          "eligible": 67,
+          "maximum_examples_per_metric_end": 5
+        },
+        "annotations": {
+          "occurrences_examined": 128,
+          "segmentation_raster_work": 0,
+          "segmentation_raster_limit": 100000000,
+          "topology_and_semantic_correctness": "not assessed"
+        },
+        "exact_duplicates_bytes": {
+          "representation": "bytes",
+          "eligible_occurrences": 128,
+          "group_detail_omissions": 0
+        },
+        "exact_duplicates_native": {
+          "representation": "native",
+          "eligible_occurrences": 128,
+          "group_detail_omissions": 0
+        },
+        "exact_duplicates_oriented": {
+          "representation": "oriented",
+          "eligible_occurrences": 128,
+          "group_detail_omissions": 0
+        },
+        "annotation_disagreement": {
+          "variant_comparisons_are_bounded": true
+        },
+        "near_duplicates": {
+          "indexed_rasters": 67,
+          "partition_entries": 469,
+          "saturated_buckets": 0,
+          "posting_visits": 1,
+          "posting_rows_loaded": 1,
+          "posting_cache_limit_bytes": 33554432,
+          "hamming_comparisons": 0,
+          "pair_populations": [
+            {
+              "split": "split_d640bc9a62321f443a06efcf",
+              "query_population": 67,
+              "reference_population": 67,
+              "queries_started": 1,
+              "queries_completed": 0,
+              "posting_visits": 1,
+              "hamming_comparisons": 0,
+              "qualifying_emissions": 0,
+              "posting_saturation_visits": 0,
+              "scope": "within_split"
+            }
+          ],
+          "cross_split_queries_complete": true,
+          "cross_split_stop_reason": null,
+          "stop_reason": "posting_visit_budget",
+          "detail_omissions": 0,
+          "absence_claim": "examined scope only; capped postings do not establish global absence"
+        }
+      },
+      "required_population": "complete inventoried and applicable supplied populations within hard limits",
+      "retained_examples_are_bounded": true
+    },
+    "pdf": "results/release/reports/bounded/review.pdf"
+  },
+  "review_pipeline": {
+    "method": "exhaustive radius-six reference search, then calibrated encoder; deduplicate and retain three suggestions/query; self matches excluded",
+    "metrics": {
+      "calibration": {
+        "macro_recall": 0.447265625,
+        "recall_by_transform": {
+          "jpeg": 1.0,
+          "resize": 1.0,
+          "brightness": 1.0,
+          "crop10": 0.015625,
+          "rotation": 0.0,
+          "padding": 0.0,
+          "overlay": 0.5625,
+          "crop40": 0.0
+        },
+        "precision": 0.9744680851063829,
+        "false_suggestions_per_100_no_copy_queries": 1.2295081967213115,
+        "true_candidates": 229,
+        "false_candidates": 6,
+        "no_copy_queries": 488,
+        "inspection_sample": [
+          {
+            "query": 1,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                0
+              ]
+            ]
+          },
+          {
+            "query": 2,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                0
+              ]
+            ]
+          },
+          {
+            "query": 3,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                0
+              ]
+            ]
+          },
+          {
+            "query": 4,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 5,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 6,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 7,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                0
+              ]
+            ]
+          },
+          {
+            "query": 8,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 10,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                9
+              ]
+            ]
+          },
+          {
+            "query": 11,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                9
+              ]
+            ]
+          },
+          {
+            "query": 12,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                9
+              ]
+            ]
+          },
+          {
+            "query": 13,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 14,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 15,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 16,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                9
+              ]
+            ]
+          },
+          {
+            "query": 17,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 19,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                18
+              ]
+            ]
+          },
+          {
+            "query": 20,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                18
+              ]
+            ]
+          },
+          {
+            "query": 21,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                18
+              ]
+            ]
+          },
+          {
+            "query": 22,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 23,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 24,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 25,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                18
+              ]
+            ]
+          },
+          {
+            "query": 26,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 28,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                27
+              ]
+            ]
+          },
+          {
+            "query": 29,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                27
+              ]
+            ]
+          },
+          {
+            "query": 30,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                27
+              ]
+            ]
+          },
+          {
+            "query": 31,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 32,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 33,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 34,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                27
+              ]
+            ]
+          },
+          {
+            "query": 35,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 37,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                36
+              ]
+            ]
+          },
+          {
+            "query": 38,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                36
+              ]
+            ]
+          },
+          {
+            "query": 39,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                36
+              ]
+            ]
+          },
+          {
+            "query": 40,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 41,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 42,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 43,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 44,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 46,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                45
+              ]
+            ]
+          },
+          {
+            "query": 47,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                45
+              ]
+            ]
+          },
+          {
+            "query": 48,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                45
+              ]
+            ]
+          },
+          {
+            "query": 49,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 50,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 51,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 52,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 53,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 55,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                54
+              ]
+            ]
+          },
+          {
+            "query": 56,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                54
+              ]
+            ]
+          },
+          {
+            "query": 57,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                54
+              ]
+            ]
+          },
+          {
+            "query": 58,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 59,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 60,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 61,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 62,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 64,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                63
+              ]
+            ]
+          },
+          {
+            "query": 65,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                63
+              ]
+            ]
+          },
+          {
+            "query": 66,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                63
+              ]
+            ]
+          },
+          {
+            "query": 67,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 68,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 69,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 70,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                63
+              ]
+            ]
+          },
+          {
+            "query": 71,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 73,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                72
+              ]
+            ]
+          },
+          {
+            "query": 74,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                72
+              ]
+            ]
+          },
+          {
+            "query": 75,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                72
+              ]
+            ]
+          },
+          {
+            "query": 76,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 77,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 78,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 79,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                72
+              ]
+            ]
+          },
+          {
+            "query": 80,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 82,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                81
+              ]
+            ]
+          },
+          {
+            "query": 83,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                81
+              ]
+            ]
+          },
+          {
+            "query": 84,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                81
+              ]
+            ]
+          },
+          {
+            "query": 85,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 86,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 87,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 88,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                81
+              ]
+            ]
+          },
+          {
+            "query": 89,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 91,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                90
+              ]
+            ]
+          },
+          {
+            "query": 92,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                90
+              ]
+            ]
+          },
+          {
+            "query": 93,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                90
+              ]
+            ]
+          },
+          {
+            "query": 94,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 95,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 96,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 97,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                90
+              ]
+            ]
+          },
+          {
+            "query": 98,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 100,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                99
+              ]
+            ]
+          },
+          {
+            "query": 101,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                99
+              ]
+            ]
+          },
+          {
+            "query": 102,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                99
+              ]
+            ]
+          },
+          {
+            "query": 103,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 104,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 105,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 106,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 107,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 109,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                108
+              ]
+            ]
+          },
+          {
+            "query": 110,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                108
+              ]
+            ]
+          },
+          {
+            "query": 111,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                108
+              ]
+            ]
+          },
+          {
+            "query": 112,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 113,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 114,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 115,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 116,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 118,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                117
+              ]
+            ]
+          },
+          {
+            "query": 119,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                117
+              ]
+            ]
+          },
+          {
+            "query": 120,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                117
+              ]
+            ]
+          },
+          {
+            "query": 121,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 122,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 123,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 124,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 125,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 127,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                126
+              ]
+            ]
+          },
+          {
+            "query": 128,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                126
+              ]
+            ]
+          },
+          {
+            "query": 129,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                126
+              ]
+            ]
+          },
+          {
+            "query": 130,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 131,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 132,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 133,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                126
+              ]
+            ]
+          },
+          {
+            "query": 134,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 136,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                135
+              ]
+            ]
+          },
+          {
+            "query": 137,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                135
+              ]
+            ]
+          },
+          {
+            "query": 138,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                135
+              ]
+            ]
+          },
+          {
+            "query": 139,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 140,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 141,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 142,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 143,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 145,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                144
+              ]
+            ]
+          },
+          {
+            "query": 146,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                144
+              ]
+            ]
+          },
+          {
+            "query": 147,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                144
+              ]
+            ]
+          },
+          {
+            "query": 148,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 149,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 150,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 151,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                144
+              ]
+            ]
+          },
+          {
+            "query": 152,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 154,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                153
+              ]
+            ]
+          },
+          {
+            "query": 155,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                153
+              ]
+            ]
+          },
+          {
+            "query": 156,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                153
+              ]
+            ]
+          },
+          {
+            "query": 157,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 158,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 159,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 160,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 161,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 163,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                162
+              ]
+            ]
+          },
+          {
+            "query": 164,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                162
+              ]
+            ]
+          },
+          {
+            "query": 165,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                162
+              ]
+            ]
+          },
+          {
+            "query": 166,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 167,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 168,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 169,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 170,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 172,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                171
+              ]
+            ]
+          },
+          {
+            "query": 173,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                171
+              ]
+            ]
+          },
+          {
+            "query": 174,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                171
+              ]
+            ]
+          },
+          {
+            "query": 175,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 176,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 177,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 178,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                171
+              ]
+            ]
+          },
+          {
+            "query": 179,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 181,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                180
+              ]
+            ]
+          },
+          {
+            "query": 182,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                180
+              ]
+            ]
+          },
+          {
+            "query": 183,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                180
+              ]
+            ]
+          },
+          {
+            "query": 184,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 185,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 186,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 187,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                180
+              ]
+            ]
+          },
+          {
+            "query": 188,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 190,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                189
+              ]
+            ]
+          },
+          {
+            "query": 191,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                189
+              ]
+            ]
+          },
+          {
+            "query": 192,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                189
+              ]
+            ]
+          },
+          {
+            "query": 193,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 194,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 195,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 196,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                189
+              ]
+            ]
+          },
+          {
+            "query": 197,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 199,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                198
+              ]
+            ]
+          },
+          {
+            "query": 200,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                198
+              ]
+            ]
+          },
+          {
+            "query": 201,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                198
+              ]
+            ]
+          },
+          {
+            "query": 202,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 203,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 204,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 205,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                198
+              ]
+            ]
+          },
+          {
+            "query": 206,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 208,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                207
+              ]
+            ]
+          },
+          {
+            "query": 209,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                207
+              ]
+            ]
+          },
+          {
+            "query": 210,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                207
+              ]
+            ]
+          },
+          {
+            "query": 211,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 212,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 213,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 214,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 215,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 217,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                216
+              ]
+            ]
+          },
+          {
+            "query": 218,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                216
+              ]
+            ]
+          },
+          {
+            "query": 219,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                216
+              ]
+            ]
+          },
+          {
+            "query": 220,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 221,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 222,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 223,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 224,
+            "no_copy": false,
+            "retained": []
+          }
+        ]
+      },
+      "held_out": {
+        "macro_recall": 0.45703125,
+        "recall_by_transform": {
+          "jpeg": 1.0,
+          "resize": 1.0,
+          "brightness": 1.0,
+          "crop10": 0.015625,
+          "rotation": 0.0,
+          "padding": 0.0,
+          "overlay": 0.640625,
+          "crop40": 0.0
+        },
+        "precision": 0.896551724137931,
+        "false_suggestions_per_100_no_copy_queries": 5.532786885245901,
+        "true_candidates": 234,
+        "false_candidates": 27,
+        "no_copy_queries": 488,
+        "inspection_sample": [
+          {
+            "query": 577,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                576
+              ]
+            ]
+          },
+          {
+            "query": 578,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                576
+              ]
+            ]
+          },
+          {
+            "query": 579,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                576
+              ]
+            ]
+          },
+          {
+            "query": 580,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 581,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 582,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 583,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 584,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 586,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                585
+              ]
+            ]
+          },
+          {
+            "query": 587,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                585
+              ]
+            ]
+          },
+          {
+            "query": 588,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                585
+              ]
+            ]
+          },
+          {
+            "query": 589,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 590,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 591,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 592,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                585
+              ]
+            ]
+          },
+          {
+            "query": 593,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 595,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                594
+              ]
+            ]
+          },
+          {
+            "query": 596,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                594
+              ]
+            ]
+          },
+          {
+            "query": 597,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                594
+              ]
+            ]
+          },
+          {
+            "query": 598,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 599,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 600,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 601,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 602,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 604,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                603
+              ]
+            ]
+          },
+          {
+            "query": 605,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                603
+              ]
+            ]
+          },
+          {
+            "query": 606,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                603
+              ]
+            ]
+          },
+          {
+            "query": 607,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 608,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 609,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 610,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                603
+              ]
+            ]
+          },
+          {
+            "query": 611,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 613,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                612
+              ]
+            ]
+          },
+          {
+            "query": 614,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                612
+              ]
+            ]
+          },
+          {
+            "query": 615,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                612
+              ]
+            ]
+          },
+          {
+            "query": 616,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 617,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 618,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 619,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                612
+              ]
+            ]
+          },
+          {
+            "query": 620,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 622,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                621
+              ]
+            ]
+          },
+          {
+            "query": 623,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                621
+              ]
+            ]
+          },
+          {
+            "query": 624,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                621
+              ]
+            ]
+          },
+          {
+            "query": 625,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 626,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 627,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 628,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                621
+              ]
+            ]
+          },
+          {
+            "query": 629,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 631,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                630
+              ]
+            ]
+          },
+          {
+            "query": 632,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                630
+              ]
+            ]
+          },
+          {
+            "query": 633,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                630
+              ]
+            ]
+          },
+          {
+            "query": 634,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 635,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 636,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 637,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                630
+              ]
+            ]
+          },
+          {
+            "query": 638,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 640,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                639
+              ]
+            ]
+          },
+          {
+            "query": 641,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                639
+              ]
+            ]
+          },
+          {
+            "query": 642,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                639
+              ]
+            ]
+          },
+          {
+            "query": 643,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 644,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 645,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 646,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 647,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 649,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                648
+              ]
+            ]
+          },
+          {
+            "query": 650,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                648
+              ]
+            ]
+          },
+          {
+            "query": 651,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                648
+              ]
+            ]
+          },
+          {
+            "query": 652,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 653,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 654,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 655,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                648
+              ]
+            ]
+          },
+          {
+            "query": 656,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 658,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                657
+              ]
+            ]
+          },
+          {
+            "query": 659,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                657
+              ]
+            ]
+          },
+          {
+            "query": 660,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                657
+              ]
+            ]
+          },
+          {
+            "query": 661,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 662,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 663,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 664,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                657
+              ]
+            ]
+          },
+          {
+            "query": 665,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 667,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                666
+              ]
+            ]
+          },
+          {
+            "query": 668,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                666
+              ]
+            ]
+          },
+          {
+            "query": 669,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                666
+              ]
+            ]
+          },
+          {
+            "query": 670,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 671,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 672,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 673,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                666
+              ]
+            ]
+          },
+          {
+            "query": 674,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 676,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                675
+              ]
+            ]
+          },
+          {
+            "query": 677,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                675
+              ]
+            ]
+          },
+          {
+            "query": 678,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                675
+              ]
+            ]
+          },
+          {
+            "query": 679,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 680,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 681,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 682,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                675
+              ]
+            ]
+          },
+          {
+            "query": 683,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 685,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                684
+              ]
+            ]
+          },
+          {
+            "query": 686,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                684
+              ]
+            ]
+          },
+          {
+            "query": 687,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                684
+              ]
+            ]
+          },
+          {
+            "query": 688,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 689,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 690,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 691,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                684
+              ]
+            ]
+          },
+          {
+            "query": 692,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 694,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                693
+              ]
+            ]
+          },
+          {
+            "query": 695,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                693
+              ]
+            ]
+          },
+          {
+            "query": 696,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                693
+              ]
+            ]
+          },
+          {
+            "query": 697,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 698,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 699,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 700,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 701,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 703,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                702
+              ]
+            ]
+          },
+          {
+            "query": 704,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                702
+              ]
+            ]
+          },
+          {
+            "query": 705,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                702
+              ]
+            ]
+          },
+          {
+            "query": 706,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 707,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 708,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 709,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 710,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 712,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                711
+              ]
+            ]
+          },
+          {
+            "query": 713,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                711
+              ]
+            ]
+          },
+          {
+            "query": 714,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                711
+              ]
+            ]
+          },
+          {
+            "query": 715,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 716,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 717,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 718,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                711
+              ]
+            ]
+          },
+          {
+            "query": 719,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 721,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                720
+              ]
+            ]
+          },
+          {
+            "query": 722,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                720
+              ]
+            ]
+          },
+          {
+            "query": 723,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                720
+              ]
+            ]
+          },
+          {
+            "query": 724,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 725,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 726,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 727,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                720
+              ]
+            ]
+          },
+          {
+            "query": 728,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 730,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                729
+              ]
+            ]
+          },
+          {
+            "query": 731,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                729
+              ]
+            ]
+          },
+          {
+            "query": 732,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                729
+              ]
+            ]
+          },
+          {
+            "query": 733,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 734,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 735,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 736,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 737,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 739,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                738
+              ]
+            ]
+          },
+          {
+            "query": 740,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                738
+              ]
+            ]
+          },
+          {
+            "query": 741,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                738
+              ]
+            ]
+          },
+          {
+            "query": 742,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 743,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 744,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 745,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 746,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 748,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                747
+              ]
+            ]
+          },
+          {
+            "query": 749,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                747
+              ]
+            ]
+          },
+          {
+            "query": 750,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                747
+              ]
+            ]
+          },
+          {
+            "query": 751,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 752,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 753,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 754,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 755,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 757,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                756
+              ]
+            ]
+          },
+          {
+            "query": 758,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                756
+              ]
+            ]
+          },
+          {
+            "query": 759,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                756
+              ]
+            ]
+          },
+          {
+            "query": 760,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 761,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 762,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 763,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 764,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 766,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                765
+              ]
+            ]
+          },
+          {
+            "query": 767,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                765
+              ]
+            ]
+          },
+          {
+            "query": 768,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                765
+              ]
+            ]
+          },
+          {
+            "query": 769,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 770,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 771,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 772,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                765
+              ]
+            ]
+          },
+          {
+            "query": 773,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 775,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                774
+              ]
+            ]
+          },
+          {
+            "query": 776,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                774
+              ]
+            ]
+          },
+          {
+            "query": 777,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                774
+              ]
+            ]
+          },
+          {
+            "query": 778,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 779,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 780,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 781,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                774
+              ]
+            ]
+          },
+          {
+            "query": 782,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 784,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                783
+              ]
+            ]
+          },
+          {
+            "query": 785,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                783
+              ]
+            ]
+          },
+          {
+            "query": 786,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                783
+              ]
+            ]
+          },
+          {
+            "query": 787,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 788,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 789,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 790,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                783
+              ]
+            ]
+          },
+          {
+            "query": 791,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 793,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                792
+              ]
+            ]
+          },
+          {
+            "query": 794,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                792
+              ]
+            ]
+          },
+          {
+            "query": 795,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                792
+              ]
+            ]
+          },
+          {
+            "query": 796,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 797,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 798,
+            "no_copy": false,
+            "retained": []
+          },
+          {
+            "query": 799,
+            "no_copy": false,
+            "retained": [
+              [
+                1.0,
+                true,
+                792
+              ]
+            ]
+          },
+          {
+            "query": 800,
+            "no_copy": false,
+            "retained": []
+          }
+        ]
+      }
+    },
+    "claim": "Pipeline held-out precision differs from encoder-only calibration; low-information perceptual confounds remain investigation candidates."
+  },
+  "internal_inspection": {
+    "sample": [
+      {
+        "query": 577,
+        "method": "jpeg",
+        "candidate": 576,
+        "known_copy": true
+      },
+      {
+        "query": 578,
+        "method": "resize",
+        "candidate": 576,
+        "known_copy": true
+      },
+      {
+        "query": 579,
+        "method": "brightness",
+        "candidate": 576,
+        "known_copy": true
+      },
+      {
+        "query": 1138,
+        "method": "crop10",
+        "candidate": 1134,
+        "known_copy": true
+      },
+      {
+        "query": 592,
+        "method": "overlay",
+        "candidate": 585,
+        "known_copy": true
+      },
+      {
+        "query": 1155,
+        "method": "authored_distractor",
+        "candidate": 1157,
+        "known_copy": false
+      },
+      {
+        "query": 1155,
+        "method": "authored_distractor",
+        "candidate": 1157,
+        "known_copy": false
+      },
+      {
+        "query": 610,
+        "method": "overlay",
+        "candidate": 603,
+        "known_copy": true
+      }
+    ],
+    "visual_review": "passed",
+    "private_contact_sheets": "results/release/model_inspection/private",
+    "observations": "Known JPEG/resize/brightness/overlay copies are readily inspectable. A model-only overlay copy adds useful evidence. Flat images of different colors expose the recorded perceptual confound; suggestions remain candidates. Rotation/padding/heavy crops are not recovered at this conservative setting."
+  }
+}

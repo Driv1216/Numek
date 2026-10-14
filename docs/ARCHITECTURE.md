@@ -1,9 +1,9 @@
 # Numek Architecture
 
-Last updated: 2026-10-11
+Last updated: 2026-10-13
 Status: M1 shared foundation, M2 regression, and M3 tabular/annotation intelligence
 implemented; M4 comparative/scalable local analysis added. Compatible pandas
-classification/M1/M2/M3 defaults are preserved; M5 temporal reliability now shares the supervised DuckDB boundary. Later modalities remain deferred.
+classification/M1/M2/M3 defaults are preserved; M5 temporal, M6 text, M7 image and M9 cross-representation reliability share the supervised DuckDB boundary. M8 audio remains deferred.
 
 ## System Overview And Boundaries
 
@@ -11,12 +11,13 @@ DataTrust is a Python package with one dataset-analysis core and three user
 interfaces: public Python API, Click CLI, and a local server-rendered Flask UI.
 It analyzes classification, partial annotations, multilabel indicators, multi-output
 regression, and target-free CSV readiness with preserved pandas defaults. Opt-in
-M4 analysis and split/version comparisons use one embedded DuckDB execution path
-and a supervised local worker. No trained model, runtime LLM, embeddings,
-persistent database or cloud service is involved.
+M4 analysis and split/version comparisons, M5 temporal audits and M6 text audits
+use embedded DuckDB execution and a supervised local worker. M6 optionally runs
+pinned offline language/embedding models. There is no runtime LLM, persistent
+service database or cloud inference dependency.
 
-The flow below describes the pandas compatibility path; the M4 path is described
-under “M4 disk execution and comparative scope.”
+The flow below describes the pandas compatibility path. M4, M5 and M6 execution
+and presentation boundaries are described in their dedicated sections below.
 
 ```text
 Python API / CLI audit / Flask UI
@@ -466,3 +467,95 @@ and failed, blocked or bounded methods. They add no analysis or scoring pipeline
 `temporal_contracts.py` adds strict temporal-specific inputs/results without extending DatasetSpec. `temporal_normalization.py` preserves exact clocks and bounded CSV/optional Parquet adapters; `temporal_diagnostics.py` covers full structural/schedule/lifecycle populations. `temporal_availability.py`, `temporal_evaluation.py`, `temporal_behavior.py` and `temporal_multivariate.py` implement qualified timing/history/maturity/fold and bounded behavioral evidence. `temporal.py` orchestrates phases and atomic optional commits.
 
 M4 and M5 use `worker.py` supervision and the existing `scalable.py` workspace with optional private phase plans. `distribution_effects.py` shares empirical mathematics while M4 interpretation/inference remains in comparison.py. Renderer/export dispatch explicitly selects schema 1.4; temporal_presentation.py and temporal templates project completed evidence. temporal_web.py registers the dedicated workflow in the same Flask app, sharing the application worker lock with M4. No registry or persistent state is introduced. See [M5 contracts and boundaries](M5_TEMPORAL_RELIABILITY.md).
+
+## M6 text execution and private evidence
+
+Schema 1.5 dispatch is additive; existing serializers and defaults are retained.
+`text_contracts` defines explicit inputs, tasks, relationships, coverage and narrow
+content/asset/location primitives. `text_normalization` strictly frames CSV/JSONL,
+preserves original coordinates and streams private DuckDB relations. A private
+workspace adapter reuses resource accounting without applying tabular NA/header
+coercion to text. `text_diagnostics` handles required population checks and unique
+identity joins. `text_search` selects metadata before loading bounded text, and
+provides vocabulary, verified MinHash candidates, repetition and winnowed passages.
+`text_models` lazily loads pinned local adapters and source-aligned token windows.
+
+`text.audit_text` uses the shared supervised worker; model/tokenizer state remains
+inside RSS/deadline/disk supervision. Scratch relations never become resolver
+dependencies. Results return separately bounded private locator metadata;
+`text_private` persists an owner-only sidecar and verifies exact source identity
+under caller-supplied allowed roots. HTML/PDF/JSON use `text_presentation` and
+`text_report.html`; canonical PDF access cannot fetch corpus assets. Disclosure
+variants have separate fingerprints and source/asset/model/output protection.
+`text_web` uses the existing app worker lock, session ownership and artifact
+identity cleanup; uploaded sources remain outside worker scratch.
+
+Selection reserves missing comparison sides together and round-robins declared
+split/field/kind/length strata. Later indexing/inference work can still exclude
+selected units; separate coverage records that loss. Embedding first/last coverage
+is conditional on actual window and tokenizer allocations. Executive review actions
+consolidate equivalent raw/NFC instructions without merging technical evidence.
+Unexpected optional text faults use `whole_audit_atomic_fail_closed`: no completed
+result is published and the workspace is deleted. Unlike recoverable optional
+tabular/temporal stages, M6 does not claim safe required-only recovery after a native
+fault. Expected budget stops remain completed bounded investigations.
+
+See [M6 detailed behavior and limitations](M6_TEXT_RELIABILITY.md), the pinned
+search/model identity files and `validation/m6/runtime-lock.txt`.
+
+
+## M7 image execution and private evidence
+
+`image_contracts` supplies distinct source/task/annotation/comparison/resource
+declarations and schema 1.6 results. `image_sources` plans metadata/media admission,
+streams standard adapters and maintains DuckDB identity relations. `image_assets`
+verifies root-constrained actual handles and bounded immutable captures, decodes
+named raster representations and computes previews/signatures. `image_annotations`
+and `image_diagnostics` own structural populations, explicit frames/taxonomies,
+composition, exact groups and declared comparisons.
+
+`image_search` indexes seven signature partitions, prioritizes cross-split
+populations and charges saturated/capped work. `image_models` verifies pinned
+local artifacts and isolates CPU execution. `images` owns one global deadline,
+frozen required core, bounded optional model allocation and final byte/membership
+verification. Workspace's image source plan estimates owned relation/index/buffer
+storage rather than six-times-media storage; existing callers are unchanged.
+
+`image_private` binds protected locator manifests, metadata-free selected previews,
+overlays and disclosure variants to canonical artifact identity.
+`image_presentation` and `image_report.html` project eight topics without a score.
+`image_web` and `image_ui.html` implement standard presets, asynchronous inspection,
+one confirmation, private downloads and a session-local opaque inspector, sharing
+the existing lock/CSRF/ownership/cancellation lifecycle. Python/CLI/browser reuse
+the same engine and exports; CSV DatasetSpec and M6 image associations are unchanged.
+
+No persistent corpus copy, generic modality framework, service or cloud dependency
+is introduced. See [detailed contracts and execution boundaries](M7_IMAGE_RELIABILITY.md).
+
+## M9 connected representations and native evidence
+
+`cross_contracts` adds schema 1.7 with explicit relationships, contextual bindings,
+reusable document recipes, reconciliation/separation and bounded models.
+`cross_sources` owns projected disk-backed records/units/edges/contexts/outcomes,
+typed/lexical identities, secure captures and settings-specific extraction reuse.
+`cross_documents` retains PDF glyph/cell geometry and DOCX XML locations with
+bounded coverage. `cross_diagnostics` resolves joins, all association context,
+recipes, precision-safe comparisons, competing values, M5 temporal selection and
+supplied separation/ancestry. No public ontology or generic validation engine is added.
+
+`cross` coordinates one required supervised core, isolated optional models and
+final integrity publication, retaining peak resources across phases. `cross_models`
+adds verified English NLI with M6 E5 retrieval and full paired SigLIP; packaged
+qualification pins settings, measured populations and algorithm identity.
+Unsupported/unqualified populations abstain. Source mutation, cancellation and
+global failures are fatal; an isolated unexpected model fault may publish a
+verified partial core. Bounded optional work remains explicit.
+
+`cross_private` resolves originals through owner-only manifests and creates
+disclosure variants through shared canonical exporters. `cross_presentation` and
+`cross_report.html` project completed evidence without a score. `cross_review`
+serializes independent exact-result-bound dispositions; no notes or decisions
+alter analytics. `cross_web`/`cross_ui.html` reuse ownership, lock, CSRF,
+confirmation, cancellation and collision controls for guided previews, result
+reopening and exact evidence/review round-trips. No persistent corpus/vector/review
+service is added. See [M9 contracts and limits](M9_CROSS_REPRESENTATION_RELIABILITY.md).

@@ -26,6 +26,36 @@ class DataTrust:
     """Generate local dataset reliability reports."""
 
     @staticmethod
+    def audit_cross_representation(spec, config=None, **kwargs):
+        from datatrust.cross import audit_cross_representation
+        return audit_cross_representation(spec, config, **kwargs)
+
+    @staticmethod
+    def resolve_cross_evidence(manifest, reference, report, **kwargs):
+        from datatrust.cross_private import resolve_evidence
+        return resolve_evidence(manifest, reference, report, **kwargs)
+
+    @staticmethod
+    def audit_images(spec, config=None, **kwargs):
+        from datatrust.images import audit_images
+        return audit_images(spec, config, **kwargs)
+
+    @staticmethod
+    def resolve_image_evidence(manifest, reference, report, **kwargs):
+        from datatrust.image_private import resolve_image_evidence
+        return resolve_image_evidence(manifest, reference, report, **kwargs)
+
+    @staticmethod
+    def audit_text(spec, config=None, **kwargs):
+        from datatrust.text import audit_text
+        return audit_text(spec, config, **kwargs)
+
+    @staticmethod
+    def resolve_text_evidence(manifest, reference, report, **kwargs):
+        from datatrust.text_private import resolve_text_evidence
+        return resolve_text_evidence(manifest, reference, report, **kwargs)
+
+    @staticmethod
     def audit_temporal(spec, config=None, **kwargs):
         from datatrust.temporal import audit_temporal
         return audit_temporal(spec, config, **kwargs)

@@ -260,6 +260,15 @@ def render_analysis_result(result):
     env.filters["count_phrase"] = count_phrase
     env.filters["regression_number"] = lambda value: "Unavailable" if value is None else (format(value, ".8g") if isinstance(value, float) else str(value))
     value = result.to_dict()
+    if result.schema_version == '1.7':
+        from datatrust.cross_presentation import report_view
+        return env.get_template('cross_report.html').render(result=value, view=report_view(result))
+    if result.schema_version == '1.6':
+        from datatrust.image_presentation import report_view
+        return env.get_template('image_report.html').render(result=value, view=report_view(result))
+    if result.schema_version == '1.5':
+        from datatrust.text_presentation import report_view
+        return env.get_template('text_report.html').render(result=value, view=report_view(result))
     if result.schema_version == '1.4':
         from datatrust.temporal_presentation import report_view
         return env.get_template('temporal_report.html').render(result=value,view=report_view(result))
@@ -283,7 +292,7 @@ def render_analysis_result(result):
 
 def write_analysis_json(result, path):
     protect_source(result.source_paths, [path])
-    if result.schema_version in {'1.3','1.4'}:
+    if result.schema_version in {'1.3','1.4','1.5','1.6','1.7'}:
         from datatrust.scalable import available
         if available(Path(path).parent) < result.execution['effective_limits']['free_disk_bytes'] + 256 * 1024**2:
             raise ValueError('Output filesystem lacks the 256 MiB export reservation plus configured free-space reserve.')
@@ -303,7 +312,7 @@ def write_report_artifacts(result, path, *, format="html", html_path=None, json_
     pdf_path = Path(path) if format == "pdf" else None
     canonical = Path(html_path) if html_path is not None else (Path(path).with_suffix(".html") if pdf_path else Path(path))
     protect_source(result.source_paths, [canonical, pdf_path, json_path])
-    if result.schema_version in {'1.3','1.4'}:
+    if result.schema_version in {'1.3','1.4','1.5','1.6','1.7'}:
         from datatrust.scalable import available
         reserve = result.execution['effective_limits']['free_disk_bytes']
         seen = set()
@@ -352,6 +361,14 @@ def write_report_artifacts(result, path, *, format="html", html_path=None, json_
         from dataclasses import replace
         from datatrust.temporal_presentation import report_view
         artifacts = replace(artifacts,qa_metadata=report_view(result)["qa"])
+    if result.schema_version == '1.5':
+        from dataclasses import replace
+        from datatrust.text_presentation import report_view
+        artifacts = replace(artifacts,qa_metadata=report_view(result)['qa'])
+    if result.schema_version == '1.6':
+        from dataclasses import replace
+        from datatrust.image_presentation import report_view
+        artifacts = replace(artifacts, qa_metadata=report_view(result)['qa'])
     return artifacts
 
 

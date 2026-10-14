@@ -1,0 +1,885 @@
+{
+  "schema_version": "1.6",
+  "methodology_id": "image_reliability_v1",
+  "profile": {
+    "audit_id": "9f9c1c243db548eeb57471775f14a8e1",
+    "occurrences": 128,
+    "source_count": 1,
+    "image_locations": 128,
+    "dataset_name": "Unlabeled image evidence",
+    "purpose": null,
+    "summary": "0 evidence-qualified findings across 128 image occurrences; completed execution.",
+    "private_manifest_sha256": "7bffa079f55ac69ac7e0b5b9c90f783aab069f312068a290d0f4771ae9d7957f",
+    "examples": [],
+    "disclosure": {
+      "policy": "references_only",
+      "references": [],
+      "overlays": false,
+      "labels": false,
+      "encoded_bytes": 0
+    },
+    "export_identity": {
+      "completed_evidence_sha256": "cdfb18e636acfade7ab629303ab267736d718dff2a4cc776a8a9029ea6d172f2",
+      "disclosure_sha256": "a3d27be032354ccd292944dd216801e1e5d73182e86dd816b76b77e5707d2425",
+      "example_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "template_sha256": "0c5d930f3f2e2b390e49a27637a24193bb59a7bdfa8ecff39ad6381581dcf029",
+      "projection_sha256": "20744f77e77dd461b539478dcf560a121ea7622a8232c94afa469100979379dc",
+      "canonical_html_sha256": "a8d66607a670d6ff009a5b860a4f9c90dffe39660bfb48ce00b49352f12e6025"
+    }
+  },
+  "checks": [
+    {
+      "id": "image_e1",
+      "family": "inventory",
+      "applicability": "applicable",
+      "execution": "completed",
+      "scope": "full_population",
+      "violations": 0
+    },
+    {
+      "id": "image_e2",
+      "family": "decode",
+      "applicability": "applicable",
+      "execution": "completed",
+      "scope": "full_population",
+      "violations": 0
+    },
+    {
+      "id": "image_e3",
+      "family": "visual_quality",
+      "applicability": "applicable",
+      "execution": "completed",
+      "scope": "full_population",
+      "violations": 0
+    },
+    {
+      "id": "image_e4",
+      "family": "visual_extremes",
+      "applicability": "applicable",
+      "execution": "completed",
+      "scope": "bounded",
+      "violations": 0
+    },
+    {
+      "id": "image_e5",
+      "family": "annotations",
+      "applicability": "applicable",
+      "execution": "completed",
+      "scope": "full_population",
+      "violations": 0
+    },
+    {
+      "id": "image_e6",
+      "family": "composition",
+      "applicability": "applicable",
+      "execution": "completed",
+      "scope": "full_population",
+      "violations": 0
+    },
+    {
+      "id": "image_e7",
+      "family": "exact_duplicates_bytes",
+      "applicability": "applicable",
+      "execution": "completed",
+      "scope": "full_population",
+      "violations": 0
+    },
+    {
+      "id": "image_e8",
+      "family": "exact_duplicates_native",
+      "applicability": "applicable",
+      "execution": "completed",
+      "scope": "full_population",
+      "violations": 0
+    },
+    {
+      "id": "image_e9",
+      "family": "exact_duplicates_oriented",
+      "applicability": "applicable",
+      "execution": "completed",
+      "scope": "full_population",
+      "violations": 0
+    },
+    {
+      "id": "image_e10",
+      "family": "annotation_disagreement",
+      "applicability": "applicable",
+      "execution": "completed",
+      "scope": "full_population",
+      "violations": 0
+    },
+    {
+      "id": "image_e11",
+      "family": "logical_identity",
+      "applicability": "applicable",
+      "execution": "completed",
+      "scope": "full_population",
+      "violations": 0
+    },
+    {
+      "id": "image_e12",
+      "family": "near_duplicates",
+      "applicability": "applicable",
+      "execution": "completed",
+      "scope": "bounded",
+      "violations": 0
+    }
+  ],
+  "evidence": [
+    {
+      "id": "image_e1",
+      "family": "inventory",
+      "meaning": "deterministic_fact",
+      "data": {
+        "occurrences": 128,
+        "directory_entries": 0,
+        "image_locations": 128,
+        "physical_media_files": 128,
+        "physical_alias_locations": 0,
+        "source_populations": [
+          {
+            "source": "source_1",
+            "role": "dataset",
+            "occurrences": 128
+          }
+        ],
+        "logical_media_bytes": 20506573,
+        "metadata_bytes": 5728
+      },
+      "references": [],
+      "scope": "full_population"
+    },
+    {
+      "id": "image_e2",
+      "family": "decode",
+      "meaning": "deterministic_fact",
+      "data": {
+        "asset_states": {
+          "decoded": 128
+        },
+        "format_extension_mismatches": 0,
+        "encoded_formats": {
+          "JPEG": 128
+        },
+        "modes": {
+          "RGB": 128
+        },
+        "decoded_pixels": 35236540,
+        "dimensions_observed": 128,
+        "frame_policy": "single frame only"
+      },
+      "references": [],
+      "scope": "full_population"
+    },
+    {
+      "id": "image_e3",
+      "family": "visual_quality",
+      "meaning": "contextual_observation",
+      "data": {
+        "eligible_assets": 67,
+        "exclusions": {
+          "decoded": 0,
+          "icc_profile": 61
+        },
+        "metrics": {
+          "contrast": {
+            "population": 67,
+            "minimum": 0.0688931724252834,
+            "median": 0.24393922115119365,
+            "maximum": 0.34001740537389136
+          },
+          "mean_luminance": {
+            "population": 67,
+            "minimum": 0.22550425098039217,
+            "median": 0.47632461072664356,
+            "maximum": 0.7149799222260519
+          },
+          "dark_fraction": {
+            "population": 67,
+            "minimum": 0.0,
+            "median": 0.010829866486068112,
+            "maximum": 0.195068359375
+          },
+          "bright_fraction": {
+            "population": 67,
+            "minimum": 0.0,
+            "median": 0.010798136393229166,
+            "maximum": 0.32954133333333335
+          },
+          "entropy": {
+            "population": 67,
+            "minimum": 4.784430997336051,
+            "median": 7.481409339023346,
+            "maximum": 7.880779580474931
+          },
+          "sharpness": {
+            "population": 67,
+            "minimum": 0.002173632075435273,
+            "median": 0.025498529587112743,
+            "maximum": 0.14138948936012613
+          },
+          "width": {
+            "population": 128,
+            "minimum": 240,
+            "maximum": 640
+          },
+          "height": {
+            "population": 128,
+            "minimum": 189,
+            "maximum": 640
+          }
+        },
+        "representation": "oriented opaque RGB; preview longest side 512; no arbitrary ICC conversion",
+        "quality_score": null
+      },
+      "references": [],
+      "scope": "full_population"
+    },
+    {
+      "id": "image_e4",
+      "family": "visual_extremes",
+      "meaning": "contextual_observation",
+      "data": {
+        "examples": [
+          {
+            "metric": "contrast",
+            "end": "lowest",
+            "examples": [
+              {
+                "reference": "image_e2832b1ccdc5ec49ba10ce92",
+                "value": 0.0688931724252834
+              },
+              {
+                "reference": "image_887fc7048a5910f5f09752e5",
+                "value": 0.10334803601913992
+              },
+              {
+                "reference": "image_d224820c98ccde32ac149dae",
+                "value": 0.10503337583745889
+              },
+              {
+                "reference": "image_b91ace5f84cce15ee40e7cac",
+                "value": 0.1260370327961191
+              },
+              {
+                "reference": "image_927ec64685d494aa6a8ce3ce",
+                "value": 0.1382888471850404
+              }
+            ]
+          },
+          {
+            "metric": "contrast",
+            "end": "highest",
+            "examples": [
+              {
+                "reference": "image_efac658255ef56671fee1bf5",
+                "value": 0.34001740537389136
+              },
+              {
+                "reference": "image_b194a6925bed230ce12de656",
+                "value": 0.32833950172334375
+              },
+              {
+                "reference": "image_0aaa413240ee9d3c4f6cb821",
+                "value": 0.3231321199757325
+              },
+              {
+                "reference": "image_08fbf0aac35502501b91dcc1",
+                "value": 0.3180389029985453
+              },
+              {
+                "reference": "image_337cffbfb580472437e97d49",
+                "value": 0.31783784879277255
+              }
+            ]
+          },
+          {
+            "metric": "sharpness",
+            "end": "lowest",
+            "examples": [
+              {
+                "reference": "image_e2832b1ccdc5ec49ba10ce92",
+                "value": 0.002173632075435273
+              },
+              {
+                "reference": "image_4d8004e4866daec02a22f33f",
+                "value": 0.002411775322461613
+              },
+              {
+                "reference": "image_887fc7048a5910f5f09752e5",
+                "value": 0.0028056567549174906
+              },
+              {
+                "reference": "image_993f1ccdd6c013ae1f847c93",
+                "value": 0.0030998882084424823
+              },
+              {
+                "reference": "image_61efdd38ab4c7dcfe4d03dd7",
+                "value": 0.0032649649873468414
+              }
+            ]
+          },
+          {
+            "metric": "sharpness",
+            "end": "highest",
+            "examples": [
+              {
+                "reference": "image_fcf9db5cc78f3c221d775c49",
+                "value": 0.14138948936012613
+              },
+              {
+                "reference": "image_e4848e2a6526ff1f53fda228",
+                "value": 0.13582328127838725
+              },
+              {
+                "reference": "image_e7747b28b2a2931f1883ca78",
+                "value": 0.1357479434209037
+              },
+              {
+                "reference": "image_7a59e200d1cfa28b52ffcae5",
+                "value": 0.10329566570071076
+              },
+              {
+                "reference": "image_d56b04251a7d9b9e257e13d3",
+                "value": 0.09904486490761372
+              }
+            ]
+          },
+          {
+            "metric": "entropy",
+            "end": "lowest",
+            "examples": [
+              {
+                "reference": "image_e2832b1ccdc5ec49ba10ce92",
+                "value": 4.784430997336051
+              },
+              {
+                "reference": "image_d224820c98ccde32ac149dae",
+                "value": 6.119249400490739
+              },
+              {
+                "reference": "image_887fc7048a5910f5f09752e5",
+                "value": 6.2647358544584115
+              },
+              {
+                "reference": "image_b194a6925bed230ce12de656",
+                "value": 6.590586183383266
+              },
+              {
+                "reference": "image_f0b03a82b8f6be6d188955a1",
+                "value": 6.685470585910732
+              }
+            ]
+          },
+          {
+            "metric": "entropy",
+            "end": "highest",
+            "examples": [
+              {
+                "reference": "image_073adcefaeb07f88b734a777",
+                "value": 7.880779580474931
+              },
+              {
+                "reference": "image_8fc9f522556fb0f734c887dd",
+                "value": 7.8654842144721675
+              },
+              {
+                "reference": "image_c7513cc76ed2d59cce4e9b3e",
+                "value": 7.864696219476783
+              },
+              {
+                "reference": "image_5f1d63b5c8b9a4f5b2076ac7",
+                "value": 7.8611462410549375
+              },
+              {
+                "reference": "image_a956676d5c8cf8f75f585165",
+                "value": 7.831693287951276
+              }
+            ]
+          },
+          {
+            "metric": "dark_fraction",
+            "end": "lowest",
+            "examples": [
+              {
+                "reference": "image_96e34049a5ed41eec0b2e61a",
+                "value": 0.0
+              },
+              {
+                "reference": "image_2061ac732e6118f2f968da3a",
+                "value": 3.814697265625e-06
+              },
+              {
+                "reference": "image_e2832b1ccdc5ec49ba10ce92",
+                "value": 5.710891812865497e-06
+              },
+              {
+                "reference": "image_29ef88303f111ab9e58eb81f",
+                "value": 1.52587890625e-05
+              },
+              {
+                "reference": "image_d9200589f14c5a3caa2a9d63",
+                "value": 4.57763671875e-05
+              }
+            ]
+          },
+          {
+            "metric": "dark_fraction",
+            "end": "highest",
+            "examples": [
+              {
+                "reference": "image_d8b407dba2e7513c24cad760",
+                "value": 0.195068359375
+              },
+              {
+                "reference": "image_7a59e200d1cfa28b52ffcae5",
+                "value": 0.15136147660818713
+              },
+              {
+                "reference": "image_3ce6a7640ea58845266bf6c3",
+                "value": 0.1274042854532164
+              },
+              {
+                "reference": "image_539d80d08409331ac1b29c6b",
+                "value": 0.11048507690429688
+              },
+              {
+                "reference": "image_61efdd38ab4c7dcfe4d03dd7",
+                "value": 0.106992
+              }
+            ]
+          },
+          {
+            "metric": "bright_fraction",
+            "end": "lowest",
+            "examples": [
+              {
+                "reference": "image_927ec64685d494aa6a8ce3ce",
+                "value": 0.0
+              },
+              {
+                "reference": "image_f0b03a82b8f6be6d188955a1",
+                "value": 0.0
+              },
+              {
+                "reference": "image_e2832b1ccdc5ec49ba10ce92",
+                "value": 0.0
+              },
+              {
+                "reference": "image_4d8004e4866daec02a22f33f",
+                "value": 0.0
+              },
+              {
+                "reference": "image_2061ac732e6118f2f968da3a",
+                "value": 3.0517578125e-05
+              }
+            ]
+          },
+          {
+            "metric": "bright_fraction",
+            "end": "highest",
+            "examples": [
+              {
+                "reference": "image_b194a6925bed230ce12de656",
+                "value": 0.32954133333333335
+              },
+              {
+                "reference": "image_c6d5050f6fe82ca5b9b6203a",
+                "value": 0.28575589364035087
+              },
+              {
+                "reference": "image_96e34049a5ed41eec0b2e61a",
+                "value": 0.2170257568359375
+              },
+              {
+                "reference": "image_efac658255ef56671fee1bf5",
+                "value": 0.20438130696614584
+              },
+              {
+                "reference": "image_8ecd46f1dfc966cab5c7c80a",
+                "value": 0.146331787109375
+              }
+            ]
+          }
+        ],
+        "interpretation": "Contextual extremes in eligible preview representations, not proof of unusability."
+      },
+      "references": [],
+      "scope": "bounded"
+    },
+    {
+      "id": "image_e5",
+      "family": "annotations",
+      "meaning": "deterministic_fact",
+      "data": {
+        "occurrence_states": {
+          "not_applicable": 128
+        },
+        "validity": {
+          "unobserved": 128
+        },
+        "blocked_geometric_checks": {},
+        "supplied_status": {
+          "unknown": 128
+        },
+        "invalidity_reasons": {},
+        "normalized_occurrences": 128,
+        "object_visits": 0,
+        "mask_pixels": 0,
+        "empty_masks": 0,
+        "segmentation_raster_pixels": 0
+      },
+      "references": [],
+      "scope": "full_population"
+    },
+    {
+      "id": "image_e6",
+      "family": "composition",
+      "meaning": "contextual_observation",
+      "data": {
+        "categories": [],
+        "distinct_source_categories": 0,
+        "category_detail_omissions": 0,
+        "label_cardinality": {
+          "0": 128
+        },
+        "splits": [
+          {
+            "split": "split_19777a782ce5a2c1380e0189",
+            "occurrences": 128
+          }
+        ],
+        "box_area": {
+          "population": 0,
+          "minimum": null,
+          "maximum": null,
+          "median": null
+        },
+        "crowd_objects": 0,
+        "object_locations_and_sizes": {
+          "center_x_fraction": {
+            "population": 0,
+            "minimum": null,
+            "maximum": null,
+            "sum": 0.0,
+            "mean": null
+          },
+          "center_y_fraction": {
+            "population": 0,
+            "minimum": null,
+            "maximum": null,
+            "sum": 0.0,
+            "mean": null
+          },
+          "width_fraction": {
+            "population": 0,
+            "minimum": null,
+            "maximum": null,
+            "sum": 0.0,
+            "mean": null
+          },
+          "height_fraction": {
+            "population": 0,
+            "minimum": null,
+            "maximum": null,
+            "sum": 0.0,
+            "mean": null
+          }
+        },
+        "mask_occupancy": {
+          "population": 0,
+          "minimum": null,
+          "maximum": null,
+          "sum": 0.0,
+          "mean": null
+        },
+        "mask_occupancy_population": "Each examined mask independently; overlapping instance areas are not a union.",
+        "category_count_policy": "Well-formed supplied members; taxonomy violations remain separately accounted.",
+        "group_populations": [
+          {
+            "source": "source_1",
+            "groups_declared": false,
+            "complete_group_occurrences": null,
+            "incomplete_group_occurrences": null,
+            "distinct_complete_groups": null
+          }
+        ]
+      },
+      "references": [],
+      "scope": "full_population"
+    },
+    {
+      "id": "image_e7",
+      "family": "exact_duplicates_bytes",
+      "meaning": "contextual_observation",
+      "data": {
+        "groups": 0,
+        "participating_occurrences": 0,
+        "cross_split_occurrences": 0,
+        "examples": []
+      },
+      "references": [],
+      "scope": "full_population"
+    },
+    {
+      "id": "image_e8",
+      "family": "exact_duplicates_native",
+      "meaning": "contextual_observation",
+      "data": {
+        "groups": 0,
+        "participating_occurrences": 0,
+        "cross_split_occurrences": 0,
+        "examples": []
+      },
+      "references": [],
+      "scope": "full_population"
+    },
+    {
+      "id": "image_e9",
+      "family": "exact_duplicates_oriented",
+      "meaning": "contextual_observation",
+      "data": {
+        "groups": 0,
+        "participating_occurrences": 0,
+        "cross_split_occurrences": 0,
+        "examples": []
+      },
+      "references": [],
+      "scope": "full_population"
+    },
+    {
+      "id": "image_e10",
+      "family": "annotation_disagreement",
+      "meaning": "contextual_observation",
+      "data": {
+        "compatible_exact_raster_groups_with_differences": 0,
+        "payload_difference_groups_blocked": 0,
+        "details": [],
+        "correct_label_identified": false
+      },
+      "references": [],
+      "scope": "full_population"
+    },
+    {
+      "id": "image_e11",
+      "family": "logical_identity",
+      "meaning": "deterministic_fact",
+      "data": {
+        "occurrences_with_duplicate_source_keys": 0
+      },
+      "references": [],
+      "scope": "full_population"
+    },
+    {
+      "id": "image_e12",
+      "family": "near_duplicates",
+      "meaning": "investigation_candidate",
+      "data": {
+        "qualifying_raster_pairs": 0,
+        "examples": [],
+        "radius": 6,
+        "representation": "DCT64 opaque RGB preview; seven disjoint partitions",
+        "approximate_groups_are_equivalence_classes": false
+      },
+      "references": [],
+      "scope": "bounded"
+    }
+  ],
+  "findings": [],
+  "coverage": {
+    "families": {
+      "inventory": {
+        "required_occurrences": 128,
+        "inventory_complete": true
+      },
+      "visual_quality": {
+        "eligible": 67,
+        "examined": 67,
+        "ineligible": 61
+      },
+      "visual_extremes": {
+        "eligible": 67,
+        "maximum_examples_per_metric_end": 5
+      },
+      "annotations": {
+        "occurrences_examined": 128,
+        "segmentation_raster_work": 0,
+        "segmentation_raster_limit": 100000000,
+        "topology_and_semantic_correctness": "not assessed"
+      },
+      "exact_duplicates_bytes": {
+        "representation": "bytes",
+        "eligible_occurrences": 128,
+        "group_detail_omissions": 0
+      },
+      "exact_duplicates_native": {
+        "representation": "native",
+        "eligible_occurrences": 128,
+        "group_detail_omissions": 0
+      },
+      "exact_duplicates_oriented": {
+        "representation": "oriented",
+        "eligible_occurrences": 128,
+        "group_detail_omissions": 0
+      },
+      "annotation_disagreement": {
+        "variant_comparisons_are_bounded": true
+      },
+      "near_duplicates": {
+        "indexed_rasters": 67,
+        "partition_entries": 469,
+        "saturated_buckets": 0,
+        "posting_visits": 1012,
+        "posting_rows_loaded": 469,
+        "posting_cache_limit_bytes": 33554432,
+        "hamming_comparisons": 74,
+        "pair_populations": [
+          {
+            "split": "split_19777a782ce5a2c1380e0189",
+            "query_population": 67,
+            "reference_population": 67,
+            "queries_started": 67,
+            "queries_completed": 67,
+            "posting_visits": 1012,
+            "hamming_comparisons": 74,
+            "qualifying_emissions": 0,
+            "posting_saturation_visits": 0,
+            "scope": "within_split"
+          }
+        ],
+        "cross_split_queries_complete": true,
+        "cross_split_stop_reason": null,
+        "stop_reason": "examined_scope_completed",
+        "detail_omissions": 0,
+        "absence_claim": "examined scope only; capped postings do not establish global absence"
+      }
+    },
+    "required_population": "complete inventoried and applicable supplied populations within hard limits",
+    "retained_examples_are_bounded": true
+  },
+  "execution": {
+    "status": "completed",
+    "backend": "duckdb_local",
+    "effective_limits": {
+      "backend": "duckdb_local",
+      "max_source_bytes": 1073741824,
+      "max_combined_source_bytes": 4294967296,
+      "max_rows": 10000000,
+      "max_combined_rows": 30000000,
+      "max_columns": 1000,
+      "memory_bytes": 2147483648,
+      "max_rss_bytes": 6442450944,
+      "threads": 2,
+      "batch_bytes": 33554432,
+      "max_record_bytes": 8388608,
+      "workspace_bytes": 68719476736,
+      "free_disk_bytes": 2147483648,
+      "max_seconds": 1799.999064042,
+      "result_bytes": 33554432
+    },
+    "image_limits": {
+      "assets": 100000,
+      "occurrences": 1000000,
+      "annotations": 10000000,
+      "pixels_per_asset": 32000000,
+      "decode_bytes": 536870912,
+      "decoded_pixels": 100000000000,
+      "polygon_vertices": 10000000,
+      "rle_runs": 10000000,
+      "segmentation_pixels": 100000000,
+      "posting_visits": 100000000,
+      "hamming_comparisons": 50000000,
+      "bucket_entries": 1024,
+      "candidate_pairs": 250000,
+      "embedding_images": 10000,
+      "cosine_pairs": 25000000,
+      "details": 100,
+      "witnesses": 5,
+      "private_bytes": 67108864
+    },
+    "image_source_limits": {
+      "media_per_input_bytes": 68719476736,
+      "combined_media_bytes": 137438953472,
+      "asset_capture_bytes": 134217728
+    },
+    "duration_seconds": 0.8564193340134807,
+    "peak_workspace_bytes": 491520,
+    "estimated_peak_workspace_bytes": 268811456,
+    "capture_read_bytes": 20512301,
+    "initial_hash_seconds": 0.019538333173841238,
+    "corpus_copied": false,
+    "publication_policy": "required_core_atomic_optional_model_isolated",
+    "warnings": [
+      "Sampled resource controls can overshoot.",
+      "Capacity and calibrated recall are measured claims for recorded workloads only."
+    ],
+    "peak_worker_rss_bytes": 167772160,
+    "whole_job_seconds": 1.6221462920075282,
+    "peak_spill_bytes": 0,
+    "serialized_bytes": 23643,
+    "final_verification_bytes": 20512301,
+    "final_verification_seconds": 0.020213875046465546,
+    "core_execution": {
+      "status": "completed",
+      "backend": "duckdb_local",
+      "effective_limits": {
+        "backend": "duckdb_local",
+        "max_source_bytes": 1073741824,
+        "max_combined_source_bytes": 4294967296,
+        "max_rows": 10000000,
+        "max_combined_rows": 30000000,
+        "max_columns": 1000,
+        "memory_bytes": 2147483648,
+        "max_rss_bytes": 6442450944,
+        "threads": 2,
+        "batch_bytes": 33554432,
+        "max_record_bytes": 8388608,
+        "workspace_bytes": 68719476736,
+        "free_disk_bytes": 2147483648,
+        "max_seconds": 1799.999064042,
+        "result_bytes": 33554432
+      },
+      "image_limits": {
+        "assets": 100000,
+        "occurrences": 1000000,
+        "annotations": 10000000,
+        "pixels_per_asset": 32000000,
+        "decode_bytes": 536870912,
+        "decoded_pixels": 100000000000,
+        "polygon_vertices": 10000000,
+        "rle_runs": 10000000,
+        "segmentation_pixels": 100000000,
+        "posting_visits": 100000000,
+        "hamming_comparisons": 50000000,
+        "bucket_entries": 1024,
+        "candidate_pairs": 250000,
+        "embedding_images": 10000,
+        "cosine_pairs": 25000000,
+        "details": 100,
+        "witnesses": 5,
+        "private_bytes": 67108864
+      },
+      "image_source_limits": {
+        "media_per_input_bytes": 68719476736,
+        "combined_media_bytes": 137438953472,
+        "asset_capture_bytes": 134217728
+      },
+      "duration_seconds": 0.8564193340134807,
+      "peak_workspace_bytes": 491520,
+      "estimated_peak_workspace_bytes": 268811456,
+      "capture_read_bytes": 20512301,
+      "initial_hash_seconds": 0.019538333173841238,
+      "corpus_copied": false,
+      "publication_policy": "required_core_atomic_optional_model_isolated",
+      "warnings": [
+        "Sampled resource controls can overshoot.",
+        "Capacity and calibrated recall are measured claims for recorded workloads only."
+      ],
+      "peak_worker_rss_bytes": 167772160,
+      "whole_job_seconds": 1.2232591670472175,
+      "peak_spill_bytes": 0,
+      "serialized_bytes": 23446
+    }
+  },
+  "generated_at": "2026-10-12T00:36:50.278174+00:00"
+}

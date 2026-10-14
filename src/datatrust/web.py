@@ -493,6 +493,12 @@ def create_app(workspace: Path, max_upload_mib: float = 100, analysis_config=Non
     register(app, workspace, data_roots or (Path.cwd(),), analysis_config)
     from datatrust.temporal_web import register as register_temporal
     register_temporal(app,workspace,data_roots or (Path.cwd(),))
+    from datatrust.text_web import register as register_text
+    register_text(app,workspace,data_roots or (Path.cwd(),))
+    from datatrust.image_web import register as register_images
+    register_images(app,workspace,data_roots or (Path.cwd(),))
+    from datatrust.cross_web import register as register_cross
+    register_cross(app,workspace,data_roots or (Path.cwd(),))
     return app
 
 
@@ -514,6 +520,8 @@ def run_ui(port: int = 8000, max_upload_mib: float = 100, open_browser: bool = T
                 threaded=False,
             )
         finally:
+            app.extensions['datatrust_m6_store'].cleanup()
+            app.extensions['datatrust_m9_store'].cleanup()
             app.extensions['datatrust_m5_store'].cleanup()
             app.extensions['datatrust_m4_store'].cleanup()
             app.extensions["datatrust_job_store"].cleanup()

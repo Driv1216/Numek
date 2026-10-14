@@ -666,3 +666,30 @@ mathematics, scope, environment, failures and presentation evidence.
 Schema 1.4 uses `temporal_reliability_v1`. Observation meaning, scheduling, layout, entities and clocks are independent. Exact clocks, declaration-qualified continuity/history, feature-bound availability/revisions, target maturity, supplied evaluation requirements and configurable behavioral investigations produce evidence without a score. Required stages cover all eligible declared records; optional searches disclose bounds and exclusions.
 
 The complete temporal rules, representations, history-state semantics, sparse-reference qualifications, provisional budgets and failure/publication boundaries are in [M5 temporal reliability](docs/M5_TEMPORAL_RELIABILITY.md). These rules do not alter M1–M4 analytical policy or legacy result schemas. Natural corpus observations and workload timings do not validate universal temporal defect thresholds or capacity guarantees.
+
+## M6–M7 representation-specific methodology
+
+Text schema 1.5 and image schema 1.6 preserve explicit populations, bounded
+investigations and exact private evidence without universal reliability scores.
+See [M6 text](docs/M6_TEXT_RELIABILITY.md) and [M7 images](docs/M7_IMAGE_RELIABILITY.md)
+for the established methods, qualified thresholds and disclosure boundaries.
+
+## M9 cross-representation methodology
+
+Schema 1.7 uses `cross_representation_reliability_v1`. Explicit typed relationships,
+context and reusable native PDF/DOCX mappings reconcile supplied facts and retain
+all eligible competing values. Deterministic decimals/dates/units/clocks remain
+distinct from optional model candidates. Discovery bounds and extraction/context
+ambiguity cannot become absence or complete assurance. Authority is a declared
+comparison policy, not external truth. Reviews are separate exact-result-bound
+snapshots and never ground truth or analytical corrections.
+
+Qualification measures the complete extraction → mapping/context → retrieval →
+comparison/model → finding pipeline, with source-family-separated calibration and
+held-out populations, explicit abstention and resource exclusions. Current model
+profiles cover authored English financial native documents and supplied COCO
+caption associations; general semantic validity is not established. Local resource
+measurements do not guarantee arbitrary-document capacity. See [M9 complete
+contracts, rules and limits](docs/M9_CROSS_REPRESENTATION_RELIABILITY.md) and
+[verification evidence](validation/m9/README.md). M1–M7 acceptance is preserved;
+M8 audio remains deferred.

@@ -23,3 +23,25 @@ __all__ += ["TemporalSourceSpec", "TemporalInputSpec", "TemporalSpec", "ClockSpe
     "ActiveInterval", "ScheduleSpec", "FeatureAvailabilitySpec", "FeatureHistorySpec", "OutcomeMaturitySpec",
     "TemporalFoldSpec", "TemporalEvaluationSpec", "SeasonalSpec", "TemporalSeriesSpec", "TemporalWorkLimits", "TemporalBehaviorSpec",
     "TemporalAnalysisConfig", "TemporalAuditSpec", "TemporalAuditResult"]
+
+from datatrust.text_contracts import (AssetSpec, ContentRef, SourceLocation, TextSourceSpec,
+    TextFieldSpec, TextInputSpec, TextTaskSpec, TextAnnotationSpec, TextConversationSpec,
+    TextRetrievalSpec, TextEvaluationSpec, TextAuditSpec, TextWorkLimits, TextModelOptions,
+    TextAnalysisConfig, TextAuditResult, TextReportArtifacts)
+__all__ += ["AssetSpec", "ContentRef", "SourceLocation", "TextSourceSpec", "TextFieldSpec",
+    "TextInputSpec", "TextTaskSpec", "TextAnnotationSpec", "TextConversationSpec", "TextRetrievalSpec",
+    "TextEvaluationSpec", "TextAuditSpec", "TextWorkLimits", "TextModelOptions", "TextAnalysisConfig",
+    "TextAuditResult", "TextReportArtifacts"]
+
+from datatrust.image_contracts import (ImageSourceSpec, ImageMappingSpec, ImageTaskSpec, ImageAnnotationSpec, ImageInputSpec, ImageSplitRequirement, ImageComparisonSpec, ImageAuditSpec, ImageSourceLimits, ImageWorkLimits, ImageModelOptions, ImageAnalysisConfig, ImageDisclosureOptions, ImageAuditResult, ImageReportArtifacts)
+__all__ += ["ImageSourceSpec", "ImageMappingSpec", "ImageTaskSpec", "ImageAnnotationSpec", "ImageInputSpec", "ImageSplitRequirement", "ImageComparisonSpec", "ImageAuditSpec", "ImageSourceLimits", "ImageWorkLimits", "ImageModelOptions", "ImageAnalysisConfig", "ImageDisclosureOptions", "ImageAuditResult", "ImageReportArtifacts"]
+
+from datatrust.cross_contracts import (CrossRepresentationInputSpec, RelationshipSpec,
+    DocumentMappingSpec, ReconciliationRule, CrossSeparationSpec, CrossRepresentationAuditSpec,
+    CrossWorkLimits, CrossModelOptions, CrossRepresentationAnalysisConfig,
+    CrossDisclosureOptions, CrossReportArtifacts, CrossRepresentationAuditResult)
+from datatrust.cross_review import ReviewDispositionSet
+__all__ += ['CrossRepresentationInputSpec','RelationshipSpec','DocumentMappingSpec','ReconciliationRule',
+    'CrossSeparationSpec','CrossRepresentationAuditSpec','CrossWorkLimits','CrossModelOptions',
+    'CrossRepresentationAnalysisConfig','CrossDisclosureOptions','CrossReportArtifacts',
+    'CrossRepresentationAuditResult','ReviewDispositionSet']

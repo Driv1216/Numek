@@ -1,0 +1,87 @@
+{
+  "date": "2026-10-11",
+  "scope": "Focused eight-item independent source-review correction pass; no M7 work.",
+  "status": "corrections_complete_acceptance_pending_user",
+  "authoritative_skill": "agents/skills/verify/skills.md",
+  "verification_runs": [
+    {
+      "command": "PYTHONPATH=src .venv/bin/python -m pytest tests/m6/test_review_corrections.py::test_conversation_witnesses_do_not_inherit_prior_violations tests/m6/test_foundation.py tests/m6/test_closure_controls.py tests/m6/test_search_models.py -q",
+      "completed_utc": "2026-10-11T16:11:12.318Z",
+      "exit_code": 0,
+      "result": "38 passed in 5.86s"
+    },
+    {
+      "command": "PYTHONPATH=src .venv/bin/python -m pytest tests/m6/test_review_corrections.py tests/m6/test_interfaces.py -q",
+      "completed_utc": "2026-10-11T16:12:30.362Z",
+      "exit_code": 0,
+      "result": "18 passed in 5.13s"
+    },
+    {
+      "command": "PYTHONPATH=src .venv/bin/python -m pytest tests/m6/test_review_corrections.py::test_disk_queue_batch_boundary_and_seeded_membership tests/m6/test_review_corrections.py::test_implicit_evaluation_comparison_precedes_other_requested_comparisons -q",
+      "completed_utc": "2026-10-11T16:15:05.301Z",
+      "exit_code": 0,
+      "result": "2 passed in 0.97s"
+    },
+    {
+      "command": "PYTHONPATH=src .venv/bin/python -m pytest -q",
+      "completed_utc": "2026-10-11T16:16:56.316Z",
+      "exit_code": 0,
+      "result": "400 passed in 33.51s"
+    }
+  ],
+  "new_regression_cases": 14,
+  "source_sha256": {
+    "src/datatrust/text_search.py": "ba48ff638c2b83bcd8e755b8ddb6cafef9fd18cb2ad8f2613e159216e5d397df",
+    "src/datatrust/text_models.py": "dec2d1fa302f7a7429c7bcd7ee8aa75f7fb3ca92aac7bd685b7d8fc165d63314",
+    "src/datatrust/text_diagnostics.py": "871b581399dca6ac27392fec6c6f273715bf1339d6f558212c2928342bfbd604",
+    "src/datatrust/text_presentation.py": "3f5ec688ba8d8b3f36e68b47309e8d709c65264a7c57eabe5411c658a52abd51",
+    "src/datatrust/text.py": "529b83e4eb67b46878b5ee7966c9ad230ed3c505d97ab7c63519c5272ecb5e99",
+    "src/datatrust/text_private.py": "3212f6a7c8d812e4edb8b0059309fd64f0bf7c6c7124630b988c76b66d44ed5c",
+    "src/datatrust/templates/text_report.html": "9fee81703e15b57cdc1a4b3ca012ae4f87301a5c222700204a79654c627d69ca",
+    "tests/m6/test_review_corrections.py": "0aa962c54cce9f8c52f763cb387dcea8f73d3781552ee90f3579f68a89eb57cd",
+    "validation/m6/review_presentation.py": "b241767d4c8f285c56ab57434dda5ca890477435d1020dd940d44379f340f0e1",
+    "validation/m6/REVIEW_CORRECTIONS.md": "3c676d035b6c0d35ed239e4493eb6aca35794c1ef160a7937b31a3e84633fd4c",
+    "README.md": "f3ec426ed9bcc18bdf0ba6a9ae20090ffd9ca4e54bcc4ddd5e9a1c426ed04c3b",
+    "docs/ARCHITECTURE.md": "4de73075c71b825ddc14103dc1569d20835fdaaa80b3ff354a42f0bbbfe8df16",
+    "docs/CURRENT_STATE.md": "9dd5c16305a49593c2d09e7238e470c48d4a76454270fbb4e0bc252b905e519b",
+    "docs/NUMEK_MASTER_CONTEXT.md": "011a5199788a8954f564b4ff9fbe2af902bcad94f5898289102f6754c052abb2",
+    "docs/M6_TEXT_RELIABILITY.md": "f479e0e348ca03ffd4c96420db77f93a41c38bfbc6968b89f1cfa802bece6dfd",
+    "validation/m6/README.md": "50acbd8d8ca7bb593bb775e9295067bb317e80e9dff1153cfc4e25bbeaadca51"
+  },
+  "reused_evidence_sha256": {
+    "validation/m6/results/calibration.json": "8521ec9dd2ca1d0f7218e5c4c178eea2883011b414626fbe36687a9596e648b1",
+    "validation/m6/results/capacity_100mib_final.json": "a55862c54d600d8bff00fd40df702b8e31c2ffd5bb42b6425605e98e737758f5",
+    "validation/m6/results/capacity_1gib_final.json": "9af833d52981b71aaa3347c84cba5894448e99520a9c918831672cb4788093e5",
+    "validation/m6/results/stress.json": "76d27e004ba523717ad2814b2897cadf735bd01ac2d89e7643f909f2331f1173",
+    "validation/m6/results/model_publisher_identity.json": "983969175d1efcdf4e57872b44614ae692ff58bf0d26d55c1b37bcce53c94bb6",
+    "validation/m6/results/verification.json": "53d10b54f81c43c014ca933ca882880a50a2ddcf31230e9f7e253ffb0aa3a54a",
+    "validation/m6/results/closure.json": "a2091649be45d42f655d21ffcce637de5517835a8a431463a111f5e8a22bc1a0",
+    "validation/m6/results/pdf_qa.json": "ccdbdef7d6fbdb8a0be681e9a2af9ca44cb9f58bc503a5c2a0e61f4ccec9d3df",
+    "validation/m6/results/presentation.json": "48bfdadeeb9bdc72e7f5f2b504dfa104f84e87ae234062e289a9350e50c4a567"
+  },
+  "presentation_ledger": "validation/m6/results/review_corrections/presentation.json",
+  "presentation": {
+    "all_pages_visually_inspected": 39,
+    "prior_pages": 53,
+    "all_eight_topics_retained": true,
+    "analytics_reused_unchanged": true,
+    "current_selection_not_claimed_by_historical_analytics": true,
+    "fontconfig_cache_warnings": "Warnings only; PDFs completed and every page visually inspected."
+  },
+  "compatibility": "All repository tests passed including legacy M1\u2013M5 and M6 API/CLI/Flask/export/private lifecycle tests. Legacy artifacts not regenerated. Browser routes and controls unchanged; existing live-browser evidence reused.",
+  "reused_evidence_limits": "LSH shingle/hash/signature/profile are unchanged. Existing large workloads/stress results describe historical selection; no new scheduler capacity claim. No expensive calibration/workload campaign repeated.",
+  "unexpected_optional_failure": {
+    "policy": "whole_audit_atomic_fail_closed",
+    "deliberate_deviation": "No required-only partial success after an unexpected optional fault. Shared native connection/collector/locators cannot be assumed trustworthy. Discarding unfinished publication and owned scratch preserves atomicity.",
+    "fault_injection": "After inserted finding/half-built index: safe AnalysisError, no returned partial result, owned workspace deleted, fresh run uncontaminated.",
+    "expected_budget_stops": "Completed bounded evidence remains available with exclusions and work coverage."
+  },
+  "remaining_limits": [
+    "Selection does not guarantee subsequent indexing/inference reaches every selected comparison side.",
+    "Both long-document endpoints require sufficient actual window and tokenizer work.",
+    "Bounded searches do not establish global absence or universal recall.",
+    "Unexpected native failure requires repair/rerun of the whole audit."
+  ],
+  "unresolved_issues": [],
+  "whitespace_check": "git diff --check passed"
+}

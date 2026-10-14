@@ -1,13 +1,13 @@
 # DataTrust
 
-Last updated: 2026-10-09
+Last updated: 2026-10-12
 
 DataTrust is a local-first Python package and browser UI that generates
 stakeholder-readable dataset reliability reports. It is designed for an ML or
 data lead who needs inspectable classification, partially annotated data,
-multilabel classification, multi-output regression, or unsupervised CSV evidence before deciding how to use a dataset.
+multilabel classification, multi-output regression, unsupervised CSV evidence, temporal datasets, and text/annotation/conversation/RAG and image/annotation evidence before deciding how to use a dataset.
 
-DataTrust has no cloud upload, account, database, or saved report history. A CSV
+DataTrust has no cloud upload, account or external database. Local DuckDB workspaces support scalable execution. A source
 is processed locally and produces standalone HTML, PDF, and strict JSON
 artifacts through Python, CLI, and browser UI. PDF derives from canonical HTML.
 
@@ -152,8 +152,10 @@ datatrust audit data.csv --task-spec task.json --config declarations.json --out 
 Explicit `--task`/`--target` flags conflict with `--task-spec`. A task example is
 `{"kind":"regression","targets":["heating_load","cooling_load"],"metadata_columns":["building_id"]}`.
 A config example is `{"annotations":{"default":{"expectation":"optional"}},"features":{"semantic_types":{"orientation":"categorical"}}}`.
-Multiple independent categorical outputs are unsupported; multilabel targets must
-be binary indicator columns. List-valued and long-form labels are deferred.
+In this tabular task flow, multiple independent categorical outputs are unsupported;
+multilabel targets must be binary indicator columns. List-valued and long-form labels
+are deferred for these tabular contracts. M6's dedicated text contracts accept
+explicitly declared nested multilabel annotations and associated annotation tables.
 
 The browser preserves its default classification flow and provides separate M3
 choices. Declare roles, annotation expectations/status, numerical output intent,
@@ -273,9 +275,12 @@ the canonical HTML digest. Configuration changes invalidate known owned outputs.
 CLI findings do not signal failure; fatal execution returns nonzero and partial
 execution returns status 2 after exporting explicitly incomplete evidence.
 
-The engine remains synchronous and in memory. Workers, disk spill, other
-formats/modalities, and model-performance analysis are deferred. Validation is
-internal engineering evidence, not external methodology or customer validation.
+The legacy pandas path remains synchronous and in memory. M4 adds opt-in
+DuckDB spill and supervised execution; M5 temporal and M6 text audits use that
+supervised boundary. M5 accepts CSV/optional scalar Parquet; M6 accepts CSV/JSONL
+and declared local text/image references, with optional offline language and
+embedding models. Prediction-performance analysis remains outside scope.
+Validation is internal engineering evidence, not external methodology or customer validation.
 
 ## Regression Intelligence (M2)
 
@@ -475,3 +480,52 @@ datatrust ui
 ```
 
 Python starts with `DataTrust.audit_temporal(TemporalAuditSpec(...), config=None)`. The browser has a dedicated Temporal audits workflow. Existing M1–M4 inputs and classification policies are preserved. See [M5 contracts, examples and methodology](docs/M5_TEMPORAL_RELIABILITY.md) and [M5 recorded verification](validation/m5/README.md). Resource budgets and investigation defaults remain provisional.
+
+## M6 text reliability intelligence
+
+Use `DataTrust.audit_text(TextAuditSpec(...), TextAnalysisConfig())`,
+`datatrust text --spec ... --out ...`, or the browser’s `/text` guided workflow.
+CSV/JSONL, supplied tokens/spans, QA, conversations/tools, retrieval provenance
+and explicit local text/image associations share the same contracts. HTML/PDF
+and strict JSON contain aggregates and opaque references by default. A separate
+protected manifest resolves exact local evidence; excerpt disclosure is explicit.
+Working optional Lingua and pinned multilingual E5-small adapters operate offline.
+
+See [M6 contracts, methodology and usage](docs/M6_TEXT_RELIABILITY.md) and
+[validation evidence](validation/m6/README.md). No universal text reliability score
+or semantic correctness guarantee is introduced.
+
+
+## M7 image reliability intelligence
+
+M1–M6 completion, including M6's understanding gate, is accepted. M7 adds separate
+image contracts and `DataTrust.audit_images()`, `datatrust images`, and guided local
+browser presets at `/images`. It covers unlabeled and classification images,
+detection, bounded segmentation integrity, exact/perceptual repetition, declared
+split/group separation and explicit version comparisons. Reports separate facts,
+violations and candidates; no image-quality score or automatic label correction
+is introduced.
+
+Install `.[images]`; optional `.[image-embeddings]` uses separately provisioned,
+pinned offline CPU artifacts. Portable HTML/PDF/JSON remain image-free and omit
+supplied labels/paths by default. The local inspector can reveal verified examples
+and overlays without authorizing portable disclosure. See [contracts, methods and
+usage](docs/M7_IMAGE_RELIABILITY.md) and [engineering evidence](validation/m7/README.md).
+
+## M9 cross-representation reliability intelligence
+
+M1–M7 are accepted; M8 audio is deferred. Use `DataTrust.audit_cross_representation()`,
+`datatrust cross-representation --spec audit.json --out report.pdf --format pdf`,
+or `/cross-representation` in the browser. Explicit relationships connect records
+to native PDF/DOCX, text and images. Reusable field/table recipes operate across
+collections while retaining ambiguous context and competing evidence. Exact
+identities, decimals/dates/units, availability/version checks and supplied
+separation/ancestry remain distinct from optional semantic candidates.
+
+Install `.[documents]`; optional `.[cross-models]` consumes separately provisioned
+pinned local CPU models. English financial NLI and supplied COCO image/text
+profiles are narrowly qualified; unsupported populations abstain. No general claim
+verification, OCR, audio/video or global score is added. Default HTML/PDF/JSON omit
+source content. Exact local evidence and independent confirm/dismiss/unresolved
+snapshots are available through Python, CLI and browser. See [contracts and examples](docs/M9_CROSS_REPRESENTATION_RELIABILITY.md)
+and [measured verification](validation/m9/README.md).

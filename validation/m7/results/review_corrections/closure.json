@@ -1,0 +1,145 @@
+{
+  "status": "complete",
+  "scope": "Five focused independent-review corrections; no M8 work.",
+  "baseline": "Current working tree captured in NUMEK_M7_Implementation_Review_2026-10-12.zip; not Git HEAD (accepted M6/M7 additions remain uncommitted).",
+  "source_changes": {
+    "src/datatrust/image_contracts.py": {
+      "before_sha256": "3635f666ac664202ae4d2b622a8fe9c5083945b93d8bb6e49e2a0788c5542e0a",
+      "after_sha256": "cb0dad71080cc7583bb151ea41175ac866f7701d2896e14a5a410703ba481a2e"
+    },
+    "src/datatrust/image_sources.py": {
+      "before_sha256": "859a4db8455a91f393b65cf403d722fd71f3328e43bba80895b701f3e40280fd",
+      "after_sha256": "89ef2d7c95bcbcc87e781235fd2b5626289b10e312863f28a4c8ffe96e1bbca7"
+    },
+    "src/datatrust/image_diagnostics.py": {
+      "before_sha256": "94cca078d060b38e81c86124561fe2320772362d05bae9e4335d6da8bcfc4d58",
+      "after_sha256": "6fe33e3d41f728ef6e17c530817f583e27d5047fcbb42fb19e6200a1ee51a0ec"
+    },
+    "src/datatrust/image_models.py": {
+      "before_sha256": "72906ee022b616880c8d9ba61a7d172b41a19b6436dcb51ddb264a1706a8f870",
+      "after_sha256": "1f8b51ebc9d4100e9a54e9235a78f907d90c31243f0f8f747e7e6b31291b06c4"
+    },
+    "src/datatrust/image_model_artifacts.json": {
+      "before_sha256": "3cd2571848b645176db52c937d16c6cdbeb76980947a841a24ad556731ce7936",
+      "after_sha256": "1a13cd503ec5d59e81d3632b1fe5139af9d4a5f2027b0a0b29d6137b266d2725"
+    },
+    "src/datatrust/image_presentation.py": {
+      "before_sha256": "20744f77e77dd461b539478dcf560a121ea7622a8232c94afa469100979379dc",
+      "after_sha256": "bfba31b2a56cdd90903ff03743fee38941fd5656a054e7b80342517091aba4fc"
+    },
+    "src/datatrust/templates/image_report.html": {
+      "before_sha256": "0c5d930f3f2e2b390e49a27637a24193bb59a7bdfa8ecff39ad6381581dcf029",
+      "after_sha256": "ce1d3e2065a5438765708ec2a53f1c6531203f49af02796296cade3b9e55bd10"
+    },
+    "docs/M7_IMAGE_RELIABILITY.md": {
+      "before_sha256": "6ac57f800611193937f98492bc337873e3d349defc9c0dce81fcd8d7afe0c0f2",
+      "after_sha256": "d151ff82bea7250b882e9ad5733fe6fa1c0c139f9d46c1a71697215b68f702a9"
+    },
+    "tests/m7/test_review_corrections.py": {
+      "before_sha256": null,
+      "after_sha256": "df14544754af1acc752595333757652899e5628ce033b3218969776bcb32c5e4"
+    },
+    "validation/m7/review_corrections.py": {
+      "before_sha256": null,
+      "after_sha256": "0ac423f2e978798654c23e21944df8ca3e707bfa58777905050eb6a4b9134285"
+    }
+  },
+  "source_diff": "source_changes.patch",
+  "verification": [
+    {
+      "command": "PYTHONPATH=src:. .venv/bin/python -m pytest tests/m7/test_review_corrections.py tests/m7/test_foundation.py tests/m7/test_formats_search.py tests/m7/test_controls.py -q",
+      "passed": 56,
+      "seconds": 3.42,
+      "scope": "Foundational regressions after coherent analytic corrections."
+    },
+    {
+      "command": "PYTHONPATH=src:. .venv/bin/python -m pytest tests/m7 tests/test_pdf.py -q",
+      "passed": 63,
+      "seconds": 6.47,
+      "scope": "Affected closure, including Python/CLI/browser, cancellation, privacy, disclosure and shared PDF lifecycle."
+    },
+    {
+      "command": "PYTHONPATH=src:. .venv/bin/python -m pytest tests/m7/test_review_corrections.py tests/m7/test_interfaces.py -q",
+      "passed": 15,
+      "seconds": 6.31,
+      "scope": "Final projection/layout/interpretation changes plus new existing-model-report regression; unchanged analytics checks reused."
+    }
+  ],
+  "artifacts": "artifacts.json",
+  "final_examples": [
+    "reviewed-private-default.html",
+    "reviewed-private-default.json",
+    "reviewed-private-default.pdf",
+    "reviewed-synthetic-overlay.html",
+    "reviewed-synthetic-overlay.json",
+    "reviewed-synthetic-overlay.pdf"
+  ],
+  "final_pdf_pages_inspected": 25,
+  "synthetic_analysis_seconds": 0.9063150410074741,
+  "presentation_reused_completed_evidence": true,
+  "unchanged_shared_integration_files": [
+    "pyproject.toml",
+    "setup.py",
+    "src/datatrust/__init__.py",
+    "src/datatrust/annotations.py",
+    "src/datatrust/cli.py",
+    "src/datatrust/comparison.py",
+    "src/datatrust/contracts.py",
+    "src/datatrust/core.py",
+    "src/datatrust/distribution_effects.py",
+    "src/datatrust/ingestion.py",
+    "src/datatrust/m4_contracts.py",
+    "src/datatrust/m4_diagnostics.py",
+    "src/datatrust/m4_web.py",
+    "src/datatrust/m4_worker.py",
+    "src/datatrust/numerical.py",
+    "src/datatrust/pdf.py",
+    "src/datatrust/profiler.py",
+    "src/datatrust/renderer.py",
+    "src/datatrust/scalable.py",
+    "src/datatrust/templates/ui.html",
+    "src/datatrust/temporal_contracts.py",
+    "src/datatrust/text_contracts.py",
+    "src/datatrust/text_models.py",
+    "src/datatrust/text_normalization.py",
+    "src/datatrust/text_private.py",
+    "src/datatrust/web.py",
+    "src/datatrust/wording.py",
+    "src/datatrust/worker.py"
+  ],
+  "benchmark_ledgers_preserved": [
+    {
+      "path": "validation/m7/results/model_benchmark.json",
+      "sha256": "38859d65b4d269d8668d95d3b656354115baedb1e3f719248f07df4d9ec1b5de"
+    },
+    {
+      "path": "validation/m7/results/model_benchmark_initial.json",
+      "sha256": "875cd436a07ebef61089c613ef52537241d0c8d0db804b330a20914e12433bd7"
+    },
+    {
+      "path": "validation/m7/results/model_benchmark_natural_only.json",
+      "sha256": "20aebf5f2cf000bae49432523efa234b42bb6224f9e2f4bf65e39e602e5bafd7"
+    },
+    {
+      "path": "validation/m7/results/release/selection_closure.json",
+      "sha256": "a5cac18d487246d4c217243cd97de8be5c67d10159f895114230a4aee6846a90"
+    }
+  ],
+  "findings": {
+    "segmentation": "Confirmed; normalized captured mask identity now triggers duplicate and aligned version comparison despite an identical relative source reference. Compatibility still gates claims.",
+    "groups": "Confirmed; per-key default, explicit composite mode, typed nullable relations, named selectors and explicit namespaces. Missing keys disclose partial scope; left occurrences counted once.",
+    "embeddings": "Confirmed; exported undirected degree limited to three at each endpoint; union/endpoint/detail omissions disclosed. Deterministic greedy selection has no matching-quality guarantee.",
+    "reports": "Confirmed; consequence-based executive decisions and separate structured family tables. Strict JSON and private-default disclosure preserved.",
+    "benchmark": "Confirmed interpretation risk. Exact encoder calibration/held-out and combined pipeline metrics retained separately; the combined 89.66% precision fails the 90% target."
+  },
+  "unsupported_review_findings": [],
+  "limits": [
+    "Post-degree-cap retrieval quality is unmeasured; no improvement/preservation claim.",
+    "Original combined pipeline does not meet its held-out precision target; this correction does not change that measurement.",
+    "Historical archives, whole-corpus capacity, model inference/benchmark and native platform evidence reused without reruns."
+  ],
+  "nonfatal_warnings": [
+    "Existing pycocotools NumPy copy-keyword deprecation warnings in four checks.",
+    "Fontconfig cache-directory warnings during PDF conversion; conversion and page inspection succeeded."
+  ]
+}

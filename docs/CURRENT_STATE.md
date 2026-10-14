@@ -1,9 +1,10 @@
 # Numek Current State
 
-Last updated: 2026-10-11
+Last updated: 2026-10-13
 Product status: Classification baseline preserved; M1 shared contracts/unlabeled
-profiling, M2 regression, M3 annotation workflows, M4 comparative/scalable analysis, and M5 temporal reliability implemented.
-M1–M3 and M3’s understanding gate are accepted by the user. M4 has internal engineering verification.
+profiling, M2 regression, M3 annotation workflows, M4 comparative/scalable analysis, M5 temporal reliability, M6 text reliability intelligence, M7 image reliability intelligence and M9 cross-representation reliability implemented.
+M1–M7 completion is accepted by the user. M8 audio is deliberately deferred.
+M9 has scoped engineering evidence, without general semantic or capacity guarantees.
 Project direction: Approved DataTrust expansion architecture and nine-milestone roadmap.
 Documentation reset: Completed.
 
@@ -165,20 +166,22 @@ remain distinct from the current eight-topic reports.
 
 - CSV classification, partial annotations, multilabel indicators, multi-output regression,
   role-aware profiling, clustering/anomaly readiness, split audits and version comparisons.
-  No model-prediction analysis, longitudinal monitoring or non-tabular modalities.
+  M5 adds temporal CSV/Parquet reliability; M6 adds text CSV/JSONL reliability,
+  local references and opt-in offline language/embedding models. There is no
+  prediction-performance analysis, live longitudinal monitoring or general image/audio engine.
 - Regression has no validated overall score, sub-scores, risk band, or readiness verdict.
   Arithmetic relationships are bounded, support-qualified observations; feature
   availability is declared/unknown. General nonlinear/multifeature dependency
   mining and instrument-resolution/quantization semantics are deferred.
 - Single-user, non-persistent local UI; no hosted service, accounts, persistent
-  database or saved report history. M4 uses an owned temporary DuckDB database,
+  service database or saved report history. M4–M6 use owned temporary DuckDB databases,
   one supervised worker and explicit source/configuration reconfirmation.
   Automatic server reloading is disabled.
 - HTML/PDF/JSON in all interfaces. Word export and a demo notebook are not implemented.
 - WeasyPrint may require native font/rendering prerequisites. Default pandas
-  analysis materializes data in memory; opt-in M4/scalable analysis uses bounded
+  analysis materializes data in memory; opt-in M4 and dedicated M5/M6 analysis use bounded
   raw ingestion and disk-backed DuckDB relations, with storage and I/O costs.
-- Legacy cooperative safeguards and M4 disk/RSS/deadline supervision are not
+- Legacy cooperative safeguards and M4–M6 disk/RSS/deadline supervision are not
   hard process quotas or capacity guarantees. Native operations and monitoring
   can overshoot; source shape/cardinality and available disk constrain execution.
   See usage/methodology for per-source versus combined limits and replacement semantics.
@@ -248,8 +251,9 @@ See [M4 evidence](../validation/m4/README.md) and its result manifests.
 Review M4 thresholds, optional-statistics packaging, local-file roots and resource
 defaults against the founder's intended use. M1–M3 acceptance is settled. M4's
 internal checks do not establish external method validity or guarantee capacity.
-Default-engine replacement, time-series/modalities and prediction/model work remain
-separate future decisions.
+At that historical handoff, time-series/text work was still future scope. M5
+and M6 now implement those capabilities; default-engine replacement, later
+modalities and prediction-performance work remain separate decisions.
 The 2026-10-11 constraint, role-change and narrative corrections received source-only
 review; execution verification was not repeated for this pass.
 
@@ -260,4 +264,82 @@ M5 now exposes DataTrust.audit_temporal, `datatrust temporal`, and a dedicated l
 
 Shared changes are confined to worker supervision, private workspace phase planning, pure distribution mathematics, explicit artifact dispatch and application-level browser worker exclusion. Existing public M1–M4 inputs and classification policies remain unchanged. Read [M5 implementation and limits](M5_TEMPORAL_RELIABILITY.md) and [new verification evidence](../validation/m5/README.md). M4's earlier execution closure and subsequent source-only corrections remain separate historical evidence.
 
-Current work is the completed M5 implementation and its recorded verification. Remaining resource and threshold uncertainties are declared engineering/research limits, not claims of validated capacity or universal temporal defects. See the M5 evidence ledger for current execution, reused evidence and historical distinctions.
+M5 implementation and its recorded verification remain historical evidence. Remaining resource and threshold uncertainties are declared engineering/research limits, not claims of universal temporal defects. See the M5 evidence ledger for its execution, reused evidence and historical distinctions.
+
+## M6 delivered capability — 2026-10-11
+
+M1–M5 completion and M5’s understanding gate are accepted by the user. M6 adds
+explicit CSV/JSONL text, token/span/QA, generation, conversation and retrieval
+contracts through Python, CLI and `/text`, with canonical HTML/PDF and strict JSON.
+Required population accounting remains separate from bounded lexical, duplicate,
+passage, language and semantic investigations. Local E5-small and Lingua adapters
+work offline; Unicode and model/runtime identities are pinned.
+
+Private-default exports bind opaque references to a separate protected manifest.
+Exact local resolution, explicit bounded excerpts, integrity checks, artifact
+collisions, cache separation and owned cleanup are implemented. There is no text
+score, cloud inference or general multimodal ingestion. The four-image fixture
+checks only pairing/media/provenance.
+
+The original repository suite passed 385 tests; an additional browser cancellation
+regression also passed. Public-corpus accounting, 100 MiB/1 GiB execution, nested
+annotation, asset-heavy and model-enabled measurements are recorded under
+`validation/m6/results/`. Final presentation/browser and closure records identify
+new versus reused evidence, including visual review of all 53 representative PDF
+pages. These establish internal engineering confidence,
+not universal candidate recall or external product validation. See
+[M6 methodology](M6_TEXT_RELIABILITY.md). Historical M1–M5 evidence is preserved.
+
+The focused independent-review corrections subsequently passed **400 repository
+tests in 33.51 seconds**, including fourteen new allocation, accounting, witness,
+synthesis and unexpected-failure controls. Comparison-side reservations and
+split-aware strata replace the earlier global selection limit; embedding coverage
+qualifies endpoint shortfalls. Reprojection of completed evidence reduced the five
+representative PDFs from 53 to 39 pages, with all pages visually reviewed and all
+eight analytical topics retained. Earlier source analytics and capacity/calibration
+records remain unchanged; they do not certify the corrected allocation's capacity.
+See [correction record](../validation/m6/REVIEW_CORRECTIONS.md). Unexpected optional
+faults retain documented whole-audit atomic failure. M7 implementation is now recorded below.
+
+
+## M7 delivered capability — 2026-10-12
+
+Image Reliability Intelligence has distinct schema 1.6 contracts, secure per-file
+immutable evidence, separate assets/occurrences/annotations, explicit frame/taxonomy
+compatibility, disk-backed full signature indexing, bounded candidate search,
+opt-in offline models, private reports and guided local investigation. Required
+failures remain atomic; an isolated optional model fault can return verified
+partial core evidence. Portable disclosure requires separate explicit selection.
+
+[Methodology and interfaces](M7_IMAGE_RELIABILITY.md) and the [closure evidence](../validation/m7/README.md)
+record benchmark selection, failed model settings, measured search/media costs,
+PDF page inspection, browser execution and historical compatibility. Defaults are
+resource safeguards, not general capacity guarantees. M1–M6 behavior and historical
+artifacts remain preserved. Audio remains deferred; M9 is recorded below.
+
+## M9 delivered capability — 2026-10-13
+
+`DataTrust.audit_cross_representation()`, `cross-representation`, `cross-evidence`,
+`cross-review` and the dedicated browser workflow connect local records, text,
+native PDF/DOCX and M7 images. Reusable label/section/table recipes, exact
+identities/cardinality/context/clocks, decimal/date/unit reconciliation, competing
+evidence and declared separation/ancestry produce explainable evidence. The
+browser previews at most 20 documents, confirms frozen declarations/sources,
+inspects exact native locators and handles independent reviewer snapshots.
+
+Schema 1.7 has no score. Default HTML/PDF/JSON omit source values, claims, paths
+and notes; protected manifests resolve originals without storing a document
+corpus. Confirm/dismiss/unresolved decisions bind exact results and cannot change
+analytical counts. Pinned local CPU model profiles are narrowly qualified for
+authored financial English PDF/DOCX and supplied COCO caption associations;
+unsupported populations abstain. General natural-document accuracy is not
+established. OCR, audio/video, unrestricted verification, model monitoring and
+persistent review services are excluded.
+
+Measurements: 10,000 field reconciliations/50 native PDF pages in about 24 seconds;
+one million records/five million associations with context checks and 1,000 native
+PDF pages in about 486 seconds, 2.36 GiB peak sampled worker RSS and 2.98 GiB peak
+workspace. The latter measures association/context/extraction, not million-record
+field reconciliation. Concurrent verification load and simple authored pages
+limit extrapolation. See [M9 behavior](M9_CROSS_REPRESENTATION_RELIABILITY.md) and
+[verification](../validation/m9/README.md). Existing milestone evidence is preserved.

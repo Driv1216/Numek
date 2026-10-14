@@ -1,0 +1,109 @@
+{
+  "models": {
+    "facebook/dinov2-small": {
+      "revision": "ed25f3a31f01632728cabb09d1542f84ab7b0056",
+      "files": {
+        "config.json": {
+          "algorithm": "git_blob_sha1",
+          "digest": "5664b325e6258d3960fad8c4c1cff958f3cc2272"
+        },
+        "preprocessor_config.json": {
+          "algorithm": "git_blob_sha1",
+          "digest": "ff5b47c2edcd1d3556d63c01a65d93b58b9efce1"
+        },
+        "model.safetensors": {
+          "algorithm": "sha256",
+          "digest": "ae1e99fcefd534ed978cdeb8326f08030c96e28b7a81ffcbc98a857c84d14be1"
+        }
+      },
+      "license": "Apache-2.0",
+      "publisher_url": "https://huggingface.co/facebook/dinov2-small/tree/ed25f3a31f01632728cabb09d1542f84ab7b0056",
+      "license_identity": {
+        "spdx": "Apache-2.0",
+        "publisher_revision": "ed25f3a31f01632728cabb09d1542f84ab7b0056",
+        "model_card_git_blob_sha1": "6b3380957df44ed203ec1d5102e1245accbbbba9",
+        "model_card_url": "https://huggingface.co/facebook/dinov2-small/blob/ed25f3a31f01632728cabb09d1542f84ab7b0056/README.md"
+      }
+    },
+    "facebook/dinov2-base": {
+      "revision": "f9e44c814b77203eaa57a6bdbbd535f21ede1415",
+      "files": {
+        "config.json": {
+          "algorithm": "git_blob_sha1",
+          "digest": "5df0129f878aa42d71fa74d27a50f382d13ed71e"
+        },
+        "preprocessor_config.json": {
+          "algorithm": "git_blob_sha1",
+          "digest": "ff5b47c2edcd1d3556d63c01a65d93b58b9efce1"
+        },
+        "model.safetensors": {
+          "algorithm": "sha256",
+          "digest": "d73036b56966966d07975d696bde331762f37297e2f095de8cea0040c3aa0841"
+        }
+      },
+      "license": "Apache-2.0",
+      "publisher_url": "https://huggingface.co/facebook/dinov2-base/tree/f9e44c814b77203eaa57a6bdbbd535f21ede1415",
+      "license_identity": {
+        "spdx": "Apache-2.0",
+        "publisher_revision": "f9e44c814b77203eaa57a6bdbbd535f21ede1415",
+        "model_card_git_blob_sha1": "d3184b255c704e4613cd9bbb11ea4127b810e264",
+        "model_card_url": "https://huggingface.co/facebook/dinov2-base/blob/f9e44c814b77203eaa57a6bdbbd535f21ede1415/README.md"
+      }
+    },
+    "google/siglip-base-patch16-224": {
+      "revision": "7fd15f0689c79d79e38b1c2e2e2370a7bf2761ed",
+      "files": {
+        "config.json": {
+          "algorithm": "git_blob_sha1",
+          "digest": "54bbd19bf5ee8f3dad513be4042dfa5dd9d85f15"
+        },
+        "preprocessor_config.json": {
+          "algorithm": "git_blob_sha1",
+          "digest": "3c352ecee4198efe2f6c6ba7446892b86203ed32"
+        },
+        "model.safetensors": {
+          "algorithm": "sha256",
+          "digest": "2c63cb7d1f2e95ba501893cbb8faeb4ea9a3af295498d35097126228659c2af8"
+        }
+      },
+      "license": "Apache-2.0",
+      "publisher_url": "https://huggingface.co/google/siglip-base-patch16-224/tree/7fd15f0689c79d79e38b1c2e2e2370a7bf2761ed",
+      "license_identity": {
+        "spdx": "Apache-2.0",
+        "publisher_revision": "7fd15f0689c79d79e38b1c2e2e2370a7bf2761ed",
+        "model_card_git_blob_sha1": "b7218cf52771e4b0137327aeb8a923d3dc48dfdb",
+        "model_card_url": "https://huggingface.co/google/siglip-base-patch16-224/blob/7fd15f0689c79d79e38b1c2e2e2370a7bf2761ed/README.md"
+      }
+    }
+  },
+  "selection": {
+    "status": "passed",
+    "default": {
+      "model": "facebook/dinov2-base",
+      "threshold": 0.9958711266517639
+    },
+    "status_scope": "Pinned encoder profile only; not acceptance of the combined review pipeline."
+  },
+  "review_evidence": {
+    "encoder_calibration": {
+      "macro_recall": 0.12890625,
+      "precision": 0.9705882352941176,
+      "false_suggestions_per_100_no_copy_queries": 0.4098360655737705
+    },
+    "encoder_held_out": {
+      "macro_recall": 0.12109375,
+      "precision": 0.9393939393939394,
+      "false_suggestions_per_100_no_copy_queries": 0.819672131147541
+    },
+    "combined_pipeline_held_out": {
+      "macro_recall": 0.45703125,
+      "precision": 0.896551724137931,
+      "false_suggestions_per_100_no_copy_queries": 5.532786885245901
+    },
+    "combined_pipeline_precision_target": 0.9,
+    "combined_pipeline_precision_target_met": false,
+    "scope": "Fixed licensed/authored fixtures; original query-wise top-three protocol, not production matching quality or the later exported degree cap.",
+    "encoder_ledger": "validation/m7/results/model_benchmark.json",
+    "pipeline_ledger": "validation/m7/results/release/selection_closure.json"
+  }
+}

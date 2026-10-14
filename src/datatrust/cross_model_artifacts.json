@@ -1,0 +1,182 @@
+{
+  "models": {
+    "nli": {
+      "model": "MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli",
+      "revision": "6f5cf0a2b59cabb106aca4c287eed12e357e90eb",
+      "files": {
+        "config.json": {
+          "algorithm": "git_blob_sha1",
+          "digest": "f5ae94167b1efbea3338ba93860abddc9f0de5f3"
+        },
+        "model.safetensors": {
+          "algorithm": "sha256",
+          "digest": "06d6fd89edd4f97816831626daafbdb0b029cf63bae8edc0bccab1d64e2e7707"
+        },
+        "tokenizer_config.json": {
+          "algorithm": "git_blob_sha1",
+          "digest": "13d6406af565bd9e59dd649afd4c2b48bddb6a4c"
+        },
+        "spm.model": {
+          "algorithm": "sha256",
+          "digest": "c679fbf93643d19aab7ee10c0b99e460bdbc02fedf34b92b05af343b4af586fd"
+        }
+      },
+      "license": "mit",
+      "model_card": "c9e9b0d4233641b89a5e612e55c59c68b66a0e97"
+    },
+    "image_text": {
+      "model": "google/siglip-base-patch16-224",
+      "revision": "7fd15f0689c79d79e38b1c2e2e2370a7bf2761ed",
+      "files": {
+        "config.json": {
+          "algorithm": "git_blob_sha1",
+          "digest": "54bbd19bf5ee8f3dad513be4042dfa5dd9d85f15"
+        },
+        "preprocessor_config.json": {
+          "algorithm": "git_blob_sha1",
+          "digest": "3c352ecee4198efe2f6c6ba7446892b86203ed32"
+        },
+        "model.safetensors": {
+          "algorithm": "sha256",
+          "digest": "2c63cb7d1f2e95ba501893cbb8faeb4ea9a3af295498d35097126228659c2af8"
+        },
+        "tokenizer_config.json": {
+          "algorithm": "git_blob_sha1",
+          "digest": "70741c5c1f6d21423ebf51ee77ef2fce868c33f2"
+        },
+        "special_tokens_map.json": {
+          "algorithm": "git_blob_sha1",
+          "digest": "6555f2261d409dea394d6b6973129a53b8725803"
+        },
+        "spiece.model": {
+          "algorithm": "sha256",
+          "digest": "1e5036bed065526c3c212dfbe288752391797c4bb1a284aa18c9a0b23fcaf8ec"
+        }
+      },
+      "license": "apache-2.0",
+      "model_card": "b7218cf52771e4b0137327aeb8a923d3dc48dfdb"
+    }
+  },
+  "qualification": {
+    "nli": {
+      "status": "passed",
+      "algorithm_identity": "b639f4daf82e9f60718ae4b310cbef93ffd24005e4d3b7a0ebdc5d56b0e47de6",
+      "revision": "6f5cf0a2b59cabb106aca4c287eed12e357e90eb",
+      "threshold": 0.8,
+      "margin": 0.1,
+      "scope": "Authored native PDF/DOCX English financial declarations; not external methodology validation.",
+      "ledger": "validation/m9/results/text_qualification.json",
+      "held_out": {
+        "counts": {
+          "support_support": 200,
+          "insufficient_abstained": 200,
+          "contradiction_contradiction": 200
+        },
+        "total": 600,
+        "assessed": 600,
+        "unexamined": 0,
+        "threshold": 0.8,
+        "margin": 0.1,
+        "support": {
+          "correct": 200,
+          "emitted": 200,
+          "eligible": 200,
+          "precision": 1.0,
+          "recall": 1.0
+        },
+        "contradiction": {
+          "correct": 200,
+          "emitted": 200,
+          "eligible": 200,
+          "precision": 1.0,
+          "recall": 1.0
+        },
+        "abstention": 0.3333333333333333,
+        "false_findings_on_insufficient": 0
+      },
+      "limits": {
+        "inputs": 64,
+        "declarations": 128,
+        "associations": 10000000,
+        "documents": 1000,
+        "pages": 10000,
+        "document_bytes": 134217728,
+        "expanded_docx_bytes": 268435456,
+        "xml_bytes": 16777216,
+        "zip_members": 10000,
+        "characters": 50000000,
+        "candidates": 100,
+        "tables": 100,
+        "region_chars": 10000,
+        "discovery_visits": 100000000,
+        "pattern_seconds": 0.05,
+        "details": 100,
+        "witnesses": 5,
+        "private_bytes": 67108864,
+        "claims": 2000,
+        "evidence_candidates": 5,
+        "image_pairs": 2000,
+        "model_seconds": 600,
+        "image_assets": 100000,
+        "image_pixels": 100000000000,
+        "image_media_bytes": 137438953472,
+        "image_media_per_input_bytes": 68719476736,
+        "tokenizer_bytes": 67108864,
+        "tokenizer_tokens": 1000000
+      },
+      "eligible_layouts": [
+        "finance",
+        "financial_evidence_v1"
+      ],
+      "eligible_mapping_kinds": [
+        "label_value",
+        "text"
+      ],
+      "qualification_reuse": {
+        "evaluated_algorithm_identity": "40b21ac3dde4fb7c572f43bc803791aa354c36306e44e727ae124da9c0dbcbe0",
+        "current_algorithm_identity": "b639f4daf82e9f60718ae4b310cbef93ffd24005e4d3b7a0ebdc5d56b0e47de6",
+        "change": "Added bounded structural witnesses, separate document/text and image overlap diagnostics, and human presentation. Native extraction, contextual reconciliation, semantic claim selection, retrieval, tokenizer, adapters, artifact identities, thresholds and qualified profiles are unchanged.",
+        "basis": "Authoritative Verification skill section 7 and user-directed focused correction pass. Source comparison against the preserved prior inspection ZIP confirmed unchanged semantic files/functions and selection block; focused native financial reconciliation and correction tests passed. No new benchmark or resource measurement.",
+        "previous_algorithm_identity": "7feb987e5ce6c419ed60be68eac4b6b20b98f1dd5a9f69ba4f6ef458f547e6f6",
+        "focused_evidence": "validation/m9/README.md#final-targeted-corrections-2026-10-13",
+        "prior_reuse_record": "validation/m9/results/qualification_reuse.json"
+      }
+    },
+    "image_text": {
+      "status": "passed",
+      "algorithm_identity": "b639f4daf82e9f60718ae4b310cbef93ffd24005e4d3b7a0ebdc5d56b0e47de6",
+      "revision": "7fd15f0689c79d79e38b1c2e2e2370a7bf2761ed",
+      "threshold": -9.825647354125977,
+      "scope": "Pinned COCO supplied captions and planted association swaps; caption truth and external validity are not established.",
+      "eligible_layouts": [
+        "coco_captions_v1"
+      ],
+      "eligible_mapping_kinds": [
+        "field"
+      ],
+      "held_out": {
+        "counts": {
+          "swap_flag": 235,
+          "correct_clear": 234,
+          "correct_flag": 1
+        },
+        "precision": 0.9957627118644068,
+        "recall": 1.0,
+        "correct_associations": 235,
+        "planted_swaps": 235,
+        "unexamined": 0,
+        "threshold": -9.825647354125977
+      },
+      "ledger": "validation/m9/results/image_qualification.json",
+      "qualification_reuse": {
+        "evaluated_algorithm_identity": "40b21ac3dde4fb7c572f43bc803791aa354c36306e44e727ae124da9c0dbcbe0",
+        "current_algorithm_identity": "b639f4daf82e9f60718ae4b310cbef93ffd24005e4d3b7a0ebdc5d56b0e47de6",
+        "change": "Added bounded structural witnesses, separate document/text and image overlap diagnostics, and human presentation. Native extraction, contextual reconciliation, semantic claim selection, retrieval, tokenizer, adapters, artifact identities, thresholds and qualified profiles are unchanged.",
+        "basis": "Authoritative Verification skill section 7 and user-directed focused correction pass. Source comparison against the preserved prior inspection ZIP confirmed unchanged semantic files/functions and selection block; focused native financial reconciliation and correction tests passed. No new benchmark or resource measurement.",
+        "previous_algorithm_identity": "7feb987e5ce6c419ed60be68eac4b6b20b98f1dd5a9f69ba4f6ef458f547e6f6",
+        "focused_evidence": "validation/m9/README.md#final-targeted-corrections-2026-10-13",
+        "prior_reuse_record": "validation/m9/results/qualification_reuse.json"
+      }
+    }
+  }
+}

@@ -18,11 +18,19 @@ dependencies = [
   "duckdb>=1.5.6,<1.6",
   "psutil>=5.9",
   "tzdata>=2025.2",
+  "unicodedataplus==16.0.0.post1",
+  "regex==2024.11.6",
 ]
 
 [project.optional-dependencies]
+documents = ["pdfplumber==0.11.9", "python-docx==1.2.0"]
+cross-models = ["torch==2.8.0", "transformers==4.57.1", "tokenizers==0.22.1", "safetensors==0.6.2", "sentencepiece==0.2.1", "protobuf==6.33.5"]
+images = ["Pillow==12.3.0", "ijson==3.4.0.post0", "PyYAML==6.0.3", "pycocotools==2.0.10"]
+image-embeddings = ["torch==2.8.0", "transformers==4.57.1", "tokenizers==0.22.1", "safetensors==0.6.2"]
 parquet = ["pyarrow>=19,<26"]
 statistics = ["scipy>=1.10,<2"]
+text-language = ["lingua-language-detector==2.1.1"]
+text-embeddings = ["torch==2.8.0", "transformers==4.57.1", "tokenizers==0.22.1", "safetensors==0.6.2"]
 dev = [
   "pypdf>=6,<7",
   "pytest>=7.0",
@@ -35,4 +43,4 @@ datatrust = "datatrust.cli:main"
 where = ["src"]
 
 [tool.setuptools.package-data]
-datatrust = ["templates/*.html"]
+datatrust = ["templates/*.html", "text_search_profile.json", "text_model_artifacts.json", "image_model_artifacts.json", "cross_model_artifacts.json"]

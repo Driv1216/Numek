@@ -1,0 +1,1646 @@
+{
+  "schema_version": "1.6",
+  "methodology_id": "image_reliability_v1",
+  "profile": {
+    "audit_id": "cf8a88d159c647a1927dfe4668abbc7e",
+    "occurrences": 128,
+    "source_count": 1,
+    "image_locations": 128,
+    "dataset_name": "Multilabel image evidence",
+    "purpose": null,
+    "summary": "0 evidence-qualified findings across 128 image occurrences; completed execution.",
+    "private_manifest_sha256": "0b73b734189992eb04ad538263ff30ae4ecbb1abfffe30c3d5c9a5db3627468e",
+    "examples": [],
+    "disclosure": {
+      "policy": "references_only",
+      "references": [],
+      "overlays": false,
+      "labels": false,
+      "encoded_bytes": 0
+    },
+    "export_identity": {
+      "completed_evidence_sha256": "033ab0f4d3eb96d6b8aa5f7fef1231f2df8dfb1e4f058f89febde8dcdea25487",
+      "disclosure_sha256": "a3d27be032354ccd292944dd216801e1e5d73182e86dd816b76b77e5707d2425",
+      "example_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "template_sha256": "0c5d930f3f2e2b390e49a27637a24193bb59a7bdfa8ecff39ad6381581dcf029",
+      "projection_sha256": "957c94acd18e8532678443c600aa72a50e668a26af56ac6875e8a1a59b58ae60"
+    }
+  },
+  "checks": [
+    {
+      "id": "image_e1",
+      "family": "inventory",
+      "applicability": "applicable",
+      "execution": "completed",
+      "scope": "full_population",
+      "violations": 0
+    },
+    {
+      "id": "image_e2",
+      "family": "decode",
+      "applicability": "applicable",
+      "execution": "completed",
+      "scope": "full_population",
+      "violations": 0
+    },
+    {
+      "id": "image_e3",
+      "family": "visual_quality",
+      "applicability": "applicable",
+      "execution": "completed",
+      "scope": "full_population",
+      "violations": 0
+    },
+    {
+      "id": "image_e4",
+      "family": "annotations",
+      "applicability": "applicable",
+      "execution": "completed",
+      "scope": "full_population",
+      "violations": 0
+    },
+    {
+      "id": "image_e5",
+      "family": "composition",
+      "applicability": "applicable",
+      "execution": "completed",
+      "scope": "full_population",
+      "violations": 0
+    },
+    {
+      "id": "image_e6",
+      "family": "multilabel_composition",
+      "applicability": "applicable",
+      "execution": "completed",
+      "scope": "bounded",
+      "violations": 0
+    },
+    {
+      "id": "image_e7",
+      "family": "exact_duplicates_bytes",
+      "applicability": "applicable",
+      "execution": "completed",
+      "scope": "full_population",
+      "violations": 0
+    },
+    {
+      "id": "image_e8",
+      "family": "exact_duplicates_native",
+      "applicability": "applicable",
+      "execution": "completed",
+      "scope": "full_population",
+      "violations": 0
+    },
+    {
+      "id": "image_e9",
+      "family": "exact_duplicates_oriented",
+      "applicability": "applicable",
+      "execution": "completed",
+      "scope": "full_population",
+      "violations": 0
+    },
+    {
+      "id": "image_e10",
+      "family": "annotation_disagreement",
+      "applicability": "applicable",
+      "execution": "completed",
+      "scope": "full_population",
+      "violations": 0
+    },
+    {
+      "id": "image_e11",
+      "family": "logical_identity",
+      "applicability": "applicable",
+      "execution": "completed",
+      "scope": "full_population",
+      "violations": 0
+    },
+    {
+      "id": "image_e12",
+      "family": "near_duplicates",
+      "applicability": "applicable",
+      "execution": "completed",
+      "scope": "bounded",
+      "violations": 0
+    }
+  ],
+  "evidence": [
+    {
+      "id": "image_e1",
+      "family": "inventory",
+      "meaning": "deterministic_fact",
+      "data": {
+        "occurrences": 128,
+        "directory_entries": 0,
+        "image_locations": 128,
+        "physical_media_files": 128,
+        "physical_alias_locations": 0,
+        "source_populations": [
+          {
+            "source": "source_1",
+            "role": "dataset",
+            "occurrences": 128
+          }
+        ],
+        "logical_media_bytes": 20506573,
+        "metadata_bytes": 8565
+      },
+      "references": [],
+      "scope": "full_population"
+    },
+    {
+      "id": "image_e2",
+      "family": "decode",
+      "meaning": "deterministic_fact",
+      "data": {
+        "asset_states": {
+          "decoded": 128
+        },
+        "format_extension_mismatches": 0,
+        "encoded_formats": {
+          "JPEG": 128
+        },
+        "modes": {
+          "RGB": 128
+        },
+        "decoded_pixels": 35236540,
+        "dimensions_observed": 128,
+        "frame_policy": "single frame only"
+      },
+      "references": [],
+      "scope": "full_population"
+    },
+    {
+      "id": "image_e3",
+      "family": "visual_quality",
+      "meaning": "contextual_observation",
+      "data": {
+        "eligible_assets": 67,
+        "exclusions": {
+          "decoded": 0,
+          "icc_profile": 61
+        },
+        "metrics": {
+          "contrast": {
+            "population": 67,
+            "minimum": 0.0688931724252834,
+            "median": 0.24393922115119365,
+            "maximum": 0.34001740537389136
+          },
+          "mean_luminance": {
+            "population": 67,
+            "minimum": 0.22550425098039217,
+            "median": 0.47632461072664356,
+            "maximum": 0.7149799222260519
+          },
+          "dark_fraction": {
+            "population": 67,
+            "minimum": 0.0,
+            "median": 0.010829866486068112,
+            "maximum": 0.195068359375
+          },
+          "bright_fraction": {
+            "population": 67,
+            "minimum": 0.0,
+            "median": 0.010798136393229166,
+            "maximum": 0.32954133333333335
+          },
+          "entropy": {
+            "population": 67,
+            "minimum": 4.784430997336051,
+            "median": 7.481409339023346,
+            "maximum": 7.880779580474931
+          },
+          "sharpness": {
+            "population": 67,
+            "minimum": 0.002173632075435273,
+            "median": 0.025498529587112743,
+            "maximum": 0.14138948936012613
+          },
+          "width": {
+            "population": 128,
+            "minimum": 240,
+            "maximum": 640
+          },
+          "height": {
+            "population": 128,
+            "minimum": 189,
+            "maximum": 640
+          }
+        },
+        "representation": "oriented opaque RGB; preview longest side 512; no arbitrary ICC conversion",
+        "quality_score": null
+      },
+      "references": [],
+      "scope": "full_population"
+    },
+    {
+      "id": "image_e4",
+      "family": "annotations",
+      "meaning": "deterministic_fact",
+      "data": {
+        "occurrence_states": {
+          "observed": 126,
+          "empty": 2
+        },
+        "validity": {
+          "valid": 128
+        },
+        "blocked_geometric_checks": {},
+        "supplied_status": {
+          "unknown": 128
+        },
+        "invalidity_reasons": {},
+        "normalized_occurrences": 128,
+        "object_visits": 0,
+        "mask_pixels": 0,
+        "segmentation_raster_pixels": 0
+      },
+      "references": [],
+      "scope": "full_population"
+    },
+    {
+      "id": "image_e5",
+      "family": "composition",
+      "meaning": "contextual_observation",
+      "data": {
+        "categories": [
+          {
+            "category": "category_7bdd707933486ce9f10be370",
+            "annotation_occurrences": 67
+          },
+          {
+            "category": "category_0e48c994f9c9889185c51878",
+            "annotation_occurrences": 16
+          },
+          {
+            "category": "category_f03e92333e315896606cdea1",
+            "annotation_occurrences": 16
+          },
+          {
+            "category": "category_f23abae7a8e4d731a34d06ae",
+            "annotation_occurrences": 11
+          },
+          {
+            "category": "category_59ab528a190e9b43bb465eb3",
+            "annotation_occurrences": 10
+          },
+          {
+            "category": "category_b59008b426e14f4223188696",
+            "annotation_occurrences": 9
+          },
+          {
+            "category": "category_d3ced54082b302eed460fe33",
+            "annotation_occurrences": 9
+          },
+          {
+            "category": "category_4080d48e206247f20bf2937c",
+            "annotation_occurrences": 9
+          },
+          {
+            "category": "category_5db9f8df146fee6449e20888",
+            "annotation_occurrences": 9
+          },
+          {
+            "category": "category_f9156d551ad236c1e0dde984",
+            "annotation_occurrences": 8
+          },
+          {
+            "category": "category_99c0159b75b1ff5e1976a4f6",
+            "annotation_occurrences": 7
+          },
+          {
+            "category": "category_dbb732416ef7c46cf02afa6b",
+            "annotation_occurrences": 7
+          },
+          {
+            "category": "category_c11ad5947771d9854d72871f",
+            "annotation_occurrences": 6
+          },
+          {
+            "category": "category_6b5be0bbb1d4703969b3a8ab",
+            "annotation_occurrences": 6
+          },
+          {
+            "category": "category_2142df6f0e90be54387ac8de",
+            "annotation_occurrences": 5
+          },
+          {
+            "category": "category_ac0d70be20f143e5757569f1",
+            "annotation_occurrences": 5
+          },
+          {
+            "category": "category_9f5913584686893dc1150f83",
+            "annotation_occurrences": 5
+          },
+          {
+            "category": "category_e8e2447887f5cb9ee40a4294",
+            "annotation_occurrences": 5
+          },
+          {
+            "category": "category_e37ce0315ee23a6f3d9ceb1f",
+            "annotation_occurrences": 5
+          },
+          {
+            "category": "category_84f1e1256e55c14c5aa744da",
+            "annotation_occurrences": 5
+          },
+          {
+            "category": "category_03e23933ff09548a1d2de9ac",
+            "annotation_occurrences": 5
+          },
+          {
+            "category": "category_7998e2b19eff1958595e00af",
+            "annotation_occurrences": 5
+          },
+          {
+            "category": "category_0f54f78982fae7990825f48f",
+            "annotation_occurrences": 5
+          },
+          {
+            "category": "category_8124d94b31bdfa3caa00025c",
+            "annotation_occurrences": 4
+          },
+          {
+            "category": "category_884fbfb690ae0c0d522b565f",
+            "annotation_occurrences": 4
+          },
+          {
+            "category": "category_7476abdc1e9f70ed0f33ded1",
+            "annotation_occurrences": 4
+          },
+          {
+            "category": "category_016a2a857798b9101730cacd",
+            "annotation_occurrences": 4
+          },
+          {
+            "category": "category_980d8d7267c6eab6d4e367e2",
+            "annotation_occurrences": 4
+          },
+          {
+            "category": "category_c69596aecc57f0f03f444a7b",
+            "annotation_occurrences": 4
+          },
+          {
+            "category": "category_9dc5c8fb81b0eaa5f0d00a48",
+            "annotation_occurrences": 4
+          },
+          {
+            "category": "category_7cd1b66ce0fd787ed51c0a82",
+            "annotation_occurrences": 4
+          },
+          {
+            "category": "category_f270c90669d35b59809860eb",
+            "annotation_occurrences": 4
+          },
+          {
+            "category": "category_e508966bc87b17f15314bda3",
+            "annotation_occurrences": 4
+          },
+          {
+            "category": "category_c8c22aabc6d0203cef4d9734",
+            "annotation_occurrences": 4
+          },
+          {
+            "category": "category_4c5cfd0310202a0cbb30f43f",
+            "annotation_occurrences": 3
+          },
+          {
+            "category": "category_e750b42f5f3a353907a62e33",
+            "annotation_occurrences": 3
+          },
+          {
+            "category": "category_620e652d6384f75cef913d1a",
+            "annotation_occurrences": 3
+          },
+          {
+            "category": "category_ee66b83fee525cc23b0f7bc0",
+            "annotation_occurrences": 3
+          },
+          {
+            "category": "category_7aa611e0122bb5d068cd13f3",
+            "annotation_occurrences": 3
+          },
+          {
+            "category": "category_5630043be1b5a98244d95592",
+            "annotation_occurrences": 3
+          },
+          {
+            "category": "category_0d12e3479e9500e91a618c83",
+            "annotation_occurrences": 2
+          },
+          {
+            "category": "category_04fe861d7114bc76d2b099d3",
+            "annotation_occurrences": 2
+          },
+          {
+            "category": "category_e1e68a15a46967bb7c71ad92",
+            "annotation_occurrences": 2
+          },
+          {
+            "category": "category_a2c214eefcf3a498d3b5c474",
+            "annotation_occurrences": 2
+          },
+          {
+            "category": "category_557e2ed49b56dd843d65697a",
+            "annotation_occurrences": 2
+          },
+          {
+            "category": "category_9f8c9badbab41ef1ce0b46bc",
+            "annotation_occurrences": 2
+          },
+          {
+            "category": "category_8fd3a7ac37eb37110d9e36c0",
+            "annotation_occurrences": 2
+          },
+          {
+            "category": "category_c3646bfef33580850d01514a",
+            "annotation_occurrences": 2
+          },
+          {
+            "category": "category_745470d06f54e80bf77114cb",
+            "annotation_occurrences": 2
+          },
+          {
+            "category": "category_bcb70cdc564c3a187f88fa97",
+            "annotation_occurrences": 2
+          },
+          {
+            "category": "category_b989ec5d86321cff27ec3db7",
+            "annotation_occurrences": 2
+          },
+          {
+            "category": "category_40ba11da2532f452aecdccd9",
+            "annotation_occurrences": 2
+          },
+          {
+            "category": "category_efdf2c4f083c2ecb17469270",
+            "annotation_occurrences": 2
+          },
+          {
+            "category": "category_f64a937f12a7b5f07f06275a",
+            "annotation_occurrences": 2
+          },
+          {
+            "category": "category_f31344339937c615dda609e9",
+            "annotation_occurrences": 2
+          },
+          {
+            "category": "category_d9998e2d469c8af9377a4f1e",
+            "annotation_occurrences": 2
+          },
+          {
+            "category": "category_f49f7a905ef74778e255a9f3",
+            "annotation_occurrences": 2
+          },
+          {
+            "category": "category_de09f655b4027b43291e2fb4",
+            "annotation_occurrences": 2
+          },
+          {
+            "category": "category_94aa27024b40daa80349817a",
+            "annotation_occurrences": 2
+          },
+          {
+            "category": "category_c3e6c03de33a846db1bea2db",
+            "annotation_occurrences": 2
+          },
+          {
+            "category": "category_fe66d63200480285614cd4de",
+            "annotation_occurrences": 1
+          },
+          {
+            "category": "category_2e1fd2f03cd1019fcbe2a828",
+            "annotation_occurrences": 1
+          },
+          {
+            "category": "category_9495a23afaa281a0c9e7a886",
+            "annotation_occurrences": 1
+          },
+          {
+            "category": "category_eaa68913f64fd9b0b254a65c",
+            "annotation_occurrences": 1
+          },
+          {
+            "category": "category_325eb56021586539bfd5d664",
+            "annotation_occurrences": 1
+          },
+          {
+            "category": "category_acf3e964213d6568250e842f",
+            "annotation_occurrences": 1
+          },
+          {
+            "category": "category_0e146eaec310d471590b3378",
+            "annotation_occurrences": 1
+          },
+          {
+            "category": "category_88b8a0244af96bba83883c26",
+            "annotation_occurrences": 1
+          },
+          {
+            "category": "category_ab59b5bae8979f0cb375b34b",
+            "annotation_occurrences": 1
+          },
+          {
+            "category": "category_a251bd08d293941e966d1dad",
+            "annotation_occurrences": 1
+          },
+          {
+            "category": "category_57e033cda1795123a56e536b",
+            "annotation_occurrences": 1
+          },
+          {
+            "category": "category_f4baaaf2d50d6b757e28eacc",
+            "annotation_occurrences": 1
+          }
+        ],
+        "distinct_categories": 72,
+        "category_detail_omissions": 0,
+        "label_cardinality": {
+          "1": 31,
+          "4": 17,
+          "2": 42,
+          "7": 4,
+          "3": 19,
+          "6": 6,
+          "11": 1,
+          "0": 2,
+          "5": 5,
+          "9": 1
+        },
+        "splits": [
+          {
+            "split": "split_cf8784422201a8b58df5afce",
+            "occurrences": 128
+          }
+        ],
+        "box_area": {
+          "population": 0,
+          "minimum": null,
+          "maximum": null,
+          "median": null
+        },
+        "crowd_objects": 0
+      },
+      "references": [],
+      "scope": "full_population"
+    },
+    {
+      "id": "image_e6",
+      "family": "multilabel_composition",
+      "meaning": "contextual_observation",
+      "data": {
+        "pairs": [
+          {
+            "left": "category_7bdd707933486ce9f10be370",
+            "right": "category_0e48c994f9c9889185c51878",
+            "both_present": 11,
+            "complete_annotation_population": 128
+          },
+          {
+            "left": "category_7bdd707933486ce9f10be370",
+            "right": "category_f03e92333e315896606cdea1",
+            "both_present": 9,
+            "complete_annotation_population": 128
+          },
+          {
+            "left": "category_7bdd707933486ce9f10be370",
+            "right": "category_f23abae7a8e4d731a34d06ae",
+            "both_present": 7,
+            "complete_annotation_population": 128
+          },
+          {
+            "left": "category_7bdd707933486ce9f10be370",
+            "right": "category_59ab528a190e9b43bb465eb3",
+            "both_present": 6,
+            "complete_annotation_population": 128
+          },
+          {
+            "left": "category_7bdd707933486ce9f10be370",
+            "right": "category_4080d48e206247f20bf2937c",
+            "both_present": 3,
+            "complete_annotation_population": 128
+          },
+          {
+            "left": "category_7bdd707933486ce9f10be370",
+            "right": "category_b59008b426e14f4223188696",
+            "both_present": 8,
+            "complete_annotation_population": 128
+          },
+          {
+            "left": "category_7bdd707933486ce9f10be370",
+            "right": "category_5db9f8df146fee6449e20888",
+            "both_present": 7,
+            "complete_annotation_population": 128
+          },
+          {
+            "left": "category_7bdd707933486ce9f10be370",
+            "right": "category_d3ced54082b302eed460fe33",
+            "both_present": 6,
+            "complete_annotation_population": 128
+          },
+          {
+            "left": "category_7bdd707933486ce9f10be370",
+            "right": "category_f9156d551ad236c1e0dde984",
+            "both_present": 4,
+            "complete_annotation_population": 128
+          },
+          {
+            "left": "category_7bdd707933486ce9f10be370",
+            "right": "category_dbb732416ef7c46cf02afa6b",
+            "both_present": 4,
+            "complete_annotation_population": 128
+          },
+          {
+            "left": "category_7bdd707933486ce9f10be370",
+            "right": "category_99c0159b75b1ff5e1976a4f6",
+            "both_present": 4,
+            "complete_annotation_population": 128
+          },
+          {
+            "left": "category_7bdd707933486ce9f10be370",
+            "right": "category_c11ad5947771d9854d72871f",
+            "both_present": 2,
+            "complete_annotation_population": 128
+          },
+          {
+            "left": "category_7bdd707933486ce9f10be370",
+            "right": "category_6b5be0bbb1d4703969b3a8ab",
+            "both_present": 5,
+            "complete_annotation_population": 128
+          },
+          {
+            "left": "category_7bdd707933486ce9f10be370",
+            "right": "category_2142df6f0e90be54387ac8de",
+            "both_present": 5,
+            "complete_annotation_population": 128
+          },
+          {
+            "left": "category_7bdd707933486ce9f10be370",
+            "right": "category_ac0d70be20f143e5757569f1",
+            "both_present": 5,
+            "complete_annotation_population": 128
+          },
+          {
+            "left": "category_7bdd707933486ce9f10be370",
+            "right": "category_03e23933ff09548a1d2de9ac",
+            "both_present": 5,
+            "complete_annotation_population": 128
+          },
+          {
+            "left": "category_7bdd707933486ce9f10be370",
+            "right": "category_e37ce0315ee23a6f3d9ceb1f",
+            "both_present": 4,
+            "complete_annotation_population": 128
+          },
+          {
+            "left": "category_7bdd707933486ce9f10be370",
+            "right": "category_7998e2b19eff1958595e00af",
+            "both_present": 5,
+            "complete_annotation_population": 128
+          },
+          {
+            "left": "category_7bdd707933486ce9f10be370",
+            "right": "category_84f1e1256e55c14c5aa744da",
+            "both_present": 3,
+            "complete_annotation_population": 128
+          },
+          {
+            "left": "category_7bdd707933486ce9f10be370",
+            "right": "category_e8e2447887f5cb9ee40a4294",
+            "both_present": 2,
+            "complete_annotation_population": 128
+          },
+          {
+            "left": "category_7bdd707933486ce9f10be370",
+            "right": "category_9f5913584686893dc1150f83",
+            "both_present": 0,
+            "complete_annotation_population": 128
+          },
+          {
+            "left": "category_7bdd707933486ce9f10be370",
+            "right": "category_0f54f78982fae7990825f48f",
+            "both_present": 5,
+            "complete_annotation_population": 128
+          },
+          {
+            "left": "category_7bdd707933486ce9f10be370",
+            "right": "category_c69596aecc57f0f03f444a7b",
+            "both_present": 3,
+            "complete_annotation_population": 128
+          },
+          {
+            "left": "category_7bdd707933486ce9f10be370",
+            "right": "category_7476abdc1e9f70ed0f33ded1",
+            "both_present": 4,
+            "complete_annotation_population": 128
+          },
+          {
+            "left": "category_7bdd707933486ce9f10be370",
+            "right": "category_9dc5c8fb81b0eaa5f0d00a48",
+            "both_present": 4,
+            "complete_annotation_population": 128
+          },
+          {
+            "left": "category_7bdd707933486ce9f10be370",
+            "right": "category_884fbfb690ae0c0d522b565f",
+            "both_present": 3,
+            "complete_annotation_population": 128
+          },
+          {
+            "left": "category_7bdd707933486ce9f10be370",
+            "right": "category_7cd1b66ce0fd787ed51c0a82",
+            "both_present": 0,
+            "complete_annotation_population": 128
+          },
+          {
+            "left": "category_7bdd707933486ce9f10be370",
+            "right": "category_8124d94b31bdfa3caa00025c",
+            "both_present": 2,
+            "complete_annotation_population": 128
+          },
+          {
+            "left": "category_7bdd707933486ce9f10be370",
+            "right": "category_016a2a857798b9101730cacd",
+            "both_present": 0,
+            "complete_annotation_population": 128
+          },
+          {
+            "left": "category_7bdd707933486ce9f10be370",
+            "right": "category_980d8d7267c6eab6d4e367e2",
+            "both_present": 1,
+            "complete_annotation_population": 128
+          },
+          {
+            "left": "category_7bdd707933486ce9f10be370",
+            "right": "category_f270c90669d35b59809860eb",
+            "both_present": 3,
+            "complete_annotation_population": 128
+          },
+          {
+            "left": "category_0e48c994f9c9889185c51878",
+            "right": "category_f03e92333e315896606cdea1",
+            "both_present": 9,
+            "complete_annotation_population": 128
+          },
+          {
+            "left": "category_0e48c994f9c9889185c51878",
+            "right": "category_f23abae7a8e4d731a34d06ae",
+            "both_present": 0,
+            "complete_annotation_population": 128
+          },
+          {
+            "left": "category_0e48c994f9c9889185c51878",
+            "right": "category_59ab528a190e9b43bb465eb3",
+            "both_present": 1,
+            "complete_annotation_population": 128
+          },
+          {
+            "left": "category_0e48c994f9c9889185c51878",
+            "right": "category_4080d48e206247f20bf2937c",
+            "both_present": 1,
+            "complete_annotation_population": 128
+          },
+          {
+            "left": "category_0e48c994f9c9889185c51878",
+            "right": "category_b59008b426e14f4223188696",
+            "both_present": 2,
+            "complete_annotation_population": 128
+          },
+          {
+            "left": "category_0e48c994f9c9889185c51878",
+            "right": "category_5db9f8df146fee6449e20888",
+            "both_present": 3,
+            "complete_annotation_population": 128
+          },
+          {
+            "left": "category_0e48c994f9c9889185c51878",
+            "right": "category_d3ced54082b302eed460fe33",
+            "both_present": 5,
+            "complete_annotation_population": 128
+          },
+          {
+            "left": "category_0e48c994f9c9889185c51878",
+            "right": "category_f9156d551ad236c1e0dde984",
+            "both_present": 4,
+            "complete_annotation_population": 128
+          },
+          {
+            "left": "category_0e48c994f9c9889185c51878",
+            "right": "category_dbb732416ef7c46cf02afa6b",
+            "both_present": 3,
+            "complete_annotation_population": 128
+          },
+          {
+            "left": "category_0e48c994f9c9889185c51878",
+            "right": "category_99c0159b75b1ff5e1976a4f6",
+            "both_present": 0,
+            "complete_annotation_population": 128
+          },
+          {
+            "left": "category_0e48c994f9c9889185c51878",
+            "right": "category_c11ad5947771d9854d72871f",
+            "both_present": 0,
+            "complete_annotation_population": 128
+          },
+          {
+            "left": "category_0e48c994f9c9889185c51878",
+            "right": "category_6b5be0bbb1d4703969b3a8ab",
+            "both_present": 2,
+            "complete_annotation_population": 128
+          },
+          {
+            "left": "category_0e48c994f9c9889185c51878",
+            "right": "category_2142df6f0e90be54387ac8de",
+            "both_present": 1,
+            "complete_annotation_population": 128
+          },
+          {
+            "left": "category_0e48c994f9c9889185c51878",
+            "right": "category_ac0d70be20f143e5757569f1",
+            "both_present": 0,
+            "complete_annotation_population": 128
+          },
+          {
+            "left": "category_0e48c994f9c9889185c51878",
+            "right": "category_03e23933ff09548a1d2de9ac",
+            "both_present": 0,
+            "complete_annotation_population": 128
+          },
+          {
+            "left": "category_0e48c994f9c9889185c51878",
+            "right": "category_e37ce0315ee23a6f3d9ceb1f",
+            "both_present": 0,
+            "complete_annotation_population": 128
+          },
+          {
+            "left": "category_0e48c994f9c9889185c51878",
+            "right": "category_7998e2b19eff1958595e00af",
+            "both_present": 0,
+            "complete_annotation_population": 128
+          },
+          {
+            "left": "category_0e48c994f9c9889185c51878",
+            "right": "category_84f1e1256e55c14c5aa744da",
+            "both_present": 2,
+            "complete_annotation_population": 128
+          },
+          {
+            "left": "category_0e48c994f9c9889185c51878",
+            "right": "category_e8e2447887f5cb9ee40a4294",
+            "both_present": 1,
+            "complete_annotation_population": 128
+          },
+          {
+            "left": "category_0e48c994f9c9889185c51878",
+            "right": "category_9f5913584686893dc1150f83",
+            "both_present": 1,
+            "complete_annotation_population": 128
+          },
+          {
+            "left": "category_0e48c994f9c9889185c51878",
+            "right": "category_0f54f78982fae7990825f48f",
+            "both_present": 3,
+            "complete_annotation_population": 128
+          },
+          {
+            "left": "category_0e48c994f9c9889185c51878",
+            "right": "category_c69596aecc57f0f03f444a7b",
+            "both_present": 2,
+            "complete_annotation_population": 128
+          },
+          {
+            "left": "category_0e48c994f9c9889185c51878",
+            "right": "category_7476abdc1e9f70ed0f33ded1",
+            "both_present": 1,
+            "complete_annotation_population": 128
+          },
+          {
+            "left": "category_0e48c994f9c9889185c51878",
+            "right": "category_9dc5c8fb81b0eaa5f0d00a48",
+            "both_present": 0,
+            "complete_annotation_population": 128
+          },
+          {
+            "left": "category_0e48c994f9c9889185c51878",
+            "right": "category_884fbfb690ae0c0d522b565f",
+            "both_present": 2,
+            "complete_annotation_population": 128
+          },
+          {
+            "left": "category_0e48c994f9c9889185c51878",
+            "right": "category_7cd1b66ce0fd787ed51c0a82",
+            "both_present": 0,
+            "complete_annotation_population": 128
+          },
+          {
+            "left": "category_0e48c994f9c9889185c51878",
+            "right": "category_8124d94b31bdfa3caa00025c",
+            "both_present": 2,
+            "complete_annotation_population": 128
+          },
+          {
+            "left": "category_0e48c994f9c9889185c51878",
+            "right": "category_016a2a857798b9101730cacd",
+            "both_present": 0,
+            "complete_annotation_population": 128
+          },
+          {
+            "left": "category_0e48c994f9c9889185c51878",
+            "right": "category_980d8d7267c6eab6d4e367e2",
+            "both_present": 1,
+            "complete_annotation_population": 128
+          },
+          {
+            "left": "category_0e48c994f9c9889185c51878",
+            "right": "category_f270c90669d35b59809860eb",
+            "both_present": 0,
+            "complete_annotation_population": 128
+          },
+          {
+            "left": "category_f03e92333e315896606cdea1",
+            "right": "category_f23abae7a8e4d731a34d06ae",
+            "both_present": 0,
+            "complete_annotation_population": 128
+          },
+          {
+            "left": "category_f03e92333e315896606cdea1",
+            "right": "category_59ab528a190e9b43bb465eb3",
+            "both_present": 1,
+            "complete_annotation_population": 128
+          },
+          {
+            "left": "category_f03e92333e315896606cdea1",
+            "right": "category_4080d48e206247f20bf2937c",
+            "both_present": 1,
+            "complete_annotation_population": 128
+          },
+          {
+            "left": "category_f03e92333e315896606cdea1",
+            "right": "category_b59008b426e14f4223188696",
+            "both_present": 1,
+            "complete_annotation_population": 128
+          },
+          {
+            "left": "category_f03e92333e315896606cdea1",
+            "right": "category_5db9f8df146fee6449e20888",
+            "both_present": 4,
+            "complete_annotation_population": 128
+          },
+          {
+            "left": "category_f03e92333e315896606cdea1",
+            "right": "category_d3ced54082b302eed460fe33",
+            "both_present": 7,
+            "complete_annotation_population": 128
+          },
+          {
+            "left": "category_f03e92333e315896606cdea1",
+            "right": "category_f9156d551ad236c1e0dde984",
+            "both_present": 4,
+            "complete_annotation_population": 128
+          },
+          {
+            "left": "category_f03e92333e315896606cdea1",
+            "right": "category_dbb732416ef7c46cf02afa6b",
+            "both_present": 3,
+            "complete_annotation_population": 128
+          },
+          {
+            "left": "category_f03e92333e315896606cdea1",
+            "right": "category_99c0159b75b1ff5e1976a4f6",
+            "both_present": 0,
+            "complete_annotation_population": 128
+          },
+          {
+            "left": "category_f03e92333e315896606cdea1",
+            "right": "category_c11ad5947771d9854d72871f",
+            "both_present": 0,
+            "complete_annotation_population": 128
+          },
+          {
+            "left": "category_f03e92333e315896606cdea1",
+            "right": "category_6b5be0bbb1d4703969b3a8ab",
+            "both_present": 0,
+            "complete_annotation_population": 128
+          },
+          {
+            "left": "category_f03e92333e315896606cdea1",
+            "right": "category_2142df6f0e90be54387ac8de",
+            "both_present": 0,
+            "complete_annotation_population": 128
+          },
+          {
+            "left": "category_f03e92333e315896606cdea1",
+            "right": "category_ac0d70be20f143e5757569f1",
+            "both_present": 0,
+            "complete_annotation_population": 128
+          },
+          {
+            "left": "category_f03e92333e315896606cdea1",
+            "right": "category_03e23933ff09548a1d2de9ac",
+            "both_present": 0,
+            "complete_annotation_population": 128
+          },
+          {
+            "left": "category_f03e92333e315896606cdea1",
+            "right": "category_e37ce0315ee23a6f3d9ceb1f",
+            "both_present": 0,
+            "complete_annotation_population": 128
+          },
+          {
+            "left": "category_f03e92333e315896606cdea1",
+            "right": "category_7998e2b19eff1958595e00af",
+            "both_present": 0,
+            "complete_annotation_population": 128
+          },
+          {
+            "left": "category_f03e92333e315896606cdea1",
+            "right": "category_84f1e1256e55c14c5aa744da",
+            "both_present": 4,
+            "complete_annotation_population": 128
+          },
+          {
+            "left": "category_f03e92333e315896606cdea1",
+            "right": "category_e8e2447887f5cb9ee40a4294",
+            "both_present": 4,
+            "complete_annotation_population": 128
+          },
+          {
+            "left": "category_f03e92333e315896606cdea1",
+            "right": "category_9f5913584686893dc1150f83",
+            "both_present": 1,
+            "complete_annotation_population": 128
+          },
+          {
+            "left": "category_f03e92333e315896606cdea1",
+            "right": "category_0f54f78982fae7990825f48f",
+            "both_present": 3,
+            "complete_annotation_population": 128
+          },
+          {
+            "left": "category_f03e92333e315896606cdea1",
+            "right": "category_c69596aecc57f0f03f444a7b",
+            "both_present": 0,
+            "complete_annotation_population": 128
+          },
+          {
+            "left": "category_f03e92333e315896606cdea1",
+            "right": "category_7476abdc1e9f70ed0f33ded1",
+            "both_present": 1,
+            "complete_annotation_population": 128
+          },
+          {
+            "left": "category_f03e92333e315896606cdea1",
+            "right": "category_9dc5c8fb81b0eaa5f0d00a48",
+            "both_present": 0,
+            "complete_annotation_population": 128
+          },
+          {
+            "left": "category_f03e92333e315896606cdea1",
+            "right": "category_884fbfb690ae0c0d522b565f",
+            "both_present": 2,
+            "complete_annotation_population": 128
+          },
+          {
+            "left": "category_f03e92333e315896606cdea1",
+            "right": "category_7cd1b66ce0fd787ed51c0a82",
+            "both_present": 0,
+            "complete_annotation_population": 128
+          },
+          {
+            "left": "category_f03e92333e315896606cdea1",
+            "right": "category_8124d94b31bdfa3caa00025c",
+            "both_present": 2,
+            "complete_annotation_population": 128
+          },
+          {
+            "left": "category_f03e92333e315896606cdea1",
+            "right": "category_016a2a857798b9101730cacd",
+            "both_present": 0,
+            "complete_annotation_population": 128
+          },
+          {
+            "left": "category_f03e92333e315896606cdea1",
+            "right": "category_980d8d7267c6eab6d4e367e2",
+            "both_present": 1,
+            "complete_annotation_population": 128
+          },
+          {
+            "left": "category_f03e92333e315896606cdea1",
+            "right": "category_f270c90669d35b59809860eb",
+            "both_present": 0,
+            "complete_annotation_population": 128
+          },
+          {
+            "left": "category_f23abae7a8e4d731a34d06ae",
+            "right": "category_59ab528a190e9b43bb465eb3",
+            "both_present": 1,
+            "complete_annotation_population": 128
+          },
+          {
+            "left": "category_f23abae7a8e4d731a34d06ae",
+            "right": "category_4080d48e206247f20bf2937c",
+            "both_present": 0,
+            "complete_annotation_population": 128
+          },
+          {
+            "left": "category_f23abae7a8e4d731a34d06ae",
+            "right": "category_b59008b426e14f4223188696",
+            "both_present": 3,
+            "complete_annotation_population": 128
+          },
+          {
+            "left": "category_f23abae7a8e4d731a34d06ae",
+            "right": "category_5db9f8df146fee6449e20888",
+            "both_present": 1,
+            "complete_annotation_population": 128
+          },
+          {
+            "left": "category_f23abae7a8e4d731a34d06ae",
+            "right": "category_d3ced54082b302eed460fe33",
+            "both_present": 0,
+            "complete_annotation_population": 128
+          },
+          {
+            "left": "category_f23abae7a8e4d731a34d06ae",
+            "right": "category_f9156d551ad236c1e0dde984",
+            "both_present": 0,
+            "complete_annotation_population": 128
+          },
+          {
+            "left": "category_f23abae7a8e4d731a34d06ae",
+            "right": "category_dbb732416ef7c46cf02afa6b",
+            "both_present": 1,
+            "complete_annotation_population": 128
+          },
+          {
+            "left": "category_f23abae7a8e4d731a34d06ae",
+            "right": "category_99c0159b75b1ff5e1976a4f6",
+            "both_present": 0,
+            "complete_annotation_population": 128
+          },
+          {
+            "left": "category_f23abae7a8e4d731a34d06ae",
+            "right": "category_c11ad5947771d9854d72871f",
+            "both_present": 0,
+            "complete_annotation_population": 128
+          },
+          {
+            "left": "category_f23abae7a8e4d731a34d06ae",
+            "right": "category_6b5be0bbb1d4703969b3a8ab",
+            "both_present": 0,
+            "complete_annotation_population": 128
+          },
+          {
+            "left": "category_f23abae7a8e4d731a34d06ae",
+            "right": "category_2142df6f0e90be54387ac8de",
+            "both_present": 1,
+            "complete_annotation_population": 128
+          },
+          {
+            "left": "category_f23abae7a8e4d731a34d06ae",
+            "right": "category_ac0d70be20f143e5757569f1",
+            "both_present": 0,
+            "complete_annotation_population": 128
+          },
+          {
+            "left": "category_f23abae7a8e4d731a34d06ae",
+            "right": "category_03e23933ff09548a1d2de9ac",
+            "both_present": 0,
+            "complete_annotation_population": 128
+          },
+          {
+            "left": "category_f23abae7a8e4d731a34d06ae",
+            "right": "category_e37ce0315ee23a6f3d9ceb1f",
+            "both_present": 2,
+            "complete_annotation_population": 128
+          },
+          {
+            "left": "category_f23abae7a8e4d731a34d06ae",
+            "right": "category_7998e2b19eff1958595e00af",
+            "both_present": 2,
+            "complete_annotation_population": 128
+          },
+          {
+            "left": "category_f23abae7a8e4d731a34d06ae",
+            "right": "category_84f1e1256e55c14c5aa744da",
+            "both_present": 0,
+            "complete_annotation_population": 128
+          },
+          {
+            "left": "category_f23abae7a8e4d731a34d06ae",
+            "right": "category_e8e2447887f5cb9ee40a4294",
+            "both_present": 0,
+            "complete_annotation_population": 128
+          },
+          {
+            "left": "category_f23abae7a8e4d731a34d06ae",
+            "right": "category_9f5913584686893dc1150f83",
+            "both_present": 1,
+            "complete_annotation_population": 128
+          },
+          {
+            "left": "category_f23abae7a8e4d731a34d06ae",
+            "right": "category_0f54f78982fae7990825f48f",
+            "both_present": 0,
+            "complete_annotation_population": 128
+          },
+          {
+            "left": "category_f23abae7a8e4d731a34d06ae",
+            "right": "category_c69596aecc57f0f03f444a7b",
+            "both_present": 0,
+            "complete_annotation_population": 128
+          },
+          {
+            "left": "category_f23abae7a8e4d731a34d06ae",
+            "right": "category_7476abdc1e9f70ed0f33ded1",
+            "both_present": 0,
+            "complete_annotation_population": 128
+          },
+          {
+            "left": "category_f23abae7a8e4d731a34d06ae",
+            "right": "category_9dc5c8fb81b0eaa5f0d00a48",
+            "both_present": 0,
+            "complete_annotation_population": 128
+          },
+          {
+            "left": "category_f23abae7a8e4d731a34d06ae",
+            "right": "category_884fbfb690ae0c0d522b565f",
+            "both_present": 0,
+            "complete_annotation_population": 128
+          },
+          {
+            "left": "category_f23abae7a8e4d731a34d06ae",
+            "right": "category_7cd1b66ce0fd787ed51c0a82",
+            "both_present": 0,
+            "complete_annotation_population": 128
+          },
+          {
+            "left": "category_f23abae7a8e4d731a34d06ae",
+            "right": "category_8124d94b31bdfa3caa00025c",
+            "both_present": 0,
+            "complete_annotation_population": 128
+          },
+          {
+            "left": "category_f23abae7a8e4d731a34d06ae",
+            "right": "category_016a2a857798b9101730cacd",
+            "both_present": 0,
+            "complete_annotation_population": 128
+          },
+          {
+            "left": "category_f23abae7a8e4d731a34d06ae",
+            "right": "category_980d8d7267c6eab6d4e367e2",
+            "both_present": 0,
+            "complete_annotation_population": 128
+          },
+          {
+            "left": "category_f23abae7a8e4d731a34d06ae",
+            "right": "category_f270c90669d35b59809860eb",
+            "both_present": 0,
+            "complete_annotation_population": 128
+          },
+          {
+            "left": "category_59ab528a190e9b43bb465eb3",
+            "right": "category_4080d48e206247f20bf2937c",
+            "both_present": 0,
+            "complete_annotation_population": 128
+          },
+          {
+            "left": "category_59ab528a190e9b43bb465eb3",
+            "right": "category_b59008b426e14f4223188696",
+            "both_present": 1,
+            "complete_annotation_population": 128
+          },
+          {
+            "left": "category_59ab528a190e9b43bb465eb3",
+            "right": "category_5db9f8df146fee6449e20888",
+            "both_present": 1,
+            "complete_annotation_population": 128
+          },
+          {
+            "left": "category_59ab528a190e9b43bb465eb3",
+            "right": "category_d3ced54082b302eed460fe33",
+            "both_present": 1,
+            "complete_annotation_population": 128
+          },
+          {
+            "left": "category_59ab528a190e9b43bb465eb3",
+            "right": "category_f9156d551ad236c1e0dde984",
+            "both_present": 0,
+            "complete_annotation_population": 128
+          },
+          {
+            "left": "category_59ab528a190e9b43bb465eb3",
+            "right": "category_dbb732416ef7c46cf02afa6b",
+            "both_present": 0,
+            "complete_annotation_population": 128
+          },
+          {
+            "left": "category_59ab528a190e9b43bb465eb3",
+            "right": "category_99c0159b75b1ff5e1976a4f6",
+            "both_present": 5,
+            "complete_annotation_population": 128
+          },
+          {
+            "left": "category_59ab528a190e9b43bb465eb3",
+            "right": "category_c11ad5947771d9854d72871f",
+            "both_present": 1,
+            "complete_annotation_population": 128
+          },
+          {
+            "left": "category_59ab528a190e9b43bb465eb3",
+            "right": "category_6b5be0bbb1d4703969b3a8ab",
+            "both_present": 0,
+            "complete_annotation_population": 128
+          },
+          {
+            "left": "category_59ab528a190e9b43bb465eb3",
+            "right": "category_2142df6f0e90be54387ac8de",
+            "both_present": 1,
+            "complete_annotation_population": 128
+          }
+        ],
+        "complete_population": 128,
+        "pair_population_not_label_correctness": true
+      },
+      "references": [],
+      "scope": "bounded"
+    },
+    {
+      "id": "image_e7",
+      "family": "exact_duplicates_bytes",
+      "meaning": "contextual_observation",
+      "data": {
+        "groups": 0,
+        "participating_occurrences": 0,
+        "cross_split_occurrences": 0,
+        "examples": []
+      },
+      "references": [],
+      "scope": "full_population"
+    },
+    {
+      "id": "image_e8",
+      "family": "exact_duplicates_native",
+      "meaning": "contextual_observation",
+      "data": {
+        "groups": 0,
+        "participating_occurrences": 0,
+        "cross_split_occurrences": 0,
+        "examples": []
+      },
+      "references": [],
+      "scope": "full_population"
+    },
+    {
+      "id": "image_e9",
+      "family": "exact_duplicates_oriented",
+      "meaning": "contextual_observation",
+      "data": {
+        "groups": 0,
+        "participating_occurrences": 0,
+        "cross_split_occurrences": 0,
+        "examples": []
+      },
+      "references": [],
+      "scope": "full_population"
+    },
+    {
+      "id": "image_e10",
+      "family": "annotation_disagreement",
+      "meaning": "contextual_observation",
+      "data": {
+        "compatible_exact_raster_groups_with_differences": 0,
+        "payload_difference_groups_blocked": 0,
+        "details": [],
+        "correct_label_identified": false
+      },
+      "references": [],
+      "scope": "full_population"
+    },
+    {
+      "id": "image_e11",
+      "family": "logical_identity",
+      "meaning": "deterministic_fact",
+      "data": {
+        "occurrences_with_duplicate_source_keys": 0
+      },
+      "references": [],
+      "scope": "full_population"
+    },
+    {
+      "id": "image_e12",
+      "family": "near_duplicates",
+      "meaning": "investigation_candidate",
+      "data": {
+        "qualifying_raster_pairs": 0,
+        "examples": [],
+        "radius": 6,
+        "representation": "DCT64 opaque RGB preview; seven disjoint partitions",
+        "approximate_groups_are_equivalence_classes": false
+      },
+      "references": [],
+      "scope": "bounded"
+    }
+  ],
+  "findings": [],
+  "coverage": {
+    "families": {
+      "inventory": {
+        "required_occurrences": 128,
+        "inventory_complete": true
+      },
+      "visual_quality": {
+        "eligible": 67,
+        "examined": 67,
+        "ineligible": 61
+      },
+      "annotations": {
+        "occurrences_examined": 128,
+        "segmentation_raster_work": 0,
+        "segmentation_raster_limit": 100000000,
+        "topology_and_semantic_correctness": "not assessed"
+      },
+      "multilabel_composition": {
+        "selected_pairs": 128,
+        "candidate_pairs_in_top32": 496,
+        "charged_population_visits": 16384,
+        "work_limit": 20000000,
+        "selection": "top32 observed categories then deterministic pair order"
+      },
+      "exact_duplicates_bytes": {
+        "representation": "bytes",
+        "eligible_occurrences": 128,
+        "group_detail_omissions": 0
+      },
+      "exact_duplicates_native": {
+        "representation": "native",
+        "eligible_occurrences": 128,
+        "group_detail_omissions": 0
+      },
+      "exact_duplicates_oriented": {
+        "representation": "oriented",
+        "eligible_occurrences": 128,
+        "group_detail_omissions": 0
+      },
+      "annotation_disagreement": {
+        "variant_comparisons_are_bounded": true
+      },
+      "near_duplicates": {
+        "indexed_rasters": 67,
+        "partition_entries": 469,
+        "saturated_buckets": 0,
+        "posting_visits": 1012,
+        "posting_rows_loaded": 469,
+        "posting_cache_limit_bytes": 33554432,
+        "hamming_comparisons": 74,
+        "pair_populations": [
+          {
+            "split": "split_cf8784422201a8b58df5afce",
+            "query_population": 67,
+            "reference_population": 67,
+            "queries_started": 67,
+            "queries_completed": 67,
+            "posting_visits": 1012,
+            "hamming_comparisons": 74,
+            "qualifying_emissions": 0,
+            "posting_saturation_visits": 0,
+            "scope": "within_split"
+          }
+        ],
+        "cross_split_queries_complete": true,
+        "cross_split_stop_reason": null,
+        "stop_reason": "examined_scope_completed",
+        "detail_omissions": 0,
+        "absence_claim": "examined scope only; capped postings do not establish global absence"
+      }
+    },
+    "required_population": "complete inventoried and applicable supplied populations within hard limits",
+    "retained_examples_are_bounded": true
+  },
+  "execution": {
+    "status": "completed",
+    "backend": "duckdb_local",
+    "effective_limits": {
+      "backend": "duckdb_local",
+      "max_source_bytes": 1073741824,
+      "max_combined_source_bytes": 4294967296,
+      "max_rows": 10000000,
+      "max_combined_rows": 30000000,
+      "max_columns": 1000,
+      "memory_bytes": 2147483648,
+      "max_rss_bytes": 6442450944,
+      "threads": 2,
+      "batch_bytes": 33554432,
+      "max_record_bytes": 8388608,
+      "workspace_bytes": 68719476736,
+      "free_disk_bytes": 2147483648,
+      "max_seconds": 1799.9989915000042,
+      "result_bytes": 33554432
+    },
+    "image_limits": {
+      "assets": 100000,
+      "occurrences": 1000000,
+      "annotations": 10000000,
+      "pixels_per_asset": 32000000,
+      "decode_bytes": 536870912,
+      "decoded_pixels": 100000000000,
+      "polygon_vertices": 10000000,
+      "rle_runs": 10000000,
+      "segmentation_pixels": 100000000,
+      "posting_visits": 100000000,
+      "hamming_comparisons": 50000000,
+      "bucket_entries": 1024,
+      "candidate_pairs": 250000,
+      "embedding_images": 10000,
+      "cosine_pairs": 25000000,
+      "details": 100,
+      "witnesses": 5,
+      "private_bytes": 67108864
+    },
+    "image_source_limits": {
+      "media_per_input_bytes": 68719476736,
+      "combined_media_bytes": 137438953472,
+      "asset_capture_bytes": 134217728
+    },
+    "duration_seconds": 0.8245356249972247,
+    "peak_workspace_bytes": 438272,
+    "estimated_peak_workspace_bytes": 268817130,
+    "capture_read_bytes": 20515138,
+    "initial_hash_seconds": 0.019903880136553198,
+    "corpus_copied": false,
+    "publication_policy": "required_core_atomic_optional_model_isolated",
+    "warnings": [
+      "Sampled resource controls can overshoot.",
+      "Capacity and calibrated recall are measured claims for recorded workloads only."
+    ],
+    "peak_worker_rss_bytes": 166920192,
+    "whole_job_seconds": 1.5753475000383332,
+    "peak_spill_bytes": 0,
+    "serialized_bytes": 51640,
+    "final_verification_bytes": 20515138,
+    "final_verification_seconds": 0.019712875015102327,
+    "core_execution": {
+      "status": "completed",
+      "backend": "duckdb_local",
+      "effective_limits": {
+        "backend": "duckdb_local",
+        "max_source_bytes": 1073741824,
+        "max_combined_source_bytes": 4294967296,
+        "max_rows": 10000000,
+        "max_combined_rows": 30000000,
+        "max_columns": 1000,
+        "memory_bytes": 2147483648,
+        "max_rss_bytes": 6442450944,
+        "threads": 2,
+        "batch_bytes": 33554432,
+        "max_record_bytes": 8388608,
+        "workspace_bytes": 68719476736,
+        "free_disk_bytes": 2147483648,
+        "max_seconds": 1799.9989915000042,
+        "result_bytes": 33554432
+      },
+      "image_limits": {
+        "assets": 100000,
+        "occurrences": 1000000,
+        "annotations": 10000000,
+        "pixels_per_asset": 32000000,
+        "decode_bytes": 536870912,
+        "decoded_pixels": 100000000000,
+        "polygon_vertices": 10000000,
+        "rle_runs": 10000000,
+        "segmentation_pixels": 100000000,
+        "posting_visits": 100000000,
+        "hamming_comparisons": 50000000,
+        "bucket_entries": 1024,
+        "candidate_pairs": 250000,
+        "embedding_images": 10000,
+        "cosine_pairs": 25000000,
+        "details": 100,
+        "witnesses": 5,
+        "private_bytes": 67108864
+      },
+      "image_source_limits": {
+        "media_per_input_bytes": 68719476736,
+        "combined_media_bytes": 137438953472,
+        "asset_capture_bytes": 134217728
+      },
+      "duration_seconds": 0.8245356249972247,
+      "peak_workspace_bytes": 438272,
+      "estimated_peak_workspace_bytes": 268817130,
+      "capture_read_bytes": 20515138,
+      "initial_hash_seconds": 0.019903880136553198,
+      "corpus_copied": false,
+      "publication_policy": "required_core_atomic_optional_model_isolated",
+      "warnings": [
+        "Sampled resource controls can overshoot.",
+        "Capacity and calibrated recall are measured claims for recorded workloads only."
+      ],
+      "peak_worker_rss_bytes": 166920192,
+      "whole_job_seconds": 1.1961466249777004,
+      "peak_spill_bytes": 0,
+      "serialized_bytes": 51444
+    }
+  },
+  "generated_at": "2026-10-11T23:29:27.547590+00:00"
+}

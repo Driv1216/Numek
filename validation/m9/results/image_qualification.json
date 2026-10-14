@@ -1,0 +1,370 @@
+{
+  "pipeline": "manifest admission -> verified decode -> paired image/text tokens -> score -> emitted candidate",
+  "source_manifest_sha256": "ae5aceb7d027ab506bf775fbddad4df155e3a0e4c9cee0fa2cd5bde41a0b33bc",
+  "archive_sha256": "113a836d90195ee1f884e704da6304dfaaecff1f023f49b6ca93c4aaae470268",
+  "eligibility": "M7 opaque RGB previews; ICC and alpha exclusions apply.",
+  "negative_truth": "Planted association swaps prefer disjoint supplied object taxonomies; they are not independently adjudicated false captions.",
+  "runs": {
+    "calibration": {
+      "metrics": {
+        "counts": {
+          "swap_flag": 100,
+          "correct_clear": 98,
+          "correct_flag": 2
+        },
+        "precision": 0.9803921568627451,
+        "recall": 1.0,
+        "correct_associations": 100,
+        "planted_swaps": 100,
+        "unexamined": 0,
+        "threshold": -9.825647354125977
+      },
+      "execution": {
+        "status": "completed",
+        "effective_limits": {
+          "backend": "duckdb_local",
+          "max_source_bytes": 5368709120,
+          "max_combined_source_bytes": 8589934592,
+          "max_rows": 10000000,
+          "max_combined_rows": 30000000,
+          "max_columns": 1000,
+          "memory_bytes": 2147483648,
+          "max_rss_bytes": 6442450944,
+          "threads": 2,
+          "batch_bytes": 33554432,
+          "max_record_bytes": 8388608,
+          "workspace_bytes": 68719476736,
+          "free_disk_bytes": 2147483648,
+          "max_seconds": 1800,
+          "result_bytes": 33554432
+        },
+        "peak_workspace_bytes": 16384,
+        "duration_seconds": 37.92503466701601,
+        "model_load_seconds": 1.9109525389503688,
+        "tokenizer_calls": 200,
+        "encoded_tokens": 0,
+        "inference_pairs": 200,
+        "tokenizer_work": {
+          "calls": 400,
+          "bytes": 21240,
+          "tokens": 15516
+        },
+        "attempted_unit_charged": false,
+        "methods": {
+          "image_text": {
+            "model": "google/siglip-base-patch16-224",
+            "revision": "7fd15f0689c79d79e38b1c2e2e2370a7bf2761ed",
+            "license": "apache-2.0",
+            "qualified": false,
+            "scope": null,
+            "threshold": -2,
+            "margin": null,
+            "device": "cpu",
+            "dtype": "float32"
+          }
+        },
+        "network_socket_operations": "blocked_inside_spawned_worker",
+        "peak_worker_rss_bytes": 1146814464,
+        "whole_job_seconds": 38.770722957968246,
+        "peak_spill_bytes": 0,
+        "serialized_bytes": 121372
+      },
+      "coverage": {
+        "selected": 200,
+        "examined": 200,
+        "unexamined": 0,
+        "stop_reason": null
+      },
+      "core_execution": {
+        "status": "completed",
+        "backend": "duckdb_local",
+        "effective_limits": {
+          "backend": "duckdb_local",
+          "max_source_bytes": 5368709120,
+          "max_combined_source_bytes": 8589934592,
+          "max_rows": 10000000,
+          "max_combined_rows": 30000000,
+          "max_columns": 1000,
+          "memory_bytes": 2147483648,
+          "max_rss_bytes": 6442450944,
+          "threads": 2,
+          "batch_bytes": 33554432,
+          "max_record_bytes": 8388608,
+          "workspace_bytes": 68719476736,
+          "free_disk_bytes": 2147483648,
+          "max_seconds": 1800,
+          "result_bytes": 33554432
+        },
+        "cross_limits": {
+          "inputs": 64,
+          "declarations": 128,
+          "associations": 10000000,
+          "documents": 1000,
+          "pages": 10000,
+          "document_bytes": 134217728,
+          "expanded_docx_bytes": 268435456,
+          "xml_bytes": 16777216,
+          "zip_members": 10000,
+          "characters": 50000000,
+          "candidates": 100,
+          "tables": 100,
+          "region_chars": 10000,
+          "discovery_visits": 100000000,
+          "pattern_seconds": 0.05,
+          "details": 100,
+          "witnesses": 5,
+          "private_bytes": 67108864,
+          "claims": 2000,
+          "evidence_candidates": 5,
+          "image_pairs": 2000,
+          "model_seconds": 600,
+          "image_assets": 100000,
+          "image_pixels": 100000000000,
+          "image_media_bytes": 137438953472,
+          "image_media_per_input_bytes": 68719476736,
+          "tokenizer_bytes": 67108864,
+          "tokenizer_tokens": 1000000
+        },
+        "peak_workspace_bytes": 372736,
+        "estimated_peak_workspace_bytes": 536870912,
+        "duration_seconds": 0.5427370410179719,
+        "capture_read_bytes": 3545436,
+        "initial_hash_seconds": 0.01310137310065329,
+        "publication_policy": "required_core_atomic_optional_models_isolated",
+        "source_populations": {
+          "source_1": {
+            "records": 200,
+            "invalid_records": 0,
+            "ingestion_seconds": 0.011626916006207466,
+            "missing_logical_ids": 0,
+            "duplicate_logical_ids": 0
+          },
+          "source_2": {
+            "records": 20,
+            "invalid_records": 0,
+            "ingestion_seconds": 0.004344291985034943,
+            "missing_logical_ids": 0,
+            "duplicate_logical_ids": 0
+          }
+        },
+        "persistent_corpus_copy": false,
+        "tabular_snapshots_temporary": true,
+        "warnings": [
+          "Budgets are provisional safeguards, not capacity promises.",
+          "Sampled RSS may overshoot.",
+          "Per-file integrity is not an atomic filesystem snapshot."
+        ],
+        "timezone_provenance": {
+          "package": "tzdata",
+          "version": "2026.5",
+          "zones": {}
+        },
+        "image_work": {
+          "decoded_pixels": 5750308,
+          "admitted_media_bytes": 3527004
+        },
+        "model_selection_seconds": 0.11111904197605327,
+        "peak_worker_rss_bytes": 161988608,
+        "whole_job_seconds": 1.0134292499860749,
+        "peak_spill_bytes": 0,
+        "serialized_bytes": 109093
+      },
+      "families": 20,
+      "ids_sha256": "88c47ef0b43b2355a5e34e0e18fb80cc56f7b68b168709f9e5bb66c940807482"
+    },
+    "held_out": {
+      "metrics": {
+        "counts": {
+          "swap_flag": 235,
+          "correct_clear": 234,
+          "correct_flag": 1
+        },
+        "precision": 0.9957627118644068,
+        "recall": 1.0,
+        "correct_associations": 235,
+        "planted_swaps": 235,
+        "unexamined": 0,
+        "threshold": -9.825647354125977
+      },
+      "execution": {
+        "status": "completed",
+        "effective_limits": {
+          "backend": "duckdb_local",
+          "max_source_bytes": 5368709120,
+          "max_combined_source_bytes": 8589934592,
+          "max_rows": 10000000,
+          "max_combined_rows": 30000000,
+          "max_columns": 1000,
+          "memory_bytes": 2147483648,
+          "max_rss_bytes": 6442450944,
+          "threads": 2,
+          "batch_bytes": 33554432,
+          "max_record_bytes": 8388608,
+          "workspace_bytes": 68719476736,
+          "free_disk_bytes": 2147483648,
+          "max_seconds": 1800,
+          "result_bytes": 33554432
+        },
+        "peak_workspace_bytes": 16384,
+        "duration_seconds": 81.49728141597006,
+        "model_load_seconds": 2.5503461582702585,
+        "tokenizer_calls": 470,
+        "encoded_tokens": 0,
+        "inference_pairs": 470,
+        "tokenizer_work": {
+          "calls": 940,
+          "bytes": 47548,
+          "tokens": 36414
+        },
+        "attempted_unit_charged": false,
+        "methods": {
+          "image_text": {
+            "model": "google/siglip-base-patch16-224",
+            "revision": "7fd15f0689c79d79e38b1c2e2e2370a7bf2761ed",
+            "license": "apache-2.0",
+            "qualified": false,
+            "scope": null,
+            "threshold": -2,
+            "margin": null,
+            "device": "cpu",
+            "dtype": "float32"
+          }
+        },
+        "network_socket_operations": "blocked_inside_spawned_worker",
+        "peak_worker_rss_bytes": 1283620864,
+        "whole_job_seconds": 82.30688683298649,
+        "peak_spill_bytes": 0,
+        "serialized_bytes": 282633
+      },
+      "coverage": {
+        "selected": 470,
+        "examined": 470,
+        "unexamined": 0,
+        "stop_reason": null
+      },
+      "core_execution": {
+        "status": "completed",
+        "backend": "duckdb_local",
+        "effective_limits": {
+          "backend": "duckdb_local",
+          "max_source_bytes": 5368709120,
+          "max_combined_source_bytes": 8589934592,
+          "max_rows": 10000000,
+          "max_combined_rows": 30000000,
+          "max_columns": 1000,
+          "memory_bytes": 2147483648,
+          "max_rss_bytes": 6442450944,
+          "threads": 2,
+          "batch_bytes": 33554432,
+          "max_record_bytes": 8388608,
+          "workspace_bytes": 68719476736,
+          "free_disk_bytes": 2147483648,
+          "max_seconds": 1800,
+          "result_bytes": 33554432
+        },
+        "cross_limits": {
+          "inputs": 64,
+          "declarations": 128,
+          "associations": 10000000,
+          "documents": 1000,
+          "pages": 10000,
+          "document_bytes": 134217728,
+          "expanded_docx_bytes": 268435456,
+          "xml_bytes": 16777216,
+          "zip_members": 10000,
+          "characters": 50000000,
+          "candidates": 100,
+          "tables": 100,
+          "region_chars": 10000,
+          "discovery_visits": 100000000,
+          "pattern_seconds": 0.05,
+          "details": 100,
+          "witnesses": 5,
+          "private_bytes": 67108864,
+          "claims": 2000,
+          "evidence_candidates": 5,
+          "image_pairs": 2000,
+          "model_seconds": 600,
+          "image_assets": 100000,
+          "image_pixels": 100000000000,
+          "image_media_bytes": 137438953472,
+          "image_media_per_input_bytes": 68719476736,
+          "tokenizer_bytes": 67108864,
+          "tokenizer_tokens": 1000000
+        },
+        "peak_workspace_bytes": 868352,
+        "estimated_peak_workspace_bytes": 536870912,
+        "duration_seconds": 1.736136291990988,
+        "capture_read_bytes": 7296456,
+        "initial_hash_seconds": 0.046770043030846864,
+        "publication_policy": "required_core_atomic_optional_models_isolated",
+        "source_populations": {
+          "source_1": {
+            "records": 470,
+            "invalid_records": 0,
+            "ingestion_seconds": 0.02605983300600201,
+            "missing_logical_ids": 0,
+            "duplicate_logical_ids": 0
+          },
+          "source_2": {
+            "records": 47,
+            "invalid_records": 0,
+            "ingestion_seconds": 0.005026292055845261,
+            "missing_logical_ids": 0,
+            "duplicate_logical_ids": 0
+          }
+        },
+        "persistent_corpus_copy": false,
+        "tabular_snapshots_temporary": true,
+        "warnings": [
+          "Budgets are provisional safeguards, not capacity promises.",
+          "Sampled RSS may overshoot.",
+          "Per-file integrity is not an atomic filesystem snapshot."
+        ],
+        "timezone_provenance": {
+          "package": "tzdata",
+          "version": "2026.5",
+          "zones": {}
+        },
+        "image_work": {
+          "decoded_pixels": 13315472,
+          "admitted_media_bytes": 7255954
+        },
+        "model_selection_seconds": 0.44607254199218005,
+        "peak_worker_rss_bytes": 170082304,
+        "whole_job_seconds": 2.2793999160057865,
+        "peak_spill_bytes": 0,
+        "serialized_bytes": 109093
+      },
+      "families": 47,
+      "ids_sha256": "622735dada207b5a0731f32a246b9e7987d7cf492ac9aca3e66bffef0d3ec666"
+    }
+  },
+  "qualification": {
+    "status": "passed",
+    "algorithm_identity": "40b21ac3dde4fb7c572f43bc803791aa354c36306e44e727ae124da9c0dbcbe0",
+    "revision": "7fd15f0689c79d79e38b1c2e2e2370a7bf2761ed",
+    "threshold": -9.825647354125977,
+    "scope": "Pinned COCO supplied captions and planted association swaps; caption truth and external validity are not established.",
+    "eligible_layouts": [
+      "coco_captions_v1"
+    ],
+    "eligible_mapping_kinds": [
+      "field"
+    ],
+    "held_out": {
+      "counts": {
+        "swap_flag": 235,
+        "correct_clear": 234,
+        "correct_flag": 1
+      },
+      "precision": 0.9957627118644068,
+      "recall": 1.0,
+      "correct_associations": 235,
+      "planted_swaps": 235,
+      "unexamined": 0,
+      "threshold": -9.825647354125977
+    },
+    "ledger": "validation/m9/results/image_qualification.json"
+  }
+}

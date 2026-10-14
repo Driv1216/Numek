@@ -1,0 +1,1082 @@
+{
+  "schema_version": "1.6",
+  "methodology_id": "image_reliability_v1",
+  "profile": {
+    "audit_id": "f5d190790e4e4ad4986478b6f6a1466a",
+    "occurrences": 128,
+    "source_count": 1,
+    "image_locations": 128,
+    "dataset_name": null,
+    "purpose": null,
+    "summary": "0 evidence-qualified findings across 128 image occurrences; completed execution.",
+    "private_manifest_sha256": "68dd46585a9e871c2af2cc6e0c83dcb423b1bf3e61fb9580b49596e28a0abe71",
+    "examples": [],
+    "disclosure": {
+      "policy": "references_only",
+      "references": [],
+      "overlays": false,
+      "labels": false,
+      "encoded_bytes": 0
+    },
+    "export_identity": {
+      "completed_evidence_sha256": "2c04490f04a3292742b88e140400b57a01372ff50eac4fa5233a53b95c026168",
+      "disclosure_sha256": "a3d27be032354ccd292944dd216801e1e5d73182e86dd816b76b77e5707d2425",
+      "example_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "template_sha256": "0c5d930f3f2e2b390e49a27637a24193bb59a7bdfa8ecff39ad6381581dcf029",
+      "projection_sha256": "20744f77e77dd461b539478dcf560a121ea7622a8232c94afa469100979379dc",
+      "canonical_html_sha256": "22e9095171245acbb4cfdbcffed46fc87aea1fcab5fbe75bad98a11646376bf9"
+    }
+  },
+  "checks": [
+    {
+      "id": "image_e1",
+      "family": "inventory",
+      "applicability": "applicable",
+      "execution": "completed",
+      "scope": "full_population",
+      "violations": 0
+    },
+    {
+      "id": "image_e2",
+      "family": "decode",
+      "applicability": "applicable",
+      "execution": "completed",
+      "scope": "full_population",
+      "violations": 0
+    },
+    {
+      "id": "image_e3",
+      "family": "visual_quality",
+      "applicability": "applicable",
+      "execution": "completed",
+      "scope": "full_population",
+      "violations": 0
+    },
+    {
+      "id": "image_e4",
+      "family": "visual_extremes",
+      "applicability": "applicable",
+      "execution": "completed",
+      "scope": "bounded",
+      "violations": 0
+    },
+    {
+      "id": "image_e5",
+      "family": "annotations",
+      "applicability": "applicable",
+      "execution": "completed",
+      "scope": "full_population",
+      "violations": 0
+    },
+    {
+      "id": "image_e6",
+      "family": "composition",
+      "applicability": "applicable",
+      "execution": "completed",
+      "scope": "full_population",
+      "violations": 0
+    },
+    {
+      "id": "image_e7",
+      "family": "exact_duplicates_bytes",
+      "applicability": "applicable",
+      "execution": "completed",
+      "scope": "full_population",
+      "violations": 0
+    },
+    {
+      "id": "image_e8",
+      "family": "exact_duplicates_native",
+      "applicability": "applicable",
+      "execution": "completed",
+      "scope": "full_population",
+      "violations": 0
+    },
+    {
+      "id": "image_e9",
+      "family": "exact_duplicates_oriented",
+      "applicability": "applicable",
+      "execution": "completed",
+      "scope": "full_population",
+      "violations": 0
+    },
+    {
+      "id": "image_e10",
+      "family": "annotation_disagreement",
+      "applicability": "applicable",
+      "execution": "completed",
+      "scope": "full_population",
+      "violations": 0
+    },
+    {
+      "id": "image_e11",
+      "family": "logical_identity",
+      "applicability": "applicable",
+      "execution": "completed",
+      "scope": "full_population",
+      "violations": 0
+    },
+    {
+      "id": "image_e12",
+      "family": "near_duplicates",
+      "applicability": "applicable",
+      "execution": "completed",
+      "scope": "bounded",
+      "violations": 0
+    }
+  ],
+  "evidence": [
+    {
+      "id": "image_e1",
+      "family": "inventory",
+      "meaning": "deterministic_fact",
+      "data": {
+        "occurrences": 128,
+        "directory_entries": 0,
+        "image_locations": 128,
+        "physical_media_files": 128,
+        "physical_alias_locations": 0,
+        "source_populations": [
+          {
+            "source": "source_1",
+            "role": "dataset",
+            "occurrences": 128
+          }
+        ],
+        "logical_media_bytes": 20506573,
+        "metadata_bytes": 5715
+      },
+      "references": [],
+      "scope": "full_population"
+    },
+    {
+      "id": "image_e2",
+      "family": "decode",
+      "meaning": "deterministic_fact",
+      "data": {
+        "asset_states": {
+          "decoded": 128
+        },
+        "format_extension_mismatches": 0,
+        "encoded_formats": {
+          "JPEG": 128
+        },
+        "modes": {
+          "RGB": 128
+        },
+        "decoded_pixels": 35236540,
+        "dimensions_observed": 128,
+        "frame_policy": "single frame only"
+      },
+      "references": [],
+      "scope": "full_population"
+    },
+    {
+      "id": "image_e3",
+      "family": "visual_quality",
+      "meaning": "contextual_observation",
+      "data": {
+        "eligible_assets": 67,
+        "exclusions": {
+          "decoded": 0,
+          "icc_profile": 61
+        },
+        "metrics": {
+          "contrast": {
+            "population": 67,
+            "minimum": 0.0688931724252834,
+            "median": 0.24393922115119365,
+            "maximum": 0.34001740537389136
+          },
+          "mean_luminance": {
+            "population": 67,
+            "minimum": 0.22550425098039217,
+            "median": 0.47632461072664356,
+            "maximum": 0.7149799222260519
+          },
+          "dark_fraction": {
+            "population": 67,
+            "minimum": 0.0,
+            "median": 0.010829866486068112,
+            "maximum": 0.195068359375
+          },
+          "bright_fraction": {
+            "population": 67,
+            "minimum": 0.0,
+            "median": 0.010798136393229166,
+            "maximum": 0.32954133333333335
+          },
+          "entropy": {
+            "population": 67,
+            "minimum": 4.784430997336051,
+            "median": 7.481409339023346,
+            "maximum": 7.880779580474931
+          },
+          "sharpness": {
+            "population": 67,
+            "minimum": 0.002173632075435273,
+            "median": 0.025498529587112743,
+            "maximum": 0.14138948936012613
+          },
+          "width": {
+            "population": 128,
+            "minimum": 240,
+            "maximum": 640
+          },
+          "height": {
+            "population": 128,
+            "minimum": 189,
+            "maximum": 640
+          }
+        },
+        "representation": "oriented opaque RGB; preview longest side 512; no arbitrary ICC conversion",
+        "quality_score": null
+      },
+      "references": [],
+      "scope": "full_population"
+    },
+    {
+      "id": "image_e4",
+      "family": "visual_extremes",
+      "meaning": "contextual_observation",
+      "data": {
+        "examples": [
+          {
+            "metric": "contrast",
+            "end": "lowest",
+            "examples": [
+              {
+                "reference": "image_24d1fb2c979e289951e79ed5",
+                "value": 0.0688931724252834
+              },
+              {
+                "reference": "image_45cda0f970af560e4b949b8e",
+                "value": 0.10334803601913992
+              },
+              {
+                "reference": "image_8f7b34585d27de621c740c71",
+                "value": 0.10503337583745889
+              },
+              {
+                "reference": "image_0b960fbcbbe006e9459c9855",
+                "value": 0.1260370327961191
+              },
+              {
+                "reference": "image_103921a408e591fda61ad632",
+                "value": 0.1382888471850404
+              }
+            ]
+          },
+          {
+            "metric": "contrast",
+            "end": "highest",
+            "examples": [
+              {
+                "reference": "image_d6dddad38cf4040a2a950419",
+                "value": 0.34001740537389136
+              },
+              {
+                "reference": "image_a223431b063edb9846082c1e",
+                "value": 0.32833950172334375
+              },
+              {
+                "reference": "image_0530454bad08499300fde65e",
+                "value": 0.3231321199757325
+              },
+              {
+                "reference": "image_ca9c24521f2899825e794fd6",
+                "value": 0.3180389029985453
+              },
+              {
+                "reference": "image_159236b301ca4ae2c60ae414",
+                "value": 0.31783784879277255
+              }
+            ]
+          },
+          {
+            "metric": "sharpness",
+            "end": "lowest",
+            "examples": [
+              {
+                "reference": "image_24d1fb2c979e289951e79ed5",
+                "value": 0.002173632075435273
+              },
+              {
+                "reference": "image_bb22c19265b7b24c3a14abe9",
+                "value": 0.002411775322461613
+              },
+              {
+                "reference": "image_45cda0f970af560e4b949b8e",
+                "value": 0.0028056567549174906
+              },
+              {
+                "reference": "image_4991d126fffa6f8944943908",
+                "value": 0.0030998882084424823
+              },
+              {
+                "reference": "image_d01a06e18e7c27e87c1fb834",
+                "value": 0.0032649649873468414
+              }
+            ]
+          },
+          {
+            "metric": "sharpness",
+            "end": "highest",
+            "examples": [
+              {
+                "reference": "image_689ee22e3501426bcefd7fe9",
+                "value": 0.14138948936012613
+              },
+              {
+                "reference": "image_ac5b97da7f86ff4bd2d074fd",
+                "value": 0.13582328127838725
+              },
+              {
+                "reference": "image_9efc08f7371e306f30742e25",
+                "value": 0.1357479434209037
+              },
+              {
+                "reference": "image_659597a5fb2dde85a36299b5",
+                "value": 0.10329566570071076
+              },
+              {
+                "reference": "image_3067d655172d268b70f5816e",
+                "value": 0.09904486490761372
+              }
+            ]
+          },
+          {
+            "metric": "entropy",
+            "end": "lowest",
+            "examples": [
+              {
+                "reference": "image_24d1fb2c979e289951e79ed5",
+                "value": 4.784430997336051
+              },
+              {
+                "reference": "image_8f7b34585d27de621c740c71",
+                "value": 6.119249400490739
+              },
+              {
+                "reference": "image_45cda0f970af560e4b949b8e",
+                "value": 6.2647358544584115
+              },
+              {
+                "reference": "image_a223431b063edb9846082c1e",
+                "value": 6.590586183383266
+              },
+              {
+                "reference": "image_a1f86a77c8baf615ca1db94d",
+                "value": 6.685470585910732
+              }
+            ]
+          },
+          {
+            "metric": "entropy",
+            "end": "highest",
+            "examples": [
+              {
+                "reference": "image_10b3f349c1d59cee9a655241",
+                "value": 7.880779580474931
+              },
+              {
+                "reference": "image_2f5443be84241cbd0628d3ec",
+                "value": 7.8654842144721675
+              },
+              {
+                "reference": "image_5bdd9a2871d6e4a06a6fa338",
+                "value": 7.864696219476783
+              },
+              {
+                "reference": "image_b20ea81da4dd7b964e21aca5",
+                "value": 7.8611462410549375
+              },
+              {
+                "reference": "image_e6a10a56bb7e27b32899809f",
+                "value": 7.831693287951276
+              }
+            ]
+          },
+          {
+            "metric": "dark_fraction",
+            "end": "lowest",
+            "examples": [
+              {
+                "reference": "image_2924541fdc6a22984561ad0b",
+                "value": 0.0
+              },
+              {
+                "reference": "image_46843fe9fba96ff6ce6d013e",
+                "value": 3.814697265625e-06
+              },
+              {
+                "reference": "image_24d1fb2c979e289951e79ed5",
+                "value": 5.710891812865497e-06
+              },
+              {
+                "reference": "image_98300fc87780d0020e69010c",
+                "value": 1.52587890625e-05
+              },
+              {
+                "reference": "image_09a1c9f87a7a7b33af69fbbd",
+                "value": 4.57763671875e-05
+              }
+            ]
+          },
+          {
+            "metric": "dark_fraction",
+            "end": "highest",
+            "examples": [
+              {
+                "reference": "image_f05eb692343cc7e625351594",
+                "value": 0.195068359375
+              },
+              {
+                "reference": "image_659597a5fb2dde85a36299b5",
+                "value": 0.15136147660818713
+              },
+              {
+                "reference": "image_9cf8b1de55098b383b88e8e8",
+                "value": 0.1274042854532164
+              },
+              {
+                "reference": "image_db5542fc77301b0af97b5880",
+                "value": 0.11048507690429688
+              },
+              {
+                "reference": "image_d01a06e18e7c27e87c1fb834",
+                "value": 0.106992
+              }
+            ]
+          },
+          {
+            "metric": "bright_fraction",
+            "end": "lowest",
+            "examples": [
+              {
+                "reference": "image_103921a408e591fda61ad632",
+                "value": 0.0
+              },
+              {
+                "reference": "image_a1f86a77c8baf615ca1db94d",
+                "value": 0.0
+              },
+              {
+                "reference": "image_24d1fb2c979e289951e79ed5",
+                "value": 0.0
+              },
+              {
+                "reference": "image_bb22c19265b7b24c3a14abe9",
+                "value": 0.0
+              },
+              {
+                "reference": "image_46843fe9fba96ff6ce6d013e",
+                "value": 3.0517578125e-05
+              }
+            ]
+          },
+          {
+            "metric": "bright_fraction",
+            "end": "highest",
+            "examples": [
+              {
+                "reference": "image_a223431b063edb9846082c1e",
+                "value": 0.32954133333333335
+              },
+              {
+                "reference": "image_e9d61473a025062840049a48",
+                "value": 0.28575589364035087
+              },
+              {
+                "reference": "image_2924541fdc6a22984561ad0b",
+                "value": 0.2170257568359375
+              },
+              {
+                "reference": "image_d6dddad38cf4040a2a950419",
+                "value": 0.20438130696614584
+              },
+              {
+                "reference": "image_0a7271b2cf1983b3c917c566",
+                "value": 0.146331787109375
+              }
+            ]
+          }
+        ],
+        "interpretation": "Contextual extremes in eligible preview representations, not proof of unusability."
+      },
+      "references": [],
+      "scope": "bounded"
+    },
+    {
+      "id": "image_e5",
+      "family": "annotations",
+      "meaning": "deterministic_fact",
+      "data": {
+        "occurrence_states": {
+          "observed": 128
+        },
+        "validity": {
+          "valid": 128
+        },
+        "blocked_geometric_checks": {},
+        "supplied_status": {
+          "unknown": 128
+        },
+        "invalidity_reasons": {},
+        "normalized_occurrences": 128,
+        "object_visits": 0,
+        "mask_pixels": 0,
+        "empty_masks": 0,
+        "segmentation_raster_pixels": 0
+      },
+      "references": [],
+      "scope": "full_population"
+    },
+    {
+      "id": "image_e6",
+      "family": "composition",
+      "meaning": "contextual_observation",
+      "data": {
+        "categories": [
+          {
+            "source": "source_1",
+            "category": "category_7a7ca10c36abd106898b9533",
+            "annotation_instances": 67,
+            "image_occurrences": 67
+          },
+          {
+            "source": "source_1",
+            "category": "category_334728e3619a53d87b56cf76",
+            "annotation_instances": 6,
+            "image_occurrences": 6
+          },
+          {
+            "source": "source_1",
+            "category": "category_b290e1f6ef7326a867533b89",
+            "annotation_instances": 4,
+            "image_occurrences": 4
+          },
+          {
+            "source": "source_1",
+            "category": "category_3d456ecb978d266cedb99ac0",
+            "annotation_instances": 4,
+            "image_occurrences": 4
+          },
+          {
+            "source": "source_1",
+            "category": "category_1f8f39fad014a8badf182985",
+            "annotation_instances": 4,
+            "image_occurrences": 4
+          },
+          {
+            "source": "source_1",
+            "category": "category_8d226646ee424c5e4d3fbb2c",
+            "annotation_instances": 3,
+            "image_occurrences": 3
+          },
+          {
+            "source": "source_1",
+            "category": "category_42dbad2e6ef135b357184dc8",
+            "annotation_instances": 2,
+            "image_occurrences": 2
+          },
+          {
+            "source": "source_1",
+            "category": "category_a1b6c1d6eb880c97ac3bdf12",
+            "annotation_instances": 2,
+            "image_occurrences": 2
+          },
+          {
+            "source": "source_1",
+            "category": "category_d6726487f928a7a3f65cd786",
+            "annotation_instances": 2,
+            "image_occurrences": 2
+          },
+          {
+            "source": "source_1",
+            "category": "category_089c30d47a8fe73d5408f6eb",
+            "annotation_instances": 2,
+            "image_occurrences": 2
+          },
+          {
+            "source": "source_1",
+            "category": "category_40075aa4c8cc2078141de2c9",
+            "annotation_instances": 2,
+            "image_occurrences": 2
+          },
+          {
+            "source": "source_1",
+            "category": "category_e24cb9423ddbf3752767ec8a",
+            "annotation_instances": 2,
+            "image_occurrences": 2
+          },
+          {
+            "source": "source_1",
+            "category": "category_5c2fadf0e0534431fe1e5c7f",
+            "annotation_instances": 2,
+            "image_occurrences": 2
+          },
+          {
+            "source": "source_1",
+            "category": "category_98a65920895d2f8e61b17219",
+            "annotation_instances": 1,
+            "image_occurrences": 1
+          },
+          {
+            "source": "source_1",
+            "category": "category_5e9d4d40a6fb14cf96375bc2",
+            "annotation_instances": 1,
+            "image_occurrences": 1
+          },
+          {
+            "source": "source_1",
+            "category": "category_458d94102285ffc074ce1c18",
+            "annotation_instances": 1,
+            "image_occurrences": 1
+          },
+          {
+            "source": "source_1",
+            "category": "category_a17a43756dba137b271f4a59",
+            "annotation_instances": 1,
+            "image_occurrences": 1
+          },
+          {
+            "source": "source_1",
+            "category": "category_3e1158ad6c5cca7f38826364",
+            "annotation_instances": 1,
+            "image_occurrences": 1
+          },
+          {
+            "source": "source_1",
+            "category": "category_1ae4e53acada9e00ee5cc989",
+            "annotation_instances": 1,
+            "image_occurrences": 1
+          },
+          {
+            "source": "source_1",
+            "category": "category_4169396d011f109f511732b4",
+            "annotation_instances": 1,
+            "image_occurrences": 1
+          },
+          {
+            "source": "source_1",
+            "category": "category_28628e98d84bc109fc7af882",
+            "annotation_instances": 1,
+            "image_occurrences": 1
+          },
+          {
+            "source": "source_1",
+            "category": "category_7044ed5aa1beb366bb9d1350",
+            "annotation_instances": 1,
+            "image_occurrences": 1
+          },
+          {
+            "source": "source_1",
+            "category": "category_ba1f5ed4c3c559a4a4f36278",
+            "annotation_instances": 1,
+            "image_occurrences": 1
+          },
+          {
+            "source": "source_1",
+            "category": "category_26b09a3ad9b276ac21bc80ba",
+            "annotation_instances": 1,
+            "image_occurrences": 1
+          },
+          {
+            "source": "source_1",
+            "category": "category_6a605d835688c35585cf810c",
+            "annotation_instances": 1,
+            "image_occurrences": 1
+          },
+          {
+            "source": "source_1",
+            "category": "category_79833ba678bfa1908fbf6755",
+            "annotation_instances": 1,
+            "image_occurrences": 1
+          },
+          {
+            "source": "source_1",
+            "category": "category_8b765bb68e1910dc8d8586ae",
+            "annotation_instances": 1,
+            "image_occurrences": 1
+          },
+          {
+            "source": "source_1",
+            "category": "category_1c432e7efb0954b99df66b54",
+            "annotation_instances": 1,
+            "image_occurrences": 1
+          },
+          {
+            "source": "source_1",
+            "category": "category_f610e00d3781909c34c5af4a",
+            "annotation_instances": 1,
+            "image_occurrences": 1
+          },
+          {
+            "source": "source_1",
+            "category": "category_d1ed3daa621da4b74959f992",
+            "annotation_instances": 1,
+            "image_occurrences": 1
+          },
+          {
+            "source": "source_1",
+            "category": "category_badf6737acf877b5d3021d4c",
+            "annotation_instances": 1,
+            "image_occurrences": 1
+          },
+          {
+            "source": "source_1",
+            "category": "category_a680d66e52a5d2177e122773",
+            "annotation_instances": 1,
+            "image_occurrences": 1
+          },
+          {
+            "source": "source_1",
+            "category": "category_2950bc16b5987ff71515b80b",
+            "annotation_instances": 1,
+            "image_occurrences": 1
+          },
+          {
+            "source": "source_1",
+            "category": "category_2354d2aa25f46dacb88858f8",
+            "annotation_instances": 1,
+            "image_occurrences": 1
+          },
+          {
+            "source": "source_1",
+            "category": "category_45da04d131124956d8debdb2",
+            "annotation_instances": 1,
+            "image_occurrences": 1
+          },
+          {
+            "source": "source_1",
+            "category": "category_449a6b8a08163e848d8dfbd1",
+            "annotation_instances": 1,
+            "image_occurrences": 1
+          },
+          {
+            "source": "source_1",
+            "category": "category_f5d06b5410827dd9ec500293",
+            "annotation_instances": 1,
+            "image_occurrences": 1
+          },
+          {
+            "source": "source_1",
+            "category": "category_61187365e8e1d5750ef78c5a",
+            "annotation_instances": 1,
+            "image_occurrences": 1
+          },
+          {
+            "source": "source_1",
+            "category": "category_44271515028b083a099005e9",
+            "annotation_instances": 1,
+            "image_occurrences": 1
+          }
+        ],
+        "distinct_source_categories": 39,
+        "category_detail_omissions": 0,
+        "label_cardinality": {
+          "1": 128
+        },
+        "splits": [
+          {
+            "split": "split_1a2ae5703983d2af8d0ba4fe",
+            "occurrences": 128
+          }
+        ],
+        "box_area": {
+          "population": 0,
+          "minimum": null,
+          "maximum": null,
+          "median": null
+        },
+        "crowd_objects": 0,
+        "category_count_policy": "Well-formed supplied members; taxonomy violations remain separately accounted.",
+        "group_populations": [
+          {
+            "source": "source_1",
+            "groups_declared": false,
+            "complete_group_occurrences": null,
+            "incomplete_group_occurrences": null,
+            "distinct_complete_groups": null
+          }
+        ]
+      },
+      "references": [],
+      "scope": "full_population"
+    },
+    {
+      "id": "image_e7",
+      "family": "exact_duplicates_bytes",
+      "meaning": "contextual_observation",
+      "data": {
+        "groups": 0,
+        "participating_occurrences": 0,
+        "cross_split_occurrences": 0,
+        "examples": []
+      },
+      "references": [],
+      "scope": "full_population"
+    },
+    {
+      "id": "image_e8",
+      "family": "exact_duplicates_native",
+      "meaning": "contextual_observation",
+      "data": {
+        "groups": 0,
+        "participating_occurrences": 0,
+        "cross_split_occurrences": 0,
+        "examples": []
+      },
+      "references": [],
+      "scope": "full_population"
+    },
+    {
+      "id": "image_e9",
+      "family": "exact_duplicates_oriented",
+      "meaning": "contextual_observation",
+      "data": {
+        "groups": 0,
+        "participating_occurrences": 0,
+        "cross_split_occurrences": 0,
+        "examples": []
+      },
+      "references": [],
+      "scope": "full_population"
+    },
+    {
+      "id": "image_e10",
+      "family": "annotation_disagreement",
+      "meaning": "contextual_observation",
+      "data": {
+        "compatible_exact_raster_groups_with_differences": 0,
+        "payload_difference_groups_blocked": 0,
+        "details": [],
+        "correct_label_identified": false
+      },
+      "references": [],
+      "scope": "full_population"
+    },
+    {
+      "id": "image_e11",
+      "family": "logical_identity",
+      "meaning": "deterministic_fact",
+      "data": {
+        "occurrences_with_duplicate_source_keys": 0
+      },
+      "references": [],
+      "scope": "full_population"
+    },
+    {
+      "id": "image_e12",
+      "family": "near_duplicates",
+      "meaning": "investigation_candidate",
+      "data": {
+        "qualifying_raster_pairs": 0,
+        "examples": [],
+        "radius": 6,
+        "representation": "DCT64 opaque RGB preview; seven disjoint partitions",
+        "approximate_groups_are_equivalence_classes": false
+      },
+      "references": [],
+      "scope": "bounded"
+    }
+  ],
+  "findings": [],
+  "coverage": {
+    "families": {
+      "inventory": {
+        "required_occurrences": 128,
+        "inventory_complete": true
+      },
+      "visual_quality": {
+        "eligible": 67,
+        "examined": 67,
+        "ineligible": 61
+      },
+      "visual_extremes": {
+        "eligible": 67,
+        "maximum_examples_per_metric_end": 5
+      },
+      "annotations": {
+        "occurrences_examined": 128,
+        "segmentation_raster_work": 0,
+        "segmentation_raster_limit": 100000000,
+        "topology_and_semantic_correctness": "not assessed"
+      },
+      "exact_duplicates_bytes": {
+        "representation": "bytes",
+        "eligible_occurrences": 128,
+        "group_detail_omissions": 0
+      },
+      "exact_duplicates_native": {
+        "representation": "native",
+        "eligible_occurrences": 128,
+        "group_detail_omissions": 0
+      },
+      "exact_duplicates_oriented": {
+        "representation": "oriented",
+        "eligible_occurrences": 128,
+        "group_detail_omissions": 0
+      },
+      "annotation_disagreement": {
+        "variant_comparisons_are_bounded": true
+      },
+      "near_duplicates": {
+        "indexed_rasters": 67,
+        "partition_entries": 469,
+        "saturated_buckets": 0,
+        "posting_visits": 1012,
+        "posting_rows_loaded": 469,
+        "posting_cache_limit_bytes": 33554432,
+        "hamming_comparisons": 74,
+        "pair_populations": [
+          {
+            "split": "split_1a2ae5703983d2af8d0ba4fe",
+            "query_population": 67,
+            "reference_population": 67,
+            "queries_started": 67,
+            "queries_completed": 67,
+            "posting_visits": 1012,
+            "hamming_comparisons": 74,
+            "qualifying_emissions": 0,
+            "posting_saturation_visits": 0,
+            "scope": "within_split"
+          }
+        ],
+        "cross_split_queries_complete": true,
+        "cross_split_stop_reason": null,
+        "stop_reason": "examined_scope_completed",
+        "detail_omissions": 0,
+        "absence_claim": "examined scope only; capped postings do not establish global absence"
+      }
+    },
+    "required_population": "complete inventoried and applicable supplied populations within hard limits",
+    "retained_examples_are_bounded": true
+  },
+  "execution": {
+    "status": "completed",
+    "backend": "duckdb_local",
+    "effective_limits": {
+      "backend": "duckdb_local",
+      "max_source_bytes": 1073741824,
+      "max_combined_source_bytes": 4294967296,
+      "max_rows": 10000000,
+      "max_combined_rows": 30000000,
+      "max_columns": 1000,
+      "memory_bytes": 2147483648,
+      "max_rss_bytes": 6442450944,
+      "threads": 2,
+      "batch_bytes": 33554432,
+      "max_record_bytes": 8388608,
+      "workspace_bytes": 68719476736,
+      "free_disk_bytes": 2147483648,
+      "max_seconds": 1799.9989735829877,
+      "result_bytes": 33554432
+    },
+    "image_limits": {
+      "assets": 100000,
+      "occurrences": 1000000,
+      "annotations": 10000000,
+      "pixels_per_asset": 32000000,
+      "decode_bytes": 536870912,
+      "decoded_pixels": 100000000000,
+      "polygon_vertices": 10000000,
+      "rle_runs": 10000000,
+      "segmentation_pixels": 100000000,
+      "posting_visits": 100000000,
+      "hamming_comparisons": 50000000,
+      "bucket_entries": 1024,
+      "candidate_pairs": 250000,
+      "embedding_images": 10000,
+      "cosine_pairs": 25000000,
+      "details": 100,
+      "witnesses": 5,
+      "private_bytes": 67108864
+    },
+    "image_source_limits": {
+      "media_per_input_bytes": 68719476736,
+      "combined_media_bytes": 137438953472,
+      "asset_capture_bytes": 134217728
+    },
+    "duration_seconds": 0.9558075420209207,
+    "peak_workspace_bytes": 487424,
+    "estimated_peak_workspace_bytes": 268811430,
+    "capture_read_bytes": 20512288,
+    "initial_hash_seconds": 0.019260869070421904,
+    "corpus_copied": false,
+    "publication_policy": "required_core_atomic_optional_model_isolated",
+    "warnings": [
+      "Sampled resource controls can overshoot.",
+      "Capacity and calibrated recall are measured claims for recorded workloads only."
+    ],
+    "peak_worker_rss_bytes": 176226304,
+    "whole_job_seconds": 1.823236333031673,
+    "peak_spill_bytes": 0,
+    "serialized_bytes": 30136,
+    "final_verification_bytes": 20512288,
+    "final_verification_seconds": 0.021602166001684964,
+    "core_execution": {
+      "status": "completed",
+      "backend": "duckdb_local",
+      "effective_limits": {
+        "backend": "duckdb_local",
+        "max_source_bytes": 1073741824,
+        "max_combined_source_bytes": 4294967296,
+        "max_rows": 10000000,
+        "max_combined_rows": 30000000,
+        "max_columns": 1000,
+        "memory_bytes": 2147483648,
+        "max_rss_bytes": 6442450944,
+        "threads": 2,
+        "batch_bytes": 33554432,
+        "max_record_bytes": 8388608,
+        "workspace_bytes": 68719476736,
+        "free_disk_bytes": 2147483648,
+        "max_seconds": 1799.9989735829877,
+        "result_bytes": 33554432
+      },
+      "image_limits": {
+        "assets": 100000,
+        "occurrences": 1000000,
+        "annotations": 10000000,
+        "pixels_per_asset": 32000000,
+        "decode_bytes": 536870912,
+        "decoded_pixels": 100000000000,
+        "polygon_vertices": 10000000,
+        "rle_runs": 10000000,
+        "segmentation_pixels": 100000000,
+        "posting_visits": 100000000,
+        "hamming_comparisons": 50000000,
+        "bucket_entries": 1024,
+        "candidate_pairs": 250000,
+        "embedding_images": 10000,
+        "cosine_pairs": 25000000,
+        "details": 100,
+        "witnesses": 5,
+        "private_bytes": 67108864
+      },
+      "image_source_limits": {
+        "media_per_input_bytes": 68719476736,
+        "combined_media_bytes": 137438953472,
+        "asset_capture_bytes": 134217728
+      },
+      "duration_seconds": 0.9558075420209207,
+      "peak_workspace_bytes": 487424,
+      "estimated_peak_workspace_bytes": 268811430,
+      "capture_read_bytes": 20512288,
+      "initial_hash_seconds": 0.019260869070421904,
+      "corpus_copied": false,
+      "publication_policy": "required_core_atomic_optional_model_isolated",
+      "warnings": [
+        "Sampled resource controls can overshoot.",
+        "Capacity and calibrated recall are measured claims for recorded workloads only."
+      ],
+      "peak_worker_rss_bytes": 176226304,
+      "whole_job_seconds": 1.3802774170180783,
+      "peak_spill_bytes": 0,
+      "serialized_bytes": 29938
+    }
+  },
+  "generated_at": "2026-10-12T00:34:29.979879+00:00"
+}

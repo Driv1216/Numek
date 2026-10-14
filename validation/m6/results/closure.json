@@ -1,0 +1,113 @@
+{
+  "status": "completed",
+  "recorded_at": "2026-10-11T13:33:38.334125+00:00",
+  "schema": "1.5",
+  "methodology": "text_reliability_v1",
+  "authority": "agents/skills/verify/skills.md",
+  "repository_suite": {
+    "command": "PYTHONPATH=src .venv/bin/python -m pytest -q",
+    "passed": 385,
+    "seconds": 31.73,
+    "scope": "Final shared-code and M6 state before adding the cancellation regression; no production source changed afterward."
+  },
+  "subsequent_focused_checks": [
+    {
+      "command": "PYTHONPATH=src .venv/bin/python -m pytest tests/m6/test_interfaces.py::test_browser_guided_confirmation_run_and_private_reveal -q",
+      "passed": 1,
+      "seconds": 1.22,
+      "purpose": "Added PDF download assertion, private resolution and source/disclosure cache transitions."
+    },
+    {
+      "command": "PYTHONPATH=src .venv/bin/python -m pytest tests/m6/test_interfaces.py::test_browser_cancel_reaches_supervisor_and_releases_worker_lock -q",
+      "passed": 1,
+      "seconds": 0.36,
+      "purpose": "New deterministic cancellation-route regression forwards to real supervisor, publishes no completed result and releases shared worker lock."
+    }
+  ],
+  "historical_verification": {
+    "commands": [
+      "PYTHONPATH=src .venv/bin/python -m validation.verify",
+      "PYTHONPATH=src .venv/bin/python -m validation.dry_runs.verify"
+    ],
+    "status": "passed",
+    "preservation": "No files under validation/m1\u2013m5, regression, unlabeled or dry_runs modified; existing public behavior covered by repository suite. Unaffected prior milestone evidence reused."
+  },
+  "new_evidence": {
+    "verification.json": "53d10b54f81c43c014ca933ca882880a50a2ddcf31230e9f7e253ffb0aa3a54a",
+    "calibration.json": "8521ec9dd2ca1d0f7218e5c4c178eea2883011b414626fbe36687a9596e648b1",
+    "capacity_100mib_final.json": "a55862c54d600d8bff00fd40df702b8e31c2ffd5bb42b6425605e98e737758f5",
+    "capacity_1gib_final.json": "9af833d52981b71aaa3347c84cba5894448e99520a9c918831672cb4788093e5",
+    "capacity_1gib_initial_failure.json": "a3e3072d2de022dc2f3a44f965e6a0102ead2c1b8d3cbfc9d4e4930b55fcb847",
+    "stress.json": "76d27e004ba523717ad2814b2897cadf735bd01ac2d89e7643f909f2331f1173",
+    "presentation.json": "48bfdadeeb9bdc72e7f5f2b504dfa104f84e87ae234062e289a9350e50c4a567",
+    "pdf_qa.json": "ccdbdef7d6fbdb8a0be681e9a2af9ca44cb9f58bc503a5c2a0e61f4ccec9d3df",
+    "model_publisher_identity.json": "983969175d1efcdf4e57872b44614ae692ff58bf0d26d55c1b37bcce53c94bb6"
+  },
+  "data_seals": {
+    "data/manifest.json": "3deff94228df196ac44b6a056631eedd2b0156f420774afeb922e8499e40cda9",
+    "data/prepared_manifest.json": "c1c99ec0a14daf5c21ead94b3ed6c8645174b2702504862270e264b219763747",
+    "data/authored/controls.jsonl": "9500ce98cd9ee2ee6924d29daf365317e1ab7a6161584b6ad45a5d2cc02f6060",
+    "runtime-lock.txt": "6797be968dfa38a5a0ec4d1e9e62bf9b14eb601911624d11a6fa2bb3c3ffa91d"
+  },
+  "source_and_test_sha256": {
+    "pyproject.toml": "55cf3642912f6550afc61c5e1d746e07aff59ad66349290f3fff02238314e0da",
+    "src/datatrust/__init__.py": "b16a4916a176ce0a7a0269e2452e178fcb950063e4cfd5eaf721d1cebae5960d",
+    "src/datatrust/cli.py": "78347da4c8434d9f8f70175e6899fff92bcfd5dddf37a403ce3410ad22285d80",
+    "src/datatrust/core.py": "033a75ca51a839fa210bc09128931daa3906512d9ed5d3048175372db1a60e44",
+    "src/datatrust/renderer.py": "5a9ff941d18b28f18a24bcc988933e4aa435c311956b48a9f089ef0e41779e11",
+    "src/datatrust/templates/text_report.html": "0c4f42b51aea3cfd63426fd7e69bbf8647ee752848a52dcc725e8a3b6a47cf53",
+    "src/datatrust/templates/text_ui.html": "4f44124e7636a23f543c7b5678b9ece0c58dbd76eb195ef365e88c3567ffbf97",
+    "src/datatrust/templates/ui.html": "6b0ef04946e341e1014634dc16082da968b324a82fae9037f5030f76a649d29c",
+    "src/datatrust/text.py": "bcf84b69d223fe9a6ef8e711914f2d728968f52cd66f9dd8b0ae1dcc581a19e2",
+    "src/datatrust/text_contracts.py": "5bce5d2c2bdba1ab6c9603ff7a43765fc10b6d0264456d20d1f0b3af580b1470",
+    "src/datatrust/text_diagnostics.py": "75d53079a2c2587f5493fca69ce2b1f3b056f5d8008898e70f9f1646f1cc47de",
+    "src/datatrust/text_model_artifacts.json": "b8fbdaac2f619b5ceceae9e304f302c41b9af3f9da4e20de85b09e938c9ce3d2",
+    "src/datatrust/text_models.py": "45393c24bfb785e2110018c4b8cf2512c1b4e64e7619d44028040592cd590f86",
+    "src/datatrust/text_normalization.py": "dad58282ba0f11f10a267f43ae72a024adac50cb8b33ec1dcd7642af37e1ee2b",
+    "src/datatrust/text_presentation.py": "133548ab1304ccd90007143e43b94c94812049050b77efa3cb39285827a52263",
+    "src/datatrust/text_private.py": "a69801d27729cab2127cee8fa5abaa0c4861cc15e33793ddc857f9c269ba8948",
+    "src/datatrust/text_search.py": "cefe5b7a74692f3870fe22d16a0b7bd278401fe81270a646cf35a3f46502a454",
+    "src/datatrust/text_search_profile.json": "b05e793ae44bd1f301adb22c7f79cf046bb34666a07f42a1582efcee496c71b6",
+    "src/datatrust/text_web.py": "36e111e2bbcc376293c033ef8f6458b528aa5cb9412b4984f5b6159628d28a04",
+    "src/datatrust/web.py": "3dd4c1f6d83b58b7d2fbc949e4e1cd0ae2a16561f9a151f3f64428935ecb9292",
+    "tests/m6/test_closure_controls.py": "3ad589b7ff920f0cab75ade56aa2ba43d055baddb8e06b2510388f92619c7fd3",
+    "tests/m6/test_foundation.py": "cce193734a5dbbb1d5cc7c72cb82793aae74c22b2f4309a51f5cb33877ce3dc9",
+    "tests/m6/test_interfaces.py": "e2a8d50f105418af0b2eb42aeb38ec0f688a82adab6ca05e1b868a8abb1318e0",
+    "tests/m6/test_search_models.py": "2c676ebc3bb1fb50cadb3026514d1ad5a5bff6755fa1871b954ea8ea00d0b67a"
+  },
+  "browser": {
+    "status": "passed",
+    "live_flow": [
+      "Corpus CSV source",
+      "Guided field/identity/classification mapping",
+      "Bounded-work configuration retained through edit and confirmation",
+      "Run and completed result",
+      "Strict JSON download",
+      "Changed historical source signature refused for witness resolution",
+      "Reconfirmation/rerun and exact CSV witness reveal"
+    ],
+    "screenshot": "results/browser-completed.jpg",
+    "screenshot_sha256": "f2220e2dc24ece145bec17ef76a0b7a51b4247a1ca10938490cc8e19e58b0e53",
+    "current_code_checks": "Flask integration tests supplement live browser with PDF/JSON downloads, private session/CSRF isolation, excerpt-cache rejection and cancellation. Live browser server preceded the final cache-hardening changes; those changes passed focused and repository tests.",
+    "temporary_server_and_tab": "closed"
+  },
+  "pdf": {
+    "reports": 5,
+    "pages": 53,
+    "visual_review": "all_pages_passed",
+    "canonical_html_digest_bindings": "verified_for_all_five_current_export_variants"
+  },
+  "reuse": [
+    "LSH calibration reused after integration; no change to its hashes or profile.",
+    "Measured structural capacity evidence reused after changes to presentation/private delivery; narrow workload parser and structural behavior unchanged.",
+    "Completed public analyses reprojected into fresh template variants without overwriting historical exports."
+  ],
+  "limitations": [
+    "Engineering evidence on macOS ARM64 Python 3.11 CPU; not external product validation.",
+    "LSH observed recall applies only to fixed ordinary calibration fixtures; saturation coverage is intentionally incomplete.",
+    "100 MiB/1 GiB narrow ASCII/template workloads use at most 128 selected lexical units; not full-corpus semantic or all-pairs capacity.",
+    "RSS enforcement is sampled and can overshoot. Token output work is charged after each whole tokenizer call, including a rejected final call.",
+    "Private manifests are separate ignored local artifacts. Historical report references require their original manifest and unchanged sources; deleted temporary inputs are unavailable.",
+    "Human reports summarize retained strict-JSON evidence; 10\u201312-page representative PDFs contain continuing tables and some whitespace."
+  ]
+}

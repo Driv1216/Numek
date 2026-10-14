@@ -86,12 +86,16 @@ def cleanup_stale(parent):
 
 
 class Workspace:
-    def __init__(self, options, inputs, progress=None, owned_snapshots=(), *, phase_plan=None):
+    def __init__(self, options, inputs, progress=None, owned_snapshots=(), *, phase_plan=None, image_source_plan=None):
         self.options = options; self.progress = progress or (lambda value: None)
         self.input_count = len(inputs)
         self.owned_snapshots = tuple(Path(p).resolve() for p in owned_snapshots)
         self.started = time.monotonic(); self.peak = 0; self.phases = []
-        sizes = [Path(i.dataset.path).stat().st_size for i in inputs]
+        sizes = [Path(i.dataset.path).stat().st_size for i in inputs] if image_source_plan is None else image_source_plan.metadata_sizes
+        if image_source_plan is not None:
+            from datatrust.image_sources import ValidatedImageSourcePlan
+            if not isinstance(image_source_plan, ValidatedImageSourcePlan):
+                raise ValueError('Image workspaces require an internally validated source plan.')
         for item, size in zip(inputs, sizes):
             tighter = item.config.limits.max_source_bytes if item.config and item.config.limits else None
             if size > min(options.max_source_bytes, tighter or options.max_source_bytes):

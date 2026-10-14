@@ -1,6 +1,6 @@
 # Numek Master Context
 
-Last updated: 2026-10-11
+Last updated: 2026-10-13
 
 ## Identity And Company Thesis
 
@@ -26,16 +26,19 @@ deeper tabular diagnostics, time series, text, images, audio, multimodal/special
 datasets. M1 implements shared contracts and useful unlabeled CSV profiling. M2 now
 implements single-target regression across Python, CLI, browser, HTML/PDF/JSON,
 with declared expectations, bounded arithmetic relationships, and evidence-based
-review priorities. Regression scoring remains undefined. Later milestones remain
-direction rather than delivered capability. Drivyaansh accepted the M2 functional
+review priorities. Regression scoring remains undefined. Drivyaansh accepted the M2 functional
 implementation on 2026-10-09; the subsequent narrow report-presentation cleanup
 preserves its analytical behavior. M3 now implements annotation-aware partial
 workflows, multilabel binary indicators, multi-output regression, and conditional
 clustering/anomaly readiness, through the shared CSV engine and every interface.
-New task scores remain undefined. M1–M3, including M3’s understanding gate, are
-accepted. M4 now implements comparative reliability and opt-in scalable local
-analysis. M5 implements temporal reliability intelligence with exact clocks, local CSV/Parquet, coverage, feature-bound timing/revisions, supplied evaluation and configurable behavioral investigation; later modalities remain direction. Internal measurements remain
+New task scores remain undefined. M1–M6 completion, including M6’s understanding
+gate, is accepted. M4 implements comparative reliability and opt-in scalable local
+analysis. M5 implements temporal reliability intelligence with exact clocks, local CSV/Parquet, coverage, feature-bound timing/revisions, supplied evaluation and configurable behavioral investigation. M6 adds text corpus, annotation, conversation and retrieval reliability with bounded duplication/model investigations and private evidence resolution; later modalities remain direction. Internal measurements remain
 scoped engineering evidence, not external validation or capacity guarantees.
+M6’s review, focused corrections and understanding gate are complete and accepted.
+M7 now implements local image reliability, bounded segmentation integrity, offline
+visual candidates and private investigation. Its measured engineering evidence
+does not imply founder acceptance or universal model/search guarantees.
 
 Build substantial capabilities when they strengthen the product. Do not keep
 Numek inside the smallest defensible prototype or treat all development beyond
@@ -270,3 +273,50 @@ architecture, methodology and M4 validation evidence for delivered scope.
 ## M5 implementation handoff — 2026-10-11
 
 The approved Temporal Reliability Intelligence scope is implemented through temporal-specific contracts, exact clocks, schedule/lifecycle/panel populations, feature-bound timing and revision states, maturity, supplied evaluation plans, configurable behavior and local Python/CLI/browser/report experiences. See [M5 implementation](M5_TEMPORAL_RELIABILITY.md). Existing M1–M4 input contracts and analytical policy are preserved; no founder decision or additional acceptance ceremony is required for this implementation. Resource budgets and threshold defaults are provisional. Verification follows the repository skill, with new evidence in validation/m5 and historical M4 execution/source-only records left distinct.
+
+## M6 implementation handoff — 2026-10-11
+
+The user accepted M1–M5 completion, including M5’s understanding gate, and
+authorized implementation of the revised M6 plan. Text Reliability Intelligence
+is implemented within DataTrust’s shared supervision, evidence, comparison and
+artifact architecture. Python/CLI/guided browser and HTML/PDF/strict JSON support
+corpora, annotations/QA/generation, conversations and retrieval provenance.
+
+The revised commitments are retained: calibrated bounded MinHash search,
+full-population versus selected-population accounting, exact private evidence
+resolution, fatal versus recoverable malformed data and reproducible long-document
+embedding windows. Optional models work locally with pinned artifacts. There is
+no universal score, cloud dependency or premature modality engine. M6 evidence
+and measured limits are in `validation/m6/`; canonical behavior is documented in
+`docs/M6_TEXT_RELIABILITY.md`. Historical evidence is unchanged. Internal closure
+is distinct from universal methodology validity or external product acceptance.
+
+
+## M7 implementation handoff — 2026-10-12
+
+The founder authorized the complete replacement M7 plan. The implementation uses
+separate image contracts and identities, verified coordinate compatibility,
+minimal-copy local source handling, full perceptual signature inventory with
+work-bounded search, optional pinned offline CPU models, and private-default
+Python/CLI/browser HTML/PDF/JSON. Benchmark failures are retained and shipping
+configuration follows the agreed recall/review-burden/resource rules. See
+`docs/M7_IMAGE_RELIABILITY.md` and `validation/m7/README.md`. Historical M1–M6
+evidence remains valid and preserved; later milestones remain deferred.
+
+## M9 implementation handoff — 2026-10-13
+
+The user accepted M1–M7, deliberately deferred M8 audio and authorized the full
+M9 plan. M9 is implemented as connected record/document/text/image reliability,
+led by reusable native PDF/DOCX reconciliation. Exact relationships, context/clocks,
+competing evidence, declared contamination, opt-in qualified English NLI/paired
+image-text and independent reviewer snapshots share the local execution/export
+boundaries. The guided 20-record/21-PDF story retains 18 agreements, one discrepancy
+and one conflict, including mixed status evidence and exact private locators.
+
+Qualification is narrow: authored financial declarations and supplied COCO
+caption-association controls; general semantic validity is not established.
+Resource budgets/timings remain provisional. OCR, audio/video, external claim
+search, model monitoring, persistent review, automatic correction and global
+scores remain excluded. See `docs/M9_CROSS_REPRESENTATION_RELIABILITY.md` and
+`validation/m9/README.md`. Historical evidence is preserved; no new approval
+ceremony is required.

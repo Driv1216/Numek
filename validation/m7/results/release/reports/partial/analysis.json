@@ -1,0 +1,903 @@
+{
+  "schema_version": "1.6",
+  "methodology_id": "image_reliability_v1",
+  "profile": {
+    "audit_id": "aa06e6d544d24e0fb16a300b1b1b9adc",
+    "occurrences": 128,
+    "source_count": 1,
+    "image_locations": 128,
+    "dataset_name": null,
+    "purpose": null,
+    "summary": "0 evidence-qualified findings across 128 image occurrences; partial execution.",
+    "private_manifest_sha256": "67b6b599fee77d0f9b834a158b145b8725654574b98481a5fd3b54c908df2069",
+    "examples": [],
+    "disclosure": {
+      "policy": "references_only",
+      "references": [],
+      "overlays": false,
+      "labels": false,
+      "encoded_bytes": 0
+    },
+    "export_identity": {
+      "completed_evidence_sha256": "01c2f9d731df57720344b4174f4980f9df170de6fb8739654041d06f4bad31dd",
+      "disclosure_sha256": "a3d27be032354ccd292944dd216801e1e5d73182e86dd816b76b77e5707d2425",
+      "example_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "template_sha256": "0c5d930f3f2e2b390e49a27637a24193bb59a7bdfa8ecff39ad6381581dcf029",
+      "projection_sha256": "20744f77e77dd461b539478dcf560a121ea7622a8232c94afa469100979379dc",
+      "canonical_html_sha256": "0bec1c81117f14508cf73ccf32d74d4bf802d760e1cc005bc1f4a3064877bcf2"
+    }
+  },
+  "checks": [
+    {
+      "id": "image_e1",
+      "family": "inventory",
+      "applicability": "applicable",
+      "execution": "completed",
+      "scope": "full_population",
+      "violations": 0
+    },
+    {
+      "id": "image_e2",
+      "family": "decode",
+      "applicability": "applicable",
+      "execution": "completed",
+      "scope": "full_population",
+      "violations": 0
+    },
+    {
+      "id": "image_e3",
+      "family": "visual_quality",
+      "applicability": "applicable",
+      "execution": "completed",
+      "scope": "full_population",
+      "violations": 0
+    },
+    {
+      "id": "image_e4",
+      "family": "visual_extremes",
+      "applicability": "applicable",
+      "execution": "completed",
+      "scope": "bounded",
+      "violations": 0
+    },
+    {
+      "id": "image_e5",
+      "family": "annotations",
+      "applicability": "applicable",
+      "execution": "completed",
+      "scope": "full_population",
+      "violations": 0
+    },
+    {
+      "id": "image_e6",
+      "family": "composition",
+      "applicability": "applicable",
+      "execution": "completed",
+      "scope": "full_population",
+      "violations": 0
+    },
+    {
+      "id": "image_e7",
+      "family": "exact_duplicates_bytes",
+      "applicability": "applicable",
+      "execution": "completed",
+      "scope": "full_population",
+      "violations": 0
+    },
+    {
+      "id": "image_e8",
+      "family": "exact_duplicates_native",
+      "applicability": "applicable",
+      "execution": "completed",
+      "scope": "full_population",
+      "violations": 0
+    },
+    {
+      "id": "image_e9",
+      "family": "exact_duplicates_oriented",
+      "applicability": "applicable",
+      "execution": "completed",
+      "scope": "full_population",
+      "violations": 0
+    },
+    {
+      "id": "image_e10",
+      "family": "annotation_disagreement",
+      "applicability": "applicable",
+      "execution": "completed",
+      "scope": "full_population",
+      "violations": 0
+    },
+    {
+      "id": "image_e11",
+      "family": "logical_identity",
+      "applicability": "applicable",
+      "execution": "completed",
+      "scope": "full_population",
+      "violations": 0
+    },
+    {
+      "id": "image_e12",
+      "family": "near_duplicates",
+      "applicability": "applicable",
+      "execution": "completed",
+      "scope": "bounded",
+      "violations": 0
+    },
+    {
+      "id": "image_embeddings",
+      "family": "embeddings",
+      "applicability": "applicable",
+      "execution": "failed",
+      "scope": "bounded",
+      "reason": "isolated_model_failure"
+    }
+  ],
+  "evidence": [
+    {
+      "id": "image_e1",
+      "family": "inventory",
+      "meaning": "deterministic_fact",
+      "data": {
+        "occurrences": 128,
+        "directory_entries": 0,
+        "image_locations": 128,
+        "physical_media_files": 128,
+        "physical_alias_locations": 0,
+        "source_populations": [
+          {
+            "source": "source_1",
+            "role": "dataset",
+            "occurrences": 128
+          }
+        ],
+        "logical_media_bytes": 20506573,
+        "metadata_bytes": 5728
+      },
+      "references": [],
+      "scope": "full_population"
+    },
+    {
+      "id": "image_e2",
+      "family": "decode",
+      "meaning": "deterministic_fact",
+      "data": {
+        "asset_states": {
+          "decoded": 128
+        },
+        "format_extension_mismatches": 0,
+        "encoded_formats": {
+          "JPEG": 128
+        },
+        "modes": {
+          "RGB": 128
+        },
+        "decoded_pixels": 35236540,
+        "dimensions_observed": 128,
+        "frame_policy": "single frame only"
+      },
+      "references": [],
+      "scope": "full_population"
+    },
+    {
+      "id": "image_e3",
+      "family": "visual_quality",
+      "meaning": "contextual_observation",
+      "data": {
+        "eligible_assets": 67,
+        "exclusions": {
+          "decoded": 0,
+          "icc_profile": 61
+        },
+        "metrics": {
+          "contrast": {
+            "population": 67,
+            "minimum": 0.0688931724252834,
+            "median": 0.24393922115119365,
+            "maximum": 0.34001740537389136
+          },
+          "mean_luminance": {
+            "population": 67,
+            "minimum": 0.22550425098039217,
+            "median": 0.47632461072664356,
+            "maximum": 0.7149799222260519
+          },
+          "dark_fraction": {
+            "population": 67,
+            "minimum": 0.0,
+            "median": 0.010829866486068112,
+            "maximum": 0.195068359375
+          },
+          "bright_fraction": {
+            "population": 67,
+            "minimum": 0.0,
+            "median": 0.010798136393229166,
+            "maximum": 0.32954133333333335
+          },
+          "entropy": {
+            "population": 67,
+            "minimum": 4.784430997336051,
+            "median": 7.481409339023346,
+            "maximum": 7.880779580474931
+          },
+          "sharpness": {
+            "population": 67,
+            "minimum": 0.002173632075435273,
+            "median": 0.025498529587112743,
+            "maximum": 0.14138948936012613
+          },
+          "width": {
+            "population": 128,
+            "minimum": 240,
+            "maximum": 640
+          },
+          "height": {
+            "population": 128,
+            "minimum": 189,
+            "maximum": 640
+          }
+        },
+        "representation": "oriented opaque RGB; preview longest side 512; no arbitrary ICC conversion",
+        "quality_score": null
+      },
+      "references": [],
+      "scope": "full_population"
+    },
+    {
+      "id": "image_e4",
+      "family": "visual_extremes",
+      "meaning": "contextual_observation",
+      "data": {
+        "examples": [
+          {
+            "metric": "contrast",
+            "end": "lowest",
+            "examples": [
+              {
+                "reference": "image_21407828316d5b29419abdb5",
+                "value": 0.0688931724252834
+              },
+              {
+                "reference": "image_f583221ec7fd890206cb791d",
+                "value": 0.10334803601913992
+              },
+              {
+                "reference": "image_cc84a9a1829af18b601ec238",
+                "value": 0.10503337583745889
+              },
+              {
+                "reference": "image_58fb12c8092a8046853a7c22",
+                "value": 0.1260370327961191
+              },
+              {
+                "reference": "image_12f7fd729dbc93fef461f033",
+                "value": 0.1382888471850404
+              }
+            ]
+          },
+          {
+            "metric": "contrast",
+            "end": "highest",
+            "examples": [
+              {
+                "reference": "image_c888d92019255b6349011281",
+                "value": 0.34001740537389136
+              },
+              {
+                "reference": "image_33bd10ba8f797221a752caea",
+                "value": 0.32833950172334375
+              },
+              {
+                "reference": "image_2474ef35810c46af64dc1246",
+                "value": 0.3231321199757325
+              },
+              {
+                "reference": "image_b48ed89f48d40c9a24c6559f",
+                "value": 0.3180389029985453
+              },
+              {
+                "reference": "image_a9737313865523e43d82ad8a",
+                "value": 0.31783784879277255
+              }
+            ]
+          },
+          {
+            "metric": "sharpness",
+            "end": "lowest",
+            "examples": [
+              {
+                "reference": "image_21407828316d5b29419abdb5",
+                "value": 0.002173632075435273
+              },
+              {
+                "reference": "image_14894630f60a34280996e0cb",
+                "value": 0.002411775322461613
+              },
+              {
+                "reference": "image_f583221ec7fd890206cb791d",
+                "value": 0.0028056567549174906
+              },
+              {
+                "reference": "image_e4ceb88fd40fa24931e3436f",
+                "value": 0.0030998882084424823
+              },
+              {
+                "reference": "image_40a0c5f1eae6020685a45b9d",
+                "value": 0.0032649649873468414
+              }
+            ]
+          },
+          {
+            "metric": "sharpness",
+            "end": "highest",
+            "examples": [
+              {
+                "reference": "image_2c4afe942bf0225a8e021043",
+                "value": 0.14138948936012613
+              },
+              {
+                "reference": "image_df2229c96b577ff98b05135a",
+                "value": 0.13582328127838725
+              },
+              {
+                "reference": "image_c8c0f0953dd7f4126329e63f",
+                "value": 0.1357479434209037
+              },
+              {
+                "reference": "image_fb94451168aa9de1c9170234",
+                "value": 0.10329566570071076
+              },
+              {
+                "reference": "image_b96ca6dc156f0154154f5803",
+                "value": 0.09904486490761372
+              }
+            ]
+          },
+          {
+            "metric": "entropy",
+            "end": "lowest",
+            "examples": [
+              {
+                "reference": "image_21407828316d5b29419abdb5",
+                "value": 4.784430997336051
+              },
+              {
+                "reference": "image_cc84a9a1829af18b601ec238",
+                "value": 6.119249400490739
+              },
+              {
+                "reference": "image_f583221ec7fd890206cb791d",
+                "value": 6.2647358544584115
+              },
+              {
+                "reference": "image_33bd10ba8f797221a752caea",
+                "value": 6.590586183383266
+              },
+              {
+                "reference": "image_29667697eca9a9fc32033c01",
+                "value": 6.685470585910732
+              }
+            ]
+          },
+          {
+            "metric": "entropy",
+            "end": "highest",
+            "examples": [
+              {
+                "reference": "image_f54affa6d271d317b0cc9ce7",
+                "value": 7.880779580474931
+              },
+              {
+                "reference": "image_e6a8dcac86baed0a0171f625",
+                "value": 7.8654842144721675
+              },
+              {
+                "reference": "image_ddc5b5ebe8b192127de85d83",
+                "value": 7.864696219476783
+              },
+              {
+                "reference": "image_bd21aed296843f3ad6209558",
+                "value": 7.8611462410549375
+              },
+              {
+                "reference": "image_bfae21eddf77310f11c2f0da",
+                "value": 7.831693287951276
+              }
+            ]
+          },
+          {
+            "metric": "dark_fraction",
+            "end": "lowest",
+            "examples": [
+              {
+                "reference": "image_d5344ebd2c69cacffc9de55d",
+                "value": 0.0
+              },
+              {
+                "reference": "image_304ce78ad4d9b4569fd7114d",
+                "value": 3.814697265625e-06
+              },
+              {
+                "reference": "image_21407828316d5b29419abdb5",
+                "value": 5.710891812865497e-06
+              },
+              {
+                "reference": "image_da5d9c5440ee98dff1a5b333",
+                "value": 1.52587890625e-05
+              },
+              {
+                "reference": "image_c94bba871958f98e7fc1c9ea",
+                "value": 4.57763671875e-05
+              }
+            ]
+          },
+          {
+            "metric": "dark_fraction",
+            "end": "highest",
+            "examples": [
+              {
+                "reference": "image_dcfaf91e252f88e05b5279ae",
+                "value": 0.195068359375
+              },
+              {
+                "reference": "image_fb94451168aa9de1c9170234",
+                "value": 0.15136147660818713
+              },
+              {
+                "reference": "image_cf3848c66476e9dcc4bfb994",
+                "value": 0.1274042854532164
+              },
+              {
+                "reference": "image_482510fad549c13cc89afc0a",
+                "value": 0.11048507690429688
+              },
+              {
+                "reference": "image_40a0c5f1eae6020685a45b9d",
+                "value": 0.106992
+              }
+            ]
+          },
+          {
+            "metric": "bright_fraction",
+            "end": "lowest",
+            "examples": [
+              {
+                "reference": "image_12f7fd729dbc93fef461f033",
+                "value": 0.0
+              },
+              {
+                "reference": "image_29667697eca9a9fc32033c01",
+                "value": 0.0
+              },
+              {
+                "reference": "image_21407828316d5b29419abdb5",
+                "value": 0.0
+              },
+              {
+                "reference": "image_14894630f60a34280996e0cb",
+                "value": 0.0
+              },
+              {
+                "reference": "image_304ce78ad4d9b4569fd7114d",
+                "value": 3.0517578125e-05
+              }
+            ]
+          },
+          {
+            "metric": "bright_fraction",
+            "end": "highest",
+            "examples": [
+              {
+                "reference": "image_33bd10ba8f797221a752caea",
+                "value": 0.32954133333333335
+              },
+              {
+                "reference": "image_fc27fa229125b8b790caa7d3",
+                "value": 0.28575589364035087
+              },
+              {
+                "reference": "image_d5344ebd2c69cacffc9de55d",
+                "value": 0.2170257568359375
+              },
+              {
+                "reference": "image_c888d92019255b6349011281",
+                "value": 0.20438130696614584
+              },
+              {
+                "reference": "image_d482c94cbd91f8a1eb62799f",
+                "value": 0.146331787109375
+              }
+            ]
+          }
+        ],
+        "interpretation": "Contextual extremes in eligible preview representations, not proof of unusability."
+      },
+      "references": [],
+      "scope": "bounded"
+    },
+    {
+      "id": "image_e5",
+      "family": "annotations",
+      "meaning": "deterministic_fact",
+      "data": {
+        "occurrence_states": {
+          "not_applicable": 128
+        },
+        "validity": {
+          "unobserved": 128
+        },
+        "blocked_geometric_checks": {},
+        "supplied_status": {
+          "unknown": 128
+        },
+        "invalidity_reasons": {},
+        "normalized_occurrences": 128,
+        "object_visits": 0,
+        "mask_pixels": 0,
+        "empty_masks": 0,
+        "segmentation_raster_pixels": 0
+      },
+      "references": [],
+      "scope": "full_population"
+    },
+    {
+      "id": "image_e6",
+      "family": "composition",
+      "meaning": "contextual_observation",
+      "data": {
+        "categories": [],
+        "distinct_source_categories": 0,
+        "category_detail_omissions": 0,
+        "label_cardinality": {
+          "0": 128
+        },
+        "splits": [
+          {
+            "split": "split_4b8dc2f02bb963c5690919fd",
+            "occurrences": 128
+          }
+        ],
+        "box_area": {
+          "population": 0,
+          "minimum": null,
+          "maximum": null,
+          "median": null
+        },
+        "crowd_objects": 0,
+        "object_locations_and_sizes": {
+          "center_x_fraction": {
+            "population": 0,
+            "minimum": null,
+            "maximum": null,
+            "sum": 0.0,
+            "mean": null
+          },
+          "center_y_fraction": {
+            "population": 0,
+            "minimum": null,
+            "maximum": null,
+            "sum": 0.0,
+            "mean": null
+          },
+          "width_fraction": {
+            "population": 0,
+            "minimum": null,
+            "maximum": null,
+            "sum": 0.0,
+            "mean": null
+          },
+          "height_fraction": {
+            "population": 0,
+            "minimum": null,
+            "maximum": null,
+            "sum": 0.0,
+            "mean": null
+          }
+        },
+        "mask_occupancy": {
+          "population": 0,
+          "minimum": null,
+          "maximum": null,
+          "sum": 0.0,
+          "mean": null
+        },
+        "mask_occupancy_population": "Each examined mask independently; overlapping instance areas are not a union.",
+        "category_count_policy": "Well-formed supplied members; taxonomy violations remain separately accounted.",
+        "group_populations": [
+          {
+            "source": "source_1",
+            "groups_declared": false,
+            "complete_group_occurrences": null,
+            "incomplete_group_occurrences": null,
+            "distinct_complete_groups": null
+          }
+        ]
+      },
+      "references": [],
+      "scope": "full_population"
+    },
+    {
+      "id": "image_e7",
+      "family": "exact_duplicates_bytes",
+      "meaning": "contextual_observation",
+      "data": {
+        "groups": 0,
+        "participating_occurrences": 0,
+        "cross_split_occurrences": 0,
+        "examples": []
+      },
+      "references": [],
+      "scope": "full_population"
+    },
+    {
+      "id": "image_e8",
+      "family": "exact_duplicates_native",
+      "meaning": "contextual_observation",
+      "data": {
+        "groups": 0,
+        "participating_occurrences": 0,
+        "cross_split_occurrences": 0,
+        "examples": []
+      },
+      "references": [],
+      "scope": "full_population"
+    },
+    {
+      "id": "image_e9",
+      "family": "exact_duplicates_oriented",
+      "meaning": "contextual_observation",
+      "data": {
+        "groups": 0,
+        "participating_occurrences": 0,
+        "cross_split_occurrences": 0,
+        "examples": []
+      },
+      "references": [],
+      "scope": "full_population"
+    },
+    {
+      "id": "image_e10",
+      "family": "annotation_disagreement",
+      "meaning": "contextual_observation",
+      "data": {
+        "compatible_exact_raster_groups_with_differences": 0,
+        "payload_difference_groups_blocked": 0,
+        "details": [],
+        "correct_label_identified": false
+      },
+      "references": [],
+      "scope": "full_population"
+    },
+    {
+      "id": "image_e11",
+      "family": "logical_identity",
+      "meaning": "deterministic_fact",
+      "data": {
+        "occurrences_with_duplicate_source_keys": 0
+      },
+      "references": [],
+      "scope": "full_population"
+    },
+    {
+      "id": "image_e12",
+      "family": "near_duplicates",
+      "meaning": "investigation_candidate",
+      "data": {
+        "qualifying_raster_pairs": 0,
+        "examples": [],
+        "radius": 6,
+        "representation": "DCT64 opaque RGB preview; seven disjoint partitions",
+        "approximate_groups_are_equivalence_classes": false
+      },
+      "references": [],
+      "scope": "bounded"
+    }
+  ],
+  "findings": [],
+  "coverage": {
+    "families": {
+      "inventory": {
+        "required_occurrences": 128,
+        "inventory_complete": true
+      },
+      "visual_quality": {
+        "eligible": 67,
+        "examined": 67,
+        "ineligible": 61
+      },
+      "visual_extremes": {
+        "eligible": 67,
+        "maximum_examples_per_metric_end": 5
+      },
+      "annotations": {
+        "occurrences_examined": 128,
+        "segmentation_raster_work": 0,
+        "segmentation_raster_limit": 100000000,
+        "topology_and_semantic_correctness": "not assessed"
+      },
+      "exact_duplicates_bytes": {
+        "representation": "bytes",
+        "eligible_occurrences": 128,
+        "group_detail_omissions": 0
+      },
+      "exact_duplicates_native": {
+        "representation": "native",
+        "eligible_occurrences": 128,
+        "group_detail_omissions": 0
+      },
+      "exact_duplicates_oriented": {
+        "representation": "oriented",
+        "eligible_occurrences": 128,
+        "group_detail_omissions": 0
+      },
+      "annotation_disagreement": {
+        "variant_comparisons_are_bounded": true
+      },
+      "near_duplicates": {
+        "indexed_rasters": 67,
+        "partition_entries": 469,
+        "saturated_buckets": 0,
+        "posting_visits": 1012,
+        "posting_rows_loaded": 469,
+        "posting_cache_limit_bytes": 33554432,
+        "hamming_comparisons": 74,
+        "pair_populations": [
+          {
+            "split": "split_4b8dc2f02bb963c5690919fd",
+            "query_population": 67,
+            "reference_population": 67,
+            "queries_started": 67,
+            "queries_completed": 67,
+            "posting_visits": 1012,
+            "hamming_comparisons": 74,
+            "qualifying_emissions": 0,
+            "posting_saturation_visits": 0,
+            "scope": "within_split"
+          }
+        ],
+        "cross_split_queries_complete": true,
+        "cross_split_stop_reason": null,
+        "stop_reason": "examined_scope_completed",
+        "detail_omissions": 0,
+        "absence_claim": "examined scope only; capped postings do not establish global absence"
+      },
+      "embeddings": {
+        "examined_evidence_committed": 0,
+        "selected": 32,
+        "reason": "isolated_model_failure",
+        "model_evidence_discarded": true
+      }
+    },
+    "required_population": "complete inventoried and applicable supplied populations within hard limits",
+    "retained_examples_are_bounded": true
+  },
+  "execution": {
+    "status": "partial",
+    "backend": "duckdb_local",
+    "effective_limits": {
+      "backend": "duckdb_local",
+      "max_source_bytes": 1073741824,
+      "max_combined_source_bytes": 4294967296,
+      "max_rows": 10000000,
+      "max_combined_rows": 30000000,
+      "max_columns": 1000,
+      "memory_bytes": 2147483648,
+      "max_rss_bytes": 6442450944,
+      "threads": 2,
+      "batch_bytes": 33554432,
+      "max_record_bytes": 8388608,
+      "workspace_bytes": 68719476736,
+      "free_disk_bytes": 2147483648,
+      "max_seconds": 1799.8743518330157,
+      "result_bytes": 33554432
+    },
+    "image_limits": {
+      "assets": 100000,
+      "occurrences": 1000000,
+      "annotations": 10000000,
+      "pixels_per_asset": 32000000,
+      "decode_bytes": 536870912,
+      "decoded_pixels": 100000000000,
+      "polygon_vertices": 10000000,
+      "rle_runs": 10000000,
+      "segmentation_pixels": 100000000,
+      "posting_visits": 100000000,
+      "hamming_comparisons": 50000000,
+      "bucket_entries": 1024,
+      "candidate_pairs": 250000,
+      "embedding_images": 32,
+      "cosine_pairs": 25000000,
+      "details": 20,
+      "witnesses": 5,
+      "private_bytes": 67108864
+    },
+    "image_source_limits": {
+      "media_per_input_bytes": 68719476736,
+      "combined_media_bytes": 137438953472,
+      "asset_capture_bytes": 134217728
+    },
+    "duration_seconds": 0.8041186250047758,
+    "peak_workspace_bytes": 487424,
+    "estimated_peak_workspace_bytes": 268811456,
+    "capture_read_bytes": 20512301,
+    "initial_hash_seconds": 0.016557956929318607,
+    "corpus_copied": false,
+    "publication_policy": "required_core_atomic_optional_model_isolated",
+    "warnings": [
+      "Sampled resource controls can overshoot.",
+      "Capacity and calibrated recall are measured claims for recorded workloads only."
+    ],
+    "peak_worker_rss_bytes": 173637632,
+    "whole_job_seconds": 1.8218319169827737,
+    "peak_spill_bytes": 0,
+    "serialized_bytes": 24121,
+    "model_failure": {
+      "code": "worker_terminated",
+      "completed_model_result_published": false
+    },
+    "final_verification_bytes": 366859590,
+    "final_verification_seconds": 0.1433671250124462,
+    "core_execution": {
+      "status": "completed",
+      "backend": "duckdb_local",
+      "effective_limits": {
+        "backend": "duckdb_local",
+        "max_source_bytes": 1073741824,
+        "max_combined_source_bytes": 4294967296,
+        "max_rows": 10000000,
+        "max_combined_rows": 30000000,
+        "max_columns": 1000,
+        "memory_bytes": 2147483648,
+        "max_rss_bytes": 6442450944,
+        "threads": 2,
+        "batch_bytes": 33554432,
+        "max_record_bytes": 8388608,
+        "workspace_bytes": 68719476736,
+        "free_disk_bytes": 2147483648,
+        "max_seconds": 1799.8743518330157,
+        "result_bytes": 33554432
+      },
+      "image_limits": {
+        "assets": 100000,
+        "occurrences": 1000000,
+        "annotations": 10000000,
+        "pixels_per_asset": 32000000,
+        "decode_bytes": 536870912,
+        "decoded_pixels": 100000000000,
+        "polygon_vertices": 10000000,
+        "rle_runs": 10000000,
+        "segmentation_pixels": 100000000,
+        "posting_visits": 100000000,
+        "hamming_comparisons": 50000000,
+        "bucket_entries": 1024,
+        "candidate_pairs": 250000,
+        "embedding_images": 32,
+        "cosine_pairs": 25000000,
+        "details": 20,
+        "witnesses": 5,
+        "private_bytes": 67108864
+      },
+      "image_source_limits": {
+        "media_per_input_bytes": 68719476736,
+        "combined_media_bytes": 137438953472,
+        "asset_capture_bytes": 134217728
+      },
+      "duration_seconds": 0.8041186250047758,
+      "peak_workspace_bytes": 487424,
+      "estimated_peak_workspace_bytes": 268811456,
+      "capture_read_bytes": 20512301,
+      "initial_hash_seconds": 0.016557956929318607,
+      "corpus_copied": false,
+      "publication_policy": "required_core_atomic_optional_model_isolated",
+      "warnings": [
+        "Sampled resource controls can overshoot.",
+        "Capacity and calibrated recall are measured claims for recorded workloads only."
+      ],
+      "peak_worker_rss_bytes": 173637632,
+      "whole_job_seconds": 1.1899959999718703,
+      "peak_spill_bytes": 0,
+      "serialized_bytes": 23424
+    }
+  },
+  "generated_at": "2026-10-12T01:13:52.625447+00:00"
+}
