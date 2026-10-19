@@ -1,0 +1,2531 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "confidenceguard.contracts/1.0",
+  "$defs": {
+    "SourceSpec": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "path": {
+          "type": "string"
+        },
+        "format": {
+          "type": "string",
+          "enum": [
+            "csv",
+            "parquet"
+          ]
+        },
+        "encoding": {
+          "type": "string"
+        },
+        "delimiter": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "path"
+      ]
+    },
+    "ClockSpec": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "column": {
+          "type": "string"
+        },
+        "encoding": {
+          "type": "string"
+        },
+        "timezone": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "format": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "epoch_unit": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "ambiguity": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "column"
+      ]
+    },
+    "TaskDefinition": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": [
+            "binary_classification",
+            "multiclass_classification",
+            "regression"
+          ]
+        },
+        "outcome_definition": {
+          "type": "string"
+        },
+        "classes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "positive_class": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "units": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "horizon": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "material_error": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "kind",
+        "outcome_definition"
+      ]
+    },
+    "ModelIdentity": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        },
+        "display_name": {
+          "type": "string"
+        },
+        "artifact_sha256": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "preprocessing": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "calibration": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "id",
+        "version"
+      ]
+    },
+    "ProbabilitySpec": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "positive_column": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "columns": {
+          "type": "object"
+        }
+      },
+      "required": []
+    },
+    "ScoreSpec": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "column": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "columns": {
+          "type": "object"
+        },
+        "direction": {
+          "type": "string",
+          "enum": [
+            "higher",
+            "lower"
+          ]
+        },
+        "meaning": {
+          "type": "string",
+          "enum": [
+            "event_ranking",
+            "class_scores",
+            "selection"
+          ]
+        }
+      },
+      "required": []
+    },
+    "DecisionSpec": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "column": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "rule": {
+          "type": "string",
+          "enum": [
+            "none",
+            "probability_threshold",
+            "score_threshold",
+            "probability_argmax",
+            "score_argmax"
+          ]
+        },
+        "threshold": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "tie_policy": {
+          "type": "string",
+          "enum": [
+            "abstain",
+            "class_order"
+          ]
+        },
+        "state_column": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "state_values": {
+          "type": "object"
+        },
+        "candidate_evaluation": {
+          "type": "boolean"
+        }
+      },
+      "required": []
+    },
+    "PredictionIntervalSpec": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "lower": {
+          "type": "string"
+        },
+        "upper": {
+          "type": "string"
+        },
+        "coverage": {
+          "type": "number"
+        },
+        "meaning": {
+          "type": "string"
+        },
+        "central": {
+          "type": "boolean"
+        },
+        "provenance": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "lower",
+        "upper",
+        "coverage"
+      ]
+    },
+    "PredictionRunSpec": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "source": {
+          "type": "string"
+        },
+        "model": {
+          "$ref": "#/$defs/ModelIdentity"
+        },
+        "key_columns": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "prediction": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "decision": {
+          "$ref": "#/$defs/DecisionSpec"
+        },
+        "probabilities": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ProbabilitySpec"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "score": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ScoreSpec"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "selection": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ScoreSpec"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "intervals": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/PredictionIntervalSpec"
+          }
+        },
+        "prediction_at": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ClockSpec"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "generated_at": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "role": {
+          "type": "string"
+        },
+        "inline_outcome": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "inline_outcome_role": {
+          "type": "string"
+        },
+        "horizon": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "entity_columns": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "id",
+        "source",
+        "model"
+      ]
+    },
+    "OutcomeSnapshotSpec": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "source": {
+          "type": "string"
+        },
+        "column": {
+          "type": "string"
+        },
+        "key_columns": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "snapshot_name": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "status_column": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "status_values": {
+          "type": "object"
+        },
+        "available_at": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ClockSpec"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "due_at": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ClockSpec"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "target_at": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ClockSpec"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "source",
+        "column"
+      ]
+    },
+    "ContextSnapshotSpec": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "source": {
+          "type": "string"
+        },
+        "key_columns": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "assertions": {
+          "type": "object"
+        }
+      },
+      "required": [
+        "source"
+      ]
+    },
+    "CohortSpec": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "column": {
+          "type": "string"
+        },
+        "categories": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "edges": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          }
+        },
+        "prediction_derived": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "id",
+        "column"
+      ]
+    },
+    "DecisionPolicySpec": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "run": {
+          "type": "string"
+        },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "probability_threshold",
+            "score_threshold",
+            "confidence_abstention",
+            "selection_abstention",
+            "interval_abstention",
+            "supplied_cost"
+          ]
+        },
+        "thresholds": {
+          "type": "array",
+          "items": {
+            "type": "number"
+          }
+        },
+        "interval": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "costs": {
+          "type": "object"
+        }
+      },
+      "required": [
+        "id",
+        "run",
+        "kind"
+      ]
+    },
+    "ComparisonSpec": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "left": {
+          "type": "string"
+        },
+        "right": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "left",
+        "right"
+      ]
+    },
+    "DisclosureSpec": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "policy": {
+          "type": "string",
+          "enum": [
+            "conservative_aggregates_v1",
+            "exact_aggregates_v1"
+          ]
+        },
+        "minimum_denominator": {
+          "type": "integer"
+        },
+        "minimum_component": {
+          "type": "integer"
+        },
+        "display_labels": {
+          "type": "object"
+        },
+        "schema_version": {
+          "type": "string"
+        }
+      },
+      "required": []
+    },
+    "SamplingSpec": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "mode": {
+          "type": "string",
+          "enum": [
+            "descriptive",
+            "independent_rows"
+          ]
+        }
+      },
+      "required": []
+    },
+    "EvaluationConfig": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "max_source_bytes": {
+          "type": "integer"
+        },
+        "max_combined_source_bytes": {
+          "type": "integer"
+        },
+        "max_rows": {
+          "type": "integer"
+        },
+        "max_combined_rows": {
+          "type": "integer"
+        },
+        "max_columns": {
+          "type": "integer"
+        },
+        "memory_bytes": {
+          "type": "integer"
+        },
+        "max_rss_bytes": {
+          "type": "integer"
+        },
+        "threads": {
+          "type": "integer"
+        },
+        "batch_bytes": {
+          "type": "integer"
+        },
+        "max_record_bytes": {
+          "type": "integer"
+        },
+        "workspace_bytes": {
+          "type": "integer"
+        },
+        "free_disk_bytes": {
+          "type": "integer"
+        },
+        "max_seconds": {
+          "type": "number"
+        },
+        "result_bytes": {
+          "type": "integer"
+        },
+        "private_bytes": {
+          "type": "integer"
+        },
+        "probability_cells": {
+          "type": "integer"
+        },
+        "max_cohorts": {
+          "type": "integer"
+        },
+        "max_groups": {
+          "type": "integer"
+        },
+        "max_classes": {
+          "type": "integer"
+        },
+        "max_policies": {
+          "type": "integer"
+        },
+        "max_thresholds": {
+          "type": "integer"
+        },
+        "max_details": {
+          "type": "integer"
+        },
+        "witnesses": {
+          "type": "integer"
+        },
+        "curve_points": {
+          "type": "integer"
+        },
+        "calibration_bins": {
+          "type": "integer"
+        },
+        "support_warning": {
+          "type": "integer"
+        },
+        "bin_support_warning": {
+          "type": "integer"
+        },
+        "high_confidence": {
+          "type": "number"
+        },
+        "probability_tolerance": {
+          "type": "number"
+        },
+        "scratch_directory": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "sampling": {
+          "$ref": "#/$defs/SamplingSpec"
+        },
+        "disclosure": {
+          "$ref": "#/$defs/DisclosureSpec"
+        }
+      },
+      "required": []
+    },
+    "EvaluationSpec": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "task": {
+          "$ref": "#/$defs/TaskDefinition"
+        },
+        "sources": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/SourceSpec"
+          }
+        },
+        "runs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/PredictionRunSpec"
+          }
+        },
+        "outcomes": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/OutcomeSnapshotSpec"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "context": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ContextSnapshotSpec"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "cohorts": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/CohortSpec"
+          }
+        },
+        "policies": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/DecisionPolicySpec"
+          }
+        },
+        "comparison": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ComparisonSpec"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "as_of": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "name": {
+          "type": "string"
+        },
+        "schema_version": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "task",
+        "sources",
+        "runs"
+      ]
+    },
+    "SourceHandle": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "handle"
+      ],
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "handle": {
+          "type": "string"
+        }
+      }
+    },
+    "TransportEvaluationSpec": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "task": {
+          "$ref": "#/$defs/TaskDefinition"
+        },
+        "sources": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/SourceHandle"
+          }
+        },
+        "runs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/PredictionRunSpec"
+          }
+        },
+        "outcomes": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/OutcomeSnapshotSpec"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "context": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ContextSnapshotSpec"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "cohorts": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/CohortSpec"
+          }
+        },
+        "policies": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/DecisionPolicySpec"
+          }
+        },
+        "comparison": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ComparisonSpec"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "as_of": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "name": {
+          "type": "string"
+        },
+        "schema_version": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "task",
+        "sources",
+        "runs"
+      ]
+    },
+    "EvaluationRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "spec"
+      ],
+      "properties": {
+        "spec": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/TransportEvaluationSpec"
+            },
+            {
+              "$ref": "#/$defs/TransportReliabilitySpec"
+            }
+          ]
+        },
+        "config": {
+          "$ref": "#/$defs/EvaluationConfig"
+        },
+        "expected_revision": {
+          "type": "integer"
+        }
+      }
+    },
+    "JobRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "client_request_id"
+      ],
+      "properties": {
+        "kind": {
+          "enum": [
+            "inspect",
+            "evaluate",
+            "export",
+            "resolve_evidence",
+            "fit",
+            "apply",
+            "study"
+          ]
+        },
+        "client_request_id": {
+          "type": "string"
+        },
+        "evaluation_id": {
+          "type": "string"
+        },
+        "revision": {
+          "type": "integer"
+        },
+        "fingerprint": {
+          "type": "string"
+        },
+        "result_id": {
+          "type": "string"
+        },
+        "format": {
+          "enum": [
+            "html",
+            "pdf"
+          ]
+        },
+        "audience": {
+          "enum": [
+            "local",
+            "shareable"
+          ]
+        },
+        "disclosure": {
+          "$ref": "#/$defs/DisclosureSpec"
+        },
+        "reference": {
+          "type": "string"
+        },
+        "reveal_values": {
+          "type": "boolean"
+        }
+      }
+    },
+    "Job": {
+      "type": "object",
+      "required": [
+        "id",
+        "kind",
+        "state",
+        "revision"
+      ],
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "kind": {
+          "type": "string"
+        },
+        "state": {
+          "enum": [
+            "pending",
+            "running",
+            "cancelling",
+            "succeeded",
+            "failed",
+            "cancelled"
+          ]
+        },
+        "revision": {
+          "type": "integer"
+        },
+        "progress": {
+          "type": "object"
+        },
+        "output": {
+          "type": "object"
+        },
+        "error": {
+          "type": [
+            "object",
+            "null"
+          ]
+        }
+      }
+    },
+    "Measurement": {
+      "type": "object",
+      "required": [
+        "id",
+        "run",
+        "scope",
+        "family",
+        "metric",
+        "denominator",
+        "value",
+        "value_state",
+        "applicability",
+        "execution",
+        "population_id"
+      ],
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "run": {
+          "type": "string"
+        },
+        "scope": {
+          "type": "string"
+        },
+        "family": {
+          "type": "string"
+        },
+        "metric": {
+          "type": "string"
+        },
+        "denominator": {
+          "type": [
+            "integer",
+            "string"
+          ]
+        },
+        "value": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "value_state": {
+          "enum": [
+            "finite",
+            "undefined",
+            "positive_infinity",
+            "negative_infinity"
+          ]
+        },
+        "applicability": {
+          "enum": [
+            "applicable",
+            "blocked"
+          ]
+        },
+        "execution": {
+          "enum": [
+            "completed",
+            "not_run"
+          ]
+        },
+        "population_id": {
+          "type": "string"
+        },
+        "data": {
+          "type": "object"
+        },
+        "denominator_kind": {
+          "enum": [
+            "eligible_records",
+            "evaluation_support",
+            "class_conditional_records",
+            "paired_base_support",
+            "not_evaluated"
+          ],
+          "description": "Record support for the referenced eligibility population. Formula denominators and model-conditional paired supports are explicit in data."
+        }
+      }
+    },
+    "Population": {
+      "type": "object",
+      "required": [
+        "id",
+        "run",
+        "scope",
+        "definition",
+        "lineage",
+        "denominator",
+        "denominator_kind"
+      ],
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "run": {
+          "type": "string"
+        },
+        "scope": {
+          "type": "string"
+        },
+        "definition": {
+          "type": "string"
+        },
+        "lineage": {
+          "type": "object",
+          "description": "Frozen normalized-input or paired-relation lineage; protected local audience only."
+        },
+        "denominator": {
+          "type": [
+            "integer",
+            "string"
+          ]
+        },
+        "denominator_kind": {
+          "enum": [
+            "eligible_records",
+            "evaluation_support",
+            "class_conditional_records",
+            "paired_base_support",
+            "not_evaluated"
+          ],
+          "description": "Record support for the referenced eligibility population. Formula denominators and model-conditional paired supports are explicit in data."
+        }
+      }
+    },
+    "Result": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/CG1Result"
+        },
+        {
+          "$ref": "#/$defs/CG2Result"
+        }
+      ]
+    },
+    "SourceRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "root_id",
+        "relative_path"
+      ],
+      "properties": {
+        "root_id": {
+          "type": "string"
+        },
+        "relative_path": {
+          "type": "string"
+        },
+        "format": {
+          "enum": [
+            "csv",
+            "parquet"
+          ]
+        },
+        "encoding": {
+          "type": "string"
+        },
+        "delimiter": {
+          "type": "string"
+        }
+      }
+    },
+    "Source": {
+      "type": "object",
+      "required": [
+        "handle",
+        "format",
+        "columns"
+      ],
+      "properties": {
+        "handle": {
+          "type": "string"
+        },
+        "format": {
+          "enum": [
+            "csv",
+            "parquet"
+          ]
+        },
+        "columns": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "Draft": {
+      "type": "object",
+      "required": [
+        "id",
+        "revision",
+        "spec",
+        "config",
+        "confirmation"
+      ],
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "revision": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "spec": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/TransportEvaluationSpec"
+            },
+            {
+              "$ref": "#/$defs/TransportReliabilitySpec"
+            }
+          ]
+        },
+        "config": {
+          "type": "object"
+        },
+        "confirmation": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "Artifact": {
+      "type": "object",
+      "required": [
+        "id",
+        "kind",
+        "audience",
+        "bytes"
+      ],
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "kind": {
+          "enum": [
+            "html",
+            "pdf",
+            "json",
+            "private_result",
+            "private_manifest",
+            "fitted_methods",
+            "application"
+          ]
+        },
+        "audience": {
+          "enum": [
+            "local",
+            "shareable"
+          ]
+        },
+        "bytes": {
+          "type": [
+            "integer",
+            "string"
+          ]
+        }
+      }
+    },
+    "Inspection": {
+      "type": "object",
+      "required": [
+        "schema_version",
+        "fingerprint",
+        "effective_spec",
+        "effective_config",
+        "sources",
+        "runs",
+        "outcomes"
+      ],
+      "properties": {
+        "schema_version": {
+          "enum": [
+            "confidenceguard.inspection/1.0",
+            "confidenceguard.inspection/1.1"
+          ]
+        },
+        "fingerprint": {
+          "type": "string"
+        },
+        "effective_spec": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/TransportEvaluationSpec"
+            },
+            {
+              "$ref": "#/$defs/TransportReliabilitySpec"
+            }
+          ]
+        },
+        "effective_config": {
+          "$ref": "#/$defs/EvaluationConfig"
+        },
+        "sources": {
+          "type": "array"
+        },
+        "runs": {
+          "type": "object"
+        },
+        "outcomes": {
+          "type": "object"
+        }
+      }
+    },
+    "Error": {
+      "type": "object",
+      "required": [
+        "api_version",
+        "error"
+      ],
+      "properties": {
+        "api_version": {
+          "const": "v1"
+        },
+        "error": {
+          "type": "object",
+          "required": [
+            "code",
+            "message",
+            "request_id",
+            "retryable"
+          ],
+          "properties": {
+            "code": {
+              "type": "string"
+            },
+            "message": {
+              "type": "string"
+            },
+            "request_id": {
+              "type": "string"
+            },
+            "retryable": {
+              "type": "boolean"
+            },
+            "field_errors": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": [
+                  "pointer",
+                  "code"
+                ],
+                "properties": {
+                  "pointer": {
+                    "type": "string"
+                  },
+                  "code": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "Page": {
+      "type": "object",
+      "required": [
+        "items",
+        "total",
+        "next_cursor",
+        "result_id"
+      ],
+      "properties": {
+        "items": {
+          "type": "array"
+        },
+        "total": {
+          "type": "integer"
+        },
+        "next_cursor": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "result_id": {
+          "type": "string"
+        }
+      }
+    },
+    "Session": {
+      "type": "object",
+      "required": [
+        "csrf_token",
+        "root_aliases",
+        "session_lifetime"
+      ],
+      "properties": {
+        "csrf_token": {
+          "type": "string"
+        },
+        "root_aliases": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "id",
+              "label"
+            ],
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "label": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "session_lifetime": {
+          "const": "local_process"
+        }
+      }
+    },
+    "Summary": {
+      "type": "object",
+      "required": [
+        "analysis_id",
+        "name",
+        "task",
+        "runs",
+        "headlines",
+        "findings",
+        "comparison"
+      ],
+      "properties": {
+        "analysis_id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "task": {
+          "type": "object"
+        },
+        "runs": {
+          "type": "array"
+        },
+        "headlines": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Measurement"
+          }
+        },
+        "findings": {
+          "type": "array"
+        },
+        "comparison": {
+          "type": [
+            "object",
+            "null"
+          ]
+        }
+      }
+    },
+    "QuantileField": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "level": {
+          "type": [
+            "number",
+            "string"
+          ]
+        },
+        "column": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "level",
+        "column"
+      ]
+    },
+    "SampleSpec": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "source": {
+          "type": "string"
+        },
+        "key_columns": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "draw_column": {
+          "type": "string"
+        },
+        "value_column": {
+          "type": "string"
+        },
+        "meaning": {
+          "type": "string",
+          "enum": [
+            "empirical_distribution",
+            "iid_monte_carlo"
+          ]
+        }
+      },
+      "required": [
+        "source",
+        "key_columns",
+        "draw_column",
+        "value_column"
+      ]
+    },
+    "RepresentationSpec": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "run": {
+          "type": "string"
+        },
+        "logits": {
+          "type": "object"
+        },
+        "binary_logit": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "scale": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "scale_model": {
+          "anyOf": [
+            {
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "quantiles": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/QuantileField"
+          }
+        },
+        "quantile_model": {
+          "anyOf": [
+            {
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "samples": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/SampleSpec"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "run"
+      ]
+    },
+    "RolePartition": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "role": {
+          "type": "string",
+          "enum": [
+            "F",
+            "S",
+            "C",
+            "E"
+          ]
+        },
+        "source": {
+          "type": "string"
+        },
+        "key_columns": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "role",
+        "source",
+        "key_columns"
+      ]
+    },
+    "RoleSpec": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "namespace": {
+          "type": "string"
+        },
+        "column": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "values": {
+          "type": "object"
+        },
+        "partitions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/RolePartition"
+          }
+        },
+        "proportions": {
+          "type": "object"
+        },
+        "seed": {
+          "type": "integer"
+        },
+        "unit": {
+          "type": "string",
+          "enum": [
+            "event",
+            "entity"
+          ]
+        }
+      },
+      "required": [
+        "namespace"
+      ]
+    },
+    "SeparationSpec": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "base_predictions_independent": {
+          "type": "boolean"
+        },
+        "evaluation_independent": {
+          "type": "boolean"
+        },
+        "exchangeable_scores": {
+          "type": "boolean"
+        },
+        "labels_representative": {
+          "type": "boolean"
+        },
+        "preserve_membership": {
+          "type": "boolean"
+        },
+        "training_partitions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/RolePartition"
+          }
+        }
+      },
+      "required": []
+    },
+    "MethodSpec": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "aps",
+            "beta",
+            "cqr",
+            "dirichlet",
+            "identity",
+            "isotonic",
+            "lac",
+            "normalized",
+            "platt",
+            "raps",
+            "split",
+            "temperature"
+          ]
+        },
+        "run": {
+          "type": "string"
+        },
+        "input": {
+          "type": "string",
+          "enum": [
+            "probabilities",
+            "probability_logit",
+            "score",
+            "logits",
+            "point",
+            "normalized",
+            "quantiles"
+          ]
+        },
+        "parent": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "levels": {
+          "type": "array",
+          "items": {
+            "type": [
+              "number",
+              "string"
+            ]
+          }
+        },
+        "epsilon": {
+          "type": "number"
+        },
+        "regularization": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "penalty": {
+          "type": "number"
+        },
+        "k_reg": {
+          "type": "integer"
+        },
+        "lower_quantile": {
+          "type": [
+            "number",
+            "string"
+          ]
+        },
+        "upper_quantile": {
+          "type": [
+            "number",
+            "string"
+          ]
+        },
+        "max_iterations": {
+          "type": "integer"
+        },
+        "tolerance": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "id",
+        "kind",
+        "run"
+      ]
+    },
+    "SelectionSpec": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "candidates": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "objective": {
+          "type": "string",
+          "enum": [
+            "log_loss",
+            "brier",
+            "efficiency"
+          ]
+        },
+        "coverage_tolerance": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "pilot_fraction": {
+          "type": "number"
+        }
+      },
+      "required": [
+        "id",
+        "candidates"
+      ]
+    },
+    "InferenceSpec": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "mode": {
+          "type": "string",
+          "enum": [
+            "descriptive",
+            "independent_rows",
+            "independent_clusters"
+          ]
+        },
+        "confidence": {
+          "type": "number"
+        },
+        "replicates": {
+          "type": "integer"
+        },
+        "seed": {
+          "type": "integer"
+        },
+        "adjustment": {
+          "type": "string",
+          "enum": [
+            "pointwise",
+            "bonferroni"
+          ]
+        },
+        "metrics": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "scopes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "inference_required": {
+          "type": "boolean"
+        },
+        "work_units": {
+          "type": "integer"
+        },
+        "minimum_tail": {
+          "type": "integer"
+        },
+        "material_difference": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": []
+    },
+    "MethodLimits": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "candidates": {
+          "type": "integer",
+          "items": {
+            "type": "string"
+          }
+        },
+        "variants": {
+          "type": "integer"
+        },
+        "parameter_elements": {
+          "type": "integer"
+        },
+        "sample_cells": {
+          "type": "integer"
+        },
+        "method_bytes": {
+          "type": "integer"
+        },
+        "max_nesting": {
+          "type": "integer"
+        }
+      },
+      "required": []
+    },
+    "ReliabilitySpec": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "evaluation": {
+          "$ref": "#/$defs/EvaluationSpec"
+        },
+        "roles": {
+          "$ref": "#/$defs/RoleSpec"
+        },
+        "representations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/RepresentationSpec"
+          }
+        },
+        "methods": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/MethodSpec"
+          }
+        },
+        "selections": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/SelectionSpec"
+          }
+        },
+        "fitted_methods": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/FittedMethod"
+          }
+        },
+        "membership_sidecars": {
+          "type": "array"
+        },
+        "comparisons": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ComparisonSpec"
+          }
+        },
+        "variant_policies": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/DecisionPolicySpec"
+          }
+        },
+        "separation": {
+          "$ref": "#/$defs/SeparationSpec"
+        },
+        "inference": {
+          "$ref": "#/$defs/InferenceSpec"
+        },
+        "limits": {
+          "$ref": "#/$defs/MethodLimits"
+        },
+        "calibration_edges": {
+          "type": "array"
+        },
+        "calibration_strategy": {
+          "type": "string",
+          "enum": [
+            "fixed",
+            "fit_equal_frequency"
+          ]
+        },
+        "output_path": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "schema_version": {
+          "type": "string",
+          "enum": [
+            "confidenceguard.evaluation_spec/1.1",
+            "confidenceguard.study_spec/1.0",
+            "confidenceguard.application_spec/1.0"
+          ]
+        }
+      },
+      "required": [
+        "evaluation",
+        "roles"
+      ]
+    },
+    "SafeValue": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "value",
+        "value_state"
+      ],
+      "properties": {
+        "value": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "value_state": {
+          "enum": [
+            "finite",
+            "positive_infinity",
+            "negative_infinity",
+            "undefined"
+          ]
+        },
+        "reason": {
+          "type": "string"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "value_state": {
+                "const": "finite"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "value": {
+                "type": "number"
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "value": {
+                "type": "null"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "ConformalThreshold": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "coverage",
+        "n",
+        "rank",
+        "threshold"
+      ],
+      "properties": {
+        "coverage": {
+          "type": "string"
+        },
+        "n": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "rank": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "threshold": {
+          "$ref": "#/$defs/SafeValue"
+        }
+      }
+    },
+    "FittedMethod": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "id",
+        "definition",
+        "algorithm_version",
+        "task",
+        "model",
+        "input_signature",
+        "parent_digest",
+        "parameters",
+        "provenance",
+        "evidence_state",
+        "artifact_digest"
+      ],
+      "properties": {
+        "schema_version": {
+          "const": "confidenceguard.fitted_method/1.0"
+        },
+        "id": {
+          "type": "string"
+        },
+        "definition": {
+          "$ref": "#/$defs/MethodSpec"
+        },
+        "algorithm_version": {
+          "type": "string"
+        },
+        "task": {
+          "$ref": "#/$defs/TaskDefinition"
+        },
+        "model": {
+          "$ref": "#/$defs/ModelIdentity"
+        },
+        "input_signature": {
+          "type": "object"
+        },
+        "parent_digest": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "parameters": {
+          "type": "object"
+        },
+        "provenance": {
+          "type": "object"
+        },
+        "evidence_state": {
+          "const": "fitted_only"
+        },
+        "artifact_digest": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      },
+      "description": "Data-only. Field-specific finite-parameter and exact conformal-rank checks are mandatory at load."
+    },
+    "FittedCollection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "methods"
+      ],
+      "properties": {
+        "schema_version": {
+          "const": "confidenceguard.fitted_collection/1.0"
+        },
+        "methods": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/FittedMethod"
+          }
+        },
+        "membership_sidecars": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        }
+      }
+    },
+    "Assessment": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "method_digest": {
+          "type": "string"
+        },
+        "application_digest": {
+          "type": "string"
+        },
+        "result_id": {
+          "type": "string"
+        },
+        "evaluation_digest": {
+          "type": "string"
+        },
+        "outcome_snapshot": {
+          "type": "string"
+        },
+        "meaning": {
+          "type": "string"
+        },
+        "assessment_digest": {
+          "type": "string"
+        },
+        "schema_version": {
+          "const": "confidenceguard.assessment/1.0"
+        },
+        "population_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "evidence_state": {
+          "const": "independently_evaluated"
+        },
+        "qualifications": {
+          "type": "object"
+        }
+      },
+      "required": [
+        "method_digest",
+        "application_digest",
+        "result_id",
+        "evaluation_digest",
+        "outcome_snapshot",
+        "meaning",
+        "assessment_digest",
+        "schema_version",
+        "population_ids",
+        "evidence_state",
+        "qualifications"
+      ]
+    },
+    "TransportReliabilitySpec": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "evaluation": {
+          "$ref": "#/$defs/TransportEvaluationSpec"
+        },
+        "roles": {
+          "$ref": "#/$defs/RoleSpec"
+        },
+        "representations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/RepresentationSpec"
+          }
+        },
+        "methods": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/MethodSpec"
+          }
+        },
+        "selections": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/SelectionSpec"
+          }
+        },
+        "fitted_methods": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/FittedMethod"
+          }
+        },
+        "membership_sidecars": {
+          "type": "array"
+        },
+        "comparisons": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ComparisonSpec"
+          }
+        },
+        "variant_policies": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/DecisionPolicySpec"
+          }
+        },
+        "separation": {
+          "$ref": "#/$defs/SeparationSpec"
+        },
+        "inference": {
+          "$ref": "#/$defs/InferenceSpec"
+        },
+        "limits": {
+          "$ref": "#/$defs/MethodLimits"
+        },
+        "calibration_edges": {
+          "type": "array"
+        },
+        "calibration_strategy": {
+          "type": "string",
+          "enum": [
+            "fixed",
+            "fit_equal_frequency"
+          ]
+        },
+        "output_path": {
+          "type": "null",
+          "description": "Host-controlled; direct paths are not accepted."
+        },
+        "schema_version": {
+          "type": "string",
+          "enum": [
+            "confidenceguard.evaluation_spec/1.1",
+            "confidenceguard.study_spec/1.0",
+            "confidenceguard.application_spec/1.0"
+          ]
+        },
+        "method_handles": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "evaluation",
+        "roles"
+      ]
+    },
+    "CG1Result": {
+      "type": "object",
+      "required": [
+        "schema_version",
+        "methodology_id",
+        "analysis_id",
+        "measurements",
+        "coverage",
+        "runs"
+      ],
+      "properties": {
+        "schema_version": {
+          "const": "confidenceguard.evaluation_result/1.0"
+        },
+        "methodology_id": {
+          "const": "prediction_evaluation_v1"
+        },
+        "analysis_id": {
+          "type": "string"
+        },
+        "measurements": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Measurement"
+          }
+        },
+        "coverage": {
+          "type": "object"
+        },
+        "runs": {
+          "type": "array"
+        },
+        "audience": {
+          "enum": [
+            "local",
+            "shareable"
+          ]
+        }
+      }
+    },
+    "CG2Result": {
+      "type": "object",
+      "required": [
+        "schema_version",
+        "methodology_id",
+        "analysis_id",
+        "measurements",
+        "coverage",
+        "runs",
+        "cg2"
+      ],
+      "properties": {
+        "schema_version": {
+          "const": "confidenceguard.evaluation_result/1.1"
+        },
+        "methodology_id": {
+          "const": "calibration_uncertainty_v1"
+        },
+        "analysis_id": {
+          "type": "string"
+        },
+        "measurements": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Measurement"
+          }
+        },
+        "coverage": {
+          "type": "object"
+        },
+        "runs": {
+          "type": "array"
+        },
+        "audience": {
+          "enum": [
+            "local",
+            "shareable"
+          ]
+        },
+        "cg2": {
+          "type": "object"
+        }
+      }
+    }
+  },
+  "$ref": "#/$defs/EvaluationSpec"
+}

@@ -1,0 +1,452 @@
+{
+  "label": "Synthetic contract examples, not measured results",
+  "evaluations": {
+    "binary_classification": {
+      "spec": {
+        "task": {
+          "kind": "binary_classification",
+          "outcome_definition": "Supplied reference outcome",
+          "classes": [
+            "0",
+            "1"
+          ],
+          "positive_class": "1"
+        },
+        "sources": [
+          {
+            "id": "predictions",
+            "handle": "SOURCE_HANDLE"
+          }
+        ],
+        "runs": [
+          {
+            "id": "candidate",
+            "source": "predictions",
+            "model": {
+              "id": "model",
+              "version": "v1"
+            },
+            "key_columns": [
+              "id"
+            ],
+            "prediction": "prediction"
+          }
+        ],
+        "outcomes": {
+          "source": "predictions",
+          "column": "outcome",
+          "key_columns": [
+            "id"
+          ]
+        }
+      },
+      "config": {}
+    },
+    "multiclass_classification": {
+      "spec": {
+        "task": {
+          "kind": "multiclass_classification",
+          "outcome_definition": "Supplied reference outcome",
+          "classes": [
+            "a",
+            "b",
+            "c"
+          ],
+          "positive_class": null
+        },
+        "sources": [
+          {
+            "id": "predictions",
+            "handle": "SOURCE_HANDLE"
+          }
+        ],
+        "runs": [
+          {
+            "id": "candidate",
+            "source": "predictions",
+            "model": {
+              "id": "model",
+              "version": "v1"
+            },
+            "key_columns": [
+              "id"
+            ],
+            "prediction": "prediction"
+          }
+        ],
+        "outcomes": {
+          "source": "predictions",
+          "column": "outcome",
+          "key_columns": [
+            "id"
+          ]
+        }
+      },
+      "config": {}
+    },
+    "regression": {
+      "spec": {
+        "task": {
+          "kind": "regression",
+          "outcome_definition": "Supplied reference outcome",
+          "classes": [],
+          "positive_class": null
+        },
+        "sources": [
+          {
+            "id": "predictions",
+            "handle": "SOURCE_HANDLE"
+          }
+        ],
+        "runs": [
+          {
+            "id": "candidate",
+            "source": "predictions",
+            "model": {
+              "id": "model",
+              "version": "v1"
+            },
+            "key_columns": [
+              "id"
+            ],
+            "prediction": "prediction"
+          }
+        ],
+        "outcomes": {
+          "source": "predictions",
+          "column": "outcome",
+          "key_columns": [
+            "id"
+          ]
+        }
+      },
+      "config": {}
+    }
+  },
+  "studies": {
+    "binary_classification": {
+      "spec": {
+        "schema_version": "confidenceguard.study_spec/1.0",
+        "evaluation": {
+          "task": {
+            "kind": "binary_classification",
+            "outcome_definition": "Supplied reference outcome",
+            "classes": [
+              "0",
+              "1"
+            ],
+            "positive_class": "1"
+          },
+          "sources": [
+            {
+              "id": "predictions",
+              "handle": "SOURCE_HANDLE"
+            }
+          ],
+          "runs": [
+            {
+              "id": "candidate",
+              "source": "predictions",
+              "model": {
+                "id": "model",
+                "version": "v1"
+              },
+              "key_columns": [
+                "id"
+              ],
+              "prediction": "prediction",
+              "probabilities": {
+                "positive_column": "probability"
+              }
+            }
+          ],
+          "outcomes": {
+            "source": "predictions",
+            "column": "outcome",
+            "key_columns": [
+              "id"
+            ]
+          }
+        },
+        "roles": {
+          "namespace": "supplied-events",
+          "column": "role"
+        },
+        "methods": [
+          {
+            "id": "beta",
+            "kind": "beta",
+            "run": "candidate"
+          },
+          {
+            "id": "lac",
+            "kind": "lac",
+            "run": "candidate",
+            "parent": "beta",
+            "levels": [
+              "0.9"
+            ]
+          }
+        ]
+      },
+      "config": {}
+    },
+    "multiclass_classification": {
+      "spec": {
+        "schema_version": "confidenceguard.study_spec/1.0",
+        "evaluation": {
+          "task": {
+            "kind": "multiclass_classification",
+            "outcome_definition": "Supplied reference outcome",
+            "classes": [
+              "a",
+              "b",
+              "c"
+            ],
+            "positive_class": null
+          },
+          "sources": [
+            {
+              "id": "predictions",
+              "handle": "SOURCE_HANDLE"
+            }
+          ],
+          "runs": [
+            {
+              "id": "candidate",
+              "source": "predictions",
+              "model": {
+                "id": "model",
+                "version": "v1"
+              },
+              "key_columns": [
+                "id"
+              ],
+              "prediction": "prediction",
+              "probabilities": {
+                "columns": {
+                  "a": "p_a",
+                  "b": "p_b",
+                  "c": "p_c"
+                }
+              }
+            }
+          ],
+          "outcomes": {
+            "source": "predictions",
+            "column": "outcome",
+            "key_columns": [
+              "id"
+            ]
+          }
+        },
+        "roles": {
+          "namespace": "supplied-events",
+          "column": "role"
+        },
+        "methods": [
+          {
+            "id": "temperature",
+            "kind": "temperature",
+            "run": "candidate"
+          },
+          {
+            "id": "aps",
+            "kind": "aps",
+            "run": "candidate",
+            "parent": "temperature"
+          }
+        ]
+      },
+      "config": {}
+    },
+    "regression": {
+      "spec": {
+        "schema_version": "confidenceguard.study_spec/1.0",
+        "evaluation": {
+          "task": {
+            "kind": "regression",
+            "outcome_definition": "Supplied reference outcome",
+            "classes": [],
+            "positive_class": null
+          },
+          "sources": [
+            {
+              "id": "predictions",
+              "handle": "SOURCE_HANDLE"
+            }
+          ],
+          "runs": [
+            {
+              "id": "candidate",
+              "source": "predictions",
+              "model": {
+                "id": "model",
+                "version": "v1"
+              },
+              "key_columns": [
+                "id"
+              ],
+              "prediction": "prediction"
+            }
+          ],
+          "outcomes": {
+            "source": "predictions",
+            "column": "outcome",
+            "key_columns": [
+              "id"
+            ]
+          }
+        },
+        "roles": {
+          "namespace": "supplied-events",
+          "column": "role"
+        },
+        "methods": [
+          {
+            "id": "split",
+            "kind": "split",
+            "run": "candidate",
+            "input": "point",
+            "levels": [
+              "0.9",
+              "0.95"
+            ]
+          }
+        ]
+      },
+      "config": {}
+    }
+  },
+  "response_examples": {
+    "session": {
+      "api_version": "v1",
+      "data": {
+        "csrf_token": "SYNTHETIC_SESSION_TOKEN",
+        "root_aliases": [
+          {
+            "id": "root_0",
+            "label": "predictions"
+          }
+        ],
+        "session_lifetime": "local_process"
+      }
+    },
+    "source": {
+      "api_version": "v1",
+      "data": {
+        "handle": "SOURCE_HANDLE",
+        "format": "csv",
+        "columns": [
+          "id",
+          "prediction",
+          "outcome"
+        ]
+      }
+    },
+    "draft": {
+      "api_version": "v1",
+      "data": {
+        "id": "EVALUATION_ID",
+        "revision": 1,
+        "spec": {
+          "task": {
+            "kind": "binary_classification",
+            "outcome_definition": "Supplied reference outcome",
+            "classes": [
+              "0",
+              "1"
+            ],
+            "positive_class": "1"
+          },
+          "sources": [
+            {
+              "id": "predictions",
+              "handle": "SOURCE_HANDLE"
+            }
+          ],
+          "runs": [
+            {
+              "id": "candidate",
+              "source": "predictions",
+              "model": {
+                "id": "model",
+                "version": "v1"
+              },
+              "key_columns": [
+                "id"
+              ],
+              "prediction": "prediction"
+            }
+          ],
+          "outcomes": {
+            "source": "predictions",
+            "column": "outcome",
+            "key_columns": [
+              "id"
+            ]
+          }
+        },
+        "config": {},
+        "confirmation": null
+      }
+    },
+    "job": {
+      "api_version": "v1",
+      "data": {
+        "id": "JOB_ID",
+        "kind": "evaluate",
+        "state": "running",
+        "revision": 2,
+        "progress": {
+          "stage": "prediction_metrics"
+        },
+        "output": {},
+        "error": null
+      }
+    },
+    "error": {
+      "api_version": "v1",
+      "error": {
+        "code": "worker_busy",
+        "message": "Another supervised operation is active.",
+        "request_id": "SYNTHETIC_REQUEST_ID",
+        "retryable": true
+      }
+    },
+    "measurement": {
+      "id": "m1",
+      "run": "candidate",
+      "scope": "overall",
+      "family": "performance",
+      "metric": "accuracy",
+      "population_id": "SYNTHETIC_POPULATION",
+      "denominator": 100,
+      "value": 0.75,
+      "value_state": "finite",
+      "applicability": "applicable",
+      "execution": "completed",
+      "basis": "measured",
+      "interpretation": "descriptive",
+      "method_standing": "established_method",
+      "method_version": "1",
+      "data": {},
+      "evidence_refs": []
+    }
+  },
+  "jobs": {
+    "inspect": {
+      "kind": "inspect",
+      "evaluation_id": "EVALUATION_ID",
+      "revision": 1,
+      "client_request_id": "inspect-1"
+    },
+    "evaluate": {
+      "kind": "evaluate",
+      "evaluation_id": "EVALUATION_ID",
+      "revision": 1,
+      "fingerprint": "CONFIRMATION_FINGERPRINT",
+      "client_request_id": "evaluate-1"
+    }
+  }
+}

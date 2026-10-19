@@ -1,0 +1,171 @@
+{
+  "task": {
+    "kind": "multiclass_classification",
+    "outcome_definition": "UCI Wine supplied cultivar class",
+    "classes": [
+      "0",
+      "1",
+      "2"
+    ],
+    "positive_class": null,
+    "units": null,
+    "horizon": null,
+    "material_error": null
+  },
+  "sources": [
+    {
+      "id": "predictions",
+      "path": "multiclass.csv",
+      "format": "csv",
+      "encoding": "utf-8-sig",
+      "delimiter": ","
+    }
+  ],
+  "runs": [
+    {
+      "id": "model0",
+      "source": "predictions",
+      "model": {
+        "id": "multiclass",
+        "version": "v1",
+        "display_name": "Multiclass model 1",
+        "artifact_sha256": null,
+        "preprocessing": null,
+        "calibration": null
+      },
+      "key_columns": [
+        "id"
+      ],
+      "prediction": "prediction0",
+      "decision": {
+        "column": null,
+        "rule": "none",
+        "threshold": null,
+        "tie_policy": "abstain",
+        "state_column": null,
+        "state_values": {
+          "issued": "issued",
+          "abstained": "abstained",
+          "failed": "failed",
+          "missing": "missing"
+        },
+        "candidate_evaluation": false
+      },
+      "probabilities": {
+        "positive_column": null,
+        "columns": {
+          "0": "p0_0",
+          "1": "p0_1",
+          "2": "p0_2"
+        }
+      },
+      "score": null,
+      "selection": null,
+      "intervals": [],
+      "prediction_at": null,
+      "generated_at": null,
+      "role": "evaluation",
+      "inline_outcome": null,
+      "inline_outcome_role": "agreement_assertion",
+      "horizon": null,
+      "entity_columns": []
+    },
+    {
+      "id": "model1",
+      "source": "predictions",
+      "model": {
+        "id": "multiclass",
+        "version": "v2",
+        "display_name": "Multiclass model 2",
+        "artifact_sha256": null,
+        "preprocessing": null,
+        "calibration": null
+      },
+      "key_columns": [
+        "id"
+      ],
+      "prediction": "prediction1",
+      "decision": {
+        "column": null,
+        "rule": "none",
+        "threshold": null,
+        "tie_policy": "abstain",
+        "state_column": null,
+        "state_values": {
+          "issued": "issued",
+          "abstained": "abstained",
+          "failed": "failed",
+          "missing": "missing"
+        },
+        "candidate_evaluation": false
+      },
+      "probabilities": {
+        "positive_column": null,
+        "columns": {
+          "0": "p1_0",
+          "1": "p1_1",
+          "2": "p1_2"
+        }
+      },
+      "score": null,
+      "selection": null,
+      "intervals": [],
+      "prediction_at": null,
+      "generated_at": null,
+      "role": "evaluation",
+      "inline_outcome": null,
+      "inline_outcome_role": "agreement_assertion",
+      "horizon": null,
+      "entity_columns": []
+    }
+  ],
+  "outcomes": {
+    "source": "predictions",
+    "column": "outcome",
+    "key_columns": [
+      "id"
+    ],
+    "snapshot_name": null,
+    "status_column": null,
+    "status_values": {
+      "final": "final",
+      "observed": "observed",
+      "provisional": "provisional",
+      "invalid": "invalid",
+      "conflicting": "conflicting"
+    },
+    "available_at": null,
+    "due_at": null,
+    "target_at": null
+  },
+  "context": null,
+  "cohorts": [
+    {
+      "id": "stratum",
+      "column": "cohort",
+      "categories": [
+        "low",
+        "high"
+      ],
+      "edges": [],
+      "prediction_derived": false
+    }
+  ],
+  "policies": [
+    {
+      "id": "abstention",
+      "run": "model0",
+      "kind": "confidence_abstention",
+      "thresholds": [],
+      "interval": null,
+      "costs": {}
+    }
+  ],
+  "comparison": {
+    "left": "model0",
+    "right": "model1"
+  },
+  "as_of": null,
+  "name": "Multiclass pinned prediction evaluation",
+  "schema_version": "confidenceguard.evaluation_spec/1.0"
+}

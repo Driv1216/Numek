@@ -1,0 +1,38 @@
+FFFF                                                                     [100%]
+=================================== FAILURES ===================================
+_______ test_conservative_unique_scores_do_not_escape_in_portable_charts _______
+tests/cg1/test_review_corrections.py:101: in test_conservative_unique_scores_do_not_escape_in_portable_charts
+    assert not any(m['metric'] in {'roc_pr_curve','ranking_score'} for m in shared['measurements'])
+E   assert not True
+E    +  where True = any(<generator object test_conservative_unique_scores_do_not_escape_in_portable_charts.<locals>.<genexpr> at 0x110f5c040>)
+___ test_safe_findings_checks_and_blockers_survive_without_sensitive_details ___
+tests/cg1/test_review_corrections.py:122: in test_safe_findings_checks_and_blockers_survive_without_sensitive_details
+    assert {'not_held_out','inference_blocked','paired_comparison_blocked','invalid_probabilities','inline_conflicts'}<=codes
+E   AssertionError: assert {'inference_b...ison_blocked'} <= {'withheld_breakdowns'}
+E     
+E     Extra items in the left set:
+E     'paired_comparison_blocked'
+E     'inference_blocked'
+E     'not_held_out'
+E     'inline_conflicts'
+E     'invalid_probabilities'
+___ test_legacy_shareable_reexport_hardened_without_mutating_stored_evidence ___
+tests/cg1/test_review_corrections.py:145: in test_legacy_shareable_reexport_hardened_without_mutating_stored_evidence
+    assert not any(m['metric']=='roc_pr_curve' for m in after['measurements'])
+E   assert not True
+E    +  where True = any(<generator object test_legacy_shareable_reexport_hardened_without_mutating_stored_evidence.<locals>.<genexpr> at 0x110fc86c0>)
+_________ test_population_ledger_matches_all_measurement_denominators __________
+tests/cg1/test_review_corrections.py:154: in test_population_ledger_matches_all_measurement_denominators
+    assert_ledger(core(s))
+tests/cg1/test_review_corrections.py:18: in assert_ledger
+    assert (p['run'],p['scope'],p['denominator'])==(m['run'],m['scope'],m['denominator'])
+E   AssertionError: assert ('model', 'overall', 5) == ('model', 'overall', 3)
+E     
+E     At index 2 diff: 5 != 3
+E     Use -v to get more diff
+=========================== short test summary info ============================
+FAILED tests/cg1/test_review_corrections.py::test_conservative_unique_scores_do_not_escape_in_portable_charts
+FAILED tests/cg1/test_review_corrections.py::test_safe_findings_checks_and_blockers_survive_without_sensitive_details
+FAILED tests/cg1/test_review_corrections.py::test_legacy_shareable_reexport_hardened_without_mutating_stored_evidence
+FAILED tests/cg1/test_review_corrections.py::test_population_ledger_matches_all_measurement_denominators
+4 failed, 5 deselected in 1.16s

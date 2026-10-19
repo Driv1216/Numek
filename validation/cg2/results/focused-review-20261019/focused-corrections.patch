@@ -1,0 +1,247 @@
+--- before/src/confidenceguard/conformal.py
++++ after/src/confidenceguard/conformal.py
+@@ -12,6 +12,10 @@
+ 
+ 
+ def value_state(value=None,*,state=None,reason=None):
++    if value is not None and math.isnan(value):
++        if state not in (None,'undefined'):
++            raise EvaluationError('NaN requires an undefined numeric state.','invalid_value_state')
++        state='undefined';reason=reason or 'not_a_number'
+     if state is None:
+         state='undefined' if value is None else 'finite' if math.isfinite(value) else 'positive_infinity' if value>0 else 'negative_infinity'
+     out={'value':float(value) if state=='finite' else None,'value_state':state}
+--- before/src/confidenceguard/membership.py
++++ after/src/confidenceguard/membership.py
+@@ -6,6 +6,19 @@
+ from .sources import rows
+ 
+ SCHEMA='confidenceguard.membership_sidecar/1.0'
++
++def assessment_membership_passed(method_id,fitted,imported_ids,checks):
++    """Current fits use checked roles; imports and upstream imports need passed checks."""
++    seen=set()
++    while method_id is not None:
++        if method_id in seen or method_id not in fitted:return False
++        seen.add(method_id)
++        check=checks.get(method_id)
++        if check is None:
++            if method_id in imported_ids:return False
++        elif check.get('status')!='passed':return False
++        method_id=fitted[method_id]['definition'].get('parent')
++    return True
+ 
+ def key_digest(namespace,value):
+     return hashlib.sha256(json.dumps([namespace,value],ensure_ascii=True,separators=(',',':')).encode()).hexdigest() if value is not None else None
+--- before/src/confidenceguard/methods.py
++++ after/src/confidenceguard/methods.py
+@@ -601,6 +601,7 @@
+         elif not spec.separation.base_predictions_independent or not spec.separation.evaluation_independent:reason='evaluation_independence_unestablished'
+         elif any(f['cross_role_entity_overlap'] for f in store.role_facts.values()):reason='cross_role_entity_dependence'
+         elif any(v['status']=='contradicted' for v in getattr(store,'prior_membership',{}).values()):reason='prior_membership_overlap'
++        elif any(not store.assessment_membership.get(node,True) for node in (m['data']['left_run'],m['data']['right_run'])):reason='prior_membership_unavailable'
+         elif request.mode=='independent_rows' and any(store.run_facts[node]['repeated_entities'] for node in (m['data']['left_run'],m['data']['right_run'])):reason='known_repeated_entities'
+         else:query=_contribution_query(store,m)
+         if query and not query[1]:
+@@ -720,9 +721,11 @@
+         diagnostic_edges=_calibration_edges(store,spec) if spec.evaluation.task.classes else []
+         if progress:progress({'stage':'method_fitting_and_selection' if operation in {'fit','study'} else 'fitted_method_application'})
+         fitted,status,selections,uncertainties=_fit_all(store,spec,methods,families)
+-        from .membership import preserve,inspect_imports
++        from .membership import preserve,inspect_imports,assessment_membership_passed
+         prior_membership=inspect_imports(store,fitted)
+         store.prior_membership=prior_membership
++        imported_ids={v['id'] for v in spec.fitted_methods}
++        store.assessment_membership={key:assessment_membership_passed(key,fitted,imported_ids,prior_membership) for key in fitted}
+         membership_sidecars=list(spec.membership_sidecars)+preserve(store,fitted)
+         roots_by_variant={key:v['definition']['run'] for key,v in fitted.items()}
+         runs=_run_objects(spec,fitted)
+@@ -767,7 +770,7 @@
+         qualifies=operation in {'study','evaluate'} and spec.separation.base_predictions_independent and spec.separation.evaluation_independent and not any(f['cross_role_entity_overlap'] for f in store.role_facts.values())
+         for key,app in applications.items():
+             n=store.con.execute(f'SELECT count(*) FROM {store.run_tables[key]} WHERE outcome_valid AND input_identity_valid AND cg_input_valid AND cg_failure IS NULL').fetchone()[0]
+-            if qualifies and n and prior_membership.get(key,{}).get('status')!='contradicted':app['assessment_eligible']=True
++            if qualifies and n and store.assessment_membership[key]:app['assessment_eligible']=True
+             else:app['assessment_eligible']=False
+             # Application identity never changes when an assessment is attached.
+         limitations=['Independent evaluation is evidence presence, not proof of improvement or future coverage.',
+@@ -797,7 +800,7 @@
+             if state['status']=='unavailable':findings.append({'code':'method_unavailable','priority':'Review','run':key,'message':'A requested method could not be fitted on its frozen population.','reason':state['reason']})
+         if any(app['unavailable_records'] for app in applications.values()):findings.append({'code':'application_unavailable_outputs','priority':'Review','message':'Some planned application inputs did not produce usable transformed outputs; primary improvement claims are limited.'})
+         observed_e=any(store.con.execute(f'SELECT count(*) FROM {store.run_tables[r.id]} WHERE outcome_valid AND input_identity_valid').fetchone()[0] for r in runs)
+-        if not qualifies or not observed_e:findings.append({'code':'independent_evaluation_unestablished','priority':'Review','message':'No qualifying independent evaluation is established; fitted/application evidence does not prove improvement.'})
++        if not qualifies or not observed_e or applications and not any(app['assessment_eligible'] for app in applications.values()):findings.append({'code':'independent_evaluation_unestablished','priority':'Review','message':'No qualifying independent evaluation is established; fitted/application evidence does not prove improvement.'})
+         if any(v['status']!='passed' for v in prior_membership.values()):findings.append({'code':'prior_membership_qualification','priority':'Review','message':'Prior fitting/selection/calibration membership checks are unavailable or contradicted; inspect exact method-specific qualifications.'})
+         if not spec.separation.exchangeable_scores or not spec.separation.labels_representative:findings.append({'code':'coverage_assumptions_unestablished','priority':'Review','message':'Ordinary future-population conformal coverage assumptions are not established.'})
+         cg={'operation':operation,'methods':{key:{'method':v['definition']['kind'],'artifact_digest':v['artifact_digest'],'evidence_state':'fitted_only','algorithm_version':v['algorithm_version']} for key,v in fitted.items()},
+--- before/src/confidenceguard/result.py
++++ after/src/confidenceguard/result.py
+@@ -98,7 +98,8 @@
+             from .methods import assessment_basis
+             spec=ReliabilitySpec.from_dict(private.get('cg2_spec'))
+             methods={m['id']:FittedMethod(m,limits=spec.limits).to_dict() for m in private.get('fitted_methods',[])}
+-            from .membership import validate as validate_membership
++            from .membership import validate as validate_membership,assessment_membership_passed
++            imported_ids={m['id'] for m in spec.fitted_methods}
+             for sidecar in private.get('membership_sidecars',[]):
+                 validate_membership(sidecar,spec.limits)
+                 if not set(sidecar['method_digests'])&{m['artifact_digest'] for m in methods.values()}:raise EvaluationError('Membership sidecar binds no supplied fitted method.')
+@@ -122,7 +123,7 @@
+                 if key is None:raise EvaluationError('Assessment refers to an unknown method.')
+                 validate_assessment(record,method_digest=methods[key]['artifact_digest'],application_digest=apps[key]['application_digest'])
+                 if record['evaluation_digest']!=basis or record['result_id']!=value['analysis_id'] or record['outcome_snapshot']!=value['outcomes'].get('snapshot_digest') or set(record['population_ids'])-populations or not apps[key].get('assessment_eligible') or not spec.separation.evaluation_independent or not spec.separation.base_predictions_independent:raise EvaluationError('Independent assessment is incompatible with its evidence.')
+-                if record['qualifications'].get('future_coverage_established') is not False or cg.get('prior_membership_checks',{}).get(key,{}).get('status')=='contradicted':raise EvaluationError('Assessment contradicts its qualification or prior membership.')
++                if record['qualifications'].get('future_coverage_established') is not False or not assessment_membership_passed(key,methods,imported_ids,cg.get('prior_membership_checks',{})):raise EvaluationError('Assessment contradicts its qualification or prior membership.')
+             views=cg.get('evidence_views',{});assessed={r['method_digest'] for r in cg.get('assessments',[])}
+             if set(views)!=set(methods):raise EvaluationError('Evidence-state inventory differs.')
+             for key,method in methods.items():
+--- before/tests/cg2/test_methods.py
++++ after/tests/cg2/test_methods.py
+@@ -8,7 +8,7 @@
+ from confidenceguard import (EvaluationError, ReliabilitySpec, fit_methods, study, evaluate,
+                              FittedMethod, EvaluationResult)
+ from confidenceguard.contracts import digest
+-from confidenceguard.conformal import rank, construct, validate_output, value_state
++from confidenceguard.conformal import rank, construct, validate_output, value_state, read_value
+ from confidenceguard.method_contracts import MethodSpec, InferenceSpec
+ from confidenceguard.inference import preflight, smooth_bootstrap
+ 
+@@ -43,6 +43,22 @@
+     assert empty['state']=='empty' and empty['width']['value']==0
+ 
+ 
++@pytest.mark.parametrize('value',[math.nan,float('-nan'),np.float64('nan')])
++def test_nan_numeric_state_is_undefined_not_infinite(value):
++    encoded=value_state(value)
++    assert encoded=={'value':None,'value_state':'undefined','reason':'not_a_number'}
++    assert read_value(json.loads(json.dumps(encoded,allow_nan=False))) is None
++    assert value_state(value,state='undefined',reason='numerical_failure')['reason']=='numerical_failure'
++    for state in ('finite','positive_infinity','negative_infinity'):
++        with pytest.raises(EvaluationError,match='NaN'):value_state(value,state=state)
++    with pytest.raises(EvaluationError):read_value(encoded,allowed=('finite','positive_infinity'))
++    with pytest.raises(EvaluationError):
++        validate_output({'state':'unbounded','lower':encoded,'upper':value_state(math.inf),'width':value_state(math.inf)})
++    assert read_value(value_state(-math.inf))==-math.inf
++    assert read_value(value_state(math.inf))==math.inf
++    assert value_state(-.5)=={'value':-.5,'value_state':'finite'}
++
++
+ def test_fit_study_reopening_and_immutable_originals(tmp_path):
+     spec=binary_spec(tmp_path,[{'id':'beta','kind':'beta','run':'original'},
+                                {'id':'lac','kind':'lac','run':'original','parent':'beta','levels':['0.9','0.999']}])
+@@ -60,6 +76,9 @@
+     tampered=copy.deepcopy(lac);tampered['parameters']['thresholds'][0]['threshold']=value_state(math.inf)
+     tampered['artifact_digest']=digest({k:v for k,v in tampered.items() if k!='artifact_digest'})
+     with pytest.raises(EvaluationError):FittedMethod(tampered)
++    undefined=copy.deepcopy(lac);undefined['parameters']['thresholds'][0]['threshold']=value_state(math.nan)
++    undefined['artifact_digest']=digest({k:v for k,v in undefined.items() if k!='artifact_digest'})
++    with pytest.raises(EvaluationError):FittedMethod(undefined)
+ 
+ 
+ def test_all_binary_calibrators_and_common_selection(tmp_path):
+--- before/tests/cg2/test_protocols.py
++++ after/tests/cg2/test_protocols.py
+@@ -20,17 +20,68 @@
+     # Omitting sidecars does not manufacture an observable membership check.
+     spec['membership_sidecars']=[]
+     result=evaluate(spec)
+-    assert result.data['cg2']['assessments'][0]['qualifications']['prior_membership']['status']=='unavailable'
+-
+-
+-def test_upstream_overlap_blocks_new_conformal_assessment(tmp_path):
++    assert result.data['cg2']['prior_membership_checks']['beta']['status']=='unavailable'
++    assert result.data['cg2']['assessments']==[]
++    assert not result.data['cg2']['applications']['beta']['assessment_eligible']
++    assert result.data['cg2']['evidence_views']['beta']['application_state']=='applied_unvalidated'
++
++
++@pytest.mark.parametrize('include_membership',[True,False])
++def test_upstream_overlap_blocks_new_conformal_assessment(tmp_path,include_membership):
+     spec=binary_spec(tmp_path);fitted=fit_methods(spec)
+     spec['methods']=[{'id':'lac','kind':'lac','run':'original','parent':'beta'}]
+-    spec['fitted_methods']=fitted.private['fitted_methods'];spec['membership_sidecars']=fitted.private['membership_sidecars']
++    spec['fitted_methods']=fitted.private['fitted_methods'];spec['membership_sidecars']=fitted.private['membership_sidecars'] if include_membership else []
+     rewrite(tmp_path/'predictions.csv',lambda rows:[row.update(role='E') for row in rows if row['role']=='F'])
+     result=study(spec)
+-    assert result.data['cg2']['prior_membership_checks']['lac']['status']=='contradicted'
++    assert result.data['cg2']['prior_membership_checks']['lac']['status']==('contradicted' if include_membership else 'unavailable')
+     assert result.data['cg2']['assessments']==[]
++    assert not result.data['cg2']['applications']['lac']['assessment_eligible']
++
++
++@pytest.mark.parametrize('membership',['missing','other_namespace','matching'])
++def test_imported_assessment_requires_observed_historical_separation(tmp_path,membership):
++    spec=binary_spec(tmp_path);fitted=fit_methods(spec)
++    spec['methods']=[];spec['fitted_methods']=fitted.private['fitted_methods']
++    spec['membership_sidecars']=[] if membership=='missing' else fitted.private['membership_sidecars']
++    if membership=='other_namespace':spec['roles']['namespace']='unmatched-events'
++    spec['inference']={'mode':'independent_rows','metrics':['brier'],'replicates':2000,'seed':37}
++    result=evaluate(spec);cg=result.data['cg2'];passed=membership=='matching'
++    assert cg['prior_membership_checks']['beta']['status']==('passed' if passed else 'unavailable')
++    assert cg['applications']['beta']['assessment_eligible'] is passed
++    assert bool(cg['assessments']) is passed
++    assert cg['evidence_views']['beta']['method_state']==('independently_evaluated' if passed else 'fitted_only')
++    assert cg['evidence_views']['beta']['application_state']==('independently_evaluated' if passed else 'applied_unvalidated')
++    assert result.private['fitted_methods']==fitted.private['fitted_methods']
++    assert any(m['run']=='beta' and m['metric']=='brier' and m['denominator']==60 and m['value_state']=='finite' for m in result.data['measurements'])
++    if passed:
++        assert cg['assessments'][0]['qualifications']['base_prediction_independence']=='declared'
++    else:
++        assert cg['inference']['contrasts']
++        assert all(c['reasons']==['prior_membership_unavailable'] for c in cg['inference']['contrasts'])
++        assert any(f['code']=='independent_evaluation_unestablished' for f in result.data['findings'])
++        assert result.to_dict()['cg2']['methods'][0]['application_evidence_state']=='applied_unvalidated'
++    EvaluationResult.from_dict(result.to_private_dict(),private=result.private)
++
++
++@pytest.mark.parametrize('membership_status',['unavailable','missing'])
++def test_rehashed_import_cannot_claim_assessment_without_membership_check(tmp_path,membership_status):
++    from confidenceguard.contracts import digest
++    from confidenceguard.methods import assessment_basis
++    spec=binary_spec(tmp_path);fitted=fit_methods(spec)
++    spec['methods']=[];spec['fitted_methods']=fitted.private['fitted_methods'];spec['membership_sidecars']=fitted.private['membership_sidecars']
++    result=evaluate(spec);raw=result.to_private_dict();private=copy.deepcopy(result.private)
++    assert raw['cg2']['assessments']
++    if membership_status=='missing':raw['cg2']['prior_membership_checks'].pop('beta')
++    else:raw['cg2']['prior_membership_checks']['beta']={'status':'unavailable','reason':'matching_prior_membership_not_supplied'}
++    basis=assessment_basis({k:v for k,v in raw.items() if k not in {'execution','binding'}})
++    raw['cg2']['assessment_basis_digest']=basis
++    for record in raw['cg2']['assessments']:
++        record['evaluation_digest']=basis
++        record['qualifications']['prior_membership']={'status':'unavailable'}
++        record['assessment_digest']=digest({k:v for k,v in record.items() if k!='assessment_digest'})
++    raw['binding']['analysis_digest']=digest({k:v for k,v in raw.items() if k!='binding'})
++    private['analysis_digest']=raw['binding']['analysis_digest'];raw['binding']['private_manifest_digest']=digest(private)
++    with pytest.raises(EvaluationError,match='prior membership'):EvaluationResult.from_dict(raw,private=private)
+ 
+ 
+ def test_membership_sidecar_roundtrip_and_tamper(tmp_path):
+--- before/docs/CG2_CONFIDENCEGUARD.md
++++ after/docs/CG2_CONFIDENCEGUARD.md
+@@ -82,6 +82,9 @@
+ evidence additionally explains its reason. Coefficients, temperatures, penalties,
+ scales and knots must be finite. A conformal threshold accepts tagged positive
+ infinity only with n >= 1 and k = n+1. An attainable-rank overflow is rejected.
++NaN is encoded as `undefined` with reason `not_a_number`, never as an infinity;
++explicitly requesting a finite/infinite NaN state is rejected. Undefined values
++cannot be fitted thresholds or interval endpoints.
+ 
+ Empty, finite, full-class, unbounded and unavailable outputs are distinct.
+ Empty intervals have width zero and miss coverage; unbounded intervals have
+@@ -200,8 +203,14 @@
+ default and charged to private-result admission. They bind namespace, model,
+ method digests and hashed event/entity membership in F/S/C. These hashes are
+ identifiers, not anonymization. Imported matching sidecars check later E overlap;
+-contradiction blocks independent assessment/inference. Parameter-only imports
+-remain usable, but missing prior checks are explicitly unavailable. Setting
++unavailable or contradicted checks block independent assessment and inference for
++affected imported methods and their dependents. Parameter-only imports remain
++applicable and descriptively evaluable, with explicit unavailable-check
++qualifications; independence declarations do not promote them to independently
++evaluated. Fresh in-study fits use their checked current role separation. Passed
++membership checks establish only supplied event/entity non-overlap, not hidden
++training independence or future exchangeability. Exact reopening rejects
++independent-assessment claims with unavailable or missing required checks. Setting
+ `separation.preserve_membership=false` is an explicit privacy/resource trade-off.
+ 
+ ```python

@@ -84,6 +84,10 @@ def create_app(workspace: Path, max_upload_mib: float = 100, analysis_config=Non
 
     @app.before_request
     def protect_posts():
+        # ConfidenceGuard owns its versioned JSON CSRF protocol. Existing form
+        # workflows retain their original token behavior.
+        if request.blueprint == 'confidenceguard_api':
+            return None
         token = session.setdefault("form_token", secrets.token_urlsafe(24))
         if request.method == "POST" and not hmac.compare_digest(
             str(request.form.get("form_token", "")), token
@@ -499,6 +503,8 @@ def create_app(workspace: Path, max_upload_mib: float = 100, analysis_config=Non
     register_images(app,workspace,data_roots or (Path.cwd(),))
     from datatrust.cross_web import register as register_cross
     register_cross(app,workspace,data_roots or (Path.cwd(),))
+    from confidenceguard.transport import register as register_confidenceguard
+    register_confidenceguard(app,workspace,data_roots or (Path.cwd(),))
     return app
 
 
@@ -520,6 +526,7 @@ def run_ui(port: int = 8000, max_upload_mib: float = 100, open_browser: bool = T
                 threaded=False,
             )
         finally:
+            app.extensions['confidenceguard_store'].cleanup()
             app.extensions['datatrust_m6_store'].cleanup()
             app.extensions['datatrust_m9_store'].cleanup()
             app.extensions['datatrust_m5_store'].cleanup()

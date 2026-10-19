@@ -1,6 +1,24 @@
 # DataTrust Methodology
 
-Last updated: 2026-10-09
+Last updated: 2026-10-19
+
+ConfidenceGuard uses the independent `prediction_evaluation_v1` methodology,
+documented in [CG1 contracts and methodology](docs/CG1_CONFIDENCEGUARD.md).
+Its supplied-prediction performance, calibration, intervals, paired populations,
+decision replay and disclosure rules do not change DataTrust's dataset scores or
+the accepted methods below. CG1 is descriptive by default, with explicitly
+qualified independent-row Wilson intervals; it fits no model/calibrator and
+produces no universal trust score.
+
+CG2's explicit `calibration_uncertainty_v1` methodology extends that engine with
+fitted probability maps, exact conformal uncertainty, quantile/sample proper scores,
+frozen common-population comparisons and paired/cluster bootstrap. F/S/C/E roles,
+finite-parameter versus tagged-unbounded-threshold validation, artifact/application/
+assessment states, adjusted tail resolution and computational admission are explicit.
+It creates no universal winner, auxiliary predictor, or future-coverage certification.
+See [CG2 methodology](docs/CG2_CONFIDENCEGUARD.md) and
+[methodological validation](validation/cg2/README.md). CG1-only requests and DataTrust
+scoring retain their accepted semantics.
 
 DataTrust produces local CSV evidence through classification, annotation-aware partial
 workflows, multilabel indicators, multi-output regression, and target-free profiling/readiness. All interfaces export HTML, its derived PDF, and strict JSON. The
@@ -693,3 +711,16 @@ measurements do not guarantee arbitrary-document capacity. See [M9 complete
 contracts, rules and limits](docs/M9_CROSS_REPRESENTATION_RELIABILITY.md) and
 [verification evidence](validation/m9/README.md). M1–M7 acceptance is preserved;
 M8 audio remains deferred.
+
+
+## ConfidenceGuard CG1 prediction evidence
+
+ConfidenceGuard's independent `prediction_evaluation_v1` methodology covers binary,
+multiclass and regression prediction artifacts. Population provenance revision 1.1
+binds frozen normalized relations and eligibility to checked record denominators,
+including conditional and paired populations. Conservative portable projections
+withhold exact ranking curves/native score summaries while retaining eligible
+scalar ranking metrics, safe findings and methodological qualifications. See
+[CG1 contracts and methodology](docs/CG1_CONFIDENCEGUARD.md) and
+[focused review evidence](validation/cg1/REVIEW_CORRECTIONS.md). These corrections
+do not change DataTrust scoring or accepted analytical engines.

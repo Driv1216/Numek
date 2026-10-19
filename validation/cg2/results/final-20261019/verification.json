@@ -1,0 +1,522 @@
+{
+  "python": "3.11.15",
+  "packages": {
+    "numpy": "2.4.6",
+    "scipy": "1.17.1",
+    "scikit-learn": "1.9.0",
+    "jsonschema": "4.26.0"
+  },
+  "seed": 20261019,
+  "generator_sha256": "5bfab88d672805e347e28a2f931a6f440d9453f7ecdf229cae2e92cf759dd81a",
+  "cases": [
+    {
+      "case": "binary",
+      "source_sha256": {
+        "predictions": "d9b4c48b2e0d057499724a6d1fa7ad21c9819eb80b2efc9b01e894f22cf344af"
+      },
+      "checks": [
+        {
+          "check": "Platt fitted map vs sklearn independent sigmoid",
+          "maximum_absolute_difference": 9.345357820933486e-10
+        },
+        {
+          "check": "platt Brier",
+          "maximum_absolute_difference": 1.3877787807814457e-16
+        },
+        {
+          "check": "platt log loss",
+          "maximum_absolute_difference": 1.1102230246251565e-16
+        },
+        {
+          "check": "platt ROC AUC",
+          "maximum_absolute_difference": 1.1102230246251565e-16
+        },
+        {
+          "check": "platt average precision",
+          "maximum_absolute_difference": 3.3306690738754696e-16
+        },
+        {
+          "check": "PAVA vs sklearn isotonic",
+          "maximum_absolute_difference": 0.0
+        },
+        {
+          "check": "isotonic Brier",
+          "maximum_absolute_difference": 1.942890293094024e-16
+        },
+        {
+          "check": "isotonic ROC AUC",
+          "maximum_absolute_difference": 0.0
+        },
+        {
+          "check": "isotonic average precision",
+          "maximum_absolute_difference": 1.1102230246251565e-16
+        },
+        {
+          "check": "Beta vs independent finite-difference objective",
+          "maximum_absolute_difference": 3.11026125252023e-06
+        },
+        {
+          "check": "beta Brier",
+          "maximum_absolute_difference": 1.1102230246251565e-16
+        },
+        {
+          "check": "beta log loss",
+          "maximum_absolute_difference": 0.0
+        },
+        {
+          "check": "beta ROC AUC",
+          "maximum_absolute_difference": 1.1102230246251565e-16
+        },
+        {
+          "check": "beta average precision",
+          "maximum_absolute_difference": 3.3306690738754696e-16
+        },
+        {
+          "check": "Binary temperature vs independent scalar optimizer",
+          "maximum_absolute_difference": 2.65295088119899e-08
+        },
+        {
+          "check": "temperature Brier",
+          "maximum_absolute_difference": 5.551115123125783e-17
+        },
+        {
+          "check": "temperature log loss",
+          "maximum_absolute_difference": 2.220446049250313e-16
+        },
+        {
+          "check": "temperature ROC AUC",
+          "maximum_absolute_difference": 1.1102230246251565e-16
+        },
+        {
+          "check": "temperature average precision",
+          "maximum_absolute_difference": 3.3306690738754696e-16
+        },
+        {
+          "check": "identity:calibration Brier",
+          "maximum_absolute_difference": 8.326672684688674e-17
+        },
+        {
+          "check": "identity:calibration log loss",
+          "maximum_absolute_difference": 0.0
+        },
+        {
+          "check": "identity:calibration ROC AUC",
+          "maximum_absolute_difference": 1.1102230246251565e-16
+        },
+        {
+          "check": "identity:calibration average precision",
+          "maximum_absolute_difference": 3.3306690738754696e-16
+        }
+      ],
+      "duration_seconds": 6.28253320800286,
+      "execution": {
+        "status": "completed",
+        "backend": "duckdb_local",
+        "engine_version": "1.5.6",
+        "effective_limits": {
+          "max_source_bytes": 5368709120,
+          "max_combined_source_bytes": 8589934592,
+          "max_rows": 10000000,
+          "max_combined_rows": 30000000,
+          "max_columns": 1000,
+          "memory_bytes": 2147483648,
+          "max_rss_bytes": 6442450944,
+          "threads": 2,
+          "batch_bytes": 33554432,
+          "max_record_bytes": 8388608,
+          "workspace_bytes": 68719476736,
+          "free_disk_bytes": 2147483648,
+          "max_seconds": 1800,
+          "result_bytes": 33554432,
+          "private_bytes": 67108864,
+          "probability_cells": 100000000,
+          "max_cohorts": 4,
+          "max_groups": 32,
+          "max_classes": 256,
+          "max_policies": 16,
+          "max_thresholds": 201,
+          "max_details": 100,
+          "witnesses": 5,
+          "curve_points": 201,
+          "calibration_bins": 10,
+          "support_warning": 100,
+          "bin_support_warning": 20,
+          "high_confidence": 0.9,
+          "probability_tolerance": 1e-06,
+          "sampling": {
+            "mode": "descriptive"
+          },
+          "disclosure": {
+            "policy": "conservative_aggregates_v1",
+            "minimum_denominator": 10,
+            "minimum_component": 10,
+            "display_labels": {},
+            "schema_version": "confidenceguard.disclosure/1.0"
+          }
+        },
+        "duration_seconds": 4.73080674999801,
+        "peak_workspace_bytes": 18333696,
+        "estimated_peak_workspace_bytes": 536870912,
+        "planning_estimate_is_upper_bound": false,
+        "publication_policy": "whole_evaluation_atomic",
+        "resource_qualification": "Sampled controls can overshoot; no capacity guarantee.",
+        "peak_worker_rss_bytes": 299499520,
+        "whole_job_seconds": 5.34673974999896,
+        "peak_spill_bytes": 0,
+        "serialized_bytes": 5709886
+      },
+      "artifacts": [
+        {
+          "audience": "local",
+          "html": "reports/binary-local.html",
+          "pdf": "reports/binary-local.pdf",
+          "html_sha256": "07778815e8757a05f9d1559b5603a37c749e7979c9d365c35bd04bec00b396f3",
+          "pdf_sha256": "27934f7d1cfb80feff8c7472ffc95ae4abd0f9ebda2ca4c4290b206fece6234e"
+        },
+        {
+          "audience": "shareable",
+          "html": "reports/binary-shareable.html",
+          "pdf": "reports/binary-shareable.pdf",
+          "html_sha256": "89ede4f85e189550b8a3bc98ed2db5b0b360fed881c9e7ecdab11fb695b6ce8c",
+          "pdf_sha256": "3762765bfb0e640411b6923f41d27ba07184937c15b3ad6e36ee8f529ff55e4b"
+        }
+      ]
+    },
+    {
+      "case": "multiclass",
+      "source_sha256": {
+        "predictions": "247219df010bb31a96b967e838da85dfe620c1b7b1deaf652d114f4cc631814a"
+      },
+      "checks": [
+        {
+          "check": "Multiclass temperature independent fit",
+          "maximum_absolute_difference": 1.1054938118260083e-06
+        },
+        {
+          "check": "temperature multiclass log loss",
+          "maximum_absolute_difference": 4.440892098500626e-16
+        },
+        {
+          "check": "temperature multiclass unhalved Brier",
+          "maximum_absolute_difference": 0.0
+        },
+        {
+          "check": "Dirichlet independent convex objective optimum",
+          "maximum_absolute_difference": 1.7637424853944594e-10
+        },
+        {
+          "check": "dirichlet multiclass log loss",
+          "maximum_absolute_difference": 4.440892098500626e-16
+        },
+        {
+          "check": "dirichlet multiclass unhalved Brier",
+          "maximum_absolute_difference": 2.220446049250313e-16
+        }
+      ],
+      "duration_seconds": 4.788036166999518,
+      "execution": {
+        "status": "completed",
+        "backend": "duckdb_local",
+        "engine_version": "1.5.6",
+        "effective_limits": {
+          "max_source_bytes": 5368709120,
+          "max_combined_source_bytes": 8589934592,
+          "max_rows": 10000000,
+          "max_combined_rows": 30000000,
+          "max_columns": 1000,
+          "memory_bytes": 2147483648,
+          "max_rss_bytes": 6442450944,
+          "threads": 2,
+          "batch_bytes": 33554432,
+          "max_record_bytes": 8388608,
+          "workspace_bytes": 68719476736,
+          "free_disk_bytes": 2147483648,
+          "max_seconds": 1800,
+          "result_bytes": 33554432,
+          "private_bytes": 67108864,
+          "probability_cells": 100000000,
+          "max_cohorts": 4,
+          "max_groups": 32,
+          "max_classes": 256,
+          "max_policies": 16,
+          "max_thresholds": 201,
+          "max_details": 100,
+          "witnesses": 5,
+          "curve_points": 201,
+          "calibration_bins": 10,
+          "support_warning": 100,
+          "bin_support_warning": 20,
+          "high_confidence": 0.9,
+          "probability_tolerance": 1e-06,
+          "sampling": {
+            "mode": "descriptive"
+          },
+          "disclosure": {
+            "policy": "conservative_aggregates_v1",
+            "minimum_denominator": 10,
+            "minimum_component": 10,
+            "display_labels": {},
+            "schema_version": "confidenceguard.disclosure/1.0"
+          }
+        },
+        "duration_seconds": 3.643540416000178,
+        "peak_workspace_bytes": 20729856,
+        "estimated_peak_workspace_bytes": 536870912,
+        "planning_estimate_is_upper_bound": false,
+        "publication_policy": "whole_evaluation_atomic",
+        "resource_qualification": "Sampled controls can overshoot; no capacity guarantee.",
+        "peak_worker_rss_bytes": 245694464,
+        "whole_job_seconds": 4.24176924999847,
+        "peak_spill_bytes": 0,
+        "serialized_bytes": 3484966
+      },
+      "artifacts": [
+        {
+          "audience": "local",
+          "html": "reports/multiclass-local.html",
+          "pdf": "reports/multiclass-local.pdf",
+          "html_sha256": "d0c44cf5d033d89886a65e54372bf998fa6924618c61dc3d3373dce177265b7f",
+          "pdf_sha256": "07b10037f432cffee7e351fc8ccf0fda3c75e3c83cba3d03e3fd22fb2d85f2cd"
+        },
+        {
+          "audience": "shareable",
+          "html": "reports/multiclass-shareable.html",
+          "pdf": "reports/multiclass-shareable.pdf",
+          "html_sha256": "0ea2612e5e997fcfea379bff31d55d98f9224559950a9d717da8a18d81534987",
+          "pdf_sha256": "df5d3794871114d5b48557f9ddc4a8ef2b03b89544db527d355ef6f5ba558aba"
+        }
+      ]
+    },
+    {
+      "case": "regression",
+      "source_sha256": {
+        "predictions": "61e8512c61e8d5ed07624a6d9fd2405d1e1032eaff76bd226492475fc0a7d8e4",
+        "samples": "a126b587af6c041aa0ad857bafa599953154de0037320dbdc4f86d326122fd4a"
+      },
+      "checks": [
+        {
+          "check": "native MAE",
+          "maximum_absolute_difference": 4.440892098500626e-16
+        },
+        {
+          "check": "pinball 0.05",
+          "maximum_absolute_difference": 2.7755575615628914e-17
+        },
+        {
+          "check": "pinball 0.5",
+          "maximum_absolute_difference": 0.0
+        },
+        {
+          "check": "pinball 0.95",
+          "maximum_absolute_difference": 4.163336342344337e-17
+        },
+        {
+          "check": "WIS",
+          "maximum_absolute_difference": 5.551115123125783e-17
+        },
+        {
+          "check": "empirical CRPS independent quadratic oracle",
+          "maximum_absolute_difference": 2.220446049250313e-16
+        },
+        {
+          "check": "split exact threshold 0.9",
+          "maximum_absolute_difference": 0.0
+        },
+        {
+          "check": "normalized exact threshold 0.9",
+          "maximum_absolute_difference": 0.0
+        },
+        {
+          "check": "cqr exact threshold 0.9",
+          "maximum_absolute_difference": 0.0
+        }
+      ],
+      "duration_seconds": 11.08222245900106,
+      "execution": {
+        "status": "completed",
+        "backend": "duckdb_local",
+        "engine_version": "1.5.6",
+        "effective_limits": {
+          "max_source_bytes": 5368709120,
+          "max_combined_source_bytes": 8589934592,
+          "max_rows": 10000000,
+          "max_combined_rows": 30000000,
+          "max_columns": 1000,
+          "memory_bytes": 2147483648,
+          "max_rss_bytes": 6442450944,
+          "threads": 2,
+          "batch_bytes": 33554432,
+          "max_record_bytes": 8388608,
+          "workspace_bytes": 68719476736,
+          "free_disk_bytes": 2147483648,
+          "max_seconds": 1800,
+          "result_bytes": 33554432,
+          "private_bytes": 67108864,
+          "probability_cells": 100000000,
+          "max_cohorts": 4,
+          "max_groups": 32,
+          "max_classes": 256,
+          "max_policies": 16,
+          "max_thresholds": 201,
+          "max_details": 100,
+          "witnesses": 5,
+          "curve_points": 201,
+          "calibration_bins": 10,
+          "support_warning": 100,
+          "bin_support_warning": 20,
+          "high_confidence": 0.9,
+          "probability_tolerance": 1e-06,
+          "sampling": {
+            "mode": "descriptive"
+          },
+          "disclosure": {
+            "policy": "conservative_aggregates_v1",
+            "minimum_denominator": 10,
+            "minimum_component": 10,
+            "display_labels": {},
+            "schema_version": "confidenceguard.disclosure/1.0"
+          }
+        },
+        "duration_seconds": 10.176449999999022,
+        "peak_workspace_bytes": 41693184,
+        "estimated_peak_workspace_bytes": 536870912,
+        "planning_estimate_is_upper_bound": false,
+        "publication_policy": "whole_evaluation_atomic",
+        "resource_qualification": "Sampled controls can overshoot; no capacity guarantee.",
+        "peak_worker_rss_bytes": 268648448,
+        "whole_job_seconds": 10.859354291998898,
+        "peak_spill_bytes": 0,
+        "serialized_bytes": 1796505
+      },
+      "artifacts": [
+        {
+          "audience": "local",
+          "html": "reports/regression-local.html",
+          "pdf": "reports/regression-local.pdf",
+          "html_sha256": "c56af2c5ee618b81c6c579c4beb592bfb4017a5c21aa36c6f203928b10028e27",
+          "pdf_sha256": "114f0abda4eb248bf9d48ec8511f4b9f4089ca34b375c3bdce06c9709735f4ae"
+        },
+        {
+          "audience": "shareable",
+          "html": "reports/regression-shareable.html",
+          "pdf": "reports/regression-shareable.pdf",
+          "html_sha256": "fc246140ca4689d0e2362d1f7423025e2606653619dd97cdda84328c09ec817d",
+          "pdf_sha256": "6bb96999d99ab2390bb30a9c8d108c2fbe44e95015cf60ddf213579ab8362986"
+        }
+      ]
+    }
+  ],
+  "conformal_experiments": [
+    {
+      "method": "lac",
+      "trials": 1200,
+      "one_future_event_per_independent_calibration_trial": true,
+      "calibration_records": 39,
+      "nominal": 0.9,
+      "covered": 1056,
+      "coverage": 0.88,
+      "mean_efficiency": 1.7091666666666667,
+      "one_sided_undercoverage_p": 0.013446801913483337,
+      "predeclared_rejection_level": 0.0001
+    },
+    {
+      "method": "aps",
+      "trials": 1200,
+      "one_future_event_per_independent_calibration_trial": true,
+      "calibration_records": 39,
+      "nominal": 0.9,
+      "covered": 1073,
+      "coverage": 0.8941666666666667,
+      "mean_efficiency": 2.0258333333333334,
+      "one_sided_undercoverage_p": 0.2632827220585759,
+      "predeclared_rejection_level": 0.0001
+    },
+    {
+      "method": "raps",
+      "trials": 1200,
+      "one_future_event_per_independent_calibration_trial": true,
+      "calibration_records": 39,
+      "nominal": 0.9,
+      "covered": 1107,
+      "coverage": 0.9225,
+      "mean_efficiency": 2.0166666666666666,
+      "one_sided_undercoverage_p": 0.996859423716492,
+      "predeclared_rejection_level": 0.0001
+    },
+    {
+      "method": "split",
+      "trials": 1200,
+      "one_future_event_per_independent_calibration_trial": true,
+      "calibration_records": 39,
+      "nominal": 0.9,
+      "covered": 1065,
+      "coverage": 0.8875,
+      "mean_efficiency": 4.230079096512966,
+      "one_sided_undercoverage_p": 0.08317278244597537,
+      "predeclared_rejection_level": 0.0001
+    },
+    {
+      "method": "normalized",
+      "trials": 1200,
+      "one_future_event_per_independent_calibration_trial": true,
+      "calibration_records": 39,
+      "nominal": 0.9,
+      "covered": 1083,
+      "coverage": 0.9025,
+      "mean_efficiency": 3.6030663457926226,
+      "one_sided_undercoverage_p": 0.627537147055249,
+      "predeclared_rejection_level": 0.0001
+    },
+    {
+      "method": "cqr",
+      "trials": 1200,
+      "one_future_event_per_independent_calibration_trial": true,
+      "calibration_records": 39,
+      "nominal": 0.9,
+      "covered": 1072,
+      "coverage": 0.8933333333333333,
+      "mean_efficiency": 3.731758006721462,
+      "one_sided_undercoverage_p": 0.2333501468171105,
+      "predeclared_rejection_level": 0.0001
+    }
+  ],
+  "bootstrap_experiments": {
+    "paired_iid": {
+      "available": 160,
+      "covered": 148,
+      "unavailable": {},
+      "trials": 160,
+      "true_effect": 0.2,
+      "conditional_coverage": 0.925,
+      "interval_availability": 1.0,
+      "nominal": 0.95,
+      "qualification": "Coverage among admitted published intervals is descriptive and conditioned on availability; refusals are reported separately. This experiment is not a universal bootstrap accuracy theorem.",
+      "one_sided_undercoverage_p": 0.10634971121135156
+    },
+    "paired_cluster": {
+      "available": 160,
+      "covered": 148,
+      "unavailable": {},
+      "trials": 160,
+      "true_effect": 0.2,
+      "conditional_coverage": 0.925,
+      "interval_availability": 1.0,
+      "nominal": 0.95,
+      "qualification": "Coverage among admitted published intervals is descriptive and conditioned on availability; refusals are reported separately. This experiment is not a universal bootstrap accuracy theorem.",
+      "one_sided_undercoverage_p": 0.10634971121135156
+    },
+    "iid_on_dependent_events_negative_control": {
+      "available": 160,
+      "covered": 95,
+      "unavailable": {},
+      "trials": 160,
+      "true_effect": 0.2,
+      "conditional_coverage": 0.59375,
+      "interval_availability": 1.0,
+      "nominal": 0.95,
+      "qualification": "Coverage among admitted published intervals is descriptive and conditioned on availability; refusals are reported separately. This experiment is not a universal bootstrap accuracy theorem."
+    }
+  },
+  "scope": "Internal mathematical/reference, schema, workflow and simulation evidence; not production, market, universal efficiency or future-coverage validation.",
+  "reference_checks": 38
+}

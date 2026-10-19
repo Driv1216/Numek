@@ -1,10 +1,19 @@
 # Numek Current State
 
-Last updated: 2026-10-13
+Last updated: 2026-10-19
 Product status: Classification baseline preserved; M1 shared contracts/unlabeled
 profiling, M2 regression, M3 annotation workflows, M4 comparative/scalable analysis, M5 temporal reliability, M6 text reliability intelligence, M7 image reliability intelligence and M9 cross-representation reliability implemented.
 M1–M7 completion is accepted by the user. M8 audio is deliberately deferred.
 M9 has scoped engineering evidence, without general semantic or capacity guarantees.
+ConfidenceGuard CG1 is now implemented: a separate, supplied-prediction workbench
+for binary classification, multiclass classification and regression, with Python,
+CLI, versioned local JSON API and functional browser workflows. It includes
+calibration/high-confidence and supplied-interval evidence, declared cohorts,
+authoritative-snapshot paired comparison, fixed-policy replay, protected
+investigation and consistent shareable HTML/PDF/JSON. No universal score or model
+execution is added. CG1 completion, independent review, corrections and its closed
+understanding gate are accepted by the user's subsequent instruction. See
+[contracts/methodology](CG1_CONFIDENCEGUARD.md) and [measured evidence](../validation/cg1/README.md).
 Project direction: Approved DataTrust expansion architecture and nine-milestone roadmap.
 Documentation reset: Completed.
 
@@ -343,3 +352,64 @@ workspace. The latter measures association/context/extraction, not million-recor
 field reconciliation. Concurrent verification load and simple authored pages
 limit extrapolation. See [M9 behavior](M9_CROSS_REPRESENTATION_RELIABILITY.md) and
 [verification](../validation/m9/README.md). Existing milestone evidence is preserved.
+
+## ConfidenceGuard CG1 verification — 2026-10-17
+
+Full repository suite: 526 passed. Subsequent isolated CG closure additions: 27
+focused tests passed; final report-label checks passed. All 24 independent metrics
+across pinned German Credit, Wine and Concrete predictions match. JSON Schemas and
+synthetic transport examples/results validate. Binary paired, multiclass and
+regression browser flows, exact resolution and exports were exercised. Six report
+variants (83 pages) received rendered visual inspection. Wheel contents and existing
+corpus/historical checksums pass. Shared DataTrust analytical engines were unchanged.
+Ordinary/wide probes measured about 10.5/9.6 seconds, with no observed spill; capacity
+ceilings and natural production workloads remain unestablished. See the CG1
+verification ledger for executed versus reused checks and precise qualifications.
+
+## ConfidenceGuard CG1 first-review corrections — 2026-10-18
+
+Focused corrections bind population provenance to frozen input/intersection lineage
+and checked eligibility counts, with explicit class/high-confidence and paired
+conditional supports. Conservative exports withhold exact ROC/PR/native-score
+details while preserving exact authorized local evidence and scalar ranking.
+Safe findings, blockers, method checks and limitations now survive portable output.
+Result/API major versions remain unchanged through qualified additive fields.
+
+New verification: 50 CG1/legacy-web tests passed, then all 11 focused regressions
+passed including one added interval-remapping case (51 distinct affected tests).
+All 24 pinned reference metrics pass; 717 matched historical analytical records
+retain scalar values/value states. Updated reports have zero population-ledger
+mismatches. JSON Schema and real PDF privacy checks pass; 49 selected PDF pages
+were inspected. Ordinary/wide probes took 11.48/9.20s with no observed spill;
+concurrent verification load limits timing comparisons. All 93 DataTrust source
+files match the correction-start snapshot. The earlier full suite/browser/model
+qualification was not rerun or reclassified as new evidence. See
+[focused correction handoff](../validation/cg1/REVIEW_CORRECTIONS.md).
+Acceptance was pending at that historical handoff. The user's subsequent
+authorization accepts CG1 and its closed understanding gate; CG2 implementation
+now extends that corrected foundation, as recorded below.
+
+## ConfidenceGuard CG2 implementation — 2026-10-19
+
+CG2 adds probability calibration (identity, monotone Platt, isotonic, monotone beta,
+temperature and qualified regularized Dirichlet), deterministic LAC/APS/RAPS,
+split/normalized regression and signed CQR. It reuses CG1 snapshots, normalized
+relations, reducers, evidence lineage, supervision, disclosure and reports.
+No separate analytical engine, auxiliary predictor training or DataTrust migration.
+
+Versioned CG2 contracts keep F/S/C/E explicit, freeze family-wide common selection
+inputs and metric-specific comparison populations, and retain application failures.
+Exact decimal conformal ranks and tagged unbounded thresholds round-trip safely.
+Quantile/sample scoring, qualified calibration diagnostics, coverage/efficiency,
+paired/cluster bootstrap and nominal/BCa-adjusted tail/resource admission are added.
+Fitted methods, application artifacts and independent assessments remain distinct.
+Protected membership sidecars enable later overlap checks; parameter-only imports
+disclose unavailable checks. Reapplication remains unvalidated.
+
+Python/CLI/API/browser fit, apply, study and supplied-uncertainty workflows use the
+existing local session/CSRF/revision/confirmation/worker-lock boundary. Canonical
+JSON/HTML/PDF use one disclosure projection. Historical CG1 evidence remains intact.
+CG3–CG7 retain their approved boundaries. Engineering evidence and operating limits
+are documented in [CG2 evidence](../validation/cg2/README.md); details and usage in
+[CG2 contracts](CG2_CONFIDENCEGUARD.md). Internal qualification does not assert
+universal method superiority, production capacity or a new accepted understanding gate.

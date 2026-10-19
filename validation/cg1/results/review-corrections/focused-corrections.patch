@@ -1,0 +1,1097 @@
+--- before/src/confidenceguard/disclosure.py
++++ after/src/confidenceguard/disclosure.py
+@@ -1,6 +1,56 @@
+ """One conservative disclosure projection shared by every portable representation."""
+ import copy
+ from .contracts import DisclosureSpec, digest, exact
++
++PROJECTION_REVISION='cg1_review_corrections_v1'
++RANKING_DETAILS={'roc_pr_curve','ranking_score','selection_score','class_score_maximum'}
++SAFE_FINDINGS={
++    'duplicate_keys':'Ambiguous prediction keys limit dependent analytical populations.',
++    'missing_keys':'Missing prediction keys limit dependent analytical populations.',
++    'invalid_probabilities':'Some supplied probabilities are invalid; independent valid decisions remain eligible.',
++    'inline_conflicts':'An inline outcome copy disagrees with the authoritative reference; consult its assertion role and comparison eligibility.',
++    'decision_rule_mismatches':'Supplied decisions do not always match the declared diagnostic rule.',
++    'unresolved_issuance':'Issuance is not fully established; operational coverage claims are limited.',
++    'not_held_out':'This run is not declared independent final evaluation; generalization is not established.',
++    'inference_blocked':'Known repeated entities block independent-row intervals.',
++    'paired_comparison_blocked':'Paired performance is unavailable under the current outcome, identity or timing declarations.',
++    'zero_probability_observed_outcome':'An observed reference outcome received zero supplied probability.'}
++SAFE_REASONS={'authoritative_outcomes_required','ambiguous_prediction_identities','conflicting_asserted_outcome_copy','ambiguous_outcome_identities','different_horizons','different_information_cutoffs','representation_or_policy_not_declared','conflicting_canonical_context_assertion','no_unique_context','interval_meaning_nominal_coverage_or_centrality_differs'}
++LIMITATIONS=['Supplied outcomes are reference evidence, not independently verified truth.','Observed labels need not represent unobserved cases.','No universal score or production approval.','Unknown provenance does not establish out-of-sample evaluation.']
++
++
++def safe_checks(raw,spec,runs,intervals):
++    """Project typed checks, never arbitrary text, category inventories or exact counts."""
++    identities={}
++    for run in spec['runs']:
++        rid=run['id'];alias=runs[rid]
++        for method in ('probability_quality','supplied_intervals','fixed_policy_replay'):
++            identities[method+':'+rid]=method+':'+alias
++        for i,_ in enumerate(spec['cohorts']):
++            for suffix in ('',':unresolved',':inventory'):
++                identities[f'cohort_{i}:{rid}{suffix}']=f'cohort_{i}:{alias}{suffix}'
++    identities.update({'paired_interval:'+k:'paired_interval:'+v for k,v in intervals.items()})
++    output=[]
++    for check in raw:
++        if check.get('id') not in identities:continue
++        if check.get('applicability') not in {'applicable','not_applicable','blocked'} or check.get('execution') not in {'completed','not_run'}:continue
++        c={'id':identities[check['id']],'applicability':check['applicability'],'execution':check['execution'],'detail_disclosure':'exact details retained locally'}
++        if check.get('reason') in SAFE_REASONS:c['reason']=check['reason']
++        output.append(c)
++    return output
++
++
++def harden_shared(data):
++    """Re-export legacy conservative projections safely, without inventing lost evidence."""
++    data=copy.deepcopy(data)
++    if data.get('disclosure',{}).get('policy')!='conservative_aggregates_v1' or data.get('coverage',{}).get('projection_revision')==PROJECTION_REVISION:return data
++    data['measurements']=[m for m in data['measurements'] if m['metric'] not in RANKING_DETAILS]
++    data['coverage']['projection_revision']=PROJECTION_REVISION
++    data['coverage']['legacy_qualification']='Legacy projection: denominator lineage and discarded findings cannot be recovered; reevaluate original inputs for corrected provenance.'
++    data['findings'].append({'code':'ranking_details_withheld','priority':'Information','message':'Exact ranking curves and native score summaries are withheld; scalar ranking metrics use all eligible score groups.'})
++    data['origin_projection_digest']=data.pop('projection_digest')
++    data['projection_digest']=digest(data)
++    return data
+ 
+ 
+ def project(result,disclosure=None):
+@@ -8,6 +58,9 @@
+     if isinstance(policy,dict):policy=DisclosureSpec.from_dict(policy)
+     raw=result.to_private_dict();measurements=raw['measurements'];protected=set()
+     if policy.policy=='conservative_aggregates_v1':
++        # Even a large denominator can hide singleton score groups. Exact score cutoffs
++        # identify predictive artifacts, and adjacent rates reveal cumulative small cells.
++        if any(m['metric'] in RANKING_DETAILS for m in measurements):protected.add('ranking_curve')
+         for m in measurements:
+             n=int(m['denominator'])
+             if 0<n<policy.minimum_denominator or any(0<float(v)<policy.minimum_component for v in m['sensitive_counts'] if v is not None):protected.add(m['disclosure_group'])
+@@ -34,7 +87,7 @@
+         return v
+     output=[]
+     for m in measurements:
+-        if m['disclosure_group'] in protected:continue
++        if m['disclosure_group'] in protected or policy.policy=='conservative_aggregates_v1' and m['metric'] in RANKING_DETAILS:continue
+         m=labels(m)
+         for k in ('sensitive_counts','disclosure_group','evidence_refs'):m.pop(k,None)
+         # Population predicates contain original classes; publish an opaque identity and scope only.
+@@ -45,10 +98,34 @@
+         public_runs.append({'id':runs[r['id']],'display_name':r['display_name'],'version_alias':r['version_alias'],'role':r['role'],'decision_provenance':{'origin':'supplied' if r['representations']['hard_prediction'] else 'derived' if d['rule']!='none' else 'none','rule':d['rule'],'threshold':d['threshold'],'tie_policy':d['tie_policy']},'representations':r['representations']})
+     comparison=raw['comparison']
+     if comparison:
+-        comparison={'left':runs[comparison['left']],'right':runs[comparison['right']],'blocked_reasons':comparison['blocked_reasons'],'timing_qualification':comparison['timing_qualification'],'scope':comparison['scope']}
++        comparison={'left':runs[comparison['left']],'right':runs[comparison['right']],'blocked_reasons':[x for x in comparison['blocked_reasons'] if x in SAFE_REASONS],'timing_qualification':comparison['timing_qualification'] if comparison['timing_qualification'] in {'unestablished','known_equal_on_shared_events'} else 'unestablished','scope':'matched supplied predictions; no isolated causal model or generalization claim'}
+     findings=[{'code':'withheld_breakdowns','priority':'Information','message':'Some related breakdowns are withheld under the selected disclosure policy.'}] if protected else []
+-    if any(m.get('value_state')=='positive_infinity' for m in output):findings.append({'code':'zero_probability_observed_outcome','priority':'Review','message':'An observed reference outcome received zero supplied probability.'})
+-    public={'schema_version':raw['schema_version'],'methodology_id':raw['methodology_id'],'analysis_id':raw['analysis_id'],'generated_at':raw['generated_at'],'name':raw['name'],'audience':'shareable','task':{'kind':raw['task']['kind'],'classes':list(classes.values()),'units':policy.display_labels.get('units','declared outcome units') if raw['task'].get('units') else None},'runs':public_runs,'outcomes':{'interpretation':'Supplied reference outcomes; correctness and population representativeness are not established.'},'comparison':comparison,'measurements':output,'checks':[],'findings':findings,'coverage':{'analytical_scope':'Completed admitted populations; exact coverage is retained in the protected bundle.','retention_limits':raw['coverage']['retention_limits'],'privacy_withholding':'Related breakdowns withheld' if protected else 'No configured small-count withholding triggered.','not_anonymity_guarantee':True},'execution':{'status':raw['execution']['status'],'backend':'duckdb_local','methodology':raw['methodology_id']},'origin_binding':raw['binding'],'disclosure':policy.to_dict()}
++    for finding in raw['findings']:
++        code=finding.get('code')
++        if code not in SAFE_FINDINGS:continue
++        if code=='zero_probability_observed_outcome' and not any(m['metric']=='log_loss' and m['value_state']=='positive_infinity' for m in output):continue
++        f={'code':code,'priority':'Review','message':SAFE_FINDINGS[code]}
++        if finding.get('run') in runs:f['run']=runs[finding['run']]
++        if code=='paired_comparison_blocked':f['reasons']=[x for x in finding.get('reasons',[]) if x in SAFE_REASONS]
++        findings.append(f)
++    if policy.policy=='conservative_aggregates_v1' and any(m['metric'] in RANKING_DETAILS for m in measurements):
++        findings.append({'code':'ranking_details_withheld','priority':'Information','message':'Exact ranking curves and native score summaries are withheld; scalar ranking metrics use all eligible score groups.'})
++    # Only disclose population records needed by retained evidence, with no SQL,
++    # source identities or class predicates. Include nested class/delta references.
++    ids={m['population_id'] for m in output}
++    def references(v):
++        if isinstance(v,dict):
++            for k,x in v.items():
++                if k.endswith('population_id') and isinstance(x,str):ids.add(x)
++                else:references(x)
++        elif isinstance(v,list):
++            for x in v:references(x)
++    references(output)
++    pops=[{k:(runs[p[k]] if k=='run' else p[k]) for k in ('id','run','scope','denominator','denominator_kind') if k in p} for p in raw['coverage']['populations'] if p['id'] in ids]
++    coverage={'analytical_scope':'Completed admitted populations; exact coverage is retained in the protected bundle.','retention_limits':raw['coverage']['retention_limits'],'privacy_withholding':'Related breakdowns withheld' if protected else 'No configured small-count withholding triggered.','not_anonymity_guarantee':True,'projection_revision':PROJECTION_REVISION,'limitations':LIMITATIONS,'sampling':raw['coverage']['sampling'],'populations':pops}
++    if raw['coverage'].get('population_provenance_version'):coverage['population_provenance_version']=raw['coverage']['population_provenance_version']
++    else:coverage['legacy_qualification']='Legacy result: corrected denominator lineage requires reevaluation.'
++    public={'schema_version':raw['schema_version'],'methodology_id':raw['methodology_id'],'analysis_id':raw['analysis_id'],'generated_at':raw['generated_at'],'name':raw['name'],'audience':'shareable','task':{'kind':raw['task']['kind'],'classes':list(classes.values()),'units':policy.display_labels.get('units','declared outcome units') if raw['task'].get('units') else None},'runs':public_runs,'outcomes':{'interpretation':'Supplied reference outcomes; correctness and population representativeness are not established.'},'comparison':comparison,'measurements':output,'checks':safe_checks(raw['checks'],result.private['spec'],runs,interval_aliases),'findings':findings,'coverage':coverage,'execution':{'status':raw['execution']['status'],'backend':'duckdb_local','methodology':raw['methodology_id']},'origin_binding':raw['binding'],'disclosure':policy.to_dict()}
+     # User-provided category mappings are not implicitly embedded in a shareable policy manifest.
+     public['disclosure']['display_labels']={}
+     public['coverage']['retention_limits'].pop('retained_witnesses',None)
+--- before/src/confidenceguard/result.py
++++ after/src/confidenceguard/result.py
+@@ -27,6 +27,20 @@
+         elif v is not None:raise EvaluationError('Nonfinite/unavailable values require null plus a value-state.')
+         ids.append(m['id'])
+     if len(set(ids))!=len(ids):raise EvaluationError('Duplicate measurement identities.')
++    if value['coverage'].get('population_provenance_version')=='1.1':
++        populations=value['coverage'].get('populations',[])
++        if not isinstance(populations,list) or any(not isinstance(p,dict) or not isinstance(p.get('id'),str) or p.get('run') not in run_ids or not isinstance(p.get('scope'),str) or p.get('denominator_kind') not in {'eligible_records','evaluation_support','class_conditional_records','paired_base_support','not_evaluated'} for p in populations):raise EvaluationError('Invalid population ledger.')
++        ledger={p['id']:p for p in populations}
++        if len(ledger)!=len(populations):raise EvaluationError('Duplicate population identities.')
++        for m in value['measurements']:
++            p=ledger.get(m['population_id'])
++            if p is None or any(p.get(k)!=m.get(k) for k in ('run','scope','denominator','denominator_kind')):raise EvaluationError('Measurement population differs from ledger.')
++            for c in m['data'].get('classes',[]):
++                for key,nkey in [('precision_population_id','predicted'),('recall_population_id','support')]:
++                    if key in c and (c[key] not in ledger or any(ledger[c[key]].get(k)!=m[k] for k in ('run','scope')) or ledger[c[key]].get('denominator')!=c.get(nkey)):raise EvaluationError('Class-conditional population differs from support.')
++            for side in ('left','right'):
++                key=side+'_population_id'
++                if key in m['data'] and (m['data'][key] not in ledger or ledger[m['data'][key]].get('denominator')!=m['data'].get(side+'_denominator') or ledger[m['data'][key]].get('run')!=m['data'].get(side+'_run') or ledger[m['data'][key]].get('scope')!=m['scope']):raise EvaluationError('Paired conditional population differs from support.')
+ 
+ 
+ @dataclass
+@@ -93,7 +107,8 @@
+     data: dict
+     def to_dict(self,audience='shareable',**kwargs):
+         if audience!='shareable':raise EvaluationError('Exact data is unavailable in this projection.')
+-        return copy.deepcopy(self.data)
++        from .disclosure import harden_shared
++        return harden_shared(self.data)
+     def to_private_dict(self):raise EvaluationError('Exact data is unavailable in this projection.')
+     def resolve_evidence(self,*args,**kwargs):raise EvaluationError('Exact resolution requires a protected result bundle.')
+     def generate_artifacts(self,path,**kwargs):
+--- before/src/confidenceguard/engine.py
++++ after/src/confidenceguard/engine.py
+@@ -85,7 +85,8 @@
+         runs=[{'id':r.id,'display_name':r.model.display_name or f'Model {i+1}','version_alias':f'Version {i+1}','model':r.model.to_dict(),'role':r.role,'decision_provenance':r.decision.to_dict(),'representations':{'hard_prediction':bool(r.prediction or r.decision.column),'probabilities':bool(r.probabilities),'scores':bool(r.score),'intervals':len(r.intervals)},'facts':store.run_facts[r.id]} for i,r in enumerate(spec.runs)]
+         for declaration,run in zip(spec.runs,runs):
+             run['decision_provenance'].update(origin='supplied' if declaration.prediction or declaration.decision.column else 'derived' if declaration.decision.rule!='none' else 'none',source_fields=[c for c in (declaration.decision.column or declaration.prediction,declaration.decision.state_column) if c],behavior='recorded candidate output' if declaration.prediction or declaration.decision.column else 'hypothetical rule' if declaration.decision.rule!='none' else 'no decision established')
+-        coverage={'sources':store.counts,'run_populations':{},'populations':list(e.populations.values()),'outcome_snapshot':store.outcome_facts,'context_snapshot':store.context_facts,'retention_limits':{'witnesses_per_group':config.witnesses,'retained_witnesses':len(e.locators),'maximum_investigation_details':config.max_details,'curve_points':config.curve_points},'analytical_scope':'All eligible admitted records; no silent sampling. Retained curve points and witnesses are bounded.','sampling':{'requested':config.sampling.mode,'inference_enabled':e.inference},'limits':{'max_cohorts':config.max_cohorts,'max_groups':config.max_groups,'probability_cells':config.probability_cells,'observed_probability_cells':cells},'limitations':['Supplied outcomes are reference evidence, not independently verified truth.','Observed labels need not represent unobserved cases.','No universal score or production approval.','Unknown provenance does not establish out-of-sample evaluation.']}
++        e.validate_populations()
++        coverage={'population_provenance_version':'1.1','sources':store.counts,'run_populations':{},'populations':list(e.populations.values()),'outcome_snapshot':store.outcome_facts,'context_snapshot':store.context_facts,'retention_limits':{'witnesses_per_group':config.witnesses,'retained_witnesses':len(e.locators),'maximum_investigation_details':config.max_details,'curve_points':config.curve_points},'analytical_scope':'All eligible admitted records; no silent sampling. Retained curve points and witnesses are bounded.','sampling':{'requested':config.sampling.mode,'inference_enabled':e.inference},'limits':{'max_cohorts':config.max_cohorts,'max_groups':config.max_groups,'probability_cells':config.probability_cells,'observed_probability_cells':cells},'limitations':['Supplied outcomes are reference evidence, not independently verified truth.','Observed labels need not represent unobserved cases.','No universal score or production approval.','Unknown provenance does not establish out-of-sample evaluation.']}
+         for r in spec.runs:
+             t=store.run_tables[r.id]
+             coverage['run_populations'][r.id]={'outcome_states':dict(store.con.execute(f'SELECT coalesce(outcome_reason,\'eligible\'),count(*) FROM {t} GROUP BY 1').fetchall()),'issuance_states':dict(store.con.execute(f'SELECT state,count(*) FROM {t} GROUP BY 1').fetchall())}
+--- before/src/confidenceguard/analytics.py
++++ after/src/confidenceguard/analytics.py
+@@ -26,15 +26,55 @@
+     def __init__(self,store):
+         self.s=store;self.con=store.con;self.config=store.config;self.measurements=[];self.populations={};self.locators={};self.checks=[]
+         self.inference=self.config.sampling.mode=='independent_rows' and not any(f['repeated_entities'] for f in store.run_facts.values())
+-
+-    def add(self,run,scope,family,metric,value=None,n=0,*,data=None,counts=(),where='true',reason=None,units=None,basis='measured',state=None):
++        self.relations={};self.population_counts={};self.table=None
++        for run in store.spec.runs:
++            source=next(s for s in store.spec.sources if s.id==run.source).to_dict();source.pop('path')
++            self.bind_relation(store.run_tables[run.id],{'kind':'normalized_run','run':run.id,'declaration_digest':digest(run.to_dict()),'source_sha256':store.sources[run.source]['sha256'],'source_interpretation':source,'task_digest':digest(store.spec.task.to_dict()),'normalization_version':'1','probability_tolerance':store.config.probability_tolerance,'outcome_snapshot':store.outcome_facts.get('snapshot_digest'),'context_snapshot':store.context_facts['snapshot_digest']})
++
++    def bind_relation(self,table,lineage):
++        self.relations[table]=lineage
++
++    def use_relation(self,table):
++        if table not in self.relations:raise AssertionError('Unbound analytical relation')
++        self.table=table
++
++    def grouped_count(self,where,n):
++        """Reuse an exact SQL GROUP BY count; avoid a full scan per declared class."""
++        key=digest([self.relations[self.table],where])
++        if key in self.population_counts and self.population_counts[key]!=n:raise AssertionError('Conflicting grouped population count')
++        self.population_counts[key]=n
++
++    def population(self,run,scope,where,n,denominator_kind='eligible_records'):
++        """Identity binds frozen relation lineage AND eligibility, never a transient table name.
++
++        Denominator is record support, not an F1 formula or a number of macro classes.
++        Check each distinct reduction against SQL while its relation still exists.
++        """
++        lineage=self.relations[self.table]
++        definition={'run':run.id,'scope':scope,'definition':where,'lineage':lineage,'denominator_kind':denominator_kind}
++        pid='pop_'+digest(definition)[:32]
++        key=digest([lineage,where])
++        if key not in self.population_counts:
++            self.population_counts[key]=self.con.execute(f'SELECT count(*) FROM {self.table} WHERE {where}').fetchone()[0]
++        if self.population_counts[key]!=n:raise AssertionError('Analytical population denominator differs from eligibility count')
++        record={'id':pid,**definition,'denominator':n}
++        if pid in self.populations and self.populations[pid]!=record:raise AssertionError('Conflicting population identity')
++        self.populations[pid]=record
++        return pid
++
++    def validate_populations(self):
++        for m in self.measurements:
++            p=self.populations[m['population_id']]
++            if (p['run'],p['scope'],p['denominator'],p['denominator_kind'])!=(m['run'],m['scope'],m['denominator'],m['denominator_kind']):raise AssertionError('Inconsistent measurement population')
++
++    def add(self,run,scope,family,metric,value=None,n=0,*,data=None,counts=(),where='true',reason=None,units=None,basis='measured',state=None,denominator_kind='eligible_records'):
+         if family in {'performance','confusion','failures','candidate','high_confidence_decision'} and run.decision.rule!='none' and not (run.prediction or run.decision.column):basis='simulated'
+         if reason:basis='unavailable'
+-        pid='pop_'+digest([run.id,scope,where])[:20]
+-        self.populations[pid]={'id':pid,'run':run.id,'scope':scope,'definition':where,'denominator':n}
++        pid=self.population(run,scope,where,n,denominator_kind)
+         m={'id':f'm{len(self.measurements)+1}','run':run.id,'scope':scope,'family':family,'metric':metric,'method_version':'1','population_id':pid,'denominator':n,'value':value,'value_state':state or ('finite' if value is not None else 'undefined'),'applicability':'blocked' if reason else 'applicable','execution':'completed' if not reason else 'not_run','reason':reason,'units':units,'basis':basis,'interpretation':'descriptive','method_standing':'established_method','sensitive_counts':list(counts),'data':data or {},'disclosure_group':scope.split('/')[0] if scope!='overall' else family,'support_warning':n<self.config.support_warning,'evidence_refs':[]}
+         if isinstance(value,float) and not math.isfinite(value):m['value']=None;m['value_state']='positive_infinity' if value>0 else 'negative_infinity'
+         m['data']=finite_data(m['data'])
++        m['denominator_kind']=denominator_kind
+         self.measurements.append(m)
+         return m
+ 
+@@ -73,6 +113,7 @@
+ 
+ 
+ def distributions(e,r,table):
++    e.use_relation(table)
+     """Descriptive predictive artifacts do not require observed labels or issuance."""
+     con=e.con;n=con.execute(f'SELECT count(*) FROM {table}').fetchone()[0]
+     values=con.execute(f'SELECT state,count(*) FROM {table} GROUP BY state ORDER BY state').fetchall()
+@@ -87,6 +128,7 @@
+ 
+ 
+ def classification(e,r,table,where,scope):
++    e.use_relation(table)
+     con=e.con;classes=e.s.spec.task.classes
+     valid=f'({where}) AND outcome_valid AND decision IS NOT NULL AND state IN (\'issued\',\'hypothetical\')'
+     n,correct=con.execute(f'SELECT count(*),count(*) FILTER(WHERE decision=y) FROM {table} WHERE {valid}').fetchone()
+@@ -97,21 +139,28 @@
+     for c in classes:
+         tp=sum(v for a,b,v in counts if a==b==c);fn=sum(v for a,b,v in counts if a==c and b!=c);fp=sum(v for a,b,v in counts if b==c and a!=c);tn=n-tp-fn-fp
+         item={'class':c,'support':tp+fn,'predicted':tp+fp,'tp':tp,'fn':fn,'fp':fp,'tn':tn,'precision':tp/(tp+fp) if tp+fp else None,'recall':tp/(tp+fn) if tp+fn else None,'f1':2*tp/(2*tp+fp+fn) if 2*tp+fp+fn else None}
++        e.grouped_count(f'{valid} AND y={literal(c)}',tp+fn)
++        e.grouped_count(f'{valid} AND decision={literal(c)}',tp+fp)
++        e.grouped_count(f'{valid} AND y<>{literal(c)}',tn+fp)
++        item['recall_population_id']=e.population(r,scope,f'{valid} AND y={literal(c)}',tp+fn,'class_conditional_records')
++        item['precision_population_id']=e.population(r,scope,f'{valid} AND decision={literal(c)}',tp+fp,'class_conditional_records')
++        item['f1_formula_denominator']=2*tp+fp+fn
+         if e.inference:item['recall_interval']=wilson(tp,tp+fn);item['precision_interval']=wilson(tp,tp+fp)
+         per.append(item)
+     e.add(r,scope,'confusion','per_class',n=n,data={'classes':per,'macro_population':'classes with observed outcome support'},counts=[v for x in per for v in (x['tp'],x['fn'],x['fp'],x['tn'])],where=valid)
+     supported=[x for x in per if x['support']]
+     for metric,key in [('balanced_accuracy','recall'),('macro_f1_observed_classes','f1')]:
+         value=sum(x[key] for x in supported)/len(supported) if supported else None
+-        m=e.add(r,scope,'performance',metric,value,n,data={'supported_classes':len(supported),'declared_classes':len(classes)},where=valid,reason=None if value is not None else 'no_observed_class_support')
++        m=e.add(r,scope,'performance',metric,value,n,data={'supported_classes':len(supported),'declared_classes':len(classes),'aggregation_denominator':'observed_support_classes'},where=valid,denominator_kind='evaluation_support',reason=None if value is not None else 'no_observed_class_support')
+         if scope=='overall':m['disclosure_group']='confusion'
+     weighted=sum((x['f1'] or 0)*x['support'] for x in per)/n if n else None
+-    m=e.add(r,scope,'performance','support_weighted_f1',weighted,n,where=valid)
++    m=e.add(r,scope,'performance','support_weighted_f1',weighted,n,where=valid,denominator_kind='evaluation_support')
+     if scope=='overall':m['disclosure_group']='confusion'
+     if e.s.spec.task.kind=='binary_classification':
+         x=next(x for x in per if x['class']==e.s.spec.task.positive_class)
+-        for metric,k,d in [('precision',x['tp'],x['tp']+x['fp']),('recall',x['tp'],x['support']),('specificity',x['tn'],x['tn']+x['fp'])]:e.ratio(r,scope,'performance',metric,k,d,where=valid)
+-        e.add(r,scope,'performance','f1',x['f1'],n,where=valid,reason=None if x['f1'] is not None else 'zero_denominator')
++        for metric,k,d,predicate in [('precision',x['tp'],x['tp']+x['fp'],f'decision={literal(x["class"])}'),('recall',x['tp'],x['support'],f'y={literal(x["class"])}'),('specificity',x['tn'],x['tn']+x['fp'],f'y<>{literal(x["class"])}')]:e.ratio(r,scope,'performance',metric,k,d,where=f'{valid} AND {predicate}',denominator_kind='class_conditional_records')
++        m=e.add(r,scope,'performance','f1',x['f1'],n,where=valid,denominator_kind='evaluation_support',data={'formula_denominator':2*x['tp']+x['fp']+x['fn']},counts=(x['tp'],x['fp'],x['fn'],x['tn']),reason=None if x['f1'] is not None else 'zero_denominator')
++        if scope=='overall':m['disclosure_group']='confusion'
+     if scope=='overall':
+         m=e.add(r,scope,'failures','issued_errors',n-correct,n,counts=(n-correct,correct),where=valid)
+         e.witnesses(m,r,table,f'{valid} AND decision<>y',[r.decision.column or r.prediction,r.inline_outcome])
+@@ -121,6 +170,7 @@
+ 
+ 
+ def regression(e,r,table,where,scope):
++    e.use_relation(table)
+     valid=f'({where}) AND outcome_valid AND point IS NOT NULL AND state IN (\'issued\',\'hypothetical\')'
+     con=e.con;n=con.execute(f'SELECT count(*) FROM {table} WHERE {valid}').fetchone()[0]
+     if not n:
+@@ -151,6 +201,7 @@
+ 
+ 
+ def ranking(e,r,table,where,scope):
++    e.use_relation(table)
+     valid=f'({where}) AND outcome_valid AND rank_score IS NOT NULL'
+     positive=literal(e.s.spec.task.positive_class);direction=-1 if r.score and r.score.direction=='lower' else 1
+     n,p=e.con.execute(f'SELECT count(*),count(*) FILTER(WHERE y={positive}) FROM {table} WHERE {valid}').fetchone();neg=n-p
+@@ -170,6 +221,7 @@
+ 
+ 
+ def calibration(e,r,table,where,scope):
++    e.use_relation(table)
+     valid=f'({where}) AND outcome_valid AND prob_valid';con=e.con
+     n,mean,loss,infinite=con.execute(f'SELECT count(*),avg(brier),avg(log_loss),count(*) FILTER(WHERE log_infinite) FROM {table} WHERE {valid}').fetchone()
+     e.add(r,scope,'probability_quality','brier',mean,n,data={'definition':'binary_event_squared_error' if e.s.spec.task.kind=='binary_classification' else 'unhalved_multiclass_sum'},where=valid,reason=None if n else 'no_eligible_probabilities')
+@@ -195,7 +247,7 @@
+             hn,errors=con.execute(f'SELECT count(*),count(*) FILTER(WHERE top_label<>y) FROM {table} WHERE {hw}').fetchone()
+             m=e.ratio(r,scope,'high_confidence','high_confidence_top_class_error_rate',errors,hn,where=hw,data={'threshold':e.config.high_confidence,'meaning':'unique_top_probability_class_mismatch_not_issued_decision'})
+             all_errors=con.execute(f'SELECT count(*) FROM {table} WHERE {valid} AND top_label IS NOT NULL AND top_label<>y').fetchone()[0]
+-            e.ratio(r,scope,'high_confidence','share_of_top_class_errors_high_confidence',errors,all_errors,where=hw)
++            e.ratio(r,scope,'high_confidence','share_of_top_class_errors_high_confidence',errors,all_errors,where=f'{valid} AND top_label IS NOT NULL AND top_label<>y')
+             if scope=='overall':e.witnesses(m,r,table,f'{hw} AND top_label<>y',list(r.probabilities.columns.values()) if r.probabilities.columns else [r.probabilities.positive_column])
+     hw=f'{valid} AND confidence>={e.config.high_confidence!r} AND state IN (\'issued\',\'hypothetical\')'
+     hn,errors=con.execute(f'SELECT count(*),count(*) FILTER(WHERE decision<>y) FROM {table} WHERE {hw}').fetchone()
+@@ -203,10 +255,11 @@
+ 
+ 
+ def intervals(e,r,table,where,scope):
++    e.use_relation(table)
+     for i,interval in enumerate(r.intervals):
+         valid=f'({where}) AND outcome_valid AND w{i} IS NOT NULL'
+         if interval.meaning!='prediction':
+-            e.add(r,scope,'intervals','interval_coverage',reason='interval_is_not_a_prediction_interval',data={'interval':interval.id},where=valid);continue
++            e.add(r,scope,'intervals','interval_coverage',reason='interval_is_not_a_prediction_interval',data={'interval':interval.id},where='false',denominator_kind='not_evaluated');continue
+         n,k,lower,upper,mean,median,p95=e.con.execute(f'SELECT count(*),count(*) FILTER(WHERE y_num BETWEEN l{i} AND u{i}),count(*) FILTER(WHERE y_num<l{i}),count(*) FILTER(WHERE y_num>u{i}),avg(w{i}),quantile_cont(w{i},.5),quantile_cont(w{i},.95) FROM {table} WHERE {valid}').fetchone()
+         e.ratio(r,scope,'intervals','interval_coverage',k,n,data={'interval':interval.id,'nominal':interval.coverage,'lower_misses':lower,'upper_misses':upper,'maturity':'supplied_outcome_eligibility'},where=valid)
+         e.add(r,scope,'intervals','interval_width',mean,n,data={'interval':interval.id,'median':median,'p95':p95},counts=(lower,upper,k),units=e.s.spec.task.units,where=valid)
+@@ -217,6 +270,7 @@
+ 
+ 
+ def evaluate_scope(e,r,table,where,scope):
++    e.use_relation(table)
+     e.s.work.check('analytical population reductions')
+     n,labeled,issued=e.con.execute(f'SELECT count(*),count(*) FILTER(WHERE outcome_valid),count(*) FILTER(WHERE state=\'issued\') FROM {table} WHERE {where}').fetchone()
+     e.add(r,scope,'availability','population_coverage',labeled/n if n else None,n,data={'records':n,'eligible_outcomes':labeled,'issued':issued,'issuance_meaning':'recorded' if r.prediction or r.decision.column or r.decision.state_column else 'unestablished'},counts=(labeled,n-labeled,issued,n-issued),where=where)
+@@ -228,23 +282,24 @@
+ 
+ 
+ def policies(e,r,table):
++    e.use_relation(table)
+     for pi,policy in enumerate(p for p in e.s.spec.policies if p.run==r.id):
+         family='policy:'+policy.id;scope='overall';config=e.config;task=e.s.spec.task
+         if policy.kind=='supplied_cost':
+-            if task.kind=='regression':e.add(r,scope,family,'empirical_cost',reason='categorical_action_outcome_costs_require_classification');continue
++            if task.kind=='regression':e.add(r,scope,family,'empirical_cost',reason='categorical_action_outcome_costs_require_classification',where='false',denominator_kind='not_evaluated');continue
+             clauses=[]
+             for action,costs in policy.costs.items():
+                 for outcome,cost in costs.items():clauses.append(f'WHEN (CASE WHEN state=\'abstained\' THEN \'abstained\' ELSE decision END)={literal(action)} AND y={literal(outcome)} THEN {cost!r}')
+-            if not clauses:e.add(r,scope,family,'empirical_cost',reason='cost_table_required');continue
++            if not clauses:e.add(r,scope,family,'empirical_cost',reason='cost_table_required',where='false',denominator_kind='not_evaluated');continue
+             n,covered,cost=e.con.execute(f'SELECT count(*),count(cost),avg(cost) FROM (SELECT CASE {" ".join(clauses)} END cost FROM {table} WHERE outcome_valid AND state IN (\'issued\',\'abstained\'))').fetchone()
+-            e.add(r,scope,family,'empirical_cost',cost if covered==n else None,n,reason=None if covered==n and n else 'incomplete_cost_table_or_empty_population',basis='simulated',data={'covered':covered,'unchanged_outcome_assumption':True});continue
++            e.add(r,scope,family,'empirical_cost',cost if covered==n else None,n,reason=None if covered==n and n else 'incomplete_cost_table_or_empty_population',basis='simulated',data={'covered':covered,'unchanged_outcome_assumption':True},where="outcome_valid AND state IN ('issued','abstained')");continue
+         binary=policy.kind in {'probability_threshold','score_threshold'}
+         if policy.kind=='probability_threshold' and task.kind=='binary_classification' and r.probabilities:score=f'probs[{task.classes.index(task.positive_class)+1}]';direction=1
+         elif policy.kind=='score_threshold' and task.kind=='binary_classification' and r.score and r.score.column:score='rank_score';direction=1 if r.score.direction=='higher' else -1
+         elif policy.kind=='confidence_abstention' and task.kind!='regression' and (r.prediction or r.decision.column or r.decision.rule!='none'):score='confidence';direction=1
+         elif policy.kind=='selection_abstention' and r.selection:score='selector';direction=1 if r.selection.direction=='higher' else -1
+         elif policy.kind=='interval_abstention' and task.kind=='regression' and policy.interval in [v.id for v in r.intervals]:score=f'w{[v.id for v in r.intervals].index(policy.interval)}';direction=-1
+-        else:e.add(r,scope,family,'policy_curve',reason='required_score_decision_or_interval_unavailable',basis='simulated');continue
++        else:e.add(r,scope,family,'policy_curve',reason='required_score_decision_or_interval_unavailable',basis='simulated',where='false',denominator_kind='not_evaluated');continue
+         valid=f'{score} IS NOT NULL'
+         if not binary:valid+=' AND '+('point IS NOT NULL AND (NOT outcome_valid OR isfinite(point-y_num))' if task.kind=='regression' else 'decision IS NOT NULL')
+         if task.kind=='regression':loss='abs(point-y_num)';positive='false'
+@@ -290,7 +345,7 @@
+                     else:point['cost_unavailable']='complete_categorical_accept_and_abstain_costs_required'
+                 if task.kind!='regression':sensitive.extend((loss_sum,ln-loss_sum))
+             points.append(point)
+-        e.add(r,scope,family,'policy_curve',n=alln,data={'kind':policy.kind,'points':points,'selection_population':'valid selector and applicable candidate outputs','decision_provenance':'simulated','threshold_units':'probability' if policy.kind.startswith('probability') or policy.kind=='confidence_abstention' else 'native_selector_units','direction':'higher' if direction==1 else 'lower','ties':'whole_equal_score_groups','unchanged_outcome_assumption':bool(policy.costs)},counts=sensitive,basis='simulated',reason=None if alln else 'no_selector_population')
++        e.add(r,scope,family,'policy_curve',n=alln,data={'kind':policy.kind,'points':points,'selection_population':'valid selector and applicable candidate outputs','decision_provenance':'simulated','threshold_units':'probability' if policy.kind.startswith('probability') or policy.kind=='confidence_abstention' else 'native_selector_units','direction':'higher' if direction==1 else 'lower','ties':'whole_equal_score_groups','unchanged_outcome_assumption':bool(policy.costs)},counts=sensitive,basis='simulated',where=valid,reason=None if alln else 'no_selector_population')
+         e.con.execute(f'DROP TABLE {g}');e.con.execute(f'DROP TABLE {g}p');e.con.execute(f'DROP TABLE {g}cuts');e.s.work.check('policy replay')
+ 
+ 
+@@ -343,6 +398,7 @@
+                     excluded=','.join(f'{c}{i}' for i in range(len(r.intervals)) for c in ('l','u','w'))
+                     projection+=f' EXCLUDE ({excluded}),'+','.join(f'{alias}.{c}{index} {c}0' for c in ('l','u','w'))
+                 e.con.execute(f'CREATE TABLE {dest} AS SELECT {projection} FROM {ta} a JOIN {tb} b USING(event_key) WHERE {condition}')
++                e.bind_relation(dest,{'kind':'paired_projection','left':e.relations[ta],'right':e.relations[tb],'selected_run':r.id,'intersection':kind,'eligibility':condition,'interval_projection':effective_run.to_dict()['intervals'] if kind in interval_pairs else None})
+                 before=len(e.measurements)
+                 if kind=='point':regression(e,r,dest,'true',scope)
+                 elif kind=='decision':classification(e,r,dest,'true',scope)
+@@ -352,13 +408,17 @@
+                 current=e.measurements[before:]
+                 populations[(scope,kind,r.id)]={m['metric']:m for m in current if m['value_state'] in {'finite','positive_infinity','negative_infinity'} and m['metric']!='reliability_diagram'}
+                 e.con.execute(f'DROP TABLE {dest}')
++            joined=f'{ta} a JOIN {tb} b USING(event_key)'
++            e.bind_relation(joined,{'kind':'paired_base','left':e.relations[ta],'right':e.relations[tb],'intersection':kind})
++            e.use_relation(joined)
++            base_n=e.con.execute(f'SELECT count(*) FROM {joined} WHERE {condition}').fetchone()[0]
+             left,right=populations[(scope,kind,a.id)],populations[(scope,kind,b.id)]
+             for metric in sorted(left.keys()&right.keys()):
+                 l,rr=left[metric],right[metric]
+                 lv=l['value'] if l['value_state']=='finite' else math.inf if l['value_state']=='positive_infinity' else -math.inf
+                 rv=rr['value'] if rr['value_state']=='finite' else math.inf if rr['value_state']=='positive_infinity' else -math.inf
+                 difference=rv-lv;undefined=math.isnan(difference)
+-                delta=e.add(b,scope,'comparison',metric+'_right_minus_left',None if undefined else difference,l['denominator'],data={'left_run':a.id,'right_run':b.id,'left':l['value'],'right':rr['value'],'left_value_state':l['value_state'],'right_value_state':rr['value_state'],'metric_population':kind,'interpretation':'conditional on common eligibility; no automatic winner'},reason='indeterminate_infinite_difference' if undefined else None,where=condition)
++                delta=e.add(b,scope,'comparison',metric+'_right_minus_left',None if undefined else difference,base_n,denominator_kind='paired_base_support',data={'left_run':a.id,'right_run':b.id,'left':l['value'],'right':rr['value'],'left_value_state':l['value_state'],'right_value_state':rr['value_state'],'metric_population':kind,'left_population_id':l['population_id'],'right_population_id':rr['population_id'],'left_denominator':l['denominator'],'right_denominator':rr['denominator'],'interpretation':'Both metrics use the common paired base; class/high-confidence conditionals may select different subsets. No automatic winner.'},reason='indeterminate_infinite_difference' if undefined else None,where=condition)
+                 delta['disclosure_group']=l['disclosure_group']
+             if kind=='decision':
+                 cells=e.con.execute(f'SELECT a.decision=a.y,b.decision=b.y,count(*) FROM {ta} a JOIN {tb} b USING(event_key) WHERE {condition} GROUP BY 1,2').fetchall()
+--- before/src/confidenceguard/artifacts.py
++++ after/src/confidenceguard/artifacts.py
+@@ -61,7 +61,7 @@
+                     if isinstance(x,(float,int)) and isinstance(y,(float,int)) and 0<=x<=1 and 0<=y<=1:xy.append(f'{40+320*x:.3f},{180-140*y:.3f}')
+                 if xy:section['charts'].append({'type':'curve','title':'FPR / TPR · retained score groups' if 'fpr' in points[0] else 'Coverage / accepted error rate · simulated policy','points':' '.join(xy)})
+         else:omitted+=1
+-    return {'sections':list(sections.values()),'headlines':headlines,'omitted':omitted,'limitations':['Metrics describe supplied outcomes and declared populations; ground truth and representativeness are not independently established.','Calibration bins and high-confidence settings are investigation definitions, not universal safety thresholds.','Policy replay is retrospective; different actions may change outcomes or their observation.','Statistical intervals, when enabled, are pointwise and assumption-qualified.','Sampled resource safeguards are not hard quotas or capacity guarantees.','No composite score, certification or production approval is defined.']}
++    return {'sections':list(sections.values()),'headlines':headlines,'omitted':omitted,'checks':data.get('checks',[])[:40],'checks_omitted':max(0,len(data.get('checks',[]))-40),'coverage_limitations':data.get('coverage',{}).get('limitations',[])+([data['coverage']['legacy_qualification']] if data.get('coverage',{}).get('legacy_qualification') else []),'limitations':['Metrics describe supplied outcomes and declared populations; ground truth and representativeness are not independently established.','Calibration bins and high-confidence settings are investigation definitions, not universal safety thresholds.','Policy replay is retrospective; different actions may change outcomes or their observation.','Statistical intervals, when enabled, are pointwise and assumption-qualified.','Sampled resource safeguards are not hard quotas or capacity guarantees.','No composite score, certification or production approval is defined.']}
+ 
+ 
+ def render_report(data):
+--- before/src/confidenceguard/schema.py
++++ after/src/confidenceguard/schema.py
+@@ -39,6 +39,8 @@
+     definitions['JobRequest']={'type':'object','additionalProperties':False,'required':['kind','client_request_id'],'properties':{'kind':{'enum':['inspect','evaluate','export','resolve_evidence']},'client_request_id':{'type':'string'},'evaluation_id':{'type':'string'},'revision':{'type':'integer'},'fingerprint':{'type':'string'},'result_id':{'type':'string'},'format':{'enum':['html','pdf']},'audience':{'enum':['local','shareable']},'disclosure':{'$ref':'#/$defs/DisclosureSpec'},'reference':{'type':'string'},'reveal_values':{'type':'boolean'}}}
+     definitions['Job']={'type':'object','required':['id','kind','state','revision'],'properties':{'id':{'type':'string'},'kind':{'type':'string'},'state':{'enum':['pending','running','cancelling','succeeded','failed','cancelled']},'revision':{'type':'integer'},'progress':{'type':'object'},'output':{'type':'object'},'error':{'type':['object','null']}}}
+     definitions['Measurement']={'type':'object','required':['id','run','scope','family','metric','denominator','value','value_state','applicability','execution','population_id'],'properties':{'id':{'type':'string'},'run':{'type':'string'},'scope':{'type':'string'},'family':{'type':'string'},'metric':{'type':'string'},'denominator':{'type':['integer','string']},'value':{'type':['number','null']},'value_state':{'enum':['finite','undefined','positive_infinity','negative_infinity']},'applicability':{'enum':['applicable','blocked']},'execution':{'enum':['completed','not_run']},'population_id':{'type':'string'},'data':{'type':'object'}}}
++    definitions['Measurement']['properties']['denominator_kind']={'enum':['eligible_records','evaluation_support','class_conditional_records','paired_base_support','not_evaluated'],'description':'Record support for the referenced eligibility population. Formula denominators and model-conditional paired supports are explicit in data.'}
++    definitions['Population']={'type':'object','required':['id','run','scope','definition','lineage','denominator','denominator_kind'],'properties':{'id':{'type':'string'},'run':{'type':'string'},'scope':{'type':'string'},'definition':{'type':'string'},'lineage':{'type':'object','description':'Frozen normalized-input or paired-relation lineage; protected local audience only.'},'denominator':{'type':['integer','string']},'denominator_kind':definitions['Measurement']['properties']['denominator_kind']}}
+     definitions['Result']={'type':'object','required':['schema_version','methodology_id','analysis_id','measurements','coverage','runs'],'properties':{'schema_version':{'const':c.RESULT_SCHEMA},'methodology_id':{'const':c.METHOD},'analysis_id':{'type':'string'},'measurements':{'type':'array','items':{'$ref':'#/$defs/Measurement'}},'coverage':{'type':'object'},'runs':{'type':'array'},'audience':{'enum':['local','shareable']}}}
+     definitions['SourceRequest']={'type':'object','additionalProperties':False,'required':['root_id','relative_path'],'properties':{'root_id':{'type':'string'},'relative_path':{'type':'string'},'format':{'enum':['csv','parquet']},'encoding':{'type':'string'},'delimiter':{'type':'string'}}}
+     definitions['Source']={'type':'object','required':['handle','format','columns'],'properties':{'handle':{'type':'string'},'format':{'enum':['csv','parquet']},'columns':{'type':'array','items':{'type':'string'}}}}
+--- before/src/confidenceguard/schemas/contracts.json
++++ after/src/confidenceguard/schemas/contracts.json
+@@ -1176,6 +1176,62 @@
+         },
+         "data": {
+           "type": "object"
++        },
++        "denominator_kind": {
++          "enum": [
++            "eligible_records",
++            "evaluation_support",
++            "class_conditional_records",
++            "paired_base_support",
++            "not_evaluated"
++          ],
++          "description": "Record support for the referenced eligibility population. Formula denominators and model-conditional paired supports are explicit in data."
++        }
++      }
++    },
++    "Population": {
++      "type": "object",
++      "required": [
++        "id",
++        "run",
++        "scope",
++        "definition",
++        "lineage",
++        "denominator",
++        "denominator_kind"
++      ],
++      "properties": {
++        "id": {
++          "type": "string"
++        },
++        "run": {
++          "type": "string"
++        },
++        "scope": {
++          "type": "string"
++        },
++        "definition": {
++          "type": "string"
++        },
++        "lineage": {
++          "type": "object",
++          "description": "Frozen normalized-input or paired-relation lineage; protected local audience only."
++        },
++        "denominator": {
++          "type": [
++            "integer",
++            "string"
++          ]
++        },
++        "denominator_kind": {
++          "enum": [
++            "eligible_records",
++            "evaluation_support",
++            "class_conditional_records",
++            "paired_base_support",
++            "not_evaluated"
++          ],
++          "description": "Record support for the referenced eligibility population. Formula denominators and model-conditional paired supports are explicit in data."
+         }
+       }
+     },
+--- before/src/confidenceguard/schemas/openapi.json
++++ after/src/confidenceguard/schemas/openapi.json
+@@ -3297,6 +3297,62 @@
+           },
+           "data": {
+             "type": "object"
++          },
++          "denominator_kind": {
++            "enum": [
++              "eligible_records",
++              "evaluation_support",
++              "class_conditional_records",
++              "paired_base_support",
++              "not_evaluated"
++            ],
++            "description": "Record support for the referenced eligibility population. Formula denominators and model-conditional paired supports are explicit in data."
++          }
++        }
++      },
++      "Population": {
++        "type": "object",
++        "required": [
++          "id",
++          "run",
++          "scope",
++          "definition",
++          "lineage",
++          "denominator",
++          "denominator_kind"
++        ],
++        "properties": {
++          "id": {
++            "type": "string"
++          },
++          "run": {
++            "type": "string"
++          },
++          "scope": {
++            "type": "string"
++          },
++          "definition": {
++            "type": "string"
++          },
++          "lineage": {
++            "type": "object",
++            "description": "Frozen normalized-input or paired-relation lineage; protected local audience only."
++          },
++          "denominator": {
++            "type": [
++              "integer",
++              "string"
++            ]
++          },
++          "denominator_kind": {
++            "enum": [
++              "eligible_records",
++              "evaluation_support",
++              "class_conditional_records",
++              "paired_base_support",
++              "not_evaluated"
++            ],
++            "description": "Record support for the referenced eligibility population. Formula denominators and model-conditional paired supports are explicit in data."
+           }
+         }
+       },
+--- before/src/confidenceguard/templates/report.html
++++ after/src/confidenceguard/templates/report.html
+@@ -4,8 +4,8 @@
+ <section><h2>Evaluation summary and priority investigations</h2>{% for run in result.runs %}<p><strong>{{ run.display_name }}</strong> · {{ run.role }} · {{ run.version_alias }}</p>{% endfor %}{% for f in result.findings %}<p><strong>{{ f.priority }} · {{ f.code|replace('_',' ') }}</strong> — {{ f.message }}{% if f.count is defined %} ({{ f.count }}){% endif %}</p>{% else %}<p>No additional finding was emitted within the completed, disclosed scope. Review evidence availability and exclusions before interpretation.</p>{% endfor %}
+ {% if result.comparison %}<h3>Paired comparison</h3><p>{{ result.comparison.scope }}. Timing: {{ result.comparison.timing_qualification }}.</p>{% if result.comparison.blocked_reasons %}<p>Paired performance blocked: {{ result.comparison.blocked_reasons|join(', ') }}</p>{% endif %}{% endif %}
+ {% if result.disclosure is defined %}<p>Disclosure policy: {{ result.disclosure.policy }}. {{ result.coverage.privacy_withholding }}</p>{% endif %}
+-{% if view.headlines %}<h3>Whole-population measurements</h3><p>Each row uses its own eligible denominator. Paired comparisons later use common eligible events. Lower losses and higher accuracy have different interpretations; no automatic winner is declared.</p><table><thead><tr><th>Run</th><th>Measurement</th><th>Value</th><th>Denominator / basis</th></tr></thead><tbody>{% for row in view.headlines %}<tr><td>{{ row.run }}</td><td>{{ row.metric }}</td><td>{{ row.value }}</td><td>{{ row.denominator }} · {{ row.note }}</td></tr>{% endfor %}</tbody></table>{% endif %}</section>
++{% if view.headlines %}<h3>Whole-population measurements</h3><p>Each row uses its own eligible denominator. Paired comparisons use a common eligible base; conditional metrics identify their own subsets. Lower losses and higher accuracy have different interpretations; no automatic winner is declared.</p><table><thead><tr><th>Run</th><th>Measurement</th><th>Value</th><th>Denominator / basis</th></tr></thead><tbody>{% for row in view.headlines %}<tr><td>{{ row.run }}</td><td>{{ row.metric }}</td><td>{{ row.value }}</td><td>{{ row.denominator }} · {{ row.note }}</td></tr>{% endfor %}</tbody></table>{% endif %}</section>
+ {% for s in view.sections %}<section><h2>{{ s.title }}</h2><p class="note">{{ s.rows|length }} of {{ s.total }} retained measurement rows displayed. Omitted presentation detail remains in the matching JSON; privacy-withheld detail is absent from this projection.</p><table><thead><tr><th>Run / population</th><th>Measurement</th><th>Value</th><th>Denominator / qualification</th></tr></thead><tbody>{% for row in s.rows %}<tr><td>{{ row.run }}<br>{{ row.scope }}</td><td>{{ row.metric }}</td><td class="value">{{ row.value }}{% if row.interval %}<br><small>95%: {{ '%.5g'|format(row.interval.lower) }}–{{ '%.5g'|format(row.interval.upper) }}</small>{% endif %}</td><td>{{ row.denominator }}<br>{{ row.note }}</td></tr>{% endfor %}</tbody></table>
+ {% for chart in s.charts %}<figure><svg viewBox="0 0 400 210" role="img" aria-label="{{ chart.title }}"><path d="M40 25V180H370" fill="none" stroke="#a7b8bd"/>{% if chart.type=='calibration' %}<path d="M40 180L360 40" stroke="#b5c5c9" fill="none" stroke-dasharray="4 4"/>{% for b in chart.bars %}<rect x="{{ b.x }}" y="{{ b.y }}" width="{{ b.width }}" height="{{ b.height }}" fill="#22787b"/><circle cx="{{ b.x+b.width/2 }}" cy="{{ b.prob_y }}" r="3" fill="#b45124"/>{% endfor %}{% else %}<polyline points="{{ chart.points }}" stroke="#22787b" fill="none" stroke-width="2"/>{% endif %}</svg><figcaption>{{ chart.title }}{% if chart.type=='calibration' %} · bars: observed frequency; dots: mean supplied probability; diagonal: equality reference{% endif %}</figcaption></figure>{% endfor %}
+ {% for d in s.details %}<details open><summary>{{ d.id }} · {{ d.metric|replace('_',' ') }}</summary><pre>{{ d.text }}</pre>{% if d.truncated %}<p>Display excerpt shortened. Matching JSON retains this record's detail.</p>{% endif %}</details>{% endfor %}</section>{% endfor %}
+-<section><h2>Methodology, coverage and limitations</h2>{% for line in view.limitations %}<p>{{ line }}</p>{% endfor %}<p>{{ result.coverage.analytical_scope }}</p>{% if result.coverage.privacy_withholding is defined %}<p>{{ result.coverage.privacy_withholding }}</p>{% endif %}<p>Analytical bounds, retained-detail omissions, presentation omissions and privacy withholding are distinct. An unavailable metric is not zero. The protected local workbench contains exact retained evidence where supplied and eligible.</p><p>Analysis identity: {{ result.analysis_id }}</p></section></main></body></html>
++<section><h2>Methodology, coverage and limitations</h2>{% if view.checks %}<h3>Method availability and qualifications</h3><p>Execution describes analytical work; exact supporting detail may be withheld in this audience.</p><table><thead><tr><th>Check</th><th>Applicability / execution</th><th>Qualification</th></tr></thead><tbody>{% for c in view.checks %}<tr><td>{{ c.id }}</td><td>{{ c.applicability }} / {{ c.execution }}</td><td>{{ c.reason|default('See analytical evidence and coverage') }}</td></tr>{% endfor %}</tbody></table>{% if view.checks_omitted %}<p>{{ view.checks_omitted }} additional checks are retained in matching JSON.</p>{% endif %}{% endif %}{% for line in view.coverage_limitations %}<p>{{ line }}</p>{% endfor %}{% for line in view.limitations %}<p>{{ line }}</p>{% endfor %}<p>{{ result.coverage.analytical_scope }}</p>{% if result.coverage.privacy_withholding is defined %}<p>{{ result.coverage.privacy_withholding }}</p>{% endif %}<p>Analytical bounds, retained-detail omissions, presentation omissions and privacy withholding are distinct. An unavailable metric is not zero. The protected local workbench contains exact retained evidence where supplied and eligible.</p><p>Analysis identity: {{ result.analysis_id }}</p></section></main></body></html>
+--- before/docs/CG1_CONFIDENCEGUARD.md
++++ after/docs/CG1_CONFIDENCEGUARD.md
+@@ -187,6 +187,32 @@
+ for a mean/parameter. No general significance/bootstrap engine, calibrator fitting,
+ conformal construction or policy optimization is included in CG1.
+ 
++Population provenance revision **1.1** binds each population identity to frozen
++normalized-source lineage, source interpretation, task/run declarations,
++probability tolerance, outcome/context snapshots, eligibility predicate and
++`denominator_kind`. Paired projections additionally bind both inputs, selected
++side, metric intersection and interval projection; transient SQL table names are
++not identities. Exact SQL counts (including reuse of grouped confusion counts)
++are checked before publication; a conflicting denominator aborts the evaluation.
++Completed-result reopening checks measurement and nested class/comparison ledger
++references for this revision.
++
++Precision uses issued predictions of the class; recall uses observed outcomes of
++the class; specificity uses observed outcomes outside the positive class. The
++share of top-class errors that are high confidence uses **all eligible top-class
++errors**, distinct from the high-confidence error rate denominator. Per-class
++records carry precision/recall population references and an explicit F1 formula
++denominator. Macro/F1 measurement denominators describe evaluation record support;
++they are marked `evaluation_support`, not misrepresented as formula denominators.
++
++Paired deltas carry `paired_base_support`, plus left/right population references
++and their individual denominators. Conditional precision/recall/high-confidence
++subsets can differ within that common base. Forcing the intersection of both
++positive decisions would redefine precision and can make its comparison
++trivially equal. These deltas are descriptive comparisons of conditionals over a
++common base, not differences on identical conditional subsets or paired-inference
++claims. Point/probability/ranking intersections remain independently identified.
++
+ Each measurement records basis (measured/simulated etc.), interpretation, method
+ standing/version, population identity/denominator, support, applicability,
+ value-state, qualifications and private evidence references. Not computed,
+@@ -205,10 +231,35 @@
+ 
+ Portable output defaults to conservative aggregates: denominators below 10 or
+ sensitive nonzero components 1–9 withhold associated breakdowns and dependent
+-rates, differences, details and findings jointly across models. Protected cohort
++rates, differences and sensitive details jointly across models. Safe qualitative
++findings and method checks remain visible without exact counts or private values. Protected cohort
+ partitions and protected confusion/calibration/policy tables are withheld as a
+ unit; exact workbench evidence remains available locally. HTML, PDF and JSON use
+ one projection, with public class/run/policy aliases and no hidden exact payload.
++The conservative projection withholds exact ROC/PR curves and native ranking,
++selection and class-score extrema/quantiles, even when overall support is large:
++unique thresholds can reveal individual prediction artifacts and small cumulative
++counts. Scalar AUC/AP still use every eligible tied score group; exact local
++curves and explicit `exact_aggregates_v1` exports retain their detail. No rounded
++curve is presented as equivalent analytical evidence.
++
++Projection revision `cg1_review_corrections_v1` retains known safe findings,
++comparison blockers, aliased check statuses, sampling qualifications and
++limitations. It strips exact finding counts, private inventories and arbitrary
++free text. An infinite-loss finding is retained only when its supporting loss is
++disclosed. All HTML/SVG/PDF/JSON share that projection; canonical reports display
++method checks and limitations. A disclosed population ledger contains only
++references needed by retained measurements, without private SQL or input lineage.
++
++Existing schema/API major versions remain unchanged through additive fields.
++Corrected population IDs and paired-delta denominator meanings intentionally
++change; consumers must use opaque IDs and `denominator_kind`. Historical artifacts
++are immutable. Reopening old conservative JSON verifies its original digest, then
++withholds ranking details on re-export, binds a new projection digest and retains
++the original digest. Lost findings and corrected population lineage cannot be
++reconstructed from old portable JSON; reevaluation is required. Old exact bundles
++can still be reopened with their matching manifest and are qualified as legacy.
++
+ Explicit alternative disclosure settings are recorded. This is not differential
+ privacy, anonymity or protection against auxiliary data/cross-export reconstruction.
+ 
+@@ -251,3 +302,10 @@
+ CG7 adds durable batch ingestion, label updates, monitoring, alert/incident lifecycle
+ and retention before considering streaming/distribution. Those capabilities remain
+ approved direction, not CG1 implementation claims.
++
++## First independent review corrections — 2026-10-18
++
++Focused correction source, independent eligibility/privacy tests, before/after
++evidence and executed verification are described in
++[CG1 review corrections](../validation/cg1/REVIEW_CORRECTIONS.md). The three-task
++scope is retained. Founder acceptance remains pending; CG2 has not started.
+--- before/METHODOLOGY.md
++++ after/METHODOLOGY.md
+@@ -701,3 +701,16 @@
+ contracts, rules and limits](docs/M9_CROSS_REPRESENTATION_RELIABILITY.md) and
+ [verification evidence](validation/m9/README.md). M1–M7 acceptance is preserved;
+ M8 audio remains deferred.
++
++
++## ConfidenceGuard CG1 prediction evidence
++
++ConfidenceGuard's independent `prediction_evaluation_v1` methodology covers binary,
++multiclass and regression prediction artifacts. Population provenance revision 1.1
++binds frozen normalized relations and eligibility to checked record denominators,
++including conditional and paired populations. Conservative portable projections
++withhold exact ranking curves/native score summaries while retaining eligible
++scalar ranking metrics, safe findings and methodological qualifications. See
++[CG1 contracts and methodology](docs/CG1_CONFIDENCEGUARD.md) and
++[focused review evidence](validation/cg1/REVIEW_CORRECTIONS.md). These corrections
++do not change DataTrust scoring or accepted analytical engines.
+--- /dev/null
++++ after/tests/cg1/test_review_corrections.py
+@@ -0,0 +1,197 @@
++"""Regression cases for the first independent CG1 review; independent populations/privacy oracles."""
++from dataclasses import replace
++import json
++from pathlib import Path
++import pytest
++from confidenceguard import *
++from confidenceguard.analytics import Evidence
++from confidenceguard.artifacts import render_report
++from confidenceguard.contracts import digest
++from .test_analysis import spec,core,measurement
++from .test_semantics_controls import paired
++
++
++def assert_ledger(result):
++    pops={p['id']:p for p in result.data['coverage']['populations']}
++    for m in result.data['measurements']:
++        p=pops[m['population_id']]
++        assert (p['run'],p['scope'],p['denominator'])==(m['run'],m['scope'],m['denominator'])
++    return pops
++
++
++def test_conditional_population_eligibility_and_high_confidence(tmp_path,monkeypatch):
++    # Three top-class errors, only one in the two-record high-confidence subset.
++    s=spec(tmp_path,'id,y,p,q\na,0,1,.95\nb,0,0,.6\nc,1,1,.2\nd,1,0,.85\ne,1,1,.95\n',prediction='p',probabilities=ProbabilitySpec('q'))
++    observed={};original=Evidence.population
++    def capture(self,run,scope,where,n,denominator_kind='eligible_records'):
++        pid=original(self,run,scope,where,n,denominator_kind)
++        observed[pid]={x[0] for x in self.con.execute(f'SELECT ordinal FROM {self.table} WHERE {where}').fetchall()}
++        return pid
++    monkeypatch.setattr(Evidence,'population',capture)
++    r=core(s);pops=assert_ledger(r)
++    expected={'accuracy':{1,2,3,4,5},'precision':{1,3,5},'recall':{3,4,5},'specificity':{1,2},'high_confidence_top_class_error_rate':{1,5},'share_of_top_class_errors_high_confidence':{1,2,3}}
++    for metric,rows in expected.items():
++        m=measurement(r,metric)
++        assert observed[m['population_id']]==rows
++        assert m['denominator']==len(rows)
++    assert len({measurement(r,m)['population_id'] for m in expected})==len(expected)
++    for c in measurement(r,'per_class')['data']['classes']:
++        assert pops[c['precision_population_id']]['denominator']==c['predicted']
++        assert pops[c['recall_population_id']]['denominator']==c['support']
++    # Reopening enforces the new additive contract, including nested references.
++    EvaluationResult.from_dict(r.to_private_dict(),private=r.private)
++    public=r.to_dict(disclosure=DisclosureSpec(policy='exact_aggregates_v1'));public['measurements'][0]['denominator']+=1
++    public['projection_digest']=digest({k:v for k,v in public.items() if k!='projection_digest'})
++    with pytest.raises(EvaluationError,match='population'):EvaluationResult.from_dict(public)
++
++
++def test_paired_equal_size_distinct_intersections_and_conditional_deltas(tmp_path,monkeypatch):
++    left='id,y,p,q,s\na,0,0,,10\nb,1,1,,20\nc,0,1,.3,\nd,1,0,.7,\ne,0,,.4,30\nf,1,,.6,40\n'
++    right='id,y,p,q,s\nf,1,,.6,40\ne,0,,.4,30\nd,1,1,.7,\nc,0,1,.3,\nb,1,1,,20\na,0,0,,10\n'
++    s=paired(tmp_path,left,right,probabilities=ProbabilitySpec('q'),score=ScoreSpec('s'))
++    observed={};original=Evidence.population
++    def capture(self,run,scope,where,n,denominator_kind='eligible_records'):
++        pid=original(self,run,scope,where,n,denominator_kind)
++        if self.relations[self.table]['kind']=='paired_projection':
++            # Stable event keys, independent of shuffled input order or physical ordinals.
++            observed[pid]={json.loads(x[0])[0] for x in self.con.execute(f'SELECT event_key FROM {self.table} WHERE {where}').fetchall()}
++        return pid
++    monkeypatch.setattr(Evidence,'population',capture)
++    r=core(s);pops=assert_ledger(r)
++    metrics={'accuracy':{'a','b','c','d'},'brier':{'c','d','e','f'},'roc_auc':{'a','b','e','f'}}
++    ids=[]
++    for metric,events in metrics.items():
++        m=measurement(r,metric,'paired')
++        assert m['denominator']==4
++        assert observed[m['population_id']]==events
++        ids.append(m['population_id'])
++    assert len(set(ids))==3
++    d=measurement(r,'precision_right_minus_left','paired','right')
++    assert d['value']==pytest.approx(2/3-1/2)
++    assert d['denominator']==4 and d['denominator_kind']=='paired_base_support'
++    assert (d['data']['left_denominator'],d['data']['right_denominator'])==(2,3)
++    assert pops[d['data']['left_population_id']]['denominator']==2
++    assert pops[d['data']['right_population_id']]['denominator']==3
++    EvaluationResult.from_dict(r.to_private_dict(),private=r.private)
++
++
++def test_policies_and_nonprediction_intervals_have_honest_support(tmp_path):
++    s=spec(tmp_path,'id,y,p,l,u,s\na,1,1,0,2,9\nb,2,2,1,3,\nc,,3,2,4,7\n','regression',prediction='p',intervals=(PredictionIntervalSpec('mean','l','u',.9,meaning='mean_confidence'),),selection=ScoreSpec('s',meaning='selection'))
++    s=replace(s,policies=(DecisionPolicySpec('select','model','selection_abstention'),DecisionPolicySpec('cost','model','supplied_cost')))
++    r=core(s);assert_ledger(r)
++    assert measurement(r,'policy_curve')['denominator']==2
++    assert measurement(r,'empirical_cost')['denominator']==0
++    assert measurement(r,'interval_coverage')['denominator_kind']=='not_evaluated'
++
++
++def sizeable_binary(tmp_path):
++    # All scores are unique; the retained ROC/PR curve includes a singleton cutoff.
++    text='id,y,p,q\n'+''.join(f'{i},{i%2},{int(i%7>2)},{.001234567+(i+1)*.0019:.9f}\n' for i in range(500))
++    return core(spec(tmp_path,text,prediction='p',probabilities=ProbabilitySpec('q')))
++
++
++def test_conservative_unique_scores_do_not_escape_in_portable_charts(tmp_path):
++    r=sizeable_binary(tmp_path);local=measurement(r,'roc_pr_curve')
++    assert local['denominator']==500
++    first=local['data']['points'][1]
++    assert round(first['tpr']*250)+round(first['fpr']*250)==1
++    assert any(1<=round(p['tpr']*250)+round(p['fpr']*250)<=9 for p in local['data']['points'][1:])
++    shared=r.to_dict();exact=r.to_dict(disclosure=DisclosureSpec(policy='exact_aggregates_v1'))
++    assert any(m['metric']=='roc_pr_curve' for m in exact['measurements'])
++    assert not any(m['metric'] in {'roc_pr_curve','ranking_score'} for m in shared['measurements'])
++    for metric in ('roc_auc','average_precision'):
++        assert next(m['value'] for m in shared['measurements'] if m['metric']==metric)==measurement(r,metric)['value']
++    html=render_report(shared)
++    assert str(first['threshold']) not in json.dumps(shared)
++    assert str(first['threshold']) not in html
++    assert 'polyline' not in html and 'FPR / TPR' not in html
++    assert measurement(r,'roc_pr_curve')==local
++    EvaluationResult.from_dict(shared)
++
++
++def test_safe_findings_checks_and_blockers_survive_without_sensitive_details(tmp_path):
++    left='id,y,p,q,g,entity\n'+''.join(f'{i},{i%2},{i%2},{1.2 if i==0 else .8},{"SECRET_CATEGORY" if i==0 else "COMMON"},same\n' for i in range(40))
++    right=left.replace('0,0,0,1.2','0,1,0,1.2')
++    s=paired(tmp_path,left,right,probabilities=ProbabilitySpec('q'),inline_outcome='y',entity_columns=('entity',),role='train')
++    s=replace(s,cohorts=(CohortSpec('SECRET_DECLARATION','g',categories=('SECRET_CATEGORY','COMMON')),))
++    r=core(s,EvaluationConfig(sampling=SamplingSpec('independent_rows')))
++    r.data['findings'].append({'code':'unknown_private','message':'SECRET_SOURCE_VALUE','count':1})
++    r.data['checks'].append({'id':'unknown','reason':'SECRET_SOURCE_VALUE'})
++    r.seal();shared=r.to_dict();text=json.dumps(shared);html=render_report(shared)
++    codes={f['code'] for f in shared['findings']}
++    assert {'not_held_out','inference_blocked','paired_comparison_blocked','invalid_probabilities','inline_conflicts'}<=codes
++    assert 'conflicting_asserted_outcome_copy' in shared['comparison']['blocked_reasons']
++    assert shared['checks'] and all('count' not in c and 'data' not in c for c in shared['checks'])
++    assert all('count' not in f for f in shared['findings'])
++    for secret in ('SECRET_CATEGORY','SECRET_DECLARATION','SECRET_SOURCE_VALUE',str(tmp_path)):
++        assert secret not in text and secret not in html
++    assert shared['coverage']['limitations'] and not shared['coverage']['sampling']['inference_enabled']
++    assert 'not held out' in html and 'probability_quality:run_1' in html
++    assert 'Observed labels need not represent unobserved cases.' in html
++
++
++def test_safe_context_blocker_and_inventory_status_survive(tmp_path):
++    s=paired(tmp_path,'id,y,p,g\na,1,1,SECRET\nb,0,0,COMMON\n','id,y,p,g\na,1,1,COMMON\nb,0,0,COMMON\n')
++    s=replace(s,context=ContextSnapshotSpec('data',('id',),assertions={'right':{'g':'g'}}),cohorts=(CohortSpec('secret','g',categories=('SECRET','COMMON')),))
++    shared=core(s).to_dict()
++    assert any(c.get('reason')=='conflicting_canonical_context_assertion' for c in shared['checks'])
++    assert any(c['id'].endswith(':inventory') for c in shared['checks'])
++    assert 'SECRET' not in json.dumps(shared)
++
++
++def test_legacy_shareable_reexport_hardened_without_mutating_stored_evidence():
++    path=Path('validation/cg1/results/reports/binary-shareable.json');before=path.read_bytes()
++    shared=EvaluationResult.from_dict(json.loads(before));after=shared.to_dict()
++    assert not any(m['metric']=='roc_pr_curve' for m in after['measurements'])
++    assert 'legacy_qualification' in after['coverage']
++    assert after['origin_projection_digest']==json.loads(before)['projection_digest']
++    assert shared.data==json.loads(before) and path.read_bytes()==before
++    assert EvaluationResult.from_dict(after).to_dict()==after
++
++
++def test_population_ledger_matches_all_measurement_denominators(tmp_path):
++    s=spec(tmp_path,'id,y,p,q\na,0,1,.95\nb,0,0,.6\nc,1,1,.2\nd,1,0,.85\ne,1,1,.95\n',prediction='p',probabilities=ProbabilitySpec('q'))
++    assert_ledger(core(s))
++
++
++def test_population_count_assertion_rejects_wrong_reduction(tmp_path,monkeypatch):
++    original=Evidence.add
++    def wrong(self,run,scope,family,metric,value=None,n=0,**kwargs):
++        if metric=='accuracy':n+=1
++        return original(self,run,scope,family,metric,value,n,**kwargs)
++    monkeypatch.setattr(Evidence,'add',wrong)
++    s=spec(tmp_path,'id,y,p\na,0,0\nb,1,1\n',prediction='p')
++    with pytest.raises(EvaluationError) as caught:core(s)
++    assert isinstance(caught.value.__cause__,AssertionError)
++
++
++def test_population_identity_binds_probability_normalization_settings(tmp_path):
++    s=spec(tmp_path,'id,y,p,q0,q1\na,0,0,.4,.6000005\nb,1,1,.2,.8000005\n',prediction='p',probabilities=ProbabilitySpec(columns={'0':'q0','1':'q1'}))
++    relaxed=core(s);strict=core(s,EvaluationConfig(probability_tolerance=1e-8))
++    a=measurement(relaxed,'brier');b=measurement(strict,'brier')
++    assert (a['denominator'],b['denominator'])==(2,0)
++    assert a['population_id']!=b['population_id']
++    assert_ledger(relaxed);assert_ledger(strict)
++
++
++def test_paired_interval_remapping_does_not_alias_equal_sized_populations(tmp_path,monkeypatch):
++    text='id,y,p,l1,u1,l2,u2\na,1,1,0,2,,\nb,2,2,1,3,,\nc,3,3,,,2,4\nd,4,4,,,3,5\ne,5,,4,6,4,6\nf,6,,5,7,5,7\n'
++    s=paired(tmp_path,text,text,kind='regression',intervals=(PredictionIntervalSpec('x','l1','u1',.9),PredictionIntervalSpec('y','l2','u2',.9)))
++    observed={};original=Evidence.population
++    def capture(self,run,scope,where,n,denominator_kind='eligible_records'):
++        pid=original(self,run,scope,where,n,denominator_kind)
++        if self.relations[self.table]['kind']=='paired_projection':observed[pid]={json.loads(x[0])[0] for x in self.con.execute(f'SELECT event_key FROM {self.table} WHERE {where}').fetchall()}
++        return pid
++    monkeypatch.setattr(Evidence,'population',capture)
++    r=core(s);assert_ledger(r)
++    point=measurement(r,'mae','paired')
++    intervals=[m for m in r.data['measurements'] if m['run']=='model' and m['scope']=='paired' and m['metric']=='interval_coverage']
++    assert observed[point['population_id']]=={'a','b','c','d'}
++    expected={'x':{'a','b','e','f'},'y':{'c','d','e','f'}}
++    for m in intervals:
++        assert m['denominator']==4
++        assert observed[m['population_id']]==expected[m['data']['interval']]
++    assert len({point['population_id'],*(m['population_id'] for m in intervals)})==3
++    # Stable IDs depend on lineage, not the sequence-numbered transient table names.
++    again=core(s)
++    assert [m['population_id'] for m in r.data['measurements']]==[m['population_id'] for m in again.data['measurements']]
+--- /dev/null
++++ after/validation/cg1/review_corrections.py
+@@ -0,0 +1,86 @@
++"""Focused CG1 review evidence; consumes pinned predictions without fitting predictors.
++
++Example: PYTHONPATH=src:. .venv/bin/python -B validation/cg1/review_corrections.py
++  --out /tmp/cg1-review-evidence --schema-path /opt/homebrew/lib/python3.11/site-packages
++Uses existing development jsonschema only; installs nothing. Refuses output reuse.
++"""
++import argparse
++from dataclasses import replace
++import hashlib
++import json
++from pathlib import Path
++import sys
++import time
++from confidenceguard import EvaluationSpec,EvaluationConfig,evaluate,EvaluationResult
++from confidenceguard.schema import schemas,openapi,examples
++from confidenceguard.analytics import digest
++from tests.cg1.test_review_corrections import sizeable_binary,assert_ledger
++from tests.cg1.test_semantics_controls import paired
++from confidenceguard import ProbabilitySpec,SamplingSpec,CohortSpec
++
++BASE=Path(__file__).resolve().parent
++
++
++def main():
++    p=argparse.ArgumentParser();p.add_argument('--out',required=True,type=Path);p.add_argument('--schema-path');args=p.parse_args()
++    if args.schema_path:sys.path.append(args.schema_path)
++    import jsonschema
++    from pypdf import PdfReader
++    out=args.out;out.mkdir(parents=True,exist_ok=False)
++    schema=schemas();jsonschema.Draft202012Validator.check_schema(schema)
++    for name,obj in [('contracts',schema),('openapi',openapi()),('examples',examples())]:
++        assert json.loads((BASE.parents[1]/'src/confidenceguard/schemas'/(name+'.json')).read_text())==obj
++    expected=json.loads((BASE/'results/reference.json').read_text())
++    ledger={'methodology':'prediction_evaluation_v1','population_provenance_version':'1.1','projection_revision':'cg1_review_corrections_v1','predictor_fitting':'not rerun; pinned reference calculations reused','cases':[]}
++    for case in expected['cases']:
++        name=case['name'];source=BASE/'data'/(name+'.csv')
++        assert hashlib.sha256(source.read_bytes()).hexdigest()==case['prediction_sha256']
++        spec=EvaluationSpec.from_dict(json.loads((BASE/'data'/(name+'.json')).read_text()),base_directory=BASE/'data')
++        result=evaluate(spec,EvaluationConfig(sampling=SamplingSpec('independent_rows')))
++        assert_ledger(result)
++        checks=[]
++        for check in case['checks']:
++            m=next(m for m in result.data['measurements'] if m['run']==check['run'] and m['scope']=='overall' and m['metric']==check['metric'])
++            assert abs(m['value']-check['expected'])<=1e-10*max(1,abs(check['expected']))
++            checks.append({**check,'observed':m['value']})
++        for audience in ('local','shareable'):
++            data=result.to_dict(audience=audience)
++            jsonschema.validate(data,{**schema,'$ref':'#/$defs/Result'})
++            if audience=='local':
++                for pop in data['coverage']['populations']:jsonschema.validate(pop,{**schema,'$ref':'#/$defs/Population'})
++            result.generate_artifacts(out/(name+'-'+audience+'.html'),json_path=out/(name+'-'+audience+'.json'),audience=audience)
++        ledger['cases'].append({'name':name,'measurements':len(result.data['measurements']),'populations':len(result.data['coverage']['populations']),'population_mismatches':0,'reference_checks':checks,'execution':result.execution,'protected_bytes':len(result.json_text().encode()),'shareable_bytes':len(json.dumps(result.to_dict()).encode())})
++    # Sizeable synthetic privacy oracle and exact local control use the same analysis.
++    inputs=out/'synthetic';inputs.mkdir()
++    result=sizeable_binary(inputs)
++    local=result.to_private_dict();shared=result.to_dict()
++    curve=next(m for m in local['measurements'] if m['metric']=='roc_pr_curve')
++    threshold=curve['data']['points'][1]['threshold']
++    for audience in ('local','shareable'):
++        result.generate_artifacts(out/('unique-scores-'+audience+'.pdf'),format='pdf',json_path=out/('unique-scores-'+audience+'.json'),audience=audience)
++    pdf=PdfReader(out/'unique-scores-shareable.pdf');text='\n'.join(page.extract_text() for page in pdf.pages)
++    assert str(threshold) not in text
++    assert str(threshold) not in (out/'unique-scores-shareable.html').read_text()
++    assert str(threshold) not in json.dumps(shared)
++    assert not any(m['metric'] in {'roc_pr_curve','ranking_score'} for m in shared['measurements'])
++    assert 'Exact ranking curves and native score summaries are withheld' in text
++    assert 'polyline' not in (out/'unique-scores-shareable.html').read_text()
++    ledger['unique_scores']={'rows':500,'unique_score_groups':curve['data']['full_score_groups'],'local_curve_retained':len(curve['data']['points']),'first_local_threshold':threshold,'first_cumulative_count':round(curve['data']['points'][1]['tpr']*250)+round(curve['data']['points'][1]['fpr']*250),'shareable_curve_records':0,'scalar_roc_auc_unchanged':next(m['value'] for m in shared['measurements'] if m['metric']=='roc_auc')==next(m['value'] for m in local['measurements'] if m['metric']=='roc_auc'),'scalar_ap_unchanged':next(m['value'] for m in shared['measurements'] if m['metric']=='average_precision')==next(m['value'] for m in local['measurements'] if m['metric']=='average_precision'),'shareable_pdf_pages':len(pdf.pages),'shareable_pdf_threshold_absent':True,'json_html_svg_checks':'passed'}
++    # Portable warnings/blockers must survive even though sensitive groups are withheld.
++    left='id,y,p,q,g,entity\n'+''.join(f'{i},{i%2},{i%2},{1.2 if i==0 else .8},{"SECRET_CATEGORY" if i==0 else "COMMON"},same\n' for i in range(40))
++    spec=paired(inputs,left,left.replace('0,0,0,1.2','0,1,0,1.2'),probabilities=ProbabilitySpec('q'),inline_outcome='y',entity_columns=('entity',),role='train')
++    spec=replace(spec,cohorts=(CohortSpec('PRIVATE_DECLARATION','g',categories=('SECRET_CATEGORY','COMMON')),))
++    from tests.cg1.test_analysis import core
++    result=core(spec,EvaluationConfig(sampling=SamplingSpec('independent_rows')))
++    result.generate_artifacts(out/'qualified-shareable.pdf',format='pdf',json_path=out/'qualified-shareable.json')
++    data=result.to_dict();pdf=PdfReader(out/'qualified-shareable.pdf');text='\n'.join(page.extract_text() for page in pdf.pages)
++    for value in ('SECRET_CATEGORY','PRIVATE_DECLARATION',str(inputs)):
++        assert value not in text and value not in json.dumps(data) and value not in (out/'qualified-shareable.html').read_text()
++    for value in ('not held out','inference blocked','paired comparison blocked','conflicting_asserted_outcome_copy','probability_quality:run_1','Observed labels need not represent unobserved cases.'):
++        assert value in text,value
++    ledger['portable_qualifications']={'finding_codes':[f['code'] for f in data['findings']],'checks':data['checks'],'limitations':data['coverage']['limitations'],'pdf_pages':len(pdf.pages),'private_values_absent':True}
++    (out/'verification.json').write_text(json.dumps(ledger,indent=2)+'\n')
++    print(json.dumps({'reference_checks':sum(len(c['reference_checks']) for c in ledger['cases']),'population_mismatches':0,'json_schema':'passed','pdfs':3,'unique_score_and_qualification_probes':'passed'}))
++
++
++if __name__=='__main__':main()
+--- /dev/null
++++ after/validation/cg1/review_corrections_resources.py
+@@ -0,0 +1,10 @@
++"""Repeat existing bounded engineering probes without overwriting historical evidence."""
++import argparse
++from pathlib import Path
++from validation.cg1 import resources
++
++if __name__=='__main__':
++    p=argparse.ArgumentParser();p.add_argument('--out',required=True,type=Path);args=p.parse_args()
++    args.out.mkdir(parents=True,exist_ok=False)
++    resources.BASE=args.out
++    resources.main()
+--- /dev/null
++++ after/validation/cg1/REVIEW_CORRECTIONS.md
+@@ -0,0 +1,134 @@
++# CG1 first independent review — focused correction handoff
++
++Implemented 2026-10-18. Founder acceptance and independent re-review remain pending.
++CG1's three-task scope is retained; CG2 was not started. No commit or push was made.
++The existing CG1 work was already untracked, so the correction patch is relative
++to a captured start-of-turn file snapshot, not Git HEAD. Unrelated design labs and
++other work were preserved.
++
++## Root causes and corrections
++
++| Finding | Actual cause | Correction |
++|---|---|---|
++| Population/denominator provenance | `Evidence.add` hashed only run/scope/predicate and overwrote the ledger entry. Precision/recall/specificity used an unconditional decision predicate despite class-conditional denominators. The high-confidence share used the high-confidence subset predicate despite an all-error denominator. Policy methods omitted selector/cost eligibility predicates. Paired temporary relations reused the same local predicates over different intersections and interval remappings. | Frozen normalized-input lineage plus eligibility and denominator meaning define each identity. Exact SQL counts are checked, with grouped confusion counts reused to avoid a scan per class. Conditional predicates, policy predicates and not-evaluated populations are explicit. Nested per-class references identify their denominators. Paired projections bind both runs, intersection and interval remapping. Deltas identify a common paired base and both conditional populations/supports. Reopening validates the revised ledger. |
++| Conservative ranking disclosure | The curve's sensitive-count list contained only total positive/negative support. Individual score thresholds and small cumulative cells could survive with large global support. Native extrema/quantiles provided another route to exact scores. | Default conservative exports withhold ROC/PR curves and native ranking/selection/class-score summaries. Authorized local and explicit exact exports retain them. Scalar AUC/AP still use all tied score groups. One projection feeds JSON, HTML/SVG and PDF. Old conservative JSON is hardened on re-export, preserving its original digest as provenance. |
++| Portable interpretation loss | The projection synthesized withholding/infinity findings and unconditionally emitted `checks=[]`, discarding useful safe interpretation. | Known finding codes get safe static text and aliased run IDs; known check identities retain applicability/execution/reason statuses. Counts, private inventories, arbitrary free text and category/source values are omitted. Comparison blockers, repeated-entity inference warnings, held-out qualifications, timing and limitations remain. A dependent infinite-loss finding is withheld with its protected loss. Canonical reports display checks and limitations. |
++
++For precision, the left/right positive-decision subsets can differ even within an
++identical paired base. Intersecting both positive subsets would redefine precision
++and can force an uninformative equal result. The correction explicitly reports
++both conditional supports rather than claiming identical conditional events.
++No paired significance or automatic model winner is inferred.
++
++## Changed source and contracts
++
++- `src/confidenceguard/analytics.py`: relation lineage, immutable population records,
++  exact count checks, conditional predicates/supports and paired delta provenance.
++- `engine.py`: final ledger consistency assertion and population provenance marker.
++- `result.py`: revised ledger validation on reopening and legacy shareable re-export.
++- `disclosure.py`: conservative ranking withholding, safe findings/checks and
++  disclosed population references without predicates or source lineage.
++- `artifacts.py`, `templates/report.html`: visible method qualifications/limitations.
++- `schema.py`, `schemas/contracts.json`, `schemas/openapi.json`: additive denominator
++  semantics and protected population definitions; bundled documents regenerated.
++- `tests/cg1/test_review_corrections.py`: 11 focused regression cases.
++- `validation/cg1/review_corrections.py` and `review_corrections_resources.py`:
++  reproducible focused reference/export/privacy and bounded resource evidence.
++- CG1 methodology, the methodology index and current-state record were updated.
++
++The result/spec/API major versions and metric formulas remain unchanged.
++`coverage.population_provenance_version="1.1"`, `denominator_kind`, population
++lineage, class/delta references and `coverage.projection_revision` are additive.
++Corrected opaque population IDs intentionally change. Conditional paired-delta
++`denominator` now describes common base support; left/right conditional denominators
++are explicit in `data`. Consumers must not interpret that base as a conditional
++formula denominator. F1/macro support is explicitly distinguished from its formula
++or class-aggregation denominator.
++
++Old exact bundles remain loadable with their matching manifests, with legacy
++qualification when projected. They cannot acquire corrected lineage without
++reevaluation. Old portable JSON cannot recover previously discarded findings.
++Re-exported legacy conservative projections receive a new projection digest and
++retain `origin_projection_digest`; historical files are never overwritten.
++
++## Before/after evidence
++
++All paths below are relative to `validation/cg1/results/review-corrections/`.
++
++| Evidence | Before | After |
++|---|---|---|
++| Stored population ledger (`recorded-defects-before.json`; fresh `final-reports/*-local.json`) | 66 binary and 22 multiclass measurement/ledger denominator mismatches | Zero mismatches over 302 binary, 234 multiclass and 181 regression records |
++| Full matched analytical values (`historical-metric-comparison.json`) | Historical reference reports | All 717 matched records retain their scalar values/value states; 15 binary and 8 multiclass paired-delta support counts are corrected |
++| Executable defect regressions (`before-regressions.txt`, `targeted-final.txt`) | Four selected tests fail against captured original source for ledger inconsistency, curve leakage, dropped qualifications and unsafe legacy re-export | All 11 focused regression cases pass |
++| 500 unique-score rows (`final-reports/unique-scores-*`) | Local retained curve includes a cutoff with cumulative count 1 and retained cumulative counts 1–9 | Exact local curve preserved; portable curve/native-score details absent; AUC/AP unchanged; sentinel score absent from portable JSON/HTML/PDF, no ROC polyline in SVG |
++| Sensitive qualification case (`final-reports/qualified-shareable.*`) | Old projection retains only withholding text | Train-role, repeated-entity, invalid-probability and conflicting-outcome findings, blockers, aliased checks and limitations survive; sentinel private values absent |
++
++The new tests independently assert row/event membership, not just hash inequality:
++class-conditional and high-confidence denominators, three equally sized but
++different decision/probability/ranking intersections, and equally sized regression
++point/interval intersections after temporary-column remapping. They also check
++normalization-setting identity, repeatability, invalid-ledger rejection and
++intentional wrong-count publication failure.
++
++## Executed verification
++
++Commands were run with `PYTHONDONTWRITEBYTECODE=1`, `PYTHONPATH=src:.`, and
++`.venv/bin/python -B`; no dependencies were installed.
++
++1. `-m pytest tests/cg1 tests/test_web.py -q --tb=short`
++   — **50 passed in 8.68s** (`tests-final.txt`). This includes the then-current 10
++   new regression tests, all 27 existing CG1 tests and 13 legacy web tests.
++2. `-m pytest tests/cg1/test_review_corrections.py -q --tb=short`
++   — **11 passed in 1.64s** (`targeted-final.txt`), including one subsequently added
++   interval-remapping regression. No product source changed after the 50-test run.
++   Thus **51 distinct affected tests** passed across these runs, not 61 distinct tests.
++3. `validation/cg1/review_corrections.py --out validation/cg1/results/review-corrections/final-reports --schema-path /opt/homebrew/lib/python3.11/site-packages`
++   — **24 pinned independent reference metrics passed**, all local/shareable
++   results validated against JSON Schema, protected populations validated, bundled
++   schemas/OpenAPI/examples matched their generators. Three real PDF exports and
++   their matching HTML/JSON passed the unique-score and qualification privacy
++   assertions (`validation-final.txt`, `final-reports/verification.json`). The
++   existing system jsonschema installation was reused; predictor fitting was not rerun.
++4. `validation/cg1/review_corrections_resources.py --out validation/cg1/results/review-corrections/resource-probes`
++   — ordinary binary 10,000 rows / 20,000 probability cells: **11.48s**, sampled peak
++   RSS **180,977,664 bytes**, protected result **51,649 bytes**; wide multiclass 8,000
++   rows / 384,000 cells: **9.20s**, sampled peak RSS **239,648,768 bytes**, protected
++   result **276,280 bytes**. Both succeeded with zero observed spill. Tests ran
++   concurrently with part of the ordinary probe; timings are not isolated benchmarks
++   or directly comparable speed-regression estimates.
++5. `pdftoppm -scale-to 1100 -png <pdf> <prefix>` for all three selected PDFs:
++   exact unique-score control (17 pages), conservative unique-score report (15),
++   and conservative qualification/blocker report (17). All **49 rendered pages**
++   were inspected in nine contact sheets. No clipping/overlap was observed; exact
++   local ROC is visible and absent from the conservative report. Existing bounded
++   detail excerpts and spacious page-break behavior remain. Contact sheets are
++   included in the review ZIP; intermediate individual page rasters stay local.
++6. SHA-256 comparison against the correction-start snapshot: **93 DataTrust source
++   files byte-for-byte unchanged**, including the preexisting CG1 Flask integration
++   (`datatrust-compatibility.json`). No packaging/dependency/shared runtime source
++   was changed by these corrections.
++
++The four failing baseline regressions used the same current test definitions with
++`PYTHONPATH=/private/tmp/numek-cg1-focused-review/before/src:.` and the filter
++`-k 'ledger_matches or conservative_unique or safe_findings or legacy_shareable'`.
++Their nonzero exit is expected and demonstrates the original defects.
++
++Previously recorded CG1/full-repository/browser/corpus qualification remains
++historical evidence, not newly executed verification. The old 526-test repository
++run was **not** repeated. No live browser automation, wheel build, model fitting,
++large historical corpus/model qualification or capacity-ceiling experiment was
++rerun for these focused changes. Flask/CLI/ownership/cancellation/export regressions
++are covered by the existing CG1 and legacy web tests in the affected run.
++
++## Limits and re-review
++
++Conservative score-detail withholding deliberately sacrifices portable ranking
++curves; authorized exact output preserves them. This is a disclosure guardrail,
++not differential privacy or resistance to every auxiliary-data/cross-export
++attack. Generic validation/qualification flags remain visible without exact counts.
++Unknown/custom finding text is kept local until an explicit safe projection exists.
++Old artifacts already shared cannot be recalled or repaired in place. Historical
++population IDs/findings need reevaluation, not guessed reconstruction. Capacity
++ceilings, real production usefulness and founder acceptance remain unestablished.
++No additional unresolved defect in the three requested correction areas was found
++by these checks; independent review remains necessary.

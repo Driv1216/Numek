@@ -1,9 +1,36 @@
 # Numek Architecture
 
-Last updated: 2026-10-13
+Last updated: 2026-10-19
 Status: M1 shared foundation, M2 regression, and M3 tabular/annotation intelligence
 implemented; M4 comparative/scalable local analysis added. Compatible pandas
 classification/M1/M2/M3 defaults are preserved; M5 temporal, M6 text, M7 image and M9 cross-representation reliability share the supervised DuckDB boundary. M8 audio remains deferred.
+
+ConfidenceGuard CG1 is implemented as the independent `confidenceguard` package
+in the existing distribution. Python/CLI/JSON transport call its application
+services and analytical engine; completed evidence flows separately into disclosure
+projections and canonical reports. A private compatibility adapter reuses existing
+worker/Workspace/file/publication helpers without extracting `numek_runtime` or
+migrating accepted DataTrust engines. The existing host only registers its
+blueprints and JSON CSRF boundary, sharing the worker lock and local lifecycle.
+Its functional static client consumes `/api/confidenceguard/v1`; analytical code
+has no browser-template/Flask dependency. See [CG1 architecture and contracts](CG1_CONFIDENCEGUARD.md).
+
+CG2 extends this boundary through `method_contracts`, `methods`, `method_sources`,
+`calibration`, `conformal`, `uncertainty`, `inference`, `fitted` and `membership`.
+`engine.open_store` is shared admission/normalization; `MethodStore` extends CG1
+relations; transformed variants reuse `analytics.Evidence` and CG1 reducers.
+F/S/C/E query separation seals E labels before fitting. Explicit comparison edges
+carry common-input/output populations and metric-specific denominators. Safe tagged
+extended values retain valid unbounded conformal thresholds while keeping optimizer
+parameters finite. Parent-owned application staging preserves atomic publication.
+Method digests, application digests and immutable assessments are separate identities.
+Protected membership sidecars and imported-method compatibility checks extend provenance.
+
+CG1 1.0 requests/results retain their path; CG2 1.1 requests/results opt into the new
+semantics. The existing v1 transport advertises both. Method fitting, application,
+independent evaluation, disclosure and exports are thin interfaces over one engine.
+CG2 adds no framework, predictor executor, persistent monitoring database or shared
+runtime extraction. See [CG2 architecture/methodology](CG2_CONFIDENCEGUARD.md).
 
 ## System Overview And Boundaries
 

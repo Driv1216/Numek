@@ -1,0 +1,409 @@
+{
+  "reference_only": true,
+  "seed": 1742,
+  "python": "3.11.15",
+  "packages": {
+    "scikit-learn": "1.7.2",
+    "numpy": "2.4.6",
+    "scipy": "1.17.1",
+    "jsonschema": "4.23.0"
+  },
+  "generator_sha256": "f99c934673aa466517bca8dad602bba242211542d415fc410457d300dddeaad8",
+  "cases": [
+    {
+      "name": "binary",
+      "source_sha256": "ceb623db48e2c6acadbdc1ddd57a4644c5c9d72184f7926797258591c4a79e2e",
+      "prediction_sha256": "d79cb60815afc934b3522231559309ea784eca8ff2e1d65debb54e021fc51a99",
+      "provenance": {
+        "source": "Pinned NUMEK UCI German Credit preparation",
+        "features": [
+          "duration_months",
+          "credit_amount",
+          "age",
+          "installment_rate",
+          "existing_credits",
+          "dependents"
+        ]
+      },
+      "source_rows": 1000,
+      "fit_indices_sha256": "c222f2aed551b3c59b7d9cfc6d061e7b5098cd8a3b64edcdd7d20a6082c4a949",
+      "calibration_indices_sha256": "e4eaaf3a02397039aa1b215fa3ba55c840696dfb8422d9d5eeb7be9b5881c6e7",
+      "evaluation_indices_sha256": "daa0d032c0bc606ed324feb7ddd80f09b38f437cc531f26577c22371a774db30",
+      "fit_rows": 640,
+      "calibration_rows": 160,
+      "evaluation_rows": 200,
+      "disjoint_splits": true,
+      "checks": [
+        {
+          "run": "model0",
+          "metric": "accuracy",
+          "expected": 0.72,
+          "observed": 0.72
+        },
+        {
+          "run": "model0",
+          "metric": "log_loss",
+          "expected": 0.5805118635079015,
+          "observed": 0.5805118635079011
+        },
+        {
+          "run": "model0",
+          "metric": "brier",
+          "expected": 0.19666274248769297,
+          "observed": 0.19666274248769297
+        },
+        {
+          "run": "model0",
+          "metric": "roc_auc",
+          "expected": 0.6446428571428572,
+          "observed": 0.6446428571428572
+        },
+        {
+          "run": "model0",
+          "metric": "average_precision",
+          "expected": 0.4693700171806007,
+          "observed": 0.4693700171806006
+        },
+        {
+          "run": "model1",
+          "metric": "accuracy",
+          "expected": 0.72,
+          "observed": 0.72
+        },
+        {
+          "run": "model1",
+          "metric": "log_loss",
+          "expected": 0.5802116425281117,
+          "observed": 0.5802116425281119
+        },
+        {
+          "run": "model1",
+          "metric": "brier",
+          "expected": 0.19658489311086771,
+          "observed": 0.1965848931108676
+        },
+        {
+          "run": "model1",
+          "metric": "roc_auc",
+          "expected": 0.6442857142857142,
+          "observed": 0.6442857142857144
+        },
+        {
+          "run": "model1",
+          "metric": "average_precision",
+          "expected": 0.4663304259777462,
+          "observed": 0.4663304259777461
+        }
+      ],
+      "whole_evaluation_seconds": 0.9579687910154462,
+      "execution": {
+        "status": "completed",
+        "backend": "duckdb_local",
+        "engine_version": "1.5.6",
+        "effective_limits": {
+          "max_source_bytes": 5368709120,
+          "max_combined_source_bytes": 8589934592,
+          "max_rows": 10000000,
+          "max_combined_rows": 30000000,
+          "max_columns": 1000,
+          "memory_bytes": 2147483648,
+          "max_rss_bytes": 6442450944,
+          "threads": 2,
+          "batch_bytes": 33554432,
+          "max_record_bytes": 8388608,
+          "workspace_bytes": 68719476736,
+          "free_disk_bytes": 2147483648,
+          "max_seconds": 1800,
+          "result_bytes": 33554432,
+          "private_bytes": 67108864,
+          "probability_cells": 100000000,
+          "max_cohorts": 4,
+          "max_groups": 32,
+          "max_classes": 256,
+          "max_policies": 16,
+          "max_thresholds": 201,
+          "max_details": 100,
+          "witnesses": 5,
+          "curve_points": 201,
+          "calibration_bins": 10,
+          "support_warning": 100,
+          "bin_support_warning": 20,
+          "high_confidence": 0.9,
+          "probability_tolerance": 1e-06,
+          "sampling": {
+            "mode": "independent_rows"
+          },
+          "disclosure": {
+            "policy": "conservative_aggregates_v1",
+            "minimum_denominator": 10,
+            "minimum_component": 10,
+            "display_labels": {}
+          }
+        },
+        "peak_workspace_bytes": 1986560,
+        "estimated_peak_workspace_bytes": 536870912,
+        "planning_estimate_is_upper_bound": false,
+        "duration_seconds": 0.3416673330357298,
+        "publication_policy": "whole_evaluation_atomic",
+        "resource_qualification": "Sampled RSS and storage controls can overshoot; admission settings are not capacity guarantees.",
+        "peak_worker_rss_bytes": 164315136,
+        "whole_job_seconds": 0.8079299160162918,
+        "peak_spill_bytes": 0,
+        "serialized_bytes": 397962
+      },
+      "report_sha256": "f10bb0494e2305036af0c6dd963348ca33b8274879a522621610d1025f9f1b77"
+    },
+    {
+      "name": "multiclass",
+      "source_sha256": "10e8a802908b34f86e5da8ce962f3c806694bc98450a18f61851af59f324bede",
+      "prediction_sha256": "cf0176bc5efd029603fed4d6566f547c88a3d00e040e6437e3a68445f12accce",
+      "provenance": {
+        "source": "scikit-learn 1.7.2 bundled UCI Wine",
+        "publisher": "https://archive.ics.uci.edu/dataset/109/wine",
+        "license": "See pinned scikit-learn dataset description and UCI attribution",
+        "features": [
+          "alcohol",
+          "malic_acid",
+          "ash",
+          "alcalinity_of_ash",
+          "magnesium",
+          "total_phenols",
+          "flavanoids",
+          "nonflavanoid_phenols",
+          "proanthocyanins",
+          "color_intensity",
+          "hue",
+          "od280/od315_of_diluted_wines",
+          "proline"
+        ]
+      },
+      "source_rows": 178,
+      "fit_indices_sha256": "b9de2a47835445c319252ace172fe23c28677dc3342147b0304fda970e135ac5",
+      "calibration_indices_sha256": "7440ce4e3711d920c77ade2010243164afb09d941a9b6b1ffcb56caf88a9e2a8",
+      "evaluation_indices_sha256": "89cf42248fdc28b113fcd21b901cf4dce77e26457aea9413c4b07f36416960d3",
+      "fit_rows": 113,
+      "calibration_rows": 29,
+      "evaluation_rows": 36,
+      "disjoint_splits": true,
+      "checks": [
+        {
+          "run": "model0",
+          "metric": "accuracy",
+          "expected": 0.9722222222222222,
+          "observed": 0.9722222222222222
+        },
+        {
+          "run": "model0",
+          "metric": "log_loss",
+          "expected": 0.058239762982000176,
+          "observed": 0.05823976298200016
+        },
+        {
+          "run": "model0",
+          "metric": "brier",
+          "expected": 0.02770369630574436,
+          "observed": 0.02770369630574436
+        },
+        {
+          "run": "model1",
+          "metric": "accuracy",
+          "expected": 0.9722222222222222,
+          "observed": 0.9722222222222222
+        },
+        {
+          "run": "model1",
+          "metric": "log_loss",
+          "expected": 0.08721569231528188,
+          "observed": 0.08721569231528188
+        },
+        {
+          "run": "model1",
+          "metric": "brier",
+          "expected": 0.03554142128709334,
+          "observed": 0.03554142128709334
+        }
+      ],
+      "whole_evaluation_seconds": 0.6426152500207536,
+      "execution": {
+        "status": "completed",
+        "backend": "duckdb_local",
+        "engine_version": "1.5.6",
+        "effective_limits": {
+          "max_source_bytes": 5368709120,
+          "max_combined_source_bytes": 8589934592,
+          "max_rows": 10000000,
+          "max_combined_rows": 30000000,
+          "max_columns": 1000,
+          "memory_bytes": 2147483648,
+          "max_rss_bytes": 6442450944,
+          "threads": 2,
+          "batch_bytes": 33554432,
+          "max_record_bytes": 8388608,
+          "workspace_bytes": 68719476736,
+          "free_disk_bytes": 2147483648,
+          "max_seconds": 1800,
+          "result_bytes": 33554432,
+          "private_bytes": 67108864,
+          "probability_cells": 100000000,
+          "max_cohorts": 4,
+          "max_groups": 32,
+          "max_classes": 256,
+          "max_policies": 16,
+          "max_thresholds": 201,
+          "max_details": 100,
+          "witnesses": 5,
+          "curve_points": 201,
+          "calibration_bins": 10,
+          "support_warning": 100,
+          "bin_support_warning": 20,
+          "high_confidence": 0.9,
+          "probability_tolerance": 1e-06,
+          "sampling": {
+            "mode": "independent_rows"
+          },
+          "disclosure": {
+            "policy": "conservative_aggregates_v1",
+            "minimum_denominator": 10,
+            "minimum_component": 10,
+            "display_labels": {}
+          }
+        },
+        "peak_workspace_bytes": 339968,
+        "estimated_peak_workspace_bytes": 536870912,
+        "planning_estimate_is_upper_bound": false,
+        "duration_seconds": 0.12005433300510049,
+        "publication_policy": "whole_evaluation_atomic",
+        "resource_qualification": "Sampled RSS and storage controls can overshoot; admission settings are not capacity guarantees.",
+        "peak_worker_rss_bytes": 165085184,
+        "whole_job_seconds": 0.580342290981207,
+        "peak_spill_bytes": 0,
+        "serialized_bytes": 368728
+      },
+      "report_sha256": "95a1a9bb704f13e22587b02b44ef7040d9180aa0ac4df51a0b1f166cc03b42a6"
+    },
+    {
+      "name": "regression",
+      "source_sha256": "938d457c467afb225716d3829152b9931e5951f61f1d1907fd3dcd2bf16e8491",
+      "prediction_sha256": "41888fd79e79b20c72bea260758471d776da8bcc5a808a32c0f59f78b07708e6",
+      "provenance": {
+        "source": "Pinned NUMEK UCI Concrete preparation"
+      },
+      "source_rows": 1030,
+      "fit_indices_sha256": "45a1b3daa75e729332407044f89def9a4a14cd2c9b3ffbac90a25bb27cc39298",
+      "calibration_indices_sha256": "d77102078d71b61694ef354e702765cb5272a4086b22178a08af18b5f3c1f86b",
+      "evaluation_indices_sha256": "7eed31e29d975f56bc38a829ffb588e279bb7d810985c3ffc0dc159a880f075d",
+      "fit_rows": 659,
+      "calibration_rows": 165,
+      "evaluation_rows": 206,
+      "disjoint_splits": true,
+      "checks": [
+        {
+          "run": "model0",
+          "metric": "mae",
+          "expected": 8.428465808816764,
+          "observed": 8.428465808816767
+        },
+        {
+          "run": "model0",
+          "metric": "rmse",
+          "expected": 10.532025584082396,
+          "observed": 10.532025584082398
+        },
+        {
+          "run": "model0",
+          "metric": "bias",
+          "expected": -0.6215127703810698,
+          "observed": -0.62151277038107
+        },
+        {
+          "run": "model0",
+          "metric": "r2",
+          "expected": 0.6511316972642236,
+          "observed": 0.6511316972642232
+        },
+        {
+          "run": "model1",
+          "metric": "mae",
+          "expected": 8.496208106408904,
+          "observed": 8.4962081064089
+        },
+        {
+          "run": "model1",
+          "metric": "rmse",
+          "expected": 10.59426082499835,
+          "observed": 10.594260824998345
+        },
+        {
+          "run": "model1",
+          "metric": "bias",
+          "expected": -0.6333550064564717,
+          "observed": -0.6333550064564715
+        },
+        {
+          "run": "model1",
+          "metric": "r2",
+          "expected": 0.6469964904021047,
+          "observed": 0.6469964904021049
+        }
+      ],
+      "whole_evaluation_seconds": 0.8077559579978697,
+      "execution": {
+        "status": "completed",
+        "backend": "duckdb_local",
+        "engine_version": "1.5.6",
+        "effective_limits": {
+          "max_source_bytes": 5368709120,
+          "max_combined_source_bytes": 8589934592,
+          "max_rows": 10000000,
+          "max_combined_rows": 30000000,
+          "max_columns": 1000,
+          "memory_bytes": 2147483648,
+          "max_rss_bytes": 6442450944,
+          "threads": 2,
+          "batch_bytes": 33554432,
+          "max_record_bytes": 8388608,
+          "workspace_bytes": 68719476736,
+          "free_disk_bytes": 2147483648,
+          "max_seconds": 1800,
+          "result_bytes": 33554432,
+          "private_bytes": 67108864,
+          "probability_cells": 100000000,
+          "max_cohorts": 4,
+          "max_groups": 32,
+          "max_classes": 256,
+          "max_policies": 16,
+          "max_thresholds": 201,
+          "max_details": 100,
+          "witnesses": 5,
+          "curve_points": 201,
+          "calibration_bins": 10,
+          "support_warning": 100,
+          "bin_support_warning": 20,
+          "high_confidence": 0.9,
+          "probability_tolerance": 1e-06,
+          "sampling": {
+            "mode": "independent_rows"
+          },
+          "disclosure": {
+            "policy": "conservative_aggregates_v1",
+            "minimum_denominator": 10,
+            "minimum_component": 10,
+            "display_labels": {}
+          }
+        },
+        "peak_workspace_bytes": 1327104,
+        "estimated_peak_workspace_bytes": 536870912,
+        "planning_estimate_is_upper_bound": false,
+        "duration_seconds": 0.33761233295081183,
+        "publication_policy": "whole_evaluation_atomic",
+        "resource_qualification": "Sampled RSS and storage controls can overshoot; admission settings are not capacity guarantees.",
+        "peak_worker_rss_bytes": 161955840,
+        "whole_job_seconds": 0.7895326249999925,
+        "peak_spill_bytes": 0,
+        "serialized_bytes": 120001
+      },
+      "report_sha256": "ab2692c7781b6f019b9c444a6c088e603bb12ad96e402a9df39eb2e7a85cef3d"
+    }
+  ],
+  "schema_validation": "Draft202012 schemas and all transport examples passed"
+}

@@ -1,6 +1,24 @@
 # DataTrust
 
-Last updated: 2026-10-12
+Last updated: 2026-10-19
+
+NUMEK now also includes **ConfidenceGuard CG1**, a distinct prediction reliability
+workbench for binary/multiclass classification and regression. It has independent
+Python/CLI contracts, a versioned local JSON API, functional browser client, paired
+evaluation, calibration/interval and fixed-policy intelligence, protected evidence,
+and conservative portable reports. See [ConfidenceGuard usage and contracts](docs/CG1_CONFIDENCEGUARD.md)
+and [engineering evidence](validation/cg1/README.md). Existing DataTrust commands,
+dataset scores and accepted M1–M7 behavior remain separate; M8 audio is deferred.
+
+**ConfidenceGuard CG2** extends that evaluator with fitted probability calibration,
+exact split-conformal sets/intervals, quantile/sample scoring, paired or cluster
+bootstrap, explicit F/S/C/E separation and reusable protected method artifacts.
+Python `study`, `fit_methods`, `apply_methods`, CLI `fit/apply/study`, the existing
+API/browser and canonical reports share the same analytical boundary. Reapplication
+is explicitly unvalidated; independent assessment never implies future improvement
+or coverage. CG1 and its understanding gate are accepted. See
+[CG2 usage, contracts and methodology](docs/CG2_CONFIDENCEGUARD.md) and
+[CG2 engineering evidence](validation/cg2/README.md).
 
 DataTrust is a local-first Python package and browser UI that generates
 stakeholder-readable dataset reliability reports. It is designed for an ML or

@@ -1,6 +1,6 @@
 # Numek Master Context
 
-Last updated: 2026-10-13
+Last updated: 2026-10-19
 
 ## Identity And Company Thesis
 
@@ -14,8 +14,12 @@ The long-term product vision connects three areas:
 - **ConfidenceGuard:** model confidence, calibration, drift, and behavioral reliability.
 - **HallucinationGuard:** grounding, supporting evidence, citations, and contradictions in LLM outputs.
 
-DataTrust is the completed foundation of Numek. ConfidenceGuard and
-HallucinationGuard describe product direction; they are not implemented modules.
+DataTrust is the completed foundation of Numek. ConfidenceGuard CG1 now implements
+a distinct supplied-prediction reliability workbench across three task families.
+The user has accepted CG1, its independent review/corrections and closed
+understanding gate. CG2 now extends that engine with calibration/uncertainty fitting,
+explicit separation, reusable artifacts and qualified statistical evaluation.
+HallucinationGuard remains product direction, not an implemented module.
 
 ## Current Product Posture
 
@@ -142,9 +146,9 @@ material out of shared planning sources unless explicitly authorized.
 
 ## Broad Development Direction
 
-The approved sequence now focuses on DataTrust expansion before ConfidenceGuard.
-The following broader company directions remain useful context; they are not
-additional M1 scope or implemented capabilities:
+The approved sequence has advanced from DataTrust M1–M7/M9 into ConfidenceGuard.
+The following broader company directions remain useful context; individual scope
+and implementation status are defined by the latest product handoffs below:
 
 - **Deeper dataset analysis:** stronger leakage review, schema checks,
   suspicious identifiers, temporal evidence, missingness patterns, richer
@@ -320,3 +324,46 @@ search, model monitoring, persistent review, automatic correction and global
 scores remain excluded. See `docs/M9_CROSS_REPRESENTATION_RELIABILITY.md` and
 `validation/m9/README.md`. Historical evidence is preserved; no new approval
 ceremony is required.
+
+## ConfidenceGuard CG1 handoff — 2026-10-17
+
+The founder approved the revised CG1 three-task scope and CG1–CG7 direction and
+explicitly requested implementation. CG1 is implemented as a separate prediction
+evaluation product, with Python/CLI, versioned local JSON transport, a functional
+API-only browser client and canonical HTML/PDF/JSON. Authoritative outcomes and
+canonical cohorts qualify paired comparisons. Supplied/derived/simulated decisions,
+probabilities/native scores, label availability, timing and statistical support
+remain explicit. Exact private investigation and conservative shareable projections
+are distinct. No universal reliability score is introduced.
+
+Infrastructure reuse uses a narrow private adapter; no `numek_runtime` extraction
+or accepted DataTrust analytical migration was made. Existing distribution/commands
+are preserved, and M8 audio stays deferred. The independent frontend design lab
+can replace the functional client via the bundled versioned contracts.
+
+CG2 calibration/uncertainty fitting, CG3 longitudinal/drift, CG4 deeper investigation,
+CG5 policy selection, CG6 execution/robustness and CG7 monitoring/operations remain
+approved continuation. No hosted service, production ingestion, persistent monitor
+or direct-model adapter is claimed in CG1. Capacity, natural-workload usefulness of
+defaults and later-method qualification remain evidence questions, not new approval
+gates. See [CG1 contracts](CG1_CONFIDENCEGUARD.md) and
+[verification](../validation/cg1/README.md). Implementation is ready for founder
+review; internal verification does not itself establish founder acceptance.
+
+## ConfidenceGuard CG2 handoff — 2026-10-19
+
+The subsequent user instruction explicitly accepts CG1 and authorizes the complete
+CG2 plan. CG2 is implemented inside the existing `confidenceguard` package. It adds
+monotone calibration maps, temperature/qualified Dirichlet, exact conformal sets and
+intervals, quantile/sample evaluation, paired/cluster inference, safe artifact states,
+F/S/C/E separation, frozen common populations and protected membership provenance.
+All interfaces use the existing supervised evaluator and canonical report/disclosure
+path. Original predictions and model identities remain immutable; applied artifacts
+are unvalidated until their own qualifying independent assessment. Assessments do
+not establish improvement or future coverage.
+
+CG1 schemas/semantics and DataTrust behavior/history are preserved. CG3 longitudinal
+analysis, CG4 automated investigation, CG5 policy optimization, CG6 predictor/auxiliary
+execution and CG7 monitoring remain separate. M8 audio remains deferred. See
+[CG2 contracts](CG2_CONFIDENCEGUARD.md) and [evidence](../validation/cg2/README.md).
+Engineering qualification does not close CG2's understanding gate for the user.

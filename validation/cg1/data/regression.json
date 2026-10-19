@@ -1,0 +1,173 @@
+{
+  "task": {
+    "kind": "regression",
+    "outcome_definition": "UCI Concrete supplied compressive strength",
+    "classes": [],
+    "positive_class": null,
+    "units": "MPa",
+    "horizon": null,
+    "material_error": 10.0
+  },
+  "sources": [
+    {
+      "id": "predictions",
+      "path": "regression.csv",
+      "format": "csv",
+      "encoding": "utf-8-sig",
+      "delimiter": ","
+    }
+  ],
+  "runs": [
+    {
+      "id": "model0",
+      "source": "predictions",
+      "model": {
+        "id": "regression",
+        "version": "v1",
+        "display_name": "Regression model 1",
+        "artifact_sha256": null,
+        "preprocessing": null,
+        "calibration": null
+      },
+      "key_columns": [
+        "id"
+      ],
+      "prediction": "prediction0",
+      "decision": {
+        "column": null,
+        "rule": "none",
+        "threshold": null,
+        "tie_policy": "abstain",
+        "state_column": null,
+        "state_values": {
+          "issued": "issued",
+          "abstained": "abstained",
+          "failed": "failed",
+          "missing": "missing"
+        },
+        "candidate_evaluation": false
+      },
+      "probabilities": null,
+      "score": null,
+      "selection": null,
+      "intervals": [
+        {
+          "id": "90",
+          "lower": "lower0",
+          "upper": "upper0",
+          "coverage": 0.9,
+          "meaning": "prediction",
+          "central": true,
+          "provenance": "Empirical 90th percentile residual width on separate calibration split; no conformal guarantee claimed."
+        }
+      ],
+      "prediction_at": null,
+      "generated_at": null,
+      "role": "evaluation",
+      "inline_outcome": null,
+      "inline_outcome_role": "agreement_assertion",
+      "horizon": null,
+      "entity_columns": []
+    },
+    {
+      "id": "model1",
+      "source": "predictions",
+      "model": {
+        "id": "regression",
+        "version": "v2",
+        "display_name": "Regression model 2",
+        "artifact_sha256": null,
+        "preprocessing": null,
+        "calibration": null
+      },
+      "key_columns": [
+        "id"
+      ],
+      "prediction": "prediction1",
+      "decision": {
+        "column": null,
+        "rule": "none",
+        "threshold": null,
+        "tie_policy": "abstain",
+        "state_column": null,
+        "state_values": {
+          "issued": "issued",
+          "abstained": "abstained",
+          "failed": "failed",
+          "missing": "missing"
+        },
+        "candidate_evaluation": false
+      },
+      "probabilities": null,
+      "score": null,
+      "selection": null,
+      "intervals": [
+        {
+          "id": "90",
+          "lower": "lower1",
+          "upper": "upper1",
+          "coverage": 0.9,
+          "meaning": "prediction",
+          "central": true,
+          "provenance": "Empirical 90th percentile residual width on separate calibration split; no conformal guarantee claimed."
+        }
+      ],
+      "prediction_at": null,
+      "generated_at": null,
+      "role": "evaluation",
+      "inline_outcome": null,
+      "inline_outcome_role": "agreement_assertion",
+      "horizon": null,
+      "entity_columns": []
+    }
+  ],
+  "outcomes": {
+    "source": "predictions",
+    "column": "outcome",
+    "key_columns": [
+      "id"
+    ],
+    "snapshot_name": null,
+    "status_column": null,
+    "status_values": {
+      "final": "final",
+      "observed": "observed",
+      "provisional": "provisional",
+      "invalid": "invalid",
+      "conflicting": "conflicting"
+    },
+    "available_at": null,
+    "due_at": null,
+    "target_at": null
+  },
+  "context": null,
+  "cohorts": [
+    {
+      "id": "stratum",
+      "column": "cohort",
+      "categories": [
+        "low",
+        "high"
+      ],
+      "edges": [],
+      "prediction_derived": false
+    }
+  ],
+  "policies": [
+    {
+      "id": "width",
+      "run": "model0",
+      "kind": "interval_abstention",
+      "thresholds": [],
+      "interval": "90",
+      "costs": {}
+    }
+  ],
+  "comparison": {
+    "left": "model0",
+    "right": "model1"
+  },
+  "as_of": null,
+  "name": "Regression pinned prediction evaluation",
+  "schema_version": "confidenceguard.evaluation_spec/1.0"
+}

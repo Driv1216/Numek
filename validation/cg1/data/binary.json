@@ -1,0 +1,168 @@
+{
+  "task": {
+    "kind": "binary_classification",
+    "outcome_definition": "German Credit supplied credit_risk",
+    "classes": [
+      "bad",
+      "good"
+    ],
+    "positive_class": "bad",
+    "units": null,
+    "horizon": null,
+    "material_error": null
+  },
+  "sources": [
+    {
+      "id": "predictions",
+      "path": "binary.csv",
+      "format": "csv",
+      "encoding": "utf-8-sig",
+      "delimiter": ","
+    }
+  ],
+  "runs": [
+    {
+      "id": "model0",
+      "source": "predictions",
+      "model": {
+        "id": "binary",
+        "version": "v1",
+        "display_name": "Binary model 1",
+        "artifact_sha256": null,
+        "preprocessing": null,
+        "calibration": null
+      },
+      "key_columns": [
+        "id"
+      ],
+      "prediction": "prediction0",
+      "decision": {
+        "column": null,
+        "rule": "none",
+        "threshold": null,
+        "tie_policy": "abstain",
+        "state_column": null,
+        "state_values": {
+          "issued": "issued",
+          "abstained": "abstained",
+          "failed": "failed",
+          "missing": "missing"
+        },
+        "candidate_evaluation": false
+      },
+      "probabilities": {
+        "positive_column": null,
+        "columns": {
+          "bad": "p0_0",
+          "good": "p0_1"
+        }
+      },
+      "score": null,
+      "selection": null,
+      "intervals": [],
+      "prediction_at": null,
+      "generated_at": null,
+      "role": "evaluation",
+      "inline_outcome": null,
+      "inline_outcome_role": "agreement_assertion",
+      "horizon": null,
+      "entity_columns": []
+    },
+    {
+      "id": "model1",
+      "source": "predictions",
+      "model": {
+        "id": "binary",
+        "version": "v2",
+        "display_name": "Binary model 2",
+        "artifact_sha256": null,
+        "preprocessing": null,
+        "calibration": null
+      },
+      "key_columns": [
+        "id"
+      ],
+      "prediction": "prediction1",
+      "decision": {
+        "column": null,
+        "rule": "none",
+        "threshold": null,
+        "tie_policy": "abstain",
+        "state_column": null,
+        "state_values": {
+          "issued": "issued",
+          "abstained": "abstained",
+          "failed": "failed",
+          "missing": "missing"
+        },
+        "candidate_evaluation": false
+      },
+      "probabilities": {
+        "positive_column": null,
+        "columns": {
+          "bad": "p1_0",
+          "good": "p1_1"
+        }
+      },
+      "score": null,
+      "selection": null,
+      "intervals": [],
+      "prediction_at": null,
+      "generated_at": null,
+      "role": "evaluation",
+      "inline_outcome": null,
+      "inline_outcome_role": "agreement_assertion",
+      "horizon": null,
+      "entity_columns": []
+    }
+  ],
+  "outcomes": {
+    "source": "predictions",
+    "column": "outcome",
+    "key_columns": [
+      "id"
+    ],
+    "snapshot_name": null,
+    "status_column": null,
+    "status_values": {
+      "final": "final",
+      "observed": "observed",
+      "provisional": "provisional",
+      "invalid": "invalid",
+      "conflicting": "conflicting"
+    },
+    "available_at": null,
+    "due_at": null,
+    "target_at": null
+  },
+  "context": null,
+  "cohorts": [
+    {
+      "id": "stratum",
+      "column": "cohort",
+      "categories": [
+        "low",
+        "high"
+      ],
+      "edges": [],
+      "prediction_derived": false
+    }
+  ],
+  "policies": [
+    {
+      "id": "threshold",
+      "run": "model0",
+      "kind": "probability_threshold",
+      "thresholds": [],
+      "interval": null,
+      "costs": {}
+    }
+  ],
+  "comparison": {
+    "left": "model0",
+    "right": "model1"
+  },
+  "as_of": null,
+  "name": "Binary pinned prediction evaluation",
+  "schema_version": "confidenceguard.evaluation_spec/1.0"
+}

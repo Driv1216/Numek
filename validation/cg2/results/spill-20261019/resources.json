@@ -1,0 +1,61 @@
+[
+  {
+    "case": "actual-spill",
+    "status": "completed",
+    "resources": {
+      "status": "completed",
+      "peak_workspace_bytes": 123211776,
+      "peak_worker_rss_bytes": 174063616,
+      "whole_job_seconds": 2.361173334000341,
+      "peak_spill_bytes": 91193344,
+      "serialized_bytes": 652
+    },
+    "result": {
+      "thresholds": [
+        {
+          "coverage": "0.5",
+          "n": 10000000,
+          "rank": 5000001,
+          "threshold": {
+            "value": 5000009.0,
+            "value_state": "finite"
+          }
+        },
+        {
+          "coverage": "0.9",
+          "n": 10000000,
+          "rank": 9000001,
+          "threshold": {
+            "value": 9000017.0,
+            "value_state": "finite"
+          }
+        },
+        {
+          "coverage": "0.999",
+          "n": 10000000,
+          "rank": 9990001,
+          "threshold": {
+            "value": 9990019.0,
+            "value_state": "finite"
+          }
+        }
+      ],
+      "scope": "CG2 exact order-statistic reducer on the shared supervised workspace"
+    }
+  },
+  {
+    "case": "resource-stop",
+    "status": "expected_stop",
+    "code": "rss_limit",
+    "resources": {
+      "status": "failed",
+      "peak_worker_rss_bytes": 41549824,
+      "peak_workspace_bytes": 0,
+      "peak_spill_bytes": 0,
+      "whole_job_seconds": 0.10368691599796875,
+      "max_rss_bytes": 33554432,
+      "sampled_rss_overshoot_bytes": 7995392,
+      "completed_result_published": false
+    }
+  }
+]
