@@ -1,0 +1,42 @@
+{
+  "schema": "cg3.package_verification/1.0",
+  "status": "passed",
+  "extracted_inventory": "all declared file hashes/sizes verified before package exercise",
+  "wheel_install": "pip --no-deps --no-compile into empty target; dependencies reused from qualified environment",
+  "exercise": {
+    "wheel_imports": {
+      "confidenceguard": "confidenceguard/__init__.py",
+      "datatrust": "datatrust/__init__.py"
+    },
+    "wheel_source_asset_files_equal": {
+      "confidenceguard": 46,
+      "datatrust": 124
+    },
+    "restored_assessments": [
+      "522e93a15b204222bec832b9a1b03a28",
+      "a63b08b955cc4f88afa01c97395edc6d",
+      "e1c509ec7a854455861395174488fc0c"
+    ],
+    "retained_fact_reconstruction": "binary metric/scopes/denominators/value states identical; numeric values within rel=1e-10, abs=1e-12",
+    "max_absolute_numeric_difference": 1.3877787807814457e-17,
+    "status": "passed"
+  },
+  "focused_tests": {
+    "passed": 9,
+    "seconds": 6.42,
+    "groups": [
+      "tests/cg3/test_history.py",
+      "tests/cg3/test_inference.py"
+    ],
+    "import_mode": "importlib",
+    "source": "extracted tests with wheel target first on PYTHONPATH"
+  },
+  "independent_existing_report_checks": 18,
+  "reports_regenerated": false,
+  "analytical_qualification_repeated": false,
+  "harness_corrections": [
+    "Spawned analytical workers require a file/module entrypoint; the initial stdin exercise was replaced by the guarded module.",
+    "Reconstructed finite floating diagnostics use rel=1e-10/abs=1e-12 rather than bit equality; maximal observed difference 2.7755575615628914e-17. Immutable reopened assessments keep their exact bytes."
+  ],
+  "reconstruction_retry": "resumed committed idempotent request, no second analytical calculation"
+}

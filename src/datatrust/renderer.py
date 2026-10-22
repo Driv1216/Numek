@@ -1,4 +1,5 @@
-from datetime import datetime
+from datetime import datetime, timezone
+from functools import lru_cache
 from pathlib import Path
 import re
 import os
@@ -8,6 +9,62 @@ import hashlib
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 from markupsafe import Markup, escape
 from datatrust.wording import count_phrase
+
+
+def _report_time(value):
+    """A report timestamp with its time zone stated: UTC when the canonical value carries an offset."""
+    try:
+        moment = datetime.fromisoformat(str(value))
+    except ValueError:
+        return str(value)
+    if moment.tzinfo is None:
+        return moment.strftime("%Y-%m-%d %H:%M:%S") + " (time zone not recorded)"
+    return moment.astimezone(timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC")
+
+
+def _legacy_time(value):
+    """The legacy report's "Generated" value: a canonical time with an offset is stated in UTC; the legacy direct
+    API (no time, or a plain local string) keeps its established bytes."""
+    if value is None:
+        return datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    try:
+        aware = datetime.fromisoformat(str(value)).tzinfo is not None
+    except ValueError:
+        aware = False
+    return _report_time(value) if aware else value
+
+
+def _delimiter_label(value):
+    from datatrust.ingestion import delimiter_name
+    name = delimiter_name(value or ",")
+    return name[:1].upper() + name[1:]
+
+
+@lru_cache(maxsize=1)
+def presentation_identity():
+    """The DataTrust package version and a digest of the report templates: how a report was rendered.
+    Recorded separately from the analytical methodology, so a presentation change never reads as a method change."""
+    from importlib.metadata import PackageNotFoundError, version
+    try:
+        package = version("datatrust")
+    except PackageNotFoundError:
+        package = "not recorded"
+    digest = hashlib.sha256()
+    for path in sorted((Path(__file__).parent / "templates").glob("*.html")):
+        digest.update(path.name.encode() + b"\0" + path.read_bytes())
+    return {"package_version": package, "report_templates": digest.hexdigest()[:12]}
+
+
+def _presentation_line():
+    identity = presentation_identity()
+    return f"DataTrust {identity['package_version']}, report templates {identity['report_templates']}"
+
+
+def _report_filters(env):
+    env.filters["report_time"] = _report_time
+    env.filters.setdefault("report_label", _report_label)
+    env.filters["delimiter_label"] = _delimiter_label
+    env.globals["presentation"] = _presentation_line()
 
 
 def render_html_report(
@@ -28,6 +85,7 @@ def render_html_report(
         lstrip_blocks=True,
     )
     env.filters["soft_wrap_name"] = _soft_wrap_name
+    _report_filters(env)
     template = env.get_template("report.html")
     safe_context = context or {
         "dataset_name": Path(profile["dataset_path"]).stem,
@@ -48,7 +106,7 @@ def render_html_report(
         narrative=narrative or {},
         target_chart=_target_chart(profile["target_distribution"]),
         missingness_chart=_missingness_chart(profile["columns"]),
-        generated_at=generated_at or datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        generated_at=_legacy_time(generated_at),
     )
 
 
@@ -246,7 +304,38 @@ def _regression_inspection_notice(warning):
 
 
 def render_analysis_result(result):
-    """Render only completed evidence; exports never trigger a new analysis."""
+    """Render only completed evidence; exports never trigger a new analysis. A source read with a separator other
+    than a comma is named under the title; comma reports are unchanged, byte for byte."""
+    return _with_separator_note(_render_analysis_result(result), result)
+
+
+def _with_separator_note(html, result):
+    note = _separator_note(result.to_dict())
+    position = html.find("</h1>")
+    if not note or position < 0:
+        return html
+    position += len("</h1>")
+    return html[:position] + f'<p class="separator-note">CSV separator: {escape(note)}.</p>' + html[position:]
+
+
+def _separator_note(value):
+    from datatrust.contracts import _PARSE_OPTION_KEYS
+    from datatrust.ingestion import delimiter_name
+    found = set()
+    def walk(item):
+        if isinstance(item, dict):
+            if _PARSE_OPTION_KEYS <= item.keys() and item.get("delimiter", ",") != ",":
+                found.add(item["delimiter"])
+            for child in item.values():
+                walk(child)
+        elif isinstance(item, list):
+            for child in item:
+                walk(child)
+    walk(value)
+    return ", ".join(sorted(delimiter_name(d) for d in found))
+
+
+def _analysis_env():
     template_dir = Path(__file__).parent / "templates"
     env = Environment(loader=FileSystemLoader(str(template_dir)),
                       autoescape=select_autoescape(["html", "xml"]), trim_blocks=True, lstrip_blocks=True)
@@ -258,7 +347,40 @@ def render_analysis_result(result):
     env.filters["regression_population"] = _regression_population
     env.filters["regression_inspection_notice"] = _regression_inspection_notice
     env.filters["count_phrase"] = count_phrase
+    _report_filters(env)
     env.filters["regression_number"] = lambda value: "Unavailable" if value is None else (format(value, ".8g") if isinstance(value, float) else str(value))
+    return env
+
+
+def _with_provenance(html, result):
+    """The legacy classification report keeps its established body; the provenance table is added before its
+    last section closes, as the analysis disclosure is in the library report."""
+    section = _analysis_env().from_string("<div class=\"analysis-disclosure\">{% include 'provenance.html' %}</div>").render(result=result.to_dict())
+    position = html.rfind("</section>")
+    return html[:position] + section + html[position:]
+
+
+def _with_layers(html, result):
+    """The legacy classification report keeps its established body; the guidance layers are inserted at its section
+    boundaries: scope and open questions after the decision summary, preprocessing guidance before methodology, and
+    the score explanation and thresholds before the appendix."""
+    env, value = _analysis_env(), result.to_dict()
+    part = lambda body: env.from_string("{% import 'guidance_layers.html' as L %}" + body).render(result=value)
+    inserts = (('<section class="action-section">', '<section class="dt-scope">{{ L.style() }}{{ L.scope_box(result.guidance) }}</section>\n'),
+               ('<section class="methodology-section">', '<section class="dt-context">{{ L.context_section(result.contextual) }}</section>\n'
+                                                         '<section class="dt-guidance">{{ L.guidance_section(result.guidance) }}</section>\n'),
+               ('<section class="appendix-section">', '<section class="dt-scoring"><h2>Score explanation and thresholds</h2>{{ L.scoring_section(result.guidance) }}'
+                                                      '{{ L.policy_table(result.guidance, result.methodology_id) }}</section>\n'))
+    for anchor, body in inserts:
+        position = html.find(anchor)
+        if position >= 0:
+            html = html[:position] + part(body) + html[position:]
+    return html
+
+
+def _render_analysis_result(result):
+    template_dir = Path(__file__).parent / "templates"
+    env = _analysis_env()
     value = result.to_dict()
     if result.schema_version == '1.7':
         from datatrust.cross_presentation import report_view
@@ -279,8 +401,8 @@ def render_analysis_result(result):
         from datatrust.presentation import report_view
         return env.get_template("m3_report.html").render(result=value, view=report_view(result))
     if result.methodology_id == "classification_legacy_2026_08_13":
-        legacy = result.to_legacy_dict()
-        html = render_html_report(**legacy, generated_at=result.generated_at)
+        legacy = result.to_legacy_dict(); legacy.pop("parsing", None)  # recorded in the JSON; the legacy HTML takes its fixed fields
+        html = _with_layers(render_html_report(**legacy, generated_at=result.generated_at), result)
         disclosure = env.get_template("analysis_disclosure.html").render(result=value)
         # Keep the established eight topics and analytical body intact.
         position = html.rfind("</section>")
@@ -325,7 +447,8 @@ def write_report_artifacts(result, path, *, format="html", html_path=None, json_
                 raise ValueError('Output filesystem lacks the 256 MiB export reservation plus configured free-space reserve.')
             seen.add(device)
     if legacy_html:
-        content = render_html_report(**result.to_legacy_dict(), generated_at=datetime.fromisoformat(result.generated_at).strftime("%Y-%m-%d %H:%M:%S")).encode("utf-8")
+        legacy = result.to_legacy_dict(); legacy.pop("parsing", None)
+        content = _with_separator_note(_with_provenance(_with_layers(render_html_report(**legacy, generated_at=result.generated_at), result), result), result).encode("utf-8")
     else:
         content = render_analysis_result(result).encode("utf-8")
     reused = _html_state(canonical, content)

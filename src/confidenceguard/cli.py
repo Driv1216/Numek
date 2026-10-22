@@ -64,12 +64,15 @@ def evidence_command(report,manifest,reference,allowed_root,reveal_values):
 @main.command('ui')
 @click.option('--port',default=8000,type=click.IntRange(1,65535))
 @click.option('--data-root',multiple=True,type=click.Path(exists=True,file_okay=False))
-def ui_command(port,data_root):
+@click.option('--workspace', 'persistent_workspace',type=click.Path(exists=True,file_okay=False))
+def ui_command(port,data_root,persistent_workspace):
     """Start the loopback host; the workbench is at /confidenceguard."""
     from datatrust.web import create_app
     with tempfile.TemporaryDirectory(prefix='confidenceguard-ui-') as directory:
-        app=create_app(Path(directory),data_roots=tuple(Path(p) for p in data_root) or (Path.cwd(),))
-        click.echo(f'ConfidenceGuard: http://127.0.0.1:{port}/confidenceguard')
+        import secrets
+        token=secrets.token_urlsafe(32) if persistent_workspace else None
+        app=create_app(Path(directory),data_roots=tuple(Path(p) for p in data_root) or (Path.cwd(),),confidenceguard_workspace=persistent_workspace,confidenceguard_launch_token=token)
+        click.echo(f'ConfidenceGuard: http://127.0.0.1:{port}/confidenceguard'+('?launch='+token if token else ''))
         try:app.run(host='127.0.0.1',port=port,debug=False,use_reloader=False,threaded=False)
         finally:
             for key,value in app.extensions.items():
@@ -78,5 +81,7 @@ def ui_command(port,data_root):
 
 from .method_cli import register as _register_methods
 _register_methods(main)
+from .history_cli import register as _register_history
+_register_history(main)
 
 if __name__=='__main__':main()

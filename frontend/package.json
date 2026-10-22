@@ -1,0 +1,28 @@
+{
+  "name": "numek-frontend",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev:site": "vite --config vite.site.config.ts",
+    "dev:app": "vite --config vite.app.config.ts",
+    "typecheck": "tsc -p tsconfig.json",
+    "build:site": "tsc -p tsconfig.json && vite build --config vite.site.config.ts && node scripts/check-bundle.mjs dist/site site",
+    "build:app": "tsc -p tsconfig.json && vite build --config vite.app.config.ts && node scripts/check-bundle.mjs ../src/datatrust/static/app app",
+    "build": "npm run build:site && npm run build:app"
+  },
+  "dependencies": {
+    "@fontsource-variable/recursive": "5.3.0",
+    "@fontsource-variable/schibsted-grotesk": "5.3.0",
+    "@fontsource/ibm-plex-mono": "5.3.0",
+    "react": "19.1.1",
+    "react-dom": "19.1.1"
+  },
+  "devDependencies": {
+    "@types/react": "19.1.10",
+    "@types/react-dom": "19.1.9",
+    "@vitejs/plugin-react": "4.7.0",
+    "typescript": "5.9.2",
+    "vite": "6.3.6"
+  }
+}

@@ -140,8 +140,8 @@ class Store:
                 payload=json.dumps({k:scalar(record.get(k)) for k in sorted(required)},ensure_ascii=True,separators=(',',':'))
                 pending.append((loc['ordinal'],payload));pending_bytes+=len(payload)+64
                 if pending_bytes>=min(self.config.batch_bytes,1024**2) or len(pending)>=1024:
-                    self.con.executemany(f'INSERT INTO {table} VALUES (?,?)',pending);pending=[];pending_bytes=0;self.work.check('projected ingestion')
-            if pending:self.con.executemany(f'INSERT INTO {table} VALUES (?,?)',pending)
+                    compat.insert_rows(self.con,table,pending);pending=[];pending_bytes=0;self.work.check('projected ingestion')
+            if pending:compat.insert_rows(self.con,table,pending)
             self.counts[s.id]=n
             if n==0:raise EvaluationError('Prediction sources require framed records.','empty_source')
 
@@ -150,8 +150,8 @@ class Store:
         batch=[];retained=0
         for ordinal,payload in rows(self.con,f'SELECT ordinal,payload FROM {self.tables[sid]}'):
             record=json.loads(payload);batch.append((ordinal,key(record,columns,f'{sid}:{ordinal}'),payload));retained+=len(payload)
-            if len(batch)>=512 or retained>=min(self.config.batch_bytes,1024**2):self.con.executemany(f'INSERT INTO {table}_raw VALUES (?,?,?)',batch);batch=[];retained=0;self.work.check('identity normalization')
-        if batch:self.con.executemany(f'INSERT INTO {table}_raw VALUES (?,?,?)',batch)
+            if len(batch)>=512 or retained>=min(self.config.batch_bytes,1024**2):compat.insert_rows(self.con,table+'_raw',batch);batch=[];retained=0;self.work.check('identity normalization')
+        if batch:compat.insert_rows(self.con,table+'_raw',batch)
         self.con.execute(f'CREATE TABLE {table} AS SELECT *,count(*) OVER(PARTITION BY event_key) multiplicity FROM {table}_raw')
         self.con.execute(f'DROP TABLE {table}_raw')
 
@@ -181,8 +181,8 @@ class Store:
                 if o.due_at and (d_state!='valid' or due>self.cutoff):reason='unresolved_or_immature_outcome'
                 retained_value=v if yn is not None or v in self.spec.task.classes else None
                 pending.append((k,ordinal,retained_value,yn,reason is None,reason,available,due,target))
-                if len(pending)>=512:self.con.executemany('INSERT INTO outcome VALUES (?,?,?,?,?,?,?,?,?)',pending);pending=[]
-            if pending:self.con.executemany('INSERT INTO outcome VALUES (?,?,?,?,?,?,?,?,?)',pending)
+                if len(pending)>=512:compat.insert_rows(self.con,'outcome',pending);pending=[]
+            if pending:compat.insert_rows(self.con,'outcome',pending)
             # Only unique identities may participate in a join, including invalid values.
             self.con.execute('CREATE TABLE outcome_unique AS SELECT * FROM outcome WHERE event_key IN (SELECT event_key FROM okeys WHERE multiplicity=1 AND event_key IS NOT NULL)')
             h=hashlib.sha256()
@@ -298,8 +298,8 @@ class Store:
                     facts['invalid_intervals'][interval.id]=facts['invalid_intervals'].get(interval.id,0)+1;lo=hi=width=None
                 row.extend((lo,hi,width))
             pending.append(tuple(row))
-            if len(pending)>=512:self.con.executemany(f'INSERT INTO {table} VALUES ({",".join("?" for _ in row)})',pending);pending=[];self.work.check('prediction normalization')
-        if pending:self.con.executemany(f'INSERT INTO {table} VALUES ({",".join("?" for _ in pending[0])})',pending)
+            if len(pending)>=512:compat.insert_rows(self.con,table,pending);pending=[];self.work.check('prediction normalization')
+        if pending:compat.insert_rows(self.con,table,pending)
         facts['repeated_entities']=self.con.execute(f'SELECT coalesce(sum(n),0) FROM (SELECT count(*) n FROM {table} WHERE entity_key IS NOT NULL GROUP BY entity_key HAVING count(*)>1)').fetchone()[0]
         self.run_facts[r.id]=facts
 

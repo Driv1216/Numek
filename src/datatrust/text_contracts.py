@@ -406,10 +406,11 @@ class TextAuditResult:
     private: dict = field(repr=False)
     schema_version: str = '1.5'
     methodology_id: str = 'text_reliability_v1'
+    guidance: dict = field(default_factory=dict, kw_only=True)  # finding_guidance_v1 and later; absent before
     @property
     def source_paths(self): return tuple(self.private['protected_paths'])
     def to_dict(self):
-        return exact_json({k:getattr(self,k) for k in ('schema_version','methodology_id','profile','checks','evidence','findings','coverage','execution','generated_at')})
+        return exact_json({k:getattr(self,k) for k in ('schema_version','methodology_id','profile','checks','evidence','findings','coverage','execution','generated_at')}|({'guidance':self.guidance} if self.guidance else {}))
     def json_text(self): return json.dumps(self.to_dict(),ensure_ascii=False,indent=2,allow_nan=False)
     def write_json(self,path,**kwargs):
         from datatrust.text_private import write_text_json

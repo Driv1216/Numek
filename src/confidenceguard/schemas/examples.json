@@ -318,6 +318,70 @@
       "config": {}
     }
   },
+  "history": {
+    "batch": {
+      "namespace": "prediction-events",
+      "outcome_definition_version": "outcome-v1",
+      "evaluation": {
+        "task": {
+          "kind": "binary_classification",
+          "outcome_definition": "Supplied reference outcome",
+          "classes": [
+            "0",
+            "1"
+          ],
+          "positive_class": "1"
+        },
+        "sources": [
+          {
+            "id": "predictions",
+            "handle": "SOURCE_HANDLE"
+          }
+        ],
+        "runs": [
+          {
+            "id": "candidate",
+            "source": "predictions",
+            "model": {
+              "id": "model",
+              "version": "v1"
+            },
+            "key_columns": [
+              "id"
+            ],
+            "prediction": "prediction"
+          }
+        ],
+        "outcomes": {
+          "source": "predictions",
+          "column": "outcome",
+          "key_columns": [
+            "id"
+          ]
+        }
+      },
+      "bindings": [
+        {
+          "run": "candidate"
+        }
+      ]
+    },
+    "longitudinal": {
+      "namespace": "prediction-events",
+      "windows": [
+        {
+          "id": "reference",
+          "start": "2026-01-01T00:00:00Z",
+          "end": "2026-02-01T00:00:00Z"
+        },
+        {
+          "id": "current",
+          "start": "2026-02-01T00:00:00Z",
+          "end": "2026-03-01T00:00:00Z"
+        }
+      ]
+    }
+  },
   "response_examples": {
     "session": {
       "api_version": "v1",

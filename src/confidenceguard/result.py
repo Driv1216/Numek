@@ -72,6 +72,9 @@ class EvaluationResult:
     @classmethod
     def from_dict(cls,value,*,private=None):
         if isinstance(value,str):value=strict_json(value)
+        if isinstance(value,dict) and value.get('schema_version')=='confidenceguard.longitudinal_result/1.0':
+            from .history_result import LongitudinalResult
+            return LongitudinalResult.from_dict(value,private=private)
         from .method_contracts import CG2_RESULT,CG2_METHOD
         cg2=isinstance(value,dict) and value.get('schema_version')==CG2_RESULT and value.get('methodology_id')==CG2_METHOD
         if not isinstance(value,dict) or not cg2 and (value.get('schema_version')!=RESULT_SCHEMA or value.get('methodology_id')!=METHOD):raise EvaluationError('Unsupported completed result.')

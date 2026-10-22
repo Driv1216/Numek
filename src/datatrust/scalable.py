@@ -14,7 +14,7 @@ import duckdb
 import pandas as pd
 from pandas._libs.parsers import STR_NA_VALUES
 
-from datatrust.contracts import AnalysisConfig, AnalysisError
+from datatrust.contracts import AnalysisConfig, AnalysisError, omit_default_delimiter
 from datatrust.ingestion import source_signature, verify_source
 
 PARSING_POLICY = 'scalable_csv_v1'
@@ -213,7 +213,7 @@ def ingest(work, item, lexical_keys=()):
     structural = hashlib.sha256(); count = 0; headers = None
     try:
         with snapshot.open(encoding=parsing.encoding, newline='') as handle:
-            reader = csv.reader(lines(handle), strict=True)
+            reader = csv.reader(lines(handle), strict=True, delimiter=parsing.delimiter)
             for row in reader:
                 used = record_bytes; record_bytes = 0; max_record = max(max_record, used)
                 blank = not nonblank; nonblank = False
@@ -229,7 +229,7 @@ def ingest(work, item, lexical_keys=()):
     except (csv.Error, UnicodeError) as exc: fail(f'CSV structural validation failed: {exc}', 'csv_structure')
     if headers is None or not count: raise ValueError('Dataset needs a header and at least one data row.')
     # Reuse pandas header resolution, preserving case-distinct names internally by position.
-    names = tuple(pd.read_csv(snapshot, encoding=parsing.encoding, nrows=0).columns)
+    names = tuple(pd.read_csv(snapshot, encoding=parsing.encoding, sep=parsing.delimiter, nrows=0).columns)
     from datatrust.annotations import effective_policy
     task, config, _, base_method = effective_policy(names, item.task, config)
     from dataclasses import replace
@@ -261,7 +261,7 @@ def ingest(work, item, lexical_keys=()):
     work.con.execute(f'CREATE TABLE {raw} (_row BIGINT, '+','.join(c+' VARCHAR' for c in cols)+')')
     observed = hashlib.sha256(); ordinal = 0
     chunk_rows = max(1, options.batch_bytes//(4*max_record+128*len(names)+8))
-    for batch in pd.read_csv(snapshot, encoding=parsing.encoding, dtype=str, keep_default_na=False, na_filter=False, engine='c', chunksize=chunk_rows):
+    for batch in pd.read_csv(snapshot, encoding=parsing.encoding, sep=parsing.delimiter, dtype=str, keep_default_na=False, na_filter=False, engine='c', chunksize=chunk_rows):
         if tuple(batch.columns) != names: fail('Tokenizer header disagreement.', 'csv_structure')
         for row in batch.itertuples(index=False, name=None): token_digest(observed, row)
         batch.columns = cols; batch.insert(0, '_row', range(ordinal+1, ordinal+len(batch)+1)); ordinal += len(batch)
@@ -327,8 +327,8 @@ def ingest(work, item, lexical_keys=()):
         if item.task.kind=='classification': usable=work.con.execute(f'SELECT count({c}) FROM {table}').fetchone()[0]
         else: usable=work.con.execute(f'SELECT count(*) FROM {table} WHERE {c} IS NOT NULL AND isfinite({c})').fetchone()[0] if types[target] in {'BIGINT','UBIGINT','DOUBLE'} else 0
         if not usable: fail('Selected target has no usable observations under its accepted base-task policy.','invalid_target','target')
-    fingerprint = hashlib.sha256(json.dumps({'policy':PARSING_POLICY,'options':asdict(parsing),'representations':representations,'token_sha256':observed.hexdigest()},sort_keys=True).encode()).hexdigest()
-    parsed = {'policy':PARSING_POLICY,'base_task_policy':base_method or {'classification':'classification_legacy_2026_08_13','regression':'regression_scalar_v1','dataset_profile':'dataset_profile_v1'}.get(item.task.kind,item.task.kind),'options':asdict(parsing),'representations':representations,'fingerprint':fingerprint,'logical_token_sha256':observed.hexdigest(),'header_mapping':[{'position':i+1,'original':h,'resolved':n} for i,(h,n) in enumerate(zip(headers,names))]}
+    fingerprint = hashlib.sha256(json.dumps({'policy':PARSING_POLICY,'options':omit_default_delimiter(asdict(parsing)),'representations':representations,'token_sha256':observed.hexdigest()},sort_keys=True).encode()).hexdigest()
+    parsed = {'policy':PARSING_POLICY,'base_task_policy':base_method or {'classification':'classification_legacy_2026_08_13','regression':'regression_scalar_v1','dataset_profile':'dataset_profile_v1'}.get(item.task.kind,item.task.kind),'options':omit_default_delimiter(asdict(parsing)),'representations':representations,'fingerprint':fingerprint,'logical_token_sha256':observed.hexdigest(),'header_mapping':[{'position':i+1,'original':h,'resolved':n} for i,(h,n) in enumerate(zip(headers,names))]}
     return Relation(item.id,item.role,table,names,types,representations,count,source,parsed,item.task,config,tuple(features),metadata,tuple(n for n in names if n in lexical))
 
 

@@ -1,0 +1,15 @@
+{# How this result was produced, from the canonical JSON only. Absent values say "Not recorded"; nothing is inferred. #}
+{% set nr = 'Not recorded' %}
+{% set targets = ([result.task.target] if result.task.target else (result.task.targets or [])) %}
+<h4>Provenance</h4>
+<table class="provenance-table"><tbody>
+<tr><th>Source file</th><td>{{ (result.context.source_filename if result.context else none) or nr }}</td></tr>
+<tr><th>Source SHA-256</th><td class="digest">{{ result.parsing.source_sha256 or nr }}</td></tr>
+<tr><th>Source size</th><td>{% if result.execution.source_bytes is not none and result.execution.source_bytes is defined %}{{ result.execution.source_bytes }} bytes{% else %}{{ nr }}{% endif %}</td></tr>
+<tr><th>Parsing</th><td>{{ result.parsing.options.delimiter | delimiter_label }} separator; encoding {{ result.parsing.options.encoding or nr }}; missing policy {{ result.parsing.options.missing_policy | report_label if result.parsing.options.missing_policy else nr }}; structure: {% if result.parsing.structure_validation %}every record of the whole source matched the header width ({{ result.parsing.structure_validation }}){% else %}{{ nr }}{% endif %}</td></tr>
+<tr><th>Task</th><td>{{ result.task.kind | report_label }}{% if targets %}; target{{ 's' if targets | length > 1 }} {{ targets | join(', ') }}{% endif %}</td></tr>
+<tr><th>Methodology</th><td>{{ result.methodology_id }}; schema {{ result.schema_version }}</td></tr>
+<tr><th>Execution scope</th><td>{{ result.execution.status | report_label }}; {{ result.execution.analyzed_rows if result.execution.analyzed_rows is not none else nr }} rows × {{ result.execution.analyzed_columns if result.execution.analyzed_columns is not none else nr }} columns; {{ result.coverage.completed_applicable_checks if result.coverage.completed_applicable_checks is defined else nr }} completed applicable checks</td></tr>
+<tr><th>Analysed</th><td>{{ result.generated_at | report_time }}</td></tr>
+<tr><th>Presentation</th><td>{{ presentation }}. This identifies how the report was rendered, not the analytical methodology.</td></tr>
+</tbody></table>

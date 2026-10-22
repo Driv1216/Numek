@@ -38,31 +38,44 @@ def _target_balance_score(class_balance: dict) -> float:
     return _clamp(100 - penalty)
 
 
+def feature_usability_contributions(columns: list) -> list:
+    """Each feature column's penalty points under the feature-usability rules, as [(column, [(rule, points)])].
+    The sub-score is 100 minus the summed points divided by the feature count, clamped to 0..100 and rounded to
+    two decimals (_feature_usability_score); reports reproduce it from this one function."""
+    contributions = []
+    for column in (c for c in columns if c["role"] == "feature"):
+        rules = []
+        if column["missing_rate"] >= 100:
+            rules.append(("missing_rate_100", 30))
+        elif column["missing_rate"] >= 50:
+            rules.append(("missing_rate_50", 20))
+        elif column["missing_rate"] >= 25:
+            rules.append(("missing_rate_25", 10))
+        if column["constant"]:
+            rules.append(("constant", 12))
+        elif column["near_constant"]:
+            rules.append(("near_constant", 8))
+        if column["high_cardinality"]:
+            rules.append(("high_cardinality", 8))
+        if column["outlier_rate"] >= 10:
+            rules.append(("iqr_rate_10", 8))
+        elif column["outlier_rate"] >= 5:
+            rules.append(("iqr_rate_5", 4))
+        contributions.append((column["name"], rules))
+    return contributions
+
+
 def _feature_usability_score(columns: list) -> float:
-    feature_columns = [column for column in columns if column["role"] == "feature"]
-    if not feature_columns:
+    contributions = feature_usability_contributions(columns)
+    if not contributions:
         return 0.0
 
     penalties = 0.0
-    for column in feature_columns:
-        if column["missing_rate"] >= 100:
-            penalties += 30
-        elif column["missing_rate"] >= 50:
-            penalties += 20
-        elif column["missing_rate"] >= 25:
-            penalties += 10
-        if column["constant"]:
-            penalties += 12
-        elif column["near_constant"]:
-            penalties += 8
-        if column["high_cardinality"]:
-            penalties += 8
-        if column["outlier_rate"] >= 10:
-            penalties += 8
-        elif column["outlier_rate"] >= 5:
-            penalties += 4
+    for _, rules in contributions:
+        for _, points in rules:
+            penalties += points
 
-    normalized_penalty = penalties / max(len(feature_columns), 1)
+    normalized_penalty = penalties / max(len(contributions), 1)
     return _clamp(100 - normalized_penalty)
 
 

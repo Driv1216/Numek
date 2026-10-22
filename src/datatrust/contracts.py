@@ -256,8 +256,11 @@ class CsvParseOptions:
     na_values: tuple = ()
     column_types: dict = field(default_factory=dict)
     column_missing_policies: dict = field(default_factory=dict, kw_only=True)
+    delimiter: str = field(default=",", kw_only=True)
 
     def __post_init__(self):
+        if not isinstance(self.delimiter, str) or len(self.delimiter) != 1 or self.delimiter in {'"', "\r", "\n"}:
+            raise ValueError("delimiter must be one character other than a quote or a line break.")
         if not isinstance(self.encoding, str):
             raise ValueError("encoding must be a supported text encoding.")
         try:
@@ -393,6 +396,104 @@ class RegressionOptions:
                    expectations_by_target=value.get("expectations_by_target", {}))
 
 
+CONTEXT_MEANINGS = ("not_collected", "not_applicable", "refused", "censored", "category")
+AVAILABILITY_VALUES = ("available_at_prediction", "unavailable_at_prediction", "unknown")
+CONDITION_OPERATORS = ("=", "!=", ">", ">=", "<", "<=", "is_null", "not_null")
+
+
+def _finite_scalar(value):
+    return isinstance(value, (str, int, float)) and not isinstance(value, bool) and not (isinstance(value, float) and not math.isfinite(value))
+
+
+@dataclass(frozen=True)
+class ColumnContext:
+    """What you declare about one column (context_v1). Declarations never change parsed values, findings or scores;
+    they produce a separate interpreted view beside the raw evidence."""
+    availability: Optional[str] = None
+    placeholders: dict = field(default_factory=dict)
+    sentinels: tuple = ()
+    applies_when: Optional[dict] = None
+    unit: Optional[str] = None
+
+    def __post_init__(self):
+        if self.availability is not None and self.availability not in AVAILABILITY_VALUES:
+            raise ValueError("Availability must be available_at_prediction, unavailable_at_prediction or unknown.")
+        if not isinstance(self.placeholders, dict) or any(not isinstance(k, str) or not k or v not in CONTEXT_MEANINGS for k, v in self.placeholders.items()):
+            raise ValueError("Placeholders map text values to one of: " + ", ".join(CONTEXT_MEANINGS) + ".")
+        if not isinstance(self.sentinels, (list, tuple)):
+            raise ValueError("Sentinels must be a list.")
+        sentinels = []
+        for item in self.sentinels:
+            if not isinstance(item, dict) or set(item) - {"value", "meaning"} or isinstance(item.get("value"), bool) \
+                    or not isinstance(item.get("value"), (int, float)) or not math.isfinite(item["value"]) or item.get("meaning") not in CONTEXT_MEANINGS:
+                raise ValueError("Each sentinel needs a finite numeric value and a declared meaning.")
+            sentinels.append({"value": item["value"], "meaning": item["meaning"]})
+        if len({s["value"] for s in sentinels}) != len(sentinels):
+            raise ValueError("A sentinel value is declared twice.")
+        object.__setattr__(self, "sentinels", tuple(sentinels))
+        if self.applies_when is not None:
+            c = self.applies_when
+            if not isinstance(c, dict) or set(c) - {"column", "op", "value"} or not isinstance(c.get("column"), str) or not c["column"] \
+                    or c.get("op") not in CONDITION_OPERATORS or (c["op"] not in {"is_null", "not_null"} and not _finite_scalar(c.get("value"))):
+                raise ValueError("applies_when needs a column, an operator (" + ", ".join(CONDITION_OPERATORS) + ") and a scalar value.")
+            object.__setattr__(self, "applies_when", dict(c))
+        if self.unit is not None and (not isinstance(self.unit, str) or len(self.unit) > 40):
+            raise ValueError("A unit is a short text label.")
+
+
+@dataclass(frozen=True)
+class DependencyLimits:
+    """Bounds of the target-dependency search: features examined, feature-target checks, and row work."""
+    max_features: int = 64
+    max_checks: int = 128
+    max_row_work: int = 200_000_000
+
+    def __post_init__(self):
+        for item in fields(self):
+            _positive(getattr(self, item.name), item.name, integer=True)
+
+
+@dataclass(frozen=True)
+class ContextOptions:
+    """Optional context (context_v1): the prediction objective and point, and per-column declarations."""
+    objective: Optional[str] = None
+    prediction_point: Optional[str] = None
+    columns: dict = field(default_factory=dict)
+    limits: DependencyLimits = field(default_factory=DependencyLimits)
+
+    def __post_init__(self):
+        for name in ("objective", "prediction_point"):
+            value = getattr(self, name)
+            if value is not None and (not isinstance(value, str) or len(value) > 500):
+                raise ValueError(f"{name} must be text of at most 500 characters.")
+        if not isinstance(self.columns, dict) or any(not isinstance(k, str) or not k for k in self.columns):
+            raise ValueError("Context columns must map column names to declarations.")
+        object.__setattr__(self, "columns", {k: _construct(ColumnContext, v) if isinstance(v, dict) else v for k, v in self.columns.items()})
+        if any(not isinstance(v, ColumnContext) for v in self.columns.values()):
+            raise ValueError("Invalid column declaration.")
+        if isinstance(self.limits, dict):
+            object.__setattr__(self, "limits", _construct(DependencyLimits, self.limits))
+        if not isinstance(self.limits, DependencyLimits):
+            raise ValueError("limits must be DependencyLimits.")
+
+    @classmethod
+    def from_dict(cls, value):
+        if not isinstance(value, dict) or set(value) - {"prediction", "columns", "limits"}:
+            raise ValueError("Context must contain only prediction, columns and limits.")
+        prediction = value.get("prediction") or {}
+        if not isinstance(prediction, dict) or set(prediction) - {"objective", "point"}:
+            raise ValueError("prediction must contain only objective and point.")
+        return cls(prediction.get("objective") or None, prediction.get("point") or None, value.get("columns", {}), value.get("limits", {}))
+
+    def to_dict(self):
+        return {"prediction": {"objective": self.objective, "point": self.prediction_point},
+                "columns": {k: {f.name: getattr(v, f.name) for f in fields(v) if getattr(v, f.name) not in (None, {}, ())} for k, v in self.columns.items()},
+                "limits": asdict(self.limits)}
+
+    def availability(self):
+        return {k: v.availability for k, v in self.columns.items() if v.availability}
+
+
 @dataclass(frozen=True)
 class AnalysisConfig:
     parsing: CsvParseOptions = field(default_factory=CsvParseOptions)
@@ -406,6 +507,7 @@ class AnalysisConfig:
     presentation: PresentationLimits = field(default_factory=PresentationLimits, kw_only=True)
     execution: object = field(default=None, kw_only=True)
     advanced: object = field(default=None, kw_only=True)
+    context: Optional[ContextOptions] = field(default=None, kw_only=True)  # context_v1; omitted from records when absent
 
     def __post_init__(self):
         from datatrust.m4_contracts import ExecutionOptions, AdvancedTabularOptions
@@ -426,12 +528,22 @@ class AnalysisConfig:
             raise ValueError("limits must be ExecutionLimits or None.")
         if self.regression is not None and not isinstance(self.regression, RegressionOptions):
             raise ValueError("regression must be RegressionOptions or None.")
+        if isinstance(self.context, dict):
+            object.__setattr__(self, "context", ContextOptions.from_dict(self.context))
+        if self.context is not None and not isinstance(self.context, ContextOptions):
+            raise ValueError("context must be ContextOptions or None.")
+        if self.context is not None and self.regression is not None:
+            # The existing regression availability contract stays the source of truth; the two must agree.
+            for column, value in self.context.availability().items():
+                declared = self.regression.feature_availability.get(column)
+                if declared is not None and declared != value:
+                    raise ValueError(f"Availability for {column} is declared twice with different values.")
 
     @classmethod
     def from_dict(cls, value):
         if not isinstance(value, dict):
             raise ValueError("Analysis configuration must be a JSON object.")
-        unknown = set(value) - {"parsing", "fidelity_inspection", "limits", "regression", "annotations", "features", "multilabel", "diagnostics", "presentation", "execution", "advanced"}
+        unknown = set(value) - {"parsing", "fidelity_inspection", "limits", "regression", "annotations", "features", "multilabel", "diagnostics", "presentation", "execution", "advanced", "context"}
         if unknown:
             raise ValueError(f"Unknown AnalysisConfig fields: {', '.join(sorted(unknown))}.")
         from datatrust.m4_contracts import ExecutionOptions, AdvancedTabularOptions
@@ -447,7 +559,15 @@ class AnalysisConfig:
             presentation=_construct(PresentationLimits, value.get("presentation", {})),
             execution=ExecutionOptions.from_dict(value["execution"]) if value.get("execution") is not None else None,
             advanced=AdvancedTabularOptions.from_dict(value["advanced"]) if value.get("advanced") is not None else None,
+            context=_context_from_record(value["context"]) if value.get("context") is not None else None,
         )
+
+
+def _context_from_record(value):
+    """Accepts the declaration layout ({prediction, columns, limits}) and the record layout asdict() produces."""
+    if isinstance(value, dict) and "prediction" not in value and {"objective", "prediction_point"} & set(value):
+        return ContextOptions(value.get("objective"), value.get("prediction_point"), value.get("columns", {}), value.get("limits", {}))
+    return ContextOptions.from_dict(value)
 
 
 @dataclass
@@ -497,13 +617,36 @@ class AnalysisError(ValueError):
         self.stage = stage
 
 
+_PARSE_OPTION_KEYS = {"encoding", "missing_policy", "na_values", "column_types"}
+
+
+def omit_default_delimiter(value):
+    """Records of CsvParseOptions leave out the default comma delimiter (its last field), so comma files keep the
+    exact records, fingerprints and seals they had before the delimiter became configurable."""
+    if isinstance(value, dict):
+        record = {k: omit_default_delimiter(v) for k, v in value.items()}
+        if _PARSE_OPTION_KEYS <= record.keys() and record.get("delimiter") == ",":
+            record.pop("delimiter")
+        if {"parsing", "fidelity_inspection"} <= record.keys() and "context" in record and record["context"] is None:
+            record.pop("context")
+        return record
+    if isinstance(value, (tuple, list)):
+        return type(value)(omit_default_delimiter(v) for v in value)
+    return value
+
+
 def json_safe(value):
     if isinstance(value, Enum):
         return value.value
     if isinstance(value, Path):
         return str(value)
     if isinstance(value, dict):
-        return {str(k): json_safe(v) for k, v in value.items()}
+        record = {str(k): json_safe(v) for k, v in value.items()}
+        if _PARSE_OPTION_KEYS <= record.keys() and record.get("delimiter") == ",":
+            record.pop("delimiter")
+        if {"parsing", "fidelity_inspection"} <= record.keys() and "context" in record and record["context"] is None:
+            record.pop("context")
+        return record
     if isinstance(value, (tuple, list)):
         return [json_safe(v) for v in value]
     if hasattr(value, "item"):
@@ -531,6 +674,8 @@ class AnalysisResult:
     generated_at: str
     methodology_id: str
     schema_version: str = "1.0"
+    guidance: dict = field(default_factory=dict, kw_only=True)  # finding_guidance_v1 and later; absent before
+    contextual: dict = field(default_factory=dict, kw_only=True)  # context_v1 and later; absent before
 
     @property
     def source_paths(self):
@@ -546,6 +691,8 @@ class AnalysisResult:
             "findings": self.findings,
             "narrative": self.narrative,
             "context": self.context,
+            # A file read with another separator says so; comma files keep the exact legacy projection.
+            **({"parsing": {"delimiter": delimiter}} if (delimiter := (self.parsing or {}).get("options", {}).get("delimiter")) else {}),
         }
 
     def to_dict(self):
@@ -557,6 +704,10 @@ class AnalysisResult:
             value["task"] = {"kind": self.task.kind, "target": self.task.target_names[0] if self.task.target_names else None}
         value["dataset"]["path"] = self.context["source_filename"]
         value["profile"].pop("dataset_path", None)
+        if not value["guidance"]:
+            value.pop("guidance")
+        if not value["contextual"]:
+            value.pop("contextual")
         return json_safe(value)
 
     def json_text(self):

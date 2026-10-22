@@ -7,7 +7,7 @@ setup(
     description="Local-first dataset reliability reports for AI teams.",
     packages=find_packages("src"),
     package_dir={"": "src"},
-    package_data={"datatrust": ["templates/*.html", "text_model_artifacts.json", "text_search_profile.json", "image_model_artifacts.json", "cross_model_artifacts.json"], "confidenceguard": ["templates/*.html", "static/*", "schemas/*.json"]},
+    package_data={"datatrust": ["templates/*.html", "static/app/*", "static/app/assets/*", "text_model_artifacts.json", "text_search_profile.json", "image_model_artifacts.json", "cross_model_artifacts.json"], "confidenceguard": ["templates/*.html", "static/*", "schemas/*.json"]},
     include_package_data=True,
     python_requires=">=3.10",
     install_requires=[

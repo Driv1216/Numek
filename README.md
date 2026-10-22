@@ -55,7 +55,9 @@ macOS, Windows, or Linux if the PDF action reports a missing system dependency.
 The implementation uses WeasyPrint's documented
 [`HTML.write_pdf()` API](https://doc.courtbouillon.org/weasyprint/stable/api_reference.html).
 
-The UI opens at `http://127.0.0.1:8000/`. It guides the user through upload,
+The app opens at `http://127.0.0.1:8000/app/` (see [The DataTrust app and saved
+analyses](#the-datatrust-app-and-saved-analyses)); `http://127.0.0.1:8000/`
+leads there too. It guides the user through upload,
 CSV validation and preview, explainable target selection,
 binary/multiclass/single-class confirmation, optional report context, a compact
 reliability overview, standalone HTML viewing, and native PDF download. Target
@@ -73,6 +75,85 @@ The server binds only to `127.0.0.1`, stores active jobs in a process-owned
 temporary directory, and removes that temporary workspace when the process
 shuts down. Stop it with `Ctrl+C`. Automatic source-code reloading is disabled,
 so restart the command after changing Python or template files.
+
+### The DataTrust app and saved analyses
+
+`datatrust ui` opens the DataTrust app at `http://127.0.0.1:8000/app/` through
+a one-time launch link. With `--no-open`, the command prints that link instead:
+it works once, and it is what grants this browser session access to saved
+analyses. The app is packaged with DataTrust, so it needs no Node.js and makes
+no requests beyond `127.0.0.1`. Every workflow has a path in the app:
+
+| Workflow | App path |
+|---|---|
+| Classification, regression, unlabeled, M3 modes | `/app/` |
+| Comparisons and versions (M4) | `/app/m4/sources` |
+| Temporal audits (M5) | `/app/temporal/sources` |
+| Text reliability (M6) | `/app/text/sources` |
+| Image reliability (M7) | `/app/images/sources` |
+| Records ↔ documents (M9) | `/app/cross/sources` |
+
+The app replaces the earlier server-rendered pages. Their addresses (`/`, `/m4`,
+`/temporal`, `/text`, `/images`, `/cross-representation`) lead to the matching
+app page, and their form posts are no longer accepted. ConfidenceGuard is
+unchanged at `/confidenceguard` and `/api/confidenceguard/v1`. Local files are named by a data-root
+alias and a relative path (`--data-root`); paths that lead outside a root are
+refused, and the browser never receives absolute paths.
+
+**Saving analyses is opt-in.** The first time the app opens, it asks whether to
+save completed analyses on this machine; nothing is recorded until you choose.
+When saving is on, Confirm offers *Don't save this analysis* for any single run.
+A saved analysis keeps only DataTrust's canonical artifacts: the analysis JSON,
+the report HTML, and a PDF. The PDF is either one you downloaded during the
+session or one made later with **Make PDF**, which converts the saved HTML
+after verifying it and needs no dataset. Each PDF is bound to the SHA-256 of the
+HTML it came from, and one conversion runs at a time per analysis. A conversion
+lock left by a stopped process is cleared, and deleting an analysis during a
+conversion keeps nothing. Saved views and the Recent sheet read the verified
+analysis JSON, so they state the same conclusions as the live result. They
+label when the analysis ran and when it was saved, in UTC, and which DataTrust
+build rendered it; analyses saved by earlier versions say this was not
+recorded. Uploaded
+datasets, source copies, private manifests, evidence excerpts, example exports
+and absolute paths are never saved.
+
+Canonical artifacts can still contain values from your data: column names,
+dataset and file names, purpose, top values and counts, target distributions,
+row references and values quoted in findings, and for text, image and document
+workflows whatever their local reports include. Saved files are readable by
+your operating-system account (directory `0700`, files `0600`); they are not
+encrypted.
+
+| | |
+|---|---|
+| Location (macOS) | `~/Library/Application Support/NUMEK/DataTrust/history` |
+| Location (Linux) | `$XDG_DATA_HOME/numek/datatrust/history` (default `~/.local/share/...`) |
+| Location (Windows) | `%LOCALAPPDATA%\NUMEK\DataTrust\history` |
+| Another location | `datatrust ui --history-dir PATH` |
+| Turn history off entirely | `datatrust ui --no-history` |
+| Retention | 90 days or 2 GiB, whichever comes first, oldest removed first; change or remove either limit in History settings |
+
+Each saved file is checked against its recorded SHA-256 and size before it is
+shown or served; a changed file is marked *Changed on disk* and not opened.
+Entries can be searched, filtered, deleted one by one, or cleared together. If
+DataTrust closes before a confirmed analysis finishes, the run is listed as not
+saved rather than reconstructed.
+
+**Saved results are read-only.** They show the canonical summary, the report and
+the saved downloads. Private inspection (revealing text, viewing images,
+investigating evidence, reviews and exports) needs the live sources, so it is
+available only for a result that is still open in the current session. For
+Records ↔ documents, a saved result can be reopened for live investigation with
+the private manifest you downloaded alongside it.
+
+Building the app from source (only needed after changing `frontend/`):
+
+```bash
+cd frontend
+npm ci
+npm run build:app    # writes src/datatrust/static/app, which is packaged
+npm run build:site   # the NUMEK marketing pages, to frontend/dist/site (not packaged)
+```
 
 The existing CLI remains available:
 
@@ -234,6 +315,182 @@ compatible. Classification requires one target; regression accepts one or more; 
 Non-default parsing remains unsupported under the compatible legacy classification policy; annotation-aware classification supports declared parsing.
 
 ### Parsing and operational configuration
+
+**CSV separators.** DataTrust reads CSV files separated by commas, semicolons,
+tabs or vertical bars. The app detects the separator on upload and shows it in
+Configure, where you can change it. Detection applies a separator only when
+exactly one of comma, semicolon, tab and vertical bar reads a sample as two or
+more consistent columns. If several do, the upload is refused with the
+candidates named, and you choose the separator; nothing is guessed. A
+single-column file and an explicit choice are read as given. Changing the
+separator clears the target, the confirmation and every artifact made from
+the previous reading. Confirm states the separator in effect. Reports and JSON
+record any separator other than a comma. On the command line, use `--delimiter`
+with `semicolon`, `tab`, `pipe`, `comma`, a single character, or `auto`. An
+ambiguous file with `auto` stops with the same message:
+
+```bash
+datatrust audit bank-full.csv --target y --delimiter auto --out report.html
+```
+
+**Whole-file structure.** Before any analysis, every record of the whole file
+is checked against the header width, using the selected encoding and separator
+and the same quoting and blank-line rules as pandas. This covers quoted
+separators and line breaks, doubled quotes and a byte-order mark. A blank line
+holds only spaces or tabs, unless the tab is the separator.
+
+A file is refused, and nothing is analysed, when:
+- a record is shorter or longer than the header. Short records used to be
+  padded with missing values; they are now refused, naming the record, the
+  line and both widths.
+- every record has one more field than the header, which pandas would
+  silently turn into a row index.
+- the structural reading and pandas count different records. This has been
+  seen only with old lone-carriage-return line endings combined with quoted
+  line breaks.
+
+The check streams the file, holds one record at a time, stops at the
+configured row limit and respects the analysis deadline. Completed results
+record `parsing.structure_validation: "complete_source_width_v1"`. This is the
+one new canonical field. It sits outside the parsing fingerprint, so seals and
+fingerprints of valid files are unchanged.
+
+**Reading results in the app.** Each mosaic tile takes its state from that
+module's canonical checks, never from an absence of findings. The states are:
+- *finding*
+- *no finding within the completed scope*, naming any excluded column, such
+  as a zero-IQR column
+- *incomplete*, when a check failed or was interrupted
+- *not assessed*
+- *not applicable*
+
+Planned search bounds are shown as bounds, not as failures. Unavailable values
+read "Unavailable", never 0. Every finding is reachable: an unrecognised code
+appears on Reports as an "Unmapped finding", and "No major issues detected" is
+a statement, not a finding. The Score tile names the governing guardrail,
+which is the lowest cap. Workflow pages (M4 to M9) list any check that failed,
+was interrupted or excluded a scope above their tiles.
+
+**Report provenance.** New classification, regression, unlabeled and M3
+reports include a Provenance table covering:
+- the source file, SHA-256 and size
+- the separator, encoding, missing-value policy and structure check
+- the task and target
+- the methodology and schema
+- the execution scope
+- the analysis time, in UTC
+- the presentation identity: the DataTrust version and a digest of the report
+  templates, recorded apart from the methodology
+
+Values absent from the canonical JSON read "Not recorded". Report times state
+UTC in every workflow's report.
+
+**Guidance and layered reports.** Every new result records one versioned
+`guidance` block (`finding_guidance_v1`) in its canonical JSON. For each
+finding the block gives:
+- what was observed: only values the result already records, with their
+  populations and denominators
+- the possible impact
+- what to investigate first
+- conditional options, each with prerequisites, when to avoid it and how to
+  verify its consequences
+- what the analysis did not assess
+
+No option is prescribed and none is ever applied. The block also records:
+- the completed scope, with a qualified conclusion
+- for classification, how the score was reached: the mean of five sub-scores,
+  every guardrail with the governing one marked, and each feature column's
+  usability penalty points, which reproduce the sub-score through the scoring
+  code's own normalisation and rounding
+- the methodology's thresholds
+
+Every report (classification, regression, unlabeled, M3, M4, M5, M6, M7 and
+M9) renders the same text in four layers:
+1. executive understanding, with "Completed scope and open questions"
+2. technical evidence
+3. preprocessing guidance
+4. methodology and reproducibility
+
+The app's module chapters stay compact. Each finding gets one "Check first"
+line pointing to the report. Analyses produced by earlier versions say that
+guidance was not recorded, and their JSON is unchanged.
+
+Module notes now match the task:
+- Regression, unlabeled and M3 runs say "Evidence only: no score is defined
+  for this task".
+- Imbalance shows class counts and separates review priority from the
+  scoring guardrail.
+- Leakage names the method that actually ran.
+- Outliers states its population. A zero-IQR column is shown as having
+  undefined fences, never as a clean 0 %.
+- Reports shows which files actually exist.
+- Schematic drawings are labelled as schematic.
+
+**Context declarations (optional, `context_v1`).** Configure has an optional
+Context section. In it you can state the prediction objective and point,
+choose meanings for suggested codes, set per-column availability, and add
+conditions and units as JSON. The same declarations work in `--config` as
+`"context": {"prediction": {...}, "columns": {...}}`. Declarations never
+change parsed values, the profile, the legacy findings or any score. They add
+a separate `contextual` block to the canonical JSON, which keeps four things
+apart:
+- **Suggested codes:** placeholder text such as `unknown`, and numeric
+  sentinels such as −1 or 999. A number is suggested only when it lies outside
+  the range of every other value and covers at least 5 rows and 1 % of values.
+  Nothing is applied unless you choose a meaning.
+- **Your declarations:** recorded with the rows each one covers.
+- **Observed co-occurrence and condition exceptions:** for example, Bank
+  Full's `pdays = −1` and `poutcome = unknown` share 36,954 rows with 5
+  exceptions, listed by row.
+- **Interpreted applicable populations:** for example, with −1 declared not
+  applicable, `pdays` is assessed on 8,257 rows, with 49 values outside the
+  fences.
+
+A bounded **target-dependency search** runs by default for classification.
+It reports each feature that alone determines the target, as an exact
+category mapping or non-overlapping class ranges, within stated limits:
+64 features, 128 checks and a row-work budget. Unsearched features and
+not-assessable cases are listed, never treated as clean.
+
+Availability findings follow the declared prediction point:
+- *unavailable* means leakage
+- *available* means a deterministic predictor to verify
+- *undeclared* means "declare before relying on it"
+
+Changing any declaration invalidates the confirmation and artifacts.
+Contextual findings are evidence only and are listed separately.
+
+**Before and after preprocessing (M4).** A fourth M4 mode compares your file
+before and after cleaning. You can declare transformations (impute, drop rows
+or columns, cap, transform, encode, rename, deduplicate, filter, resample,
+other) and optional identity keys. The report then covers:
+- a row and column reconciliation, plus a per-class reconciliation, which
+  always balance arithmetically
+- record lineage: retained, dropped and added identities by class, available
+  only with complete and unique identity keys (otherwise stated as
+  unavailable)
+- declared steps the data does not reflect, and changes nobody declared,
+  including observed encodings
+- missing and non-finite deltas
+- target class shares
+- remaining risks, marked still present, new or no longer flagged
+
+It never performs a transformation and never infers pipeline use. It also
+states that fewer findings or a higher score afterwards do not establish
+improvement.
+
+**Measured scale.** `docs/SCALABILITY.md` records what this machine measured: core, M4 and the app, by stage, with refusals by declared safeguards. These are measurements, not guarantees. Format options for your decision are ranked in `docs/proposals/FORMATS_RANKED.md`.
+
+**Qualification.** `validation/ws3/benchmark.json` holds 29 cases, frozen
+before evaluation. `validation/ws3/run_benchmark.py` checks them against
+independent pandas oracles and writes `validation/ws3/results/`. It reports
+detections, misses, false flags, abstentions and unsearched scope
+separately.
+
+In `options.json` the same setting is `"parsing": {"delimiter": ";"}`. Decimal
+commas (`1,5`) are not interpreted: such a column is read as text, and declaring
+it numeric fails rather than coercing values. Image manifests (M7) are read as
+comma-separated.
 
 An `options.json` example (unknown fields are rejected):
 
@@ -502,7 +759,7 @@ Python starts with `DataTrust.audit_temporal(TemporalAuditSpec(...), config=None
 ## M6 text reliability intelligence
 
 Use `DataTrust.audit_text(TextAuditSpec(...), TextAnalysisConfig())`,
-`datatrust text --spec ... --out ...`, or the browser’s `/text` guided workflow.
+`datatrust text --spec ... --out ...`, or the app’s Text workflow (`/app/text/sources`).
 CSV/JSONL, supplied tokens/spans, QA, conversations/tools, retrieval provenance
 and explicit local text/image associations share the same contracts. HTML/PDF
 and strict JSON contain aggregates and opaque references by default. A separate
@@ -518,7 +775,7 @@ or semantic correctness guarantee is introduced.
 
 M1–M6 completion, including M6's understanding gate, is accepted. M7 adds separate
 image contracts and `DataTrust.audit_images()`, `datatrust images`, and guided local
-browser presets at `/images`. It covers unlabeled and classification images,
+app presets at `/app/images/sources`. It covers unlabeled and classification images,
 detection, bounded segmentation integrity, exact/perceptual repetition, declared
 split/group separation and explicit version comparisons. Reports separate facts,
 violations and candidates; no image-quality score or automatic label correction
@@ -534,7 +791,7 @@ usage](docs/M7_IMAGE_RELIABILITY.md) and [engineering evidence](validation/m7/RE
 
 M1–M7 are accepted; M8 audio is deferred. Use `DataTrust.audit_cross_representation()`,
 `datatrust cross-representation --spec audit.json --out report.pdf --format pdf`,
-or `/cross-representation` in the browser. Explicit relationships connect records
+or the app’s Records ↔ documents workflow (`/app/cross/sources`). Explicit relationships connect records
 to native PDF/DOCX, text and images. Reusable field/table recipes operate across
 collections while retaining ambiguous context and competing evidence. Exact
 identities, decimals/dates/units, availability/version checks and supplied
@@ -547,3 +804,14 @@ verification, OCR, audio/video or global score is added. Default HTML/PDF/JSON o
 source content. Exact local evidence and independent confirm/dismiss/unresolved
 snapshots are available through Python, CLI and browser. See [contracts and examples](docs/M9_CROSS_REPRESENTATION_RELIABILITY.md)
 and [measured verification](validation/m9/README.md).
+
+### ConfidenceGuard historical workspace
+
+One ConfidenceGuard product supports both standalone prediction evaluation and
+opt-in model reliability history. Initialize with `confidenceguard workspace
+--path /absolute/local/workspace init`, explicitly enable saving, then import
+supplied prediction/outcome specifications. Launch the existing browser with
+`confidenceguard ui --workspace /absolute/local/workspace` and use its one-time
+launch link. See [CG3 methodology and usage](docs/CG3_CONFIDENCEGUARD.md) and
+[technical verification](validation/cg3/README.md). Local history retains sensitive
+projected facts; DataTrust's source-free report history remains separate.

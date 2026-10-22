@@ -67,6 +67,8 @@ def _execute(spec,config,*,progress=None):
         executive=executive_summary({'profile':profile,'checks':e.checks,'evidence':e.records,'findings':e.findings,'coverage':{'families':e.coverage}})
         profile.update(summary=executive['summary'],executive_action_count=len(executive['actions']),technical_finding_count=len(e.findings))
         result=TextAuditResult(profile,e.checks,e.records,e.findings,{'required_population':'All framed records and valid applicable mapped items; invalidity remains accounted.','families':e.coverage,'retained_details_are_bounded':True},execution,datetime.now(timezone.utc).isoformat(),private)
+        from datatrust.guidance import attach_guidance
+        attach_guidance(result)
         if len(result.json_text().encode())>config.execution.result_bytes:fail('Public text result exceeds budget.','result_limit')
         work.check('completed text evidence publication',config.execution.result_bytes+len(raw))
         return result

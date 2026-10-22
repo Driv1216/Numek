@@ -136,5 +136,7 @@ def audit_images(spec,config=None,*,progress=None,cancel=None):
     final.execution['peak_worker_rss_bytes']=max(core_execution.get('peak_worker_rss_bytes',0),final.execution.get('peak_worker_rss_bytes',0),final.execution.get('model_execution',{}).get('peak_worker_rss_bytes',0))
     remaining()
     final.profile['summary']=f'{len(final.findings)} evidence-qualified findings across {final.profile["occurrences"]} image occurrences; {final.execution["status"]} execution.'
+    from datatrust.guidance import attach_guidance
+    attach_guidance(final)
     if len(final.json_text().encode())>config.execution.result_bytes: error('result_limit')
     return final

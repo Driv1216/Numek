@@ -11,7 +11,7 @@ from collections import Counter
 import numpy as np
 import pandas as pd
 
-from datatrust.contracts import (AnnotationOptions, AnnotationSpec, canonical_status_values,
+from datatrust.contracts import (AnnotationOptions, AnnotationSpec, canonical_status_values, omit_default_delimiter,
                                  RegressionOptions, TargetExpectations, FeatureOptions, AnalysisError, json_safe)
 from datatrust.numerical import numeric_column, finite_mask, target_evidence, shape_evidence
 
@@ -86,7 +86,7 @@ def specification_fingerprint(task, config, columns):
     task, config, roles, method = effective_policy(columns, task, config)
     # Use normalized membership and effective per-target declarations.
     annotations = config.annotations or AnnotationOptions(AnnotationSpec('expected') if method is None else AnnotationSpec())
-    canonical = asdict(config)
+    canonical = omit_default_delimiter(asdict(config))
     canonical.pop('annotations')
     for key in ('execution', 'advanced'):
         if canonical.get(key) is None: canonical.pop(key, None)

@@ -1,8 +1,8 @@
-<style>.analysis-disclosure td, .analysis-disclosure th, .analysis-disclosure .digest { overflow-wrap: anywhere; } .analysis-disclosure table { table-layout: fixed; } .analysis-disclosure .callout { margin: 12px 0; } .analysis-disclosure .limit-table th:first-child { width: 60%; } @media print { .analysis-disclosure h3, .analysis-disclosure h4 { break-after: avoid; } }</style>
+<style>.analysis-disclosure td, .analysis-disclosure th, .analysis-disclosure .digest, .provenance-table td { overflow-wrap: anywhere; } .analysis-disclosure table { table-layout: fixed; } .analysis-disclosure .callout { margin: 12px 0; } .analysis-disclosure .limit-table th:first-child { width: 60%; } @media print { .analysis-disclosure h3, .analysis-disclosure h4 { break-after: avoid; } }</style>
 <div class="analysis-disclosure">
   <h3>Parsing, execution, and coverage disclosure</h3>
   {% if result.execution.status == 'partial' %}<div class="callout"><strong>Analysis incomplete</strong> — review unavailable checks below.</div>{% endif %}
-  <p>Parser: {{ result.parsing.parser }} / pandas {{ result.parsing.pandas_version }}. Comma delimiter, inferred header, blank lines skipped. Encoding: {{ result.parsing.options.encoding }}. Missing policy: {{ result.parsing.options.missing_policy | report_label }}. Source values were not rewritten.</p>
+  <p>Parser: {{ result.parsing.parser }} / pandas {{ result.parsing.pandas_version }}. {{ result.parsing.options.delimiter | delimiter_label }} delimiter, inferred header, blank lines skipped. Encoding: {{ result.parsing.options.encoding }}. Missing policy: {{ result.parsing.options.missing_policy | report_label }}. Source values were not rewritten.</p>
   <p>Custom missing tokens: {% for token in result.parsing.options.na_values %}{{ token | tojson }}{{ ", " if not loop.last }}{% else %}None configured{% endfor %}; explicit column types: {% for column, kind in result.parsing.options.column_types.items() %}{{ column | soft_wrap_name }}: {{ kind }}{{ "; " if not loop.last }}{% else %}None configured{% endfor %}.</p>
   <p>Source SHA-256: <span class="digest">{{ result.parsing.source_sha256 }}</span>. Method: {{ result.methodology_id }}.</p>
   <p>Token inspection: {{ result.parsing.fidelity_inspection.bytes_inspected }} bytes, {{ result.parsing.fidelity_inspection.records_inspected }} data records, {{ result.parsing.fidelity_inspection.comparable_cells }} comparable cells; stopping reason: {{ result.parsing.fidelity_inspection.stopping_reason | report_label }}. Alignment confirmed: {{ result.parsing.fidelity_inspection.alignment_confirmed | report_value }}.</p>
@@ -13,6 +13,7 @@
   <div class="callout"><strong>{{ warning.code }}{% if warning.column %} · {{ warning.column }}{% endif %}</strong><p>{{ warning.interpretation }}</p><p class="small">Observed occurrences: {{ warning.observed_count }}; setting: {{ warning.setting }}. {{ warning.recommendation }}</p></div>
   {% endif %}
   {% else %}<p>No parsing warnings observed within the inspected scope.</p>{% endfor %}
+  {% include 'provenance.html' %}
   <h4>Operational safeguards</h4>
   <p>{{ result.execution.enforcement }}</p>
   <p>Backend: {{ result.execution.backend | report_label }}; frame: {{ result.execution.frame_bytes }} bytes; elapsed: {{ result.execution.elapsed_seconds }} seconds.</p>

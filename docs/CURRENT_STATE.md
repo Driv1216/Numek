@@ -1,6 +1,6 @@
 # Numek Current State
 
-Last updated: 2026-10-19
+Last updated: 2026-10-21
 Product status: Classification baseline preserved; M1 shared contracts/unlabeled
 profiling, M2 regression, M3 annotation workflows, M4 comparative/scalable analysis, M5 temporal reliability, M6 text reliability intelligence, M7 image reliability intelligence and M9 cross-representation reliability implemented.
 M1–M7 completion is accepted by the user. M8 audio is deliberately deferred.
@@ -16,6 +16,16 @@ understanding gate are accepted by the user's subsequent instruction. See
 [contracts/methodology](CG1_CONFIDENCEGUARD.md) and [measured evidence](../validation/cg1/README.md).
 Project direction: Approved DataTrust expansion architecture and nine-milestone roadmap.
 Documentation reset: Completed.
+
+ConfidenceGuard now includes opt-in longitudinal reliability within the same product.
+CG3 adds protected projected-fact capture before eligibility filtering, frozen
+method outputs, an authoritative SQLite catalog, immutable JSONL evidence,
+supervised DuckDB reconstruction, revisions/backfill/as-of maturity and immutable
+restatements. Reference/current drift, performance/calibration/uncertainty evolution,
+declared-cohort mix, qualified resampling and exploratory temporal investigation
+share Python/CLI/API/browser and canonical reporting. Standalone CG1/CG2 and
+DataTrust history semantics remain intact. See [CG3 contracts and methodology](CG3_CONFIDENCEGUARD.md).
+CG3 is complete, including corrections R1–R3, as confirmed by the user on 2026-10-21.
 
 ## What Works Now
 
@@ -409,7 +419,11 @@ disclose unavailable checks. Reapplication remains unvalidated.
 Python/CLI/API/browser fit, apply, study and supplied-uncertainty workflows use the
 existing local session/CSRF/revision/confirmation/worker-lock boundary. Canonical
 JSON/HTML/PDF use one disclosure projection. Historical CG1 evidence remains intact.
-CG3–CG7 retain their approved boundaries. Engineering evidence and operating limits
+CG3 now implements longitudinal reliability within the same product. CG4–CG7
+retain their approved future boundaries. CG1/CG2 completion, independent review,
+corrections and closed understanding gates are explicitly accepted by the user. Engineering evidence and operating limits
 are documented in [CG2 evidence](../validation/cg2/README.md); details and usage in
 [CG2 contracts](CG2_CONFIDENCEGUARD.md). Internal qualification does not assert
 universal method superiority, production capacity or a new accepted understanding gate.
+
+CG3 is complete, including corrections R1–R3, as confirmed by the user on 2026-10-21. See [correction record](../validation/cg3/review-corrections/README.md).

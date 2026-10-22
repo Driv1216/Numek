@@ -137,6 +137,8 @@ def execute(spec,config,owned_snapshots=(),progress=None):
         summary=f'{len(e.findings)} evidence-qualified finding(s) across {len(profiles)} supplied source(s). '
         summary+= 'Optional failures leave this result partial; review unanswered scope.' if status=='partial' else 'Required stages completed over eligible records; behavioral search scope is disclosed separately.'
         result=TemporalAuditResult(spec,{'sources':profiles},effective,{r.id:r.parsing for r in relations.values()},e.checks,e.records,e.findings,{'summary':summary,'actions':e.findings[:config.presentation.executive_actions],'limitations':['No composite score or universal readiness verdict.','Investigation defaults are not validated defect criteria.','Supplied evidence does not prove what a production pipeline consumed.']},coverage,execution,{'dataset_name':spec.dataset_name or 'Temporal reliability audit','purpose':spec.purpose,'presentation':asdict(config.presentation)},datetime.now(timezone.utc).isoformat())
+        from datatrust.guidance import attach_guidance
+        attach_guidance(result)
         if len(result.json_text().encode())>config.execution.result_bytes:fail('Retained temporal result exceeds configured JSON budget.','result_limit')
         return result
     finally:

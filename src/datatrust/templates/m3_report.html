@@ -8,11 +8,12 @@ h1 { font-size:25pt; line-height:1.15; margin:8px 0 14px; overflow-wrap:anywhere
 @media print { body { max-width:none; padding:0; } .executive { break-after:page; } }
 </style></head><body>
 <div class="executive"><div class="pill">DATATRUST · TABULAR DATASET RELIABILITY · {{ result.task.kind | replace('_',' ') }}</div>
-<h1>{{ result.context.dataset_name }}</h1><p class="muted">{{ result.context.source_filename }} · {{ result.generated_at }}</p>
+<h1>{{ result.context.dataset_name }}</h1><p class="muted">{{ result.context.source_filename }} · {{ result.generated_at | report_time }}</p>
 <h2>1. Executive review summary</h2><p>{{ result.narrative.overall_assessment }}</p>
 <div class="metrics"><div><b>{{ result.profile.row_count }}</b>parsed rows</div><div><b>{{ result.profile.feature_count }}</b>input features</div><div><b>{{ result.profile.roles.targets | length }}</b>declared targets</div></div>
 <p>{{ result.narrative.principal_evidence_summary }}</p>
 {% if result.execution.status == 'partial' %}<div class="banner"><b>Analysis incomplete.</b> Applicable checks failed or were interrupted. Review execution coverage before interpreting the available evidence.</div>{% endif %}
+{% import 'guidance_layers.html' as L %}{{ L.style() }}{{ L.scope_box(result.guidance) }}
 <h2>2. Prioritized actions</h2>{% for action in view.actions %}<div class="action {{ action.severity }}"><h3>{{ action.severity }} · {{ action.title }}</h3><p>{{ action.recommendation }}</p>{% if action.affected_count %}<p class="muted">{{ action.affected_count }} affected fields or checks; {{ action.scope }}</p>{% endif %}</div>{% else %}<div class="empty">No supported review findings in the computed scope. Coverage limitations and unavailable evidence still require review.</div>{% endfor %}
 <p class="muted">Composite scoring: not defined. Priorities are internal review rules, not validated performance or readiness ratings.</p></div>
 <h2>3. Dataset, roles, parsing, declarations</h2><p>{% if result.context.purpose %}Purpose: {{ result.context.purpose }}{% else %}Purpose undeclared.{% endif %}</p>
@@ -33,9 +34,10 @@ h1 { font-size:25pt; line-height:1.15; margin:8px 0 14px; overflow-wrap:anywhere
 {{ tables(view.task_tables) }}
 <h2>6. Features, repetition, annotation populations</h2><p>All-column parsed duplicates: {{ result.profile.duplicate_rows | regression_number }} extra rows. Selected-feature identity and observed annotation variation have separate scopes. Repetition may be legitimate or intentional weighting.</p>{% if view.repetition and view.repetition.status == "completed" %}<p>Selected-input repetition: {{ view.repetition.repeated_group_count }} groups; {{ view.repetition.varying_row_union }} rows participate in observed annotation disagreement; {{ view.repetition.mixed_metadata_group_union }} groups have mixed expectation/status metadata. These scopes remain separate.</p>{% endif %}
 {{ tables(view.feature_tables) }}<p>{{ view.cohort_availability or "" }}</p><p>Population contrasts are descriptive within this file. They do not establish a missingness mechanism, representativeness, or deployment shift.</p>
+{{ L.context_section(result.contextual) }}{{ L.guidance_section(result.guidance) }}
 <h2>7. Applicability, bounds, scoring, limitations</h2><p>{{ result.narrative.limitations }}</p><p>Execution: {{ result.execution.status }}. {{ result.coverage.meaning }} {{ result.execution.enforcement }}</p>
 {% for bound in view.bounds %}<p><b>{{ bound.diagnostic }}: {{ bound.status }}.</b> {{ bound.meaning }}</p>{% endfor %}
 <h3>Presentation truncation</h3><p>These records were computed and remain in JSON; their omission here is separate from analytical bounds and execution failures.</p><ul class="omissions">{% for o in view.qa.presentation_omissions %}<li>{{ o.topic }}: {{ o.displayed }} displayed of {{ o.computed }} computed; {{ o.omitted }} omitted from this presentation.</li>{% else %}<li>No computed detail records omitted by presentation limits.</li>{% endfor %}</ul>
-<div class="appendix"><h2>8. Technical appendix</h2><p>Methodology: {{ result.methodology_id }} · Schema {{ result.schema_version }}. Source SHA-256: <code>{{ result.parsing.source_sha256 }}</code>. {{ view.qa.appendix_detail_rows }} detail rows displayed; appendix budget {{ view.qa.limits.appendix_rows }}. Full checks, evidence references, declarations, bounds, and computed data are in JSON.</p>{{ tables(view.appendix) }}</div>
+<div class="appendix"><h2>8. Technical appendix</h2><p>Methodology: {{ result.methodology_id }} · Schema {{ result.schema_version }}. Source SHA-256: <code>{{ result.parsing.source_sha256 }}</code>. {{ view.qa.appendix_detail_rows }} detail rows displayed; appendix budget {{ view.qa.limits.appendix_rows }}. Full checks, evidence references, declarations, bounds, and computed data are in JSON.</p>{% include 'provenance.html' %}{{ tables(view.appendix) }}</div>
 <script type="application/json" id="datatrust-presentation-qa">{{ view.qa | tojson }}</script>
 </body></html>

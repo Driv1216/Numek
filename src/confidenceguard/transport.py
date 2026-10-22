@@ -55,7 +55,7 @@ class Sessions:
         self.sessions.clear()
 
 
-def register(app,workspace,roots):
+def register(app,workspace,roots,*,persistent_workspace=None,launch_token=None):
     app.config['SESSION_COOKIE_HTTPONLY']=True
     app.config['SESSION_COOKIE_SAMESITE']='Strict'
     store=Sessions(Path(workspace)/'confidenceguard',roots,app.extensions['datatrust_worker_lock']);app.extensions['confidenceguard_store']=store
@@ -64,6 +64,9 @@ def register(app,workspace,roots):
     def own(collection,identifier):
         value=store.current()[collection].get(identifier)
         if value is None:abort(404)
+        if value.get('workspace_instance') is not None:
+            authorized=app.extensions['confidenceguard_authorize_workspace']()
+            if authorized.instance_id!=value['workspace_instance']:abort(404)
         return value
     def body(allowed,required=()):
         if not request.is_json:abort(415)
@@ -127,6 +130,8 @@ def register(app,workspace,roots):
     def failure(exc):
         status=exc.code if isinstance(exc,HTTPException) else 422 if isinstance(exc,(ValueError,TypeError)) else 500
         code=exc.code if isinstance(exc,EvaluationError) else f'http_{status}' if isinstance(exc,HTTPException) else 'invalid_request' if status==422 else 'operation_failed'
+        if code in {'workspace_busy','worker_busy','stale_confirmation','idempotency_conflict','stale_deletion','operation_incomplete'}:status=409
+        if code in {'history_quota','history_record_limit','manifest_limit','history_scan_limit'}:status=413
         return jsonify({'api_version':'v1','error':{'code':code,'message':'Request could not be completed; review the declared fields or resource state.','field_errors':[{'pointer':'/','code':code}] if status==422 else [],'request_id':uuid.uuid4().hex,'retryable':status==409}}),status
 
     @bp.get('/session')
@@ -381,6 +386,8 @@ def register(app,workspace,roots):
         r.headers['Content-Disposition']='attachment; filename="fitted-method.json"'
         return r
 
+    from .history_web import register as register_history
+    register_history(bp,app,store,workspace_path=persistent_workspace,launch_token=launch_token)
     app.register_blueprint(bp)
     static=Blueprint('confidenceguard_client',__name__,static_folder='static',static_url_path='/confidenceguard/assets')
     @static.after_request
@@ -389,5 +396,10 @@ def register(app,workspace,roots):
         r.headers['Content-Security-Policy']="default-src 'self'; script-src 'self'; style-src 'self'; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'"
         return r
     @static.get('/confidenceguard')
-    def client():return static.send_static_file('index.html')
+    def client():
+        if 'launch' in request.args:
+            app.extensions['confidenceguard_redeem_workspace'](request.args['launch'])
+            from flask import redirect
+            return redirect('/confidenceguard',code=303)
+        return static.send_static_file('index.html')
     app.register_blueprint(static)

@@ -118,9 +118,8 @@ def test_cell_limits_oversize_alignment_and_encoding(tmp_path):
     r = profile(tmp_path, 'a,b\n001,002\n003,004\n', AnalysisConfig(fidelity_inspection=FidelityInspectionLimits(max_cells=1)))
     assert r.parsing['fidelity_inspection']['comparable_cells'] == 1
     assert r.parsing['fidelity_inspection']['stopping_reason'] == 'cell_limit'
-    r = profile(tmp_path, 'a,b\n001\n002,x\n')
-    assert not r.parsing['fidelity_inspection']['alignment_confirmed']
-    assert not any(w['code']=='leading_zero_numeric_conversion' for w in r.parsing_warnings)
+    with pytest.raises(AnalysisError, match='has 1 field; the header has 2'):  # WS1: a short record is refused, never padded
+        profile(tmp_path, 'a,b\n001\n002,x\n')
     r = profile(tmp_path, 'a,b\n001,"'+'z'*300+'"\n', AnalysisConfig(fidelity_inspection=FidelityInspectionLimits(max_bytes=20)))
     assert r.parsing['fidelity_inspection']['comparable_cells'] == 0
     for encoding in ('latin-1','utf-16'):
@@ -184,7 +183,7 @@ def test_strict_json_reference_resolution_and_classification_protection(tmp_path
         DataTrust.from_spec(DatasetSpec(tmp_path/'source.csv'),TaskSpec('classification','label'),AnalysisConfig(parsing=CsvParseOptions(missing_policy='empty_only'))).analyze_result()
 
 
-@pytest.mark.parametrize('value', [{'backend':'worker'}, {'parsing':{'delimiter':';'}}, {'limits':{'max_rows':0}}, {'fidelity_inspection':{'max_bytes':float('inf')}}, {'parsing':{'column_types':{'a':[]}}}])
+@pytest.mark.parametrize('value', [{'backend':'worker'}, {'parsing':{'delimiter':';;'}}, {'limits':{'max_rows':0}}, {'fidelity_inspection':{'max_bytes':float('inf')}}, {'parsing':{'column_types':{'a':[]}}}])
 def test_invalid_configuration_is_rejected(value):
     with pytest.raises(ValueError): AnalysisConfig.from_dict(value)
 

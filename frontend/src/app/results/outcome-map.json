@@ -1,0 +1,130 @@
+{
+  "$comment": "Which mosaic tile shows each canonical finding code and which canonical checks decide each tile's state. Explicit only: a code missing here is shown on Reports as an unmapped finding, and tests/test_outcome_states.py fails for any code the core, M3 and contextual (context_v1) engines can emit. no_major_issues is a narrative statement, never a finding.",
+  "narrative_only": [
+    "no_major_issues"
+  ],
+  "findings": {
+    "possible_target_leakage": "leakage",
+    "leakage_review_prompts": "leakage",
+    "regression_declared_availability": "leakage",
+    "regression_name_review": "leakage",
+    "regression_relationships_unavailable_at_prediction": "leakage",
+    "declared_input_unavailability": "leakage",
+    "input_target_relationships_unavailable_at_prediction": "leakage",
+    "missing_target_labels": "gaps",
+    "severe_feature_missingness": "gaps",
+    "high_missingness": "gaps",
+    "widespread_row_missingness": "gaps",
+    "fully_missing_columns": "gaps",
+    "column_missingness": "gaps",
+    "dataset_missingness": "gaps",
+    "regression_missing_targets": "gaps",
+    "expected_annotation_gaps_high": "gaps",
+    "expected_annotation_gaps_moderate": "gaps",
+    "duplicate_records": "dups",
+    "conflicting_target_labels": "conflicts",
+    "regression_repeated_input_variation": "conflicts",
+    "observed_annotation_disagreement": "conflicts",
+    "single_target_class": "imbalance",
+    "target_imbalance": "imbalance",
+    "constant_observed_class": "imbalance",
+    "constant_observed_labels": "imbalance",
+    "limited_label_support": "imbalance",
+    "constant_fields": "outliers",
+    "near_constant_fields": "outliers",
+    "high_cardinality_categoricals": "outliers",
+    "numeric_outlier_concentration": "outliers",
+    "non_finite_values": "outliers",
+    "regression_nonfinite_targets": "outliers",
+    "regression_constant_target": "outliers",
+    "regression_target_concentration": "outliers",
+    "regression_target_extremes": "outliers",
+    "constant_numerical_outputs": "outliers",
+    "output_concentration": "outliers",
+    "output_extreme_candidates": "outliers",
+    "conditional_scale_review": "outliers",
+    "regression_relationships_unknown": "relations",
+    "input_target_relationships_unknown": "relations",
+    "no_feature_columns": "reports",
+    "regression_no_features": "reports",
+    "regression_limited_observations": "reports",
+    "regression_precision_review": "reports",
+    "regression_declared_constraints": "reports",
+    "invalid_annotations": "reports",
+    "annotation_declaration_conflicts": "reports",
+    "unresolved_annotation_metadata": "reports",
+    "multilabel_declared_constraints": "reports",
+    "numerical_target_constraints": "reports",
+    "limited_numerical_evidence": "reports",
+    "limited_finite_outputs": "reports",
+    "declared_unavailable_feature": "leakage",
+    "target_dependency_unavailable": "leakage",
+    "dependency_availability_unknown": "leakage",
+    "deterministic_predictor_declared_available": "leakage",
+    "declared_condition_exceptions": "gaps",
+    "declared_missing_population": "gaps",
+    "applicable_population_outliers": "outliers",
+    "declared_value_not_observed": "reports"
+  },
+  "checks": {
+    "score": [
+      "classification_scoring"
+    ],
+    "gaps": [
+      "missingness",
+      "feature_missingness",
+      "annotation_coverage",
+      "target_coverage",
+      "contextual_evidence"
+    ],
+    "dups": [
+      "exact_duplicates"
+    ],
+    "conflicts": [
+      "label_conflicts",
+      "regression_repeated_inputs",
+      "annotation_repetition"
+    ],
+    "imbalance": [
+      "classification_target",
+      "classification_distribution",
+      "multilabel",
+      "multilabel_cardinality",
+      "multilabel_pair"
+    ],
+    "leakage": [
+      "target_leakage",
+      "regression_availability",
+      "regression_names",
+      "contextual_evidence"
+    ],
+    "outliers": [
+      "numeric_summary",
+      "numeric_outliers",
+      "column_variation",
+      "categorical_cardinality",
+      "regression_target",
+      "regression_sample_std",
+      "regression_extremes",
+      "regression_bowley_skewness",
+      "regression_histogram",
+      "regression_rounding",
+      "regression_distribution",
+      "multioutput_regression",
+      "output_evidence",
+      "readiness",
+      "contextual_evidence"
+    ],
+    "relations": [
+      "regression_relationships",
+      "regression_relationship",
+      "regression_relationship_group",
+      "output_identity"
+    ]
+  },
+  "reasons": {
+    "zero_iqr": "the middle half has no spread (IQR is zero), so no fences exist",
+    "floating_resolution": "values are too close to floating-point resolution to resolve",
+    "numeric evidence unavailable": "numeric evidence was unavailable"
+  }
+}

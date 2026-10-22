@@ -1,6 +1,6 @@
 # Numek Architecture
 
-Last updated: 2026-10-19
+Last updated: 2026-10-21
 Status: M1 shared foundation, M2 regression, and M3 tabular/annotation intelligence
 implemented; M4 comparative/scalable local analysis added. Compatible pandas
 classification/M1/M2/M3 defaults are preserved; M5 temporal, M6 text, M7 image and M9 cross-representation reliability share the supervised DuckDB boundary. M8 audio remains deferred.
@@ -31,6 +31,16 @@ semantics. The existing v1 transport advertises both. Method fitting, applicatio
 independent evaluation, disclosure and exports are thin interfaces over one engine.
 CG2 adds no framework, predictor executor, persistent monitoring database or shared
 runtime extraction. See [CG2 architecture/methodology](CG2_CONFIDENCEGUARD.md).
+
+ConfidenceGuard now includes opt-in longitudinal reliability within the same product.
+CG3 adds protected projected-fact capture before eligibility filtering, frozen
+method outputs, an authoritative SQLite catalog, immutable JSONL evidence,
+supervised DuckDB reconstruction, revisions/backfill/as-of maturity and immutable
+restatements. Reference/current drift, performance/calibration/uncertainty evolution,
+declared-cohort mix, qualified resampling and exploratory temporal investigation
+share Python/CLI/API/browser and canonical reporting. Standalone CG1/CG2 and
+DataTrust history semantics remain intact. See [CG3 contracts and methodology](CG3_CONFIDENCEGUARD.md).
+CG3 is complete, including corrections R1–R3, as confirmed by the user on 2026-10-21.
 
 ## System Overview And Boundaries
 
@@ -586,3 +596,5 @@ alter analytics. `cross_web`/`cross_ui.html` reuse ownership, lock, CSRF,
 confirmation, cancellation and collision controls for guided previews, result
 reopening and exact evidence/review round-trips. No persistent corpus/vector/review
 service is added. See [M9 contracts and limits](M9_CROSS_REPRESENTATION_RELIABILITY.md).
+
+CG3 is complete, including corrections R1–R3, as confirmed by the user on 2026-10-21. See [correction record](../validation/cg3/review-corrections/README.md).

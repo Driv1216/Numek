@@ -44,7 +44,8 @@ def view(data):
             value='∞' if m['value_state']=='positive_infinity' else '−∞' if m['value_state']=='negative_infinity' else display(m['value'])
             if m['value_state']=='undefined' and m.get('data') and not m.get('reason'):value='Structured evidence'
             label=m['metric'].replace('_',' ')
-            if m.get('data',{}).get('target'):label+=' · '+m['data']['target']
+            if m.get('metric_label'):label=m['metric_label']
+            elif m.get('data',{}).get('target'):label+=' · '+m['data']['target']
             uncertainty=m.get('uncertainty')
             interval_label=(f"{100*uncertainty.get('level',.95):.5g}% family confidence · Bonferroni m={uncertainty.get('family_size')}" if uncertainty and uncertainty.get('adjustment')=='bonferroni' else f"{100*uncertainty.get('level',.95):.5g}% pointwise" if uncertainty else '')
             section['rows'].append({'run':m['run'],'scope':m['scope'],'metric':label,'value':value,'denominator':display(m['denominator']),'note':m.get('reason') or ('Limited observed support' if m.get('support_warning') else ''),'interval':uncertainty,'interval_label':interval_label})
@@ -86,7 +87,21 @@ def view(data):
             selection_panels.append({'id':s['id'],'objective':s['objective'],'selected':s['selected'],
                                       'common_support':(s.get('common_population') or {}).get('denominator','Protected / see local evidence'),
                                       'candidates':json.dumps(candidates,ensure_ascii=False,indent=2)[:4000]})
-    return {'matched':matched,'sections':list(sections.values()),'headlines':headlines,'omitted':omitted,'checks':data.get('checks',[])[:40],'checks_omitted':max(0,len(data.get('checks',[]))-40),'coverage_limitations':data.get('coverage',{}).get('limitations',[])+([data['coverage']['legacy_qualification']] if data.get('coverage',{}).get('legacy_qualification') else []),'cg2':cg,'method_panels':method_panels,'selection_panels':selection_panels,'limitations':['Metrics describe supplied outcomes and declared populations; ground truth and representativeness are not independently established.','Calibration bins and high-confidence settings are investigation definitions, not universal safety thresholds.','Policy replay is retrospective; different actions may change outcomes or their observation.','Statistical intervals, when enabled, are assumption-qualified; the recorded adjustment distinguishes pointwise and family confidence.','Sampled resource safeguards are not hard quotas or capacity guarantees.','No composite score, certification or production approval is defined.']}
+    charts=[]
+    for series in data.get('history',{}).get('temporal',[])[:12]:
+        points=series['points'];finite=[p['value'] for p in points if p['value'] is not None]
+        if not finite:continue
+        lo,hi=min(finite),max(finite);segments=[];segment=[]
+        for i,p in enumerate(points):
+            if p['value'] is None:
+                if segment:segments.append(' '.join(segment));segment=[]
+                continue
+            x=35+590*i/max(1,len(points)-1);y=95 if hi==lo else 175-145*(p['value']-lo)/(hi-lo)
+            segment.append(f'{x:.3f},{y:.3f}')
+        if segment:segments.append(' '.join(segment))
+        charts.append({'title':series.get('metric_label',series['metric']) + ' · ' + series['variant'],'segments':segments,'minimum':display(lo),'maximum':display(hi),'variant':series['variant'],
+            'points':[{'x':35+590*i/max(1,len(points)-1),'y':95 if hi==lo else 175-145*(p['value']-lo)/(hi-lo),'window':p['window'],'value':display(p['value']),'support':p['support']} for i,p in enumerate(points) if p['value'] is not None]})
+    return {'history_charts':charts,'matched':matched,'sections':list(sections.values()),'headlines':headlines,'omitted':omitted,'checks':data.get('checks',[])[:40],'checks_omitted':max(0,len(data.get('checks',[]))-40),'coverage_limitations':data.get('coverage',{}).get('limitations',[])+([data['coverage']['legacy_qualification']] if data.get('coverage',{}).get('legacy_qualification') else []),'cg2':cg,'method_panels':method_panels,'selection_panels':selection_panels,'limitations':['Metrics describe supplied outcomes and declared populations; ground truth and representativeness are not independently established.','Calibration bins and high-confidence settings are investigation definitions, not universal safety thresholds.','Policy replay is retrospective; different actions may change outcomes or their observation.','Statistical intervals, when enabled, are assumption-qualified; the recorded adjustment distinguishes pointwise and family confidence.','Sampled resource safeguards are not hard quotas or capacity guarantees.','No composite score, certification or production approval is defined.']}
 
 
 def render_report(data):
@@ -109,7 +124,8 @@ def generate_artifacts(result,path,*,format='html',html_path=None,json_path=None
     if audience not in {'shareable','local'}:raise EvaluationError('Unsupported artifact audience.')
     if isinstance(result,SharedResult) and (audience!='shareable' or disclosure is not None):raise EvaluationError('A shareable import cannot change disclosure or recover exact values.')
     if isinstance(disclosure,dict):disclosure=DisclosureSpec.from_dict(disclosure)
-    if isinstance(result,EvaluationResult):EvaluationResult.from_dict(result.to_private_dict(),private=result.private)
+    if isinstance(result,EvaluationResult):
+        type(result).from_dict(result.to_private_dict(),private=result.private)
     data=result.to_dict(audience=audience,**({'disclosure':disclosure} if isinstance(result,EvaluationResult) else {}))
     canonical=Path(html_path) if html_path else Path(path).with_suffix('.html') if format=='pdf' else Path(path)
     pdf_path=Path(path) if format=='pdf' else None

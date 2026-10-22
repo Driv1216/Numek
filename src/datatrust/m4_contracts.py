@@ -189,6 +189,31 @@ class DatasetInput:
             raise ValueError('Comparison diagnostics belong to ComparisonConfig.advanced, not individual inputs.')
 
 
+TRANSFORMATION_KINDS = ('impute', 'drop_rows', 'drop_columns', 'cap', 'transform', 'encode', 'rename', 'deduplicate', 'filter', 'resample', 'other')
+
+
+@dataclass(frozen=True)
+class TransformationSpec:
+    """A preprocessing step you declare for a before/after assessment. Declared, not observed: the assessment
+    reports separately what the data shows, and never performs a transformation."""
+    kind: str
+    columns: tuple = ()
+    outputs: tuple = ()
+    description: str = ''
+
+    def __post_init__(self):
+        if self.kind not in TRANSFORMATION_KINDS:
+            raise ValueError('Transformation kind must be one of: ' + ', '.join(TRANSFORMATION_KINDS) + '.')
+        for name in ('columns', 'outputs'):
+            object.__setattr__(self, name, _names(getattr(self, name), name) if getattr(self, name) else ())
+        if self.kind in {'impute', 'drop_columns', 'cap', 'transform', 'encode', 'rename'} and not self.columns:
+            raise ValueError(f'A {self.kind} transformation names its columns.')
+        if self.kind == 'rename' and len(self.outputs) != len(self.columns):
+            raise ValueError('A rename lists one output name per column.')
+        if not isinstance(self.description, str) or len(self.description) > 300:
+            raise ValueError('A transformation description is text of at most 300 characters.')
+
+
 @dataclass(frozen=True)
 class ComparisonSpec:
     mode: str
@@ -200,8 +225,15 @@ class ComparisonSpec:
     intent_pairs: tuple = ()
     dataset_name: str = None
     purpose: str = None
+    preset: str = field(default=None, kw_only=True)
+    transformations: tuple = field(default=(), kw_only=True)
 
     def __post_init__(self):
+        if self.preset not in {None, 'before_after'}: raise ValueError('Unknown comparison preset.')
+        if self.preset == 'before_after' and self.mode != 'versions': raise ValueError('The before/after preset compares two versions.')
+        if self.transformations and self.preset != 'before_after': raise ValueError('Declared transformations belong to the before/after preset.')
+        object.__setattr__(self, 'transformations', tuple(_construct(TransformationSpec, v) if isinstance(v, dict) else v for v in self.transformations))
+        if any(not isinstance(v, TransformationSpec) for v in self.transformations): raise ValueError('Invalid transformation declaration.')
         object.__setattr__(self, 'inputs', tuple(_construct(DatasetInput, v) if isinstance(v, dict) else v for v in self.inputs))
         if any(not isinstance(v, DatasetInput) for v in self.inputs): raise ValueError('Invalid comparison input.')
         roles = [v.role for v in self.inputs]; ids = [v.id for v in self.inputs]
@@ -286,16 +318,19 @@ class ComparisonResult:
     generated_at: str
     methodology_id: str
     schema_version: str = '1.3'
+    guidance: dict = field(default_factory=dict, kw_only=True)  # finding_guidance_v1 and later; absent before
 
     @property
     def source_paths(self): return tuple(v.dataset.path for v in self.inputs)
 
     def to_dict(self):
         value=asdict(self)
+        if not value['guidance']: value.pop('guidance')
         for item in value['inputs']:
             item['dataset']['path']=Path(item['dataset']['source_filename'] or item['dataset']['path']).name
         if value['comparison']:
             value['comparison'].pop('inputs',None)
+            value['comparison']=spec_record(value['comparison'])
         return json_safe(value)
 
     def json_text(self): return json.dumps(self.to_dict(),ensure_ascii=False,indent=2,allow_nan=False)+'\n'
@@ -308,3 +343,12 @@ class ComparisonResult:
     def generate_report(self,path,*,format='html',html_path=None):
         a=self.generate_artifacts(path,format=format,html_path=html_path)
         return a.pdf_path if format=='pdf' else a.html_path
+
+
+def spec_record(value):
+    """A comparison specification record without default preset fields, so splits and versions records, seals and
+    canonical JSON are exactly as before the before/after preset existed."""
+    value = dict(value)
+    if value.get('preset') is None: value.pop('preset', None)
+    if not value.get('transformations'): value.pop('transformations', None)
+    return value

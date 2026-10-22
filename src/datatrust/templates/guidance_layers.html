@@ -1,0 +1,128 @@
+{# Report layers rendered from the canonical guidance block (finding_guidance_v1). Nothing here computes evidence:
+   every value comes from result.guidance, which the analysis recorded. Results without a block say so. #}
+{% macro style() %}<style>.dt-layer { margin: 18px 0; } .dt-layer h3 { margin: 16px 0 6px; } .dt-layer h4 { margin: 10px 0 4px; font-size: 0.95em; }
+.dt-layer ul { margin: 4px 0 8px 18px; padding: 0; } .dt-layer li { margin: 2px 0; } .dt-layer table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+.dt-layer th, .dt-layer td { text-align: left; vertical-align: top; padding: 5px 8px 5px 0; border-bottom: 1px solid #d5e4eb; overflow-wrap: anywhere; font-size: 0.92em; }
+.dt-layer .dt-kind { font-size: 0.8em; text-transform: uppercase; letter-spacing: .04em; opacity: .75; } .dt-item { break-inside: avoid-page; border-top: 1px solid #bcd3de; padding-top: 8px; margin-top: 14px; }
+@media print { .dt-item h3 { break-after: avoid; } }</style>{% endmacro %}
+
+{% macro scope_box(g) %}
+<div class="dt-layer callout">
+  <h3>Completed scope and open questions</h3>
+  {% if not g %}<p>Scope and open questions were not recorded by the version that produced this analysis.</p>{% else %}
+  <p>{{ g.scope.conclusion }}</p>
+  {% if g.scope.not_completed %}<h4>Not concluded on</h4><ul>{% for c in g.scope.not_completed %}<li>{{ c.state | capitalize }} · {{ c.check | report_label }}{% if c.scope and c.scope != 'dataset' %} · {{ c.scope }}{% endif %}{% if c.reason %}: {{ c.reason | report_label }}{% endif %}</li>{% endfor %}</ul>
+  {% if g.scope.not_completed_total > g.scope.not_completed | length %}<p class="section-note">{{ g.scope.not_completed_total - g.scope.not_completed | length }} more in the check table and JSON.</p>{% endif %}{% endif %}
+  {% if g.scope.unknowns %}<h4>Not assessed by this analysis</h4><ul>{% for u in g.scope.unknowns %}<li>{{ u }}</li>{% endfor %}</ul>{% endif %}
+  {% endif %}
+</div>
+{% endmacro %}
+
+{% macro guidance_section(g, heading='Preprocessing guidance') %}
+<div class="dt-layer">
+  <h2>{{ heading }}</h2>
+  {% if not g %}<p>Guidance was not recorded by the version that produced this analysis.</p>
+  {% elif not g['items'] %}<p class="section-note">No finding called for guidance. The scope and open questions above still apply.</p>
+  {% else %}
+  <p class="section-note">For each finding: what was observed, its possible impact, what to investigate first, options with their prerequisites, when to avoid them and how to verify the result, and what this analysis did not assess. Options are conditional; none is prescribed and none was applied. Guidance version {{ g.version }}.</p>
+  {% for ref, item in g['items'].items() %}
+  <div class="dt-item">
+    <h3>{{ item.title }}</h3>
+    <h4>Observed</h4><ul>{% for o in item.observed %}<li>{{ o }}</li>{% endfor %}</ul>
+    <h4>Possible impact</h4><ul>{% for o in item.impact %}<li>{{ o }}</li>{% endfor %}</ul>
+    <h4>Investigate first</h4><ul>{% for o in item.investigate %}<li>{{ o }}</li>{% endfor %}</ul>
+    <h4>Options</h4>
+    <table><thead><tr><th>Option</th><th>Prerequisites</th><th>Avoid when</th><th>How to verify</th></tr></thead><tbody>
+    {% for o in item.options %}<tr><td>{{ o.option }}</td><td>{{ o.prerequisites }}</td><td>{{ o.avoid_when }}</td><td>{{ o.verify }}</td></tr>{% endfor %}
+    </tbody></table>
+    {% if item.unknowns %}<h4>Not assessed</h4><ul>{% for o in item.unknowns %}<li>{{ o }}</li>{% endfor %}</ul>{% endif %}
+  </div>
+  {% endfor %}
+  {% endif %}
+</div>
+{% endmacro %}
+
+{% macro scoring_section(g) %}
+{% if g and g.scoring %}{% set s = g.scoring %}
+<div class="dt-layer">
+  <h3>How the score was reached</h3>
+  <p>{{ s.evidence_score.method }} Evidence score {{ s.evidence_score.mean }}. {{ s.overall_method }} Final score {{ s.overall }}.</p>
+  <table><thead><tr><th>Sub-score</th><th>Value</th></tr></thead><tbody>{% for name, v in s.evidence_score.sub_scores.items() %}<tr><td>{{ name | report_label }}</td><td>{{ v }}</td></tr>{% endfor %}</tbody></table>
+  {% if s.guardrails %}<h4>Guardrails</h4><ul>{% for gr in s.guardrails %}<li>Cap {{ gr.cap }}{% if gr.governing %} (governing){% else %} (also triggered){% endif %}: {{ gr.explanation }}</li>{% endfor %}</ul>{% endif %}
+  <h4>Feature-usability contributors</h4>
+  <p>{{ s.feature_usability.method }} {{ s.feature_usability.raw_points }} raw points across {{ s.feature_usability.feature_count }} feature columns give a sub-score of {{ s.feature_usability.sub_score }}.</p>
+  {% if s.feature_usability.contributors %}<table><thead><tr><th>Column</th><th>Rule</th><th>Points</th></tr></thead><tbody>{% for c in s.feature_usability.contributors %}{% for r in c.rules %}<tr><td>{{ c.column }}</td><td>{{ r.rule }}</td><td>{{ r.points }}</td></tr>{% endfor %}{% endfor %}</tbody></table>
+  {% else %}<p class="section-note">No feature column triggered a penalty rule.</p>{% endif %}
+</div>
+{% endif %}
+{% endmacro %}
+
+{% macro policy_table(g, methodology) %}
+{% if g and g.policy %}
+<div class="dt-layer">
+  <h3>Thresholds and policy ({{ methodology }})</h3>
+  <table><thead><tr><th>Rule</th><th>Threshold</th><th>Effect</th></tr></thead><tbody>{% for p in g.policy %}<tr><td>{{ p.rule }}</td><td>{{ p.threshold }}</td><td>{{ p.effect }}</td></tr>{% endfor %}</tbody></table>
+  <p class="section-note">These are the review thresholds this methodology applies. They are heuristic review settings, not validated cut-offs.</p>
+</div>
+{% endif %}
+{% endmacro %}
+
+{% macro context_section(c) %}
+<div class="dt-layer">
+  <h2>Context and declarations</h2>
+  {% if not c %}<p>Contextual evidence was not recorded by the version that produced this analysis.</p>
+  {% elif c.status != 'completed' %}<p>Contextual evidence did not complete: {{ c.reason }}. Nothing contextual was concluded.</p>
+  {% else %}
+  <p class="section-note">Declarations never change parsed values, findings or scores. Candidates are suggestions only. Pipeline or model use is never inferred. Version {{ c.version }}.</p>
+  <h3>Prediction</h3>
+  <p>{% if c.prediction.declared %}Objective: {{ c.prediction.objective or 'not stated' }}. Prediction point: {{ c.prediction.point or 'not stated' }}.{% else %}No prediction objective or point was declared, so availability at prediction time was not concluded on.{% endif %}</p>
+  {% if c.availability %}<table><thead><tr><th>Column</th><th>Declared availability</th></tr></thead><tbody>{% for col, v in c.availability.items() %}<tr><td>{{ col }}</td><td>{{ v | report_label }}</td></tr>{% endfor %}</tbody></table>{% endif %}
+  <h3>Suggested codes (not applied)</h3>
+  {% if c.candidates %}<table><thead><tr><th>Column</th><th>Value</th><th>Rows</th><th>Rule</th></tr></thead><tbody>{% for x in c.candidates %}<tr><td>{{ x.column }}</td><td>{{ x.value }}</td><td>{{ x.rows }} ({{ x.rate }}%)</td><td>{{ x.rule }}</td></tr>{% endfor %}</tbody></table>
+  {% else %}<p>No value matched the candidate rules ({{ c.candidate_rules.version }}).</p>{% endif %}
+  {% if c.interpreted %}<h3>Your declarations and the applicable populations</h3>
+  {% for name, r in c.interpreted.items() %}<div class="dt-item"><h4>{{ name }}{% if r.unit %} ({{ r.unit }}){% endif %}</h4><ul>
+    {% for code in r.declared_codes %}<li>{{ code.value }} declared {{ code.meaning | report_label }}: {{ code.rows }} rows{% if not code.observed %} (not found in the data){% endif %}</li>{% endfor %}
+    <li>Applicable population: {{ r.applicable_rows }} of {{ r.rows }} rows; declared missing {{ r.declared_missing_rows }}; declared not applicable {{ r.structural_absence_rows }}; parser missing {{ r.parser_missing_rows }}.</li>
+    {% if r.condition %}<li>Condition {{ r.condition.column }} {{ r.condition.op }} {{ r.condition.value }}: holds in {{ r.condition.rows_true }} rows, not in {{ r.condition.rows_false }}, unevaluable in {{ r.condition.rows_unevaluable }}. Exceptions: {{ r.condition.exceptions.value_present_where_declared_not_to_apply }} rows hold a value where it should not apply; {{ r.condition.exceptions.not_applicable_code_where_condition_holds }} carry a not-applicable code where it should apply.</li>{% endif %}
+    {% if r.applicable_numeric %}{% set q = r.applicable_numeric %}<li>Applicable finite values {{ q.finite_count }}{% if q.summary %}: min {{ q.summary.min }}, q1 {{ q.summary.q1 }}, median {{ q.summary.median }}, q3 {{ q.summary.q3 }}, max {{ q.summary.max }}{% endif %}; {% if q.outlier_rate is not none %}{{ q.outlier_count }} outside the 1.5 × IQR fences ({{ q.outlier_rate }}%){% else %}IQR evidence not assessable: {{ q.outlier_unavailable_reason | report_label }}{% endif %}.</li>{% endif %}
+  </ul></div>{% endfor %}{% endif %}
+  <h3>Observed co-occurrence of codes</h3>
+  {% if c.observed_dependencies.pairs %}<ul>{% for d in c.observed_dependencies.pairs %}<li>{{ d.a.column }} = {{ d.a.value }} ({{ d.a.rows }} rows) and {{ d.b.column }} = {{ d.b.value }} ({{ d.b.rows }} rows): {{ d.both }} rows together; {{ d.a_only }} only in {{ d.a.column }}, {{ d.b_only }} only in {{ d.b.column }}.{% if d.a_only_row_refs or d.b_only_row_refs %} Parsed rows {{ (d.a_only_row_refs + d.b_only_row_refs) | join(', ') }}.{% endif %}</li>{% endfor %}</ul>
+  {% else %}<p>No pair of codes met the rule: {{ c.observed_dependencies.rule }}.</p>{% endif %}
+  <h3>Target-dependency search</h3>
+  {% set s = c.dependency_search %}
+  {% if s.status == 'not_applicable' %}<p>Not applicable: {{ s.reason }}</p>
+  {% elif s.status == 'not_assessable' %}<p>Not assessable: {{ s.reason }}</p>
+  {% else %}<p>{{ s.method }}. {{ s.checks | length }} features checked{% if s.unsearched_features %}; {{ s.unsearched_features | length }} unsearched within the limits ({{ s.unsearched_features | join(', ') }}){% endif %}. Gates: at least {{ s.gates.min_category_support }} rows per category or class, {{ s.gates.min_matched_rows }} matched rows and {{ s.gates.min_coverage * 100 }}% coverage, with no exceptions. {% if s.flagged %}Flagged: {{ s.flagged | join(', ') }}.{% else %}No feature determined the target within this scope; noisy or multi-feature dependence was not searched.{% endif %}</p>{% endif %}
+  <p class="section-note">{{ c.demonstrated_use }}</p>
+  {% endif %}
+</div>
+{% endmacro %}
+
+{% macro before_after_section(measurements) %}
+{% for key, m in measurements.items() if key.endswith('.before_after') %}{% set o = m.observed %}
+<div class="dt-layer">
+  <h2>Reconciliation and lineage (before and after preprocessing)</h2>
+  <p>{{ m.statement }}</p>
+  <h3>Counts</h3>
+  <p>Rows: {{ o.rows.reconciliation }}. {{ o.rows.explanation }}{{ '' if o.rows.explanation.endswith('.') else '.' }}{% if o.rows.explained is sameas true %} Verified through identity keys.{% endif %} Columns: {{ o.columns.before }} before, {{ o.columns.after }} after.</p>
+  {% if o.rows.by_class_difference %}<p>Change by target class: {% for k, v in o.rows.by_class_difference.items() %}{{ k }} {{ '+' if v > 0 }}{{ v }}{{ '; ' if not loop.last }}{% endfor %}; missing target {{ o.rows.missing_target_difference }}.</p>{% endif %}
+  <h3>Lineage</h3>
+  {% if m.lineage.available is sameas false %}<p>{{ m.lineage.reason }}</p>{% else %}
+  <p>Key {{ m.lineage.key | join(' + ') }}: {{ m.lineage.identities.retained }} identities retained, {{ m.lineage.identities.dropped }} dropped, {{ m.lineage.identities.added }} added ({{ m.lineage.identity_reconciliation }}).{% if not m.lineage.row_level %} {{ m.lineage.row_level_reason }}{% endif %}</p>
+  {% if m.lineage.by_class %}<p>Dropped by class: {% for k, v in m.lineage.by_class.dropped.items() %}{{ k }} {{ v }}{{ ', ' if not loop.last }}{% else %}none{% endfor %}. Added by class: {% for k, v in m.lineage.by_class.added.items() %}{{ k }} {{ v }}{{ ', ' if not loop.last }}{% else %}none{% endfor %}. Retained records whose label changed: {{ m.lineage.by_class.label_changed }}.</p>{% endif %}{% endif %}
+  <h3>Declared transformations and what the data shows</h3>
+  {% if m.declared_transformations %}<table><thead><tr><th>Declared</th><th>Columns</th><th>Description</th></tr></thead><tbody>{% for t in m.declared_transformations %}<tr><td>{{ t.kind | report_label }}</td><td>{{ (t.columns + t.outputs) | join(', ') or '—' }}</td><td>{{ t.description or '—' }}</td></tr>{% endfor %}</tbody></table>{% else %}<p>No transformation was declared.</p>{% endif %}
+  {% if o.declared_but_not_observed %}<p>Declared but not observed: {% for x in o.declared_but_not_observed %}{{ x.kind | report_label }} ({{ x.columns | join(', ') or 'rows' }}): {{ x.reason }}{{ '; ' if not loop.last }}{% endfor %}.</p>{% endif %}
+  {% if o.undeclared_changes %}<p>Observed but not declared: {% for x in o.undeclared_changes %}{{ x.change }} {{ x.column }}{{ ', ' if not loop.last }}{% endfor %}.</p>{% endif %}
+  {% if o.observed_encoding_patterns %}<p>Possible encodings (observed, not declared): {% for x in o.observed_encoding_patterns %}{{ x.column }} → {{ x.outputs | length }} columns{{ '; ' if not loop.last }}{% endfor %}. These are not comparable as declared; declare an encode step with its outputs to compare them.</p>{% endif %}
+  {% if o.declared_imputation_remaining %}<p>Declared imputed but still missing: {% for x in o.declared_imputation_remaining %}{{ x.column }} {{ x.still_missing }}{{ ', ' if not loop.last }}{% endfor %}.</p>{% endif %}
+  {% if o.missingness %}<h3>Missing and non-finite values</h3><table><thead><tr><th>Column</th><th>Missing before</th><th>Missing after</th><th>Non-finite before</th><th>Non-finite after</th></tr></thead><tbody>{% for x in o.missingness %}<tr><td>{{ x.column }}</td><td>{{ x.before_missing }}</td><td>{{ x.after_missing }}</td><td>{{ x.before_non_finite }}</td><td>{{ x.after_non_finite }}</td></tr>{% endfor %}</tbody></table>{% endif %}
+  {% if o.target_coverage %}<h3>Target coverage ({{ o.target_coverage.target }})</h3><table><thead><tr><th>Class</th><th>Before</th><th>After</th><th>Share change (points)</th></tr></thead><tbody>{% for c in o.target_coverage.classes %}<tr><td>{{ c['class'] }}</td><td>{{ c.before }} ({{ c.before_share }}%)</td><td>{{ c.after }} ({{ c.after_share }}%)</td><td>{{ c.share_change_points }}</td></tr>{% endfor %}</tbody></table>{% endif %}
+  <h3>Remaining risks</h3>
+  <p>Still present: {{ m.remaining_risks.still_present | join('; ') or 'none' }}. New after: {{ m.remaining_risks.new | join('; ') or 'none' }}. No longer flagged: {{ m.remaining_risks.no_longer_flagged | join('; ') or 'none' }}. {{ m.remaining_risks.meaning }}</p>
+  <p class="section-note">{{ m.pipeline_use }}</p>
+</div>
+{% endfor %}
+{% endmacro %}

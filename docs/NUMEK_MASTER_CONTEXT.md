@@ -1,6 +1,16 @@
 # Numek Master Context
 
-Last updated: 2026-10-19
+Last updated: 2026-10-21
+
+ConfidenceGuard now includes opt-in longitudinal reliability within the same product.
+CG3 adds protected projected-fact capture before eligibility filtering, frozen
+method outputs, an authoritative SQLite catalog, immutable JSONL evidence,
+supervised DuckDB reconstruction, revisions/backfill/as-of maturity and immutable
+restatements. Reference/current drift, performance/calibration/uncertainty evolution,
+declared-cohort mix, qualified resampling and exploratory temporal investigation
+share Python/CLI/API/browser and canonical reporting. Standalone CG1/CG2 and
+DataTrust history semantics remain intact. See [CG3 contracts and methodology](CG3_CONFIDENCEGUARD.md).
+CG3 is complete, including corrections R1–R3, as confirmed by the user on 2026-10-21.
 
 ## Identity And Company Thesis
 
@@ -341,9 +351,9 @@ or accepted DataTrust analytical migration was made. Existing distribution/comma
 are preserved, and M8 audio stays deferred. The independent frontend design lab
 can replace the functional client via the bundled versioned contracts.
 
-CG2 calibration/uncertainty fitting, CG3 longitudinal/drift, CG4 deeper investigation,
-CG5 policy selection, CG6 execution/robustness and CG7 monitoring/operations remain
-approved continuation. No hosted service, production ingestion, persistent monitor
+CG2 calibration/uncertainty and CG3 longitudinal/drift now extend this same product.
+CG4 deeper investigation, CG5 policy selection, CG6 execution/robustness and CG7
+monitoring/operations remain approved continuation. No hosted service, production ingestion, persistent monitor
 or direct-model adapter is claimed in CG1. Capacity, natural-workload usefulness of
 defaults and later-method qualification remain evidence questions, not new approval
 gates. See [CG1 contracts](CG1_CONFIDENCEGUARD.md) and
@@ -363,7 +373,11 @@ are unvalidated until their own qualifying independent assessment. Assessments d
 not establish improvement or future coverage.
 
 CG1 schemas/semantics and DataTrust behavior/history are preserved. CG3 longitudinal
-analysis, CG4 automated investigation, CG5 policy optimization, CG6 predictor/auxiliary
-execution and CG7 monitoring remain separate. M8 audio remains deferred. See
+analysis is now implemented in the same product; CG4 automated investigation, CG5
+policy optimization, CG6 predictor/auxiliary execution and CG7 monitoring remain future
+development milestones. M8 audio remains deferred. See
 [CG2 contracts](CG2_CONFIDENCEGUARD.md) and [evidence](../validation/cg2/README.md).
-Engineering qualification does not close CG2's understanding gate for the user.
+The user has subsequently confirmed CG1 and CG2 complete, independently reviewed,
+corrected, and their understanding gates closed. CG3 is complete, including corrections R1–R3, as confirmed by the user on 2026-10-21.
+
+CG3 is complete, including corrections R1–R3, as confirmed by the user on 2026-10-21. See [correction record](../validation/cg3/review-corrections/README.md).

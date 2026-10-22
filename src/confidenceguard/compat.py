@@ -77,3 +77,23 @@ def protected_directory(path):
 def pdf(html,path,expected):
     from datatrust.pdf import render_pdf_report
     return render_pdf_report(html,path,expected_html_sha256=expected)
+
+
+def insert_rows(con, table, records):
+    """Bounded explicit registration, with external access still disabled.
+
+    This is an insertion optimization, never a DataFrame analytical path. Object
+    dtype preserves lexical strings; HUGEINT values are explicitly cast from
+    exact decimal strings rather than passing through a float inference step.
+    """
+    if not records:return
+    import pandas as pd
+    import re
+    if not re.fullmatch(r'[A-Za-z_][A-Za-z_0-9]*',table):raise EvaluationError('Invalid internal relation.')
+    schema=con.execute(f'DESCRIBE {table}').fetchall()
+    huge=[i for i,column in enumerate(schema) if column[1]=='HUGEINT']
+    values=[tuple(str(v) if i in huge and v is not None else v for i,v in enumerate(row)) for row in records] if huge else records
+    frame=pd.DataFrame(values,columns=[v[0] for v in schema],dtype=object)
+    con.register('cg_bounded_insert',frame)
+    try:con.execute(f'INSERT INTO {table} SELECT * FROM cg_bounded_insert')
+    finally:con.unregister('cg_bounded_insert')

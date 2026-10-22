@@ -1,0 +1,32 @@
+F.                                                                       [100%]
+=================================== FAILURES ===================================
+____ test_multiple_interval_definitions_and_nominal_levels_remain_distinct _____
+
+tmp_path = PosixPath('/private/var/folders/cs/c15xvw9d3t53tzcws5yxjxcr0000gn/T/pytest-of-drivyaanshyadav/pytest-185/test_multiple_interval_definit0')
+
+    def test_multiple_interval_definitions_and_nominal_levels_remain_distinct(tmp_path):
+        packet=create(tmp_path/'inputs',kind='regression',events=365)
+        packet['evaluation']['runs'][0]['intervals'].append({'id':'supplied80','lower':'q05','upper':'q95','coverage':.8})
+        candidate=copy.deepcopy(packet['evaluation']['runs'][0]);candidate['id']='candidate';candidate['model']['version']='2'
+        candidate['intervals'].append({'id':'unrelated70','lower':'q05','upper':'q95','coverage':.7})
+        packet['evaluation']['runs'].append(candidate);packet['bindings'].append({'run':'candidate','features':{'region':'categorical','feature':'numeric'}})
+        ws=ReliabilityWorkspace.initialize(tmp_path/'workspace',WorkspaceConfig(saving=True,free_disk_bytes=1));ws.ingest(packet)
+        spec=specification(sorted(ws.models(),key=lambda m:m['run']['model']['version']),cohort=False);spec['material_thresholds']={'interval_coverage':.01,'bias':.01}
+        a,b=spec['variants'];spec['comparisons'].append({'id':'matched','kind':'matched','reference_window':'reference','current_window':'reference','reference_variant':a,'current_variant':b})
+        spec['drift_thresholds']={'feature:feature':{'ks_distance':0.}}
+        result=ws.analyze(spec)
+        for metric in ['interval_coverage','interval_width','central_interval_score']:
+            series=[v for v in result.data['history']['temporal'] if v['metric']==metric and v['variant']==a]
+            contrasts=[m for m in result.data['history']['comparisons'][0]['metrics'] if m['metric']==metric]
+            assert len(series)==len(contrasts)==2
+            assert len({v['metric_key'] for v in series})==2
+            matched=[m for m in result.data['history']['comparisons'][1]['metrics'] if m['metric']==metric]
+>           assert len(matched)==2 and all(m['value']==0 and m['reference_support']==181 for m in matched)
+E           AssertionError: assert (2 == 2 and False)
+E            +  where 2 = len([{'scope': 'overall', 'metric': 'central_interval_score', 'metric_identity': {'metric': 'central_interval_score', 'fam...'synthetic units', ...}, 'metric_key': 'metric_f3bcb982a7544fa146011ebd33c0e621fb750de42028fd673d6dd6d68fe018a6', ...}])
+E            +  and   False = all(<generator object test_multiple_interval_definitions_and_nominal_levels_remain_distinct.<locals>.<genexpr> at 0x10922cc70>)
+
+tests/cg3/test_review_corrections.py:108: AssertionError
+=========================== short test summary info ============================
+FAILED tests/cg3/test_review_corrections.py::test_multiple_interval_definitions_and_nominal_levels_remain_distinct
+1 failed, 1 passed in 4.93s

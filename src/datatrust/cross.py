@@ -217,6 +217,8 @@ def audit_cross_representation(spec,config=None,*,progress=None,cancel=None,owne
     result.execution['whole_job_seconds']=time.monotonic()-started
     from datatrust.cross_presentation import summary
     result.profile['summary']=summary(result)
+    from datatrust.guidance import attach_guidance
+    attach_guidance(result)
     for _ in range(2): result.execution['serialized_bytes']=len(result.json_text().encode())
     if len(result.json_text().encode())>config.execution.result_bytes: fail('Final M9 result budget exceeded.','result_limit')
     return result

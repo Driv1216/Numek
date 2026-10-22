@@ -4,6 +4,7 @@ from pathlib import Path
 
 from datatrust import AnalysisConfig, DataTrust, DatasetSpec, TaskSpec
 from datatrust.renderer import write_html_report
+from datatrust.history import HistoryError
 from datatrust.web import run_ui
 
 
@@ -24,6 +25,7 @@ def main():
 @click.option("--task-spec", "task_spec_path", type=click.Path(exists=True, dir_okay=False), help="JSON task, targets, roles, and group keys.")
 @click.option("--name", "dataset_name", help="Optional dataset/report display name.")
 @click.option("--purpose", help="Optional description of the prediction purpose.")
+@click.option("--delimiter", help="CSV separator: comma, semicolon, tab, pipe, a single character, or auto to detect it. Default: the --config value, else comma.")
 def audit(
     dataset_path: str,
     target: str,
@@ -36,10 +38,18 @@ def audit(
     json_out: str,
     config_path: str,
     task_spec_path: str,
+    delimiter: str = None,
 ):
     """Audit a CSV dataset and write a discoverable report bundle."""
     try:
         config = _load_config(config_path)
+        if delimiter is not None:
+            from dataclasses import replace
+            from datatrust.ingestion import resolve_delimiter
+            named = {"comma": ",", "semicolon": ";", "tab": "\t", "\\t": "\t", "pipe": "|", "bar": "|"}.get(delimiter.lower(), delimiter)
+            base = config or AnalysisConfig()
+            named = resolve_delimiter(dataset_path, named, base.parsing.encoding)
+            config = replace(base, parsing=replace(base.parsing, delimiter=named))
         spec = DatasetSpec(dataset_path, dataset_name=dataset_name, purpose=purpose)
         if task_spec_path:
             from click.core import ParameterSource
@@ -50,7 +60,7 @@ def audit(
             task_spec = TaskSpec("dataset_profile" if task == "unlabeled" else task, targets=target)
         audit = DataTrust.from_spec(spec, task_spec, config)
         result = audit.analyze_result()
-        if result.methodology_id == "classification_legacy_2026_08_13" and not task_spec_path and report_format == "html" and not config_path and not json_out and not html_out:
+        if result.methodology_id == "classification_legacy_2026_08_13" and not task_spec_path and report_format == "html" and not config_path and not json_out and not html_out and delimiter is None:
             # Established explicit HTML behavior remains available through the CLI.
             report_path = write_html_report(result.to_legacy_dict(), output_path)
             click.echo(f"DataTrust report written to {report_path}")
@@ -192,7 +202,9 @@ def text_evidence(manifest,report,reference,data_root,show_content,max_chars):
 @click.option("--no-open", is_flag=True, help="Do not open the default browser automatically.")
 @click.option("--config", "config_path", type=click.Path(exists=True, dir_okay=False), help="Default operational and inspection settings for local UI runs.")
 @click.option('--data-root', 'data_roots', multiple=True, type=click.Path(exists=True, file_okay=False), help='Allowed local dataset root; repeat for additional roots. Defaults to launch directory.')
-def ui(port: int, max_upload_mib: float, no_open: bool, config_path: str, data_roots: tuple):
+@click.option("--history-dir", type=click.Path(file_okay=False), help="Folder for saved analyses (canonical reports only). Defaults to the per-user data folder.")
+@click.option("--no-history", is_flag=True, help="Turn saved analyses off for this run: nothing is recorded or shown.")
+def ui(port: int, max_upload_mib: float, no_open: bool, config_path: str, data_roots: tuple, history_dir: str, no_history: bool):
     """Start the local browser report generator."""
     click.echo(f"Starting DataTrust at http://127.0.0.1:{port}/")
     try:
@@ -200,8 +212,10 @@ def ui(port: int, max_upload_mib: float, no_open: bool, config_path: str, data_r
         if config_path:
             kwargs["analysis_config"] = _load_config(config_path)
         if data_roots: kwargs['data_roots'] = data_roots
+        if history_dir: kwargs['history_dir'] = history_dir
+        if no_history: kwargs['history_enabled'] = False
         run_ui(**kwargs)
-    except (OSError, ValueError) as exc:
+    except (OSError, ValueError, HistoryError) as exc:
         raise click.ClickException(f"Local UI could not start: {exc}") from exc
 
 

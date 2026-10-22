@@ -5,7 +5,7 @@ import json
 import math
 import re
 from typing import Optional
-from datatrust.contracts import (_construct, _names, _positive, AnalysisConfig, CsvParseOptions,
+from datatrust.contracts import (_construct, _names, _positive, AnalysisConfig, CsvParseOptions, omit_default_delimiter,
     TaskSpec, PresentationLimits, json_safe)
 from datatrust.m4_contracts import ExecutionOptions
 
@@ -514,10 +514,13 @@ class TemporalAuditResult:
     schema_version: str = '1.4'
     methodology_id: str = 'temporal_reliability_v1'
     parsing_warnings: list = field(default_factory=list)
+    guidance: dict = field(default_factory=dict, kw_only=True)  # finding_guidance_v1 and later; absent before
     @property
     def source_paths(self):return tuple(x.source.path for x in self.spec.inputs)
     def to_dict(self):
-        v=asdict(self);v['spec']['inputs']=[{**x,'source':{**x['source'],'path':Path(x['source']['path']).name}} for x in v['spec']['inputs']]
+        v=omit_default_delimiter(asdict(self))
+        if not v['guidance']: v.pop('guidance')
+        v['spec']['inputs']=[{**x,'source':{**x['source'],'path':Path(x['source']['path']).name}} for x in v['spec']['inputs']]
         return exact_json(v)
     def json_text(self):return json.dumps(self.to_dict(),ensure_ascii=False,indent=2,allow_nan=False)
     def write_json(self,path):

@@ -363,6 +363,7 @@ class CrossRepresentationAuditResult:
     private: dict = field(repr=False)
     schema_version: str = '1.7'
     methodology_id: str = 'cross_representation_reliability_v1'
+    guidance: dict = field(default_factory=dict, kw_only=True)  # finding_guidance_v1 and later; absent before
     @property
     def source_paths(self): return tuple(dict.fromkeys((*self.private['files'],*self.private.get('unavailable',()))))
     @classmethod
@@ -375,7 +376,7 @@ class CrossRepresentationAuditResult:
         for n in ('examples','disclosure','export_identity'): value['profile'].pop(n,None)
         result=cls(**value,private=private)
         return result
-    def to_dict(self): return exact_json({n:getattr(self,n) for n in ('schema_version','methodology_id','profile','checks','evidence','findings','coverage','execution','generated_at')})
+    def to_dict(self): return exact_json({n:getattr(self,n) for n in ('schema_version','methodology_id','profile','checks','evidence','findings','coverage','execution','generated_at')}|({'guidance':self.guidance} if self.guidance else {}))
     def json_text(self): return json.dumps(self.to_dict(),ensure_ascii=False,indent=2,allow_nan=False)
     def generate_artifacts(self,path,**kwargs):
         from datatrust.cross_private import generate_artifacts

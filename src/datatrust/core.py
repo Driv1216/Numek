@@ -166,7 +166,8 @@ def run_analysis(dataset: DatasetSpec, task: TaskSpec, config=None) -> AnalysisR
             validate_options(task.target_names, config.multilabel)
         if m3_method and config.limits is None:
             limits = ExecutionLimits.unlabeled_defaults()
-        if not m3_method and task.kind == "classification" and config.parsing != CsvParseOptions():
+        # The separator only decides where cells split; every value interpretation keeps the legacy defaults.
+        if not m3_method and task.kind == "classification" and replace(config.parsing, delimiter=",") != CsvParseOptions():
             raise ValueError("Non-default classification parsing is outside M1; legacy defaults are preserved.")
         return task, config, limits
     roles = None; m3_method = None
@@ -364,6 +365,12 @@ def run_analysis(dataset: DatasetSpec, task: TaskSpec, config=None) -> AnalysisR
         checks[-1].applicability = Applicability.BLOCKED
         checks[-1].execution = ExecutionStatus.NOT_RUN
         checks[-1].reason = "Token alignment unavailable; interpretation review limitations are disclosed separately."
+    # Contextual evidence (context_v1) sits beside the raw evidence: it never alters the profile, findings or scores.
+    from datatrust.contextual import build as build_contextual, not_completed, validate as validate_context
+    validate_context(handle.data, config)  # a declaration naming unknown columns is a configuration error
+    contextual = optional("contextual_evidence", lambda: build_contextual(handle.data, task, config, profile, roles if m3_method else None, method))
+    if contextual is None:
+        contextual = not_completed(next((c.reason for c in reversed(checks) if c.check_id == "contextual_evidence"), None))
     # Do not mix snapshots even if the source changed while optional checks ran.
     verify_source(dataset.path, handle.source)
     if task.kind == "classification" and not m3_method:
@@ -415,13 +422,14 @@ def run_analysis(dataset: DatasetSpec, task: TaskSpec, config=None) -> AnalysisR
             elif isinstance(value,list):
                 for child in value: attach_m3_rows(child)
         attach_m3_rows(profile)
-    return AnalysisResult(replace(dataset, path=str(Path(dataset.path).resolve())), task, profile, {**handle.parsing, "source_sha256": handle.source["sha256"]},
+    from datatrust.guidance import attach_guidance
+    return attach_guidance(_with_contextual(contextual, AnalysisResult(replace(dataset, path=str(Path(dataset.path).resolve())), task, profile, {**handle.parsing, "source_sha256": handle.source["sha256"]},
                           handle.parsing_warnings, checks, evidence, findings, narrative, context, coverage, scores,
                           {"status": "partial" if partial else "completed", "backend": "pandas_in_memory", "materialization": "in_memory",
                            "source_bytes": handle.source["bytes"], "analyzed_rows": profile["row_count"], "analyzed_columns": profile["column_count"],
                            "frame_bytes": handle.frame_bytes, "elapsed_seconds": round(time.monotonic() - start, 6), "limits": asdict(limits),
                            "enforcement": "Source/header preflight, bounded row read, post-load frame measurement, cooperative stage deadlines; no hard memory or execution guarantee."},
-                          datetime.now(timezone.utc).isoformat(), method, schema_version="1.2" if m3_method else "1.1" if task.kind == "regression" else "1.0")
+                          datetime.now(timezone.utc).isoformat(), method, schema_version="1.2" if m3_method else "1.1" if task.kind == "regression" else "1.0")))
 
 
 def _clean_context_value(value, label: str, maximum_length: int):
@@ -449,3 +457,8 @@ def _humanize_fallback_name(value: str) -> str:
         for part in parts:
             words.append(part.capitalize() if part.islower() else part)
     return " ".join(words) or str(value)
+
+
+def _with_contextual(contextual, result):
+    result.contextual = contextual
+    return result

@@ -30,16 +30,18 @@ PRIOR_CONTEXT_TOKENS = {"historical", "past", "prior", "previous"}
 
 
 def load_csv_dataset(
-    dataset_path: Path, *, usecols: Optional[List[str]] = None, nrows: Optional[int] = None
+    dataset_path: Path, *, usecols: Optional[List[str]] = None, nrows: Optional[int] = None, options=None
 ) -> pd.DataFrame:
-    """Compatibility wrapper for the shared CSV loader."""
+    """Compatibility wrapper for the shared CSV loader. `options` (CsvParseOptions) carries a declared delimiter."""
     from datatrust.ingestion import read_csv
-    return read_csv(dataset_path, usecols=usecols, nrows=nrows)
+    return read_csv(dataset_path, usecols=usecols, nrows=nrows, options=options)
 
 
-def inspect_csv_dataset(dataset_path: Path, preview_rows: int = 10) -> dict:
+def inspect_csv_dataset(dataset_path: Path, preview_rows: int = 10, options=None) -> dict:
     """Return upload-stage facts without requiring a target selection."""
-    data = load_csv_dataset(dataset_path)
+    from datatrust.ingestion import validate_csv_structure
+    validate_csv_structure(dataset_path, options)  # A malformed file is refused at upload, not after configuring.
+    data = load_csv_dataset(dataset_path, options=options)
     if len(data) == 0:
         raise ValueError("Dataset is empty and cannot be analyzed.")
     if len(data.columns) == 0:
@@ -58,9 +60,9 @@ def inspect_csv_dataset(dataset_path: Path, preview_rows: int = 10) -> dict:
     }
 
 
-def inspect_classification_target(dataset_path: Path, target: str) -> dict:
+def inspect_classification_target(dataset_path: Path, target: str, options=None) -> dict:
     """Return target confirmation facts using the same rules as full profiling."""
-    data = load_csv_dataset(dataset_path)
+    data = load_csv_dataset(dataset_path, options=options)
     if target not in data.columns:
         raise ValueError(f"Target column '{target}' was not found in the dataset.")
     if len(data) == 0:

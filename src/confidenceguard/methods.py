@@ -681,10 +681,10 @@ def _application_record(store,artifact,table,uncertainty_table):
     result['application_digest']=digest(result);return result
 
 
-def _execute2(spec,config,roots,operation,expected,staging=None,*,progress=None):
+def _execute2(spec,config,roots,operation,expected,staging=None,capture=None,*,progress=None):
     started=time.monotonic();work=None
     try:
-        work,store,cells=open_store(spec.evaluation,config,roots,progress,extension=spec)
+        work,store,cells=open_store(spec.evaluation,config,roots,progress,extension=spec,capture=capture)
         methods,families=_effective_methods(spec)
         declared_edges=_comparison_edges(spec,methods)
         fingerprint=digest({'sources':{k:{'sha256':v['sha256'],'bytes':v['bytes']} for k,v in store.sources.items()},'spec':spec.to_dict(),'config':config.to_dict(),'methodology':CG2_METHOD,
@@ -730,6 +730,8 @@ def _execute2(spec,config,roots,operation,expected,staging=None,*,progress=None)
         roots_by_variant={key:v['definition']['run'] for key,v in fitted.items()}
         runs=_run_objects(spec,fitted)
         if operation in {'study','evaluate'}:store.unseal_evaluation_labels(roots_by_variant)
+        if capture is not None:
+            store.history_capture.outputs(store,fitted=fitted,uncertainties=uncertainties,runs=runs,membership=membership_sidecars,calibration_edges=diagnostic_edges)
         full_tables=_evaluation_relations(store,runs)
         store.spec=_view(spec.evaluation,runs=tuple(runs),comparison=None,policies=tuple((*spec.evaluation.policies,*spec.variant_policies)))
         e=Evidence(store);store._evidence=e
@@ -886,7 +888,7 @@ def _publish_application(store,spec,fitted,uncertainties,result,staging):
     finally:pass # Parent owns cleanup, including worker termination during a native call.
 
 
-def _service(spec,config,operation,*,progress=None,cancel=None,allowed_roots=None,expected_fingerprint=None):
+def _service(spec,config,operation,*,progress=None,cancel=None,allowed_roots=None,expected_fingerprint=None,_capture=None):
     spec,config,roots=_arguments2(spec,config,allowed_roots)
     worker_config=replace(config,result_bytes=config.private_bytes+config.result_bytes)
     staging=None
@@ -899,7 +901,7 @@ def _service(spec,config,operation,*,progress=None,cancel=None,allowed_roots=Non
         stat=os.fstat(fd);os.close(fd)
         staging={'path':str(stage),'writing':str(writing),'device':stat.st_dev,'inode':stat.st_ino}
     try:
-        result=compat.supervise(_execute2,(spec,config,roots,operation,expected_fingerprint,staging),worker_config,progress=progress,cancel=cancel)
+        result=compat.supervise(_execute2,(spec,config,roots,operation,expected_fingerprint,staging,_capture),worker_config,progress=progress,cancel=cancel)
         if operation=='inspect':return result.to_dict()
         if cancel is not None and cancel.is_set():raise EvaluationError('CG2 cancelled before commit.','cancelled')
         if staging:result.execution['application_committed']=True

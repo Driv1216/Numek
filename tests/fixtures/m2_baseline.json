@@ -3954,6 +3954,7 @@
           "strength_mpa": "float64"
         },
         "provisional_types": false,
+        "structure_validation": "complete_source_width_v1",
         "header_mapping": [
           {
             "position": 1,
@@ -8493,9 +8494,231 @@
       },
       "generated_at": "2026-10-09T00:00:00+00:00",
       "methodology_id": "tabular_regression_v1",
-      "schema_version": "1.1"
+      "schema_version": "1.1",
+      "guidance": {
+        "version": "finding_guidance_v1",
+        "items": {
+          "duplicate_records": {
+            "catalogue": "duplicates",
+            "title": "Exact repeated records",
+            "observed": [
+              "25 of 1,030 rows repeat an earlier row (2.43%), in 11 groups; largest group 4 rows."
+            ],
+            "impact": [
+              "Identical rows give repeated cases more weight.",
+              "If copies land on both sides of a train/test split, evaluation can look better than it will be on new data."
+            ],
+            "investigate": [
+              "Whether repetition reflects genuine repeated events (the same values recurring legitimately) or copying.",
+              "Whether an identifier or timestamp exists that would make repeated rows distinct."
+            ],
+            "options": [
+              {
+                "option": "Keep repeated rows but split by group",
+                "prerequisites": "An identifier or the full row can define groups.",
+                "avoid_when": "Groups cannot be defined.",
+                "verify": "Confirm that no group appears in more than one split."
+              },
+              {
+                "option": "Remove exact copies",
+                "prerequisites": "Repetition is confirmed to be copying, not repeated events.",
+                "avoid_when": "Rows are legitimate repeated observations; removing them changes the represented frequencies.",
+                "verify": "Report row counts and class shares before and after; re-run this analysis on the result."
+              }
+            ],
+            "unknowns": [
+              "Whether repeated rows are legitimate repeated events or copies was not assessed."
+            ]
+          },
+          "numeric_outlier_concentration": {
+            "catalogue": "outliers",
+            "title": "IQR review candidates",
+            "observed": [
+              "age_days: 59 of 1,030 finite values (5.73%) outside the 1.5 × IQR fences; q1 7, q3 56, min 1, max 365; 0 negative, 0 zero."
+            ],
+            "impact": [
+              "Values outside the 1.5 × IQR fences can dominate scale-sensitive methods and summary statistics.",
+              "They may be legitimate tails, unit or entry errors, or sentinel codes."
+            ],
+            "investigate": [
+              "The extreme values themselves: are they plausible for the field's meaning and unit?",
+              "Whether a single code (for example −1 or 999) accounts for many of them."
+            ],
+            "options": [
+              {
+                "option": "Keep the values and use robust methods or transforms",
+                "prerequisites": "The values are legitimate.",
+                "avoid_when": "They are confirmed errors or sentinel codes.",
+                "verify": "Compare model behaviour with and without the transform on the same split."
+              },
+              {
+                "option": "Cap (winsorise) the values",
+                "prerequisites": "Extremes are legitimate but over-influential, and the cap is chosen from training rows only.",
+                "avoid_when": "Tails carry the signal you care about (for example, fraud amounts); or the cap uses evaluation data.",
+                "verify": "Report how many values change and compare metrics on tail cases specifically."
+              },
+              {
+                "option": "Correct or remove values",
+                "prerequisites": "They are confirmed errors from source records.",
+                "avoid_when": "They are legitimate rare observations.",
+                "verify": "Re-run this analysis and record which rows changed."
+              }
+            ],
+            "unknowns": [
+              "Whether extreme values are legitimate was not assessed; an IQR flag does not establish an error."
+            ]
+          },
+          "regression_repeated_input_variation": {
+            "catalogue": "label_conflicts",
+            "title": "Target variation within repeated inputs",
+            "observed": [
+              "20 participating rows."
+            ],
+            "impact": [
+              "Identical recorded inputs with different outcomes limit how well any model can fit those cases.",
+              "Conflicts may reflect omitted context, outcomes that are genuinely random, or annotation differences."
+            ],
+            "investigate": [
+              "A sample of conflicting groups: what distinguishes them that the file does not record.",
+              "Whether conflicts concentrate in one source, annotator or period."
+            ],
+            "options": [
+              {
+                "option": "Keep all rows and treat the variation as real",
+                "prerequisites": "The variation is plausible for the outcome.",
+                "avoid_when": "One label is known to be wrong.",
+                "verify": "Report the conflicting share alongside model results."
+              },
+              {
+                "option": "Adjudicate labels",
+                "prerequisites": "A reviewer or reference can decide the correct label.",
+                "avoid_when": "No reliable reference exists; majority voting would invent certainty.",
+                "verify": "Record changed labels and re-run this analysis."
+              },
+              {
+                "option": "Add the missing context as features",
+                "prerequisites": "The distinguishing information exists and is available at prediction time.",
+                "avoid_when": "The added information is only known after the outcome.",
+                "verify": "Re-check repeated-input conflicts with the added features."
+              }
+            ],
+            "unknowns": [
+              "Which label, if any, is correct was not assessed."
+            ]
+          }
+        },
+        "scope": {
+          "execution": "completed",
+          "not_completed": [],
+          "not_completed_total": 0,
+          "unknowns": [
+            "0 possible placeholder or sentinel codes were suggested but none was declared, so none was interpreted.",
+            "Prediction-time availability is known only for features you declared; the relationship search is bounded to its stated methods.",
+            "Whether repeated rows are legitimate repeated events or copies was not assessed.",
+            "Whether extreme values are legitimate was not assessed; an IQR flag does not establish an error.",
+            "Which label, if any, is correct was not assessed."
+          ],
+          "conclusion": "Within the completed checks, 3 findings call for review (2 moderate, 1 low). This is review evidence for the stated scope; it does not establish model performance, semantic correctness or prediction-time availability."
+        },
+        "policy": [
+          {
+            "rule": "IQR review candidates",
+            "threshold": "≥ 5% of finite values outside 1.5 × IQR fences",
+            "effect": "Finding (evidence only; no score)."
+          },
+          {
+            "rule": "Column missingness",
+            "threshold": "≥ 25% missing (High from 50%); cells ≥ 10%; rows with a gap ≥ 25%",
+            "effect": "Findings (evidence only)."
+          },
+          {
+            "rule": "Duplicates",
+            "threshold": "Any repeated row (Moderate from 2%, High from 10%)",
+            "effect": "Finding (evidence only)."
+          },
+          {
+            "rule": "Relationship search",
+            "threshold": "Declared support and coverage requirements",
+            "effect": "Findings by declared availability; bounded search."
+          },
+          {
+            "rule": "Score",
+            "threshold": "None",
+            "effect": "No validated score is defined for regression."
+          }
+        ]
+      },
+      "contextual": {
+        "version": "context_v1",
+        "status": "completed",
+        "prediction": {
+          "objective": null,
+          "point": null,
+          "declared": false
+        },
+        "declarations": {},
+        "availability": {},
+        "features": [
+          "cement",
+          "blast_furnace_slag",
+          "fly_ash",
+          "water",
+          "superplasticizer",
+          "coarse_aggregate",
+          "fine_aggregate",
+          "age_days"
+        ],
+        "candidates": [],
+        "candidate_rules": {
+          "version": "candidate_rules_v1",
+          "placeholder_tokens": [
+            "unknown",
+            "unk",
+            "n/a",
+            "na",
+            "none",
+            "null",
+            "missing",
+            "?",
+            "-",
+            "--",
+            "not known",
+            "not available",
+            "undefined",
+            "unspecified",
+            "nan",
+            "blank"
+          ],
+          "sentinel_codes": [
+            -1,
+            -9,
+            -99,
+            -999,
+            -9999,
+            9,
+            99,
+            999,
+            9999,
+            99999
+          ],
+          "meaning": "Candidates are suggestions only; nothing is interpreted until you declare it."
+        },
+        "interpreted": {},
+        "observed_dependencies": {
+          "pairs": [],
+          "indicators_examined": 0,
+          "indicators_unexamined": 0,
+          "rule": "cross-column code pairs sharing at least 95% of their rows and at least 5 rows"
+        },
+        "demonstrated_use": "Not observed: DataTrust does not see your pipeline. A before/after comparison can show which columns survive preprocessing.",
+        "dependency_search": {
+          "status": "not_applicable",
+          "reason": "Runs for single-target classification; regression uses its bounded relationship search."
+        },
+        "findings": []
+      }
     },
-    "html_sha256": "c81921f8314c6d1f0ba269d4be9840e478f2cc3286e54b3d25e77d53a0a0549a"
+    "html_sha256": "44f2ba6f9c129b730ea2449e9fc0021c9851db9f45273f5e49c3df019f6e54b0"
   },
   "bike_hour": {
     "dataset": {
@@ -14052,6 +14275,7 @@
           "cnt": "int64"
         },
         "provisional_types": false,
+        "structure_validation": "complete_source_width_v1",
         "header_mapping": [
           {
             "position": 1,
@@ -20348,9 +20572,265 @@
       },
       "generated_at": "2026-10-09T00:00:00+00:00",
       "methodology_id": "tabular_regression_v1",
-      "schema_version": "1.1"
+      "schema_version": "1.1",
+      "guidance": {
+        "version": "finding_guidance_v1",
+        "items": {
+          "regression_declared_availability": {
+            "catalogue": "declared_unavailable",
+            "title": "Columns declared unavailable at prediction time",
+            "observed": [
+              "casual, registered"
+            ],
+            "impact": [
+              "Inputs you declared unavailable at prediction time would make evaluation optimistic if used."
+            ],
+            "investigate": [
+              "Whether these inputs are present in the feature set any downstream model will use."
+            ],
+            "options": [
+              {
+                "option": "Exclude the declared inputs from training and evaluation",
+                "prerequisites": "None.",
+                "avoid_when": "The declaration was wrong; correct it and re-run instead.",
+                "verify": "Confirm the final feature list omits them."
+              }
+            ],
+            "unknowns": [
+              "Actual model use of these inputs was not observed; the declaration is yours."
+            ]
+          },
+          "regression_relationships_unavailable_at_prediction": {
+            "catalogue": "target_relationship",
+            "title": "Supported target relationships",
+            "observed": [
+              "cnt = casual + registered"
+            ],
+            "impact": [
+              "A target reproducible from inputs means those inputs carry the answer; if they are not available at prediction time, evaluation is invalid."
+            ],
+            "investigate": [
+              "How the related inputs are produced, and whether they are known before the outcome."
+            ],
+            "options": [
+              {
+                "option": "Exclude the related inputs",
+                "prerequisites": "They are recorded after, or derived from, the outcome.",
+                "avoid_when": "They are legitimate, available predictors.",
+                "verify": "Re-run this analysis; the relationship finding should no longer apply."
+              },
+              {
+                "option": "Keep them with a documented availability decision",
+                "prerequisites": "They are available at prediction time.",
+                "avoid_when": "Availability is uncertain.",
+                "verify": "Validate on a time-ordered split that reflects the real prediction point."
+              }
+            ],
+            "unknowns": [
+              "The search covers its stated methods and bounds only; relationships outside them were not searched."
+            ]
+          },
+          "numeric_outlier_concentration": {
+            "catalogue": "outliers",
+            "title": "IQR review candidates",
+            "observed": [
+              "casual: 1,192 of 17,379 finite values (6.86%) outside the 1.5 × IQR fences; q1 4, q3 48, min 0, max 367; 0 negative, 1,581 zero.",
+              "IQR is zero for holiday (q1 equals q3), so the fences cannot separate values; no rate was computed for them."
+            ],
+            "impact": [
+              "Values outside the 1.5 × IQR fences can dominate scale-sensitive methods and summary statistics.",
+              "They may be legitimate tails, unit or entry errors, or sentinel codes."
+            ],
+            "investigate": [
+              "The extreme values themselves: are they plausible for the field's meaning and unit?",
+              "Whether a single code (for example −1 or 999) accounts for many of them."
+            ],
+            "options": [
+              {
+                "option": "Keep the values and use robust methods or transforms",
+                "prerequisites": "The values are legitimate.",
+                "avoid_when": "They are confirmed errors or sentinel codes.",
+                "verify": "Compare model behaviour with and without the transform on the same split."
+              },
+              {
+                "option": "Cap (winsorise) the values",
+                "prerequisites": "Extremes are legitimate but over-influential, and the cap is chosen from training rows only.",
+                "avoid_when": "Tails carry the signal you care about (for example, fraud amounts); or the cap uses evaluation data.",
+                "verify": "Report how many values change and compare metrics on tail cases specifically."
+              },
+              {
+                "option": "Correct or remove values",
+                "prerequisites": "They are confirmed errors from source records.",
+                "avoid_when": "They are legitimate rare observations.",
+                "verify": "Re-run this analysis and record which rows changed."
+              }
+            ],
+            "unknowns": [
+              "Whether extreme values are legitimate was not assessed; an IQR flag does not establish an error."
+            ]
+          },
+          "near_constant_fields": {
+            "catalogue": "constant_features",
+            "title": "Near-constant fields",
+            "observed": [
+              "holiday: 2 distinct values; most common '0' in 97.12% of rows."
+            ],
+            "impact": [
+              "A column with one value (or nearly one) carries little or no information for most methods, and rare values may be noise or important exceptions."
+            ],
+            "investigate": [
+              "Whether the rare values are meaningful exceptions, errors, or a coding of missing values."
+            ],
+            "options": [
+              {
+                "option": "Exclude constant columns",
+                "prerequisites": "The column has exactly one value in every population that matters.",
+                "avoid_when": "The data is a subset and other subsets vary.",
+                "verify": "Confirm the column is constant in every split."
+              },
+              {
+                "option": "Keep near-constant columns",
+                "prerequisites": "The rare values carry meaning for the outcome.",
+                "avoid_when": "The rare values are errors or placeholders.",
+                "verify": "Check how the rare values relate to the target before deciding."
+              }
+            ],
+            "unknowns": [
+              "Whether rare values are meaningful was not assessed."
+            ]
+          }
+        },
+        "scope": {
+          "execution": "completed",
+          "not_completed": [
+            {
+              "check": "numeric_outliers",
+              "scope": "holiday",
+              "state": "excluded",
+              "reason": "zero_iqr"
+            }
+          ],
+          "not_completed_total": 1,
+          "unknowns": [
+            "0 possible placeholder or sentinel codes were suggested but none was declared, so none was interpreted.",
+            "Prediction-time availability is known only for features you declared; the relationship search is bounded to its stated methods.",
+            "Actual model use of these inputs was not observed; the declaration is yours.",
+            "The search covers its stated methods and bounds only; relationships outside them were not searched.",
+            "Whether extreme values are legitimate was not assessed; an IQR flag does not establish an error.",
+            "Whether rare values are meaningful was not assessed."
+          ],
+          "conclusion": "Within the completed checks, 4 findings call for review (2 high, 1 moderate, 1 low). Some scopes were excluded by a method's preconditions and are listed. This is review evidence for the stated scope; it does not establish model performance, semantic correctness or prediction-time availability."
+        },
+        "policy": [
+          {
+            "rule": "IQR review candidates",
+            "threshold": "≥ 5% of finite values outside 1.5 × IQR fences",
+            "effect": "Finding (evidence only; no score)."
+          },
+          {
+            "rule": "Column missingness",
+            "threshold": "≥ 25% missing (High from 50%); cells ≥ 10%; rows with a gap ≥ 25%",
+            "effect": "Findings (evidence only)."
+          },
+          {
+            "rule": "Duplicates",
+            "threshold": "Any repeated row (Moderate from 2%, High from 10%)",
+            "effect": "Finding (evidence only)."
+          },
+          {
+            "rule": "Relationship search",
+            "threshold": "Declared support and coverage requirements",
+            "effect": "Findings by declared availability; bounded search."
+          },
+          {
+            "rule": "Score",
+            "threshold": "None",
+            "effect": "No validated score is defined for regression."
+          }
+        ]
+      },
+      "contextual": {
+        "version": "context_v1",
+        "status": "completed",
+        "prediction": {
+          "objective": null,
+          "point": null,
+          "declared": false
+        },
+        "declarations": {},
+        "availability": {
+          "casual": "unavailable_at_prediction",
+          "registered": "unavailable_at_prediction"
+        },
+        "features": [
+          "instant",
+          "dteday",
+          "season",
+          "yr",
+          "mnth",
+          "hr",
+          "holiday",
+          "weekday",
+          "workingday",
+          "weathersit",
+          "temp",
+          "atemp",
+          "hum",
+          "windspeed",
+          "casual",
+          "registered"
+        ],
+        "candidates": [],
+        "candidate_rules": {
+          "version": "candidate_rules_v1",
+          "placeholder_tokens": [
+            "unknown",
+            "unk",
+            "n/a",
+            "na",
+            "none",
+            "null",
+            "missing",
+            "?",
+            "-",
+            "--",
+            "not known",
+            "not available",
+            "undefined",
+            "unspecified",
+            "nan",
+            "blank"
+          ],
+          "sentinel_codes": [
+            -1,
+            -9,
+            -99,
+            -999,
+            -9999,
+            9,
+            99,
+            999,
+            9999,
+            99999
+          ],
+          "meaning": "Candidates are suggestions only; nothing is interpreted until you declare it."
+        },
+        "interpreted": {},
+        "observed_dependencies": {
+          "pairs": [],
+          "indicators_examined": 0,
+          "indicators_unexamined": 0,
+          "rule": "cross-column code pairs sharing at least 95% of their rows and at least 5 rows"
+        },
+        "demonstrated_use": "Not observed: DataTrust does not see your pipeline. A before/after comparison can show which columns survive preprocessing.",
+        "dependency_search": {
+          "status": "not_applicable",
+          "reason": "Runs for single-target classification; regression uses its bounded relationship search."
+        },
+        "findings": []
+      }
     },
-    "html_sha256": "ba9aa90de494f0846d6d1bb89717c0b3513a9be9bb0fad8d318a262a58662315"
+    "html_sha256": "13eb2260457339b2e6518f13a239f04fce587fb4c4292fdbd80a0433219e1998"
   },
   "bike_hour_components_removed": {
     "dataset": {
@@ -25318,6 +25798,7 @@
           "cnt": "int64"
         },
         "provisional_types": false,
+        "structure_validation": "complete_source_width_v1",
         "header_mapping": [
           {
             "position": 1,
@@ -30921,9 +31402,164 @@
       },
       "generated_at": "2026-10-09T00:00:00+00:00",
       "methodology_id": "tabular_regression_v1",
-      "schema_version": "1.1"
+      "schema_version": "1.1",
+      "guidance": {
+        "version": "finding_guidance_v1",
+        "items": {
+          "near_constant_fields": {
+            "catalogue": "constant_features",
+            "title": "Near-constant fields",
+            "observed": [
+              "holiday: 2 distinct values; most common '0' in 97.12% of rows."
+            ],
+            "impact": [
+              "A column with one value (or nearly one) carries little or no information for most methods, and rare values may be noise or important exceptions."
+            ],
+            "investigate": [
+              "Whether the rare values are meaningful exceptions, errors, or a coding of missing values."
+            ],
+            "options": [
+              {
+                "option": "Exclude constant columns",
+                "prerequisites": "The column has exactly one value in every population that matters.",
+                "avoid_when": "The data is a subset and other subsets vary.",
+                "verify": "Confirm the column is constant in every split."
+              },
+              {
+                "option": "Keep near-constant columns",
+                "prerequisites": "The rare values carry meaning for the outcome.",
+                "avoid_when": "The rare values are errors or placeholders.",
+                "verify": "Check how the rare values relate to the target before deciding."
+              }
+            ],
+            "unknowns": [
+              "Whether rare values are meaningful was not assessed."
+            ]
+          }
+        },
+        "scope": {
+          "execution": "completed",
+          "not_completed": [
+            {
+              "check": "numeric_outliers",
+              "scope": "holiday",
+              "state": "excluded",
+              "reason": "zero_iqr"
+            }
+          ],
+          "not_completed_total": 1,
+          "unknowns": [
+            "0 possible placeholder or sentinel codes were suggested but none was declared, so none was interpreted.",
+            "Prediction-time availability is known only for features you declared; the relationship search is bounded to its stated methods.",
+            "Whether rare values are meaningful was not assessed."
+          ],
+          "conclusion": "Within the completed checks, 1 finding calls for review (1 low). Some scopes were excluded by a method's preconditions and are listed. This is review evidence for the stated scope; it does not establish model performance, semantic correctness or prediction-time availability."
+        },
+        "policy": [
+          {
+            "rule": "IQR review candidates",
+            "threshold": "≥ 5% of finite values outside 1.5 × IQR fences",
+            "effect": "Finding (evidence only; no score)."
+          },
+          {
+            "rule": "Column missingness",
+            "threshold": "≥ 25% missing (High from 50%); cells ≥ 10%; rows with a gap ≥ 25%",
+            "effect": "Findings (evidence only)."
+          },
+          {
+            "rule": "Duplicates",
+            "threshold": "Any repeated row (Moderate from 2%, High from 10%)",
+            "effect": "Finding (evidence only)."
+          },
+          {
+            "rule": "Relationship search",
+            "threshold": "Declared support and coverage requirements",
+            "effect": "Findings by declared availability; bounded search."
+          },
+          {
+            "rule": "Score",
+            "threshold": "None",
+            "effect": "No validated score is defined for regression."
+          }
+        ]
+      },
+      "contextual": {
+        "version": "context_v1",
+        "status": "completed",
+        "prediction": {
+          "objective": null,
+          "point": null,
+          "declared": false
+        },
+        "declarations": {},
+        "availability": {},
+        "features": [
+          "instant",
+          "dteday",
+          "season",
+          "yr",
+          "mnth",
+          "hr",
+          "holiday",
+          "weekday",
+          "workingday",
+          "weathersit",
+          "temp",
+          "atemp",
+          "hum",
+          "windspeed"
+        ],
+        "candidates": [],
+        "candidate_rules": {
+          "version": "candidate_rules_v1",
+          "placeholder_tokens": [
+            "unknown",
+            "unk",
+            "n/a",
+            "na",
+            "none",
+            "null",
+            "missing",
+            "?",
+            "-",
+            "--",
+            "not known",
+            "not available",
+            "undefined",
+            "unspecified",
+            "nan",
+            "blank"
+          ],
+          "sentinel_codes": [
+            -1,
+            -9,
+            -99,
+            -999,
+            -9999,
+            9,
+            99,
+            999,
+            9999,
+            99999
+          ],
+          "meaning": "Candidates are suggestions only; nothing is interpreted until you declare it."
+        },
+        "interpreted": {},
+        "observed_dependencies": {
+          "pairs": [],
+          "indicators_examined": 0,
+          "indicators_unexamined": 0,
+          "rule": "cross-column code pairs sharing at least 95% of their rows and at least 5 rows"
+        },
+        "demonstrated_use": "Not observed: DataTrust does not see your pipeline. A before/after comparison can show which columns survive preprocessing.",
+        "dependency_search": {
+          "status": "not_applicable",
+          "reason": "Runs for single-target classification; regression uses its bounded relationship search."
+        },
+        "findings": []
+      }
     },
-    "html_sha256": "31bd6ae0dc530022315513cb40565009fe69d301c567dd1f6af400303926e5a6"
+    "html_sha256": "449e04ef35e825233e9ec8a821171443639741433dc759356468d7626ad9b60b"
   },
   "bike_day": {
     "dataset": {
@@ -36076,6 +36712,7 @@
           "cnt": "int64"
         },
         "provisional_types": false,
+        "structure_validation": "complete_source_width_v1",
         "header_mapping": [
           {
             "position": 1,
@@ -42085,9 +42722,295 @@
       },
       "generated_at": "2026-10-09T00:00:00+00:00",
       "methodology_id": "tabular_regression_v1",
-      "schema_version": "1.1"
+      "schema_version": "1.1",
+      "guidance": {
+        "version": "finding_guidance_v1",
+        "items": {
+          "regression_declared_availability": {
+            "catalogue": "declared_unavailable",
+            "title": "Columns declared unavailable at prediction time",
+            "observed": [
+              "casual, registered"
+            ],
+            "impact": [
+              "Inputs you declared unavailable at prediction time would make evaluation optimistic if used."
+            ],
+            "investigate": [
+              "Whether these inputs are present in the feature set any downstream model will use."
+            ],
+            "options": [
+              {
+                "option": "Exclude the declared inputs from training and evaluation",
+                "prerequisites": "None.",
+                "avoid_when": "The declaration was wrong; correct it and re-run instead.",
+                "verify": "Confirm the final feature list omits them."
+              }
+            ],
+            "unknowns": [
+              "Actual model use of these inputs was not observed; the declaration is yours."
+            ]
+          },
+          "regression_relationships_unavailable_at_prediction": {
+            "catalogue": "target_relationship",
+            "title": "Supported target relationships",
+            "observed": [
+              "cnt = casual + registered"
+            ],
+            "impact": [
+              "A target reproducible from inputs means those inputs carry the answer; if they are not available at prediction time, evaluation is invalid."
+            ],
+            "investigate": [
+              "How the related inputs are produced, and whether they are known before the outcome."
+            ],
+            "options": [
+              {
+                "option": "Exclude the related inputs",
+                "prerequisites": "They are recorded after, or derived from, the outcome.",
+                "avoid_when": "They are legitimate, available predictors.",
+                "verify": "Re-run this analysis; the relationship finding should no longer apply."
+              },
+              {
+                "option": "Keep them with a documented availability decision",
+                "prerequisites": "They are available at prediction time.",
+                "avoid_when": "Availability is uncertain.",
+                "verify": "Validate on a time-ordered split that reflects the real prediction point."
+              }
+            ],
+            "unknowns": [
+              "The search covers its stated methods and bounds only; relationships outside them were not searched."
+            ]
+          },
+          "numeric_outlier_concentration": {
+            "catalogue": "outliers",
+            "title": "IQR review candidates",
+            "observed": [
+              "casual: 44 of 731 finite values (6.02%) outside the 1.5 × IQR fences; q1 315.5, q3 1,096, min 2, max 3,410; 0 negative, 0 zero.",
+              "IQR is zero for holiday (q1 equals q3), so the fences cannot separate values; no rate was computed for them."
+            ],
+            "impact": [
+              "Values outside the 1.5 × IQR fences can dominate scale-sensitive methods and summary statistics.",
+              "They may be legitimate tails, unit or entry errors, or sentinel codes."
+            ],
+            "investigate": [
+              "The extreme values themselves: are they plausible for the field's meaning and unit?",
+              "Whether a single code (for example −1 or 999) accounts for many of them."
+            ],
+            "options": [
+              {
+                "option": "Keep the values and use robust methods or transforms",
+                "prerequisites": "The values are legitimate.",
+                "avoid_when": "They are confirmed errors or sentinel codes.",
+                "verify": "Compare model behaviour with and without the transform on the same split."
+              },
+              {
+                "option": "Cap (winsorise) the values",
+                "prerequisites": "Extremes are legitimate but over-influential, and the cap is chosen from training rows only.",
+                "avoid_when": "Tails carry the signal you care about (for example, fraud amounts); or the cap uses evaluation data.",
+                "verify": "Report how many values change and compare metrics on tail cases specifically."
+              },
+              {
+                "option": "Correct or remove values",
+                "prerequisites": "They are confirmed errors from source records.",
+                "avoid_when": "They are legitimate rare observations.",
+                "verify": "Re-run this analysis and record which rows changed."
+              }
+            ],
+            "unknowns": [
+              "Whether extreme values are legitimate was not assessed; an IQR flag does not establish an error."
+            ]
+          },
+          "near_constant_fields": {
+            "catalogue": "constant_features",
+            "title": "Near-constant fields",
+            "observed": [
+              "holiday: 2 distinct values; most common '0' in 97.13% of rows."
+            ],
+            "impact": [
+              "A column with one value (or nearly one) carries little or no information for most methods, and rare values may be noise or important exceptions."
+            ],
+            "investigate": [
+              "Whether the rare values are meaningful exceptions, errors, or a coding of missing values."
+            ],
+            "options": [
+              {
+                "option": "Exclude constant columns",
+                "prerequisites": "The column has exactly one value in every population that matters.",
+                "avoid_when": "The data is a subset and other subsets vary.",
+                "verify": "Confirm the column is constant in every split."
+              },
+              {
+                "option": "Keep near-constant columns",
+                "prerequisites": "The rare values carry meaning for the outcome.",
+                "avoid_when": "The rare values are errors or placeholders.",
+                "verify": "Check how the rare values relate to the target before deciding."
+              }
+            ],
+            "unknowns": [
+              "Whether rare values are meaningful was not assessed."
+            ]
+          },
+          "high_cardinality_categoricals": {
+            "catalogue": "high_cardinality",
+            "title": "High-cardinality text or categories",
+            "observed": [
+              "dteday: 731 distinct values (100.0% of rows)."
+            ],
+            "impact": [
+              "Columns with many distinct values may be identifiers or free text; one-hot encoding them inflates dimensionality and can memorise rows."
+            ],
+            "investigate": [
+              "Whether each column is an identifier, free text or a category with many levels."
+            ],
+            "options": [
+              {
+                "option": "Exclude identifiers from features",
+                "prerequisites": "The column identifies records rather than describing them.",
+                "avoid_when": "Its values carry meaning (for example, a product code).",
+                "verify": "Use identifiers for grouping splits instead, and confirm no group crosses splits."
+              },
+              {
+                "option": "Group rare levels or use target-free encodings",
+                "prerequisites": "The column is a genuine category.",
+                "avoid_when": "Encoders are fitted on data that includes evaluation rows (target encoding leaks).",
+                "verify": "Fit encoders on training rows only; compare validation metrics."
+              }
+            ],
+            "unknowns": [
+              "The semantic type of these columns was not assessed."
+            ]
+          }
+        },
+        "scope": {
+          "execution": "completed",
+          "not_completed": [
+            {
+              "check": "numeric_outliers",
+              "scope": "holiday",
+              "state": "excluded",
+              "reason": "zero_iqr"
+            }
+          ],
+          "not_completed_total": 1,
+          "unknowns": [
+            "0 possible placeholder or sentinel codes were suggested but none was declared, so none was interpreted.",
+            "Prediction-time availability is known only for features you declared; the relationship search is bounded to its stated methods.",
+            "Actual model use of these inputs was not observed; the declaration is yours.",
+            "The search covers its stated methods and bounds only; relationships outside them were not searched.",
+            "Whether extreme values are legitimate was not assessed; an IQR flag does not establish an error.",
+            "Whether rare values are meaningful was not assessed.",
+            "The semantic type of these columns was not assessed."
+          ],
+          "conclusion": "Within the completed checks, 5 findings call for review (2 high, 1 moderate, 2 low). Some scopes were excluded by a method's preconditions and are listed. This is review evidence for the stated scope; it does not establish model performance, semantic correctness or prediction-time availability."
+        },
+        "policy": [
+          {
+            "rule": "IQR review candidates",
+            "threshold": "≥ 5% of finite values outside 1.5 × IQR fences",
+            "effect": "Finding (evidence only; no score)."
+          },
+          {
+            "rule": "Column missingness",
+            "threshold": "≥ 25% missing (High from 50%); cells ≥ 10%; rows with a gap ≥ 25%",
+            "effect": "Findings (evidence only)."
+          },
+          {
+            "rule": "Duplicates",
+            "threshold": "Any repeated row (Moderate from 2%, High from 10%)",
+            "effect": "Finding (evidence only)."
+          },
+          {
+            "rule": "Relationship search",
+            "threshold": "Declared support and coverage requirements",
+            "effect": "Findings by declared availability; bounded search."
+          },
+          {
+            "rule": "Score",
+            "threshold": "None",
+            "effect": "No validated score is defined for regression."
+          }
+        ]
+      },
+      "contextual": {
+        "version": "context_v1",
+        "status": "completed",
+        "prediction": {
+          "objective": null,
+          "point": null,
+          "declared": false
+        },
+        "declarations": {},
+        "availability": {
+          "casual": "unavailable_at_prediction",
+          "registered": "unavailable_at_prediction"
+        },
+        "features": [
+          "instant",
+          "dteday",
+          "season",
+          "yr",
+          "mnth",
+          "holiday",
+          "weekday",
+          "workingday",
+          "weathersit",
+          "temp",
+          "atemp",
+          "hum",
+          "windspeed",
+          "casual",
+          "registered"
+        ],
+        "candidates": [],
+        "candidate_rules": {
+          "version": "candidate_rules_v1",
+          "placeholder_tokens": [
+            "unknown",
+            "unk",
+            "n/a",
+            "na",
+            "none",
+            "null",
+            "missing",
+            "?",
+            "-",
+            "--",
+            "not known",
+            "not available",
+            "undefined",
+            "unspecified",
+            "nan",
+            "blank"
+          ],
+          "sentinel_codes": [
+            -1,
+            -9,
+            -99,
+            -999,
+            -9999,
+            9,
+            99,
+            999,
+            9999,
+            99999
+          ],
+          "meaning": "Candidates are suggestions only; nothing is interpreted until you declare it."
+        },
+        "interpreted": {},
+        "observed_dependencies": {
+          "pairs": [],
+          "indicators_examined": 0,
+          "indicators_unexamined": 0,
+          "rule": "cross-column code pairs sharing at least 95% of their rows and at least 5 rows"
+        },
+        "demonstrated_use": "Not observed: DataTrust does not see your pipeline. A before/after comparison can show which columns survive preprocessing.",
+        "dependency_search": {
+          "status": "not_applicable",
+          "reason": "Runs for single-target classification; regression uses its bounded relationship search."
+        },
+        "findings": []
+      }
     },
-    "html_sha256": "77ef1347236aa86de0ebe898d90c4a6010aa5a25eae414b30582ebeda82eabc0"
+    "html_sha256": "240a21dbd3450e9e5af5870685b78eb2ed070d25e841658cae38f1aa13985d83"
   },
   "bike_day_components_removed": {
     "dataset": {
@@ -46677,6 +47600,7 @@
           "cnt": "int64"
         },
         "provisional_types": false,
+        "structure_validation": "complete_source_width_v1",
         "header_mapping": [
           {
             "position": 1,
@@ -52019,9 +52943,194 @@
       },
       "generated_at": "2026-10-09T00:00:00+00:00",
       "methodology_id": "tabular_regression_v1",
-      "schema_version": "1.1"
+      "schema_version": "1.1",
+      "guidance": {
+        "version": "finding_guidance_v1",
+        "items": {
+          "near_constant_fields": {
+            "catalogue": "constant_features",
+            "title": "Near-constant fields",
+            "observed": [
+              "holiday: 2 distinct values; most common '0' in 97.13% of rows."
+            ],
+            "impact": [
+              "A column with one value (or nearly one) carries little or no information for most methods, and rare values may be noise or important exceptions."
+            ],
+            "investigate": [
+              "Whether the rare values are meaningful exceptions, errors, or a coding of missing values."
+            ],
+            "options": [
+              {
+                "option": "Exclude constant columns",
+                "prerequisites": "The column has exactly one value in every population that matters.",
+                "avoid_when": "The data is a subset and other subsets vary.",
+                "verify": "Confirm the column is constant in every split."
+              },
+              {
+                "option": "Keep near-constant columns",
+                "prerequisites": "The rare values carry meaning for the outcome.",
+                "avoid_when": "The rare values are errors or placeholders.",
+                "verify": "Check how the rare values relate to the target before deciding."
+              }
+            ],
+            "unknowns": [
+              "Whether rare values are meaningful was not assessed."
+            ]
+          },
+          "high_cardinality_categoricals": {
+            "catalogue": "high_cardinality",
+            "title": "High-cardinality text or categories",
+            "observed": [
+              "dteday: 731 distinct values (100.0% of rows)."
+            ],
+            "impact": [
+              "Columns with many distinct values may be identifiers or free text; one-hot encoding them inflates dimensionality and can memorise rows."
+            ],
+            "investigate": [
+              "Whether each column is an identifier, free text or a category with many levels."
+            ],
+            "options": [
+              {
+                "option": "Exclude identifiers from features",
+                "prerequisites": "The column identifies records rather than describing them.",
+                "avoid_when": "Its values carry meaning (for example, a product code).",
+                "verify": "Use identifiers for grouping splits instead, and confirm no group crosses splits."
+              },
+              {
+                "option": "Group rare levels or use target-free encodings",
+                "prerequisites": "The column is a genuine category.",
+                "avoid_when": "Encoders are fitted on data that includes evaluation rows (target encoding leaks).",
+                "verify": "Fit encoders on training rows only; compare validation metrics."
+              }
+            ],
+            "unknowns": [
+              "The semantic type of these columns was not assessed."
+            ]
+          }
+        },
+        "scope": {
+          "execution": "completed",
+          "not_completed": [
+            {
+              "check": "numeric_outliers",
+              "scope": "holiday",
+              "state": "excluded",
+              "reason": "zero_iqr"
+            }
+          ],
+          "not_completed_total": 1,
+          "unknowns": [
+            "0 possible placeholder or sentinel codes were suggested but none was declared, so none was interpreted.",
+            "Prediction-time availability is known only for features you declared; the relationship search is bounded to its stated methods.",
+            "Whether rare values are meaningful was not assessed.",
+            "The semantic type of these columns was not assessed."
+          ],
+          "conclusion": "Within the completed checks, 2 findings call for review (2 low). Some scopes were excluded by a method's preconditions and are listed. This is review evidence for the stated scope; it does not establish model performance, semantic correctness or prediction-time availability."
+        },
+        "policy": [
+          {
+            "rule": "IQR review candidates",
+            "threshold": "≥ 5% of finite values outside 1.5 × IQR fences",
+            "effect": "Finding (evidence only; no score)."
+          },
+          {
+            "rule": "Column missingness",
+            "threshold": "≥ 25% missing (High from 50%); cells ≥ 10%; rows with a gap ≥ 25%",
+            "effect": "Findings (evidence only)."
+          },
+          {
+            "rule": "Duplicates",
+            "threshold": "Any repeated row (Moderate from 2%, High from 10%)",
+            "effect": "Finding (evidence only)."
+          },
+          {
+            "rule": "Relationship search",
+            "threshold": "Declared support and coverage requirements",
+            "effect": "Findings by declared availability; bounded search."
+          },
+          {
+            "rule": "Score",
+            "threshold": "None",
+            "effect": "No validated score is defined for regression."
+          }
+        ]
+      },
+      "contextual": {
+        "version": "context_v1",
+        "status": "completed",
+        "prediction": {
+          "objective": null,
+          "point": null,
+          "declared": false
+        },
+        "declarations": {},
+        "availability": {},
+        "features": [
+          "instant",
+          "dteday",
+          "season",
+          "yr",
+          "mnth",
+          "holiday",
+          "weekday",
+          "workingday",
+          "weathersit",
+          "temp",
+          "atemp",
+          "hum",
+          "windspeed"
+        ],
+        "candidates": [],
+        "candidate_rules": {
+          "version": "candidate_rules_v1",
+          "placeholder_tokens": [
+            "unknown",
+            "unk",
+            "n/a",
+            "na",
+            "none",
+            "null",
+            "missing",
+            "?",
+            "-",
+            "--",
+            "not known",
+            "not available",
+            "undefined",
+            "unspecified",
+            "nan",
+            "blank"
+          ],
+          "sentinel_codes": [
+            -1,
+            -9,
+            -99,
+            -999,
+            -9999,
+            9,
+            99,
+            999,
+            9999,
+            99999
+          ],
+          "meaning": "Candidates are suggestions only; nothing is interpreted until you declare it."
+        },
+        "interpreted": {},
+        "observed_dependencies": {
+          "pairs": [],
+          "indicators_examined": 0,
+          "indicators_unexamined": 0,
+          "rule": "cross-column code pairs sharing at least 95% of their rows and at least 5 rows"
+        },
+        "demonstrated_use": "Not observed: DataTrust does not see your pipeline. A before/after comparison can show which columns survive preprocessing.",
+        "dependency_search": {
+          "status": "not_applicable",
+          "reason": "Runs for single-target classification; regression uses its bounded relationship search."
+        },
+        "findings": []
+      }
     },
-    "html_sha256": "e5f6453502ebe2f908e8c564b597957fe5ed197892b95c265bfab94361e287a3"
+    "html_sha256": "d312b3d99c89cb6f89240329260dc242d471a464639f70ead1e1944ea8a2ce97"
   },
   "copy": {
     "dataset": {
@@ -52974,6 +54083,7 @@
           "outcome": "float64"
         },
         "provisional_types": false,
+        "structure_validation": "complete_source_width_v1",
         "header_mapping": [
           {
             "position": 1,
@@ -54394,9 +55504,138 @@
       },
       "generated_at": "2026-10-09T00:00:00+00:00",
       "methodology_id": "tabular_regression_v1",
-      "schema_version": "1.1"
+      "schema_version": "1.1",
+      "guidance": {
+        "version": "finding_guidance_v1",
+        "items": {
+          "regression_relationships_unknown": {
+            "catalogue": "target_relationship_unknown",
+            "title": "Supported target relationships",
+            "observed": [
+              "outcome = input"
+            ],
+            "impact": [
+              "A target reproducible from inputs whose availability is unknown may be leakage or a legitimate deterministic rule."
+            ],
+            "investigate": [
+              "Declare each related input's availability, then re-run."
+            ],
+            "options": [
+              {
+                "option": "Declare availability and re-run",
+                "prerequisites": "You know when each input becomes available.",
+                "avoid_when": "Not applicable: this changes no data.",
+                "verify": "The re-run classifies the relationship as available or unavailable at prediction time."
+              }
+            ],
+            "unknowns": [
+              "Availability of the related inputs was not declared."
+            ]
+          }
+        },
+        "scope": {
+          "execution": "completed",
+          "not_completed": [],
+          "not_completed_total": 0,
+          "unknowns": [
+            "0 possible placeholder or sentinel codes were suggested but none was declared, so none was interpreted.",
+            "Prediction-time availability is known only for features you declared; the relationship search is bounded to its stated methods.",
+            "Availability of the related inputs was not declared."
+          ],
+          "conclusion": "Within the completed checks, 1 finding calls for review (1 moderate). This is review evidence for the stated scope; it does not establish model performance, semantic correctness or prediction-time availability."
+        },
+        "policy": [
+          {
+            "rule": "IQR review candidates",
+            "threshold": "≥ 5% of finite values outside 1.5 × IQR fences",
+            "effect": "Finding (evidence only; no score)."
+          },
+          {
+            "rule": "Column missingness",
+            "threshold": "≥ 25% missing (High from 50%); cells ≥ 10%; rows with a gap ≥ 25%",
+            "effect": "Findings (evidence only)."
+          },
+          {
+            "rule": "Duplicates",
+            "threshold": "Any repeated row (Moderate from 2%, High from 10%)",
+            "effect": "Finding (evidence only)."
+          },
+          {
+            "rule": "Relationship search",
+            "threshold": "Declared support and coverage requirements",
+            "effect": "Findings by declared availability; bounded search."
+          },
+          {
+            "rule": "Score",
+            "threshold": "None",
+            "effect": "No validated score is defined for regression."
+          }
+        ]
+      },
+      "contextual": {
+        "version": "context_v1",
+        "status": "completed",
+        "prediction": {
+          "objective": null,
+          "point": null,
+          "declared": false
+        },
+        "declarations": {},
+        "availability": {},
+        "features": [
+          "input"
+        ],
+        "candidates": [],
+        "candidate_rules": {
+          "version": "candidate_rules_v1",
+          "placeholder_tokens": [
+            "unknown",
+            "unk",
+            "n/a",
+            "na",
+            "none",
+            "null",
+            "missing",
+            "?",
+            "-",
+            "--",
+            "not known",
+            "not available",
+            "undefined",
+            "unspecified",
+            "nan",
+            "blank"
+          ],
+          "sentinel_codes": [
+            -1,
+            -9,
+            -99,
+            -999,
+            -9999,
+            9,
+            99,
+            999,
+            9999,
+            99999
+          ],
+          "meaning": "Candidates are suggestions only; nothing is interpreted until you declare it."
+        },
+        "interpreted": {},
+        "observed_dependencies": {
+          "pairs": [],
+          "indicators_examined": 0,
+          "indicators_unexamined": 0,
+          "rule": "cross-column code pairs sharing at least 95% of their rows and at least 5 rows"
+        },
+        "demonstrated_use": "Not observed: DataTrust does not see your pipeline. A before/after comparison can show which columns survive preprocessing.",
+        "dependency_search": {
+          "status": "not_applicable",
+          "reason": "Runs for single-target classification; regression uses its bounded relationship search."
+        },
+        "findings": []
+      }
     },
-    "html_sha256": "98c76e1cbece67a087017802f7bcb42e77e384365f589e325cf37789a4b8ce66"
+    "html_sha256": "fd15b743298bbe9ed9e0a1f516538d36fb705b7db944bdfc068209a009ae77c2"
   },
   "affine": {
     "dataset": {
@@ -55349,6 +56588,7 @@
           "outcome": "float64"
         },
         "provisional_types": false,
+        "structure_validation": "complete_source_width_v1",
         "header_mapping": [
           {
             "position": 1,
@@ -56769,9 +58009,138 @@
       },
       "generated_at": "2026-10-09T00:00:00+00:00",
       "methodology_id": "tabular_regression_v1",
-      "schema_version": "1.1"
+      "schema_version": "1.1",
+      "guidance": {
+        "version": "finding_guidance_v1",
+        "items": {
+          "regression_relationships_unknown": {
+            "catalogue": "target_relationship_unknown",
+            "title": "Supported target relationships",
+            "observed": [
+              "outcome = 0.5000000000000001 * input + -3.5000000000000004"
+            ],
+            "impact": [
+              "A target reproducible from inputs whose availability is unknown may be leakage or a legitimate deterministic rule."
+            ],
+            "investigate": [
+              "Declare each related input's availability, then re-run."
+            ],
+            "options": [
+              {
+                "option": "Declare availability and re-run",
+                "prerequisites": "You know when each input becomes available.",
+                "avoid_when": "Not applicable: this changes no data.",
+                "verify": "The re-run classifies the relationship as available or unavailable at prediction time."
+              }
+            ],
+            "unknowns": [
+              "Availability of the related inputs was not declared."
+            ]
+          }
+        },
+        "scope": {
+          "execution": "completed",
+          "not_completed": [],
+          "not_completed_total": 0,
+          "unknowns": [
+            "0 possible placeholder or sentinel codes were suggested but none was declared, so none was interpreted.",
+            "Prediction-time availability is known only for features you declared; the relationship search is bounded to its stated methods.",
+            "Availability of the related inputs was not declared."
+          ],
+          "conclusion": "Within the completed checks, 1 finding calls for review (1 moderate). This is review evidence for the stated scope; it does not establish model performance, semantic correctness or prediction-time availability."
+        },
+        "policy": [
+          {
+            "rule": "IQR review candidates",
+            "threshold": "≥ 5% of finite values outside 1.5 × IQR fences",
+            "effect": "Finding (evidence only; no score)."
+          },
+          {
+            "rule": "Column missingness",
+            "threshold": "≥ 25% missing (High from 50%); cells ≥ 10%; rows with a gap ≥ 25%",
+            "effect": "Findings (evidence only)."
+          },
+          {
+            "rule": "Duplicates",
+            "threshold": "Any repeated row (Moderate from 2%, High from 10%)",
+            "effect": "Finding (evidence only)."
+          },
+          {
+            "rule": "Relationship search",
+            "threshold": "Declared support and coverage requirements",
+            "effect": "Findings by declared availability; bounded search."
+          },
+          {
+            "rule": "Score",
+            "threshold": "None",
+            "effect": "No validated score is defined for regression."
+          }
+        ]
+      },
+      "contextual": {
+        "version": "context_v1",
+        "status": "completed",
+        "prediction": {
+          "objective": null,
+          "point": null,
+          "declared": false
+        },
+        "declarations": {},
+        "availability": {},
+        "features": [
+          "input"
+        ],
+        "candidates": [],
+        "candidate_rules": {
+          "version": "candidate_rules_v1",
+          "placeholder_tokens": [
+            "unknown",
+            "unk",
+            "n/a",
+            "na",
+            "none",
+            "null",
+            "missing",
+            "?",
+            "-",
+            "--",
+            "not known",
+            "not available",
+            "undefined",
+            "unspecified",
+            "nan",
+            "blank"
+          ],
+          "sentinel_codes": [
+            -1,
+            -9,
+            -99,
+            -999,
+            -9999,
+            9,
+            99,
+            999,
+            9999,
+            99999
+          ],
+          "meaning": "Candidates are suggestions only; nothing is interpreted until you declare it."
+        },
+        "interpreted": {},
+        "observed_dependencies": {
+          "pairs": [],
+          "indicators_examined": 0,
+          "indicators_unexamined": 0,
+          "rule": "cross-column code pairs sharing at least 95% of their rows and at least 5 rows"
+        },
+        "demonstrated_use": "Not observed: DataTrust does not see your pipeline. A before/after comparison can show which columns survive preprocessing.",
+        "dependency_search": {
+          "status": "not_applicable",
+          "reason": "Runs for single-target classification; regression uses its bounded relationship search."
+        },
+        "findings": []
+      }
     },
-    "html_sha256": "a9e14192eb72e3b20e30da33af365114f02e09f8f92553762bcccc27deebee05"
+    "html_sha256": "1347793f8f11bd3224050dd4d1d13d21aebcaf7ad3ca6cae6e7df3c121ee4fd4"
   },
   "sum": {
     "dataset": {
@@ -57810,6 +59179,7 @@
           "outcome": "float64"
         },
         "provisional_types": false,
+        "structure_validation": "complete_source_width_v1",
         "header_mapping": [
           {
             "position": 1,
@@ -59342,9 +60712,139 @@
       },
       "generated_at": "2026-10-09T00:00:00+00:00",
       "methodology_id": "tabular_regression_v1",
-      "schema_version": "1.1"
+      "schema_version": "1.1",
+      "guidance": {
+        "version": "finding_guidance_v1",
+        "items": {
+          "regression_relationships_unknown": {
+            "catalogue": "target_relationship_unknown",
+            "title": "Supported target relationships",
+            "observed": [
+              "outcome = a + b"
+            ],
+            "impact": [
+              "A target reproducible from inputs whose availability is unknown may be leakage or a legitimate deterministic rule."
+            ],
+            "investigate": [
+              "Declare each related input's availability, then re-run."
+            ],
+            "options": [
+              {
+                "option": "Declare availability and re-run",
+                "prerequisites": "You know when each input becomes available.",
+                "avoid_when": "Not applicable: this changes no data.",
+                "verify": "The re-run classifies the relationship as available or unavailable at prediction time."
+              }
+            ],
+            "unknowns": [
+              "Availability of the related inputs was not declared."
+            ]
+          }
+        },
+        "scope": {
+          "execution": "completed",
+          "not_completed": [],
+          "not_completed_total": 0,
+          "unknowns": [
+            "0 possible placeholder or sentinel codes were suggested but none was declared, so none was interpreted.",
+            "Prediction-time availability is known only for features you declared; the relationship search is bounded to its stated methods.",
+            "Availability of the related inputs was not declared."
+          ],
+          "conclusion": "Within the completed checks, 1 finding calls for review (1 moderate). This is review evidence for the stated scope; it does not establish model performance, semantic correctness or prediction-time availability."
+        },
+        "policy": [
+          {
+            "rule": "IQR review candidates",
+            "threshold": "≥ 5% of finite values outside 1.5 × IQR fences",
+            "effect": "Finding (evidence only; no score)."
+          },
+          {
+            "rule": "Column missingness",
+            "threshold": "≥ 25% missing (High from 50%); cells ≥ 10%; rows with a gap ≥ 25%",
+            "effect": "Findings (evidence only)."
+          },
+          {
+            "rule": "Duplicates",
+            "threshold": "Any repeated row (Moderate from 2%, High from 10%)",
+            "effect": "Finding (evidence only)."
+          },
+          {
+            "rule": "Relationship search",
+            "threshold": "Declared support and coverage requirements",
+            "effect": "Findings by declared availability; bounded search."
+          },
+          {
+            "rule": "Score",
+            "threshold": "None",
+            "effect": "No validated score is defined for regression."
+          }
+        ]
+      },
+      "contextual": {
+        "version": "context_v1",
+        "status": "completed",
+        "prediction": {
+          "objective": null,
+          "point": null,
+          "declared": false
+        },
+        "declarations": {},
+        "availability": {},
+        "features": [
+          "a",
+          "b"
+        ],
+        "candidates": [],
+        "candidate_rules": {
+          "version": "candidate_rules_v1",
+          "placeholder_tokens": [
+            "unknown",
+            "unk",
+            "n/a",
+            "na",
+            "none",
+            "null",
+            "missing",
+            "?",
+            "-",
+            "--",
+            "not known",
+            "not available",
+            "undefined",
+            "unspecified",
+            "nan",
+            "blank"
+          ],
+          "sentinel_codes": [
+            -1,
+            -9,
+            -99,
+            -999,
+            -9999,
+            9,
+            99,
+            999,
+            9999,
+            99999
+          ],
+          "meaning": "Candidates are suggestions only; nothing is interpreted until you declare it."
+        },
+        "interpreted": {},
+        "observed_dependencies": {
+          "pairs": [],
+          "indicators_examined": 0,
+          "indicators_unexamined": 0,
+          "rule": "cross-column code pairs sharing at least 95% of their rows and at least 5 rows"
+        },
+        "demonstrated_use": "Not observed: DataTrust does not see your pipeline. A before/after comparison can show which columns survive preprocessing.",
+        "dependency_search": {
+          "status": "not_applicable",
+          "reason": "Runs for single-target classification; regression uses its bounded relationship search."
+        },
+        "findings": []
+      }
     },
-    "html_sha256": "064a9331829e6d282ba430c77e1cb2061d4c1964e193934773253cdfe0c5af59"
+    "html_sha256": "6fe757fce88fb72e3f60905ded7d98fae55ab840e7eff8b0c77ff42a7d9bdf6d"
   },
   "sparse_copy": {
     "dataset": {
@@ -60341,6 +61841,7 @@
           "outcome": "float64"
         },
         "provisional_types": false,
+        "structure_validation": "complete_source_width_v1",
         "header_mapping": [
           {
             "position": 1,
@@ -61797,9 +63298,231 @@
       },
       "generated_at": "2026-10-09T00:00:00+00:00",
       "methodology_id": "tabular_regression_v1",
-      "schema_version": "1.1"
+      "schema_version": "1.1",
+      "guidance": {
+        "version": "finding_guidance_v1",
+        "items": {
+          "column_missingness": {
+            "catalogue": "missing_values",
+            "title": "Substantial column missingness",
+            "observed": [
+              "input: 80 of 100 rows missing (80.0%).",
+              "80 missing cells (40.0% of cells); 80 rows with at least one missing feature (80.0%)."
+            ],
+            "impact": [
+              "Rows with gaps may be dropped or filled by later tools without notice, changing who is represented.",
+              "If missingness depends on the outcome or on a group, both deletion and imputation can bias results."
+            ],
+            "investigate": [
+              "Which columns and rows carry the gaps, and whether they share a source, period or group.",
+              "Whether a gap means 'not collected', 'not applicable' or 'zero', which the file alone cannot say."
+            ],
+            "options": [
+              {
+                "option": "Keep gaps and use methods that accept missing values",
+                "prerequisites": "The downstream method handles missing values natively.",
+                "avoid_when": "The method silently drops or zero-fills them.",
+                "verify": "Confirm the row count and class shares that reach the method equal those analysed here."
+              },
+              {
+                "option": "Impute values",
+                "prerequisites": "The meaning of a gap is known and imputation fits it (for example, values missing at random within groups).",
+                "avoid_when": "Gaps are structural ('not applicable') or concentrated in one outcome or group; or the imputer is fitted on data that includes evaluation rows.",
+                "verify": "Fit the imputer on training rows only; add a was-missing indicator; compare results with and without imputation on the same split."
+              },
+              {
+                "option": "Drop affected rows or columns",
+                "prerequisites": "The affected share is small and unrelated to the outcome.",
+                "avoid_when": "Gaps concentrate in one class or group, or a column is mostly empty but informative when present.",
+                "verify": "Report how many rows, and which class and group shares, remain after dropping."
+              }
+            ],
+            "unknowns": [
+              "Why values are missing, and whether text placeholders such as 'unknown' stand for missing values, was not assessed."
+            ]
+          },
+          "dataset_missingness": {
+            "catalogue": "missing_values",
+            "title": "Dataset-wide missingness",
+            "observed": [
+              "input: 80 of 100 rows missing (80.0%).",
+              "80 missing cells (40.0% of cells); 80 rows with at least one missing feature (80.0%)."
+            ],
+            "impact": [
+              "Rows with gaps may be dropped or filled by later tools without notice, changing who is represented.",
+              "If missingness depends on the outcome or on a group, both deletion and imputation can bias results."
+            ],
+            "investigate": [
+              "Which columns and rows carry the gaps, and whether they share a source, period or group.",
+              "Whether a gap means 'not collected', 'not applicable' or 'zero', which the file alone cannot say."
+            ],
+            "options": [
+              {
+                "option": "Keep gaps and use methods that accept missing values",
+                "prerequisites": "The downstream method handles missing values natively.",
+                "avoid_when": "The method silently drops or zero-fills them.",
+                "verify": "Confirm the row count and class shares that reach the method equal those analysed here."
+              },
+              {
+                "option": "Impute values",
+                "prerequisites": "The meaning of a gap is known and imputation fits it (for example, values missing at random within groups).",
+                "avoid_when": "Gaps are structural ('not applicable') or concentrated in one outcome or group; or the imputer is fitted on data that includes evaluation rows.",
+                "verify": "Fit the imputer on training rows only; add a was-missing indicator; compare results with and without imputation on the same split."
+              },
+              {
+                "option": "Drop affected rows or columns",
+                "prerequisites": "The affected share is small and unrelated to the outcome.",
+                "avoid_when": "Gaps concentrate in one class or group, or a column is mostly empty but informative when present.",
+                "verify": "Report how many rows, and which class and group shares, remain after dropping."
+              }
+            ],
+            "unknowns": [
+              "Why values are missing, and whether text placeholders such as 'unknown' stand for missing values, was not assessed."
+            ]
+          },
+          "regression_repeated_input_variation": {
+            "catalogue": "label_conflicts",
+            "title": "Target variation within repeated inputs",
+            "observed": [
+              "80 participating rows."
+            ],
+            "impact": [
+              "Identical recorded inputs with different outcomes limit how well any model can fit those cases.",
+              "Conflicts may reflect omitted context, outcomes that are genuinely random, or annotation differences."
+            ],
+            "investigate": [
+              "A sample of conflicting groups: what distinguishes them that the file does not record.",
+              "Whether conflicts concentrate in one source, annotator or period."
+            ],
+            "options": [
+              {
+                "option": "Keep all rows and treat the variation as real",
+                "prerequisites": "The variation is plausible for the outcome.",
+                "avoid_when": "One label is known to be wrong.",
+                "verify": "Report the conflicting share alongside model results."
+              },
+              {
+                "option": "Adjudicate labels",
+                "prerequisites": "A reviewer or reference can decide the correct label.",
+                "avoid_when": "No reliable reference exists; majority voting would invent certainty.",
+                "verify": "Record changed labels and re-run this analysis."
+              },
+              {
+                "option": "Add the missing context as features",
+                "prerequisites": "The distinguishing information exists and is available at prediction time.",
+                "avoid_when": "The added information is only known after the outcome.",
+                "verify": "Re-check repeated-input conflicts with the added features."
+              }
+            ],
+            "unknowns": [
+              "Which label, if any, is correct was not assessed."
+            ]
+          }
+        },
+        "scope": {
+          "execution": "completed",
+          "not_completed": [],
+          "not_completed_total": 0,
+          "unknowns": [
+            "0 possible placeholder or sentinel codes were suggested but none was declared, so none was interpreted.",
+            "Prediction-time availability is known only for features you declared; the relationship search is bounded to its stated methods.",
+            "Why values are missing, and whether text placeholders such as 'unknown' stand for missing values, was not assessed.",
+            "Which label, if any, is correct was not assessed."
+          ],
+          "conclusion": "Within the completed checks, 3 findings call for review (2 high, 1 low). This is review evidence for the stated scope; it does not establish model performance, semantic correctness or prediction-time availability."
+        },
+        "policy": [
+          {
+            "rule": "IQR review candidates",
+            "threshold": "≥ 5% of finite values outside 1.5 × IQR fences",
+            "effect": "Finding (evidence only; no score)."
+          },
+          {
+            "rule": "Column missingness",
+            "threshold": "≥ 25% missing (High from 50%); cells ≥ 10%; rows with a gap ≥ 25%",
+            "effect": "Findings (evidence only)."
+          },
+          {
+            "rule": "Duplicates",
+            "threshold": "Any repeated row (Moderate from 2%, High from 10%)",
+            "effect": "Finding (evidence only)."
+          },
+          {
+            "rule": "Relationship search",
+            "threshold": "Declared support and coverage requirements",
+            "effect": "Findings by declared availability; bounded search."
+          },
+          {
+            "rule": "Score",
+            "threshold": "None",
+            "effect": "No validated score is defined for regression."
+          }
+        ]
+      },
+      "contextual": {
+        "version": "context_v1",
+        "status": "completed",
+        "prediction": {
+          "objective": null,
+          "point": null,
+          "declared": false
+        },
+        "declarations": {},
+        "availability": {},
+        "features": [
+          "input"
+        ],
+        "candidates": [],
+        "candidate_rules": {
+          "version": "candidate_rules_v1",
+          "placeholder_tokens": [
+            "unknown",
+            "unk",
+            "n/a",
+            "na",
+            "none",
+            "null",
+            "missing",
+            "?",
+            "-",
+            "--",
+            "not known",
+            "not available",
+            "undefined",
+            "unspecified",
+            "nan",
+            "blank"
+          ],
+          "sentinel_codes": [
+            -1,
+            -9,
+            -99,
+            -999,
+            -9999,
+            9,
+            99,
+            999,
+            9999,
+            99999
+          ],
+          "meaning": "Candidates are suggestions only; nothing is interpreted until you declare it."
+        },
+        "interpreted": {},
+        "observed_dependencies": {
+          "pairs": [],
+          "indicators_examined": 0,
+          "indicators_unexamined": 0,
+          "rule": "cross-column code pairs sharing at least 95% of their rows and at least 5 rows"
+        },
+        "demonstrated_use": "Not observed: DataTrust does not see your pipeline. A before/after comparison can show which columns survive preprocessing.",
+        "dependency_search": {
+          "status": "not_applicable",
+          "reason": "Runs for single-target classification; regression uses its bounded relationship search."
+        },
+        "findings": []
+      }
     },
-    "html_sha256": "cf84488e798022be3a8a16761809005084ecc111789575242b461f267ff0e109"
+    "html_sha256": "bba3402bff7580719f43b62f19d734a3d437b3f751a5071c1262578ea37cc2a0"
   },
   "missing_nonfinite": {
     "dataset": {
@@ -62644,6 +64367,7 @@
           "outcome": "float64"
         },
         "provisional_types": false,
+        "structure_validation": "complete_source_width_v1",
         "header_mapping": [
           {
             "position": 1,
@@ -63976,9 +65700,177 @@
       },
       "generated_at": "2026-10-09T00:00:00+00:00",
       "methodology_id": "tabular_regression_v1",
-      "schema_version": "1.1"
+      "schema_version": "1.1",
+      "guidance": {
+        "version": "finding_guidance_v1",
+        "items": {
+          "regression_nonfinite_targets": {
+            "catalogue": "non_finite",
+            "title": "Non-finite numerical targets",
+            "observed": [
+              "Positive infinity: 1; negative infinity: 1."
+            ],
+            "impact": [
+              "Infinity values break many calculations or are silently dropped."
+            ],
+            "investigate": [
+              "Whether infinities come from division by zero or are used as codes."
+            ],
+            "options": [
+              {
+                "option": "Recompute at the source",
+                "prerequisites": "The originating calculation is known.",
+                "avoid_when": "Infinity is a deliberate code with a documented meaning.",
+                "verify": "Re-run this analysis; the non-finite count should be zero."
+              },
+              {
+                "option": "Declare them missing",
+                "prerequisites": "They represent 'undefined'.",
+                "avoid_when": "They carry a distinct meaning.",
+                "verify": "Compare counts before and after."
+              }
+            ],
+            "unknowns": [
+              "The origin of non-finite values was not assessed."
+            ]
+          },
+          "regression_missing_targets": {
+            "catalogue": "missing_targets",
+            "title": "Missing numerical targets",
+            "observed": [
+              "Finite and missing populations are reported separately."
+            ],
+            "impact": [
+              "Rows without a target cannot be used for supervised training or evaluation and were excluded from target calculations.",
+              "If unlabeled rows differ from labeled ones, results describe only the labeled population."
+            ],
+            "investigate": [
+              "Why the target is absent: pending, not applicable, or lost.",
+              "Whether unlabeled rows differ in their feature distributions from labeled rows."
+            ],
+            "options": [
+              {
+                "option": "Exclude unlabeled rows from supervised use and say so",
+                "prerequisites": "None.",
+                "avoid_when": "The unlabeled rows are the population the model will serve.",
+                "verify": "Compare feature distributions of labeled and unlabeled rows and report any difference."
+              },
+              {
+                "option": "Obtain the missing labels",
+                "prerequisites": "The labels exist upstream or can be collected.",
+                "avoid_when": "Labels would be produced by a model or rule derived from the same features.",
+                "verify": "Re-run this analysis once labels are added and compare target shares."
+              }
+            ],
+            "unknowns": [
+              "Whether absent targets are pending, inapplicable or lost was not declared."
+            ]
+          }
+        },
+        "scope": {
+          "execution": "completed",
+          "not_completed": [],
+          "not_completed_total": 0,
+          "unknowns": [
+            "0 possible placeholder or sentinel codes were suggested but none was declared, so none was interpreted.",
+            "Prediction-time availability is known only for features you declared; the relationship search is bounded to its stated methods.",
+            "The origin of non-finite values was not assessed.",
+            "Whether absent targets are pending, inapplicable or lost was not declared."
+          ],
+          "conclusion": "Within the completed checks, 2 findings call for review (1 high, 1 moderate). This is review evidence for the stated scope; it does not establish model performance, semantic correctness or prediction-time availability."
+        },
+        "policy": [
+          {
+            "rule": "IQR review candidates",
+            "threshold": "≥ 5% of finite values outside 1.5 × IQR fences",
+            "effect": "Finding (evidence only; no score)."
+          },
+          {
+            "rule": "Column missingness",
+            "threshold": "≥ 25% missing (High from 50%); cells ≥ 10%; rows with a gap ≥ 25%",
+            "effect": "Findings (evidence only)."
+          },
+          {
+            "rule": "Duplicates",
+            "threshold": "Any repeated row (Moderate from 2%, High from 10%)",
+            "effect": "Finding (evidence only)."
+          },
+          {
+            "rule": "Relationship search",
+            "threshold": "Declared support and coverage requirements",
+            "effect": "Findings by declared availability; bounded search."
+          },
+          {
+            "rule": "Score",
+            "threshold": "None",
+            "effect": "No validated score is defined for regression."
+          }
+        ]
+      },
+      "contextual": {
+        "version": "context_v1",
+        "status": "completed",
+        "prediction": {
+          "objective": null,
+          "point": null,
+          "declared": false
+        },
+        "declarations": {},
+        "availability": {},
+        "features": [
+          "input"
+        ],
+        "candidates": [],
+        "candidate_rules": {
+          "version": "candidate_rules_v1",
+          "placeholder_tokens": [
+            "unknown",
+            "unk",
+            "n/a",
+            "na",
+            "none",
+            "null",
+            "missing",
+            "?",
+            "-",
+            "--",
+            "not known",
+            "not available",
+            "undefined",
+            "unspecified",
+            "nan",
+            "blank"
+          ],
+          "sentinel_codes": [
+            -1,
+            -9,
+            -99,
+            -999,
+            -9999,
+            9,
+            99,
+            999,
+            9999,
+            99999
+          ],
+          "meaning": "Candidates are suggestions only; nothing is interpreted until you declare it."
+        },
+        "interpreted": {},
+        "observed_dependencies": {
+          "pairs": [],
+          "indicators_examined": 0,
+          "indicators_unexamined": 0,
+          "rule": "cross-column code pairs sharing at least 95% of their rows and at least 5 rows"
+        },
+        "demonstrated_use": "Not observed: DataTrust does not see your pipeline. A before/after comparison can show which columns survive preprocessing.",
+        "dependency_search": {
+          "status": "not_applicable",
+          "reason": "Runs for single-target classification; regression uses its bounded relationship search."
+        },
+        "findings": []
+      }
     },
-    "html_sha256": "d22cde512eab1e5723bb8a7195cbddfa9d8232f05614e362b5a34222f3c8d67c"
+    "html_sha256": "69c007bfc53434c64ecf84070394e095b2ccc4816eb326d3c1b0acf059b59093"
   },
   "constant": {
     "dataset": {
@@ -64782,6 +66674,7 @@
           "outcome": "float64"
         },
         "provisional_types": false,
+        "structure_validation": "complete_source_width_v1",
         "header_mapping": [
           {
             "position": 1,
@@ -66083,9 +67976,163 @@
       },
       "generated_at": "2026-10-09T00:00:00+00:00",
       "methodology_id": "tabular_regression_v1",
-      "schema_version": "1.1"
+      "schema_version": "1.1",
+      "guidance": {
+        "version": "finding_guidance_v1",
+        "items": {
+          "regression_constant_target": {
+            "catalogue": "single_class",
+            "title": "Observed constant target",
+            "observed": [
+              "100 finite observations."
+            ],
+            "impact": [
+              "With one observed class or a constant target, there is no variation to learn or evaluate."
+            ],
+            "investigate": [
+              "Whether the file is a filtered subset, and whether other outcomes exist upstream."
+            ],
+            "options": [
+              {
+                "option": "Recover the excluded outcomes",
+                "prerequisites": "The full population is available.",
+                "avoid_when": "The task genuinely has a single outcome.",
+                "verify": "Re-run this analysis and confirm two or more outcomes."
+              },
+              {
+                "option": "Reframe the task",
+                "prerequisites": "The question can be posed without a varying target (for example, profiling or anomaly review).",
+                "avoid_when": "A supervised model is still required.",
+                "verify": "Run the matching DataTrust mode for the reframed task."
+              }
+            ],
+            "unknowns": [
+              "Whether other outcomes exist outside this file was not assessed."
+            ]
+          }
+        },
+        "scope": {
+          "execution": "completed",
+          "not_completed": [
+            {
+              "check": "regression_extremes",
+              "scope": "outcome",
+              "state": "excluded",
+              "reason": "zero_iqr"
+            },
+            {
+              "check": "regression_bowley_skewness",
+              "scope": "outcome",
+              "state": "excluded",
+              "reason": "zero_iqr"
+            },
+            {
+              "check": "regression_rounding",
+              "scope": "outcome",
+              "state": "excluded",
+              "reason": "insufficient_support"
+            }
+          ],
+          "not_completed_total": 3,
+          "unknowns": [
+            "0 possible placeholder or sentinel codes were suggested but none was declared, so none was interpreted.",
+            "Prediction-time availability is known only for features you declared; the relationship search is bounded to its stated methods.",
+            "Whether other outcomes exist outside this file was not assessed."
+          ],
+          "conclusion": "Within the completed checks, 1 finding calls for review (1 high). Some scopes were excluded by a method's preconditions and are listed. This is review evidence for the stated scope; it does not establish model performance, semantic correctness or prediction-time availability."
+        },
+        "policy": [
+          {
+            "rule": "IQR review candidates",
+            "threshold": "≥ 5% of finite values outside 1.5 × IQR fences",
+            "effect": "Finding (evidence only; no score)."
+          },
+          {
+            "rule": "Column missingness",
+            "threshold": "≥ 25% missing (High from 50%); cells ≥ 10%; rows with a gap ≥ 25%",
+            "effect": "Findings (evidence only)."
+          },
+          {
+            "rule": "Duplicates",
+            "threshold": "Any repeated row (Moderate from 2%, High from 10%)",
+            "effect": "Finding (evidence only)."
+          },
+          {
+            "rule": "Relationship search",
+            "threshold": "Declared support and coverage requirements",
+            "effect": "Findings by declared availability; bounded search."
+          },
+          {
+            "rule": "Score",
+            "threshold": "None",
+            "effect": "No validated score is defined for regression."
+          }
+        ]
+      },
+      "contextual": {
+        "version": "context_v1",
+        "status": "completed",
+        "prediction": {
+          "objective": null,
+          "point": null,
+          "declared": false
+        },
+        "declarations": {},
+        "availability": {},
+        "features": [
+          "input"
+        ],
+        "candidates": [],
+        "candidate_rules": {
+          "version": "candidate_rules_v1",
+          "placeholder_tokens": [
+            "unknown",
+            "unk",
+            "n/a",
+            "na",
+            "none",
+            "null",
+            "missing",
+            "?",
+            "-",
+            "--",
+            "not known",
+            "not available",
+            "undefined",
+            "unspecified",
+            "nan",
+            "blank"
+          ],
+          "sentinel_codes": [
+            -1,
+            -9,
+            -99,
+            -999,
+            -9999,
+            9,
+            99,
+            999,
+            9999,
+            99999
+          ],
+          "meaning": "Candidates are suggestions only; nothing is interpreted until you declare it."
+        },
+        "interpreted": {},
+        "observed_dependencies": {
+          "pairs": [],
+          "indicators_examined": 0,
+          "indicators_unexamined": 0,
+          "rule": "cross-column code pairs sharing at least 95% of their rows and at least 5 rows"
+        },
+        "demonstrated_use": "Not observed: DataTrust does not see your pipeline. A before/after comparison can show which columns survive preprocessing.",
+        "dependency_search": {
+          "status": "not_applicable",
+          "reason": "Runs for single-target classification; regression uses its bounded relationship search."
+        },
+        "findings": []
+      }
     },
-    "html_sha256": "39dfb1ae7a81ce50cc9f061322bfac72200e342b8666221cbbbfa7c198b0547f"
+    "html_sha256": "2784c6ecf290af45d9ac8677f35893ae8fda8030806a28cfb58efaf219c70975"
   },
   "constraint_union": {
     "dataset": {
@@ -67047,6 +69094,7 @@
           "outcome": "float64"
         },
         "provisional_types": false,
+        "structure_validation": "complete_source_width_v1",
         "header_mapping": [
           {
             "position": 1,
@@ -68411,9 +70459,144 @@
       },
       "generated_at": "2026-10-09T00:00:00+00:00",
       "methodology_id": "tabular_regression_v1",
-      "schema_version": "1.1"
+      "schema_version": "1.1",
+      "guidance": {
+        "version": "finding_guidance_v1",
+        "items": {
+          "regression_declared_constraints": {
+            "catalogue": "declared_constraints",
+            "title": "Declared target constraint violations",
+            "observed": [
+              "above_declared_maximum: 9; declared_nonnegative: 2; declared_integer: 1"
+            ],
+            "impact": [
+              "Values that violate requirements you declared contradict the intended definition of the data."
+            ],
+            "investigate": [
+              "The violating values against the declaration: is the value wrong, or the requirement?"
+            ],
+            "options": [
+              {
+                "option": "Correct values at the source",
+                "prerequisites": "The requirement is right and the values are errors.",
+                "avoid_when": "The requirement was mis-specified.",
+                "verify": "Re-run this analysis; violations should be zero."
+              },
+              {
+                "option": "Revise the declaration",
+                "prerequisites": "The requirement was too strict.",
+                "avoid_when": "The values are genuinely invalid.",
+                "verify": "Re-run with the revised declaration."
+              }
+            ],
+            "unknowns": [
+              "DataTrust checks your declaration; it does not independently verify it."
+            ]
+          }
+        },
+        "scope": {
+          "execution": "completed",
+          "not_completed": [],
+          "not_completed_total": 0,
+          "unknowns": [
+            "0 possible placeholder or sentinel codes were suggested but none was declared, so none was interpreted.",
+            "Prediction-time availability is known only for features you declared; the relationship search is bounded to its stated methods.",
+            "DataTrust checks your declaration; it does not independently verify it."
+          ],
+          "conclusion": "Within the completed checks, 1 finding calls for review (1 high). This is review evidence for the stated scope; it does not establish model performance, semantic correctness or prediction-time availability."
+        },
+        "policy": [
+          {
+            "rule": "IQR review candidates",
+            "threshold": "≥ 5% of finite values outside 1.5 × IQR fences",
+            "effect": "Finding (evidence only; no score)."
+          },
+          {
+            "rule": "Column missingness",
+            "threshold": "≥ 25% missing (High from 50%); cells ≥ 10%; rows with a gap ≥ 25%",
+            "effect": "Findings (evidence only)."
+          },
+          {
+            "rule": "Duplicates",
+            "threshold": "Any repeated row (Moderate from 2%, High from 10%)",
+            "effect": "Finding (evidence only)."
+          },
+          {
+            "rule": "Relationship search",
+            "threshold": "Declared support and coverage requirements",
+            "effect": "Findings by declared availability; bounded search."
+          },
+          {
+            "rule": "Score",
+            "threshold": "None",
+            "effect": "No validated score is defined for regression."
+          }
+        ]
+      },
+      "contextual": {
+        "version": "context_v1",
+        "status": "completed",
+        "prediction": {
+          "objective": null,
+          "point": null,
+          "declared": false
+        },
+        "declarations": {},
+        "availability": {},
+        "features": [
+          "input"
+        ],
+        "candidates": [],
+        "candidate_rules": {
+          "version": "candidate_rules_v1",
+          "placeholder_tokens": [
+            "unknown",
+            "unk",
+            "n/a",
+            "na",
+            "none",
+            "null",
+            "missing",
+            "?",
+            "-",
+            "--",
+            "not known",
+            "not available",
+            "undefined",
+            "unspecified",
+            "nan",
+            "blank"
+          ],
+          "sentinel_codes": [
+            -1,
+            -9,
+            -99,
+            -999,
+            -9999,
+            9,
+            99,
+            999,
+            9999,
+            99999
+          ],
+          "meaning": "Candidates are suggestions only; nothing is interpreted until you declare it."
+        },
+        "interpreted": {},
+        "observed_dependencies": {
+          "pairs": [],
+          "indicators_examined": 0,
+          "indicators_unexamined": 0,
+          "rule": "cross-column code pairs sharing at least 95% of their rows and at least 5 rows"
+        },
+        "demonstrated_use": "Not observed: DataTrust does not see your pipeline. A before/after comparison can show which columns survive preprocessing.",
+        "dependency_search": {
+          "status": "not_applicable",
+          "reason": "Runs for single-target classification; regression uses its bounded relationship search."
+        },
+        "findings": []
+      }
     },
-    "html_sha256": "a138c68d42fb035a3544e92bcf8fad45dec17ac87f3369ceae63a40ae7df0256"
+    "html_sha256": "1598f7fcca1394020992a728b25aec56b369eb1864a846f759f63513197ea62b"
   },
   "rounded_legitimate": {
     "dataset": {
@@ -69309,6 +71492,7 @@
           "outcome": "float64"
         },
         "provisional_types": false,
+        "structure_validation": "complete_source_width_v1",
         "header_mapping": [
           {
             "position": 1,
@@ -70625,9 +72809,112 @@
       },
       "generated_at": "2026-10-09T00:00:00+00:00",
       "methodology_id": "tabular_regression_v1",
-      "schema_version": "1.1"
+      "schema_version": "1.1",
+      "guidance": {
+        "version": "finding_guidance_v1",
+        "items": {},
+        "scope": {
+          "execution": "completed",
+          "not_completed": [],
+          "not_completed_total": 0,
+          "unknowns": [
+            "0 possible placeholder or sentinel codes were suggested but none was declared, so none was interpreted.",
+            "Prediction-time availability is known only for features you declared; the relationship search is bounded to its stated methods."
+          ],
+          "conclusion": "Within the completed checks, no finding met its review threshold. This is review evidence for the stated scope; it does not establish model performance, semantic correctness or prediction-time availability."
+        },
+        "policy": [
+          {
+            "rule": "IQR review candidates",
+            "threshold": "≥ 5% of finite values outside 1.5 × IQR fences",
+            "effect": "Finding (evidence only; no score)."
+          },
+          {
+            "rule": "Column missingness",
+            "threshold": "≥ 25% missing (High from 50%); cells ≥ 10%; rows with a gap ≥ 25%",
+            "effect": "Findings (evidence only)."
+          },
+          {
+            "rule": "Duplicates",
+            "threshold": "Any repeated row (Moderate from 2%, High from 10%)",
+            "effect": "Finding (evidence only)."
+          },
+          {
+            "rule": "Relationship search",
+            "threshold": "Declared support and coverage requirements",
+            "effect": "Findings by declared availability; bounded search."
+          },
+          {
+            "rule": "Score",
+            "threshold": "None",
+            "effect": "No validated score is defined for regression."
+          }
+        ]
+      },
+      "contextual": {
+        "version": "context_v1",
+        "status": "completed",
+        "prediction": {
+          "objective": null,
+          "point": null,
+          "declared": false
+        },
+        "declarations": {},
+        "availability": {},
+        "features": [
+          "input"
+        ],
+        "candidates": [],
+        "candidate_rules": {
+          "version": "candidate_rules_v1",
+          "placeholder_tokens": [
+            "unknown",
+            "unk",
+            "n/a",
+            "na",
+            "none",
+            "null",
+            "missing",
+            "?",
+            "-",
+            "--",
+            "not known",
+            "not available",
+            "undefined",
+            "unspecified",
+            "nan",
+            "blank"
+          ],
+          "sentinel_codes": [
+            -1,
+            -9,
+            -99,
+            -999,
+            -9999,
+            9,
+            99,
+            999,
+            9999,
+            99999
+          ],
+          "meaning": "Candidates are suggestions only; nothing is interpreted until you declare it."
+        },
+        "interpreted": {},
+        "observed_dependencies": {
+          "pairs": [],
+          "indicators_examined": 0,
+          "indicators_unexamined": 0,
+          "rule": "cross-column code pairs sharing at least 95% of their rows and at least 5 rows"
+        },
+        "demonstrated_use": "Not observed: DataTrust does not see your pipeline. A before/after comparison can show which columns survive preprocessing.",
+        "dependency_search": {
+          "status": "not_applicable",
+          "reason": "Runs for single-target classification; regression uses its bounded relationship search."
+        },
+        "findings": []
+      }
     },
-    "html_sha256": "90d55a5563a29879e1e0543b251fa1cb183904a82f945b6eb8f881f1657d3bed"
+    "html_sha256": "ee502e02b3ec1bb2f334399950a5b1267a26396843645594326b1b607983dc73"
   },
   "heavy_tail_legitimate": {
     "dataset": {
@@ -71578,6 +73865,7 @@
           "outcome": "float64"
         },
         "provisional_types": false,
+        "structure_validation": "complete_source_width_v1",
         "header_mapping": [
           {
             "position": 1,
@@ -72933,9 +75221,152 @@
       },
       "generated_at": "2026-10-09T00:00:00+00:00",
       "methodology_id": "tabular_regression_v1",
-      "schema_version": "1.1"
+      "schema_version": "1.1",
+      "guidance": {
+        "version": "finding_guidance_v1",
+        "items": {
+          "regression_target_extremes": {
+            "catalogue": "outliers",
+            "title": "Extreme target review candidates",
+            "observed": [
+              "Lower: 3; upper: 4."
+            ],
+            "impact": [
+              "Values outside the 1.5 × IQR fences can dominate scale-sensitive methods and summary statistics.",
+              "They may be legitimate tails, unit or entry errors, or sentinel codes."
+            ],
+            "investigate": [
+              "The extreme values themselves: are they plausible for the field's meaning and unit?",
+              "Whether a single code (for example −1 or 999) accounts for many of them."
+            ],
+            "options": [
+              {
+                "option": "Keep the values and use robust methods or transforms",
+                "prerequisites": "The values are legitimate.",
+                "avoid_when": "They are confirmed errors or sentinel codes.",
+                "verify": "Compare model behaviour with and without the transform on the same split."
+              },
+              {
+                "option": "Cap (winsorise) the values",
+                "prerequisites": "Extremes are legitimate but over-influential, and the cap is chosen from training rows only.",
+                "avoid_when": "Tails carry the signal you care about (for example, fraud amounts); or the cap uses evaluation data.",
+                "verify": "Report how many values change and compare metrics on tail cases specifically."
+              },
+              {
+                "option": "Correct or remove values",
+                "prerequisites": "They are confirmed errors from source records.",
+                "avoid_when": "They are legitimate rare observations.",
+                "verify": "Re-run this analysis and record which rows changed."
+              }
+            ],
+            "unknowns": [
+              "Whether extreme values are legitimate was not assessed; an IQR flag does not establish an error."
+            ]
+          }
+        },
+        "scope": {
+          "execution": "completed",
+          "not_completed": [],
+          "not_completed_total": 0,
+          "unknowns": [
+            "0 possible placeholder or sentinel codes were suggested but none was declared, so none was interpreted.",
+            "Prediction-time availability is known only for features you declared; the relationship search is bounded to its stated methods.",
+            "Whether extreme values are legitimate was not assessed; an IQR flag does not establish an error."
+          ],
+          "conclusion": "Within the completed checks, 1 finding calls for review (1 low). This is review evidence for the stated scope; it does not establish model performance, semantic correctness or prediction-time availability."
+        },
+        "policy": [
+          {
+            "rule": "IQR review candidates",
+            "threshold": "≥ 5% of finite values outside 1.5 × IQR fences",
+            "effect": "Finding (evidence only; no score)."
+          },
+          {
+            "rule": "Column missingness",
+            "threshold": "≥ 25% missing (High from 50%); cells ≥ 10%; rows with a gap ≥ 25%",
+            "effect": "Findings (evidence only)."
+          },
+          {
+            "rule": "Duplicates",
+            "threshold": "Any repeated row (Moderate from 2%, High from 10%)",
+            "effect": "Finding (evidence only)."
+          },
+          {
+            "rule": "Relationship search",
+            "threshold": "Declared support and coverage requirements",
+            "effect": "Findings by declared availability; bounded search."
+          },
+          {
+            "rule": "Score",
+            "threshold": "None",
+            "effect": "No validated score is defined for regression."
+          }
+        ]
+      },
+      "contextual": {
+        "version": "context_v1",
+        "status": "completed",
+        "prediction": {
+          "objective": null,
+          "point": null,
+          "declared": false
+        },
+        "declarations": {},
+        "availability": {},
+        "features": [
+          "input"
+        ],
+        "candidates": [],
+        "candidate_rules": {
+          "version": "candidate_rules_v1",
+          "placeholder_tokens": [
+            "unknown",
+            "unk",
+            "n/a",
+            "na",
+            "none",
+            "null",
+            "missing",
+            "?",
+            "-",
+            "--",
+            "not known",
+            "not available",
+            "undefined",
+            "unspecified",
+            "nan",
+            "blank"
+          ],
+          "sentinel_codes": [
+            -1,
+            -9,
+            -99,
+            -999,
+            -9999,
+            9,
+            99,
+            999,
+            9999,
+            99999
+          ],
+          "meaning": "Candidates are suggestions only; nothing is interpreted until you declare it."
+        },
+        "interpreted": {},
+        "observed_dependencies": {
+          "pairs": [],
+          "indicators_examined": 0,
+          "indicators_unexamined": 0,
+          "rule": "cross-column code pairs sharing at least 95% of their rows and at least 5 rows"
+        },
+        "demonstrated_use": "Not observed: DataTrust does not see your pipeline. A before/after comparison can show which columns survive preprocessing.",
+        "dependency_search": {
+          "status": "not_applicable",
+          "reason": "Runs for single-target classification; regression uses its bounded relationship search."
+        },
+        "findings": []
+      }
     },
-    "html_sha256": "322538a6a204cbb60c971b6998541d8f504567ad7e6c06e94ce67928407e05b1"
+    "html_sha256": "e80f80ea29aa172bc3df978d861e5e60d56d084ab9a794ad7d172b00c45d03ee"
   },
   "skew_legitimate": {
     "dataset": {
@@ -73996,6 +76427,7 @@
           "outcome": "float64"
         },
         "provisional_types": false,
+        "structure_validation": "complete_source_width_v1",
         "header_mapping": [
           {
             "position": 1,
@@ -75370,9 +77802,190 @@
       },
       "generated_at": "2026-10-09T00:00:00+00:00",
       "methodology_id": "tabular_regression_v1",
-      "schema_version": "1.1"
+      "schema_version": "1.1",
+      "guidance": {
+        "version": "finding_guidance_v1",
+        "items": {
+          "numeric_outlier_concentration": {
+            "catalogue": "outliers",
+            "title": "IQR review candidates",
+            "observed": [
+              "input: 5 of 100 finite values (5.0%) outside the 1.5 × IQR fences; q1 -0.35625, q3 0.801208, min -2.87011, max 3.21158; 44 negative, 0 zero."
+            ],
+            "impact": [
+              "Values outside the 1.5 × IQR fences can dominate scale-sensitive methods and summary statistics.",
+              "They may be legitimate tails, unit or entry errors, or sentinel codes."
+            ],
+            "investigate": [
+              "The extreme values themselves: are they plausible for the field's meaning and unit?",
+              "Whether a single code (for example −1 or 999) accounts for many of them."
+            ],
+            "options": [
+              {
+                "option": "Keep the values and use robust methods or transforms",
+                "prerequisites": "The values are legitimate.",
+                "avoid_when": "They are confirmed errors or sentinel codes.",
+                "verify": "Compare model behaviour with and without the transform on the same split."
+              },
+              {
+                "option": "Cap (winsorise) the values",
+                "prerequisites": "Extremes are legitimate but over-influential, and the cap is chosen from training rows only.",
+                "avoid_when": "Tails carry the signal you care about (for example, fraud amounts); or the cap uses evaluation data.",
+                "verify": "Report how many values change and compare metrics on tail cases specifically."
+              },
+              {
+                "option": "Correct or remove values",
+                "prerequisites": "They are confirmed errors from source records.",
+                "avoid_when": "They are legitimate rare observations.",
+                "verify": "Re-run this analysis and record which rows changed."
+              }
+            ],
+            "unknowns": [
+              "Whether extreme values are legitimate was not assessed; an IQR flag does not establish an error."
+            ]
+          },
+          "regression_target_extremes": {
+            "catalogue": "outliers",
+            "title": "Extreme target review candidates",
+            "observed": [
+              "Lower: 0; upper: 10."
+            ],
+            "impact": [
+              "Values outside the 1.5 × IQR fences can dominate scale-sensitive methods and summary statistics.",
+              "They may be legitimate tails, unit or entry errors, or sentinel codes."
+            ],
+            "investigate": [
+              "The extreme values themselves: are they plausible for the field's meaning and unit?",
+              "Whether a single code (for example −1 or 999) accounts for many of them."
+            ],
+            "options": [
+              {
+                "option": "Keep the values and use robust methods or transforms",
+                "prerequisites": "The values are legitimate.",
+                "avoid_when": "They are confirmed errors or sentinel codes.",
+                "verify": "Compare model behaviour with and without the transform on the same split."
+              },
+              {
+                "option": "Cap (winsorise) the values",
+                "prerequisites": "Extremes are legitimate but over-influential, and the cap is chosen from training rows only.",
+                "avoid_when": "Tails carry the signal you care about (for example, fraud amounts); or the cap uses evaluation data.",
+                "verify": "Report how many values change and compare metrics on tail cases specifically."
+              },
+              {
+                "option": "Correct or remove values",
+                "prerequisites": "They are confirmed errors from source records.",
+                "avoid_when": "They are legitimate rare observations.",
+                "verify": "Re-run this analysis and record which rows changed."
+              }
+            ],
+            "unknowns": [
+              "Whether extreme values are legitimate was not assessed; an IQR flag does not establish an error."
+            ]
+          }
+        },
+        "scope": {
+          "execution": "completed",
+          "not_completed": [],
+          "not_completed_total": 0,
+          "unknowns": [
+            "0 possible placeholder or sentinel codes were suggested but none was declared, so none was interpreted.",
+            "Prediction-time availability is known only for features you declared; the relationship search is bounded to its stated methods.",
+            "Whether extreme values are legitimate was not assessed; an IQR flag does not establish an error."
+          ],
+          "conclusion": "Within the completed checks, 2 findings call for review (1 moderate, 1 low). This is review evidence for the stated scope; it does not establish model performance, semantic correctness or prediction-time availability."
+        },
+        "policy": [
+          {
+            "rule": "IQR review candidates",
+            "threshold": "≥ 5% of finite values outside 1.5 × IQR fences",
+            "effect": "Finding (evidence only; no score)."
+          },
+          {
+            "rule": "Column missingness",
+            "threshold": "≥ 25% missing (High from 50%); cells ≥ 10%; rows with a gap ≥ 25%",
+            "effect": "Findings (evidence only)."
+          },
+          {
+            "rule": "Duplicates",
+            "threshold": "Any repeated row (Moderate from 2%, High from 10%)",
+            "effect": "Finding (evidence only)."
+          },
+          {
+            "rule": "Relationship search",
+            "threshold": "Declared support and coverage requirements",
+            "effect": "Findings by declared availability; bounded search."
+          },
+          {
+            "rule": "Score",
+            "threshold": "None",
+            "effect": "No validated score is defined for regression."
+          }
+        ]
+      },
+      "contextual": {
+        "version": "context_v1",
+        "status": "completed",
+        "prediction": {
+          "objective": null,
+          "point": null,
+          "declared": false
+        },
+        "declarations": {},
+        "availability": {},
+        "features": [
+          "input"
+        ],
+        "candidates": [],
+        "candidate_rules": {
+          "version": "candidate_rules_v1",
+          "placeholder_tokens": [
+            "unknown",
+            "unk",
+            "n/a",
+            "na",
+            "none",
+            "null",
+            "missing",
+            "?",
+            "-",
+            "--",
+            "not known",
+            "not available",
+            "undefined",
+            "unspecified",
+            "nan",
+            "blank"
+          ],
+          "sentinel_codes": [
+            -1,
+            -9,
+            -99,
+            -999,
+            -9999,
+            9,
+            99,
+            999,
+            9999,
+            99999
+          ],
+          "meaning": "Candidates are suggestions only; nothing is interpreted until you declare it."
+        },
+        "interpreted": {},
+        "observed_dependencies": {
+          "pairs": [],
+          "indicators_examined": 0,
+          "indicators_unexamined": 0,
+          "rule": "cross-column code pairs sharing at least 95% of their rows and at least 5 rows"
+        },
+        "demonstrated_use": "Not observed: DataTrust does not see your pipeline. A before/after comparison can show which columns survive preprocessing.",
+        "dependency_search": {
+          "status": "not_applicable",
+          "reason": "Runs for single-target classification; regression uses its bounded relationship search."
+        },
+        "findings": []
+      }
     },
-    "html_sha256": "36780f1826b2fd7f552aec45f176426297ed57a6cf3d58e833b4bf967fd41760"
+    "html_sha256": "dfc8ba73a4580a34062a76314e45a35499342181a5639e1aef92877c63e6c896"
   },
   "bounded_legitimate": {
     "dataset": {
@@ -76237,6 +78850,7 @@
           "outcome": "float64"
         },
         "provisional_types": false,
+        "structure_validation": "complete_source_width_v1",
         "header_mapping": [
           {
             "position": 1,
@@ -77567,9 +80181,152 @@
       },
       "generated_at": "2026-10-09T00:00:00+00:00",
       "methodology_id": "tabular_regression_v1",
-      "schema_version": "1.1"
+      "schema_version": "1.1",
+      "guidance": {
+        "version": "finding_guidance_v1",
+        "items": {
+          "numeric_outlier_concentration": {
+            "catalogue": "outliers",
+            "title": "IQR review candidates",
+            "observed": [
+              "input: 5 of 100 finite values (5.0%) outside the 1.5 × IQR fences; q1 -0.635158, q3 0.475538, min -2.90404, max 3.91509; 47 negative, 0 zero."
+            ],
+            "impact": [
+              "Values outside the 1.5 × IQR fences can dominate scale-sensitive methods and summary statistics.",
+              "They may be legitimate tails, unit or entry errors, or sentinel codes."
+            ],
+            "investigate": [
+              "The extreme values themselves: are they plausible for the field's meaning and unit?",
+              "Whether a single code (for example −1 or 999) accounts for many of them."
+            ],
+            "options": [
+              {
+                "option": "Keep the values and use robust methods or transforms",
+                "prerequisites": "The values are legitimate.",
+                "avoid_when": "They are confirmed errors or sentinel codes.",
+                "verify": "Compare model behaviour with and without the transform on the same split."
+              },
+              {
+                "option": "Cap (winsorise) the values",
+                "prerequisites": "Extremes are legitimate but over-influential, and the cap is chosen from training rows only.",
+                "avoid_when": "Tails carry the signal you care about (for example, fraud amounts); or the cap uses evaluation data.",
+                "verify": "Report how many values change and compare metrics on tail cases specifically."
+              },
+              {
+                "option": "Correct or remove values",
+                "prerequisites": "They are confirmed errors from source records.",
+                "avoid_when": "They are legitimate rare observations.",
+                "verify": "Re-run this analysis and record which rows changed."
+              }
+            ],
+            "unknowns": [
+              "Whether extreme values are legitimate was not assessed; an IQR flag does not establish an error."
+            ]
+          }
+        },
+        "scope": {
+          "execution": "completed",
+          "not_completed": [],
+          "not_completed_total": 0,
+          "unknowns": [
+            "0 possible placeholder or sentinel codes were suggested but none was declared, so none was interpreted.",
+            "Prediction-time availability is known only for features you declared; the relationship search is bounded to its stated methods.",
+            "Whether extreme values are legitimate was not assessed; an IQR flag does not establish an error."
+          ],
+          "conclusion": "Within the completed checks, 1 finding calls for review (1 moderate). This is review evidence for the stated scope; it does not establish model performance, semantic correctness or prediction-time availability."
+        },
+        "policy": [
+          {
+            "rule": "IQR review candidates",
+            "threshold": "≥ 5% of finite values outside 1.5 × IQR fences",
+            "effect": "Finding (evidence only; no score)."
+          },
+          {
+            "rule": "Column missingness",
+            "threshold": "≥ 25% missing (High from 50%); cells ≥ 10%; rows with a gap ≥ 25%",
+            "effect": "Findings (evidence only)."
+          },
+          {
+            "rule": "Duplicates",
+            "threshold": "Any repeated row (Moderate from 2%, High from 10%)",
+            "effect": "Finding (evidence only)."
+          },
+          {
+            "rule": "Relationship search",
+            "threshold": "Declared support and coverage requirements",
+            "effect": "Findings by declared availability; bounded search."
+          },
+          {
+            "rule": "Score",
+            "threshold": "None",
+            "effect": "No validated score is defined for regression."
+          }
+        ]
+      },
+      "contextual": {
+        "version": "context_v1",
+        "status": "completed",
+        "prediction": {
+          "objective": null,
+          "point": null,
+          "declared": false
+        },
+        "declarations": {},
+        "availability": {},
+        "features": [
+          "input"
+        ],
+        "candidates": [],
+        "candidate_rules": {
+          "version": "candidate_rules_v1",
+          "placeholder_tokens": [
+            "unknown",
+            "unk",
+            "n/a",
+            "na",
+            "none",
+            "null",
+            "missing",
+            "?",
+            "-",
+            "--",
+            "not known",
+            "not available",
+            "undefined",
+            "unspecified",
+            "nan",
+            "blank"
+          ],
+          "sentinel_codes": [
+            -1,
+            -9,
+            -99,
+            -999,
+            -9999,
+            9,
+            99,
+            999,
+            9999,
+            99999
+          ],
+          "meaning": "Candidates are suggestions only; nothing is interpreted until you declare it."
+        },
+        "interpreted": {},
+        "observed_dependencies": {
+          "pairs": [],
+          "indicators_examined": 0,
+          "indicators_unexamined": 0,
+          "rule": "cross-column code pairs sharing at least 95% of their rows and at least 5 rows"
+        },
+        "demonstrated_use": "Not observed: DataTrust does not see your pipeline. A before/after comparison can show which columns survive preprocessing.",
+        "dependency_search": {
+          "status": "not_applicable",
+          "reason": "Runs for single-target classification; regression uses its bounded relationship search."
+        },
+        "findings": []
+      }
     },
-    "html_sha256": "715d7aa9bde9c54b09fb8d5dfbe4f21bd31e227470405b4e4e6658517e327244"
+    "html_sha256": "18c4029c21d3f514472c30a8ad3e9a2210152310b68803ca297e817660e36073"
   },
   "zero_inflated_count": {
     "dataset": {
@@ -78513,6 +81270,7 @@
           "outcome": "float64"
         },
         "provisional_types": false,
+        "structure_validation": "complete_source_width_v1",
         "header_mapping": [
           {
             "position": 1,
@@ -79833,9 +82591,157 @@
       },
       "generated_at": "2026-10-09T00:00:00+00:00",
       "methodology_id": "tabular_regression_v1",
-      "schema_version": "1.1"
+      "schema_version": "1.1",
+      "guidance": {
+        "version": "finding_guidance_v1",
+        "items": {
+          "regression_target_concentration": {
+            "catalogue": "concentration",
+            "title": "Target concentration review",
+            "observed": [
+              "Most-common-value share: 81.00%; boundary candidates: 1."
+            ],
+            "impact": [
+              "Many targets at one value or boundary can indicate censoring, default values or a genuinely concentrated outcome."
+            ],
+            "investigate": [
+              "Whether the common value is a floor, ceiling, default or placeholder."
+            ],
+            "options": [
+              {
+                "option": "Model the concentration explicitly",
+                "prerequisites": "The concentrated value is a real outcome (for example, zero counts).",
+                "avoid_when": "It is a placeholder.",
+                "verify": "Check residuals at the concentrated value separately."
+              },
+              {
+                "option": "Treat the value as censored or missing",
+                "prerequisites": "It is a measurement limit or placeholder.",
+                "avoid_when": "It is a real outcome.",
+                "verify": "Re-run this analysis with the value declared missing and compare the target distribution."
+              }
+            ],
+            "unknowns": [
+              "Why values concentrate was not assessed."
+            ]
+          }
+        },
+        "scope": {
+          "execution": "completed",
+          "not_completed": [
+            {
+              "check": "regression_extremes",
+              "scope": "outcome",
+              "state": "excluded",
+              "reason": "zero_iqr"
+            },
+            {
+              "check": "regression_bowley_skewness",
+              "scope": "outcome",
+              "state": "excluded",
+              "reason": "zero_iqr"
+            }
+          ],
+          "not_completed_total": 2,
+          "unknowns": [
+            "0 possible placeholder or sentinel codes were suggested but none was declared, so none was interpreted.",
+            "Prediction-time availability is known only for features you declared; the relationship search is bounded to its stated methods.",
+            "Why values concentrate was not assessed."
+          ],
+          "conclusion": "Within the completed checks, 1 finding calls for review (1 low). Some scopes were excluded by a method's preconditions and are listed. This is review evidence for the stated scope; it does not establish model performance, semantic correctness or prediction-time availability."
+        },
+        "policy": [
+          {
+            "rule": "IQR review candidates",
+            "threshold": "≥ 5% of finite values outside 1.5 × IQR fences",
+            "effect": "Finding (evidence only; no score)."
+          },
+          {
+            "rule": "Column missingness",
+            "threshold": "≥ 25% missing (High from 50%); cells ≥ 10%; rows with a gap ≥ 25%",
+            "effect": "Findings (evidence only)."
+          },
+          {
+            "rule": "Duplicates",
+            "threshold": "Any repeated row (Moderate from 2%, High from 10%)",
+            "effect": "Finding (evidence only)."
+          },
+          {
+            "rule": "Relationship search",
+            "threshold": "Declared support and coverage requirements",
+            "effect": "Findings by declared availability; bounded search."
+          },
+          {
+            "rule": "Score",
+            "threshold": "None",
+            "effect": "No validated score is defined for regression."
+          }
+        ]
+      },
+      "contextual": {
+        "version": "context_v1",
+        "status": "completed",
+        "prediction": {
+          "objective": null,
+          "point": null,
+          "declared": false
+        },
+        "declarations": {},
+        "availability": {},
+        "features": [
+          "input"
+        ],
+        "candidates": [],
+        "candidate_rules": {
+          "version": "candidate_rules_v1",
+          "placeholder_tokens": [
+            "unknown",
+            "unk",
+            "n/a",
+            "na",
+            "none",
+            "null",
+            "missing",
+            "?",
+            "-",
+            "--",
+            "not known",
+            "not available",
+            "undefined",
+            "unspecified",
+            "nan",
+            "blank"
+          ],
+          "sentinel_codes": [
+            -1,
+            -9,
+            -99,
+            -999,
+            -9999,
+            9,
+            99,
+            999,
+            9999,
+            99999
+          ],
+          "meaning": "Candidates are suggestions only; nothing is interpreted until you declare it."
+        },
+        "interpreted": {},
+        "observed_dependencies": {
+          "pairs": [],
+          "indicators_examined": 0,
+          "indicators_unexamined": 0,
+          "rule": "cross-column code pairs sharing at least 95% of their rows and at least 5 rows"
+        },
+        "demonstrated_use": "Not observed: DataTrust does not see your pipeline. A before/after comparison can show which columns survive preprocessing.",
+        "dependency_search": {
+          "status": "not_applicable",
+          "reason": "Runs for single-target classification; regression uses its bounded relationship search."
+        },
+        "findings": []
+      }
     },
-    "html_sha256": "b4c4d596e010a5462739f0aca5d2aadb26c70fbfa5db39a4c9b8f37206f476f9"
+    "html_sha256": "ab0b744fbf7e69f915040129f7b20bd0fa22291e5f178b49234f3279e3b8a12e"
   },
   "repeated_measurements": {
     "dataset": {
@@ -80907,6 +83813,7 @@
           "outcome": "float64"
         },
         "provisional_types": false,
+        "structure_validation": "complete_source_width_v1",
         "header_mapping": [
           {
             "position": 1,
@@ -82247,8 +85154,151 @@
       },
       "generated_at": "2026-10-09T00:00:00+00:00",
       "methodology_id": "tabular_regression_v1",
-      "schema_version": "1.1"
+      "schema_version": "1.1",
+      "guidance": {
+        "version": "finding_guidance_v1",
+        "items": {
+          "regression_repeated_input_variation": {
+            "catalogue": "label_conflicts",
+            "title": "Target variation within repeated inputs",
+            "observed": [
+              "100 participating rows."
+            ],
+            "impact": [
+              "Identical recorded inputs with different outcomes limit how well any model can fit those cases.",
+              "Conflicts may reflect omitted context, outcomes that are genuinely random, or annotation differences."
+            ],
+            "investigate": [
+              "A sample of conflicting groups: what distinguishes them that the file does not record.",
+              "Whether conflicts concentrate in one source, annotator or period."
+            ],
+            "options": [
+              {
+                "option": "Keep all rows and treat the variation as real",
+                "prerequisites": "The variation is plausible for the outcome.",
+                "avoid_when": "One label is known to be wrong.",
+                "verify": "Report the conflicting share alongside model results."
+              },
+              {
+                "option": "Adjudicate labels",
+                "prerequisites": "A reviewer or reference can decide the correct label.",
+                "avoid_when": "No reliable reference exists; majority voting would invent certainty.",
+                "verify": "Record changed labels and re-run this analysis."
+              },
+              {
+                "option": "Add the missing context as features",
+                "prerequisites": "The distinguishing information exists and is available at prediction time.",
+                "avoid_when": "The added information is only known after the outcome.",
+                "verify": "Re-check repeated-input conflicts with the added features."
+              }
+            ],
+            "unknowns": [
+              "Which label, if any, is correct was not assessed."
+            ]
+          }
+        },
+        "scope": {
+          "execution": "completed",
+          "not_completed": [],
+          "not_completed_total": 0,
+          "unknowns": [
+            "0 possible placeholder or sentinel codes were suggested but none was declared, so none was interpreted.",
+            "Prediction-time availability is known only for features you declared; the relationship search is bounded to its stated methods.",
+            "Which label, if any, is correct was not assessed."
+          ],
+          "conclusion": "Within the completed checks, 1 finding calls for review (1 low). This is review evidence for the stated scope; it does not establish model performance, semantic correctness or prediction-time availability."
+        },
+        "policy": [
+          {
+            "rule": "IQR review candidates",
+            "threshold": "≥ 5% of finite values outside 1.5 × IQR fences",
+            "effect": "Finding (evidence only; no score)."
+          },
+          {
+            "rule": "Column missingness",
+            "threshold": "≥ 25% missing (High from 50%); cells ≥ 10%; rows with a gap ≥ 25%",
+            "effect": "Findings (evidence only)."
+          },
+          {
+            "rule": "Duplicates",
+            "threshold": "Any repeated row (Moderate from 2%, High from 10%)",
+            "effect": "Finding (evidence only)."
+          },
+          {
+            "rule": "Relationship search",
+            "threshold": "Declared support and coverage requirements",
+            "effect": "Findings by declared availability; bounded search."
+          },
+          {
+            "rule": "Score",
+            "threshold": "None",
+            "effect": "No validated score is defined for regression."
+          }
+        ]
+      },
+      "contextual": {
+        "version": "context_v1",
+        "status": "completed",
+        "prediction": {
+          "objective": null,
+          "point": null,
+          "declared": false
+        },
+        "declarations": {},
+        "availability": {},
+        "features": [
+          "input"
+        ],
+        "candidates": [],
+        "candidate_rules": {
+          "version": "candidate_rules_v1",
+          "placeholder_tokens": [
+            "unknown",
+            "unk",
+            "n/a",
+            "na",
+            "none",
+            "null",
+            "missing",
+            "?",
+            "-",
+            "--",
+            "not known",
+            "not available",
+            "undefined",
+            "unspecified",
+            "nan",
+            "blank"
+          ],
+          "sentinel_codes": [
+            -1,
+            -9,
+            -99,
+            -999,
+            -9999,
+            9,
+            99,
+            999,
+            9999,
+            99999
+          ],
+          "meaning": "Candidates are suggestions only; nothing is interpreted until you declare it."
+        },
+        "interpreted": {},
+        "observed_dependencies": {
+          "pairs": [],
+          "indicators_examined": 0,
+          "indicators_unexamined": 0,
+          "rule": "cross-column code pairs sharing at least 95% of their rows and at least 5 rows"
+        },
+        "demonstrated_use": "Not observed: DataTrust does not see your pipeline. A before/after comparison can show which columns survive preprocessing.",
+        "dependency_search": {
+          "status": "not_applicable",
+          "reason": "Runs for single-target classification; regression uses its bounded relationship search."
+        },
+        "findings": []
+      }
     },
-    "html_sha256": "6cf2318a308f967fb5b61fc6447c332320d7b2153ddf8bb8298e61bdb0966de6"
+    "html_sha256": "5fc227d77fe8340d6fd26066247d25521b0f01a2226572de5bedec462f31decf"
   }
 }

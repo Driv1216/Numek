@@ -114,6 +114,9 @@ def execute(inputs,options,advanced,spec=None,comparison_config=None,owned_snaps
         if spec:
             from datatrust.comparison import compare_relations
             summary=compare_relations(e,spec,relations,profiles,annotations,comparison_config)
+            if getattr(spec,'preset',None)=='before_after':
+                from datatrust.before_after import assess
+                assess(e,spec,relations)  # recorded as evidence and findings; not repeated in the summary
         for item,r in zip(inputs,relations):verify_source(item.dataset.path,r.source,'final source verification')
         work.check('completed evidence publication',options.result_bytes)
         provenance={r.id:{'sha256':r.source['sha256'],'source_bytes':r.source['bytes'],'rows':r.rows,'columns':len(r.names),'parsing_fingerprint':r.parsing['fingerprint']} for r in relations}
@@ -127,6 +130,8 @@ def execute(inputs,options,advanced,spec=None,comparison_config=None,owned_snaps
         else:
             r=relations[0]
             result=AnalysisResult(inputs[0].dataset,r.task,profiles[r.id],r.parsing,[],e.checks,e.records,findings,narrative,{'dataset_name':inputs[0].dataset.dataset_name,'purpose':inputs[0].dataset.purpose,'source_filename':r.source['filename'],'presentation':asdict(r.config.presentation)},coverage,_classification_score(work,r,profiles[r.id]),execution,now,METHOD,'1.3')
+        from datatrust.guidance import attach_guidance
+        attach_guidance(result)
         size=len(result.json_text().encode('utf-8'))
         if size>options.result_bytes:fail(f'Serialized retained result {size} bytes exceeds {options.result_bytes}; reduce diagnostic/detail bounds.', 'result_limit')
         result.execution['serialized_bytes']=size

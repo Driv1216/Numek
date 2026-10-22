@@ -15,3 +15,10 @@ from .methods import fit_methods, apply_methods, study
 ConfidenceGuard.fit_methods=staticmethod(fit_methods)
 ConfidenceGuard.apply_methods=staticmethod(apply_methods)
 ConfidenceGuard.study=staticmethod(study)
+from .history_contracts import (WorkspaceConfig, PredictionBatchSpec, HistoricalRunBinding, OutcomeRevisionSpec,
+    HistoricalCorrectionSpec, HistoricalWindow, HistoricalComparison, LongitudinalSpec, LongitudinalInferenceSpec,
+    HistoricalEvidenceManifest)
+from .history_result import LongitudinalResult
+from .workspace import ReliabilityWorkspace
+from .longitudinal import make_windows
+ConfidenceGuard.workspace=ReliabilityWorkspace

@@ -27,7 +27,7 @@ def preflight(spec,config):
     if spec.context and set(spec.context.assertions)-{r.id for r in spec.runs}:raise EvaluationError('Unknown context assertion run.')
 
 
-def open_store(spec,config,roots,progress=None,extension=None):
+def open_store(spec,config,roots,progress=None,extension=None,capture=None):
     """Shared CG1/CG2 snapshot admission and normalization boundary."""
     work=None
     try:
@@ -50,7 +50,12 @@ def open_store(spec,config,roots,progress=None,extension=None):
         else:
             from .method_sources import MethodStore
             store=MethodStore(work,spec,config,roots,extension)
+        if capture is not None:
+            from .history_capture import Capture
+            store.history_capture=Capture(capture,store)
+            store.history_capture.extend_projection(store)
         store.ingest()
+        if capture is not None:store.history_capture.raw(store)
         cells=sum(store.counts[r.source]*(len(spec.task.classes) if r.probabilities or r.score and r.score.columns else 0) for r in spec.runs)
         if cells>config.probability_cells:raise EvaluationError('Probability/score cell admission exceeded.','probability_cell_limit')
         store.prepare()
@@ -60,10 +65,11 @@ def open_store(spec,config,roots,progress=None,extension=None):
         raise
 
 
-def _execute(spec,config,roots,inspection,expected,*,progress=None):
+def _execute(spec,config,roots,inspection,expected,capture=None,*,progress=None):
     started=time.monotonic();work=None
     try:
-        work,store,cells=open_store(spec,config,roots,progress)
+        work,store,cells=open_store(spec,config,roots,progress,capture=capture)
+        if capture is not None and not inspection:store.history_capture.outputs(store)
         fingerprint=digest({'sources':{sid:{'sha256':v['sha256'],'bytes':v['bytes']} for sid,v in store.sources.items()},'spec':spec.to_dict(),'config':config.to_dict(),'outcome_snapshot':store.outcome_facts.get('snapshot_digest'),'context_snapshot':store.context_facts['snapshot_digest'],'methodology':METHOD})
         if expected and expected!=fingerprint:raise EvaluationError('Confirmed inputs or configuration changed.','stale_confirmation')
         if inspection:
@@ -134,16 +140,16 @@ def _arguments(spec,config,allowed_roots):
     return spec,config,roots
 
 
-def evaluate(spec,config=None,*,progress=None,cancel=None,allowed_roots=None,expected_fingerprint=None):
+def evaluate(spec,config=None,*,progress=None,cancel=None,allowed_roots=None,expected_fingerprint=None,_capture=None):
     from .method_contracts import ReliabilitySpec, parse_spec
     if isinstance(spec,dict):spec=parse_spec(spec)
     if isinstance(spec,ReliabilitySpec):
         from .methods import evaluate_methods
-        return evaluate_methods(spec,config,progress=progress,cancel=cancel,allowed_roots=allowed_roots,expected_fingerprint=expected_fingerprint)
+        return evaluate_methods(spec,config,progress=progress,cancel=cancel,allowed_roots=allowed_roots,expected_fingerprint=expected_fingerprint,_capture=_capture)
     spec,config,roots=_arguments(spec,config,allowed_roots)
     # The legacy worker protocol must budget the full protected return value.
     worker_config=replace(config,result_bytes=config.private_bytes+config.result_bytes)
-    result=compat.supervise(_execute,(spec,config,roots,False,expected_fingerprint),worker_config,progress=progress,cancel=cancel)
+    result=compat.supervise(_execute,(spec,config,roots,False,expected_fingerprint,_capture),worker_config,progress=progress,cancel=cancel)
     if cancel is not None and cancel.is_set():raise EvaluationError('Evaluation cancelled before commit.','cancelled')
     result.seal()
     if len(result.json_text().encode())>config.private_bytes:raise EvaluationError('Final protected result exceeds budget.','private_result_limit')

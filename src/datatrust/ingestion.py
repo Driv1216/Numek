@@ -13,7 +13,7 @@ from pathlib import Path
 
 import pandas as pd
 
-from datatrust.contracts import AnalysisError, CsvParseOptions
+from datatrust.contracts import AnalysisError, CsvParseOptions, omit_default_delimiter
 
 
 @dataclass
@@ -38,6 +38,139 @@ def source_digest(path):
     return digest.hexdigest()
 
 
+DELIMITER_NAMES = {",": "comma", ";": "semicolon", "\t": "tab", "|": "vertical bar"}
+
+
+def delimiter_name(delimiter):
+    return DELIMITER_NAMES.get(delimiter, repr(delimiter))
+
+
+CANDIDATE_DELIMITERS = (",", ";", "\t", "|")
+
+
+def delimiter_candidates(path, encoding="utf-8"):
+    """The candidate separators that read a bounded sample as at least two columns of one width: the header and
+    every sampled complete record, under strict CSV quoting."""
+    from datatrust.contracts import FidelityInspectionLimits
+    limits = FidelityInspectionLimits(max_bytes=65536, max_records=50, max_cells=20000)
+    found = []
+    for delimiter in CANDIDATE_DELIMITERS:
+        try:
+            sample = inspect_source_tokens(path, encoding, limits, delimiter)
+        except (OSError, UnicodeError, csv.Error, ValueError):
+            continue
+        if sample["headers"] is None or len(sample["headers"]) < 2:
+            continue
+        width = len(sample["headers"])
+        if sample["records"] and all(r["width"] == width for r in sample["records"]):
+            found.append(delimiter)
+    return found
+
+
+def detect_delimiter(path, encoding="utf-8"):
+    """The separator a CSV evidently uses: the one candidate that fits (see delimiter_candidates), or comma when
+    none does (a genuine single column, or a file no candidate reads cleanly). None when two or more fit: the
+    reading is ambiguous and the separator must be chosen explicitly. Never a guess."""
+    found = delimiter_candidates(path, encoding)
+    if len(found) > 1:
+        return None
+    return found[0] if found else ","
+
+
+def ambiguous_delimiter_message(path, encoding="utf-8"):
+    names = [delimiter_name(d) for d in delimiter_candidates(path, encoding)]
+    return (f"This file reads consistently with more than one separator ({' and '.join(names)}). "
+            "Choose its separator explicitly; nothing was analysed.")
+
+
+def resolve_delimiter(path, choice, encoding="utf-8"):
+    """A declared separator, or "auto": the detected one. Raises ValueError when detection is ambiguous."""
+    if choice != "auto":
+        return choice
+    found = detect_delimiter(path, encoding)
+    if found is None:
+        raise ValueError(ambiguous_delimiter_message(path, encoding))
+    return found
+
+
+STRUCTURE_VALIDATION = "complete_source_width_v1"
+STRUCTURE_CHECKPOINT_RECORDS = 100_000
+
+
+def validate_csv_structure(path, options=None, *, max_rows=None, checkpoint=None):
+    """Every logical record of the whole source has its header's width, read with the selected encoding and
+    separator. Rows are never padded, dropped or re-interpreted as an index.
+
+    Matches pandas.read_csv defaults: double-quote quoting with doubled quotes, quoted separators and line breaks,
+    a leading byte-order mark, and skip_blank_lines (a line of only spaces and tabs, other than the separator
+    itself, is blank). Streaming: memory holds one logical record. Stops after max_rows + 1 data records, where
+    the established row limit takes over, and calls checkpoint periodically so the analysis deadline applies.
+    Returns the number of data records validated."""
+    import sys
+    options = options or CsvParseOptions()
+    delimiter = options.delimiter
+    blank_chars = " \t\r\n".replace(delimiter, "") if delimiter in " \t" else " \t\r\n"
+    name = delimiter_name(delimiter)
+    buffer = []
+
+    def lines(handle):
+        for line in handle:
+            buffer.append(line)
+            yield line
+
+    previous_limit = csv.field_size_limit()
+    csv.field_size_limit(sys.maxsize)  # pandas bounds no field length; resource limits apply to the source.
+    try:
+        with Path(path).open(encoding=options.encoding, errors="strict", newline="") as handle:
+            reader = csv.reader(lines(handle), delimiter=delimiter)
+            width = None
+            count = 0
+            mismatch = None
+            for row in reader:
+                text = "".join(buffer)
+                buffer.clear()
+                if width is None and text.startswith("﻿"):
+                    text = text[1:]
+                    if row and row[0].startswith("﻿"):
+                        row[0] = row[0][1:]
+                if not row or (all(not field.strip(blank_chars) for field in row) and not text.strip(blank_chars)):
+                    continue
+                if width is None:
+                    width = len(row)
+                    continue
+                count += 1
+                if len(row) != width:
+                    if count == 1 and len(row) == width + 1:
+                        mismatch = (count, reader.line_num, len(row))  # Possibly an implicit index: keep looking.
+                    elif mismatch is None or len(row) != width + 1:
+                        raise _width_error(count, reader.line_num, len(row), width, name)
+                elif mismatch is not None:
+                    raise _width_error(*mismatch, width, name)
+                if max_rows is not None and count > max_rows:
+                    break
+                if checkpoint is not None and count % STRUCTURE_CHECKPOINT_RECORDS == 0:
+                    checkpoint("CSV structure validation")
+            if mismatch is not None:
+                raise AnalysisError(
+                    f"Every record has {width + 1} fields but the header has {width}, so the first field would "
+                    "silently become a row index. Add a header name for the first column, or check the separator "
+                    f"({name}). Nothing was analysed.", code="csv_structure", stage="CSV structure validation")
+            return count
+    except UnicodeDecodeError as exc:
+        raise ValueError("CSV must use a text encoding that pandas can read (UTF-8 recommended).") from exc
+    except csv.Error as exc:
+        raise ValueError(f"CSV could not be parsed as a {name}-delimited file with a header.") from exc
+    finally:
+        csv.field_size_limit(previous_limit)
+
+
+def _width_error(record, line, found, width, name):
+    return AnalysisError(
+        f"CSV record {record} (ending on line {line}) has {found} field{'s' if found != 1 else ''}; the header has "
+        f"{width}. Records are never padded or dropped. Check the separator ({name}) and quoting, or repair that "
+        "record. Nothing was analysed.", code="csv_structure", stage="CSV structure validation")
+
+
 def verify_source(path, source, stage="source verification"):
     try:
         unchanged = (source_signature(path) == source["signature"] and source_digest(path) == source["sha256"])
@@ -59,6 +192,8 @@ def read_csv(dataset_path, *, usecols=None, nrows=None, options=None):
     kwargs = {"usecols": usecols, "nrows": nrows}
     if options is not None and options != CsvParseOptions():
         kwargs["encoding"] = options.encoding
+        if options.delimiter != ",":
+            kwargs["sep"] = options.delimiter
         if options.missing_policy != "pandas_default":
             kwargs["keep_default_na"] = False
             kwargs["na_values"] = [""] if options.missing_policy == "empty_only" else list(options.na_values)
@@ -80,7 +215,8 @@ def read_csv(dataset_path, *, usecols=None, nrows=None, options=None):
     except pd.errors.EmptyDataError as exc:
         raise ValueError("Dataset is empty and cannot be analyzed.") from exc
     except pd.errors.ParserError as exc:
-        raise ValueError("CSV could not be parsed as a comma-delimited file with a header.") from exc
+        name = delimiter_name(options.delimiter if options is not None else ",")
+        raise ValueError(f"CSV could not be parsed as a {name}-delimited file with a header.") from exc
     except UnicodeDecodeError as exc:
         raise ValueError("CSV must use a text encoding that pandas can read (UTF-8 recommended).") from exc
     except PermissionError as exc:
@@ -89,7 +225,7 @@ def read_csv(dataset_path, *, usecols=None, nrows=None, options=None):
         raise ValueError(f"Dataset could not be read: {exc}") from exc
 
 
-def inspect_source_tokens(path, encoding, limits):
+def inspect_source_tokens(path, encoding, limits, delimiter=","):
     """Only complete logical records are retained; counts describe a prefix."""
     result = {"headers": None, "records": [], "bytes_inspected": 0, "records_inspected": 0,
               "cells_retained": 0, "complete": False, "stopping_reason": "eof"}
@@ -104,7 +240,7 @@ def inspect_source_tokens(path, encoding, limits):
         if text.startswith("\ufeff"):
             text = text[1:]
         lines = io.StringIO(text, newline="").readlines()
-        reader = csv.reader(io.StringIO(text, newline=""), strict=True)
+        reader = csv.reader(io.StringIO(text, newline=""), strict=True, delimiter=delimiter)
         previous_line = 0
         for tokens in reader:
             record_text = "".join(lines[previous_line:reader.line_num])
@@ -238,12 +374,16 @@ def load_dataset(dataset, task, config, limits, checkpoint, *, preview_rows=None
     inspection_limits = config.fidelity_inspection
     if preview_rows is not None:
         inspection_limits = replace(inspection_limits, max_records=min(inspection_limits.max_records, preview_rows))
-    sample = inspect_source_tokens(path, config.parsing.encoding, inspection_limits)
+    # Comma files keep the established call exactly; another separator is passed through.
+    sample = (inspect_source_tokens(path, config.parsing.encoding, inspection_limits) if config.parsing.delimiter == ","
+              else inspect_source_tokens(path, config.parsing.encoding, inspection_limits, config.parsing.delimiter))
     if limits.max_columns is not None:
         # Header-only pandas parsing is authoritative if bounded review could not obtain it.
         width = len(sample["headers"]) if sample["headers"] is not None else len(read_csv(path, nrows=0, options=config.parsing).columns)
         if width > limits.max_columns:
             raise AnalysisError("Header exceeds max_columns before data parsing.", code="resource_limit", stage="header")
+    checkpoint("CSV structure validation")
+    validated = validate_csv_structure(path, config.parsing, max_rows=limits.max_rows, checkpoint=checkpoint)
     checkpoint("CSV loading")
     nrows = limits.max_rows + 1 if limits.max_rows is not None else None
     if preview_rows is not None:
@@ -253,6 +393,12 @@ def load_dataset(dataset, task, config, limits, checkpoint, *, preview_rows=None
         data = read_csv(path, nrows=nrows, options=config.parsing)
     if limits.max_rows is not None and len(data) > limits.max_rows:
         raise AnalysisError("Dataset exceeds max_rows; the bounded read is not a complete analysis.", code="resource_limit", stage="CSV loading")
+    if preview_rows is None and len(data) != validated:
+        # Two independent readings must agree; a disagreement (seen with lone carriage-return line endings and
+        # quoted line breaks) means the records cannot be trusted to be what the file holds.
+        raise AnalysisError(f"The CSV reader found {len(data)} records but structural validation found {validated}, so "
+                            "the file's line endings or quoting are read inconsistently. Re-save it with standard line "
+                            "endings (LF or CRLF). Nothing was analysed.", code="csv_structure", stage="CSV structure validation")
     if len(data) == 0:
         # Classification target validation keeps its established ordering in the profiler.
         if task.kind != "classification":
@@ -263,7 +409,7 @@ def load_dataset(dataset, task, config, limits, checkpoint, *, preview_rows=None
     if limits.max_frame_bytes is not None and frame_bytes > limits.max_frame_bytes:
         raise AnalysisError("Loaded DataFrame exceeds max_frame_bytes. This post-load safeguard is not a peak-memory guarantee.", code="resource_limit", stage="materialization")
     effective = {"options": parsing_options_dict(config.parsing), "pandas_version": pd.__version__, "parser": "pandas.read_csv",
-                 "delimiter": ",", "header": "infer", "skip_blank_lines": True,
+                 "delimiter": config.parsing.delimiter, "header": "infer", "skip_blank_lines": True,
                  "dtypes": {str(name): str(dtype) for name, dtype in data.dtypes.items()},
                  "provisional_types": preview_rows is not None}
     fingerprint = hashlib.sha256(json.dumps(effective, sort_keys=True).encode()).hexdigest()
@@ -274,7 +420,8 @@ def load_dataset(dataset, task, config, limits, checkpoint, *, preview_rows=None
                        "evidence_type": "interpretation_review_warning", "setting": "pandas_default",
                        "inspected_population": scope, "row_refs": [],
                        "recommendation": "Review the source format; parser warnings do not establish a data defect."})
-    effective.update({"header_mapping": mapping, "fidelity_inspection": scope,
+    # Recorded after the fingerprint: valid files keep the fingerprints and seals they had before validation.
+    effective.update({"structure_validation": STRUCTURE_VALIDATION, "header_mapping": mapping, "fidelity_inspection": scope,
                       "inspection_limits": asdict(config.fidelity_inspection), "fingerprint": fingerprint,
                       "inference_caution": "NA-like tokens may become missing; numeric-looking codes may lose leading zeros. No source values were rewritten."})
     checkpoint("materialization")
@@ -336,7 +483,7 @@ def inspect_regression_target(dataset, target, config=None):
 
 
 def parsing_options_dict(options):
-    value = asdict(options)
+    value = omit_default_delimiter(asdict(options))
     if not value["column_missing_policies"]:
         value.pop("column_missing_policies")
     return value

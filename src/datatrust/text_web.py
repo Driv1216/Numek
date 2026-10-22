@@ -74,6 +74,139 @@ def fingerprint(spec,config):
     return hashlib.sha256(json.dumps(value,sort_keys=True,ensure_ascii=True).encode()).hexdigest(),value
 
 
+# M6 steps shared by the classic form routes and the JSON API (datatrust.api_web). `form` is a MultiDict
+# with the classic form's field names; repeated rows arrive as repeated keys.
+
+def m6_path_allowed(store,value):
+    p=Path(value).expanduser().resolve()
+    if not p.is_file() or not any(p.is_relative_to(r) for r in store.roots):raise ValueError('Source must be a regular file within configured roots.')
+    return p
+
+
+def m6_remember(j,kind,path):j.setdefault('artifacts',{})[kind]={'path':Path(path),'signature':capture(path)['signature'],'sha256':capture(path)['sha256']}
+
+
+def m6_checked(j,kind):
+    if j.get('result'):
+        from datatrust.text_normalization import source_signature
+        identities=list(j['result'].private['sources'].values())+list(j['result'].private['assets'].values())
+        for model in j['result'].private['models'].values():
+            identities+=list(model.get('files',{}).values())
+            if model.get('manifest'):identities.append(model['manifest'])
+        try:
+            if any(source_signature(info['path'])!=tuple(info['signature']) for info in identities):abort(409,description='Analysis source identity changed. Reconfirm the audit.')
+        except OSError:abort(409,description='Analysis source is unavailable. Reconfirm the audit.')
+    a=j.get('artifacts',{}).get(kind)
+    if not a:abort(404)
+    current=capture(a['path'])
+    if current['sha256']!=a['sha256'] or current['signature']!=a['signature']:abort(409,description='Artifact identity changed.')
+    return a['path']
+
+
+def m6_artifact(j,kind):
+    """The owned artifact for kind; the PDF is rendered from the owned HTML on first request."""
+    if kind not in {'html','json','pdf','private'}:abort(404)
+    if kind=='pdf' and kind not in j.get('artifacts',{}):
+        html=m6_checked(j,'html')
+        from datatrust.pdf import render_pdf_report
+        path=render_pdf_report(html,j['directory']/'report.pdf',expected_html_sha256=j['artifacts']['html']['sha256']);m6_remember(j,'pdf',path)
+    return m6_checked(j,kind)
+
+
+def start_m6(store,preset):
+    old=store.jobs.get(session.get('m6_job'))
+    if old:store.invalidate(old)
+    j=store.create('text');os.chmod(j['directory'],0o700);j['preset']=preset;TextTaskSpec(j['preset']);session['m6_job']=j['id']
+    return j
+
+
+def add_m6_source(store,j,form,upload):
+    """A source (upload or data-root file) or a referenced asset upload. Raises on refusal."""
+    store.invalidate(j)
+    if form.get('asset_upload')=='yes':
+        name=secure_filename(upload.filename) if upload else ''
+        if not name:raise ValueError('Select an asset file.')
+        destination=j['directory']/name
+        # Never overwrite a source or earlier uploaded asset.
+        if destination.exists():raise ValueError('An uploaded filename is already occupied.')
+        upload.save(destination);os.chmod(destination,0o600);j.setdefault('asset_uploads',[]).append(destination)
+    else:
+        local=form.get('local_path','').strip();fmt=form.get('format','jsonl')
+        if bool(upload and upload.filename)==bool(local):raise ValueError('Choose one uploaded or local source.')
+        identity=form.get('source_id') or f's{len(j["sources"])+1}'
+        if identity in {s['id'] for s in j['sources']}:raise ValueError('Source ID is already used.')
+        if local:path=m6_path_allowed(store,local)
+        else:
+            name=secure_filename(upload.filename)
+            if not name:raise ValueError('Select a source file.')
+            path=j['directory']/name
+            if path.exists():raise ValueError('Uploaded filename is already occupied.')
+            upload.save(path);os.chmod(path,0o600)
+        source=TextSourceSpec(str(path),fmt,form.get('encoding','utf-8'),form.get('delimiter',','),form.get('quotechar','"'))
+        preview=[]
+        for n,(loc,record,reason) in enumerate(frames(path,source,TextAnalysisConfig().execution,TextWorkLimits())):
+            if n>=128:break
+            if 'header' in loc:preview=loc['header'];break
+            if record is not None:preview=list(record);break
+        j['sources'].append({'id':identity,'path':path,'format':fmt,'encoding':source.encoding,'delimiter':source.delimiter,'quotechar':source.quotechar,'fields':preview})
+
+
+def configure_m6(store,j,form):
+    """Guided rows or a complete spec to a sealed fingerprint. Raises on refusal."""
+    j['form_values']=form.to_dict(flat=False)
+    store.invalidate(j)
+    if form.get('spec_json','').strip():
+        spec=TextAuditSpec.from_dict(strict_json(form['spec_json']));config=TextAnalysisConfig.from_dict(strict_json(form.get('config_json') or '{}'))
+        for item in spec.inputs:m6_path_allowed(store,item.source.path)
+        spec=replace(spec,allowed_roots=tuple(map(str,store.roots))+(str(j['directory']),))
+    else:spec,config=guided(j,form,store.roots+(j['directory'],))
+    for path in [config.models.embedding_directory,config.execution.scratch_directory]:
+        if path and not any(Path(path).resolve().is_relative_to(r) for r in store.roots):raise ValueError('Model/scratch directories must stay in configured roots.')
+    fp,sealed=fingerprint(spec,config);j.update(spec=spec,config=config,fingerprint=fp,sealed=sealed,state='confirm')
+
+
+def run_m6(store,j,confirmed):
+    if j.get('state')!='confirm' or confirmed!='yes':abort(400)
+    fp,sealed=fingerprint(j['spec'],j['config'])
+    if fp!=j['fingerprint']:abort(409,description='Source, asset, model or declarations changed. Reconfirm the audit.')
+    if not store.lock.acquire(blocking=False):abort(409,description='Another supervised audit is active.')
+    j.update(state='running',progress={});j['cancel'].clear()
+    def execute():
+        try:
+            result=audit_text(j['spec'],j['config'],progress=lambda v:j['progress'].update(v),cancel=j['cancel'])
+            # Bind the result to all source/assets/models captured at confirmation.
+            for sid,info in result.private['sources'].items():
+                if info['sha256']!=sealed['sources'][sid]['sha256']:raise ValueError('Source changed after confirmation.')
+            for path,info in result.private['assets'].items():
+                if path not in sealed['assets'] or info['sha256']!=sealed['assets'][path]['sha256']:raise ValueError('Asset changed after confirmation.')
+            if result.private['models']!=sealed['models']:raise ValueError('Model changed after confirmation.')
+            j['result']=result
+            artifacts=result.generate_artifacts(j['directory']/'report.html',json_path=j['directory']/'analysis.json')
+            for kind,path in [('html',artifacts.html_path),('json',artifacts.json_path),('private',artifacts.private_manifest_path)]:m6_remember(j,kind,path)
+            j['state']='completed'
+        except Exception as exc:j.update(state='failed',error=f'{getattr(exc,"code",type(exc).__name__)} at {getattr(exc,"stage","text execution")}',failure_execution=getattr(exc,'execution',{}))
+        finally:store.lock.release()
+    j['thread']=threading.Thread(target=execute,daemon=True);j['thread'].start()
+
+
+def m6_evidence(store,j,reference,reveal):
+    """Resolve one reference to exact local evidence; raises when the source changed or is unavailable."""
+    if j.get('state')!='completed':abort(400)
+    return j['result'].resolve_evidence(reference,allowed_roots=store.roots+(j['directory'],),reveal_content=reveal)
+
+
+def m6_excerpts(store,j,refs):
+    if j.get('state')!='completed':abort(400)
+    key=hashlib.sha256(json.dumps(refs).encode()).hexdigest()[:16]
+    try:
+        for ref in refs:j['result'].resolve_evidence(ref,allowed_roots=store.roots+(j['directory'],),reveal_content=True)
+    except Exception:abort(409,description='Excerpt source changed or is unavailable. Reconfirm the audit.')
+    path=j['directory']/f'excerpts-{key}.html'
+    if 'excerpt-'+key not in j.get('artifacts',{}):
+        artifacts=j['result'].generate_artifacts(path,excerpt_refs=refs,allowed_roots=store.roots+(j['directory'],));m6_remember(j,'excerpt-'+key,artifacts.html_path)
+    return m6_checked(j,'excerpt-'+key)
+
+
 def register(app,workspace,roots):
     root=Path(workspace)/'m6';root.mkdir(mode=0o700,exist_ok=True)
     store=Sessions(root,roots,TextAnalysisConfig());store.lock=app.extensions['datatrust_worker_lock'];app.extensions['datatrust_m6_store']=store
@@ -82,84 +215,26 @@ def register(app,workspace,roots):
         j=store.jobs.get(session.get('m6_job'))
         if j is None:abort(400,description='Start a text audit in this session.')
         return j
-    def path_allowed(value):
-        p=Path(value).expanduser().resolve()
-        if not p.is_file() or not any(p.is_relative_to(r) for r in store.roots):raise ValueError('Source must be a regular file within configured roots.')
-        return p
-    def remember(j,kind,path):j.setdefault('artifacts',{})[kind]={'path':Path(path),'signature':capture(path)['signature'],'sha256':capture(path)['sha256']}
-    def checked(j,kind):
-        if j.get('result'):
-            from datatrust.text_normalization import source_signature
-            identities=list(j['result'].private['sources'].values())+list(j['result'].private['assets'].values())
-            for model in j['result'].private['models'].values():
-                identities+=list(model.get('files',{}).values())
-                if model.get('manifest'):identities.append(model['manifest'])
-            try:
-                if any(source_signature(info['path'])!=tuple(info['signature']) for info in identities):abort(409,description='Analysis source identity changed. Reconfirm the audit.')
-            except OSError:abort(409,description='Analysis source is unavailable. Reconfirm the audit.')
-        a=j.get('artifacts',{}).get(kind)
-        if not a:abort(404)
-        current=capture(a['path'])
-        if current['sha256']!=a['sha256'] or current['signature']!=a['signature']:abort(409,description='Artifact identity changed.')
-        return a['path']
     def page(stage,j=None,**kwargs):return render_template('text_ui.html',stage=stage,job=j,defaults=TextAnalysisConfig(),execution_fields=asdict(ExecutionOptions()),limit_fields=asdict(TextWorkLimits()),**kwargs)
     @bp.route('/text',methods=['GET','POST'])
     def start():
         if request.method=='POST':
-            old=store.jobs.get(session.get('m6_job'))
-            if old:store.invalidate(old)
-            j=store.create('text');os.chmod(j['directory'],0o700);j['preset']=request.form.get('preset','corpus');TextTaskSpec(j['preset']);session['m6_job']=j['id']
+            start_m6(store,request.form.get('preset','corpus'))
             return redirect(url_for('m6.sources'))
         return page('start')
     @bp.route('/text/sources',methods=['GET','POST'])
     def sources():
         j=job()
         if request.method=='POST':
-            try:
-                store.invalidate(j)
-                if request.form.get('asset_upload')=='yes':
-                    upload=request.files.get('dataset');name=secure_filename(upload.filename) if upload else ''
-                    if not name:raise ValueError('Select an asset file.')
-                    destination=j['directory']/name
-                    # Never overwrite a source or earlier uploaded asset.
-                    if destination.exists():raise ValueError('An uploaded filename is already occupied.')
-                    upload.save(destination);os.chmod(destination,0o600);j.setdefault('asset_uploads',[]).append(destination)
-                else:
-                    upload=request.files.get('dataset');local=request.form.get('local_path','').strip();fmt=request.form.get('format','jsonl')
-                    if bool(upload and upload.filename)==bool(local):raise ValueError('Choose one uploaded or local source.')
-                    identity=request.form.get('source_id') or f's{len(j["sources"])+1}'
-                    if identity in {s['id'] for s in j['sources']}:raise ValueError('Source ID is already used.')
-                    if local:path=path_allowed(local)
-                    else:
-                        name=secure_filename(upload.filename)
-                        if not name:raise ValueError('Select a source file.')
-                        path=j['directory']/name
-                        if path.exists():raise ValueError('Uploaded filename is already occupied.')
-                        upload.save(path);os.chmod(path,0o600)
-                    source=TextSourceSpec(str(path),fmt,request.form.get('encoding','utf-8'),request.form.get('delimiter',','),request.form.get('quotechar','"'))
-                    preview=[]
-                    for n,(loc,record,reason) in enumerate(frames(path,source,TextAnalysisConfig().execution,TextWorkLimits())):
-                        if n>=128:break
-                        if 'header' in loc:preview=loc['header'];break
-                        if record is not None:preview=list(record);break
-                    j['sources'].append({'id':identity,'path':path,'format':fmt,'encoding':source.encoding,'delimiter':source.delimiter,'quotechar':source.quotechar,'fields':preview})
+            try:add_m6_source(store,j,request.form,request.files.get('dataset'))
             except Exception as exc:flash(str(exc) if isinstance(exc,ValueError) else 'Source could not be loaded.','error')
         return page('sources',j)
     @bp.route('/text/configure',methods=['GET','POST'])
     def configure():
         j=job()
         if request.method=='POST':
-            j['form_values']=request.form.to_dict(flat=False)
             try:
-                store.invalidate(j)
-                if request.form.get('spec_json','').strip():
-                    spec=TextAuditSpec.from_dict(strict_json(request.form['spec_json']));config=TextAnalysisConfig.from_dict(strict_json(request.form.get('config_json') or '{}'))
-                    for item in spec.inputs:path_allowed(item.source.path)
-                    spec=replace(spec,allowed_roots=tuple(map(str,store.roots))+(str(j['directory']),))
-                else:spec,config=guided(j,request.form,store.roots+(j['directory'],))
-                for path in [config.models.embedding_directory,config.execution.scratch_directory]:
-                    if path and not any(Path(path).resolve().is_relative_to(r) for r in store.roots):raise ValueError('Model/scratch directories must stay in configured roots.')
-                fp,sealed=fingerprint(spec,config);j.update(spec=spec,config=config,fingerprint=fp,sealed=sealed,state='confirm')
+                configure_m6(store,j,request.form)
                 return redirect(url_for('m6.confirm'))
             except Exception as exc:flash(str(exc) if isinstance(exc,ValueError) else 'Declarations could not be confirmed.','error')
         return page('configure',j)
@@ -170,28 +245,7 @@ def register(app,workspace,roots):
         return page('confirm',j)
     @bp.post('/text/run')
     def run():
-        j=job()
-        if j.get('state')!='confirm' or request.form.get('confirm')!='yes':abort(400)
-        fp,sealed=fingerprint(j['spec'],j['config'])
-        if fp!=j['fingerprint']:abort(409,description='Source, asset, model or declarations changed. Reconfirm the audit.')
-        if not store.lock.acquire(blocking=False):abort(409,description='Another supervised audit is active.')
-        j.update(state='running',progress={});j['cancel'].clear()
-        def execute():
-            try:
-                result=audit_text(j['spec'],j['config'],progress=lambda v:j['progress'].update(v),cancel=j['cancel'])
-                # Bind the result to all source/assets/models captured at confirmation.
-                for sid,info in result.private['sources'].items():
-                    if info['sha256']!=sealed['sources'][sid]['sha256']:raise ValueError('Source changed after confirmation.')
-                for path,info in result.private['assets'].items():
-                    if path not in sealed['assets'] or info['sha256']!=sealed['assets'][path]['sha256']:raise ValueError('Asset changed after confirmation.')
-                if result.private['models']!=sealed['models']:raise ValueError('Model changed after confirmation.')
-                j['result']=result
-                artifacts=result.generate_artifacts(j['directory']/'report.html',json_path=j['directory']/'analysis.json')
-                for kind,path in [('html',artifacts.html_path),('json',artifacts.json_path),('private',artifacts.private_manifest_path)]:remember(j,kind,path)
-                j['state']='completed'
-            except Exception as exc:j.update(state='failed',error=f'{getattr(exc,"code",type(exc).__name__)} at {getattr(exc,"stage","text execution")}',failure_execution=getattr(exc,'execution',{}))
-            finally:store.lock.release()
-        j['thread']=threading.Thread(target=execute,daemon=True);j['thread'].start()
+        run_m6(store,job(),request.form.get('confirm'))
         return redirect(url_for('m6.result'))
     @bp.post('/text/cancel')
     def cancel():job()['cancel'].set();return redirect(url_for('m6.result'))
@@ -201,33 +255,18 @@ def register(app,workspace,roots):
     @bp.get('/text/result')
     def result():return page('result',job())
     @bp.get('/text/report')
-    def report():return send_file(checked(job(),'html'),mimetype='text/html')
+    def report():return send_file(m6_checked(job(),'html'),mimetype='text/html')
     @bp.get('/text/download/<kind>')
     def download(kind):
-        j=job()
-        if kind not in {'html','json','pdf','private'}:abort(404)
-        if kind=='pdf' and kind not in j.get('artifacts',{}):
-            html=checked(j,'html')
-            from datatrust.pdf import render_pdf_report
-            path=render_pdf_report(html,j['directory']/'report.pdf',expected_html_sha256=j['artifacts']['html']['sha256']);remember(j,'pdf',path)
-        return send_file(checked(j,kind),as_attachment=True)
+        return send_file(m6_artifact(job(),kind),as_attachment=True)
     @bp.post('/text/evidence')
     def evidence():
         j=job()
         if j.get('state')!='completed':abort(400)
-        try:value=j['result'].resolve_evidence(request.form['reference'],allowed_roots=store.roots+(j['directory'],),reveal_content=request.form.get('reveal')=='yes')
+        try:value=m6_evidence(store,j,request.form['reference'],request.form.get('reveal')=='yes')
         except Exception as exc:return jsonify(status='changed_or_unavailable',reason=getattr(exc,'code',type(exc).__name__)),409
         return page('evidence',j,resolved=value)
     @bp.post('/text/export-excerpts')
     def excerpts():
-        j=job()
-        if j.get('state')!='completed':abort(400)
-        refs=names(request.form.get('references',''));key=hashlib.sha256(json.dumps(refs).encode()).hexdigest()[:16]
-        try:
-            for ref in refs:j['result'].resolve_evidence(ref,allowed_roots=store.roots+(j['directory'],),reveal_content=True)
-        except Exception:abort(409,description='Excerpt source changed or is unavailable. Reconfirm the audit.')
-        path=j['directory']/f'excerpts-{key}.html'
-        if 'excerpt-'+key not in j.get('artifacts',{}):
-            artifacts=j['result'].generate_artifacts(path,excerpt_refs=refs,allowed_roots=store.roots+(j['directory'],));remember(j,'excerpt-'+key,artifacts.html_path)
-        return send_file(checked(j,'excerpt-'+key),as_attachment=True)
+        return send_file(m6_excerpts(store,job(),names(request.form.get('references',''))),as_attachment=True)
     app.register_blueprint(bp)
