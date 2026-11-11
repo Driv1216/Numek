@@ -8,7 +8,7 @@ import math
 import os
 from pathlib import Path
 from . import compat
-from .contracts import ClockSpec, EvaluationError, OutcomeSnapshotSpec, digest
+from .contracts import ClockSpec, EvaluationError, digest
 
 
 def scalar(value):
@@ -83,14 +83,12 @@ class Store:
     def __init__(self,work,spec,config,roots):
         self.work,self.con,self.spec,self.config,self.roots=work,work.con,spec,config,roots
         self.sources={};self.tables={};self.headers={};self.counts={};self.snapshots={};self.total=0;self.warnings=[]
-        self.outcomes=spec.outcomes
-        if not self.outcomes and len(spec.runs)==1 and spec.runs[0].inline_outcome:
-            r=spec.runs[0];self.outcomes=OutcomeSnapshotSpec(r.source,r.inline_outcome,r.key_columns)
+        self.outcomes=spec.effective_outcomes
         self.context=spec.context
         self.cohort_columns=[c.column for c in spec.cohorts]
 
     def selected(self,sid):
-        selected=set()
+        selected=set(getattr(self,'extra_projection',{}).get(sid,()))
         def clock(c):
             if c:selected.add(c.column)
         for r in self.spec.runs:
@@ -111,6 +109,15 @@ class Store:
         if context_sid==sid:
             selected.update(self.cohort_columns);selected.update(self.context.key_columns if self.context else self.outcomes.key_columns)
         return selected
+
+    def add_projection(self,projection):
+        """Explicit shared column admission; callers cannot replace selection logic."""
+        if not hasattr(self,'extra_projection'):self.extra_projection={}
+        sources={s.id for s in self.spec.sources}
+        for sid,columns in projection.items():
+            if sid not in sources or not isinstance(columns,(set,tuple,list)) or any(not isinstance(c,str) or not c for c in columns):
+                raise EvaluationError('Invalid additional source projection.')
+            self.extra_projection.setdefault(sid,set()).update(columns)
 
     def ingest(self):
         combined=0

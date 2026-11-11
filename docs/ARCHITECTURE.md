@@ -1,6 +1,90 @@
 # Numek Architecture
 
-Last updated: 2026-10-21
+## CG6 accepted architecture — 2026-11-08
+
+The founder has confirmed CG6 is done and accepted; CG1–CG6 are complete within
+their approved scopes. Earlier pending-review, pending-understanding and
+pending-acceptance statements are historical. The accepted runtime/assets identity
+is `aa72f09caa5bc5b174db5b4253add54a9fba8b3ecec3309c99f0beb0608fbf6a`
+across 230 files.
+
+The [final implementation explainer](../validation/cg6/CG6_FINAL_IMPLEMENTATION_EXPLAINER.md)
+documents the three CG6 packages, complete inference/output contracts, restricted
+F/S auxiliary learning, registered variants/attacks, root/entity/batch inference,
+frozen CG1–CG5 integration, catalog-v2 binary retention and shared product/report
+paths. It includes six Mermaid diagrams and complete execution walkthroughs.
+This documentation update changes no architecture, implementation or scientific
+method. CPU/MPS qualification remains source/host-scoped; actual NVIDIA CUDA
+qualification is separately pending hardware and nonblocking. Historical evidence
+and sealed source/closure receipts remain unchanged. No CG7 implementation follows
+automatically from acceptance.
+
+## CG6 review-correction boundaries — 2026-11-08
+
+R1–R6 preserve the three-package architecture and catalog v2. Direct auxiliary
+artifacts join the execution admission contract before projection/reservation;
+assessment compatibility includes effective ordered ensemble definitions; imported
+CG2 eligibility reuses the authoritative membership helper. One focused robustness
+helper projects differentiable point/probability bindings for numeric/tensor/image
+attack objectives; final candidate replay is unchanged. Numeric fit statistics
+honor missing sentinels. Deterministic CUDA validates operator startup cuBLAS
+configuration before configuration-time native calls. See
+[the correction record](../validation/cg6/review-corrections-r1-r6/REVIEW_CORRECTIONS.md).
+No new schema, service, training family or acceptance claim is introduced.
+
+## CG6 controlled execution extension - 2026-11-07
+
+The three focused CG6 packages add admitted complete predictor pipelines, restricted auxiliary fitting and finite robustness orchestration behind the existing supervised operation boundary. Generated keyed outputs reuse CG1/CG2 reducers; frozen CG4 membership and CG5 policies are applied without rediscovery/rebinding. Model reuse is job-local, not persistent serving. The catalog stays at v2: `opaque_artifact_bytes_v1` objects and data-only descriptors use existing atomic publication, dependencies and lifecycle. CPU, MPS and CUDA remain first-class interfaces; actual unavailable NVIDIA qualification is a separate nonblocking ledger state. See [the CG6 contracts and boundaries](CG6_CONFIDENCEGUARD.md).
+
+## CG5 completion — 2026-11-06
+
+The founder has confirmed CG5 is fully completed, including implementation,
+independent review, R01–R09 and D1–D5 corrections, engineering verification and
+the implementation understanding gate. This decision supersedes pending-review,
+pending-understanding and pending-founder-acceptance language retained below.
+CG1–CG5 are complete within their approved scopes; scientific limitations and
+source-specific historical evidence remain unchanged. No CG6 work is implied.
+
+The [final implementation explainer](../validation/cg5/CG5_FINAL_IMPLEMENTATION_EXPLAINER.md) covers architecture, source files,
+policy semantics, optimization, statistical assessment, four execution scenarios,
+corrections, limitations, glossary and 15 technical questions. Its quick
+requirements review found all 13 requested areas present and no material issues
+in the technical spot-checks; no test suite was rerun for that document review.
+The explained 190-file runtime identity is
+`7d3f64affcbc9491223e23294482149848f3bd945a7aaefce33af4af7b3fc3b9`.
+
+Last updated: 2026-11-08
+
+CG5 adds focused policy contracts/interpreter, evidence adapters, an admitted S-only
+optimization problem, registered bounded backends, frozen policy claims and product
+adapters inside ConfidenceGuard. Executable, study, selection, frozen-family and
+assessment identities are independent. Existing normalization, native reducers,
+frozen CG2 kernels, CG3 reconstruction, CG4 membership, exposure ledger, packet
+codec and supervised worker remain authoritative. No historical store, database
+migration, worker service, fitting stage or general plugin framework is added.
+See [CG5 implementation](CG5_CONFIDENCEGUARD.md).
+The targeted review corrections preserve these boundaries: input identity v2,
+mandatory frozen constraints, independent cell admission and replayed objective
+equivalence, bounded outer-routing/inner-MILP search, separately bounded nomination
+state, scoped historical constraint ledgers and interpretable disclosure. No shared
+CG1–CG4 numerical kernel or DataTrust analytical engine is replaced. CG5 acceptance
+remains pending; see the [correction record](../validation/cg5/review-corrections-20261104/REVIEW_CORRECTIONS.md).
+
+CG1–CG4 completion is established by the current project decision; the following
+CG4 candidate/review language is historical. Its scientific limits remain current.
+
+The CG4 technical-review candidate adds a fixed investigation capability inside
+ConfidenceGuard, without a general execution/plugin framework. Typed feature
+Parquet and non-object vector NPY extend immutable JSONL evidence; catalog v2
+indexes codec locations, dependencies and protected exposure use. Discovery on D,
+selection on S, frozen membership and independent H assessment call shared metric
+reducers. Python/CLI/local API/browser and canonical reports share application
+services and supervision. [CG4 architecture and limitations](CG4_CONFIDENCEGUARD.md)
+and [the evidence ledger](../validation/cg4/IMPLEMENTATION_STATUS.md) describe current
+supported implementation, experimental capabilities and approved qualification deferrals.
+The founder-approved closure revision is documented in
+[the scope record](../validation/cg4/CLOSURE_SCOPE_REVISION.md); independent review
+and acceptance follow delivery.
 Status: M1 shared foundation, M2 regression, and M3 tabular/annotation intelligence
 implemented; M4 comparative/scalable local analysis added. Compatible pandas
 classification/M1/M2/M3 defaults are preserved; M5 temporal, M6 text, M7 image and M9 cross-representation reliability share the supervised DuckDB boundary. M8 audio remains deferred.
@@ -107,8 +191,9 @@ All runtime modules below live in `src/datatrust/`.
 
 `validation/` is separate engineering/evidence tooling, not a runtime package
 dependency. `tests/` exercises implemented contracts and failures. Packaging is
-specified in `pyproject.toml`; `setup.py` retains compatibility metadata, and
-both currently identify package version 0.1.0 with Python >=3.10. Templates are
+specified authoritatively in `pyproject.toml`; `setup.py` is a compatibility shim.
+Package version remains 0.1.0, with Python >=3.12, 3.13 primary and scoped 3.14
+capability qualification. Exact qualification locks are in `constraints/`. Templates are
 included as package data; the console entry point is `datatrust.cli:main`.
 
 ## Analysis Flow And Public Contract

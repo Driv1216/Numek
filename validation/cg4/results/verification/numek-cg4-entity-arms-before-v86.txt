@@ -1,0 +1,154 @@
+FFFFF                                                                    [100%]
+=================================== FAILURES ===================================
+_____ test_dependent_observations_across_arms_use_native_finite_components _____
+
+tmp_path = PosixPath('/private/var/folders/cs/c15xvw9d3t53tzcws5yxjxcr0000gn/T/pytest-of-drivyaanshyadav/pytest-533/test_dependent_observations_ac0')
+
+    def test_dependent_observations_across_arms_use_native_finite_components(tmp_path):
+        result = investigate(paired_events(tmp_path))
+        candidate = broad_failure(result)
+        assert candidate['S']['conditional_members'] == 120
+>       frozen = freeze_hypotheses(result, [candidate['id']], confirmation=protocol())
+                                                                           ^^^^^^^^^^
+
+tests/cg4/test_entity_arm_confirmation.py:47: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/cg4/test_entity_arm_confirmation.py:15: in protocol
+    return ConfirmationSpec(sampling='independent_entity_arms',
+<string>:27: in __init__
+    ???
+src/confidenceguard/investigation_contracts.py:246: in __post_init__
+    choice(self.sampling,{'independent_rows','independent_entities','descriptive','unsupported_temporal'},'confirmation sampling')
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+value = 'independent_entity_arms'
+options = {'descriptive', 'independent_entities', 'independent_rows', 'unsupported_temporal'}
+name = 'confirmation sampling'
+
+    def choice(value, options, name):
+>       if value not in options: raise EvaluationError(f'Unsupported {name}.')
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       confidenceguard.contracts.EvaluationError: Unsupported confirmation sampling.
+
+src/confidenceguard/contracts.py:48: EvaluationError
+_ test_repeated_potential_records_refuse_before_label_filtering[3-False-complement] _
+
+tmp_path = PosixPath('/private/var/folders/cs/c15xvw9d3t53tzcws5yxjxcr0000gn/T/pytest-of-drivyaanshyadav/pytest-533/test_repeated_potential_record0')
+per_entity = 3, hide_labels = False, comparator = 'complement'
+
+    @pytest.mark.parametrize(('per_entity', 'hide_labels', 'comparator'), [
+        (3, False, 'complement'), (3, True, 'complement'), (2, False, 'overall'),
+    ])
+    def test_repeated_potential_records_refuse_before_label_filtering(tmp_path, per_entity, hide_labels, comparator):
+        result = investigate(paired_events(tmp_path, per_entity=per_entity,
+            hide_repeated_labels=hide_labels, comparator=comparator))
+>       frozen = freeze_hypotheses(result, [broad_failure(result)['id']], confirmation=protocol())
+                                                                                       ^^^^^^^^^^
+
+tests/cg4/test_entity_arm_confirmation.py:72: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/cg4/test_entity_arm_confirmation.py:15: in protocol
+    return ConfirmationSpec(sampling='independent_entity_arms',
+<string>:27: in __init__
+    ???
+src/confidenceguard/investigation_contracts.py:246: in __post_init__
+    choice(self.sampling,{'independent_rows','independent_entities','descriptive','unsupported_temporal'},'confirmation sampling')
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+value = 'independent_entity_arms'
+options = {'descriptive', 'independent_entities', 'independent_rows', 'unsupported_temporal'}
+name = 'confirmation sampling'
+
+    def choice(value, options, name):
+>       if value not in options: raise EvaluationError(f'Unsupported {name}.')
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       confidenceguard.contracts.EvaluationError: Unsupported confirmation sampling.
+
+src/confidenceguard/contracts.py:48: EvaluationError
+_ test_repeated_potential_records_refuse_before_label_filtering[3-True-complement] _
+
+tmp_path = PosixPath('/private/var/folders/cs/c15xvw9d3t53tzcws5yxjxcr0000gn/T/pytest-of-drivyaanshyadav/pytest-533/test_repeated_potential_record1')
+per_entity = 3, hide_labels = True, comparator = 'complement'
+
+    @pytest.mark.parametrize(('per_entity', 'hide_labels', 'comparator'), [
+        (3, False, 'complement'), (3, True, 'complement'), (2, False, 'overall'),
+    ])
+    def test_repeated_potential_records_refuse_before_label_filtering(tmp_path, per_entity, hide_labels, comparator):
+        result = investigate(paired_events(tmp_path, per_entity=per_entity,
+            hide_repeated_labels=hide_labels, comparator=comparator))
+>       frozen = freeze_hypotheses(result, [broad_failure(result)['id']], confirmation=protocol())
+                                                                                       ^^^^^^^^^^
+
+tests/cg4/test_entity_arm_confirmation.py:72: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/cg4/test_entity_arm_confirmation.py:15: in protocol
+    return ConfirmationSpec(sampling='independent_entity_arms',
+<string>:27: in __init__
+    ???
+src/confidenceguard/investigation_contracts.py:246: in __post_init__
+    choice(self.sampling,{'independent_rows','independent_entities','descriptive','unsupported_temporal'},'confirmation sampling')
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+value = 'independent_entity_arms'
+options = {'descriptive', 'independent_entities', 'independent_rows', 'unsupported_temporal'}
+name = 'confirmation sampling'
+
+    def choice(value, options, name):
+>       if value not in options: raise EvaluationError(f'Unsupported {name}.')
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       confidenceguard.contracts.EvaluationError: Unsupported confirmation sampling.
+
+src/confidenceguard/contracts.py:48: EvaluationError
+_ test_repeated_potential_records_refuse_before_label_filtering[2-False-overall] _
+
+tmp_path = PosixPath('/private/var/folders/cs/c15xvw9d3t53tzcws5yxjxcr0000gn/T/pytest-of-drivyaanshyadav/pytest-533/test_repeated_potential_record2')
+per_entity = 2, hide_labels = False, comparator = 'overall'
+
+    @pytest.mark.parametrize(('per_entity', 'hide_labels', 'comparator'), [
+        (3, False, 'complement'), (3, True, 'complement'), (2, False, 'overall'),
+    ])
+    def test_repeated_potential_records_refuse_before_label_filtering(tmp_path, per_entity, hide_labels, comparator):
+        result = investigate(paired_events(tmp_path, per_entity=per_entity,
+            hide_repeated_labels=hide_labels, comparator=comparator))
+>       frozen = freeze_hypotheses(result, [broad_failure(result)['id']], confirmation=protocol())
+                                                                                       ^^^^^^^^^^
+
+tests/cg4/test_entity_arm_confirmation.py:72: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/cg4/test_entity_arm_confirmation.py:15: in protocol
+    return ConfirmationSpec(sampling='independent_entity_arms',
+<string>:27: in __init__
+    ???
+src/confidenceguard/investigation_contracts.py:246: in __post_init__
+    choice(self.sampling,{'independent_rows','independent_entities','descriptive','unsupported_temporal'},'confirmation sampling')
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+value = 'independent_entity_arms'
+options = {'descriptive', 'independent_entities', 'independent_rows', 'unsupported_temporal'}
+name = 'confirmation sampling'
+
+    def choice(value, options, name):
+>       if value not in options: raise EvaluationError(f'Unsupported {name}.')
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       confidenceguard.contracts.EvaluationError: Unsupported confirmation sampling.
+
+src/confidenceguard/contracts.py:48: EvaluationError
+____ test_arm_design_cannot_select_bootstrap_or_omit_entity_role_assignment ____
+
+tmp_path = PosixPath('/private/var/folders/cs/c15xvw9d3t53tzcws5yxjxcr0000gn/T/pytest-of-drivyaanshyadav/pytest-533/test_arm_design_cannot_select_0')
+
+    def test_arm_design_cannot_select_bootstrap_or_omit_entity_role_assignment(tmp_path):
+>       with pytest.raises(EvaluationError, match='finite'):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: Regex pattern did not match.
+E         Expected regex: 'finite'
+E         Actual message: 'Unsupported confirmation sampling.'
+
+tests/cg4/test_entity_arm_confirmation.py:82: AssertionError
+=========================== short test summary info ============================
+FAILED tests/cg4/test_entity_arm_confirmation.py::test_dependent_observations_across_arms_use_native_finite_components
+FAILED tests/cg4/test_entity_arm_confirmation.py::test_repeated_potential_records_refuse_before_label_filtering[3-False-complement]
+FAILED tests/cg4/test_entity_arm_confirmation.py::test_repeated_potential_records_refuse_before_label_filtering[3-True-complement]
+FAILED tests/cg4/test_entity_arm_confirmation.py::test_repeated_potential_records_refuse_before_label_filtering[2-False-overall]
+FAILED tests/cg4/test_entity_arm_confirmation.py::test_arm_design_cannot_select_bootstrap_or_omit_entity_role_assignment
+5 failed in 13.08s

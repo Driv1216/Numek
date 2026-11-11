@@ -1,0 +1,48 @@
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+_ test_uniform_failure_above_declared_ceiling_is_a_frozen_population_claim[structured] _
+
+tmp_path = PosixPath('/private/var/folders/cs/c15xvw9d3t53tzcws5yxjxcr0000gn/T/pytest-of-drivyaanshyadav/pytest-443/test_uniform_failure_above_dec0')
+strategy = 'structured'
+
+    @pytest.mark.parametrize('strategy',['structured','catboost'])
+    def test_uniform_failure_above_declared_ceiling_is_a_frozen_population_claim(tmp_path,strategy):
+        spec=binary(tmp_path,strategies=(strategy,))
+        path=tmp_path/'predictions.csv'
+        with path.open() as stream:rows=list(csv.DictReader(stream))
+        for row in rows:row['decision']=str(1-int(row['y']))
+        with path.open('w',newline='') as stream:
+            writer=csv.DictWriter(stream,fieldnames=list(rows[0]));writer.writeheader();writer.writerows(rows)
+        spec=replace(spec,objectives=(replace(spec.objectives[0],comparator='ceiling',ceiling=.1),))
+        result=investigate(spec)
+        candidates=result.data['investigation']['candidates']
+>       assert len(candidates)==1
+E       assert 0 == 1
+E        +  where 0 = len([])
+
+tests/cg4/test_population_ceiling.py:24: AssertionError
+_ test_uniform_failure_above_declared_ceiling_is_a_frozen_population_claim[catboost] _
+
+tmp_path = PosixPath('/private/var/folders/cs/c15xvw9d3t53tzcws5yxjxcr0000gn/T/pytest-of-drivyaanshyadav/pytest-443/test_uniform_failure_above_dec1')
+strategy = 'catboost'
+
+    @pytest.mark.parametrize('strategy',['structured','catboost'])
+    def test_uniform_failure_above_declared_ceiling_is_a_frozen_population_claim(tmp_path,strategy):
+        spec=binary(tmp_path,strategies=(strategy,))
+        path=tmp_path/'predictions.csv'
+        with path.open() as stream:rows=list(csv.DictReader(stream))
+        for row in rows:row['decision']=str(1-int(row['y']))
+        with path.open('w',newline='') as stream:
+            writer=csv.DictWriter(stream,fieldnames=list(rows[0]));writer.writeheader();writer.writerows(rows)
+        spec=replace(spec,objectives=(replace(spec.objectives[0],comparator='ceiling',ceiling=.1),))
+        result=investigate(spec)
+        candidates=result.data['investigation']['candidates']
+>       assert len(candidates)==1
+E       assert 0 == 1
+E        +  where 0 = len([])
+
+tests/cg4/test_population_ceiling.py:24: AssertionError
+=========================== short test summary info ============================
+FAILED tests/cg4/test_population_ceiling.py::test_uniform_failure_above_declared_ceiling_is_a_frozen_population_claim[structured]
+FAILED tests/cg4/test_population_ceiling.py::test_uniform_failure_above_declared_ceiling_is_a_frozen_population_claim[catboost]
+2 failed in 6.84s

@@ -1,0 +1,180 @@
+{
+  "predictors": [
+    {
+      "id": "model",
+      "task": {
+        "kind": "regression",
+        "outcome_definition": "observed",
+        "classes": [],
+        "positive_class": null,
+        "units": "items",
+        "horizon": null,
+        "material_error": null
+      },
+      "adapter": "torch",
+      "inputs": [
+        {
+          "id": "x",
+          "column": "x",
+          "kind": "float",
+          "role": "model_input",
+          "units": null,
+          "missing_values": [
+            ""
+          ],
+          "boolean_true": [
+            "true",
+            "1",
+            "True"
+          ],
+          "boolean_false": [
+            "false",
+            "0",
+            "False"
+          ],
+          "available_at": null,
+          "effective_at": null,
+          "outcome_derived": false
+        }
+      ],
+      "outputs": [
+        {
+          "channel": "point",
+          "source": "output",
+          "indices": [],
+          "classes": [],
+          "levels": [],
+          "activation": "none",
+          "direction": "higher",
+          "meaning": "event_ranking",
+          "mapping": {}
+        }
+      ],
+      "files": [
+        {
+          "name": "linear.safetensors",
+          "path": "/Users/drivyaanshyadav/Desktop/Numek/validation/cg6/results/browser/linear.safetensors",
+          "sha256": "4d841ce60efaa1bf34efae240f9d50364aaa1bee38e17134522da83f4710415d"
+        }
+      ],
+      "entry": "linear.safetensors",
+      "preprocessing": {},
+      "architecture": {
+        "kind": "mlp",
+        "hidden": [],
+        "input_dim": 1,
+        "output_dim": 1
+      },
+      "decision": {
+        "column": null,
+        "rule": "none",
+        "threshold": null,
+        "tie_policy": "abstain",
+        "state_column": null,
+        "state_values": {
+          "issued": "issued",
+          "abstained": "abstained",
+          "failed": "failed",
+          "missing": "missing"
+        },
+        "candidate_evaluation": false
+      },
+      "registration": null,
+      "runtime": {},
+      "provenance": {},
+      "retention": "copy",
+      "execution_view_only": false,
+      "schema_version": "confidenceguard.predictor_spec/1.0"
+    }
+  ],
+  "sources": [
+    {
+      "id": "input",
+      "path": "/Users/drivyaanshyadav/Desktop/Numek/validation/cg6/results/browser/inputs.csv",
+      "format": "csv",
+      "encoding": "utf-8-sig",
+      "delimiter": ","
+    }
+  ],
+  "input_source": "input",
+  "key_columns": [
+    "id"
+  ],
+  "namespace": "cg6-test-browser",
+  "entity_columns": [
+    "entity"
+  ],
+  "batch_columns": [],
+  "context_fields": [],
+  "outcomes": {
+    "source": "input",
+    "column": "y",
+    "key_columns": [
+      "id"
+    ],
+    "snapshot_name": null,
+    "status_column": null,
+    "status_values": {
+      "final": "final",
+      "observed": "observed",
+      "provisional": "provisional",
+      "invalid": "invalid",
+      "conflicting": "conflicting"
+    },
+    "available_at": null,
+    "due_at": null,
+    "target_at": null
+  },
+  "cohorts": [],
+  "roles": {
+    "namespace": "cg6-test-browser",
+    "column": "role",
+    "values": {
+      "F": "F",
+      "S": "S",
+      "C": "C",
+      "E": "E"
+    },
+    "partitions": [],
+    "proportions": {},
+    "seed": 0,
+    "unit": "entity"
+  },
+  "information_cutoff": null,
+  "as_of": null,
+  "auxiliaries": [],
+  "fitted_methods": [],
+  "membership_sidecars": [],
+  "evidence_retention": "materialized_inputs",
+  "ensembles": [],
+  "device": {
+    "kind": "cpu",
+    "index": 0,
+    "precision": "float32",
+    "allow_cpu_fallback": false,
+    "deterministic": true,
+    "onnx_mode": "strict",
+    "memory_bytes": 2147483648
+  },
+  "limits": {
+    "batch_rows": 1024,
+    "modality_batch_rows": 32,
+    "batch_tensor_bytes": 67108864,
+    "max_artifact_bytes": 2147483648,
+    "max_artifact_files": 128,
+    "max_predictors": 16,
+    "max_variants": 10000000,
+    "max_output_cells": 100000000,
+    "max_tokens": 256,
+    "max_tokens_work": 20000000,
+    "max_image_pixels": 16000000,
+    "max_queries": 1000000,
+    "max_candidates": 8,
+    "max_fits": 64,
+    "max_inference_retries": 3,
+    "cache_bytes": 67108864,
+    "retained_rows": 1000
+  },
+  "name": "ConfidenceGuard predictor execution",
+  "schema_version": "confidenceguard.execution_spec/1.0"
+}

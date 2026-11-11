@@ -1,0 +1,105 @@
+...F                                                                     [100%]
+=================================== FAILURES ===================================
+_ test_retained_encoded_content_uses_declared_cutoff_without_loading_a_model[2026-01-03T00:00:00Z-2026-01-01T12:00:00Z-True-False-False] _
+
+tmp_path = PosixPath('/private/tmp/numek-cg4-corrections/final-retained312/test_retained_encoded_content_3')
+cutoff = '2026-01-03T00:00:00Z', content = '2026-01-01T12:00:00Z'
+retain_cutoff = True, retain_view = False, expected = False
+
+    @pytest.mark.parametrize('cutoff,content,retain_cutoff,retain_view,expected',[
+        ('2026-01-01T00:00:00Z','2026-01-01T12:00:00Z',True,True,False),
+        ('2026-01-03T00:00:00Z','2026-01-02T12:00:00Z',True,True,True),
+        ('2026-01-03T00:00:00Z','2026-01-01T12:00:00Z',False,True,False),
+        ('2026-01-03T00:00:00Z','2026-01-01T12:00:00Z',True,False,False),
+    ])
+    def test_retained_encoded_content_uses_declared_cutoff_without_loading_a_model(tmp_path,cutoff,content,retain_cutoff,retain_view,expected):
+        from confidenceguard import DiscoveryRepresentationSpec
+        from confidenceguard.history_storage import EvidenceWriter
+        from confidenceguard.investigation_history import envelope
+        from confidenceguard.history_contracts import instant
+        ws,_,history=retained_input(tmp_path,cutoff=cutoff,content=content)
+        predictions=list(ws.catalog.iter_facts('prediction'));variant=history.objectives[0].run
+        # Synthetic retained encoder outputs isolate the historical availability path;
+        # this is not an encoder inference or publisher-authentication qualification.
+        with ws.catalog.operation():
+            operation,_=ws.catalog.begin('retained-encoder-fixture','same')
+            writer=EvidenceWriter(ws.path/'staging'/operation,ws.catalog.config,operation)
+            locations=writer.add_vectors(np.ones((1,384),dtype='<f4'))
+            records=[]
+            for fact in predictions:
+                owner=digest([fact['key'],fact['revision']])
+                payload={'namespace':history.roles.namespace,'representation':'encoded','owner':'prediction_revision',
+                    'owner_key':owner,'opportunity_key':fact['payload']['opportunity_key'],'variant':variant,
+                    'values':{},'state':'observed','reason':'','dimensions':384,'vector_digest':locations[0]['vector_digest'],
+                    'spec':{'kind':'e5_text','field':'context.x','model_digest':None},
+                    'content_available':[str(instant(content)),'valid'],'content_availability_declaration':'dated'}
+                if retain_cutoff:payload['content_information_cutoff']={'policy':FEATURE_TIME_POLICY,
+                    'clock':history.features[0].information_cutoff.to_dict(),'tick_ns':str(instant(cutoff)),'state':'valid'}
+                records.append(envelope('representation',[history.roles.namespace,'encoded',owner],payload))
+            writer.add_features(records,());writer.finish({'capture_stages':['synthetic_retained_encoder_output']})
+            ws.catalog.commit_capture(operation)
+        if not retain_view:
+            objects=sorted({fact['object_id'] for fact in ws.catalog.iter_facts('feature')})
+            ws.delete(ws.deletion_preview(object_ids=objects))
+        selection=replace(history,representations=(DiscoveryRepresentationSpec('encoded',kind='retained',dimensions=384),))
+        s,c,roots=arguments(selection,None,None)
+>       with prepared(s,c,roots) as p:
+             ^^^^^^^^^^^^^^^^^^^
+
+tests/cg4/test_review_corrections.py:304: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+validation/cg4/runtime.nosync/cpython-3.12.15-macos-aarch64-none/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+src/confidenceguard/investigation.py:274: in prepared
+    with _prepared(spec,config,roots,progress,identity_only=identity_only) as p:yield p
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+validation/cg4/runtime.nosync/cpython-3.12.15-macos-aarch64-none/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+src/confidenceguard/investigation.py:281: in _prepared
+    with prepare_history(spec,config,roots,progress,identity_only=identity_only) as packet:yield packet
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+validation/cg4/runtime.nosync/cpython-3.12.15-macos-aarch64-none/lib/python3.12/contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+src/confidenceguard/investigation_history.py:263: in prepare_history
+    variants,scan=load_history(work,root,selection,selection.catalog_sequence)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src/confidenceguard/history_selection.py:32: in load_history
+    for fact in catalog.iter_facts(kind, sequence=(spec.prediction_catalog_sequence or sequence) if kind != 'outcome' else sequence, batch_ids=spec.batch_ids, max_records=spec.max_scan_records, check=work.check):
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <confidenceguard.history_storage.Catalog object at 0x11b486e40>
+kind = 'opportunity', sequence = 3, keys = None, fact_digests = ()
+batch_ids = (), require_complete = True, max_records = 30000000
+check = <bound method Workspace.check of <datatrust.scalable.Workspace object at 0x11b4877a0>>
+_logical_order = False
+
+    def iter_facts(self, kind=None, *, sequence=None, keys=None, fact_digests=(), batch_ids=(), require_complete=True, max_records=30000000, check=None, _logical_order=False):
+        where = ["p.state='committed'", "o.state='active'"]; args = []
+        if kind: where.append('f.kind=?'); args.append(kind)
+        if sequence is not None: where.append('p.sequence<=?'); args.append(sequence)
+        if fact_digests:
+            where.append('f.fact_digest IN ('+','.join('?' for _ in fact_digests)+')');args.extend(fact_digests)
+        with closing(self._connect()) as db:
+            if batch_ids:
+                placeholders = ','.join('?' for _ in batch_ids)
+                where.append(f"EXISTS(SELECT 1 FROM occurrences oc JOIN operations op ON op.id=oc.operation_id WHERE oc.fact_id=f.id AND op.state='committed' AND oc.operation_id IN ({placeholders})" + (' AND op.sequence<=?' if sequence is not None else '') + ')')
+                args.extend(batch_ids)
+                if sequence is not None: args.append(sequence)
+            if keys is not None:
+                db.execute('CREATE TEMP TABLE selected_keys(key TEXT PRIMARY KEY)')
+                db.executemany('INSERT OR IGNORE INTO selected_keys VALUES (?)', ((k,) for k in keys))
+                where.append('f.key IN (SELECT key FROM selected_keys)')
+            missing_where = [w for w in where if w != "o.state='active'"] + ["o.state!='active'"]
+            missing = db.execute('SELECT count(*) FROM facts f JOIN objects o ON o.id=f.object_id JOIN operations p ON p.id=f.operation_id WHERE ' + ' AND '.join(missing_where),args).fetchone()[0]
+            if missing and require_complete:
+>               raise EvaluationError('Selected historical evidence was deleted or is unavailable; choose an intact explicit batch population.', 'historical_evidence_unavailable')
+E               confidenceguard.contracts.EvaluationError: Selected historical evidence was deleted or is unavailable; choose an intact explicit batch population.
+
+src/confidenceguard/history_storage.py:742: EvaluationError
+=========================== short test summary info ============================
+FAILED tests/cg4/test_review_corrections.py::test_retained_encoded_content_uses_declared_cutoff_without_loading_a_model[2026-01-03T00:00:00Z-2026-01-01T12:00:00Z-True-False-False]
+1 failed, 3 passed, 27 deselected in 13.83s

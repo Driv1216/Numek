@@ -1,0 +1,384 @@
+{
+  "source": "validation/regression/reports/bike_hour.json",
+  "comparison_source": "validation/regression/reports/bike_hour_components_removed.json",
+  "status": "Existing internal validation examples; no new analytical run",
+  "dataset": {
+    "path": "bike_hour.csv",
+    "format": "csv",
+    "sample_unit": "row",
+    "dataset_name": "Bike Hour",
+    "purpose": "Forecast interval total before its outcomes are known.",
+    "source_filename": null
+  },
+  "profile": {
+    "row_count": 17379,
+    "column_count": 17,
+    "feature_count": 16
+  },
+  "scoring": {
+    "status": "not_defined",
+    "values": null,
+    "reason": "No validated scoring policy is defined for regression reliability."
+  },
+  "findings": [
+    {
+      "code": "regression_declared_availability",
+      "title": "Columns declared unavailable at prediction time",
+      "finding": "2 feature columns are declared unavailable at the intended prediction time.",
+      "evidence": "casual, registered",
+      "recommendation": "Verify the intended input set and collection timing. This declaration does not establish actual model use or leakage.",
+      "severity": "High",
+      "modeling_impact": "Collection timing can determine whether a proposed feature is usable for the intended outcome.",
+      "evidence_type": "user_declared_context",
+      "population": {
+        "name": "feature columns",
+        "denominator": 16
+      },
+      "limitations": "Feature timing is user-declared or unknown; names alone do not establish availability or leakage.",
+      "evidence_refs": [
+        "regression_availability.47"
+      ]
+    },
+    {
+      "code": "regression_relationships_unavailable_at_prediction",
+      "title": "Supported target relationships",
+      "finding": "1 distinct target relationship meets the support and coverage requirements.",
+      "evidence": "cnt = casual + registered",
+      "recommendation": "Verify feature availability and derivation against the intended prediction time; observed algebra alone does not prove leakage.",
+      "severity": "High",
+      "modeling_impact": "An outcome-derived field unavailable at the intended prediction time may invalidate the intended feature set.",
+      "evidence_type": "contextual_review",
+      "population": {
+        "name": "fully verified relationship overlap scopes",
+        "denominator": null,
+        "detail": "Each witness reports its own overlap and finite-target coverage."
+      },
+      "limitations": "Observed identities and supplied availability do not establish actual model use, independent provenance, or leakage.",
+      "evidence_refs": [
+        "regression_relationship_group.45",
+        "regression_relationship.44"
+      ]
+    },
+    {
+      "code": "numeric_outlier_concentration",
+      "title": "IQR review candidates",
+      "finding": "Some fields have at least 5% of finite values outside the 1.5-IQR fences.",
+      "evidence": "casual: 1192 of 17379 finite values (6.86%)",
+      "recommendation": "Review distributions, units, and legitimate rare observations. Skew or an IQR flag does not prove a data error.",
+      "severity": "Moderate",
+      "modeling_impact": "Extreme observations can influence some analyses; this check does not establish task suitability.",
+      "evidence_type": "review_observation",
+      "population": {
+        "name": "finite values by affected feature",
+        "denominator": null,
+        "detail": "Each referenced column retains its own finite denominator; infinity counts use all parsed rows."
+      },
+      "limitations": "These shared structural observations require context; rarity, repetition, and IQR candidates alone do not prove errors.",
+      "evidence_refs": [
+        "numeric_outliers.32"
+      ]
+    },
+    {
+      "code": "near_constant_fields",
+      "title": "Near-constant fields",
+      "finding": "1 column meets the near-constant fields review rule.",
+      "evidence": "holiday: 2 observed values, 97.12% top share",
+      "recommendation": "Review whether rare values are legitimate and important before changing these fields.",
+      "severity": "Low",
+      "modeling_impact": "Observed distributions need interpretation against the intended data use; rarity or cardinality alone is not a defect.",
+      "evidence_type": "review_observation",
+      "population": {
+        "name": "feature columns",
+        "denominator": 16
+      },
+      "limitations": "These shared structural observations require context; rarity, repetition, and IQR candidates alone do not prove errors.",
+      "evidence_refs": [
+        "column_variation.2"
+      ]
+    }
+  ],
+  "relationship": {
+    "id": "relationship.0",
+    "method": "pair_sum",
+    "columns": [
+      "casual",
+      "registered"
+    ],
+    "expression": "cnt = casual + registered",
+    "overlap_count": 17379,
+    "target_coverage": 100.0,
+    "total_row_coverage": 100.0,
+    "target_distinct_count": 869,
+    "support_sha256": "dd2d63bef01fc13dfc3aa1bcf4ed9ccf8490c44ad873cc5ec71b714b735fb03c",
+    "coefficient": null,
+    "intercept": null,
+    "constant_component": null,
+    "normalized_tolerance": 1.0000711270750858e-10,
+    "fully_verified": true,
+    "availability": "unavailable_at_prediction",
+    "availability_by_column": {
+      "casual": "unavailable_at_prediction",
+      "registered": "unavailable_at_prediction"
+    },
+    "declaration_source": "user_declared_or_unknown",
+    "action_eligible": true,
+    "non_escalation_reasons": [],
+    "excluded_rows": 0,
+    "missing_target_count": 0,
+    "nonfinite_target_count": 0,
+    "feature_exclusions": {
+      "casual": {
+        "missing": 0,
+        "nonfinite": 0
+      },
+      "registered": {
+        "missing": 0,
+        "nonfinite": 0
+      }
+    },
+    "evidence_refs": [
+      "regression_relationship.44"
+    ],
+    "row_refs": [
+      {
+        "source_sha256": "11e08374c448229649b93e64c7442558b93d516a008804bd70bdb8c82333c434",
+        "parsing_fingerprint": "19d2d091dd4d30e4c32554569445efc8645d4e3f7d50aa4cc1eb0cb5610adc87",
+        "parsed_row": 1
+      },
+      {
+        "source_sha256": "11e08374c448229649b93e64c7442558b93d516a008804bd70bdb8c82333c434",
+        "parsing_fingerprint": "19d2d091dd4d30e4c32554569445efc8645d4e3f7d50aa4cc1eb0cb5610adc87",
+        "parsed_row": 2
+      },
+      {
+        "source_sha256": "11e08374c448229649b93e64c7442558b93d516a008804bd70bdb8c82333c434",
+        "parsing_fingerprint": "19d2d091dd4d30e4c32554569445efc8645d4e3f7d50aa4cc1eb0cb5610adc87",
+        "parsed_row": 3
+      },
+      {
+        "source_sha256": "11e08374c448229649b93e64c7442558b93d516a008804bd70bdb8c82333c434",
+        "parsing_fingerprint": "19d2d091dd4d30e4c32554569445efc8645d4e3f7d50aa4cc1eb0cb5610adc87",
+        "parsed_row": 4
+      },
+      {
+        "source_sha256": "11e08374c448229649b93e64c7442558b93d516a008804bd70bdb8c82333c434",
+        "parsing_fingerprint": "19d2d091dd4d30e4c32554569445efc8645d4e3f7d50aa4cc1eb0cb5610adc87",
+        "parsed_row": 5
+      }
+    ]
+  },
+  "histogram": {
+    "method": "freedman_diaconis_capped_40",
+    "denominator": 17379,
+    "bins": [
+      {
+        "lower": 1.0,
+        "upper": 25.4,
+        "count": 3377
+      },
+      {
+        "lower": 25.4,
+        "upper": 49.800000000000004,
+        "count": 1444
+      },
+      {
+        "lower": 49.800000000000004,
+        "upper": 74.2,
+        "count": 1144
+      },
+      {
+        "lower": 74.2,
+        "upper": 98.60000000000001,
+        "count": 1007
+      },
+      {
+        "lower": 98.60000000000001,
+        "upper": 122.99999999999999,
+        "count": 965
+      },
+      {
+        "lower": 122.99999999999999,
+        "upper": 147.4,
+        "count": 952
+      },
+      {
+        "lower": 147.4,
+        "upper": 171.8,
+        "count": 900
+      },
+      {
+        "lower": 171.8,
+        "upper": 196.20000000000002,
+        "count": 888
+      },
+      {
+        "lower": 196.20000000000002,
+        "upper": 220.6,
+        "count": 767
+      },
+      {
+        "lower": 220.6,
+        "upper": 244.99999999999997,
+        "count": 726
+      },
+      {
+        "lower": 244.99999999999997,
+        "upper": 269.4,
+        "count": 584
+      },
+      {
+        "lower": 269.4,
+        "upper": 293.8,
+        "count": 582
+      },
+      {
+        "lower": 293.8,
+        "upper": 318.2,
+        "count": 522
+      },
+      {
+        "lower": 318.2,
+        "upper": 342.6,
+        "count": 409
+      },
+      {
+        "lower": 342.6,
+        "upper": 367.0,
+        "count": 362
+      },
+      {
+        "lower": 367.0,
+        "upper": 391.40000000000003,
+        "count": 367
+      },
+      {
+        "lower": 391.40000000000003,
+        "upper": 415.8,
+        "count": 290
+      },
+      {
+        "lower": 415.8,
+        "upper": 440.2,
+        "count": 252
+      },
+      {
+        "lower": 440.2,
+        "upper": 464.6,
+        "count": 242
+      },
+      {
+        "lower": 464.6,
+        "upper": 488.99999999999994,
+        "count": 203
+      },
+      {
+        "lower": 488.99999999999994,
+        "upper": 513.4,
+        "count": 213
+      },
+      {
+        "lower": 513.4,
+        "upper": 537.8,
+        "count": 158
+      },
+      {
+        "lower": 537.8,
+        "upper": 562.2,
+        "count": 148
+      },
+      {
+        "lower": 562.2,
+        "upper": 586.6,
+        "count": 144
+      },
+      {
+        "lower": 586.6,
+        "upper": 611.0000000000001,
+        "count": 111
+      },
+      {
+        "lower": 611.0000000000001,
+        "upper": 635.4,
+        "count": 92
+      },
+      {
+        "lower": 635.4,
+        "upper": 659.8,
+        "count": 86
+      },
+      {
+        "lower": 659.8,
+        "upper": 684.2,
+        "count": 80
+      },
+      {
+        "lower": 684.2,
+        "upper": 708.6,
+        "count": 64
+      },
+      {
+        "lower": 708.6,
+        "upper": 733.0,
+        "count": 55
+      },
+      {
+        "lower": 733.0,
+        "upper": 757.4,
+        "count": 42
+      },
+      {
+        "lower": 757.4,
+        "upper": 781.8000000000001,
+        "count": 27
+      },
+      {
+        "lower": 781.8000000000001,
+        "upper": 806.2,
+        "count": 37
+      },
+      {
+        "lower": 806.2,
+        "upper": 830.6,
+        "count": 43
+      },
+      {
+        "lower": 830.6,
+        "upper": 855.0,
+        "count": 35
+      },
+      {
+        "lower": 855.0,
+        "upper": 879.4,
+        "count": 24
+      },
+      {
+        "lower": 879.4,
+        "upper": 903.8000000000001,
+        "count": 20
+      },
+      {
+        "lower": 903.8000000000001,
+        "upper": 928.2,
+        "count": 5
+      },
+      {
+        "lower": 928.2,
+        "upper": 952.6,
+        "count": 4
+      },
+      {
+        "lower": 952.6,
+        "upper": 977.0,
+        "count": 8
+      }
+    ],
+    "interval_policy": "left closed, right open; final bin includes maximum"
+  },
+  "comparison": {
+    "columns": 15,
+    "finding_codes": [
+      "near_constant_fields"
+    ],
+    "scope": "Two separately saved regression runs. Not a newly executed M4 comparison; removal does not prove overall reliability."
+  }
+}

@@ -1,0 +1,12 @@
+--- prior/src/confidenceguard/history_capture.py
++++ current/src/confidenceguard/history_capture.py
+@@ -114,6 +114,9 @@
+                     opportunity=values(raw,binding.opportunity_columns or run.key_columns)
+                     target=values(raw,binding.target_columns) if binding.target_columns else [binding.target_instance]
+                     events.add(digest([batch.namespace,event]));units.add(digest([batch.namespace,entity or event]))
++                    from .evidence_use import source_aliases
++                    for source in (run.source,batch.base.outcomes.source if batch.base.outcomes else run.source):
++                        ee,uu=source_aliases(store.sources[source],event,entity);events.update(ee);units.update(uu)
+                     if identity is not None and opportunity is not None and target is not None:
+                         opp=digest([target_identity(batch.namespace,identity,batch.outcome_definition_version,target),opportunity])
+                         events.add(digest([batch.namespace,opp]));units.add(digest([batch.namespace,opp]))

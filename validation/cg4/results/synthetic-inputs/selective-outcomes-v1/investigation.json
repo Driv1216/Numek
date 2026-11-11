@@ -1,0 +1,89 @@
+{
+  "evaluation": {
+    "as_of": "2026-01-02T00:00:00Z",
+    "outcomes": {
+      "available_at": {
+        "column": "available"
+      },
+      "column": "y",
+      "key_columns": [
+        "id"
+      ],
+      "source": "data",
+      "status_column": "status",
+      "status_values": {
+        "conflicting": "conflicting",
+        "final": "final",
+        "invalid": "invalid",
+        "pending": "pending",
+        "provisional": "provisional",
+        "withdrawn": "withdrawn"
+      }
+    },
+    "runs": [
+      {
+        "entity_columns": [
+          "entity"
+        ],
+        "id": "model",
+        "key_columns": [
+          "id"
+        ],
+        "model": {
+          "id": "synthetic-fixture",
+          "version": "v1"
+        },
+        "prediction": "decision",
+        "source": "data"
+      }
+    ],
+    "sources": [
+      {
+        "id": "data",
+        "path": "predictions.csv"
+      }
+    ],
+    "task": {
+      "classes": [
+        "0",
+        "1"
+      ],
+      "kind": "binary_classification",
+      "outcome_definition": "Synthetic fixture; only correct H predictions have final labels",
+      "positive_class": "1"
+    }
+  },
+  "features": [],
+  "name": "CG4 selective labels: observed-label scope",
+  "objectives": [
+    {
+      "bounds": [],
+      "ceiling": 0.1,
+      "comparator": "ceiling",
+      "current_period": null,
+      "direction": "higher",
+      "id": "error",
+      "interval": null,
+      "material_error": null,
+      "metric": "error_rate",
+      "metric_identity": {},
+      "nominal": null,
+      "practical_threshold": 0.1,
+      "reference_period": null,
+      "reference_run": null,
+      "run": "model",
+      "target": null,
+      "training_clip": 30,
+      "units": "fraction"
+    }
+  ],
+  "roles": {
+    "column": "role",
+    "namespace": "cg4-browser-selective-labels-v1",
+    "unit": "entity"
+  },
+  "schema_version": "confidenceguard.investigation_spec/1.0",
+  "strategies": [
+    "structured"
+  ]
+}

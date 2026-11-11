@@ -5,6 +5,7 @@ import json
 import os
 from pathlib import Path
 import shutil
+from functools import lru_cache
 
 from datatrust.contracts import AnalysisError
 from datatrust.ingestion import source_signature, source_digest
@@ -63,11 +64,27 @@ def graphemes(text):
     return regex.findall(r'\X',text)
 
 
+@lru_cache(maxsize=1)
+def _legacy_casefold_table():
+    """The accepted representation used CPython 3.11's full case mapping.
+
+    Python 3.14 adds casing for 27 previously unchanged characters. Pin the
+    original scalar mapping, while leaving pinned Unicode-16 NFC unchanged.
+    Full case folding is context independent, so translation preserves strings
+    and expansions exactly. A new casing policy would need a new method ID.
+    """
+    data=strict_json(Path(__file__).with_name('legacy_casefold.json').read_text())
+    return {int(cp):text for cp,text in data['nonidentity_mappings'].items()}
+
+
+def legacy_casefold(text):return text.translate(_legacy_casefold_table())
+
+
 def views(text,names):
     import unicodedataplus as u
     result={'raw':text}
     if 'nfc' in names:result['nfc']=u.normalize('NFC',text)
-    if 'casefold' in names:result['casefold']=u.normalize('NFC',text).casefold()
+    if 'casefold' in names:result['casefold']=legacy_casefold(u.normalize('NFC',text))
     if 'whitespace' in names:result['whitespace']=' '.join(text.split())
     return result
 

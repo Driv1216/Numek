@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>NUMEK v3 · Round three</title>
+  <link rel="stylesheet" href="../board.css" />
+  <link rel="stylesheet" href="./round-three.css" />
+</head>
+<body>
+  <header class="top">
+    <div class="top__mark">NUMEK <span>visual lab v3 · round three</span></div>
+    <nav><a href="#directions">Ten directions</a><a href="#matrix">How they differ</a><a href="#board">Research board</a><a href="#method">Method</a></nav>
+  </header>
+
+  <section class="intro">
+    <p class="kicker">Creative-direction checkpoint · round three · awaiting review — nothing is built yet</p>
+    <h1>Ten more ways NUMEK could look, drawn only from references not used in rounds one and two.</h1>
+    <div class="intro__cols">
+      <p><strong>What was studied.</strong> 42 references: the library entries not yet used (Phantom, Unseen 2025, GMB, Immersive Garden, basement, Siena, Seasoned, ART+TECH, plus Vercel and Figma as secondary) and 32 individual Awwwards winners pulled from the Data Visualization, Experimental and Site of the Day/Month listings. Each was captured headlessly with gates opened, drags and hovers performed, ~12 scroll frames and a 45-second recording; every observation below is written from those captures.</p>
+      <p><strong>Same content, same rules.</strong> All ten use the fixture of rounds one and two: the Adult audit (48,842 × 15; evidence 89.15 → final 69.0 Elevated, held by the critical-sub-score guardrail at target balance 47.86) and the same seven local runs. Only classification runs carry a score. No direction adds hosted monitoring, certification, collaboration or agent features, and ConfidenceGuard and HallucinationGuard remain research directions.</p>
+    </div>
+  </section>
+
+  <section id="directions" class="directions"></section>
+
+  <section class="matrix-wrap" id="matrix">
+    <h2 class="sec">How the ten differ</h2>
+    <div class="matrix" id="matrix-table"></div>
+  </section>
+
+  <section id="board" class="board">
+    <h2 class="sec">Research board</h2>
+    <p class="note">Frames are genuine headless-Chromium captures at 1440×900 (in <code>research/r4/captures</code>). Hover a card to play its recording. Status: <b>live</b> = the original site was captured; <b>gallery</b> = only its Awwwards page; <b>partial</b> = a loader, gate or consent dialog blocked part of it; <b>inaccessible</b> = blocked or broken. Partial and inaccessible references inform nothing.</p>
+    <div class="filters" id="filters"></div>
+    <div id="refs"></div>
+  </section>
+
+  <section id="method" class="method">
+    <h2 class="sec">Method and limits</h2>
+    <ul>
+      <li>Winners were found by reading the Awwwards collection pages (<code>research/scripts/awwwards-list.mjs</code>) and each winner’s Awwwards page for its live URL and award (<code>awwwards-sites.mjs</code>). The Seventh Eye was excluded because round one already used it.</li>
+      <li>Captures by <code>research/scripts/capture-deep.mjs</code>: Siena’s Enter gate opened, Phantom’s wall dragged, GMB’s list hovered, long loaders waited out (Unseen 60 s+, Immersive Garden 16 s). Five were re-run (<code>references-r4b.json</code>).</li>
+      <li>Not inspected properly: Unseen 2025 (loader only — seen through its Awwwards page instead), Active Theory (“browser not supported”), US Avionix and Chladni (stalled at their gates), Subdivisions (geo-blocked 403), Navigate (SSL error), basement’s machine mode (timed out). F-List and Floema were seen only behind consent dialogs, which were neither accepted nor declined.</li>
+      <li>Headless capture uses software WebGL, so heavy 3D sites may move more smoothly in a real browser than the recordings suggest.</li>
+      <li>References are research only. No brand assets, logos or compositions are reused for NUMEK; each direction lists exactly what technique it borrows and what it leaves.</li>
+    </ul>
+  </section>
+
+  <script type="module" src="./board.js"></script>
+</body>
+</html>

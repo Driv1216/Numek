@@ -1,0 +1,860 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Synthetic multiclass_classification policy record — ConfidenceGuard</title><style>
+@page{size:A4;margin:17mm 14mm}*{box-sizing:border-box}body{font:11px/1.5 Arial,sans-serif;color:#182432;margin:0}main{max-width:1050px;margin:auto;padding:24px}h1{font-size:28px;line-height:1.15}h2{font-size:18px;margin-top:28px}h3{font-size:13px}p,td,th{overflow-wrap:anywhere}small,.note{color:#536375}header{border-bottom:3px solid #196d70;padding-bottom:16px}section{break-before:page}section:first-of-type{break-before:auto}table{width:100%;border-collapse:collapse;table-layout:fixed}th,td{padding:7px;text-align:left;vertical-align:top;border-bottom:1px solid #d7e1e5}th{background:#edf4f4}tr{break-inside:avoid}thead{display:table-header-group}pre{white-space:pre-wrap;overflow-wrap:anywhere;font:9px/1.4 monospace;border-left:2px solid #c4d8d8;padding-left:8px}figure{break-inside:avoid;margin:18px 0}svg{width:380px;max-width:100%;height:210px}details{margin:12px 0}.banner{padding:12px;background:#edf4f4}.value{font-variant-numeric:tabular-nums}@media print{main{padding:0}details{display:block}details>summary{font-weight:bold}details pre{display:block}a{color:inherit}}
+ .cg2 section,.cg4 section{break-before:auto}.cg2 h2,.cg4 h2,.cg4 h3{break-after:avoid}.cg4 article{break-inside:avoid}.cg4 .candidate-intro,.cg4 .overlap-intro{break-after:avoid}</style></head><body class=""><main><header><p>NUMEK / ConfidenceGuard · Model Reliability Intelligence</p><h1>Synthetic multiclass_classification policy record</h1><p>Multiclass Classification · 2026-11-03T20:42:20.964286+00:00</p><p>Method policy_selection_v1 · confidenceguard.policy_result/1.0</p><div class="banner">Exact protected local report — contains confidential aggregate evidence. No overall reliability score or production approval is defined.</div></header>
+<section><h2>Evaluation summary and priority investigations</h2><p><strong>policy_0c008595d305beb1</strong> · selection · Frozen policy</p><p><strong>policy_2d31e783b4a18729</strong> · selection · Frozen policy</p><p><strong>policy_287e6545849dbc98</strong> · selection · Frozen policy</p><p><strong>policy_70fa41d4640f80a1</strong> · selection · Frozen policy</p><p><strong>policy_2318020e98c59ba6</strong> · selection · Frozen policy</p><p><strong>policy_39c2a4fef14f4c10</strong> · selection · Frozen policy</p><p>No additional finding was emitted within the completed, disclosed scope. Review evidence availability and exclusions before interpretation.</p><h3>Whole-population measurements</h3><p>Each row uses its own eligible denominator. Paired comparisons use a common eligible base; conditional metrics identify their own subsets. Lower losses and higher accuracy have different interpretations; no automatic winner is declared.</p><table><thead><tr><th>Run</th><th>Measurement</th><th>Value</th><th>Denominator / basis</th></tr></thead><tbody><tr><td>policy_39c2a4fef14f4c10</td><td>accuracy</td><td>0.76666667</td><td>600 · simulated</td></tr><tr><td>policy_39c2a4fef14f4c10</td><td>brier</td><td>0.35041667</td><td>600 · simulated</td></tr><tr><td>policy_39c2a4fef14f4c10</td><td>log loss</td><td>0.63986648</td><td>600 · simulated</td></tr></tbody></table></section>
+<section class="cg5"><h2>Decision record · selection</h2><p>Executable policies, empirical feasibility, search completeness and independent statistical support are separate conclusions. This record authorizes no deployment.</p>
+<h3>Primary nomination</h3><pre>{
+  "empirical_optimum": [
+    -0.7666666666666667
+  ],
+  "nominated_objective": [
+    -0.7666666666666667
+  ],
+  "policy_digest": "39c2a4fef14f4c10ca3ace3bad5cc0274eb81a6eaf814821c6ffaa940fb7bc1b",
+  "rationale": "Feasible development objectives, then declared numerical tie tolerance, structural complexity and canonical definition order.",
+  "within_selection_tolerance": false
+}</pre><p>Study e6305b17324a7661a35595111e3d061c8b111ea5898b0584b33d07bccca430b4<br>Selection 50672109dd0ad21cfb5e06d51942593df5fd662518ce344ea6b87d2f3d36a44e</p><h3>Frozen behavior, decision economics and input dependencies</h3><p>Exact definitions and decision costs appear only in this protected audience. Replaying supplied actions does not recover a production rule.</p><pre>{
+  "39c2a4fef14f4c10ca3ace3bad5cc0274eb81a6eaf814821c6ffaa940fb7bc1b": {
+    "decision_costs": {},
+    "fallback": {
+      "kind": "abstain"
+    },
+    "input_identity": {
+      "feature_time_policy": "declared_information_cutoff_v2",
+      "feature_time_view": "available_at_decision",
+      "features": [],
+      "intervals": [],
+      "method_digest": null,
+      "model": {
+        "artifact_sha256": null,
+        "calibration": null,
+        "id": "synthetic",
+        "preprocessing": null,
+        "version": "v1"
+      },
+      "probability": {
+        "columns": {
+          "a": "p_a",
+          "b": "p_b",
+          "c": "p_c"
+        },
+        "positive_column": null
+      },
+      "region_representations": [],
+      "regions": [],
+      "representation": null,
+      "score": null,
+      "selection": null,
+      "task": {
+        "classes": [
+          "a",
+          "b",
+          "c"
+        ],
+        "horizon": null,
+        "kind": "multiclass_classification",
+        "material_error": null,
+        "outcome_definition": "Synthetic engineering outcome",
+        "positive_class": null,
+        "units": null
+      },
+      "version": "policy_input_semantics_v1"
+    },
+    "nodes": {
+      "a": {
+        "accepted": "emit",
+        "kind": "accept",
+        "rejected": "reject",
+        "when": {
+          "constant": 0.5,
+          "kind": "compare",
+          "op": "ge",
+          "value": {
+            "kind": "probability",
+            "target": "a"
+          }
+        }
+      },
+      "b": {
+        "accepted": "emit",
+        "kind": "accept",
+        "rejected": "reject",
+        "when": {
+          "constant": 0.5,
+          "kind": "compare",
+          "op": "ge",
+          "value": {
+            "kind": "probability",
+            "target": "b"
+          }
+        }
+      },
+      "c": {
+        "accepted": "emit",
+        "kind": "accept",
+        "rejected": "reject",
+        "when": {
+          "constant": 0.5,
+          "kind": "compare",
+          "op": "ge",
+          "value": {
+            "kind": "probability",
+            "target": "c"
+          }
+        }
+      },
+      "emit": {
+        "action": {
+          "kind": "argmax"
+        },
+        "kind": "action"
+      },
+      "reject": {
+        "action": {
+          "kind": "abstain"
+        },
+        "kind": "action"
+      },
+      "root": {
+        "kind": "rules",
+        "otherwise": "c",
+        "rules": [
+          {
+            "then": "a",
+            "when": {
+              "constant": "a",
+              "kind": "compare",
+              "op": "eq",
+              "value": {
+                "kind": "argmax_class"
+              }
+            }
+          },
+          {
+            "then": "b",
+            "when": {
+              "constant": "b",
+              "kind": "compare",
+              "op": "eq",
+              "value": {
+                "kind": "argmax_class"
+              }
+            }
+          }
+        ]
+      }
+    },
+    "root": "root",
+    "run": "model",
+    "schema_version": "confidenceguard.policy_spec/1.0",
+    "task": {
+      "classes": [
+        "a",
+        "b",
+        "c"
+      ],
+      "horizon": null,
+      "kind": "multiclass_classification",
+      "material_error": null,
+      "outcome_definition": "Synthetic engineering outcome",
+      "positive_class": null,
+      "units": null
+    },
+    "unavailable": {
+      "kind": "unavailable"
+    }
+  }
+}</pre><h3>Evaluation economics and estimand definitions</h3><pre>{
+  "costs": {},
+  "known_charges": {},
+  "metric_definitions": [
+    {
+      "basis": "observed_outcome",
+      "bounds": [],
+      "cost": null,
+      "direction": "maximize",
+      "id": "correct",
+      "interval": null,
+      "level": 0.5,
+      "loss": "absolute",
+      "metric": "correct_issue_rate",
+      "scope": "overall",
+      "target": null,
+      "units": "fraction",
+      "weight": 1.0
+    },
+    {
+      "basis": "operational",
+      "bounds": [],
+      "cost": null,
+      "direction": "maximize",
+      "id": "coverage",
+      "interval": null,
+      "level": 0.5,
+      "loss": "absolute",
+      "metric": "issued_coverage",
+      "scope": "overall",
+      "target": null,
+      "units": "fraction",
+      "weight": 1.0
+    },
+    {
+      "basis": "observed_outcome",
+      "bounds": [],
+      "cost": null,
+      "direction": "maximize",
+      "id": "a_precision",
+      "interval": null,
+      "level": 0.5,
+      "loss": "absolute",
+      "metric": "precision",
+      "scope": "overall",
+      "target": "a",
+      "units": "fraction",
+      "weight": 1.0
+    },
+    {
+      "basis": "operational",
+      "bounds": [],
+      "cost": null,
+      "direction": "minimize",
+      "id": "accounting:issued_coverage",
+      "interval": null,
+      "level": 0.5,
+      "loss": "absolute",
+      "metric": "issued_coverage",
+      "scope": "overall",
+      "target": null,
+      "units": "fraction",
+      "weight": 1.0
+    },
+    {
+      "basis": "operational",
+      "bounds": [],
+      "cost": null,
+      "direction": "minimize",
+      "id": "accounting:abstention_rate",
+      "interval": null,
+      "level": 0.5,
+      "loss": "absolute",
+      "metric": "abstention_rate",
+      "scope": "overall",
+      "target": null,
+      "units": "fraction",
+      "weight": 1.0
+    },
+    {
+      "basis": "operational",
+      "bounds": [],
+      "cost": null,
+      "direction": "minimize",
+      "id": "accounting:deferral_rate",
+      "interval": null,
+      "level": 0.5,
+      "loss": "absolute",
+      "metric": "deferral_rate",
+      "scope": "overall",
+      "target": null,
+      "units": "fraction",
+      "weight": 1.0
+    },
+    {
+      "basis": "operational",
+      "bounds": [],
+      "cost": null,
+      "direction": "minimize",
+      "id": "accounting:unavailable_rate",
+      "interval": null,
+      "level": 0.5,
+      "loss": "absolute",
+      "metric": "unavailable_rate",
+      "scope": "overall",
+      "target": null,
+      "units": "fraction",
+      "weight": 1.0
+    },
+    {
+      "basis": "operational",
+      "bounds": [],
+      "cost": null,
+      "direction": "minimize",
+      "id": "accounting:input_unavailable_rate",
+      "interval": null,
+      "level": 0.5,
+      "loss": "absolute",
+      "metric": "input_unavailable_rate",
+      "scope": "overall",
+      "target": null,
+      "units": "fraction",
+      "weight": 1.0
+    },
+    {
+      "basis": "observed_outcome",
+      "bounds": [],
+      "cost": null,
+      "direction": "minimize",
+      "id": "accounting:issued_label_availability",
+      "interval": null,
+      "level": 0.5,
+      "loss": "absolute",
+      "metric": "issued_label_availability",
+      "scope": "overall",
+      "target": null,
+      "units": "fraction",
+      "weight": 1.0
+    },
+    {
+      "basis": "observed_outcome",
+      "bounds": [],
+      "cost": null,
+      "direction": "minimize",
+      "id": "accounting:labeled_issued_share",
+      "interval": null,
+      "level": 0.5,
+      "loss": "absolute",
+      "metric": "labeled_issued_share",
+      "scope": "overall",
+      "target": null,
+      "units": "fraction",
+      "weight": 1.0
+    },
+    {
+      "basis": "observed_outcome",
+      "bounds": [],
+      "cost": null,
+      "direction": "minimize",
+      "id": "accounting:selective_risk",
+      "interval": null,
+      "level": 0.5,
+      "loss": "absolute",
+      "metric": "selective_risk",
+      "scope": "overall",
+      "target": null,
+      "units": "fraction",
+      "weight": 1.0
+    },
+    {
+      "basis": "observed_outcome",
+      "bounds": [],
+      "cost": null,
+      "direction": "minimize",
+      "id": "accounting:correct_issue_rate",
+      "interval": null,
+      "level": 0.5,
+      "loss": "absolute",
+      "metric": "correct_issue_rate",
+      "scope": "overall",
+      "target": null,
+      "units": "fraction",
+      "weight": 1.0
+    }
+  ]
+}</pre><h3>Search and certificate scope</h3><p>Enumeration is complete only within its declared finite family. Solver standing concerns the encoded model within recorded tolerances. Bounded search and sampled trade-offs carry no general global guarantee.</p><pre>{
+  "backend": "milp",
+  "certificate_scope": "Declared finite development family only.",
+  "declared_parameter_space": 8,
+  "domain_digest": "80a8ee51e959320d90e8ec963ed58a12fc2ea87430442b0e5e31ebeafd50ca70",
+  "evaluated": 1,
+  "family": "class_acceptance",
+  "search_coverage": "complete",
+  "solution_standing": "solver_optimal_encoded_model",
+  "solver_runs": [
+    {
+      "authoritative_re_evaluation": "feasible",
+      "candidate": [
+        1,
+        0,
+        1,
+        0,
+        1,
+        0
+      ],
+      "certificate_scope": "Encoded finite model within recorded floating-point tolerances; authoritative policy replay must agree.",
+      "encoded_dual_bound": -0.7666666666666666,
+      "encoded_objective": -0.7666666666666666,
+      "mip_gap": 0.0,
+      "nodes": 0,
+      "objective_scaling": 1.0,
+      "profile": {
+        "available": true,
+        "highs": "1.12.0",
+        "numpy": "2.4.6",
+        "profile": "scipy_1.18.1_highs_1.12.0_single_thread_v1",
+        "python": "3.13.17",
+        "scipy": "1.18.1"
+      },
+      "row_scaling": [
+        1.0,
+        1.0,
+        1.0,
+        0.0078125,
+        0.0078125,
+        0.015625,
+        0.0078125,
+        0.0078125,
+        0.0625
+      ],
+      "seconds": 0.0026672499952837825,
+      "settings": {
+        "dual_feasibility_tolerance": 1e-09,
+        "mip_abs_gap": 0.0,
+        "mip_feasibility_tolerance": 1e-09,
+        "mip_rel_gap": 0.0,
+        "parallel": false,
+        "presolve": true,
+        "primal_feasibility_tolerance": 1e-09,
+        "random_seed": 0,
+        "small_matrix_value": 1e-12,
+        "threads": 1,
+        "time_limit": 300
+      },
+      "state": "solver_optimal_encoded_model"
+    }
+  ]
+}</pre><h3>Empirical trade-offs</h3><pre>{
+  "axes": [
+    {
+      "basis": "observed_outcome",
+      "bounds": [],
+      "cost": null,
+      "direction": "maximize",
+      "id": "correct",
+      "interval": null,
+      "level": 0.5,
+      "loss": "absolute",
+      "metric": "correct_issue_rate",
+      "scope": "overall",
+      "target": null,
+      "units": "fraction",
+      "weight": 1.0
+    }
+  ],
+  "dominance_complete_for_retained_pool": true,
+  "interpretation": "Empirical trade-offs; conditional risk, full-opportunity behavior and workload retain distinct denominators. No statistical distinguishability claim.",
+  "plot": null,
+  "policies": [
+    "0c008595d305beb1488e11e5b0eb8771b1a24bd825fe0fd7b6a5c194007781db",
+    "39c2a4fef14f4c10ca3ace3bad5cc0274eb81a6eaf814821c6ffaa940fb7bc1b"
+  ],
+  "standing": "sampled_tradeoff_set"
+}</pre><p>Axes retain their own estimands and denominators. Selective loss does not replace coverage, full-opportunity performance or workload.</p><h3>Replayed policy evidence</h3><p>6 of 6 retained candidates shown. Protected JSON retains all admitted detail; presentation limits do not change search completeness.</p><article><h3>39c2a4fef14f4c10ca3ace3bad5cc0274eb81a6eaf814821c6ffaa940fb7bc1b</h3><p>feasible</p><table><thead><tr><th>Metric / basis</th><th>Value / state</th><th>Denominator</th></tr></thead><tbody><tr><td>correct · correct_issue_rate<br>observed_outcome · fraction</td><td>0.7666666666666667 · finite</td><td>600<br></td></tr><tr><td>coverage · issued_coverage<br>operational · fraction</td><td>1.0 · finite</td><td>600<br></td></tr><tr><td>a_precision · precision<br>observed_outcome · fraction</td><td>0.8 · finite</td><td>200<br></td></tr><tr><td>accounting:issued_coverage · issued_coverage<br>operational · fraction</td><td>1.0 · finite</td><td>600<br></td></tr><tr><td>accounting:abstention_rate · abstention_rate<br>operational · fraction</td><td>0.0 · finite</td><td>600<br></td></tr><tr><td>accounting:deferral_rate · deferral_rate<br>operational · fraction</td><td>0.0 · finite</td><td>600<br></td></tr><tr><td>accounting:unavailable_rate · unavailable_rate<br>operational · fraction</td><td>0.0 · finite</td><td>600<br></td></tr><tr><td>accounting:input_unavailable_rate · input_unavailable_rate<br>operational · fraction</td><td>0.0 · finite</td><td>600<br></td></tr><tr><td>accounting:issued_label_availability · issued_label_availability<br>observed_outcome · fraction</td><td>1.0 · finite</td><td>600<br></td></tr><tr><td>accounting:labeled_issued_share · labeled_issued_share<br>observed_outcome · fraction</td><td>1.0 · finite</td><td>600<br></td></tr><tr><td>accounting:selective_risk · selective_risk<br>observed_outcome · fraction</td><td>0.23333333333333334 · finite</td><td>600<br></td></tr><tr><td>accounting:correct_issue_rate · correct_issue_rate<br>observed_outcome · fraction</td><td>0.7666666666666667 · finite</td><td>600<br></td></tr></tbody></table><pre>[
+  {
+    "id": "minimum_coverage",
+    "reason": null,
+    "slack": 0.5,
+    "state": "feasible"
+  },
+  {
+    "id": "a_precision",
+    "reason": null,
+    "slack": 0.10000000000000009,
+    "state": "feasible"
+  }
+]</pre><details><summary>Routes and complete-batch accounting</summary><pre>{
+  "capacity": [],
+  "fallback_events": {},
+  "overlap_events": {
+    "root": 0
+  },
+  "routes": {
+    "a": 200,
+    "b": 200,
+    "c": 200,
+    "emit": 600,
+    "root": 600
+  },
+  "unknown_routes": {},
+  "unresolved_predicates": {
+    "root": 0
+  }
+}</pre></details></article><article><h3>0c008595d305beb1488e11e5b0eb8771b1a24bd825fe0fd7b6a5c194007781db · baseline</h3><p>feasible</p><table><thead><tr><th>Metric / basis</th><th>Value / state</th><th>Denominator</th></tr></thead><tbody><tr><td>correct · correct_issue_rate<br>observed_outcome · fraction</td><td>0.7666666666666667 · finite</td><td>600<br></td></tr><tr><td>coverage · issued_coverage<br>operational · fraction</td><td>1.0 · finite</td><td>600<br></td></tr><tr><td>a_precision · precision<br>observed_outcome · fraction</td><td>0.8 · finite</td><td>200<br></td></tr><tr><td>accounting:issued_coverage · issued_coverage<br>operational · fraction</td><td>1.0 · finite</td><td>600<br></td></tr><tr><td>accounting:abstention_rate · abstention_rate<br>operational · fraction</td><td>0.0 · finite</td><td>600<br></td></tr><tr><td>accounting:deferral_rate · deferral_rate<br>operational · fraction</td><td>0.0 · finite</td><td>600<br></td></tr><tr><td>accounting:unavailable_rate · unavailable_rate<br>operational · fraction</td><td>0.0 · finite</td><td>600<br></td></tr><tr><td>accounting:input_unavailable_rate · input_unavailable_rate<br>operational · fraction</td><td>0.0 · finite</td><td>600<br></td></tr><tr><td>accounting:issued_label_availability · issued_label_availability<br>observed_outcome · fraction</td><td>1.0 · finite</td><td>600<br></td></tr><tr><td>accounting:labeled_issued_share · labeled_issued_share<br>observed_outcome · fraction</td><td>1.0 · finite</td><td>600<br></td></tr><tr><td>accounting:selective_risk · selective_risk<br>observed_outcome · fraction</td><td>0.23333333333333334 · finite</td><td>600<br></td></tr><tr><td>accounting:correct_issue_rate · correct_issue_rate<br>observed_outcome · fraction</td><td>0.7666666666666667 · finite</td><td>600<br></td></tr></tbody></table><pre>[
+  {
+    "id": "minimum_coverage",
+    "reason": null,
+    "slack": 0.5,
+    "state": "feasible"
+  },
+  {
+    "id": "a_precision",
+    "reason": null,
+    "slack": 0.10000000000000009,
+    "state": "feasible"
+  }
+]</pre><details><summary>Routes and complete-batch accounting</summary><pre>{
+  "capacity": [],
+  "fallback_events": {},
+  "overlap_events": {},
+  "routes": {
+    "root": 600
+  },
+  "unknown_routes": {},
+  "unresolved_predicates": {}
+}</pre></details></article><article><h3>2d31e783b4a18729b5ec597cf5726c1b480d63385e425ca62b615714a2d2edba · baseline</h3><p>undefined</p><table><thead><tr><th>Metric / basis</th><th>Value / state</th><th>Denominator</th></tr></thead><tbody><tr><td>correct · correct_issue_rate<br>observed_outcome · fraction</td><td>0.0 · finite</td><td>600<br></td></tr><tr><td>coverage · issued_coverage<br>operational · fraction</td><td>0.0 · finite</td><td>600<br></td></tr><tr><td>a_precision · precision<br>observed_outcome · fraction</td><td>None · undefined</td><td>0<br>zero_denominator</td></tr><tr><td>accounting:issued_coverage · issued_coverage<br>operational · fraction</td><td>0.0 · finite</td><td>600<br></td></tr><tr><td>accounting:abstention_rate · abstention_rate<br>operational · fraction</td><td>1.0 · finite</td><td>600<br></td></tr><tr><td>accounting:deferral_rate · deferral_rate<br>operational · fraction</td><td>0.0 · finite</td><td>600<br></td></tr><tr><td>accounting:unavailable_rate · unavailable_rate<br>operational · fraction</td><td>0.0 · finite</td><td>600<br></td></tr><tr><td>accounting:input_unavailable_rate · input_unavailable_rate<br>operational · fraction</td><td>0.0 · finite</td><td>600<br></td></tr><tr><td>accounting:issued_label_availability · issued_label_availability<br>observed_outcome · fraction</td><td>None · undefined</td><td>0<br>zero_denominator</td></tr><tr><td>accounting:labeled_issued_share · labeled_issued_share<br>observed_outcome · fraction</td><td>0.0 · finite</td><td>600<br></td></tr><tr><td>accounting:selective_risk · selective_risk<br>observed_outcome · fraction</td><td>None · undefined</td><td>0<br>zero_denominator</td></tr><tr><td>accounting:correct_issue_rate · correct_issue_rate<br>observed_outcome · fraction</td><td>0.0 · finite</td><td>600<br></td></tr></tbody></table><pre>[
+  {
+    "id": "minimum_coverage",
+    "reason": null,
+    "slack": -0.5,
+    "state": "violated"
+  },
+  {
+    "id": "a_precision",
+    "reason": "zero_denominator",
+    "slack": null,
+    "state": "undefined"
+  }
+]</pre><details><summary>Routes and complete-batch accounting</summary><pre>{
+  "capacity": [],
+  "fallback_events": {},
+  "overlap_events": {},
+  "routes": {
+    "root": 600
+  },
+  "unknown_routes": {},
+  "unresolved_predicates": {}
+}</pre></details></article><article><h3>287e6545849dbc984b55f98276b02d8f07f01b9744a47e76393920d9d2141cf6 · baseline</h3><p>violated</p><table><thead><tr><th>Metric / basis</th><th>Value / state</th><th>Denominator</th></tr></thead><tbody><tr><td>correct · correct_issue_rate<br>observed_outcome · fraction</td><td>0.3333333333333333 · finite</td><td>600<br></td></tr><tr><td>coverage · issued_coverage<br>operational · fraction</td><td>1.0 · finite</td><td>600<br></td></tr><tr><td>a_precision · precision<br>observed_outcome · fraction</td><td>0.3333333333333333 · finite</td><td>600<br></td></tr><tr><td>accounting:issued_coverage · issued_coverage<br>operational · fraction</td><td>1.0 · finite</td><td>600<br></td></tr><tr><td>accounting:abstention_rate · abstention_rate<br>operational · fraction</td><td>0.0 · finite</td><td>600<br></td></tr><tr><td>accounting:deferral_rate · deferral_rate<br>operational · fraction</td><td>0.0 · finite</td><td>600<br></td></tr><tr><td>accounting:unavailable_rate · unavailable_rate<br>operational · fraction</td><td>0.0 · finite</td><td>600<br></td></tr><tr><td>accounting:input_unavailable_rate · input_unavailable_rate<br>operational · fraction</td><td>0.0 · finite</td><td>600<br></td></tr><tr><td>accounting:issued_label_availability · issued_label_availability<br>observed_outcome · fraction</td><td>1.0 · finite</td><td>600<br></td></tr><tr><td>accounting:labeled_issued_share · labeled_issued_share<br>observed_outcome · fraction</td><td>1.0 · finite</td><td>600<br></td></tr><tr><td>accounting:selective_risk · selective_risk<br>observed_outcome · fraction</td><td>0.6666666666666666 · finite</td><td>600<br></td></tr><tr><td>accounting:correct_issue_rate · correct_issue_rate<br>observed_outcome · fraction</td><td>0.3333333333333333 · finite</td><td>600<br></td></tr></tbody></table><pre>[
+  {
+    "id": "minimum_coverage",
+    "reason": null,
+    "slack": 0.5,
+    "state": "feasible"
+  },
+  {
+    "id": "a_precision",
+    "reason": null,
+    "slack": -0.36666666666666664,
+    "state": "violated"
+  }
+]</pre><details><summary>Routes and complete-batch accounting</summary><pre>{
+  "capacity": [],
+  "fallback_events": {},
+  "overlap_events": {},
+  "routes": {
+    "root": 600
+  },
+  "unknown_routes": {},
+  "unresolved_predicates": {}
+}</pre></details></article><article><h3>70fa41d4640f80a1708c22f19bea47a0db9b202fee6a5bd44751ff07b1f6d7e6 · baseline</h3><p>undefined</p><table><thead><tr><th>Metric / basis</th><th>Value / state</th><th>Denominator</th></tr></thead><tbody><tr><td>correct · correct_issue_rate<br>observed_outcome · fraction</td><td>0.3 · finite</td><td>600<br></td></tr><tr><td>coverage · issued_coverage<br>operational · fraction</td><td>1.0 · finite</td><td>600<br></td></tr><tr><td>a_precision · precision<br>observed_outcome · fraction</td><td>None · undefined</td><td>0<br>zero_denominator</td></tr><tr><td>accounting:issued_coverage · issued_coverage<br>operational · fraction</td><td>1.0 · finite</td><td>600<br></td></tr><tr><td>accounting:abstention_rate · abstention_rate<br>operational · fraction</td><td>0.0 · finite</td><td>600<br></td></tr><tr><td>accounting:deferral_rate · deferral_rate<br>operational · fraction</td><td>0.0 · finite</td><td>600<br></td></tr><tr><td>accounting:unavailable_rate · unavailable_rate<br>operational · fraction</td><td>0.0 · finite</td><td>600<br></td></tr><tr><td>accounting:input_unavailable_rate · input_unavailable_rate<br>operational · fraction</td><td>0.0 · finite</td><td>600<br></td></tr><tr><td>accounting:issued_label_availability · issued_label_availability<br>observed_outcome · fraction</td><td>1.0 · finite</td><td>600<br></td></tr><tr><td>accounting:labeled_issued_share · labeled_issued_share<br>observed_outcome · fraction</td><td>1.0 · finite</td><td>600<br></td></tr><tr><td>accounting:selective_risk · selective_risk<br>observed_outcome · fraction</td><td>0.7 · finite</td><td>600<br></td></tr><tr><td>accounting:correct_issue_rate · correct_issue_rate<br>observed_outcome · fraction</td><td>0.3 · finite</td><td>600<br></td></tr></tbody></table><pre>[
+  {
+    "id": "minimum_coverage",
+    "reason": null,
+    "slack": 0.5,
+    "state": "feasible"
+  },
+  {
+    "id": "a_precision",
+    "reason": "zero_denominator",
+    "slack": null,
+    "state": "undefined"
+  }
+]</pre><details><summary>Routes and complete-batch accounting</summary><pre>{
+  "capacity": [],
+  "fallback_events": {},
+  "overlap_events": {},
+  "routes": {
+    "root": 600
+  },
+  "unknown_routes": {},
+  "unresolved_predicates": {}
+}</pre></details></article><article><h3>2318020e98c59ba6f020849b063632e209ab81f84e237e299a3c3af9b33fe69a · baseline</h3><p>undefined</p><table><thead><tr><th>Metric / basis</th><th>Value / state</th><th>Denominator</th></tr></thead><tbody><tr><td>correct · correct_issue_rate<br>observed_outcome · fraction</td><td>0.36666666666666664 · finite</td><td>600<br></td></tr><tr><td>coverage · issued_coverage<br>operational · fraction</td><td>1.0 · finite</td><td>600<br></td></tr><tr><td>a_precision · precision<br>observed_outcome · fraction</td><td>None · undefined</td><td>0<br>zero_denominator</td></tr><tr><td>accounting:issued_coverage · issued_coverage<br>operational · fraction</td><td>1.0 · finite</td><td>600<br></td></tr><tr><td>accounting:abstention_rate · abstention_rate<br>operational · fraction</td><td>0.0 · finite</td><td>600<br></td></tr><tr><td>accounting:deferral_rate · deferral_rate<br>operational · fraction</td><td>0.0 · finite</td><td>600<br></td></tr><tr><td>accounting:unavailable_rate · unavailable_rate<br>operational · fraction</td><td>0.0 · finite</td><td>600<br></td></tr><tr><td>accounting:input_unavailable_rate · input_unavailable_rate<br>operational · fraction</td><td>0.0 · finite</td><td>600<br></td></tr><tr><td>accounting:issued_label_availability · issued_label_availability<br>observed_outcome · fraction</td><td>1.0 · finite</td><td>600<br></td></tr><tr><td>accounting:labeled_issued_share · labeled_issued_share<br>observed_outcome · fraction</td><td>1.0 · finite</td><td>600<br></td></tr><tr><td>accounting:selective_risk · selective_risk<br>observed_outcome · fraction</td><td>0.6333333333333333 · finite</td><td>600<br></td></tr><tr><td>accounting:correct_issue_rate · correct_issue_rate<br>observed_outcome · fraction</td><td>0.36666666666666664 · finite</td><td>600<br></td></tr></tbody></table><pre>[
+  {
+    "id": "minimum_coverage",
+    "reason": null,
+    "slack": 0.5,
+    "state": "feasible"
+  },
+  {
+    "id": "a_precision",
+    "reason": "zero_denominator",
+    "slack": null,
+    "state": "undefined"
+  }
+]</pre><details><summary>Routes and complete-batch accounting</summary><pre>{
+  "capacity": [],
+  "fallback_events": {},
+  "overlap_events": {},
+  "routes": {
+    "root": 600
+  },
+  "unknown_routes": {},
+  "unresolved_predicates": {}
+}</pre></details></article><h3>Economics and observation</h3><p>Observed-outcome costs are historical proxies. Model-implied expected costs use supplied predictive distributions. Known charges measure workload costs. Missing-label envelopes provide ranges without imputed outcomes. These quantities may use different populations and are not automatically net economic value.</p><p>Deferral supplies no reviewer effectiveness. Selective labels identify observed-label performance unless valid bounds or an admitted observation design support more.</p><h3>Countable execution</h3><pre>{
+  "counts": {
+    "action_cells": 32100,
+    "contribution_cells": 64800,
+    "dominance_pairs": 2,
+    "max_candidates": 1,
+    "metric_records": 72,
+    "predicate_events": 10000,
+    "solver_calls": 1,
+    "solver_nodes": 0,
+    "solver_seconds": 0.0026672499952837825
+  },
+  "limits": {
+    "action_cells": 100000000,
+    "assessment_claims": 256,
+    "assessment_components": 4096,
+    "assessment_policies": 8,
+    "beam_width": 64,
+    "contribution_cells": 100000000,
+    "dominance_pairs": 10000000,
+    "materialized_bytes": 1073741824,
+    "max_candidates": 4096,
+    "max_cells": 32,
+    "max_cutpoints": 1000000,
+    "max_options": 256,
+    "max_search_states": 1000000,
+    "metric_records": 65536,
+    "predicate_events": 100000000,
+    "solver_calls": 64,
+    "solver_nodes": 100000,
+    "solver_nonzeros": 1000000,
+    "solver_rows": 8192,
+    "solver_seconds": 300,
+    "solver_variables": 8192
+  },
+  "materialized_limit_bytes": 1073741824,
+  "retained_allocation_bytes": 4423724,
+  "version": "policy_countable_operations_v1"
+}</pre></section><section><h2>Availability</h2><p class="note">1 of 1 retained measurement rows displayed. Omitted presentation detail remains in the matching JSON; privacy-withheld detail is absent from this projection.</p><table><thead><tr><th>Run / population</th><th>Measurement</th><th>Value</th><th>Denominator / qualification</th></tr></thead><tbody><tr><td>policy_39c2a4fef14f4c10<br>overall</td><td>population coverage</td><td class="value">1</td><td>600<br></td></tr></tbody></table>
+<details open><summary>m1 · population coverage</summary><pre>{
+  &#34;records&#34;: 600,
+  &#34;eligible_outcomes&#34;: 600,
+  &#34;issued&#34;: 0,
+  &#34;issuance_meaning&#34;: &#34;unestablished&#34;
+}</pre></details></section><section><h2>Performance</h2><p class="note">4 of 4 retained measurement rows displayed. Omitted presentation detail remains in the matching JSON; privacy-withheld detail is absent from this projection.</p><table><thead><tr><th>Run / population</th><th>Measurement</th><th>Value</th><th>Denominator / qualification</th></tr></thead><tbody><tr><td>policy_39c2a4fef14f4c10<br>overall</td><td>accuracy</td><td class="value">0.76666667</td><td>600<br></td></tr><tr><td>policy_39c2a4fef14f4c10<br>overall</td><td>balanced accuracy</td><td class="value">0.76835017</td><td>600<br></td></tr><tr><td>policy_39c2a4fef14f4c10<br>overall</td><td>macro f1 observed classes</td><td class="value">0.76624896</td><td>600<br></td></tr><tr><td>policy_39c2a4fef14f4c10<br>overall</td><td>support weighted f1</td><td class="value">0.76708438</td><td>600<br></td></tr></tbody></table>
+<details open><summary>m5 · balanced accuracy</summary><pre>{
+  &#34;supported_classes&#34;: 3,
+  &#34;declared_classes&#34;: 3,
+  &#34;aggregation_denominator&#34;: &#34;observed_support_classes&#34;
+}</pre></details><details open><summary>m6 · macro f1 observed classes</summary><pre>{
+  &#34;supported_classes&#34;: 3,
+  &#34;declared_classes&#34;: 3,
+  &#34;aggregation_denominator&#34;: &#34;observed_support_classes&#34;
+}</pre></details></section><section><h2>Confusion</h2><p class="note">2 of 2 retained measurement rows displayed. Omitted presentation detail remains in the matching JSON; privacy-withheld detail is absent from this projection.</p><table><thead><tr><th>Run / population</th><th>Measurement</th><th>Value</th><th>Denominator / qualification</th></tr></thead><tbody><tr><td>policy_39c2a4fef14f4c10<br>overall</td><td>confusion</td><td class="value">Structured evidence</td><td>600<br></td></tr><tr><td>policy_39c2a4fef14f4c10<br>overall</td><td>per class</td><td class="value">Structured evidence</td><td>600<br></td></tr></tbody></table>
+<details open><summary>m3 · confusion</summary><pre>{
+  &#34;cells&#34;: [
+    {
+      &#34;actual&#34;: &#34;a&#34;,
+      &#34;predicted&#34;: &#34;a&#34;,
+      &#34;count&#34;: 160
+    },
+    {
+      &#34;actual&#34;: &#34;a&#34;,
+      &#34;predicted&#34;: &#34;c&#34;,
+      &#34;count&#34;: 40
+    },
+    {
+      &#34;actual&#34;: &#34;b&#34;,
+      &#34;predicted&#34;: &#34;a&#34;,
+      &#34;count&#34;: 40
+    },
+    {
+      &#34;actual&#34;: &#34;b&#34;,
+      &#34;predicted&#34;: &#34;b&#34;,
+      &#34;count&#34;: 140
+    }
+  ]
+}</pre><p>Display excerpt shortened. Matching JSON retains this record's detail.</p></details><details open><summary>m4 · per class</summary><pre>{
+  &#34;classes&#34;: [
+    {
+      &#34;class&#34;: &#34;a&#34;,
+      &#34;support&#34;: 200,
+      &#34;predicted&#34;: 200,
+      &#34;tp&#34;: 160,
+      &#34;fn&#34;: 40,
+      &#34;fp&#34;: 40,
+      &#34;tn&#34;: 360,
+      &#34;precision&#34;: 0.8,
+      &#34;recall&#34;: 0.8,
+      &#34;f1&#34;: 0.8,
+      &#34;recall_population_id&#34;: &#34;pop_08978e95c7ed60aaa760a1c17c788de7&#34;,
+      &#34;precision_population_id&#34;: &#34;pop_6fdf437817b75d7f67df022daea00c28&#34;,
+      &#34;f1_formula_denominator&#34;: 400
+    },
+    {
+      &#34;class&#34;: &#34;b&#34;,
+      &#34;support&#34;: 180,
+      &#34;predicted&#34;: 200,
+      &#34;tp&#34;: 140,
+      &#34;fn&#34;: 40,
+      &#34;fp&#34;: 60,
+      &#34;tn&#34;: 360,
+      &#34;precision&#34;: 0.7,
+      &#34;recall&#34;: 0.7777777777777778,
+      &#34;f1&#34;: 0.7368421052631579,
+      &#34;recall_population_id&#34;: &#34;pop_081684040e10bba64181b1d5a6de3795&#34;,
+      &#34;precision_population_id&#34;: &#34;pop_d026b620402fd169d1309e0ce8b172ea&#34;,
+      &#34;f1_formula_denominator&#34;: 380
+    },
+    {
+      &#34;class&#34;: &#34;c&#34;,
+      &#34;support&#34;: 220,
+      &#34;predicted&#34;: 200,
+      &#34;tp&#34;: 160,
+      &#34;fn&#34;: 60,
+      &#34;fp&#34;: 40,
+      &#34;tn&#34;: 340,
+      &#34;precision&#34;: 0.8,
+      &#34;recall&#34;: 0.7272727272727273,
+      &#34;f1&#34;: 0.7619047619047619,
+      &#34;recall_population_id&#34;: &#34;pop_67da78a04822d53aae701836632c7f37&#34;,
+      &#34;precision_population_id&#34;: &#34;pop_6fc43a6eba141d900c4f6d22dd935779&#34;,
+      &#34;f1_formula_denominator&#34;: 420
+    }
+  ],
+  &#34;macro_population&#34;: &#34;classes with observed outcome support&#34;
+}</pre></details></section><section><h2>Failures</h2><p class="note">1 of 1 retained measurement rows displayed. Omitted presentation detail remains in the matching JSON; privacy-withheld detail is absent from this projection.</p><table><thead><tr><th>Run / population</th><th>Measurement</th><th>Value</th><th>Denominator / qualification</th></tr></thead><tbody><tr><td>policy_39c2a4fef14f4c10<br>overall</td><td>issued errors</td><td class="value">140</td><td>600<br></td></tr></tbody></table>
+</section><section><h2>Probability Quality</h2><p class="note">2 of 2 retained measurement rows displayed. Omitted presentation detail remains in the matching JSON; privacy-withheld detail is absent from this projection.</p><table><thead><tr><th>Run / population</th><th>Measurement</th><th>Value</th><th>Denominator / qualification</th></tr></thead><tbody><tr><td>policy_39c2a4fef14f4c10<br>overall</td><td>brier</td><td class="value">0.35041667</td><td>600<br></td></tr><tr><td>policy_39c2a4fef14f4c10<br>overall</td><td>log loss</td><td class="value">0.63986648</td><td>600<br></td></tr></tbody></table>
+<details open><summary>m9 · brier</summary><pre>{
+  &#34;definition&#34;: &#34;unhalved_multiclass_sum&#34;
+}</pre></details><details open><summary>m10 · log loss</summary><pre>{
+  &#34;zero_true_class_probability&#34;: 0,
+  &#34;logarithm&#34;: &#34;natural&#34;
+}</pre></details></section><section><h2>Calibration</h2><p class="note">5 of 5 retained measurement rows displayed. Omitted presentation detail remains in the matching JSON; privacy-withheld detail is absent from this projection.</p><table><thead><tr><th>Run / population</th><th>Measurement</th><th>Value</th><th>Denominator / qualification</th></tr></thead><tbody><tr><td>policy_39c2a4fef14f4c10<br>overall</td><td>reliability diagram · class:a</td><td class="value">0.066666667</td><td>600<br></td></tr><tr><td>policy_39c2a4fef14f4c10<br>overall</td><td>reliability diagram · class:b</td><td class="value">0.05</td><td>600<br></td></tr><tr><td>policy_39c2a4fef14f4c10<br>overall</td><td>reliability diagram · class:c</td><td class="value">0.05</td><td>600<br></td></tr><tr><td>policy_39c2a4fef14f4c10<br>overall</td><td>reliability diagram · top_label</td><td class="value">0.066666667</td><td>600<br></td></tr><tr><td>policy_39c2a4fef14f4c10<br>overall</td><td>reliability diagram · supplied_or_derived_decision</td><td class="value">0.066666667</td><td>600<br></td></tr></tbody></table>
+<figure><svg viewBox="0 0 400 210" role="img" aria-label="class:a"><path d="M40 25V180H370" fill="none" stroke="#a7b8bd"/><path d="M40 180L360 40" stroke="#b5c5c9" fill="none" stroke-dasharray="4 4"/><rect x="40.0" y="180.0" width="24.0" height="0.0" fill="#22787b"/><circle cx="52.0" cy="169.50000000000003" r="3" fill="#b45124"/><rect x="104.0" y="152.0" width="24.0" height="28.0" fill="#22787b"/><circle cx="116.0" cy="148.4999999999999" r="3" fill="#b45124"/><rect x="200.0" y="96.0" width="24.0" height="84.0" fill="#22787b"/><circle cx="212.0" cy="103.00000000000013" r="3" fill="#b45124"/><rect x="296.0" y="40.0" width="24.0" height="140.0" fill="#22787b"/><circle cx="308.0" cy="61.0000000000001" r="3" fill="#b45124"/></svg><figcaption>class:a · bars: observed frequency; dots: mean supplied probability; diagonal: equality reference</figcaption></figure><figure><svg viewBox="0 0 400 210" role="img" aria-label="class:b"><path d="M40 25V180H370" fill="none" stroke="#a7b8bd"/><path d="M40 180L360 40" stroke="#b5c5c9" fill="none" stroke-dasharray="4 4"/><rect x="40.0" y="180.0" width="24.0" height="0.0" fill="#22787b"/><circle cx="52.0" cy="169.50000000000003" r="3" fill="#b45124"/><rect x="104.0" y="152.0" width="24.0" height="28.0" fill="#22787b"/><circle cx="116.0" cy="148.4999999999999" r="3" fill="#b45124"/><rect x="200.0" y="96.0" width="24.0" height="84.0" fill="#22787b"/><circle cx="212.0" cy="103.00000000000013" r="3" fill="#b45124"/><rect x="296.0" y="68.0" width="24.0" height="112.0" fill="#22787b"/><circle cx="308.0" cy="61.0000000000001" r="3" fill="#b45124"/></svg><figcaption>class:b · bars: observed frequency; dots: mean supplied probability; diagonal: equality reference</figcaption></figure><details open><summary>m11 · reliability diagram</summary><pre>{
+  &#34;target&#34;: &#34;class:a&#34;,
+  &#34;bins&#34;: [
+    {
+      &#34;bin&#34;: 0,
+      &#34;lower&#34;: 0.0,
+      &#34;upper&#34;: 0.1,
+      &#34;upper_inclusive&#34;: false,
+      &#34;count&#34;: 200,
+      &#34;mean_probability&#34;: 0.07499999999999973,
+      &#34;observed_frequency&#34;: 0.0,
+      &#34;interval&#34;: null,
+      &#34;limited_bin_support&#34;: false
+    },
+    {
+      &#34;bin&#34;: 1,
+      &#34;lower&#34;: 0.1,
+      &#34;upper&#34;: 0.2,
+      &#34;upper_inclusive&#34;: false,
+      &#34;count&#34;: 0,
+      &#34;mean_probability&#34;: null,
+      &#34;observed_frequency&#34;: null,
+      &#34;interval&#34;: null,
+      &#34;limited_bin_support&#34;: true
+    },
+    {
+      &#34;bin&#34;: 2,
+      &#34;lower&#34;: 0.2,
+      &#34;upper&#34;: 0.3,
+      &#34;upper_inclusive&#34;: false,
+      &#34;count&#34;: 200,
+      &#34;mean_probability&#34;: 0.2250000000000008,
+      &#34;observed_frequency&#34;: 0.2,
+      &#34;interval&#34;: null,
+      &#34;limited_bin_support&#34;: false
+    },
+    {
+      &#34;bin&#34;: 3,
+      &#34;lower&#34;: 0.3,
+      &#34;upper&#34;: 0.4,
+      &#34;upper_inclusive&#34;: false,
+      &#34;count&#34;: 0,
+      &#34;mean_probability&#34;: null,
+      &#34;observed_frequency&#34;: null,
+      &#34;interval&#34;: null,
+      &#34;limited_bin_support&#34;: true
+    }
+  ],
+  &#34;ece_definition&#34;: &#34;sum_bin_mass_absolute_frequency_gap&#34;,
+  &#34;binning&#34;: &#34;fixed_equal_width&#34;
+}</pre><p>Display excerpt shortened. Matching JSON retains this record's detail.</p></details><details open><summary>m12 · reliability diagram</summary><pre>{
+  &#34;target&#34;: &#34;class:b&#34;,
+  &#34;bins&#34;: [
+    {
+      &#34;bin&#34;: 0,
+      &#34;lower&#34;: 0.0,
+      &#34;upper&#34;: 0.1,
+      &#34;upper_inclusive&#34;: false,
+      &#34;count&#34;: 200,
+      &#34;mean_probability&#34;: 0.07499999999999973,
+      &#34;observed_frequency&#34;: 0.0,
+      &#34;interval&#34;: null,
+      &#34;limited_bin_support&#34;: false
+    },
+    {
+      &#34;bin&#34;: 1,
+      &#34;lower&#34;: 0.1,
+      &#34;upper&#34;: 0.2,
+      &#34;upper_inclusive&#34;: false,
+      &#34;count&#34;: 0,
+      &#34;mean_probability&#34;: null,
+      &#34;observed_frequency&#34;: null,
+      &#34;interval&#34;: null,
+      &#34;limited_bin_support&#34;: true
+    },
+    {
+      &#34;bin&#34;: 2,
+      &#34;lower&#34;: 0.2,
+      &#34;upper&#34;: 0.3,
+      &#34;upper_inclusive&#34;: false,
+      &#34;count&#34;: 200,
+      &#34;mean_probability&#34;: 0.2250000000000008,
+      &#34;observed_frequency&#34;: 0.2,
+      &#34;interval&#34;: null,
+      &#34;limited_bin_support&#34;: false
+    },
+    {
+      &#34;bin&#34;: 3,
+      &#34;lower&#34;: 0.3,
+      &#34;upper&#34;: 0.4,
+      &#34;upper_inclusive&#34;: false,
+      &#34;count&#34;: 0,
+      &#34;mean_probability&#34;: null,
+      &#34;observed_frequency&#34;: null,
+      &#34;interval&#34;: null,
+      &#34;limited_bin_support&#34;: true
+    }
+  ],
+  &#34;ece_definition&#34;: &#34;sum_bin_mass_absolute_frequency_gap&#34;,
+  &#34;binning&#34;: &#34;fixed_equal_width&#34;
+}</pre><p>Display excerpt shortened. Matching JSON retains this record's detail.</p></details></section><section><h2>High Confidence</h2><p class="note">2 of 2 retained measurement rows displayed. Omitted presentation detail remains in the matching JSON; privacy-withheld detail is absent from this projection.</p><table><thead><tr><th>Run / population</th><th>Measurement</th><th>Value</th><th>Denominator / qualification</th></tr></thead><tbody><tr><td>policy_39c2a4fef14f4c10<br>overall</td><td>high confidence top class error rate</td><td class="value">Unavailable</td><td>0<br>zero_denominator</td></tr><tr><td>policy_39c2a4fef14f4c10<br>overall</td><td>share of top class errors high confidence</td><td class="value">0</td><td>140<br></td></tr></tbody></table>
+<details open><summary>m15 · high confidence top class error rate</summary><pre>{
+  &#34;threshold&#34;: 0.9,
+  &#34;meaning&#34;: &#34;unique_top_probability_class_mismatch_not_issued_decision&#34;
+}</pre></details></section><section><h2>High Confidence Decision</h2><p class="note">1 of 1 retained measurement rows displayed. Omitted presentation detail remains in the matching JSON; privacy-withheld detail is absent from this projection.</p><table><thead><tr><th>Run / population</th><th>Measurement</th><th>Value</th><th>Denominator / qualification</th></tr></thead><tbody><tr><td>policy_39c2a4fef14f4c10<br>overall</td><td>high confidence decision error rate</td><td class="value">Unavailable</td><td>0<br>zero_denominator</td></tr></tbody></table>
+<details open><summary>m18 · high confidence decision error rate</summary><pre>{
+  &#34;confidence&#34;: &#34;probability_assigned_to_chosen_class&#34;
+}</pre></details></section><section><h2>Policy</h2><p class="note">20 of 72 retained measurement rows displayed. Omitted presentation detail remains in the matching JSON; privacy-withheld detail is absent from this projection.</p><table><thead><tr><th>Run / population</th><th>Measurement</th><th>Value</th><th>Denominator / qualification</th></tr></thead><tbody><tr><td>policy_0c008595d305beb1<br>correct</td><td>correct issue rate</td><td class="value">0.76666667</td><td>600<br></td></tr><tr><td>policy_0c008595d305beb1<br>coverage</td><td>issued coverage</td><td class="value">1</td><td>600<br></td></tr><tr><td>policy_0c008595d305beb1<br>a_precision</td><td>precision</td><td class="value">0.8</td><td>200<br></td></tr><tr><td>policy_0c008595d305beb1<br>accounting:issued_coverage</td><td>issued coverage</td><td class="value">1</td><td>600<br></td></tr><tr><td>policy_0c008595d305beb1<br>accounting:abstention_rate</td><td>abstention rate</td><td class="value">0</td><td>600<br></td></tr><tr><td>policy_0c008595d305beb1<br>accounting:deferral_rate</td><td>deferral rate</td><td class="value">0</td><td>600<br></td></tr><tr><td>policy_0c008595d305beb1<br>accounting:unavailable_rate</td><td>unavailable rate</td><td class="value">0</td><td>600<br></td></tr><tr><td>policy_0c008595d305beb1<br>accounting:input_unavailable_rate</td><td>input unavailable rate</td><td class="value">0</td><td>600<br></td></tr><tr><td>policy_0c008595d305beb1<br>accounting:issued_label_availability</td><td>issued label availability</td><td class="value">1</td><td>600<br></td></tr><tr><td>policy_0c008595d305beb1<br>accounting:labeled_issued_share</td><td>labeled issued share</td><td class="value">1</td><td>600<br></td></tr><tr><td>policy_0c008595d305beb1<br>accounting:selective_risk</td><td>selective risk</td><td class="value">0.23333333</td><td>600<br></td></tr><tr><td>policy_0c008595d305beb1<br>accounting:correct_issue_rate</td><td>correct issue rate</td><td class="value">0.76666667</td><td>600<br></td></tr><tr><td>policy_2d31e783b4a18729<br>correct</td><td>correct issue rate</td><td class="value">0</td><td>600<br></td></tr><tr><td>policy_2d31e783b4a18729<br>coverage</td><td>issued coverage</td><td class="value">0</td><td>600<br></td></tr><tr><td>policy_2d31e783b4a18729<br>a_precision</td><td>precision</td><td class="value">Unavailable</td><td>0<br>zero_denominator</td></tr><tr><td>policy_2d31e783b4a18729<br>accounting:issued_coverage</td><td>issued coverage</td><td class="value">0</td><td>600<br></td></tr><tr><td>policy_2d31e783b4a18729<br>accounting:abstention_rate</td><td>abstention rate</td><td class="value">1</td><td>600<br></td></tr><tr><td>policy_2d31e783b4a18729<br>accounting:deferral_rate</td><td>deferral rate</td><td class="value">0</td><td>600<br></td></tr><tr><td>policy_2d31e783b4a18729<br>accounting:unavailable_rate</td><td>unavailable rate</td><td class="value">0</td><td>600<br></td></tr><tr><td>policy_2d31e783b4a18729<br>accounting:input_unavailable_rate</td><td>input unavailable rate</td><td class="value">0</td><td>600<br></td></tr></tbody></table>
+<details open><summary>policy_m19 · correct issue rate</summary><pre>{
+  &#34;metric&#34;: &#34;correct_issue_rate&#34;,
+  &#34;value&#34;: 0.7666666666666667,
+  &#34;value_state&#34;: &#34;finite&#34;,
+  &#34;denominator&#34;: 600,
+  &#34;planned&#34;: 600,
+  &#34;reason&#34;: null,
+  &#34;basis&#34;: &#34;observed_outcome&#34;,
+  &#34;units&#34;: &#34;fraction&#34;,
+  &#34;statistic_kind&#34;: &#34;mean&#34;,
+  &#34;numerator&#34;: 460.0,
+  &#34;cells&#34;: null,
+  &#34;sensitive_counts&#34;: [
+    600,
+    0,
+    460,
+    140
+  ],
+  &#34;definition_digest&#34;: &#34;96d199ac76fef49c2d54ae5747255d8d3207c1d2ba080b87abd21521a4826a36&#34;
+}</pre></details><details open><summary>policy_m20 · issued coverage</summary><pre>{
+  &#34;metric&#34;: &#34;issued_coverage&#34;,
+  &#34;value&#34;: 1.0,
+  &#34;value_state&#34;: &#34;finite&#34;,
+  &#34;denominator&#34;: 600,
+  &#34;planned&#34;: 600,
+  &#34;reason&#34;: null,
+  &#34;basis&#34;: &#34;operational&#34;,
+  &#34;units&#34;: &#34;fraction&#34;,
+  &#34;statistic_kind&#34;: &#34;mean&#34;,
+  &#34;numerator&#34;: 600.0,
+  &#34;cells&#34;: null,
+  &#34;sensitive_counts&#34;: [
+    600,
+    0,
+    600,
+    0
+  ],
+  &#34;definition_digest&#34;: &#34;ff6b31bedee9b99c9114a1f1be6fd9b0c27a35d8e32508e2b534740002b1841a&#34;
+}</pre></details></section><section><h2>Methodology, coverage and limitations</h2><p>Policy decisions are hypothetical offline replay; no deployment approval or causal business-value guarantee.</p><p>Observed-outcome, model-implied, operational and missing-label bounds are different estimands.</p><p>Conditional selective risk, full-opportunity behavior and deferral workload have different denominators.</p><p>Independent support conditions on frozen policies and declared sampling, observation, bounds and exposure assumptions.</p><p>Historical stability does not establish future effectiveness. Conformal marginal coverage is not conditional policy coverage.</p><p>Sampled resource controls can overshoot; admission defaults are not capacity guarantees.</p><p>Metrics describe supplied outcomes and declared populations; ground truth and representativeness are not independently established.</p><p>Calibration bins and high-confidence settings are investigation definitions, not universal safety thresholds.</p><p>Policy replay is retrospective; different actions may change outcomes or their observation.</p><p>Statistical intervals, when enabled, are assumption-qualified; the recorded adjustment distinguishes pointwise and family confidence.</p><p>Sampled resource safeguards are not hard quotas or capacity guarantees.</p><p>No composite score, certification or production approval is defined.</p><p></p><p>Analytical bounds, retained-detail omissions, presentation omissions and privacy withholding are distinct. An unavailable metric is not zero. The protected local workbench contains exact retained evidence where supplied and eligible.</p><p>Analysis identity: 4118d30603e24f99ab031a98fa9d9d08</p></section></main></body></html>

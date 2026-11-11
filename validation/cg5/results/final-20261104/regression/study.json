@@ -1,0 +1,267 @@
+{
+  "baselines": [],
+  "candidates": [],
+  "charges": {},
+  "constraints": [],
+  "evaluation_costs": {
+    "quantity": {
+      "kind": "numeric_loss",
+      "level": 0.8,
+      "loss": "pinball",
+      "nonissued": {
+        "abstained": 3,
+        "unavailable": 5
+      }
+    }
+  },
+  "families": [
+    {
+      "backend": "enumerate",
+      "id": "quantities",
+      "kind": "finite",
+      "parameters": [
+        {
+          "count": null,
+          "endpoints": true,
+          "id": "action",
+          "kind": "node",
+          "lower": null,
+          "upper": null,
+          "value": null,
+          "values": [
+            {
+              "action": {
+                "kind": "numeric",
+                "value": 2.0
+              },
+              "kind": "action"
+            },
+            {
+              "action": {
+                "kind": "numeric",
+                "value": 4.0
+              },
+              "kind": "action"
+            },
+            {
+              "action": {
+                "kind": "numeric",
+                "value": 6.0
+              },
+              "kind": "action"
+            },
+            {
+              "action": {
+                "kind": "numeric",
+                "value": 8.0
+              },
+              "kind": "action"
+            }
+          ]
+        }
+      ],
+      "template": {
+        "fallback": {
+          "kind": "abstain"
+        },
+        "nodes": {
+          "root": {
+            "parameter": "action"
+          }
+        },
+        "root": "root",
+        "run": "model",
+        "task": {
+          "classes": [],
+          "horizon": null,
+          "kind": "regression",
+          "material_error": null,
+          "outcome_definition": "Synthetic engineering outcome",
+          "positive_class": null,
+          "units": "items"
+        },
+        "unavailable": {
+          "kind": "unavailable"
+        }
+      }
+    }
+  ],
+  "imported_policies": [],
+  "input": {
+    "as_of": null,
+    "batches": [],
+    "evaluation": {
+      "as_of": null,
+      "cohorts": [],
+      "comparison": null,
+      "context": null,
+      "name": "ConfidenceGuard evaluation",
+      "outcomes": {
+        "available_at": null,
+        "column": "y",
+        "due_at": null,
+        "key_columns": [
+          "id"
+        ],
+        "snapshot_name": null,
+        "source": "data",
+        "status_column": null,
+        "status_values": {
+          "conflicting": "conflicting",
+          "final": "final",
+          "invalid": "invalid",
+          "observed": "observed",
+          "provisional": "provisional"
+        },
+        "target_at": null
+      },
+      "policies": [],
+      "runs": [
+        {
+          "decision": {
+            "candidate_evaluation": false,
+            "column": null,
+            "rule": "none",
+            "state_column": null,
+            "state_values": {
+              "abstained": "abstained",
+              "failed": "failed",
+              "issued": "issued",
+              "missing": "missing"
+            },
+            "threshold": null,
+            "tie_policy": "abstain"
+          },
+          "entity_columns": [],
+          "generated_at": null,
+          "horizon": null,
+          "id": "model",
+          "inline_outcome": null,
+          "inline_outcome_role": "agreement_assertion",
+          "intervals": [],
+          "key_columns": [
+            "id"
+          ],
+          "model": {
+            "artifact_sha256": null,
+            "calibration": null,
+            "display_name": "",
+            "id": "synthetic",
+            "preprocessing": null,
+            "version": "v1"
+          },
+          "prediction": "prediction",
+          "prediction_at": null,
+          "probabilities": null,
+          "role": "unknown",
+          "score": null,
+          "selection": null,
+          "source": "data"
+        }
+      ],
+      "schema_version": "confidenceguard.evaluation_spec/1.0",
+      "sources": [
+        {
+          "delimiter": ",",
+          "encoding": "utf-8-sig",
+          "format": "csv",
+          "id": "data",
+          "path": "/Users/drivyaanshyadav/Desktop/Numek/validation/cg5/results/final-20261104/regression/data/predictions.csv"
+        }
+      ],
+      "task": {
+        "classes": [],
+        "horizon": null,
+        "kind": "regression",
+        "material_error": null,
+        "outcome_definition": "Synthetic engineering outcome",
+        "positive_class": null,
+        "units": "items"
+      }
+    },
+    "feature_time_view": "available_at_decision",
+    "features": [],
+    "fitted_methods": [],
+    "history": null,
+    "membership_sidecars": [],
+    "region_representations": [],
+    "regions": [],
+    "representations": [],
+    "roles": {
+      "column": "role",
+      "namespace": "cg5-regression-regression",
+      "partitions": [],
+      "proportions": {},
+      "seed": 0,
+      "unit": "event",
+      "values": {
+        "C": "C",
+        "E": "E",
+        "F": "F",
+        "S": "S"
+      }
+    },
+    "run_bindings": {},
+    "schema_version": "confidenceguard.policy_input/1.0",
+    "separation": {
+      "base_predictions_independent": false,
+      "evaluation_independent": false,
+      "exchangeable_scores": false,
+      "labels_representative": false,
+      "preserve_membership": true,
+      "training_partitions": []
+    }
+  },
+  "limits": {
+    "action_cells": 100000000,
+    "assessment_claims": 256,
+    "assessment_components": 4096,
+    "assessment_policies": 8,
+    "beam_width": 64,
+    "contribution_cells": 100000000,
+    "dominance_pairs": 10000000,
+    "materialized_bytes": 1073741824,
+    "max_candidates": 4096,
+    "max_cells": 32,
+    "max_cutpoints": 1000000,
+    "max_options": 256,
+    "max_search_states": 1000000,
+    "metric_records": 65536,
+    "predicate_events": 100000000,
+    "solver_calls": 64,
+    "solver_nodes": 100000,
+    "solver_nonzeros": 1000000,
+    "solver_rows": 8192,
+    "solver_seconds": 300,
+    "solver_variables": 8192
+  },
+  "name": "Synthetic regression policy record",
+  "objectives": [
+    {
+      "basis": "observed_outcome",
+      "bounds": [
+        0,
+        10
+      ],
+      "cost": "quantity",
+      "direction": "minimize",
+      "id": "quantity_cost",
+      "interval": null,
+      "level": 0.5,
+      "loss": "absolute",
+      "metric": "empirical_cost",
+      "scope": "overall",
+      "target": null,
+      "units": "cost_units",
+      "weight": 1.0
+    }
+  ],
+  "schema_version": "confidenceguard.policy_study_spec/1.0",
+  "search": {
+    "absolute_tolerance": 1e-10,
+    "epsilon_constraints": [],
+    "mode": "lexicographic",
+    "relative_tolerance": 1e-08,
+    "seed": 0
+  }
+}

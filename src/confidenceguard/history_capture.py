@@ -50,6 +50,86 @@ class CaptureDescriptor:
     operation_id: str
     workspace_config: dict
     batch: dict
+    inputs: dict | None = None
+
+
+def batch_projection(batch):
+    """Fixed historical projections, shared by admission and actual capture."""
+    projection={source.id:set() for source in batch.base.sources}
+    bindings={b.run:b for b in batch.bindings}
+    for run in batch.base.runs:
+        binding=bindings[run.id];columns=projection[run.source]
+        for attr in ('event_columns','opportunity_columns','target_columns'):columns.update(getattr(binding,attr))
+        columns.update(binding.features)
+        columns.update(v for v in (binding.attempt_column,binding.slot_column,binding.revision_column,binding.predecessor_column,binding.correction_reason_column) if v)
+        for clock in (binding.opportunity_at,binding.information_cutoff,binding.available_at):
+            if clock:columns.add(clock.column)
+        if batch.base.context:projection[batch.base.context.source].update(binding.features)
+    if batch.feature_views:
+        from .features import feature_projection
+        from types import SimpleNamespace
+        extra=feature_projection(SimpleNamespace(features=batch.feature_views,objectives=(SimpleNamespace(run=batch.base.runs[0].id),),roles=SimpleNamespace(column=None)),batch.base)
+        for sid,columns in extra.items():projection[sid].update(columns)
+    return projection
+
+
+def capture_inputs_worker(batch,config,roots,*,progress=None):
+    """Bind external bytes and observable exposure identities without fitting."""
+    from .engine import open_store
+    from .result import Inspection
+    from .representations import verified_encoder
+    from .investigation_history import cells_from_row
+    batch=PredictionBatchSpec.from_dict(batch);work=None
+    try:
+        extension=batch.evaluation if hasattr(batch.evaluation,'evaluation') else None
+        work,store,_=open_store(batch.base,config,roots,progress,extension=extension,projection=batch_projection(batch))
+        external={};events=set();units=set();bindings={b.run:b for b in batch.bindings}
+        for spec in batch.discovery_representations:
+            if spec.kind=='supplied':
+                external[spec.id+':matrix']=compat.capture(spec.matrix_path,roots)[0]
+                external[spec.id+':keys']=compat.capture(spec.keys_source.path,roots)[0]
+            else:
+                provenance=verified_encoder(spec,roots,work)
+                external[spec.id+':manifest']=provenance['manifest']
+                for filename,info in provenance['files'].items():external[spec.id+':model:'+filename]=info
+                if spec.kind=='dinov2_image':
+                    view_id,field_id=spec.field.split('.',1)
+                    view=next((v for v in batch.feature_views if v.id==view_id),None)
+                    if view is None:raise EvaluationError('Encoder field is absent from retained features.','feature_not_retained')
+                    base=next(r for r in batch.base.runs if r.id==(view.run or batch.base.runs[0].id))
+                    for _,payload in rows(store.con,f'SELECT ordinal,payload FROM {store.tables[view.source or base.source]}',batch=512):
+                        cell=cells_from_row(view,json.loads(payload))[field_id]
+                        if cell['state']!='observed':continue
+                        path=Path(cell['lexical']);path=path if path.is_absolute() else Path(batch.base.sources[0].path).parent/path
+                        info=compat.capture(path,roots,max_bytes=config.max_record_bytes)[0]
+                        external[spec.id+':asset:'+digest(str(path))]=info;work.check('capture asset identities')
+        if batch.operation!='ingest':
+            for run in batch.base.runs:
+                binding=bindings[run.id];table=store.run_tables[run.id]
+                columns={r[0] for r in store.con.execute(f'DESCRIBE {table}').fetchall()}
+                where=" AND r.cg_role IN ('F','S','C')" if batch.operation=='fit' and 'cg_role' in columns else ''
+                query=f'SELECT r.event_key,r.entity_key,s.payload FROM {table} r JOIN {store.tables[run.source]} s USING(ordinal) WHERE r.event_key IS NOT NULL'+where
+                for event,entity,payload in rows(store.con,query,batch=512):
+                    raw=json.loads(payload);identity=values(raw,binding.event_columns or run.key_columns)
+                    opportunity=values(raw,binding.opportunity_columns or run.key_columns)
+                    target=values(raw,binding.target_columns) if binding.target_columns else [binding.target_instance]
+                    events.add(digest([batch.namespace,event]));units.add(digest([batch.namespace,entity or event]))
+                    from .evidence_use import source_aliases
+                    for source in (run.source,batch.base.outcomes.source if batch.base.outcomes else run.source):
+                        ee,uu=source_aliases(store.sources[source],event,entity);events.update(ee);units.update(uu)
+                    if identity is not None and opportunity is not None and target is not None:
+                        opp=digest([target_identity(batch.namespace,identity,batch.outcome_definition_version,target),opportunity])
+                        events.add(digest([batch.namespace,opp]));units.add(digest([batch.namespace,opp]))
+                    if entity is not None and binding.entity_namespace:
+                        namespaced=json.dumps([binding.entity_namespace,entity],ensure_ascii=True,separators=(',',':'))
+                        units.add(digest([batch.namespace,namespaced]))
+                    if (len(events)+len(units))*192>config.max_rss_bytes//8:raise EvaluationError('Capture exposure identities exceed explicit memory admission.','evidence_use_capacity')
+        for info in external.values():compat.capture(info['path'],roots,expected=info)
+        store.verify()
+        return Inspection({'sources':store.sources,'external':external,'events':sorted(events),'units':sorted(units)},
+                          {'status':'completed','peak_workspace_bytes':work.peak})
+    finally:
+        if work:work.close()
 
 
 class Capture:
@@ -62,27 +142,13 @@ class Capture:
                          'identity_qualification': 'Supplied explicit namespace/keys; hashes are identifiers, not anonymization.'}
 
     def extend_projection(self, store):
-        original = store.selected
-
-        def selected(sid):
-            columns = set(original(sid))
-            for run in store.spec.runs:
-                b = self.bindings[run.id]
-                if run.source == sid:
-                    for attr in ('event_columns', 'opportunity_columns', 'target_columns'):
-                        columns.update(getattr(b, attr))
-                    columns.update(b.features)
-                    columns.update(v for v in (b.attempt_column, b.slot_column, b.revision_column, b.predecessor_column, b.correction_reason_column) if v)
-                    for clock in (b.opportunity_at, b.information_cutoff, b.available_at):
-                        if clock: columns.add(clock.column)
-                canonical = store.context.source if store.context else None
-                if canonical == sid:
-                    columns.update(b.features)
-            return columns
-        store.selected = selected
+        store.add_projection(batch_projection(self.batch))
 
     def raw(self, store):
         """Called immediately after ingest and before prepare, including invalid facts."""
+        if self.descriptor.inputs is not None:
+            expected=self.descriptor.inputs['sources']
+            if {k:v['sha256'] for k,v in expected.items()}!={k:v['sha256'] for k,v in store.sources.items()}:raise EvaluationError('Sources changed after capture admission.','source_changed')
         self.metadata['sources'] = store.sources
         self.metadata['headers'] = store.headers
         self.metadata['counts'] = store.counts
@@ -216,7 +282,13 @@ class Capture:
                 sample_table=store.input_facts[root_id]['sample_table']
                 for opp_key,prediction_key,prediction_revision,draw,value in rows(store.con,f'SELECT DISTINCT m.opportunity_key,m.prediction_key,m.prediction_revision,s.draw,s.value FROM {sample_table} s JOIN {mapping} m USING(event_key) ORDER BY m.opportunity_key,s.draw',batch=512):
                     self.writer.add('sample',[prediction_key,prediction_revision,draw],{'namespace':self.batch.namespace,'opportunity_key':opp_key,'variant':vid,'prediction_key':prediction_key,'prediction_revision':prediction_revision,'draw':draw,'value':value})
+            if self.batch.feature_views or self.batch.discovery_representations:
+                from .investigation_history import capture_typed
+                capture_typed(self,store,run,base,vid,mapping)
             store.con.execute(f'DROP TABLE {mapping}')
+        if self.descriptor.inputs is not None:
+            for info in self.descriptor.inputs['external'].values():compat.capture(info['path'],store.roots,expected=info)
+            self.metadata['external_inputs']=self.descriptor.inputs['external']
         return self.writer.finish(self.metadata)
 
 

@@ -1,0 +1,29 @@
+Traceback (most recent call last):
+  File "/Users/drivyaanshyadav/Desktop/Numek/validation/cg6/performance.py", line 139, in <module>
+    if __name__=='__main__':main()
+                            ~~~~^^
+  File "/Users/drivyaanshyadav/Desktop/Numek/validation/cg6/performance.py", line 135, in main
+    record=run_one(name,p,directory,protocol['config']);record['protocol_sha256']=hashlib.sha256((ROOT/'performance_protocol.json').read_bytes()).hexdigest();write(directory/'receipt.json',record);records.append(record)
+  File "/Users/drivyaanshyadav/Desktop/Numek/validation/cg6/performance.py", line 91, in run_one
+    result=run_robustness(RobustnessSpec(s,scenarios),config)
+  File "/Users/drivyaanshyadav/Desktop/Numek/src/confidenceguard/robustness/services.py", line 299, in run_robustness
+    claims.append({'id':c.id,'state':'refused','reason':'entity_crosses_batches','allocated_alpha':(1-protocol.confidence)/len(protocol.claims)} if crossed else assess(r['values'],entities,c,protocol,len(protocol.claims),potential_entities=potential_units))
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/drivyaanshyadav/Desktop/Numek/src/confidenceguard/execution/services.py", line 374, in service
+    result=compat.supervise(_worker,(spec,config,roots,operation,expected_fingerprint,str(staging),host_bindings(),options),budget,progress=progress,cancel=cancel,deadline=deadline)
+  File "/Users/drivyaanshyadav/Desktop/Numek/src/confidenceguard/compat.py", line 22, in supervise
+    try:return run_supervised(operation,arguments,limits,progress=progress,cancel=cancel)
+               ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/drivyaanshyadav/Desktop/Numek/src/datatrust/worker.py", line 43, in run_supervised
+    if receiver.poll(.1):
+       ~~~~~~~~~~~~~^^^^
+  File "/Users/drivyaanshyadav/Desktop/Numek/validation/cg4/runtime.nosync/cpython-3.13.17-macos-aarch64-none/lib/python3.13/multiprocessing/connection.py", line 262, in poll
+    return self._poll(timeout)
+           ~~~~~~~~~~^^^^^^^^^
+  File "/Users/drivyaanshyadav/Desktop/Numek/validation/cg4/runtime.nosync/cpython-3.13.17-macos-aarch64-none/lib/python3.13/multiprocessing/connection.py", line 445, in _poll
+    r = wait([self], timeout)
+  File "/Users/drivyaanshyadav/Desktop/Numek/validation/cg4/runtime.nosync/cpython-3.13.17-macos-aarch64-none/lib/python3.13/multiprocessing/connection.py", line 1174, in wait
+    ready = selector.select(timeout)
+  File "/Users/drivyaanshyadav/Desktop/Numek/validation/cg4/runtime.nosync/cpython-3.13.17-macos-aarch64-none/lib/python3.13/selectors.py", line 398, in select
+    fd_event_list = self._selector.poll(timeout)
+KeyboardInterrupt

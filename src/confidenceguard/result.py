@@ -72,6 +72,15 @@ class EvaluationResult:
     @classmethod
     def from_dict(cls,value,*,private=None):
         if isinstance(value,str):value=strict_json(value)
+        if isinstance(value,dict) and value.get('schema_version')=='confidenceguard.execution_result/1.0':
+            from .execution.result import ExecutionResult
+            return ExecutionResult.from_dict(value,private=private)
+        if isinstance(value,dict) and value.get('schema_version')=='confidenceguard.policy_result/1.0':
+            from .policy_result import PolicyResult
+            return PolicyResult.from_dict(value,private=private)
+        if isinstance(value,dict) and value.get('schema_version') in {'confidenceguard.investigation_result/1.0','confidenceguard.confirmation_assessment/1.0'}:
+            from .investigation_result import InvestigationResult
+            return InvestigationResult.from_dict(value,private=private)
         if isinstance(value,dict) and value.get('schema_version')=='confidenceguard.longitudinal_result/1.0':
             from .history_result import LongitudinalResult
             return LongitudinalResult.from_dict(value,private=private)

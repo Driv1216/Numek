@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>NUMEK v3 · Screenshot sheet</title>
+<style>
+  :root { --bg: #f2f1ed; --ink: #161616; --mute: #6d6c67; --line: #d5d3cc; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.5 ui-sans-serif, system-ui, -apple-system, sans-serif; }
+  header { padding: 40px 32px 10px; max-width: 1500px; margin: 0 auto; }
+  h1 { font-size: 44px; letter-spacing: -.035em; margin: 0 0 8px; }
+  header p { color: var(--mute); max-width: 820px; margin: 0; }
+  section { max-width: 1500px; margin: 0 auto; padding: 36px 32px; border-bottom: 1px solid var(--line); }
+  h2 { font-size: 30px; letter-spacing: -.03em; margin: 0 0 16px; }
+  h2 a { font-size: 14px; font-weight: 400; margin-left: 14px; color: var(--mute); }
+  .row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .m { display: grid; grid-template-columns: repeat(3, 180px) 1fr; gap: 16px; margin-top: 16px; align-items: start; }
+  figure { margin: 0; }
+  figure img, figure video { width: 100%; display: block; border: 1px solid var(--line); background: #fff; }
+  figcaption { font-size: 12.5px; color: var(--mute); margin-top: 6px; }
+  .story img { max-height: none; }
+  details { margin-top: 16px; } summary { cursor: pointer; color: var(--mute); }
+  @media (max-width: 900px) { .row, .m { grid-template-columns: 1fr 1fr; } }
+</style>
+</head>
+<body>
+<header>
+  <h1>Screenshot sheet</h1>
+  <p>Real headless-Chromium captures of all thirty screens at 1440×900 and 390×844, plus a scroll storyboard and a screen recording of each landing page. Regenerate with <code>node scripts/capture-concepts.mjs</code> while the dev server runs.</p>
+</header>
+<main id="sheet"></main>
+<script>
+  const concepts = [['markup', '01 Markup'], ['every-row', '02 Every Row'], ['issue', '03 The Issue'], ['passage', '04 Passage'], ['two-readings', '05 Two Readings'], ['provenance', '06 Provenance'], ['collection', '07 Collection'], ['modules', '08 Modules'], ['camera', '09 Product Camera'], ['lexicon', '10 Lexicon']];
+  document.getElementById('sheet').innerHTML = concepts.map(([id, name]) => `
+    <section>
+      <h2>${name}<a href="/#/${id}/landing">open live →</a></h2>
+      <div class="row">
+        <figure><img src="${id}-landing.jpg" alt="${name} landing" loading="lazy"><figcaption>Landing · first viewport</figcaption></figure>
+        <figure><img src="${id}-app.jpg" alt="${name} dashboard" loading="lazy"><figcaption>Dashboard / application home</figcaption></figure>
+        <figure><img src="${id}-results.jpg" alt="${name} results" loading="lazy"><figcaption>Results · Adult</figcaption></figure>
+      </div>
+      <div class="m">
+        <figure><img src="${id}-m-landing.jpg" alt="" loading="lazy"><figcaption>Mobile landing</figcaption></figure>
+        <figure><img src="${id}-m-app.jpg" alt="" loading="lazy"><figcaption>Mobile dashboard</figcaption></figure>
+        <figure><img src="${id}-m-results.jpg" alt="" loading="lazy"><figcaption>Mobile results</figcaption></figure>
+        <figure><video src="${id}.mp4" controls muted loop playsinline preload="none" poster="${id}-landing.jpg"></video><figcaption>Landing scroll recording (wheel-driven, ~1 viewport per second)</figcaption></figure>
+      </div>
+      <details><summary>Full landing as a scroll storyboard (viewport frames in reading order)</summary>
+        <figure class="story"><img src="${id}-story.jpg" alt="${name} landing storyboard" loading="lazy"></figure>
+      </details>
+    </section>`).join('');
+</script>
+</body>
+</html>

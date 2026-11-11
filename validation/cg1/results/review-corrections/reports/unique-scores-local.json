@@ -1,0 +1,3270 @@
+{
+  "schema_version": "confidenceguard.evaluation_result/1.0",
+  "methodology_id": "prediction_evaluation_v1",
+  "analysis_id": "4d0fade383ed46beabef30cff9807a03",
+  "generated_at": "2026-10-18T15:11:54.482031+00:00",
+  "name": "ConfidenceGuard evaluation",
+  "task": {
+    "kind": "binary_classification",
+    "outcome_definition": "supplied outcome",
+    "classes": [
+      "0",
+      "1"
+    ],
+    "positive_class": "1",
+    "units": null,
+    "horizon": null,
+    "material_error": null
+  },
+  "runs": [
+    {
+      "id": "model",
+      "display_name": "Model 1",
+      "version_alias": "Version 1",
+      "model": {
+        "id": "model",
+        "version": "v1",
+        "display_name": "",
+        "artifact_sha256": null,
+        "preprocessing": null,
+        "calibration": null
+      },
+      "role": "unknown",
+      "decision_provenance": {
+        "column": null,
+        "rule": "none",
+        "threshold": null,
+        "tie_policy": "abstain",
+        "state_column": null,
+        "state_values": {
+          "issued": "issued",
+          "abstained": "abstained",
+          "failed": "failed",
+          "missing": "missing"
+        },
+        "candidate_evaluation": false,
+        "origin": "supplied",
+        "source_fields": [
+          "p"
+        ],
+        "behavior": "recorded candidate output"
+      },
+      "representations": {
+        "hard_prediction": true,
+        "probabilities": true,
+        "scores": false,
+        "intervals": 0
+      },
+      "facts": {
+        "records": 500,
+        "duplicate_keys": 0,
+        "missing_keys": 0,
+        "invalid_probabilities": 0,
+        "probability_sum_roundoff": 0,
+        "inline_conflicts": 0,
+        "inline_comparable": 0,
+        "inline_missing": 0,
+        "inline_invalid": 0,
+        "context_conflicts": {},
+        "decision_rule_mismatches": 0,
+        "unresolved_issuance": 0,
+        "invalid_intervals": {},
+        "role": "unknown",
+        "repeated_entities": 0
+      }
+    }
+  ],
+  "outcomes": {
+    "authority": "data",
+    "timing": "supplied_snapshot_maturity_unestablished",
+    "duplicate_rows": 0,
+    "invalid_keys": 0,
+    "canonical_content_digest": "0fe1b5d2b7ce3ec31c66a4ce140b05719778cad7e7a8995952eb1ac493249a53",
+    "snapshot_digest": "f6574073e08c8d74b2e0cc733e7a4608fd05d27fdd772da437d62ad2e2aec73c",
+    "effective_cutoff_ns": "1792336314039289000"
+  },
+  "comparison": null,
+  "measurements": [
+    {
+      "id": "m1",
+      "run": "model",
+      "scope": "overall",
+      "family": "prediction_distributions",
+      "metric": "recorded_decision_states",
+      "method_version": "1",
+      "population_id": "pop_c374454eaf0b076272f075f0a26032cd",
+      "denominator": 500,
+      "value": null,
+      "value_state": "undefined",
+      "applicability": "applicable",
+      "execution": "completed",
+      "reason": null,
+      "units": null,
+      "basis": "measured",
+      "interpretation": "descriptive",
+      "method_standing": "established_method",
+      "sensitive_counts": [
+        500
+      ],
+      "data": {
+        "states": [
+          {
+            "state": "issued",
+            "count": 500
+          }
+        ]
+      },
+      "disclosure_group": "prediction_distributions",
+      "support_warning": false,
+      "evidence_refs": [],
+      "denominator_kind": "eligible_records"
+    },
+    {
+      "id": "m2",
+      "run": "model",
+      "scope": "overall",
+      "family": "prediction_distributions",
+      "metric": "probability_concentration",
+      "method_version": "1",
+      "population_id": "pop_2af72baeed0092476b07f5e216f66bf7",
+      "denominator": 500,
+      "value": 0.738047940784,
+      "value_state": "finite",
+      "applicability": "applicable",
+      "execution": "completed",
+      "reason": null,
+      "units": null,
+      "basis": "measured",
+      "interpretation": "descriptive",
+      "method_standing": "established_method",
+      "sensitive_counts": [
+        106,
+        104,
+        106,
+        106,
+        78
+      ],
+      "data": {
+        "mean_entropy_nats": 0.5208539082625363,
+        "mean_top_two_margin": 0.47609588156800003,
+        "maximum_probability_histogram": [
+          {
+            "bin": 5,
+            "count": 106
+          },
+          {
+            "bin": 6,
+            "count": 104
+          },
+          {
+            "bin": 7,
+            "count": 106
+          },
+          {
+            "bin": 8,
+            "count": 106
+          },
+          {
+            "bin": 9,
+            "count": 78
+          }
+        ],
+        "interpretation": "Descriptive supplied probability concentration; no epistemic/aleatoric decomposition or correctness assurance."
+      },
+      "disclosure_group": "prediction_distributions",
+      "support_warning": false,
+      "evidence_refs": [],
+      "denominator_kind": "eligible_records"
+    },
+    {
+      "id": "m3",
+      "run": "model",
+      "scope": "overall",
+      "family": "prediction_distributions",
+      "metric": "ranking_score",
+      "method_version": "1",
+      "population_id": "pop_83a65cf52df3900febe95788d59917e9",
+      "denominator": 500,
+      "value": null,
+      "value_state": "undefined",
+      "applicability": "applicable",
+      "execution": "completed",
+      "reason": null,
+      "units": null,
+      "basis": "measured",
+      "interpretation": "descriptive",
+      "method_standing": "established_method",
+      "sensitive_counts": [],
+      "data": {
+        "minimum": 0.003134567,
+        "maximum": 0.951234567,
+        "q25": 0.24015956700000002,
+        "median": 0.477184567,
+        "q75": 0.714209567,
+        "interpretation": "Supplied native units; no probability interpretation inferred."
+      },
+      "disclosure_group": "prediction_distributions",
+      "support_warning": false,
+      "evidence_refs": [],
+      "denominator_kind": "eligible_records"
+    },
+    {
+      "id": "m4",
+      "run": "model",
+      "scope": "overall",
+      "family": "availability",
+      "metric": "population_coverage",
+      "method_version": "1",
+      "population_id": "pop_c374454eaf0b076272f075f0a26032cd",
+      "denominator": 500,
+      "value": 1.0,
+      "value_state": "finite",
+      "applicability": "applicable",
+      "execution": "completed",
+      "reason": null,
+      "units": null,
+      "basis": "measured",
+      "interpretation": "descriptive",
+      "method_standing": "established_method",
+      "sensitive_counts": [
+        500,
+        0,
+        500,
+        0
+      ],
+      "data": {
+        "records": 500,
+        "eligible_outcomes": 500,
+        "issued": 500,
+        "issuance_meaning": "recorded"
+      },
+      "disclosure_group": "availability",
+      "support_warning": false,
+      "evidence_refs": [],
+      "denominator_kind": "eligible_records"
+    },
+    {
+      "id": "m5",
+      "run": "model",
+      "scope": "overall",
+      "family": "performance",
+      "metric": "accuracy",
+      "method_version": "1",
+      "population_id": "pop_e01e38a8e630e9711fc4cd9589db6859",
+      "denominator": 500,
+      "value": 0.5,
+      "value_state": "finite",
+      "applicability": "applicable",
+      "execution": "completed",
+      "reason": null,
+      "units": null,
+      "basis": "measured",
+      "interpretation": "descriptive",
+      "method_standing": "established_method",
+      "sensitive_counts": [
+        250,
+        250
+      ],
+      "data": {},
+      "disclosure_group": "performance",
+      "support_warning": false,
+      "evidence_refs": [],
+      "denominator_kind": "eligible_records"
+    },
+    {
+      "id": "m6",
+      "run": "model",
+      "scope": "overall",
+      "family": "confusion",
+      "metric": "confusion",
+      "method_version": "1",
+      "population_id": "pop_e01e38a8e630e9711fc4cd9589db6859",
+      "denominator": 500,
+      "value": null,
+      "value_state": "undefined",
+      "applicability": "applicable",
+      "execution": "completed",
+      "reason": null,
+      "units": null,
+      "basis": "measured",
+      "interpretation": "descriptive",
+      "method_standing": "established_method",
+      "sensitive_counts": [
+        108,
+        142,
+        108,
+        142
+      ],
+      "data": {
+        "cells": [
+          {
+            "actual": "0",
+            "predicted": "0",
+            "count": 108
+          },
+          {
+            "actual": "0",
+            "predicted": "1",
+            "count": 142
+          },
+          {
+            "actual": "1",
+            "predicted": "0",
+            "count": 108
+          },
+          {
+            "actual": "1",
+            "predicted": "1",
+            "count": 142
+          }
+        ]
+      },
+      "disclosure_group": "confusion",
+      "support_warning": false,
+      "evidence_refs": [],
+      "denominator_kind": "eligible_records"
+    },
+    {
+      "id": "m7",
+      "run": "model",
+      "scope": "overall",
+      "family": "confusion",
+      "metric": "per_class",
+      "method_version": "1",
+      "population_id": "pop_e01e38a8e630e9711fc4cd9589db6859",
+      "denominator": 500,
+      "value": null,
+      "value_state": "undefined",
+      "applicability": "applicable",
+      "execution": "completed",
+      "reason": null,
+      "units": null,
+      "basis": "measured",
+      "interpretation": "descriptive",
+      "method_standing": "established_method",
+      "sensitive_counts": [
+        108,
+        142,
+        108,
+        142,
+        142,
+        108,
+        142,
+        108
+      ],
+      "data": {
+        "classes": [
+          {
+            "class": "0",
+            "support": 250,
+            "predicted": 216,
+            "tp": 108,
+            "fn": 142,
+            "fp": 108,
+            "tn": 142,
+            "precision": 0.5,
+            "recall": 0.432,
+            "f1": 0.463519313304721,
+            "recall_population_id": "pop_873dbf270f341794478f3c52558b07c7",
+            "precision_population_id": "pop_256a85c992fc394391b17af2e68affbc",
+            "f1_formula_denominator": 466
+          },
+          {
+            "class": "1",
+            "support": 250,
+            "predicted": 284,
+            "tp": 142,
+            "fn": 108,
+            "fp": 142,
+            "tn": 108,
+            "precision": 0.5,
+            "recall": 0.568,
+            "f1": 0.5318352059925093,
+            "recall_population_id": "pop_44dc53b5e2e3b582170519de98cc1260",
+            "precision_population_id": "pop_e91b1549e4d91a3e1e34bbb8b737c8b3",
+            "f1_formula_denominator": 534
+          }
+        ],
+        "macro_population": "classes with observed outcome support"
+      },
+      "disclosure_group": "confusion",
+      "support_warning": false,
+      "evidence_refs": [],
+      "denominator_kind": "eligible_records"
+    },
+    {
+      "id": "m8",
+      "run": "model",
+      "scope": "overall",
+      "family": "performance",
+      "metric": "balanced_accuracy",
+      "method_version": "1",
+      "population_id": "pop_bfd3002b089947be0ec88dd4fc280501",
+      "denominator": 500,
+      "value": 0.5,
+      "value_state": "finite",
+      "applicability": "applicable",
+      "execution": "completed",
+      "reason": null,
+      "units": null,
+      "basis": "measured",
+      "interpretation": "descriptive",
+      "method_standing": "established_method",
+      "sensitive_counts": [],
+      "data": {
+        "supported_classes": 2,
+        "declared_classes": 2,
+        "aggregation_denominator": "observed_support_classes"
+      },
+      "disclosure_group": "confusion",
+      "support_warning": false,
+      "evidence_refs": [],
+      "denominator_kind": "evaluation_support"
+    },
+    {
+      "id": "m9",
+      "run": "model",
+      "scope": "overall",
+      "family": "performance",
+      "metric": "macro_f1_observed_classes",
+      "method_version": "1",
+      "population_id": "pop_bfd3002b089947be0ec88dd4fc280501",
+      "denominator": 500,
+      "value": 0.4976772596486152,
+      "value_state": "finite",
+      "applicability": "applicable",
+      "execution": "completed",
+      "reason": null,
+      "units": null,
+      "basis": "measured",
+      "interpretation": "descriptive",
+      "method_standing": "established_method",
+      "sensitive_counts": [],
+      "data": {
+        "supported_classes": 2,
+        "declared_classes": 2,
+        "aggregation_denominator": "observed_support_classes"
+      },
+      "disclosure_group": "confusion",
+      "support_warning": false,
+      "evidence_refs": [],
+      "denominator_kind": "evaluation_support"
+    },
+    {
+      "id": "m10",
+      "run": "model",
+      "scope": "overall",
+      "family": "performance",
+      "metric": "support_weighted_f1",
+      "method_version": "1",
+      "population_id": "pop_bfd3002b089947be0ec88dd4fc280501",
+      "denominator": 500,
+      "value": 0.4976772596486152,
+      "value_state": "finite",
+      "applicability": "applicable",
+      "execution": "completed",
+      "reason": null,
+      "units": null,
+      "basis": "measured",
+      "interpretation": "descriptive",
+      "method_standing": "established_method",
+      "sensitive_counts": [],
+      "data": {},
+      "disclosure_group": "confusion",
+      "support_warning": false,
+      "evidence_refs": [],
+      "denominator_kind": "evaluation_support"
+    },
+    {
+      "id": "m11",
+      "run": "model",
+      "scope": "overall",
+      "family": "performance",
+      "metric": "precision",
+      "method_version": "1",
+      "population_id": "pop_e91b1549e4d91a3e1e34bbb8b737c8b3",
+      "denominator": 284,
+      "value": 0.5,
+      "value_state": "finite",
+      "applicability": "applicable",
+      "execution": "completed",
+      "reason": null,
+      "units": null,
+      "basis": "measured",
+      "interpretation": "descriptive",
+      "method_standing": "established_method",
+      "sensitive_counts": [
+        142,
+        142
+      ],
+      "data": {},
+      "disclosure_group": "performance",
+      "support_warning": false,
+      "evidence_refs": [],
+      "denominator_kind": "class_conditional_records"
+    },
+    {
+      "id": "m12",
+      "run": "model",
+      "scope": "overall",
+      "family": "performance",
+      "metric": "recall",
+      "method_version": "1",
+      "population_id": "pop_44dc53b5e2e3b582170519de98cc1260",
+      "denominator": 250,
+      "value": 0.568,
+      "value_state": "finite",
+      "applicability": "applicable",
+      "execution": "completed",
+      "reason": null,
+      "units": null,
+      "basis": "measured",
+      "interpretation": "descriptive",
+      "method_standing": "established_method",
+      "sensitive_counts": [
+        142,
+        108
+      ],
+      "data": {},
+      "disclosure_group": "performance",
+      "support_warning": false,
+      "evidence_refs": [],
+      "denominator_kind": "class_conditional_records"
+    },
+    {
+      "id": "m13",
+      "run": "model",
+      "scope": "overall",
+      "family": "performance",
+      "metric": "specificity",
+      "method_version": "1",
+      "population_id": "pop_dda6c8c0177fb19a2d397ae215422b0a",
+      "denominator": 250,
+      "value": 0.432,
+      "value_state": "finite",
+      "applicability": "applicable",
+      "execution": "completed",
+      "reason": null,
+      "units": null,
+      "basis": "measured",
+      "interpretation": "descriptive",
+      "method_standing": "established_method",
+      "sensitive_counts": [
+        108,
+        142
+      ],
+      "data": {},
+      "disclosure_group": "performance",
+      "support_warning": false,
+      "evidence_refs": [],
+      "denominator_kind": "class_conditional_records"
+    },
+    {
+      "id": "m14",
+      "run": "model",
+      "scope": "overall",
+      "family": "performance",
+      "metric": "f1",
+      "method_version": "1",
+      "population_id": "pop_bfd3002b089947be0ec88dd4fc280501",
+      "denominator": 500,
+      "value": 0.5318352059925093,
+      "value_state": "finite",
+      "applicability": "applicable",
+      "execution": "completed",
+      "reason": null,
+      "units": null,
+      "basis": "measured",
+      "interpretation": "descriptive",
+      "method_standing": "established_method",
+      "sensitive_counts": [
+        142,
+        142,
+        108,
+        108
+      ],
+      "data": {
+        "formula_denominator": 534
+      },
+      "disclosure_group": "confusion",
+      "support_warning": false,
+      "evidence_refs": [],
+      "denominator_kind": "evaluation_support"
+    },
+    {
+      "id": "m15",
+      "run": "model",
+      "scope": "overall",
+      "family": "failures",
+      "metric": "issued_errors",
+      "method_version": "1",
+      "population_id": "pop_e01e38a8e630e9711fc4cd9589db6859",
+      "denominator": 500,
+      "value": 250,
+      "value_state": "finite",
+      "applicability": "applicable",
+      "execution": "completed",
+      "reason": null,
+      "units": null,
+      "basis": "measured",
+      "interpretation": "descriptive",
+      "method_standing": "established_method",
+      "sensitive_counts": [
+        250,
+        250
+      ],
+      "data": {},
+      "disclosure_group": "failures",
+      "support_warning": false,
+      "evidence_refs": [
+        "ref_6c21da6b1a856d6b82922a22",
+        "ref_066d9d5a42be2376adbb7fe7",
+        "ref_371394e053fdb924ca14c885",
+        "ref_07ff6734af4540c264bc250f",
+        "ref_7988c35443e3b3486d09ae30"
+      ],
+      "denominator_kind": "eligible_records"
+    },
+    {
+      "id": "m16",
+      "run": "model",
+      "scope": "overall",
+      "family": "ranking",
+      "metric": "roc_auc",
+      "method_version": "1",
+      "population_id": "pop_282b26d7d9018e502690ab08e430c24f",
+      "denominator": 500,
+      "value": 0.502,
+      "value_state": "finite",
+      "applicability": "applicable",
+      "execution": "completed",
+      "reason": null,
+      "units": null,
+      "basis": "measured",
+      "interpretation": "descriptive",
+      "method_standing": "established_method",
+      "sensitive_counts": [
+        250,
+        250
+      ],
+      "data": {},
+      "disclosure_group": "ranking",
+      "support_warning": false,
+      "evidence_refs": [],
+      "denominator_kind": "eligible_records"
+    },
+    {
+      "id": "m17",
+      "run": "model",
+      "scope": "overall",
+      "family": "ranking",
+      "metric": "average_precision",
+      "method_version": "1",
+      "population_id": "pop_282b26d7d9018e502690ab08e430c24f",
+      "denominator": 500,
+      "value": 0.5074849716105485,
+      "value_state": "finite",
+      "applicability": "applicable",
+      "execution": "completed",
+      "reason": null,
+      "units": null,
+      "basis": "measured",
+      "interpretation": "descriptive",
+      "method_standing": "established_method",
+      "sensitive_counts": [
+        250,
+        250
+      ],
+      "data": {
+        "prevalence": 0.5,
+        "definition": "non_interpolated_recall_increment"
+      },
+      "disclosure_group": "ranking",
+      "support_warning": false,
+      "evidence_refs": [],
+      "denominator_kind": "eligible_records"
+    },
+    {
+      "id": "m18",
+      "run": "model",
+      "scope": "overall",
+      "family": "ranking_curve",
+      "metric": "roc_pr_curve",
+      "method_version": "1",
+      "population_id": "pop_282b26d7d9018e502690ab08e430c24f",
+      "denominator": 500,
+      "value": null,
+      "value_state": "undefined",
+      "applicability": "applicable",
+      "execution": "completed",
+      "reason": null,
+      "units": null,
+      "basis": "measured",
+      "interpretation": "descriptive",
+      "method_standing": "established_method",
+      "sensitive_counts": [
+        250,
+        250
+      ],
+      "data": {
+        "points": [
+          {
+            "threshold": null,
+            "state": "none",
+            "tpr": 0.0,
+            "fpr": 0.0,
+            "precision": null,
+            "recall": 0.0
+          },
+          {
+            "threshold": 0.951234567,
+            "state": "finite",
+            "tpr": 0.004,
+            "fpr": 0.0,
+            "precision": 1.0,
+            "recall": 0.004
+          },
+          {
+            "threshold": 0.945534567,
+            "state": "finite",
+            "tpr": 0.008,
+            "fpr": 0.008,
+            "precision": 0.5,
+            "recall": 0.008
+          },
+          {
+            "threshold": 0.939834567,
+            "state": "finite",
+            "tpr": 0.016,
+            "fpr": 0.012,
+            "precision": 0.5714285714285714,
+            "recall": 0.016
+          },
+          {
+            "threshold": 0.934134567,
+            "state": "finite",
+            "tpr": 0.02,
+            "fpr": 0.02,
+            "precision": 0.5,
+            "recall": 0.02
+          },
+          {
+            "threshold": 0.928434567,
+            "state": "finite",
+            "tpr": 0.028,
+            "fpr": 0.024,
+            "precision": 0.5384615384615384,
+            "recall": 0.028
+          },
+          {
+            "threshold": 0.922734567,
+            "state": "finite",
+            "tpr": 0.032,
+            "fpr": 0.032,
+            "precision": 0.5,
+            "recall": 0.032
+          },
+          {
+            "threshold": 0.917034567,
+            "state": "finite",
+            "tpr": 0.04,
+            "fpr": 0.036,
+            "precision": 0.5263157894736842,
+            "recall": 0.04
+          },
+          {
+            "threshold": 0.911334567,
+            "state": "finite",
+            "tpr": 0.044,
+            "fpr": 0.044,
+            "precision": 0.5,
+            "recall": 0.044
+          },
+          {
+            "threshold": 0.905634567,
+            "state": "finite",
+            "tpr": 0.052,
+            "fpr": 0.048,
+            "precision": 0.52,
+            "recall": 0.052
+          },
+          {
+            "threshold": 0.899934567,
+            "state": "finite",
+            "tpr": 0.056,
+            "fpr": 0.056,
+            "precision": 0.5,
+            "recall": 0.056
+          },
+          {
+            "threshold": 0.894234567,
+            "state": "finite",
+            "tpr": 0.064,
+            "fpr": 0.06,
+            "precision": 0.5161290322580645,
+            "recall": 0.064
+          },
+          {
+            "threshold": 0.888534567,
+            "state": "finite",
+            "tpr": 0.068,
+            "fpr": 0.068,
+            "precision": 0.5,
+            "recall": 0.068
+          },
+          {
+            "threshold": 0.882834567,
+            "state": "finite",
+            "tpr": 0.076,
+            "fpr": 0.072,
+            "precision": 0.5135135135135135,
+            "recall": 0.076
+          },
+          {
+            "threshold": 0.877134567,
+            "state": "finite",
+            "tpr": 0.08,
+            "fpr": 0.08,
+            "precision": 0.5,
+            "recall": 0.08
+          },
+          {
+            "threshold": 0.871434567,
+            "state": "finite",
+            "tpr": 0.088,
+            "fpr": 0.084,
+            "precision": 0.5116279069767442,
+            "recall": 0.088
+          },
+          {
+            "threshold": 0.865734567,
+            "state": "finite",
+            "tpr": 0.092,
+            "fpr": 0.092,
+            "precision": 0.5,
+            "recall": 0.092
+          },
+          {
+            "threshold": 0.860034567,
+            "state": "finite",
+            "tpr": 0.1,
+            "fpr": 0.096,
+            "precision": 0.5102040816326531,
+            "recall": 0.1
+          },
+          {
+            "threshold": 0.854334567,
+            "state": "finite",
+            "tpr": 0.104,
+            "fpr": 0.104,
+            "precision": 0.5,
+            "recall": 0.104
+          },
+          {
+            "threshold": 0.848634567,
+            "state": "finite",
+            "tpr": 0.112,
+            "fpr": 0.108,
+            "precision": 0.509090909090909,
+            "recall": 0.112
+          },
+          {
+            "threshold": 0.842934567,
+            "state": "finite",
+            "tpr": 0.116,
+            "fpr": 0.116,
+            "precision": 0.5,
+            "recall": 0.116
+          },
+          {
+            "threshold": 0.837234567,
+            "state": "finite",
+            "tpr": 0.124,
+            "fpr": 0.12,
+            "precision": 0.5081967213114754,
+            "recall": 0.124
+          },
+          {
+            "threshold": 0.831534567,
+            "state": "finite",
+            "tpr": 0.128,
+            "fpr": 0.128,
+            "precision": 0.5,
+            "recall": 0.128
+          },
+          {
+            "threshold": 0.825834567,
+            "state": "finite",
+            "tpr": 0.136,
+            "fpr": 0.132,
+            "precision": 0.5074626865671642,
+            "recall": 0.136
+          },
+          {
+            "threshold": 0.820134567,
+            "state": "finite",
+            "tpr": 0.14,
+            "fpr": 0.14,
+            "precision": 0.5,
+            "recall": 0.14
+          },
+          {
+            "threshold": 0.814434567,
+            "state": "finite",
+            "tpr": 0.148,
+            "fpr": 0.144,
+            "precision": 0.5068493150684932,
+            "recall": 0.148
+          },
+          {
+            "threshold": 0.808734567,
+            "state": "finite",
+            "tpr": 0.152,
+            "fpr": 0.152,
+            "precision": 0.5,
+            "recall": 0.152
+          },
+          {
+            "threshold": 0.803034567,
+            "state": "finite",
+            "tpr": 0.16,
+            "fpr": 0.156,
+            "precision": 0.5063291139240507,
+            "recall": 0.16
+          },
+          {
+            "threshold": 0.797334567,
+            "state": "finite",
+            "tpr": 0.164,
+            "fpr": 0.164,
+            "precision": 0.5,
+            "recall": 0.164
+          },
+          {
+            "threshold": 0.791634567,
+            "state": "finite",
+            "tpr": 0.172,
+            "fpr": 0.168,
+            "precision": 0.5058823529411764,
+            "recall": 0.172
+          },
+          {
+            "threshold": 0.785934567,
+            "state": "finite",
+            "tpr": 0.176,
+            "fpr": 0.176,
+            "precision": 0.5,
+            "recall": 0.176
+          },
+          {
+            "threshold": 0.780234567,
+            "state": "finite",
+            "tpr": 0.184,
+            "fpr": 0.18,
+            "precision": 0.5054945054945055,
+            "recall": 0.184
+          },
+          {
+            "threshold": 0.774534567,
+            "state": "finite",
+            "tpr": 0.188,
+            "fpr": 0.188,
+            "precision": 0.5,
+            "recall": 0.188
+          },
+          {
+            "threshold": 0.768834567,
+            "state": "finite",
+            "tpr": 0.196,
+            "fpr": 0.192,
+            "precision": 0.5051546391752577,
+            "recall": 0.196
+          },
+          {
+            "threshold": 0.763134567,
+            "state": "finite",
+            "tpr": 0.2,
+            "fpr": 0.2,
+            "precision": 0.5,
+            "recall": 0.2
+          },
+          {
+            "threshold": 0.757434567,
+            "state": "finite",
+            "tpr": 0.208,
+            "fpr": 0.204,
+            "precision": 0.5048543689320388,
+            "recall": 0.208
+          },
+          {
+            "threshold": 0.751734567,
+            "state": "finite",
+            "tpr": 0.212,
+            "fpr": 0.212,
+            "precision": 0.5,
+            "recall": 0.212
+          },
+          {
+            "threshold": 0.746034567,
+            "state": "finite",
+            "tpr": 0.22,
+            "fpr": 0.216,
+            "precision": 0.5045871559633027,
+            "recall": 0.22
+          },
+          {
+            "threshold": 0.740334567,
+            "state": "finite",
+            "tpr": 0.224,
+            "fpr": 0.224,
+            "precision": 0.5,
+            "recall": 0.224
+          },
+          {
+            "threshold": 0.734634567,
+            "state": "finite",
+            "tpr": 0.232,
+            "fpr": 0.228,
+            "precision": 0.5043478260869565,
+            "recall": 0.232
+          },
+          {
+            "threshold": 0.728934567,
+            "state": "finite",
+            "tpr": 0.236,
+            "fpr": 0.236,
+            "precision": 0.5,
+            "recall": 0.236
+          },
+          {
+            "threshold": 0.723234567,
+            "state": "finite",
+            "tpr": 0.244,
+            "fpr": 0.24,
+            "precision": 0.5041322314049587,
+            "recall": 0.244
+          },
+          {
+            "threshold": 0.717534567,
+            "state": "finite",
+            "tpr": 0.248,
+            "fpr": 0.248,
+            "precision": 0.5,
+            "recall": 0.248
+          },
+          {
+            "threshold": 0.711834567,
+            "state": "finite",
+            "tpr": 0.256,
+            "fpr": 0.252,
+            "precision": 0.5039370078740157,
+            "recall": 0.256
+          },
+          {
+            "threshold": 0.706134567,
+            "state": "finite",
+            "tpr": 0.26,
+            "fpr": 0.26,
+            "precision": 0.5,
+            "recall": 0.26
+          },
+          {
+            "threshold": 0.700434567,
+            "state": "finite",
+            "tpr": 0.268,
+            "fpr": 0.264,
+            "precision": 0.5037593984962406,
+            "recall": 0.268
+          },
+          {
+            "threshold": 0.694734567,
+            "state": "finite",
+            "tpr": 0.272,
+            "fpr": 0.272,
+            "precision": 0.5,
+            "recall": 0.272
+          },
+          {
+            "threshold": 0.689034567,
+            "state": "finite",
+            "tpr": 0.28,
+            "fpr": 0.276,
+            "precision": 0.5035971223021583,
+            "recall": 0.28
+          },
+          {
+            "threshold": 0.683334567,
+            "state": "finite",
+            "tpr": 0.284,
+            "fpr": 0.284,
+            "precision": 0.5,
+            "recall": 0.284
+          },
+          {
+            "threshold": 0.677634567,
+            "state": "finite",
+            "tpr": 0.292,
+            "fpr": 0.288,
+            "precision": 0.503448275862069,
+            "recall": 0.292
+          },
+          {
+            "threshold": 0.671934567,
+            "state": "finite",
+            "tpr": 0.296,
+            "fpr": 0.296,
+            "precision": 0.5,
+            "recall": 0.296
+          },
+          {
+            "threshold": 0.666234567,
+            "state": "finite",
+            "tpr": 0.304,
+            "fpr": 0.3,
+            "precision": 0.5033112582781457,
+            "recall": 0.304
+          },
+          {
+            "threshold": 0.660534567,
+            "state": "finite",
+            "tpr": 0.308,
+            "fpr": 0.308,
+            "precision": 0.5,
+            "recall": 0.308
+          },
+          {
+            "threshold": 0.654834567,
+            "state": "finite",
+            "tpr": 0.316,
+            "fpr": 0.312,
+            "precision": 0.5031847133757962,
+            "recall": 0.316
+          },
+          {
+            "threshold": 0.649134567,
+            "state": "finite",
+            "tpr": 0.32,
+            "fpr": 0.32,
+            "precision": 0.5,
+            "recall": 0.32
+          },
+          {
+            "threshold": 0.643434567,
+            "state": "finite",
+            "tpr": 0.328,
+            "fpr": 0.324,
+            "precision": 0.5030674846625767,
+            "recall": 0.328
+          },
+          {
+            "threshold": 0.637734567,
+            "state": "finite",
+            "tpr": 0.332,
+            "fpr": 0.332,
+            "precision": 0.5,
+            "recall": 0.332
+          },
+          {
+            "threshold": 0.632034567,
+            "state": "finite",
+            "tpr": 0.34,
+            "fpr": 0.336,
+            "precision": 0.5029585798816568,
+            "recall": 0.34
+          },
+          {
+            "threshold": 0.626334567,
+            "state": "finite",
+            "tpr": 0.344,
+            "fpr": 0.344,
+            "precision": 0.5,
+            "recall": 0.344
+          },
+          {
+            "threshold": 0.620634567,
+            "state": "finite",
+            "tpr": 0.352,
+            "fpr": 0.348,
+            "precision": 0.5028571428571429,
+            "recall": 0.352
+          },
+          {
+            "threshold": 0.614934567,
+            "state": "finite",
+            "tpr": 0.356,
+            "fpr": 0.356,
+            "precision": 0.5,
+            "recall": 0.356
+          },
+          {
+            "threshold": 0.609234567,
+            "state": "finite",
+            "tpr": 0.364,
+            "fpr": 0.36,
+            "precision": 0.5027624309392266,
+            "recall": 0.364
+          },
+          {
+            "threshold": 0.603534567,
+            "state": "finite",
+            "tpr": 0.368,
+            "fpr": 0.368,
+            "precision": 0.5,
+            "recall": 0.368
+          },
+          {
+            "threshold": 0.597834567,
+            "state": "finite",
+            "tpr": 0.376,
+            "fpr": 0.372,
+            "precision": 0.5026737967914439,
+            "recall": 0.376
+          },
+          {
+            "threshold": 0.592134567,
+            "state": "finite",
+            "tpr": 0.38,
+            "fpr": 0.38,
+            "precision": 0.5,
+            "recall": 0.38
+          },
+          {
+            "threshold": 0.586434567,
+            "state": "finite",
+            "tpr": 0.388,
+            "fpr": 0.384,
+            "precision": 0.5025906735751295,
+            "recall": 0.388
+          },
+          {
+            "threshold": 0.580734567,
+            "state": "finite",
+            "tpr": 0.392,
+            "fpr": 0.392,
+            "precision": 0.5,
+            "recall": 0.392
+          },
+          {
+            "threshold": 0.575034567,
+            "state": "finite",
+            "tpr": 0.4,
+            "fpr": 0.396,
+            "precision": 0.5025125628140703,
+            "recall": 0.4
+          },
+          {
+            "threshold": 0.569334567,
+            "state": "finite",
+            "tpr": 0.404,
+            "fpr": 0.404,
+            "precision": 0.5,
+            "recall": 0.404
+          },
+          {
+            "threshold": 0.563634567,
+            "state": "finite",
+            "tpr": 0.412,
+            "fpr": 0.408,
+            "precision": 0.5024390243902439,
+            "recall": 0.412
+          },
+          {
+            "threshold": 0.557934567,
+            "state": "finite",
+            "tpr": 0.416,
+            "fpr": 0.416,
+            "precision": 0.5,
+            "recall": 0.416
+          },
+          {
+            "threshold": 0.552234567,
+            "state": "finite",
+            "tpr": 0.424,
+            "fpr": 0.42,
+            "precision": 0.5023696682464455,
+            "recall": 0.424
+          },
+          {
+            "threshold": 0.546534567,
+            "state": "finite",
+            "tpr": 0.428,
+            "fpr": 0.428,
+            "precision": 0.5,
+            "recall": 0.428
+          },
+          {
+            "threshold": 0.540834567,
+            "state": "finite",
+            "tpr": 0.436,
+            "fpr": 0.432,
+            "precision": 0.5023041474654378,
+            "recall": 0.436
+          },
+          {
+            "threshold": 0.535134567,
+            "state": "finite",
+            "tpr": 0.44,
+            "fpr": 0.44,
+            "precision": 0.5,
+            "recall": 0.44
+          },
+          {
+            "threshold": 0.529434567,
+            "state": "finite",
+            "tpr": 0.448,
+            "fpr": 0.444,
+            "precision": 0.5022421524663677,
+            "recall": 0.448
+          },
+          {
+            "threshold": 0.523734567,
+            "state": "finite",
+            "tpr": 0.452,
+            "fpr": 0.452,
+            "precision": 0.5,
+            "recall": 0.452
+          },
+          {
+            "threshold": 0.518034567,
+            "state": "finite",
+            "tpr": 0.46,
+            "fpr": 0.456,
+            "precision": 0.5021834061135371,
+            "recall": 0.46
+          },
+          {
+            "threshold": 0.512334567,
+            "state": "finite",
+            "tpr": 0.464,
+            "fpr": 0.464,
+            "precision": 0.5,
+            "recall": 0.464
+          },
+          {
+            "threshold": 0.506634567,
+            "state": "finite",
+            "tpr": 0.472,
+            "fpr": 0.468,
+            "precision": 0.502127659574468,
+            "recall": 0.472
+          },
+          {
+            "threshold": 0.500934567,
+            "state": "finite",
+            "tpr": 0.476,
+            "fpr": 0.476,
+            "precision": 0.5,
+            "recall": 0.476
+          },
+          {
+            "threshold": 0.495234567,
+            "state": "finite",
+            "tpr": 0.484,
+            "fpr": 0.48,
+            "precision": 0.5020746887966805,
+            "recall": 0.484
+          },
+          {
+            "threshold": 0.489534567,
+            "state": "finite",
+            "tpr": 0.488,
+            "fpr": 0.488,
+            "precision": 0.5,
+            "recall": 0.488
+          },
+          {
+            "threshold": 0.483834567,
+            "state": "finite",
+            "tpr": 0.496,
+            "fpr": 0.492,
+            "precision": 0.5020242914979757,
+            "recall": 0.496
+          },
+          {
+            "threshold": 0.478134567,
+            "state": "finite",
+            "tpr": 0.5,
+            "fpr": 0.5,
+            "precision": 0.5,
+            "recall": 0.5
+          },
+          {
+            "threshold": 0.472434567,
+            "state": "finite",
+            "tpr": 0.508,
+            "fpr": 0.504,
+            "precision": 0.5019762845849802,
+            "recall": 0.508
+          },
+          {
+            "threshold": 0.466734567,
+            "state": "finite",
+            "tpr": 0.512,
+            "fpr": 0.512,
+            "precision": 0.5,
+            "recall": 0.512
+          },
+          {
+            "threshold": 0.461034567,
+            "state": "finite",
+            "tpr": 0.52,
+            "fpr": 0.516,
+            "precision": 0.5019305019305019,
+            "recall": 0.52
+          },
+          {
+            "threshold": 0.455334567,
+            "state": "finite",
+            "tpr": 0.524,
+            "fpr": 0.524,
+            "precision": 0.5,
+            "recall": 0.524
+          },
+          {
+            "threshold": 0.449634567,
+            "state": "finite",
+            "tpr": 0.532,
+            "fpr": 0.528,
+            "precision": 0.5018867924528302,
+            "recall": 0.532
+          },
+          {
+            "threshold": 0.443934567,
+            "state": "finite",
+            "tpr": 0.536,
+            "fpr": 0.536,
+            "precision": 0.5,
+            "recall": 0.536
+          },
+          {
+            "threshold": 0.438234567,
+            "state": "finite",
+            "tpr": 0.544,
+            "fpr": 0.54,
+            "precision": 0.5018450184501845,
+            "recall": 0.544
+          },
+          {
+            "threshold": 0.432534567,
+            "state": "finite",
+            "tpr": 0.548,
+            "fpr": 0.548,
+            "precision": 0.5,
+            "recall": 0.548
+          },
+          {
+            "threshold": 0.426834567,
+            "state": "finite",
+            "tpr": 0.556,
+            "fpr": 0.552,
+            "precision": 0.5018050541516246,
+            "recall": 0.556
+          },
+          {
+            "threshold": 0.421134567,
+            "state": "finite",
+            "tpr": 0.56,
+            "fpr": 0.56,
+            "precision": 0.5,
+            "recall": 0.56
+          },
+          {
+            "threshold": 0.415434567,
+            "state": "finite",
+            "tpr": 0.568,
+            "fpr": 0.564,
+            "precision": 0.5017667844522968,
+            "recall": 0.568
+          },
+          {
+            "threshold": 0.409734567,
+            "state": "finite",
+            "tpr": 0.572,
+            "fpr": 0.572,
+            "precision": 0.5,
+            "recall": 0.572
+          },
+          {
+            "threshold": 0.404034567,
+            "state": "finite",
+            "tpr": 0.58,
+            "fpr": 0.576,
+            "precision": 0.5017301038062284,
+            "recall": 0.58
+          },
+          {
+            "threshold": 0.398334567,
+            "state": "finite",
+            "tpr": 0.584,
+            "fpr": 0.584,
+            "precision": 0.5,
+            "recall": 0.584
+          },
+          {
+            "threshold": 0.392634567,
+            "state": "finite",
+            "tpr": 0.592,
+            "fpr": 0.588,
+            "precision": 0.5016949152542373,
+            "recall": 0.592
+          },
+          {
+            "threshold": 0.386934567,
+            "state": "finite",
+            "tpr": 0.596,
+            "fpr": 0.596,
+            "precision": 0.5,
+            "recall": 0.596
+          },
+          {
+            "threshold": 0.381234567,
+            "state": "finite",
+            "tpr": 0.604,
+            "fpr": 0.6,
+            "precision": 0.5016611295681063,
+            "recall": 0.604
+          },
+          {
+            "threshold": 0.375534567,
+            "state": "finite",
+            "tpr": 0.608,
+            "fpr": 0.608,
+            "precision": 0.5,
+            "recall": 0.608
+          },
+          {
+            "threshold": 0.369834567,
+            "state": "finite",
+            "tpr": 0.616,
+            "fpr": 0.612,
+            "precision": 0.501628664495114,
+            "recall": 0.616
+          },
+          {
+            "threshold": 0.364134567,
+            "state": "finite",
+            "tpr": 0.62,
+            "fpr": 0.62,
+            "precision": 0.5,
+            "recall": 0.62
+          },
+          {
+            "threshold": 0.358434567,
+            "state": "finite",
+            "tpr": 0.628,
+            "fpr": 0.624,
+            "precision": 0.5015974440894568,
+            "recall": 0.628
+          },
+          {
+            "threshold": 0.352734567,
+            "state": "finite",
+            "tpr": 0.632,
+            "fpr": 0.632,
+            "precision": 0.5,
+            "recall": 0.632
+          },
+          {
+            "threshold": 0.347034567,
+            "state": "finite",
+            "tpr": 0.64,
+            "fpr": 0.636,
+            "precision": 0.5015673981191222,
+            "recall": 0.64
+          },
+          {
+            "threshold": 0.341334567,
+            "state": "finite",
+            "tpr": 0.644,
+            "fpr": 0.644,
+            "precision": 0.5,
+            "recall": 0.644
+          },
+          {
+            "threshold": 0.335634567,
+            "state": "finite",
+            "tpr": 0.652,
+            "fpr": 0.648,
+            "precision": 0.5015384615384615,
+            "recall": 0.652
+          },
+          {
+            "threshold": 0.329934567,
+            "state": "finite",
+            "tpr": 0.656,
+            "fpr": 0.656,
+            "precision": 0.5,
+            "recall": 0.656
+          },
+          {
+            "threshold": 0.324234567,
+            "state": "finite",
+            "tpr": 0.664,
+            "fpr": 0.66,
+            "precision": 0.5015105740181269,
+            "recall": 0.664
+          },
+          {
+            "threshold": 0.318534567,
+            "state": "finite",
+            "tpr": 0.668,
+            "fpr": 0.668,
+            "precision": 0.5,
+            "recall": 0.668
+          },
+          {
+            "threshold": 0.312834567,
+            "state": "finite",
+            "tpr": 0.676,
+            "fpr": 0.672,
+            "precision": 0.5014836795252225,
+            "recall": 0.676
+          },
+          {
+            "threshold": 0.307134567,
+            "state": "finite",
+            "tpr": 0.68,
+            "fpr": 0.68,
+            "precision": 0.5,
+            "recall": 0.68
+          },
+          {
+            "threshold": 0.301434567,
+            "state": "finite",
+            "tpr": 0.688,
+            "fpr": 0.684,
+            "precision": 0.5014577259475219,
+            "recall": 0.688
+          },
+          {
+            "threshold": 0.295734567,
+            "state": "finite",
+            "tpr": 0.692,
+            "fpr": 0.692,
+            "precision": 0.5,
+            "recall": 0.692
+          },
+          {
+            "threshold": 0.290034567,
+            "state": "finite",
+            "tpr": 0.7,
+            "fpr": 0.696,
+            "precision": 0.501432664756447,
+            "recall": 0.7
+          },
+          {
+            "threshold": 0.284334567,
+            "state": "finite",
+            "tpr": 0.704,
+            "fpr": 0.704,
+            "precision": 0.5,
+            "recall": 0.704
+          },
+          {
+            "threshold": 0.278634567,
+            "state": "finite",
+            "tpr": 0.712,
+            "fpr": 0.708,
+            "precision": 0.5014084507042254,
+            "recall": 0.712
+          },
+          {
+            "threshold": 0.272934567,
+            "state": "finite",
+            "tpr": 0.716,
+            "fpr": 0.716,
+            "precision": 0.5,
+            "recall": 0.716
+          },
+          {
+            "threshold": 0.267234567,
+            "state": "finite",
+            "tpr": 0.724,
+            "fpr": 0.72,
+            "precision": 0.5013850415512465,
+            "recall": 0.724
+          },
+          {
+            "threshold": 0.261534567,
+            "state": "finite",
+            "tpr": 0.728,
+            "fpr": 0.728,
+            "precision": 0.5,
+            "recall": 0.728
+          },
+          {
+            "threshold": 0.255834567,
+            "state": "finite",
+            "tpr": 0.736,
+            "fpr": 0.732,
+            "precision": 0.5013623978201635,
+            "recall": 0.736
+          },
+          {
+            "threshold": 0.250134567,
+            "state": "finite",
+            "tpr": 0.74,
+            "fpr": 0.74,
+            "precision": 0.5,
+            "recall": 0.74
+          },
+          {
+            "threshold": 0.244434567,
+            "state": "finite",
+            "tpr": 0.748,
+            "fpr": 0.744,
+            "precision": 0.5013404825737265,
+            "recall": 0.748
+          },
+          {
+            "threshold": 0.238734567,
+            "state": "finite",
+            "tpr": 0.752,
+            "fpr": 0.752,
+            "precision": 0.5,
+            "recall": 0.752
+          },
+          {
+            "threshold": 0.233034567,
+            "state": "finite",
+            "tpr": 0.76,
+            "fpr": 0.756,
+            "precision": 0.5013192612137203,
+            "recall": 0.76
+          },
+          {
+            "threshold": 0.227334567,
+            "state": "finite",
+            "tpr": 0.764,
+            "fpr": 0.764,
+            "precision": 0.5,
+            "recall": 0.764
+          },
+          {
+            "threshold": 0.221634567,
+            "state": "finite",
+            "tpr": 0.772,
+            "fpr": 0.768,
+            "precision": 0.5012987012987012,
+            "recall": 0.772
+          },
+          {
+            "threshold": 0.215934567,
+            "state": "finite",
+            "tpr": 0.776,
+            "fpr": 0.776,
+            "precision": 0.5,
+            "recall": 0.776
+          },
+          {
+            "threshold": 0.210234567,
+            "state": "finite",
+            "tpr": 0.784,
+            "fpr": 0.78,
+            "precision": 0.5012787723785166,
+            "recall": 0.784
+          },
+          {
+            "threshold": 0.204534567,
+            "state": "finite",
+            "tpr": 0.788,
+            "fpr": 0.788,
+            "precision": 0.5,
+            "recall": 0.788
+          },
+          {
+            "threshold": 0.198834567,
+            "state": "finite",
+            "tpr": 0.796,
+            "fpr": 0.792,
+            "precision": 0.5012594458438288,
+            "recall": 0.796
+          },
+          {
+            "threshold": 0.193134567,
+            "state": "finite",
+            "tpr": 0.8,
+            "fpr": 0.8,
+            "precision": 0.5,
+            "recall": 0.8
+          },
+          {
+            "threshold": 0.187434567,
+            "state": "finite",
+            "tpr": 0.808,
+            "fpr": 0.804,
+            "precision": 0.5012406947890818,
+            "recall": 0.808
+          },
+          {
+            "threshold": 0.181734567,
+            "state": "finite",
+            "tpr": 0.812,
+            "fpr": 0.812,
+            "precision": 0.5,
+            "recall": 0.812
+          },
+          {
+            "threshold": 0.176034567,
+            "state": "finite",
+            "tpr": 0.82,
+            "fpr": 0.816,
+            "precision": 0.5012224938875306,
+            "recall": 0.82
+          },
+          {
+            "threshold": 0.170334567,
+            "state": "finite",
+            "tpr": 0.824,
+            "fpr": 0.824,
+            "precision": 0.5,
+            "recall": 0.824
+          },
+          {
+            "threshold": 0.164634567,
+            "state": "finite",
+            "tpr": 0.832,
+            "fpr": 0.828,
+            "precision": 0.5012048192771085,
+            "recall": 0.832
+          },
+          {
+            "threshold": 0.158934567,
+            "state": "finite",
+            "tpr": 0.836,
+            "fpr": 0.836,
+            "precision": 0.5,
+            "recall": 0.836
+          },
+          {
+            "threshold": 0.153234567,
+            "state": "finite",
+            "tpr": 0.844,
+            "fpr": 0.84,
+            "precision": 0.501187648456057,
+            "recall": 0.844
+          },
+          {
+            "threshold": 0.147534567,
+            "state": "finite",
+            "tpr": 0.848,
+            "fpr": 0.848,
+            "precision": 0.5,
+            "recall": 0.848
+          },
+          {
+            "threshold": 0.141834567,
+            "state": "finite",
+            "tpr": 0.856,
+            "fpr": 0.852,
+            "precision": 0.5011709601873536,
+            "recall": 0.856
+          },
+          {
+            "threshold": 0.136134567,
+            "state": "finite",
+            "tpr": 0.86,
+            "fpr": 0.86,
+            "precision": 0.5,
+            "recall": 0.86
+          },
+          {
+            "threshold": 0.130434567,
+            "state": "finite",
+            "tpr": 0.868,
+            "fpr": 0.864,
+            "precision": 0.5011547344110855,
+            "recall": 0.868
+          },
+          {
+            "threshold": 0.124734567,
+            "state": "finite",
+            "tpr": 0.872,
+            "fpr": 0.872,
+            "precision": 0.5,
+            "recall": 0.872
+          },
+          {
+            "threshold": 0.119034567,
+            "state": "finite",
+            "tpr": 0.88,
+            "fpr": 0.876,
+            "precision": 0.5011389521640092,
+            "recall": 0.88
+          },
+          {
+            "threshold": 0.113334567,
+            "state": "finite",
+            "tpr": 0.884,
+            "fpr": 0.884,
+            "precision": 0.5,
+            "recall": 0.884
+          },
+          {
+            "threshold": 0.107634567,
+            "state": "finite",
+            "tpr": 0.892,
+            "fpr": 0.888,
+            "precision": 0.501123595505618,
+            "recall": 0.892
+          },
+          {
+            "threshold": 0.101934567,
+            "state": "finite",
+            "tpr": 0.896,
+            "fpr": 0.896,
+            "precision": 0.5,
+            "recall": 0.896
+          },
+          {
+            "threshold": 0.096234567,
+            "state": "finite",
+            "tpr": 0.904,
+            "fpr": 0.9,
+            "precision": 0.5011086474501109,
+            "recall": 0.904
+          },
+          {
+            "threshold": 0.090534567,
+            "state": "finite",
+            "tpr": 0.908,
+            "fpr": 0.908,
+            "precision": 0.5,
+            "recall": 0.908
+          },
+          {
+            "threshold": 0.084834567,
+            "state": "finite",
+            "tpr": 0.916,
+            "fpr": 0.912,
+            "precision": 0.5010940919037199,
+            "recall": 0.916
+          },
+          {
+            "threshold": 0.079134567,
+            "state": "finite",
+            "tpr": 0.92,
+            "fpr": 0.92,
+            "precision": 0.5,
+            "recall": 0.92
+          },
+          {
+            "threshold": 0.073434567,
+            "state": "finite",
+            "tpr": 0.928,
+            "fpr": 0.924,
+            "precision": 0.5010799136069114,
+            "recall": 0.928
+          },
+          {
+            "threshold": 0.067734567,
+            "state": "finite",
+            "tpr": 0.932,
+            "fpr": 0.932,
+            "precision": 0.5,
+            "recall": 0.932
+          },
+          {
+            "threshold": 0.062034567,
+            "state": "finite",
+            "tpr": 0.94,
+            "fpr": 0.936,
+            "precision": 0.5010660980810234,
+            "recall": 0.94
+          },
+          {
+            "threshold": 0.056334567,
+            "state": "finite",
+            "tpr": 0.944,
+            "fpr": 0.944,
+            "precision": 0.5,
+            "recall": 0.944
+          },
+          {
+            "threshold": 0.050634567,
+            "state": "finite",
+            "tpr": 0.952,
+            "fpr": 0.948,
+            "precision": 0.5010526315789474,
+            "recall": 0.952
+          },
+          {
+            "threshold": 0.044934567,
+            "state": "finite",
+            "tpr": 0.956,
+            "fpr": 0.956,
+            "precision": 0.5,
+            "recall": 0.956
+          },
+          {
+            "threshold": 0.039234567,
+            "state": "finite",
+            "tpr": 0.964,
+            "fpr": 0.96,
+            "precision": 0.501039501039501,
+            "recall": 0.964
+          },
+          {
+            "threshold": 0.033534567,
+            "state": "finite",
+            "tpr": 0.968,
+            "fpr": 0.968,
+            "precision": 0.5,
+            "recall": 0.968
+          },
+          {
+            "threshold": 0.027834567,
+            "state": "finite",
+            "tpr": 0.976,
+            "fpr": 0.972,
+            "precision": 0.5010266940451745,
+            "recall": 0.976
+          },
+          {
+            "threshold": 0.022134567,
+            "state": "finite",
+            "tpr": 0.98,
+            "fpr": 0.98,
+            "precision": 0.5,
+            "recall": 0.98
+          },
+          {
+            "threshold": 0.016434567,
+            "state": "finite",
+            "tpr": 0.988,
+            "fpr": 0.984,
+            "precision": 0.5010141987829615,
+            "recall": 0.988
+          },
+          {
+            "threshold": 0.010734567,
+            "state": "finite",
+            "tpr": 0.992,
+            "fpr": 0.992,
+            "precision": 0.5,
+            "recall": 0.992
+          },
+          {
+            "threshold": 0.005034567,
+            "state": "finite",
+            "tpr": 1.0,
+            "fpr": 0.996,
+            "precision": 0.501002004008016,
+            "recall": 1.0
+          },
+          {
+            "threshold": 0.003134567,
+            "state": "finite",
+            "tpr": 1.0,
+            "fpr": 1.0,
+            "precision": 0.5,
+            "recall": 1.0
+          }
+        ],
+        "full_score_groups": 500,
+        "retained_points": 169,
+        "selection": "label_independent_score_group_order",
+        "scalar_metrics_use_all_groups": true
+      },
+      "disclosure_group": "ranking_curve",
+      "support_warning": false,
+      "evidence_refs": [],
+      "denominator_kind": "eligible_records"
+    },
+    {
+      "id": "m19",
+      "run": "model",
+      "scope": "overall",
+      "family": "probability_quality",
+      "metric": "brier",
+      "method_version": "1",
+      "population_id": "pop_3478867a763da8304513d55d00655082",
+      "denominator": 500,
+      "value": 0.3247785764829773,
+      "value_state": "finite",
+      "applicability": "applicable",
+      "execution": "completed",
+      "reason": null,
+      "units": null,
+      "basis": "measured",
+      "interpretation": "descriptive",
+      "method_standing": "established_method",
+      "sensitive_counts": [],
+      "data": {
+        "definition": "binary_event_squared_error"
+      },
+      "disclosure_group": "probability_quality",
+      "support_warning": false,
+      "evidence_refs": [],
+      "denominator_kind": "eligible_records"
+    },
+    {
+      "id": "m20",
+      "run": "model",
+      "scope": "overall",
+      "family": "probability_quality",
+      "metric": "log_loss",
+      "method_version": "1",
+      "population_id": "pop_3478867a763da8304513d55d00655082",
+      "denominator": 500,
+      "value": 0.9375861537587044,
+      "value_state": "finite",
+      "applicability": "applicable",
+      "execution": "completed",
+      "reason": null,
+      "units": null,
+      "basis": "measured",
+      "interpretation": "descriptive",
+      "method_standing": "established_method",
+      "sensitive_counts": [
+        0,
+        500
+      ],
+      "data": {
+        "zero_true_class_probability": 0,
+        "logarithm": "natural"
+      },
+      "disclosure_group": "probability_quality",
+      "support_warning": false,
+      "evidence_refs": [],
+      "denominator_kind": "eligible_records"
+    },
+    {
+      "id": "m21",
+      "run": "model",
+      "scope": "overall",
+      "family": "calibration",
+      "metric": "reliability_diagram",
+      "method_version": "1",
+      "population_id": "pop_3360893bb0a24116bc32a6990aaab57d",
+      "denominator": 500,
+      "value": 0.23804794078399996,
+      "value_state": "finite",
+      "applicability": "applicable",
+      "execution": "completed",
+      "reason": null,
+      "units": null,
+      "basis": "measured",
+      "interpretation": "descriptive",
+      "method_standing": "established_method",
+      "sensitive_counts": [
+        25,
+        26,
+        27,
+        26,
+        26,
+        27,
+        26,
+        26,
+        27,
+        26,
+        26,
+        27,
+        26,
+        26,
+        27,
+        26,
+        26,
+        27,
+        14,
+        13
+      ],
+      "data": {
+        "target": "event",
+        "bins": [
+          {
+            "bin": 0,
+            "lower": 0.0,
+            "upper": 0.1,
+            "upper_inclusive": false,
+            "count": 51,
+            "mean_probability": 0.05063456700000002,
+            "observed_frequency": 0.49019607843137253,
+            "interval": null,
+            "limited_bin_support": false
+          },
+          {
+            "bin": 1,
+            "lower": 0.1,
+            "upper": 0.2,
+            "upper_inclusive": false,
+            "count": 53,
+            "mean_probability": 0.1494345670000001,
+            "observed_frequency": 0.5094339622641509,
+            "interval": null,
+            "limited_bin_support": false
+          },
+          {
+            "bin": 2,
+            "lower": 0.2,
+            "upper": 0.3,
+            "upper_inclusive": false,
+            "count": 53,
+            "mean_probability": 0.25013456699999986,
+            "observed_frequency": 0.49056603773584906,
+            "interval": null,
+            "limited_bin_support": false
+          },
+          {
+            "bin": 3,
+            "lower": 0.3,
+            "upper": 0.4,
+            "upper_inclusive": false,
+            "count": 52,
+            "mean_probability": 0.34988456700000004,
+            "observed_frequency": 0.5,
+            "interval": null,
+            "limited_bin_support": false
+          },
+          {
+            "bin": 4,
+            "lower": 0.4,
+            "upper": 0.5,
+            "upper_inclusive": false,
+            "count": 53,
+            "mean_probability": 0.44963456700000004,
+            "observed_frequency": 0.5094339622641509,
+            "interval": null,
+            "limited_bin_support": false
+          },
+          {
+            "bin": 5,
+            "lower": 0.5,
+            "upper": 0.6,
+            "upper_inclusive": false,
+            "count": 53,
+            "mean_probability": 0.5503345669999998,
+            "observed_frequency": 0.49056603773584906,
+            "interval": null,
+            "limited_bin_support": false
+          },
+          {
+            "bin": 6,
+            "lower": 0.6,
+            "upper": 0.7,
+            "upper_inclusive": false,
+            "count": 52,
+            "mean_probability": 0.6500845669999998,
+            "observed_frequency": 0.5,
+            "interval": null,
+            "limited_bin_support": false
+          },
+          {
+            "bin": 7,
+            "lower": 0.7,
+            "upper": 0.8,
+            "upper_inclusive": false,
+            "count": 53,
+            "mean_probability": 0.749834567,
+            "observed_frequency": 0.5094339622641509,
+            "interval": null,
+            "limited_bin_support": false
+          },
+          {
+            "bin": 8,
+            "lower": 0.8,
+            "upper": 0.9,
+            "upper_inclusive": false,
+            "count": 53,
+            "mean_probability": 0.850534567,
+            "observed_frequency": 0.49056603773584906,
+            "interval": null,
+            "limited_bin_support": false
+          },
+          {
+            "bin": 9,
+            "lower": 0.9,
+            "upper": 1.0,
+            "upper_inclusive": true,
+            "count": 27,
+            "mean_probability": 0.9265345669999999,
+            "observed_frequency": 0.5185185185185185,
+            "interval": null,
+            "limited_bin_support": false
+          }
+        ],
+        "ece_definition": "sum_bin_mass_absolute_frequency_gap",
+        "binning": "fixed_equal_width"
+      },
+      "disclosure_group": "calibration",
+      "support_warning": false,
+      "evidence_refs": [],
+      "denominator_kind": "eligible_records"
+    },
+    {
+      "id": "m22",
+      "run": "model",
+      "scope": "overall",
+      "family": "calibration",
+      "metric": "reliability_diagram",
+      "method_version": "1",
+      "population_id": "pop_0186960d05e0b7ba750322dfab761aca",
+      "denominator": 500,
+      "value": 0.238047940784,
+      "value_state": "finite",
+      "applicability": "applicable",
+      "execution": "completed",
+      "reason": null,
+      "units": null,
+      "basis": "measured",
+      "interpretation": "descriptive",
+      "method_standing": "established_method",
+      "sensitive_counts": [
+        52,
+        54,
+        52,
+        52,
+        54,
+        52,
+        52,
+        54,
+        40,
+        38
+      ],
+      "data": {
+        "target": "top_label",
+        "bins": [
+          {
+            "bin": 0,
+            "lower": 0.0,
+            "upper": 0.1,
+            "upper_inclusive": false,
+            "count": 0,
+            "mean_probability": null,
+            "observed_frequency": null,
+            "interval": null,
+            "limited_bin_support": true
+          },
+          {
+            "bin": 1,
+            "lower": 0.1,
+            "upper": 0.2,
+            "upper_inclusive": false,
+            "count": 0,
+            "mean_probability": null,
+            "observed_frequency": null,
+            "interval": null,
+            "limited_bin_support": true
+          },
+          {
+            "bin": 2,
+            "lower": 0.2,
+            "upper": 0.3,
+            "upper_inclusive": false,
+            "count": 0,
+            "mean_probability": null,
+            "observed_frequency": null,
+            "interval": null,
+            "limited_bin_support": true
+          },
+          {
+            "bin": 3,
+            "lower": 0.3,
+            "upper": 0.4,
+            "upper_inclusive": false,
+            "count": 0,
+            "mean_probability": null,
+            "observed_frequency": null,
+            "interval": null,
+            "limited_bin_support": true
+          },
+          {
+            "bin": 4,
+            "lower": 0.4,
+            "upper": 0.5,
+            "upper_inclusive": false,
+            "count": 0,
+            "mean_probability": null,
+            "observed_frequency": null,
+            "interval": null,
+            "limited_bin_support": true
+          },
+          {
+            "bin": 5,
+            "lower": 0.5,
+            "upper": 0.6,
+            "upper_inclusive": false,
+            "count": 106,
+            "mean_probability": 0.55035,
+            "observed_frequency": 0.49056603773584906,
+            "interval": null,
+            "limited_bin_support": false
+          },
+          {
+            "bin": 6,
+            "lower": 0.6,
+            "upper": 0.7,
+            "upper_inclusive": false,
+            "count": 104,
+            "mean_probability": 0.6501,
+            "observed_frequency": 0.5,
+            "interval": null,
+            "limited_bin_support": false
+          },
+          {
+            "bin": 7,
+            "lower": 0.7,
+            "upper": 0.8,
+            "upper_inclusive": false,
+            "count": 106,
+            "mean_probability": 0.74985,
+            "observed_frequency": 0.5094339622641509,
+            "interval": null,
+            "limited_bin_support": false
+          },
+          {
+            "bin": 8,
+            "lower": 0.8,
+            "upper": 0.9,
+            "upper_inclusive": false,
+            "count": 106,
+            "mean_probability": 0.8505500000000001,
+            "observed_frequency": 0.49056603773584906,
+            "interval": null,
+            "limited_bin_support": false
+          },
+          {
+            "bin": 9,
+            "lower": 0.9,
+            "upper": 1.0,
+            "upper_inclusive": true,
+            "count": 78,
+            "mean_probability": 0.9414624409230766,
+            "observed_frequency": 0.5128205128205128,
+            "interval": null,
+            "limited_bin_support": false
+          }
+        ],
+        "ece_definition": "sum_bin_mass_absolute_frequency_gap",
+        "binning": "fixed_equal_width"
+      },
+      "disclosure_group": "calibration",
+      "support_warning": false,
+      "evidence_refs": [],
+      "denominator_kind": "eligible_records"
+    },
+    {
+      "id": "m23",
+      "run": "model",
+      "scope": "overall",
+      "family": "high_confidence",
+      "metric": "high_confidence_top_class_error_rate",
+      "method_version": "1",
+      "population_id": "pop_3fee941abc96fb75bf0035bfb1ad0205",
+      "denominator": 78,
+      "value": 0.48717948717948717,
+      "value_state": "finite",
+      "applicability": "applicable",
+      "execution": "completed",
+      "reason": null,
+      "units": null,
+      "basis": "measured",
+      "interpretation": "descriptive",
+      "method_standing": "established_method",
+      "sensitive_counts": [
+        38,
+        40
+      ],
+      "data": {
+        "threshold": 0.9,
+        "meaning": "unique_top_probability_class_mismatch_not_issued_decision"
+      },
+      "disclosure_group": "high_confidence",
+      "support_warning": true,
+      "evidence_refs": [
+        "ref_eae371ed97691c3bf658f6fc",
+        "ref_34f0fe28ce5e198f9def511e",
+        "ref_72278a89677ba61b08d83bc1",
+        "ref_b2352bc5e0b99bd3335d33c3",
+        "ref_00b9382c0fce005bb29b651f"
+      ],
+      "denominator_kind": "eligible_records"
+    },
+    {
+      "id": "m24",
+      "run": "model",
+      "scope": "overall",
+      "family": "high_confidence",
+      "metric": "share_of_top_class_errors_high_confidence",
+      "method_version": "1",
+      "population_id": "pop_b4281e8a6f018b915db73a1a52ebf0c6",
+      "denominator": 250,
+      "value": 0.152,
+      "value_state": "finite",
+      "applicability": "applicable",
+      "execution": "completed",
+      "reason": null,
+      "units": null,
+      "basis": "measured",
+      "interpretation": "descriptive",
+      "method_standing": "established_method",
+      "sensitive_counts": [
+        38,
+        212
+      ],
+      "data": {},
+      "disclosure_group": "high_confidence",
+      "support_warning": false,
+      "evidence_refs": [],
+      "denominator_kind": "eligible_records"
+    },
+    {
+      "id": "m25",
+      "run": "model",
+      "scope": "overall",
+      "family": "calibration",
+      "metric": "reliability_diagram",
+      "method_version": "1",
+      "population_id": "pop_b5ccf68581005fc73097d2d8c0991c25",
+      "denominator": 500,
+      "value": 0.23804794078400002,
+      "value_state": "finite",
+      "applicability": "applicable",
+      "execution": "completed",
+      "reason": null,
+      "units": null,
+      "basis": "measured",
+      "interpretation": "descriptive",
+      "method_standing": "established_method",
+      "sensitive_counts": [
+        20,
+        20,
+        28,
+        27,
+        24,
+        26,
+        27,
+        28,
+        26,
+        24,
+        28,
+        28,
+        24,
+        25,
+        28,
+        28,
+        25,
+        26,
+        20,
+        18
+      ],
+      "data": {
+        "target": "supplied_or_derived_decision",
+        "bins": [
+          {
+            "bin": 0,
+            "lower": 0.0,
+            "upper": 0.1,
+            "upper_inclusive": false,
+            "count": 40,
+            "mean_probability": 0.05729382679999999,
+            "observed_frequency": 0.5,
+            "interval": null,
+            "limited_bin_support": false
+          },
+          {
+            "bin": 1,
+            "lower": 0.1,
+            "upper": 0.2,
+            "upper_inclusive": false,
+            "count": 55,
+            "mean_probability": 0.15003530852727268,
+            "observed_frequency": 0.509090909090909,
+            "interval": null,
+            "limited_bin_support": false
+          },
+          {
+            "bin": 2,
+            "lower": 0.2,
+            "upper": 0.3,
+            "upper_inclusive": false,
+            "count": 50,
+            "mean_probability": 0.24969153071999997,
+            "observed_frequency": 0.48,
+            "interval": null,
+            "limited_bin_support": false
+          },
+          {
+            "bin": 3,
+            "lower": 0.3,
+            "upper": 0.4,
+            "upper_inclusive": false,
+            "count": 55,
+            "mean_probability": 0.3495353085272727,
+            "observed_frequency": 0.4909090909090909,
+            "interval": null,
+            "limited_bin_support": false
+          },
+          {
+            "bin": 4,
+            "lower": 0.4,
+            "upper": 0.5,
+            "upper_inclusive": false,
+            "count": 50,
+            "mean_probability": 0.4491915307200001,
+            "observed_frequency": 0.52,
+            "interval": null,
+            "limited_bin_support": false
+          },
+          {
+            "bin": 5,
+            "lower": 0.5,
+            "upper": 0.6,
+            "upper_inclusive": false,
+            "count": 56,
+            "mean_probability": 0.5499406524285714,
+            "observed_frequency": 0.5,
+            "interval": null,
+            "limited_bin_support": false
+          },
+          {
+            "bin": 6,
+            "lower": 0.6,
+            "upper": 0.7,
+            "upper_inclusive": false,
+            "count": 49,
+            "mean_probability": 0.6496906524285716,
+            "observed_frequency": 0.4897959183673469,
+            "interval": null,
+            "limited_bin_support": false
+          },
+          {
+            "bin": 7,
+            "lower": 0.7,
+            "upper": 0.8,
+            "upper_inclusive": false,
+            "count": 56,
+            "mean_probability": 0.7494406524285715,
+            "observed_frequency": 0.5,
+            "interval": null,
+            "limited_bin_support": false
+          },
+          {
+            "bin": 8,
+            "lower": 0.8,
+            "upper": 0.9,
+            "upper_inclusive": false,
+            "count": 51,
+            "mean_probability": 0.8511812150784314,
+            "observed_frequency": 0.49019607843137253,
+            "interval": null,
+            "limited_bin_support": false
+          },
+          {
+            "bin": 9,
+            "lower": 0.9,
+            "upper": 1.0,
+            "upper_inclusive": true,
+            "count": 38,
+            "mean_probability": 0.9401532490526314,
+            "observed_frequency": 0.5263157894736842,
+            "interval": null,
+            "limited_bin_support": false
+          }
+        ],
+        "ece_definition": "sum_bin_mass_absolute_frequency_gap",
+        "binning": "fixed_equal_width"
+      },
+      "disclosure_group": "calibration",
+      "support_warning": false,
+      "evidence_refs": [],
+      "denominator_kind": "eligible_records"
+    },
+    {
+      "id": "m26",
+      "run": "model",
+      "scope": "overall",
+      "family": "high_confidence_decision",
+      "metric": "high_confidence_decision_error_rate",
+      "method_version": "1",
+      "population_id": "pop_41731648f1c1be8db9a6e5d365165653",
+      "denominator": 38,
+      "value": 0.47368421052631576,
+      "value_state": "finite",
+      "applicability": "applicable",
+      "execution": "completed",
+      "reason": null,
+      "units": null,
+      "basis": "measured",
+      "interpretation": "descriptive",
+      "method_standing": "established_method",
+      "sensitive_counts": [
+        18,
+        20
+      ],
+      "data": {
+        "confidence": "probability_assigned_to_chosen_class"
+      },
+      "disclosure_group": "high_confidence_decision",
+      "support_warning": true,
+      "evidence_refs": [],
+      "denominator_kind": "eligible_records"
+    }
+  ],
+  "checks": [
+    {
+      "id": "probability_quality:model",
+      "applicability": "applicable",
+      "execution": "completed",
+      "reason": null
+    },
+    {
+      "id": "supplied_intervals:model",
+      "applicability": "not_applicable",
+      "execution": "not_run",
+      "reason": "representation_or_policy_not_declared"
+    },
+    {
+      "id": "fixed_policy_replay:model",
+      "applicability": "not_applicable",
+      "execution": "not_run",
+      "reason": "representation_or_policy_not_declared"
+    }
+  ],
+  "findings": [],
+  "coverage": {
+    "population_provenance_version": "1.1",
+    "sources": {
+      "data": 500
+    },
+    "run_populations": {
+      "model": {
+        "outcome_states": {
+          "eligible": 500
+        },
+        "issuance_states": {
+          "issued": 500
+        }
+      }
+    },
+    "populations": [
+      {
+        "id": "pop_c374454eaf0b076272f075f0a26032cd",
+        "run": "model",
+        "scope": "overall",
+        "definition": "true",
+        "lineage": {
+          "kind": "normalized_run",
+          "run": "model",
+          "declaration_digest": "7065bd86d02acceccf909988d871ab1aa301cf15b1cc881a146203218183b632",
+          "source_sha256": "c3307134914e3cf86dbb6a4f5f83a7a6f669073afcbf01750d294a3e4584a104",
+          "source_interpretation": {
+            "id": "data",
+            "format": "csv",
+            "encoding": "utf-8-sig",
+            "delimiter": ","
+          },
+          "task_digest": "5b9ed449ab0928b5f8a970380654d884308d54dc79e5325f5e0b46fc62f40801",
+          "normalization_version": "1",
+          "outcome_snapshot": "f6574073e08c8d74b2e0cc733e7a4608fd05d27fdd772da437d62ad2e2aec73c",
+          "context_snapshot": "37f0658538ba2c41eae5e3b7b53ab8c68d4af633a069818348f62f9886c471b3"
+        },
+        "denominator_kind": "eligible_records",
+        "denominator": 500
+      },
+      {
+        "id": "pop_2af72baeed0092476b07f5e216f66bf7",
+        "run": "model",
+        "scope": "overall",
+        "definition": "prob_valid",
+        "lineage": {
+          "kind": "normalized_run",
+          "run": "model",
+          "declaration_digest": "7065bd86d02acceccf909988d871ab1aa301cf15b1cc881a146203218183b632",
+          "source_sha256": "c3307134914e3cf86dbb6a4f5f83a7a6f669073afcbf01750d294a3e4584a104",
+          "source_interpretation": {
+            "id": "data",
+            "format": "csv",
+            "encoding": "utf-8-sig",
+            "delimiter": ","
+          },
+          "task_digest": "5b9ed449ab0928b5f8a970380654d884308d54dc79e5325f5e0b46fc62f40801",
+          "normalization_version": "1",
+          "outcome_snapshot": "f6574073e08c8d74b2e0cc733e7a4608fd05d27fdd772da437d62ad2e2aec73c",
+          "context_snapshot": "37f0658538ba2c41eae5e3b7b53ab8c68d4af633a069818348f62f9886c471b3"
+        },
+        "denominator_kind": "eligible_records",
+        "denominator": 500
+      },
+      {
+        "id": "pop_83a65cf52df3900febe95788d59917e9",
+        "run": "model",
+        "scope": "overall",
+        "definition": "rank_score IS NOT NULL",
+        "lineage": {
+          "kind": "normalized_run",
+          "run": "model",
+          "declaration_digest": "7065bd86d02acceccf909988d871ab1aa301cf15b1cc881a146203218183b632",
+          "source_sha256": "c3307134914e3cf86dbb6a4f5f83a7a6f669073afcbf01750d294a3e4584a104",
+          "source_interpretation": {
+            "id": "data",
+            "format": "csv",
+            "encoding": "utf-8-sig",
+            "delimiter": ","
+          },
+          "task_digest": "5b9ed449ab0928b5f8a970380654d884308d54dc79e5325f5e0b46fc62f40801",
+          "normalization_version": "1",
+          "outcome_snapshot": "f6574073e08c8d74b2e0cc733e7a4608fd05d27fdd772da437d62ad2e2aec73c",
+          "context_snapshot": "37f0658538ba2c41eae5e3b7b53ab8c68d4af633a069818348f62f9886c471b3"
+        },
+        "denominator_kind": "eligible_records",
+        "denominator": 500
+      },
+      {
+        "id": "pop_e01e38a8e630e9711fc4cd9589db6859",
+        "run": "model",
+        "scope": "overall",
+        "definition": "(true) AND outcome_valid AND decision IS NOT NULL AND state IN ('issued','hypothetical')",
+        "lineage": {
+          "kind": "normalized_run",
+          "run": "model",
+          "declaration_digest": "7065bd86d02acceccf909988d871ab1aa301cf15b1cc881a146203218183b632",
+          "source_sha256": "c3307134914e3cf86dbb6a4f5f83a7a6f669073afcbf01750d294a3e4584a104",
+          "source_interpretation": {
+            "id": "data",
+            "format": "csv",
+            "encoding": "utf-8-sig",
+            "delimiter": ","
+          },
+          "task_digest": "5b9ed449ab0928b5f8a970380654d884308d54dc79e5325f5e0b46fc62f40801",
+          "normalization_version": "1",
+          "outcome_snapshot": "f6574073e08c8d74b2e0cc733e7a4608fd05d27fdd772da437d62ad2e2aec73c",
+          "context_snapshot": "37f0658538ba2c41eae5e3b7b53ab8c68d4af633a069818348f62f9886c471b3"
+        },
+        "denominator_kind": "eligible_records",
+        "denominator": 500
+      },
+      {
+        "id": "pop_873dbf270f341794478f3c52558b07c7",
+        "run": "model",
+        "scope": "overall",
+        "definition": "(true) AND outcome_valid AND decision IS NOT NULL AND state IN ('issued','hypothetical') AND y='0'",
+        "lineage": {
+          "kind": "normalized_run",
+          "run": "model",
+          "declaration_digest": "7065bd86d02acceccf909988d871ab1aa301cf15b1cc881a146203218183b632",
+          "source_sha256": "c3307134914e3cf86dbb6a4f5f83a7a6f669073afcbf01750d294a3e4584a104",
+          "source_interpretation": {
+            "id": "data",
+            "format": "csv",
+            "encoding": "utf-8-sig",
+            "delimiter": ","
+          },
+          "task_digest": "5b9ed449ab0928b5f8a970380654d884308d54dc79e5325f5e0b46fc62f40801",
+          "normalization_version": "1",
+          "outcome_snapshot": "f6574073e08c8d74b2e0cc733e7a4608fd05d27fdd772da437d62ad2e2aec73c",
+          "context_snapshot": "37f0658538ba2c41eae5e3b7b53ab8c68d4af633a069818348f62f9886c471b3"
+        },
+        "denominator_kind": "class_conditional_records",
+        "denominator": 250
+      },
+      {
+        "id": "pop_256a85c992fc394391b17af2e68affbc",
+        "run": "model",
+        "scope": "overall",
+        "definition": "(true) AND outcome_valid AND decision IS NOT NULL AND state IN ('issued','hypothetical') AND decision='0'",
+        "lineage": {
+          "kind": "normalized_run",
+          "run": "model",
+          "declaration_digest": "7065bd86d02acceccf909988d871ab1aa301cf15b1cc881a146203218183b632",
+          "source_sha256": "c3307134914e3cf86dbb6a4f5f83a7a6f669073afcbf01750d294a3e4584a104",
+          "source_interpretation": {
+            "id": "data",
+            "format": "csv",
+            "encoding": "utf-8-sig",
+            "delimiter": ","
+          },
+          "task_digest": "5b9ed449ab0928b5f8a970380654d884308d54dc79e5325f5e0b46fc62f40801",
+          "normalization_version": "1",
+          "outcome_snapshot": "f6574073e08c8d74b2e0cc733e7a4608fd05d27fdd772da437d62ad2e2aec73c",
+          "context_snapshot": "37f0658538ba2c41eae5e3b7b53ab8c68d4af633a069818348f62f9886c471b3"
+        },
+        "denominator_kind": "class_conditional_records",
+        "denominator": 216
+      },
+      {
+        "id": "pop_44dc53b5e2e3b582170519de98cc1260",
+        "run": "model",
+        "scope": "overall",
+        "definition": "(true) AND outcome_valid AND decision IS NOT NULL AND state IN ('issued','hypothetical') AND y='1'",
+        "lineage": {
+          "kind": "normalized_run",
+          "run": "model",
+          "declaration_digest": "7065bd86d02acceccf909988d871ab1aa301cf15b1cc881a146203218183b632",
+          "source_sha256": "c3307134914e3cf86dbb6a4f5f83a7a6f669073afcbf01750d294a3e4584a104",
+          "source_interpretation": {
+            "id": "data",
+            "format": "csv",
+            "encoding": "utf-8-sig",
+            "delimiter": ","
+          },
+          "task_digest": "5b9ed449ab0928b5f8a970380654d884308d54dc79e5325f5e0b46fc62f40801",
+          "normalization_version": "1",
+          "outcome_snapshot": "f6574073e08c8d74b2e0cc733e7a4608fd05d27fdd772da437d62ad2e2aec73c",
+          "context_snapshot": "37f0658538ba2c41eae5e3b7b53ab8c68d4af633a069818348f62f9886c471b3"
+        },
+        "denominator_kind": "class_conditional_records",
+        "denominator": 250
+      },
+      {
+        "id": "pop_e91b1549e4d91a3e1e34bbb8b737c8b3",
+        "run": "model",
+        "scope": "overall",
+        "definition": "(true) AND outcome_valid AND decision IS NOT NULL AND state IN ('issued','hypothetical') AND decision='1'",
+        "lineage": {
+          "kind": "normalized_run",
+          "run": "model",
+          "declaration_digest": "7065bd86d02acceccf909988d871ab1aa301cf15b1cc881a146203218183b632",
+          "source_sha256": "c3307134914e3cf86dbb6a4f5f83a7a6f669073afcbf01750d294a3e4584a104",
+          "source_interpretation": {
+            "id": "data",
+            "format": "csv",
+            "encoding": "utf-8-sig",
+            "delimiter": ","
+          },
+          "task_digest": "5b9ed449ab0928b5f8a970380654d884308d54dc79e5325f5e0b46fc62f40801",
+          "normalization_version": "1",
+          "outcome_snapshot": "f6574073e08c8d74b2e0cc733e7a4608fd05d27fdd772da437d62ad2e2aec73c",
+          "context_snapshot": "37f0658538ba2c41eae5e3b7b53ab8c68d4af633a069818348f62f9886c471b3"
+        },
+        "denominator_kind": "class_conditional_records",
+        "denominator": 284
+      },
+      {
+        "id": "pop_bfd3002b089947be0ec88dd4fc280501",
+        "run": "model",
+        "scope": "overall",
+        "definition": "(true) AND outcome_valid AND decision IS NOT NULL AND state IN ('issued','hypothetical')",
+        "lineage": {
+          "kind": "normalized_run",
+          "run": "model",
+          "declaration_digest": "7065bd86d02acceccf909988d871ab1aa301cf15b1cc881a146203218183b632",
+          "source_sha256": "c3307134914e3cf86dbb6a4f5f83a7a6f669073afcbf01750d294a3e4584a104",
+          "source_interpretation": {
+            "id": "data",
+            "format": "csv",
+            "encoding": "utf-8-sig",
+            "delimiter": ","
+          },
+          "task_digest": "5b9ed449ab0928b5f8a970380654d884308d54dc79e5325f5e0b46fc62f40801",
+          "normalization_version": "1",
+          "outcome_snapshot": "f6574073e08c8d74b2e0cc733e7a4608fd05d27fdd772da437d62ad2e2aec73c",
+          "context_snapshot": "37f0658538ba2c41eae5e3b7b53ab8c68d4af633a069818348f62f9886c471b3"
+        },
+        "denominator_kind": "evaluation_support",
+        "denominator": 500
+      },
+      {
+        "id": "pop_dda6c8c0177fb19a2d397ae215422b0a",
+        "run": "model",
+        "scope": "overall",
+        "definition": "(true) AND outcome_valid AND decision IS NOT NULL AND state IN ('issued','hypothetical') AND y<>'1'",
+        "lineage": {
+          "kind": "normalized_run",
+          "run": "model",
+          "declaration_digest": "7065bd86d02acceccf909988d871ab1aa301cf15b1cc881a146203218183b632",
+          "source_sha256": "c3307134914e3cf86dbb6a4f5f83a7a6f669073afcbf01750d294a3e4584a104",
+          "source_interpretation": {
+            "id": "data",
+            "format": "csv",
+            "encoding": "utf-8-sig",
+            "delimiter": ","
+          },
+          "task_digest": "5b9ed449ab0928b5f8a970380654d884308d54dc79e5325f5e0b46fc62f40801",
+          "normalization_version": "1",
+          "outcome_snapshot": "f6574073e08c8d74b2e0cc733e7a4608fd05d27fdd772da437d62ad2e2aec73c",
+          "context_snapshot": "37f0658538ba2c41eae5e3b7b53ab8c68d4af633a069818348f62f9886c471b3"
+        },
+        "denominator_kind": "class_conditional_records",
+        "denominator": 250
+      },
+      {
+        "id": "pop_282b26d7d9018e502690ab08e430c24f",
+        "run": "model",
+        "scope": "overall",
+        "definition": "(true) AND outcome_valid AND rank_score IS NOT NULL",
+        "lineage": {
+          "kind": "normalized_run",
+          "run": "model",
+          "declaration_digest": "7065bd86d02acceccf909988d871ab1aa301cf15b1cc881a146203218183b632",
+          "source_sha256": "c3307134914e3cf86dbb6a4f5f83a7a6f669073afcbf01750d294a3e4584a104",
+          "source_interpretation": {
+            "id": "data",
+            "format": "csv",
+            "encoding": "utf-8-sig",
+            "delimiter": ","
+          },
+          "task_digest": "5b9ed449ab0928b5f8a970380654d884308d54dc79e5325f5e0b46fc62f40801",
+          "normalization_version": "1",
+          "outcome_snapshot": "f6574073e08c8d74b2e0cc733e7a4608fd05d27fdd772da437d62ad2e2aec73c",
+          "context_snapshot": "37f0658538ba2c41eae5e3b7b53ab8c68d4af633a069818348f62f9886c471b3"
+        },
+        "denominator_kind": "eligible_records",
+        "denominator": 500
+      },
+      {
+        "id": "pop_3478867a763da8304513d55d00655082",
+        "run": "model",
+        "scope": "overall",
+        "definition": "(true) AND outcome_valid AND prob_valid",
+        "lineage": {
+          "kind": "normalized_run",
+          "run": "model",
+          "declaration_digest": "7065bd86d02acceccf909988d871ab1aa301cf15b1cc881a146203218183b632",
+          "source_sha256": "c3307134914e3cf86dbb6a4f5f83a7a6f669073afcbf01750d294a3e4584a104",
+          "source_interpretation": {
+            "id": "data",
+            "format": "csv",
+            "encoding": "utf-8-sig",
+            "delimiter": ","
+          },
+          "task_digest": "5b9ed449ab0928b5f8a970380654d884308d54dc79e5325f5e0b46fc62f40801",
+          "normalization_version": "1",
+          "outcome_snapshot": "f6574073e08c8d74b2e0cc733e7a4608fd05d27fdd772da437d62ad2e2aec73c",
+          "context_snapshot": "37f0658538ba2c41eae5e3b7b53ab8c68d4af633a069818348f62f9886c471b3"
+        },
+        "denominator_kind": "eligible_records",
+        "denominator": 500
+      },
+      {
+        "id": "pop_3360893bb0a24116bc32a6990aaab57d",
+        "run": "model",
+        "scope": "overall",
+        "definition": "(true) AND outcome_valid AND prob_valid AND (true)",
+        "lineage": {
+          "kind": "normalized_run",
+          "run": "model",
+          "declaration_digest": "7065bd86d02acceccf909988d871ab1aa301cf15b1cc881a146203218183b632",
+          "source_sha256": "c3307134914e3cf86dbb6a4f5f83a7a6f669073afcbf01750d294a3e4584a104",
+          "source_interpretation": {
+            "id": "data",
+            "format": "csv",
+            "encoding": "utf-8-sig",
+            "delimiter": ","
+          },
+          "task_digest": "5b9ed449ab0928b5f8a970380654d884308d54dc79e5325f5e0b46fc62f40801",
+          "normalization_version": "1",
+          "outcome_snapshot": "f6574073e08c8d74b2e0cc733e7a4608fd05d27fdd772da437d62ad2e2aec73c",
+          "context_snapshot": "37f0658538ba2c41eae5e3b7b53ab8c68d4af633a069818348f62f9886c471b3"
+        },
+        "denominator_kind": "eligible_records",
+        "denominator": 500
+      },
+      {
+        "id": "pop_0186960d05e0b7ba750322dfab761aca",
+        "run": "model",
+        "scope": "overall",
+        "definition": "(true) AND outcome_valid AND prob_valid AND (top_label IS NOT NULL)",
+        "lineage": {
+          "kind": "normalized_run",
+          "run": "model",
+          "declaration_digest": "7065bd86d02acceccf909988d871ab1aa301cf15b1cc881a146203218183b632",
+          "source_sha256": "c3307134914e3cf86dbb6a4f5f83a7a6f669073afcbf01750d294a3e4584a104",
+          "source_interpretation": {
+            "id": "data",
+            "format": "csv",
+            "encoding": "utf-8-sig",
+            "delimiter": ","
+          },
+          "task_digest": "5b9ed449ab0928b5f8a970380654d884308d54dc79e5325f5e0b46fc62f40801",
+          "normalization_version": "1",
+          "outcome_snapshot": "f6574073e08c8d74b2e0cc733e7a4608fd05d27fdd772da437d62ad2e2aec73c",
+          "context_snapshot": "37f0658538ba2c41eae5e3b7b53ab8c68d4af633a069818348f62f9886c471b3"
+        },
+        "denominator_kind": "eligible_records",
+        "denominator": 500
+      },
+      {
+        "id": "pop_3fee941abc96fb75bf0035bfb1ad0205",
+        "run": "model",
+        "scope": "overall",
+        "definition": "(true) AND outcome_valid AND prob_valid AND top_label IS NOT NULL AND list_max(probs)>=0.9",
+        "lineage": {
+          "kind": "normalized_run",
+          "run": "model",
+          "declaration_digest": "7065bd86d02acceccf909988d871ab1aa301cf15b1cc881a146203218183b632",
+          "source_sha256": "c3307134914e3cf86dbb6a4f5f83a7a6f669073afcbf01750d294a3e4584a104",
+          "source_interpretation": {
+            "id": "data",
+            "format": "csv",
+            "encoding": "utf-8-sig",
+            "delimiter": ","
+          },
+          "task_digest": "5b9ed449ab0928b5f8a970380654d884308d54dc79e5325f5e0b46fc62f40801",
+          "normalization_version": "1",
+          "outcome_snapshot": "f6574073e08c8d74b2e0cc733e7a4608fd05d27fdd772da437d62ad2e2aec73c",
+          "context_snapshot": "37f0658538ba2c41eae5e3b7b53ab8c68d4af633a069818348f62f9886c471b3"
+        },
+        "denominator_kind": "eligible_records",
+        "denominator": 78
+      },
+      {
+        "id": "pop_b4281e8a6f018b915db73a1a52ebf0c6",
+        "run": "model",
+        "scope": "overall",
+        "definition": "(true) AND outcome_valid AND prob_valid AND top_label IS NOT NULL AND top_label<>y",
+        "lineage": {
+          "kind": "normalized_run",
+          "run": "model",
+          "declaration_digest": "7065bd86d02acceccf909988d871ab1aa301cf15b1cc881a146203218183b632",
+          "source_sha256": "c3307134914e3cf86dbb6a4f5f83a7a6f669073afcbf01750d294a3e4584a104",
+          "source_interpretation": {
+            "id": "data",
+            "format": "csv",
+            "encoding": "utf-8-sig",
+            "delimiter": ","
+          },
+          "task_digest": "5b9ed449ab0928b5f8a970380654d884308d54dc79e5325f5e0b46fc62f40801",
+          "normalization_version": "1",
+          "outcome_snapshot": "f6574073e08c8d74b2e0cc733e7a4608fd05d27fdd772da437d62ad2e2aec73c",
+          "context_snapshot": "37f0658538ba2c41eae5e3b7b53ab8c68d4af633a069818348f62f9886c471b3"
+        },
+        "denominator_kind": "eligible_records",
+        "denominator": 250
+      },
+      {
+        "id": "pop_b5ccf68581005fc73097d2d8c0991c25",
+        "run": "model",
+        "scope": "overall",
+        "definition": "(true) AND outcome_valid AND prob_valid AND (confidence IS NOT NULL AND state IN ('issued','hypothetical'))",
+        "lineage": {
+          "kind": "normalized_run",
+          "run": "model",
+          "declaration_digest": "7065bd86d02acceccf909988d871ab1aa301cf15b1cc881a146203218183b632",
+          "source_sha256": "c3307134914e3cf86dbb6a4f5f83a7a6f669073afcbf01750d294a3e4584a104",
+          "source_interpretation": {
+            "id": "data",
+            "format": "csv",
+            "encoding": "utf-8-sig",
+            "delimiter": ","
+          },
+          "task_digest": "5b9ed449ab0928b5f8a970380654d884308d54dc79e5325f5e0b46fc62f40801",
+          "normalization_version": "1",
+          "outcome_snapshot": "f6574073e08c8d74b2e0cc733e7a4608fd05d27fdd772da437d62ad2e2aec73c",
+          "context_snapshot": "37f0658538ba2c41eae5e3b7b53ab8c68d4af633a069818348f62f9886c471b3"
+        },
+        "denominator_kind": "eligible_records",
+        "denominator": 500
+      },
+      {
+        "id": "pop_41731648f1c1be8db9a6e5d365165653",
+        "run": "model",
+        "scope": "overall",
+        "definition": "(true) AND outcome_valid AND prob_valid AND confidence>=0.9 AND state IN ('issued','hypothetical')",
+        "lineage": {
+          "kind": "normalized_run",
+          "run": "model",
+          "declaration_digest": "7065bd86d02acceccf909988d871ab1aa301cf15b1cc881a146203218183b632",
+          "source_sha256": "c3307134914e3cf86dbb6a4f5f83a7a6f669073afcbf01750d294a3e4584a104",
+          "source_interpretation": {
+            "id": "data",
+            "format": "csv",
+            "encoding": "utf-8-sig",
+            "delimiter": ","
+          },
+          "task_digest": "5b9ed449ab0928b5f8a970380654d884308d54dc79e5325f5e0b46fc62f40801",
+          "normalization_version": "1",
+          "outcome_snapshot": "f6574073e08c8d74b2e0cc733e7a4608fd05d27fdd772da437d62ad2e2aec73c",
+          "context_snapshot": "37f0658538ba2c41eae5e3b7b53ab8c68d4af633a069818348f62f9886c471b3"
+        },
+        "denominator_kind": "eligible_records",
+        "denominator": 38
+      }
+    ],
+    "outcome_snapshot": {
+      "authority": "data",
+      "timing": "supplied_snapshot_maturity_unestablished",
+      "duplicate_rows": 0,
+      "invalid_keys": 0,
+      "canonical_content_digest": "0fe1b5d2b7ce3ec31c66a4ce140b05719778cad7e7a8995952eb1ac493249a53",
+      "snapshot_digest": "f6574073e08c8d74b2e0cc733e7a4608fd05d27fdd772da437d62ad2e2aec73c",
+      "effective_cutoff_ns": "1792336314039289000"
+    },
+    "context_snapshot": {
+      "authority": "data",
+      "canonical_content_digest": "e10debae0115c0c1c77dcd265a0f582fe580b1856ff59500701df0c18207a70e",
+      "snapshot_digest": "37f0658538ba2c41eae5e3b7b53ab8c68d4af633a069818348f62f9886c471b3",
+      "membership": "one canonical context for all runs"
+    },
+    "retention_limits": {
+      "witnesses_per_group": 5,
+      "retained_witnesses": 10,
+      "maximum_investigation_details": 100,
+      "curve_points": 201
+    },
+    "analytical_scope": "All eligible admitted records; no silent sampling. Retained curve points and witnesses are bounded.",
+    "sampling": {
+      "requested": "descriptive",
+      "inference_enabled": false
+    },
+    "limits": {
+      "max_cohorts": 4,
+      "max_groups": 32,
+      "probability_cells": 100000000,
+      "observed_probability_cells": 1000
+    },
+    "limitations": [
+      "Supplied outcomes are reference evidence, not independently verified truth.",
+      "Observed labels need not represent unobserved cases.",
+      "No universal score or production approval.",
+      "Unknown provenance does not establish out-of-sample evaluation."
+    ],
+    "cohort_definitions": []
+  },
+  "execution": {
+    "status": "completed",
+    "backend": "duckdb_local",
+    "engine_version": "1.5.6",
+    "effective_limits": {
+      "max_source_bytes": 5368709120,
+      "max_combined_source_bytes": 8589934592,
+      "max_rows": 10000000,
+      "max_combined_rows": 30000000,
+      "max_columns": 1000,
+      "memory_bytes": 2147483648,
+      "max_rss_bytes": 6442450944,
+      "threads": 2,
+      "batch_bytes": 33554432,
+      "max_record_bytes": 8388608,
+      "workspace_bytes": 68719476736,
+      "free_disk_bytes": 2147483648,
+      "max_seconds": 1800,
+      "result_bytes": 33554432,
+      "private_bytes": 67108864,
+      "probability_cells": 100000000,
+      "max_cohorts": 4,
+      "max_groups": 32,
+      "max_classes": 256,
+      "max_policies": 16,
+      "max_thresholds": 201,
+      "max_details": 100,
+      "witnesses": 5,
+      "curve_points": 201,
+      "calibration_bins": 10,
+      "support_warning": 100,
+      "bin_support_warning": 20,
+      "high_confidence": 0.9,
+      "probability_tolerance": 1e-06,
+      "sampling": {
+        "mode": "descriptive"
+      },
+      "disclosure": {
+        "policy": "conservative_aggregates_v1",
+        "minimum_denominator": 10,
+        "minimum_component": 10,
+        "display_labels": {},
+        "schema_version": "confidenceguard.disclosure/1.0"
+      }
+    },
+    "peak_workspace_bytes": 3096576,
+    "estimated_peak_workspace_bytes": 536870912,
+    "planning_estimate_is_upper_bound": false,
+    "duration_seconds": 0.5035913750007239,
+    "publication_policy": "whole_evaluation_atomic",
+    "resource_qualification": "Sampled RSS and storage controls can overshoot; admission settings are not capacity guarantees."
+  },
+  "binding": {
+    "analysis_digest": "861cfdc7cd17b3c59053c5e97c0896adcf27e553634c2ce70af8699446579e99",
+    "private_manifest_digest": "e60a01e8e1bd2dfd38aa60d6d0a3a66e0964b08c5062026e75cf14ef2cba8f71"
+  }
+}

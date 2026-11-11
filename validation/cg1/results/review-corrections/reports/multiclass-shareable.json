@@ -1,0 +1,432 @@
+{
+  "schema_version": "confidenceguard.evaluation_result/1.0",
+  "methodology_id": "prediction_evaluation_v1",
+  "analysis_id": "3564cee1c9494382aec5f1b3ba461a3e",
+  "generated_at": "2026-10-18T15:11:43.738602+00:00",
+  "name": "Multiclass pinned prediction evaluation",
+  "audience": "shareable",
+  "task": {
+    "kind": "multiclass_classification",
+    "classes": [
+      "Class 1",
+      "Class 2",
+      "Class 3"
+    ],
+    "units": null
+  },
+  "runs": [
+    {
+      "id": "run_1",
+      "display_name": "Multiclass model 1",
+      "version_alias": "Version 1",
+      "role": "evaluation",
+      "decision_provenance": {
+        "origin": "supplied",
+        "rule": "none",
+        "threshold": null,
+        "tie_policy": "abstain"
+      },
+      "representations": {
+        "hard_prediction": true,
+        "probabilities": true,
+        "scores": false,
+        "intervals": 0
+      }
+    },
+    {
+      "id": "run_2",
+      "display_name": "Multiclass model 2",
+      "version_alias": "Version 2",
+      "role": "evaluation",
+      "decision_provenance": {
+        "origin": "supplied",
+        "rule": "none",
+        "threshold": null,
+        "tie_policy": "abstain"
+      },
+      "representations": {
+        "hard_prediction": true,
+        "probabilities": true,
+        "scores": false,
+        "intervals": 0
+      }
+    }
+  ],
+  "outcomes": {
+    "interpretation": "Supplied reference outcomes; correctness and population representativeness are not established."
+  },
+  "comparison": {
+    "left": "run_1",
+    "right": "run_2",
+    "blocked_reasons": [],
+    "timing_qualification": "unestablished",
+    "scope": "matched supplied predictions; no isolated causal model or generalization claim"
+  },
+  "measurements": [
+    {
+      "id": "m3",
+      "run": "run_1",
+      "scope": "overall",
+      "family": "availability",
+      "metric": "population_coverage",
+      "method_version": "1",
+      "population_id": "pop_c94de0f4a7f0ace9691477297dae1c6f",
+      "denominator": 36,
+      "value": 1.0,
+      "value_state": "finite",
+      "applicability": "applicable",
+      "execution": "completed",
+      "reason": null,
+      "units": null,
+      "basis": "measured",
+      "interpretation": "descriptive",
+      "method_standing": "established_method",
+      "data": {
+        "records": 36,
+        "eligible_outcomes": 36,
+        "issued": 36,
+        "issuance_meaning": "recorded"
+      },
+      "support_warning": true,
+      "denominator_kind": "eligible_records",
+      "evidence_refs": []
+    },
+    {
+      "id": "m11",
+      "run": "run_1",
+      "scope": "overall",
+      "family": "probability_quality",
+      "metric": "brier",
+      "method_version": "1",
+      "population_id": "pop_e1872530d005f82c390706554fac37a5",
+      "denominator": 36,
+      "value": 0.02770369630574436,
+      "value_state": "finite",
+      "applicability": "applicable",
+      "execution": "completed",
+      "reason": null,
+      "units": null,
+      "basis": "measured",
+      "interpretation": "descriptive",
+      "method_standing": "established_method",
+      "data": {
+        "definition": "unhalved_multiclass_sum"
+      },
+      "support_warning": true,
+      "denominator_kind": "eligible_records",
+      "evidence_refs": []
+    },
+    {
+      "id": "m12",
+      "run": "run_1",
+      "scope": "overall",
+      "family": "probability_quality",
+      "metric": "log_loss",
+      "method_version": "1",
+      "population_id": "pop_e1872530d005f82c390706554fac37a5",
+      "denominator": 36,
+      "value": 0.05823976298200016,
+      "value_state": "finite",
+      "applicability": "applicable",
+      "execution": "completed",
+      "reason": null,
+      "units": null,
+      "basis": "measured",
+      "interpretation": "descriptive",
+      "method_standing": "established_method",
+      "data": {
+        "zero_true_class_probability": 0,
+        "logarithm": "natural"
+      },
+      "support_warning": true,
+      "denominator_kind": "eligible_records",
+      "evidence_refs": []
+    },
+    {
+      "id": "m20",
+      "run": "run_1",
+      "scope": "overall",
+      "family": "high_confidence_decision",
+      "metric": "high_confidence_decision_error_rate",
+      "method_version": "1",
+      "population_id": "pop_f6b2de0a42a48b5d859e74278e3368a0",
+      "denominator": 32,
+      "value": 0.0,
+      "value_state": "finite",
+      "applicability": "applicable",
+      "execution": "completed",
+      "reason": null,
+      "units": null,
+      "basis": "measured",
+      "interpretation": "inferential",
+      "method_standing": "established_method",
+      "data": {
+        "confidence": "probability_assigned_to_chosen_class"
+      },
+      "support_warning": true,
+      "denominator_kind": "eligible_records",
+      "uncertainty": {
+        "lower": 0.0,
+        "upper": 0.1071791982550706,
+        "level": 0.95,
+        "method": "wilson",
+        "scope": "pointwise_independent_Bernoulli"
+      },
+      "evidence_refs": []
+    },
+    {
+      "id": "m58",
+      "run": "run_2",
+      "scope": "overall",
+      "family": "availability",
+      "metric": "population_coverage",
+      "method_version": "1",
+      "population_id": "pop_e9b74553c3a6a7394c2891c83dbcf0af",
+      "denominator": 36,
+      "value": 1.0,
+      "value_state": "finite",
+      "applicability": "applicable",
+      "execution": "completed",
+      "reason": null,
+      "units": null,
+      "basis": "measured",
+      "interpretation": "descriptive",
+      "method_standing": "established_method",
+      "data": {
+        "records": 36,
+        "eligible_outcomes": 36,
+        "issued": 36,
+        "issuance_meaning": "recorded"
+      },
+      "support_warning": true,
+      "denominator_kind": "eligible_records",
+      "evidence_refs": []
+    },
+    {
+      "id": "m66",
+      "run": "run_2",
+      "scope": "overall",
+      "family": "probability_quality",
+      "metric": "brier",
+      "method_version": "1",
+      "population_id": "pop_f1497ce5b4bddbf24aec1a5a0cd78b2a",
+      "denominator": 36,
+      "value": 0.03554142128709334,
+      "value_state": "finite",
+      "applicability": "applicable",
+      "execution": "completed",
+      "reason": null,
+      "units": null,
+      "basis": "measured",
+      "interpretation": "descriptive",
+      "method_standing": "established_method",
+      "data": {
+        "definition": "unhalved_multiclass_sum"
+      },
+      "support_warning": true,
+      "denominator_kind": "eligible_records",
+      "evidence_refs": []
+    },
+    {
+      "id": "m67",
+      "run": "run_2",
+      "scope": "overall",
+      "family": "probability_quality",
+      "metric": "log_loss",
+      "method_version": "1",
+      "population_id": "pop_f1497ce5b4bddbf24aec1a5a0cd78b2a",
+      "denominator": 36,
+      "value": 0.08721569231528188,
+      "value_state": "finite",
+      "applicability": "applicable",
+      "execution": "completed",
+      "reason": null,
+      "units": null,
+      "basis": "measured",
+      "interpretation": "descriptive",
+      "method_standing": "established_method",
+      "data": {
+        "zero_true_class_probability": 0,
+        "logarithm": "natural"
+      },
+      "support_warning": true,
+      "denominator_kind": "eligible_records",
+      "evidence_refs": []
+    },
+    {
+      "id": "m75",
+      "run": "run_2",
+      "scope": "overall",
+      "family": "high_confidence_decision",
+      "metric": "high_confidence_decision_error_rate",
+      "method_version": "1",
+      "population_id": "pop_ef37c8665262a97a6183eaab1b9a8abe",
+      "denominator": 30,
+      "value": 0.0,
+      "value_state": "finite",
+      "applicability": "applicable",
+      "execution": "completed",
+      "reason": null,
+      "units": null,
+      "basis": "measured",
+      "interpretation": "inferential",
+      "method_standing": "established_method",
+      "data": {
+        "confidence": "probability_assigned_to_chosen_class"
+      },
+      "support_warning": true,
+      "denominator_kind": "eligible_records",
+      "uncertainty": {
+        "lower": 0.0,
+        "upper": 0.11351339317396876,
+        "level": 0.95,
+        "method": "wilson",
+        "scope": "pointwise_independent_Bernoulli"
+      },
+      "evidence_refs": []
+    }
+  ],
+  "checks": [
+    {
+      "id": "probability_quality:run_1",
+      "applicability": "applicable",
+      "execution": "completed",
+      "detail_disclosure": "exact details retained locally"
+    },
+    {
+      "id": "supplied_intervals:run_1",
+      "applicability": "not_applicable",
+      "execution": "not_run",
+      "detail_disclosure": "exact details retained locally",
+      "reason": "representation_or_policy_not_declared"
+    },
+    {
+      "id": "fixed_policy_replay:run_1",
+      "applicability": "applicable",
+      "execution": "completed",
+      "detail_disclosure": "exact details retained locally"
+    },
+    {
+      "id": "cohort_0:run_1:inventory",
+      "applicability": "applicable",
+      "execution": "completed",
+      "detail_disclosure": "exact details retained locally"
+    },
+    {
+      "id": "probability_quality:run_2",
+      "applicability": "applicable",
+      "execution": "completed",
+      "detail_disclosure": "exact details retained locally"
+    },
+    {
+      "id": "supplied_intervals:run_2",
+      "applicability": "not_applicable",
+      "execution": "not_run",
+      "detail_disclosure": "exact details retained locally",
+      "reason": "representation_or_policy_not_declared"
+    },
+    {
+      "id": "fixed_policy_replay:run_2",
+      "applicability": "not_applicable",
+      "execution": "not_run",
+      "detail_disclosure": "exact details retained locally",
+      "reason": "representation_or_policy_not_declared"
+    },
+    {
+      "id": "cohort_0:run_2:inventory",
+      "applicability": "applicable",
+      "execution": "completed",
+      "detail_disclosure": "exact details retained locally"
+    }
+  ],
+  "findings": [
+    {
+      "code": "withheld_breakdowns",
+      "priority": "Information",
+      "message": "Some related breakdowns are withheld under the selected disclosure policy."
+    }
+  ],
+  "coverage": {
+    "analytical_scope": "Completed admitted populations; exact coverage is retained in the protected bundle.",
+    "retention_limits": {
+      "witnesses_per_group": 5,
+      "maximum_investigation_details": 100,
+      "curve_points": 201
+    },
+    "privacy_withholding": "Related breakdowns withheld",
+    "not_anonymity_guarantee": true,
+    "projection_revision": "cg1_review_corrections_v1",
+    "limitations": [
+      "Supplied outcomes are reference evidence, not independently verified truth.",
+      "Observed labels need not represent unobserved cases.",
+      "No universal score or production approval.",
+      "Unknown provenance does not establish out-of-sample evaluation."
+    ],
+    "sampling": {
+      "requested": "independent_rows",
+      "inference_enabled": true
+    },
+    "populations": [
+      {
+        "id": "pop_c94de0f4a7f0ace9691477297dae1c6f",
+        "run": "run_1",
+        "scope": "overall",
+        "denominator": 36,
+        "denominator_kind": "eligible_records"
+      },
+      {
+        "id": "pop_e1872530d005f82c390706554fac37a5",
+        "run": "run_1",
+        "scope": "overall",
+        "denominator": 36,
+        "denominator_kind": "eligible_records"
+      },
+      {
+        "id": "pop_f6b2de0a42a48b5d859e74278e3368a0",
+        "run": "run_1",
+        "scope": "overall",
+        "denominator": 32,
+        "denominator_kind": "eligible_records"
+      },
+      {
+        "id": "pop_e9b74553c3a6a7394c2891c83dbcf0af",
+        "run": "run_2",
+        "scope": "overall",
+        "denominator": 36,
+        "denominator_kind": "eligible_records"
+      },
+      {
+        "id": "pop_f1497ce5b4bddbf24aec1a5a0cd78b2a",
+        "run": "run_2",
+        "scope": "overall",
+        "denominator": 36,
+        "denominator_kind": "eligible_records"
+      },
+      {
+        "id": "pop_ef37c8665262a97a6183eaab1b9a8abe",
+        "run": "run_2",
+        "scope": "overall",
+        "denominator": 30,
+        "denominator_kind": "eligible_records"
+      }
+    ],
+    "population_provenance_version": "1.1"
+  },
+  "execution": {
+    "status": "completed",
+    "backend": "duckdb_local",
+    "methodology": "prediction_evaluation_v1"
+  },
+  "origin_binding": {
+    "analysis_digest": "ec9be2a6fc2a9273622bbd0d0a76370a1d194dcf6686040056a05185f517646f",
+    "private_manifest_digest": "9deead11b44fcf026ad595fd8c3a7da652ba4771bfdb128e7636b0fb61f3473a"
+  },
+  "disclosure": {
+    "policy": "conservative_aggregates_v1",
+    "minimum_denominator": 10,
+    "minimum_component": 10,
+    "display_labels": {},
+    "schema_version": "confidenceguard.disclosure/1.0"
+  },
+  "projection_digest": "4f40bd688f1099200d68c86c4458f9725c3d6352557f0a7e447a93a9e60e19e5"
+}

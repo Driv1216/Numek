@@ -1,0 +1,74 @@
+{
+  "schema_version": "confidenceguard.investigation_spec/1.0",
+  "name": "CG4 guided whole-population ceiling",
+  "evaluation": {
+    "task": {
+      "kind": "binary_classification",
+      "outcome_definition": "Supplied reference outcome",
+      "classes": [
+        "0",
+        "1"
+      ],
+      "positive_class": "1"
+    },
+    "name": "ConfidenceGuard evaluation",
+    "sources": [
+      {
+        "id": "source1",
+        "handle": "3e6d8e5b60154ce88647ae493d44aef2"
+      }
+    ],
+    "runs": [
+      {
+        "id": "run1",
+        "source": "source1",
+        "model": {
+          "id": "model1",
+          "version": "v1",
+          "display_name": "Model 1"
+        },
+        "key_columns": [
+          "id"
+        ],
+        "decision": {
+          "rule": "none",
+          "tie_policy": "abstain"
+        },
+        "role": "unknown",
+        "prediction": "decision"
+      }
+    ],
+    "outcomes": {
+      "source": "source1",
+      "column": "y",
+      "key_columns": [
+        "id"
+      ]
+    }
+  },
+  "roles": {
+    "namespace": "cg4-browser-ceiling-workflow-v1",
+    "unit": "independent_rows",
+    "seed": 0,
+    "column": "role"
+  },
+  "objectives": [
+    {
+      "id": "objective",
+      "metric": "error_rate",
+      "run": "run1",
+      "direction": "auto",
+      "comparator": "ceiling",
+      "practical_threshold": 0.1,
+      "ceiling": 0
+    }
+  ],
+  "features": [],
+  "representations": [],
+  "strategies": [
+    "structured",
+    "catboost",
+    "geometric"
+  ],
+  "feature_time_view": "available_at_decision"
+}

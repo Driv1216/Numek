@@ -1,0 +1,268 @@
+........F..F..F..F........                                               [100%]
+=================================== FAILURES ===================================
+_ test_saved_worker_failure_is_not_treated_as_completed_evidence[False-1-qualify_objectives] _
+
+tmp_path = PosixPath('/private/var/folders/cs/c15xvw9d3t53tzcws5yxjxcr0000gn/T/pytest-of-drivyaanshyadav/pytest-502/test_saved_worker_failure_is_n1')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x10b5ffd50>
+name = 'qualify_objectives', workers = 1, pending = False
+
+    @pytest.mark.parametrize('name',['qualify_pipeline','qualify_objectives','qualify_history'])
+    @pytest.mark.parametrize('workers',[1,4])
+    @pytest.mark.parametrize('pending',[False,True])
+    def test_saved_worker_failure_is_not_treated_as_completed_evidence(tmp_path,monkeypatch,name,workers,pending):
+        directory=Path(__file__).resolve().parents[2]/'validation/cg4';monkeypatch.syspath_prepend(str(directory))
+        spec=importlib.util.spec_from_file_location('_cg4_failed_resume_'+name,directory/(name+'.py'))
+        module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module)
+        pipeline=module if name=='qualify_pipeline' else module.pipeline
+        monkeypatch.setattr(pipeline,'identity',lambda:{})
+        monkeypatch.setattr(pipeline,'runtime_versions',lambda:{})
+        def failed(*args,**kwargs):raise RuntimeError('Synthetic worker failure retained for resumption test')
+        monkeypatch.setattr(module,'trial',failed)
+        common=['--panel','development']
+        if name=='qualify_pipeline':
+            common+=['--archetype','interaction_without_marginals'];path=tmp_path/'development-interaction_without_marginals-0.json'
+            monkeypatch.setattr(module,'snapshot_sources',lambda *args:None)
+        elif name=='qualify_objectives':
+            objective=next(iter(module.PANELS));common=[objective]+common;path=tmp_path/(objective+'-0.json')
+        else:path=tmp_path/'0.json'
+        monkeypatch.setattr(sys,'argv',[name,*common,'--worker','--seed','0','--out',str(path)])
+        module.main()
+        if pending:
+            path=path.rename(path.with_suffix('.pending'))
+        before=path.read_bytes()
+        def unexpected(*args,**kwargs):raise AssertionError('Another worker launched despite the retained execution failure')
+        monkeypatch.setattr(module.subprocess,'run',unexpected)
+        monkeypatch.setattr(sys,'argv',[name,*common,'--out',str(tmp_path),'--count','1','--workers',str(workers)])
+>       with pytest.raises(RuntimeError,match='pending evidence' if pending else 'saved trial'):module.main()
+                                                                                                ^^^^^^^^^^^^^
+
+tests/cg4/test_failed_campaign_reuse.py:35: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+validation/cg4/qualify_objectives.py:166: in main
+    parser.add_argument('--worker', action='store_true'); parser.add_argument('--seed', type=int); args = parser.parse_args()
+                                                                                                          ^^^^^^^^^^^^^^^^^^^
+validation/cg4/runtime.nosync/cpython-3.13.17-macos-aarch64-none/lib/python3.13/argparse.py:1930: in parse_args
+    self.error(msg)
+validation/cg4/runtime.nosync/cpython-3.13.17-macos-aarch64-none/lib/python3.13/argparse.py:2686: in error
+    self.exit(2, _('%(prog)s: error: %(message)s\n') % args)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = ArgumentParser(prog='qualify_objectives', usage=None, description=None, formatter_class=<class 'argparse.HelpFormatter'>, conflict_handler='error', add_help=True)
+status = 2
+message = 'qualify_objectives: error: unrecognized arguments: --workers 1\n'
+
+    def exit(self, status=0, message=None):
+        if message:
+            self._print_message(message, _sys.stderr)
+>       _sys.exit(status)
+E       SystemExit: 2
+
+validation/cg4/runtime.nosync/cpython-3.13.17-macos-aarch64-none/lib/python3.13/argparse.py:2673: SystemExit
+----------------------------- Captured stderr call -----------------------------
+usage: qualify_objectives [-h] --panel {development,qualification} --out OUT
+                          [--offset OFFSET] [--count COUNT]
+                          [--strategies STRATEGIES] [--full-profile]
+                          [--worker] [--seed SEED]
+                          {false_negative,false_positive,precision,probability_quality,calibration_residual,calibration_bins,regression_bias,regression_tail,ranking_auc,ranking_ap,uncertainty_coverage,uncertainty_efficiency,paired_degradation,paired_precision}
+qualify_objectives: error: unrecognized arguments: --workers 1
+_ test_saved_worker_failure_is_not_treated_as_completed_evidence[False-4-qualify_objectives] _
+
+tmp_path = PosixPath('/private/var/folders/cs/c15xvw9d3t53tzcws5yxjxcr0000gn/T/pytest-of-drivyaanshyadav/pytest-502/test_saved_worker_failure_is_n4')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x10ee22f90>
+name = 'qualify_objectives', workers = 4, pending = False
+
+    @pytest.mark.parametrize('name',['qualify_pipeline','qualify_objectives','qualify_history'])
+    @pytest.mark.parametrize('workers',[1,4])
+    @pytest.mark.parametrize('pending',[False,True])
+    def test_saved_worker_failure_is_not_treated_as_completed_evidence(tmp_path,monkeypatch,name,workers,pending):
+        directory=Path(__file__).resolve().parents[2]/'validation/cg4';monkeypatch.syspath_prepend(str(directory))
+        spec=importlib.util.spec_from_file_location('_cg4_failed_resume_'+name,directory/(name+'.py'))
+        module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module)
+        pipeline=module if name=='qualify_pipeline' else module.pipeline
+        monkeypatch.setattr(pipeline,'identity',lambda:{})
+        monkeypatch.setattr(pipeline,'runtime_versions',lambda:{})
+        def failed(*args,**kwargs):raise RuntimeError('Synthetic worker failure retained for resumption test')
+        monkeypatch.setattr(module,'trial',failed)
+        common=['--panel','development']
+        if name=='qualify_pipeline':
+            common+=['--archetype','interaction_without_marginals'];path=tmp_path/'development-interaction_without_marginals-0.json'
+            monkeypatch.setattr(module,'snapshot_sources',lambda *args:None)
+        elif name=='qualify_objectives':
+            objective=next(iter(module.PANELS));common=[objective]+common;path=tmp_path/(objective+'-0.json')
+        else:path=tmp_path/'0.json'
+        monkeypatch.setattr(sys,'argv',[name,*common,'--worker','--seed','0','--out',str(path)])
+        module.main()
+        if pending:
+            path=path.rename(path.with_suffix('.pending'))
+        before=path.read_bytes()
+        def unexpected(*args,**kwargs):raise AssertionError('Another worker launched despite the retained execution failure')
+        monkeypatch.setattr(module.subprocess,'run',unexpected)
+        monkeypatch.setattr(sys,'argv',[name,*common,'--out',str(tmp_path),'--count','1','--workers',str(workers)])
+>       with pytest.raises(RuntimeError,match='pending evidence' if pending else 'saved trial'):module.main()
+                                                                                                ^^^^^^^^^^^^^
+
+tests/cg4/test_failed_campaign_reuse.py:35: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+validation/cg4/qualify_objectives.py:166: in main
+    parser.add_argument('--worker', action='store_true'); parser.add_argument('--seed', type=int); args = parser.parse_args()
+                                                                                                          ^^^^^^^^^^^^^^^^^^^
+validation/cg4/runtime.nosync/cpython-3.13.17-macos-aarch64-none/lib/python3.13/argparse.py:1930: in parse_args
+    self.error(msg)
+validation/cg4/runtime.nosync/cpython-3.13.17-macos-aarch64-none/lib/python3.13/argparse.py:2686: in error
+    self.exit(2, _('%(prog)s: error: %(message)s\n') % args)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = ArgumentParser(prog='qualify_objectives', usage=None, description=None, formatter_class=<class 'argparse.HelpFormatter'>, conflict_handler='error', add_help=True)
+status = 2
+message = 'qualify_objectives: error: unrecognized arguments: --workers 4\n'
+
+    def exit(self, status=0, message=None):
+        if message:
+            self._print_message(message, _sys.stderr)
+>       _sys.exit(status)
+E       SystemExit: 2
+
+validation/cg4/runtime.nosync/cpython-3.13.17-macos-aarch64-none/lib/python3.13/argparse.py:2673: SystemExit
+----------------------------- Captured stderr call -----------------------------
+usage: qualify_objectives [-h] --panel {development,qualification} --out OUT
+                          [--offset OFFSET] [--count COUNT]
+                          [--strategies STRATEGIES] [--full-profile]
+                          [--worker] [--seed SEED]
+                          {false_negative,false_positive,precision,probability_quality,calibration_residual,calibration_bins,regression_bias,regression_tail,ranking_auc,ranking_ap,uncertainty_coverage,uncertainty_efficiency,paired_degradation,paired_precision}
+qualify_objectives: error: unrecognized arguments: --workers 4
+_ test_saved_worker_failure_is_not_treated_as_completed_evidence[True-1-qualify_objectives] _
+
+tmp_path = PosixPath('/private/var/folders/cs/c15xvw9d3t53tzcws5yxjxcr0000gn/T/pytest-of-drivyaanshyadav/pytest-502/test_saved_worker_failure_is_n7')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x10ee4b4d0>
+name = 'qualify_objectives', workers = 1, pending = True
+
+    @pytest.mark.parametrize('name',['qualify_pipeline','qualify_objectives','qualify_history'])
+    @pytest.mark.parametrize('workers',[1,4])
+    @pytest.mark.parametrize('pending',[False,True])
+    def test_saved_worker_failure_is_not_treated_as_completed_evidence(tmp_path,monkeypatch,name,workers,pending):
+        directory=Path(__file__).resolve().parents[2]/'validation/cg4';monkeypatch.syspath_prepend(str(directory))
+        spec=importlib.util.spec_from_file_location('_cg4_failed_resume_'+name,directory/(name+'.py'))
+        module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module)
+        pipeline=module if name=='qualify_pipeline' else module.pipeline
+        monkeypatch.setattr(pipeline,'identity',lambda:{})
+        monkeypatch.setattr(pipeline,'runtime_versions',lambda:{})
+        def failed(*args,**kwargs):raise RuntimeError('Synthetic worker failure retained for resumption test')
+        monkeypatch.setattr(module,'trial',failed)
+        common=['--panel','development']
+        if name=='qualify_pipeline':
+            common+=['--archetype','interaction_without_marginals'];path=tmp_path/'development-interaction_without_marginals-0.json'
+            monkeypatch.setattr(module,'snapshot_sources',lambda *args:None)
+        elif name=='qualify_objectives':
+            objective=next(iter(module.PANELS));common=[objective]+common;path=tmp_path/(objective+'-0.json')
+        else:path=tmp_path/'0.json'
+        monkeypatch.setattr(sys,'argv',[name,*common,'--worker','--seed','0','--out',str(path)])
+        module.main()
+        if pending:
+            path=path.rename(path.with_suffix('.pending'))
+        before=path.read_bytes()
+        def unexpected(*args,**kwargs):raise AssertionError('Another worker launched despite the retained execution failure')
+        monkeypatch.setattr(module.subprocess,'run',unexpected)
+        monkeypatch.setattr(sys,'argv',[name,*common,'--out',str(tmp_path),'--count','1','--workers',str(workers)])
+>       with pytest.raises(RuntimeError,match='pending evidence' if pending else 'saved trial'):module.main()
+                                                                                                ^^^^^^^^^^^^^
+
+tests/cg4/test_failed_campaign_reuse.py:35: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+validation/cg4/qualify_objectives.py:166: in main
+    parser.add_argument('--worker', action='store_true'); parser.add_argument('--seed', type=int); args = parser.parse_args()
+                                                                                                          ^^^^^^^^^^^^^^^^^^^
+validation/cg4/runtime.nosync/cpython-3.13.17-macos-aarch64-none/lib/python3.13/argparse.py:1930: in parse_args
+    self.error(msg)
+validation/cg4/runtime.nosync/cpython-3.13.17-macos-aarch64-none/lib/python3.13/argparse.py:2686: in error
+    self.exit(2, _('%(prog)s: error: %(message)s\n') % args)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = ArgumentParser(prog='qualify_objectives', usage=None, description=None, formatter_class=<class 'argparse.HelpFormatter'>, conflict_handler='error', add_help=True)
+status = 2
+message = 'qualify_objectives: error: unrecognized arguments: --workers 1\n'
+
+    def exit(self, status=0, message=None):
+        if message:
+            self._print_message(message, _sys.stderr)
+>       _sys.exit(status)
+E       SystemExit: 2
+
+validation/cg4/runtime.nosync/cpython-3.13.17-macos-aarch64-none/lib/python3.13/argparse.py:2673: SystemExit
+----------------------------- Captured stderr call -----------------------------
+usage: qualify_objectives [-h] --panel {development,qualification} --out OUT
+                          [--offset OFFSET] [--count COUNT]
+                          [--strategies STRATEGIES] [--full-profile]
+                          [--worker] [--seed SEED]
+                          {false_negative,false_positive,precision,probability_quality,calibration_residual,calibration_bins,regression_bias,regression_tail,ranking_auc,ranking_ap,uncertainty_coverage,uncertainty_efficiency,paired_degradation,paired_precision}
+qualify_objectives: error: unrecognized arguments: --workers 1
+_ test_saved_worker_failure_is_not_treated_as_completed_evidence[True-4-qualify_objectives] _
+
+tmp_path = PosixPath('/private/var/folders/cs/c15xvw9d3t53tzcws5yxjxcr0000gn/T/pytest-of-drivyaanshyadav/pytest-502/test_saved_worker_failure_is_n10')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x10ee475f0>
+name = 'qualify_objectives', workers = 4, pending = True
+
+    @pytest.mark.parametrize('name',['qualify_pipeline','qualify_objectives','qualify_history'])
+    @pytest.mark.parametrize('workers',[1,4])
+    @pytest.mark.parametrize('pending',[False,True])
+    def test_saved_worker_failure_is_not_treated_as_completed_evidence(tmp_path,monkeypatch,name,workers,pending):
+        directory=Path(__file__).resolve().parents[2]/'validation/cg4';monkeypatch.syspath_prepend(str(directory))
+        spec=importlib.util.spec_from_file_location('_cg4_failed_resume_'+name,directory/(name+'.py'))
+        module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module)
+        pipeline=module if name=='qualify_pipeline' else module.pipeline
+        monkeypatch.setattr(pipeline,'identity',lambda:{})
+        monkeypatch.setattr(pipeline,'runtime_versions',lambda:{})
+        def failed(*args,**kwargs):raise RuntimeError('Synthetic worker failure retained for resumption test')
+        monkeypatch.setattr(module,'trial',failed)
+        common=['--panel','development']
+        if name=='qualify_pipeline':
+            common+=['--archetype','interaction_without_marginals'];path=tmp_path/'development-interaction_without_marginals-0.json'
+            monkeypatch.setattr(module,'snapshot_sources',lambda *args:None)
+        elif name=='qualify_objectives':
+            objective=next(iter(module.PANELS));common=[objective]+common;path=tmp_path/(objective+'-0.json')
+        else:path=tmp_path/'0.json'
+        monkeypatch.setattr(sys,'argv',[name,*common,'--worker','--seed','0','--out',str(path)])
+        module.main()
+        if pending:
+            path=path.rename(path.with_suffix('.pending'))
+        before=path.read_bytes()
+        def unexpected(*args,**kwargs):raise AssertionError('Another worker launched despite the retained execution failure')
+        monkeypatch.setattr(module.subprocess,'run',unexpected)
+        monkeypatch.setattr(sys,'argv',[name,*common,'--out',str(tmp_path),'--count','1','--workers',str(workers)])
+>       with pytest.raises(RuntimeError,match='pending evidence' if pending else 'saved trial'):module.main()
+                                                                                                ^^^^^^^^^^^^^
+
+tests/cg4/test_failed_campaign_reuse.py:35: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+validation/cg4/qualify_objectives.py:166: in main
+    parser.add_argument('--worker', action='store_true'); parser.add_argument('--seed', type=int); args = parser.parse_args()
+                                                                                                          ^^^^^^^^^^^^^^^^^^^
+validation/cg4/runtime.nosync/cpython-3.13.17-macos-aarch64-none/lib/python3.13/argparse.py:1930: in parse_args
+    self.error(msg)
+validation/cg4/runtime.nosync/cpython-3.13.17-macos-aarch64-none/lib/python3.13/argparse.py:2686: in error
+    self.exit(2, _('%(prog)s: error: %(message)s\n') % args)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = ArgumentParser(prog='qualify_objectives', usage=None, description=None, formatter_class=<class 'argparse.HelpFormatter'>, conflict_handler='error', add_help=True)
+status = 2
+message = 'qualify_objectives: error: unrecognized arguments: --workers 4\n'
+
+    def exit(self, status=0, message=None):
+        if message:
+            self._print_message(message, _sys.stderr)
+>       _sys.exit(status)
+E       SystemExit: 2
+
+validation/cg4/runtime.nosync/cpython-3.13.17-macos-aarch64-none/lib/python3.13/argparse.py:2673: SystemExit
+----------------------------- Captured stderr call -----------------------------
+usage: qualify_objectives [-h] --panel {development,qualification} --out OUT
+                          [--offset OFFSET] [--count COUNT]
+                          [--strategies STRATEGIES] [--full-profile]
+                          [--worker] [--seed SEED]
+                          {false_negative,false_positive,precision,probability_quality,calibration_residual,calibration_bins,regression_bias,regression_tail,ranking_auc,ranking_ap,uncertainty_coverage,uncertainty_efficiency,paired_degradation,paired_precision}
+qualify_objectives: error: unrecognized arguments: --workers 4
+=========================== short test summary info ============================
+FAILED tests/cg4/test_failed_campaign_reuse.py::test_saved_worker_failure_is_not_treated_as_completed_evidence[False-1-qualify_objectives]
+FAILED tests/cg4/test_failed_campaign_reuse.py::test_saved_worker_failure_is_not_treated_as_completed_evidence[False-4-qualify_objectives]
+FAILED tests/cg4/test_failed_campaign_reuse.py::test_saved_worker_failure_is_not_treated_as_completed_evidence[True-1-qualify_objectives]
+FAILED tests/cg4/test_failed_campaign_reuse.py::test_saved_worker_failure_is_not_treated_as_completed_evidence[True-4-qualify_objectives]
+4 failed, 22 passed in 0.82s

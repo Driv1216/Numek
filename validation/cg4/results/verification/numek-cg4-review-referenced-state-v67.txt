@@ -1,0 +1,27 @@
+.F................                                                       [100%]
+=================================== FAILURES ===================================
+_ test_review_retains_hash_verified_referenced_synthetic_state_without_admitting_environments _
+
+tmp_path = PosixPath('/private/var/folders/cs/c15xvw9d3t53tzcws5yxjxcr0000gn/T/pytest-of-drivyaanshyadav/pytest-512/test_review_retains_hash_verif0')
+
+    def test_review_retains_hash_verified_referenced_synthetic_state_without_admitting_environments(tmp_path):
+        module=tool('package_review');relative=Path('validation/cg4/results/review-reproduction-paired-v55/runtime.nosync/backup/objects/fact.jsonl')
+        evidence=tmp_path/relative;evidence.parent.mkdir(parents=True);evidence.write_bytes(b'{"synthetic":true}\n')
+        receipt=tmp_path/'validation/cg4/results/verification/selector-correction-v59-manifest.json';receipt.parent.mkdir()
+        row={'path':str(relative),**module.record(evidence)}
+        receipt.write_text(json.dumps({'files':[row]}))
+        assert not module.admitted(relative) and module.referenced_synthetic_state(tmp_path)=={evidence}
+        evidence.write_bytes(b'changed')
+        with pytest.raises(ValueError,match='changed'):module.referenced_synthetic_state(tmp_path)
+        for path in ['validation/cg4/py313q.nosync/pyvenv.cfg',
+                     'validation/cg4/results/review-reproduction-paired-v55/runtime.nosync/environment/pyvenv.cfg',
+                     '../outside.jsonl']:
+            receipt.write_text(json.dumps({'files':[{**row,'path':path}]}))
+>           with pytest.raises(ValueError,match='not a declared'):module.referenced_synthetic_state(tmp_path)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           Failed: DID NOT RAISE ValueError
+
+tests/cg4/test_review_package.py:50: Failed
+=========================== short test summary info ============================
+FAILED tests/cg4/test_review_package.py::test_review_retains_hash_verified_referenced_synthetic_state_without_admitting_environments
+1 failed, 17 passed in 0.28s

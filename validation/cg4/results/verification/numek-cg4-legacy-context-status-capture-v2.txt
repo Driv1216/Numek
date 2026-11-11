@@ -1,0 +1,54 @@
+Traceback (most recent call last):
+  File "/Users/drivyaanshyadav/Desktop/Numek/validation/cg4/check_legacy_status_capture.py", line 99, in <module>
+    if __name__=='__main__':main()
+                            ~~~~^^
+  File "/Users/drivyaanshyadav/Desktop/Numek/validation/cg4/check_legacy_status_capture.py", line 60, in main
+    capture(Path(args.capture_worker),Path(args.expected_source),legacy_context);return
+    ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/drivyaanshyadav/Desktop/Numek/validation/cg4/check_legacy_status_capture.py", line 39, in capture
+    ws.ingest({'schema_version':'confidenceguard.prediction_batch_spec/2.0','namespace':'legacy-status-example',
+    ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        'outcome_definition_version':'v1','evaluation':evaluation,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        'bindings':[{'run':'model',**({'features':['status']} if legacy_context else {})}],
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        'feature_views':[] if legacy_context else views})
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/drivyaanshyadav/Desktop/Numek/validation/cg4/source-capsules.nosync/d8f73aaacf3d835d4323561e94336fccef453cdc6db5c985af2357b4084dcc46/src/confidenceguard/workspace.py", line 69, in ingest
+    if isinstance(batch, dict): batch = PredictionBatchSpec.from_dict(batch)
+                                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^
+  File "/Users/drivyaanshyadav/Desktop/Numek/validation/cg4/source-capsules.nosync/d8f73aaacf3d835d4323561e94336fccef453cdc6db5c985af2357b4084dcc46/src/confidenceguard/history_contracts.py", line 147, in from_dict
+    return super().from_dict(value)
+           ~~~~~~~~~~~~~~~~~^^^^^^^
+  File "/Users/drivyaanshyadav/Desktop/Numek/validation/cg4/source-capsules.nosync/d8f73aaacf3d835d4323561e94336fccef453cdc6db5c985af2357b4084dcc46/src/confidenceguard/contracts.py", line 65, in from_dict
+    try: return cls(**value)
+                ~~~^^^^^^^^^
+  File "<string>", line 14, in __init__
+  File "/Users/drivyaanshyadav/Desktop/Numek/validation/cg4/source-capsules.nosync/d8f73aaacf3d835d4323561e94336fccef453cdc6db5c985af2357b4084dcc46/src/confidenceguard/history_contracts.py", line 107, in __post_init__
+    sequence(self, 'bindings', HistoricalRunBinding)
+    ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/drivyaanshyadav/Desktop/Numek/validation/cg4/source-capsules.nosync/d8f73aaacf3d835d4323561e94336fccef453cdc6db5c985af2357b4084dcc46/src/confidenceguard/contracts.py", line 80, in sequence
+    value=tuple(cls.from_dict(v) if isinstance(v,dict) else v for v in value)
+  File "/Users/drivyaanshyadav/Desktop/Numek/validation/cg4/source-capsules.nosync/d8f73aaacf3d835d4323561e94336fccef453cdc6db5c985af2357b4084dcc46/src/confidenceguard/contracts.py", line 80, in <genexpr>
+    value=tuple(cls.from_dict(v) if isinstance(v,dict) else v for v in value)
+                ~~~~~~~~~~~~~^^^
+  File "/Users/drivyaanshyadav/Desktop/Numek/validation/cg4/source-capsules.nosync/d8f73aaacf3d835d4323561e94336fccef453cdc6db5c985af2357b4084dcc46/src/confidenceguard/contracts.py", line 65, in from_dict
+    try: return cls(**value)
+                ~~~^^^^^^^^^
+  File "<string>", line 19, in __init__
+  File "/Users/drivyaanshyadav/Desktop/Numek/validation/cg4/source-capsules.nosync/d8f73aaacf3d835d4323561e94336fccef453cdc6db5c985af2357b4084dcc46/src/confidenceguard/history_contracts.py", line 83, in __post_init__
+    raise EvaluationError('Features map retained column names to numeric/categorical semantics.')
+confidenceguard.contracts.EvaluationError: Features map retained column names to numeric/categorical semantics.
+Traceback (most recent call last):
+  File "/Users/drivyaanshyadav/Desktop/Numek/validation/cg4/check_legacy_status_capture.py", line 99, in <module>
+    if __name__=='__main__':main()
+                            ~~~~^^
+  File "/Users/drivyaanshyadav/Desktop/Numek/validation/cg4/check_legacy_status_capture.py", line 66, in main
+    subprocess.run([sys.executable,'-B',str(Path(__file__).resolve()),'--capture-worker',str(root),'--expected-source',str(capsule)],
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        cwd=capsule,env={**os.environ,'PYTHONPATH':str(capsule/'src')},check=True)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/drivyaanshyadav/Desktop/Numek/validation/cg4/runtime.nosync/cpython-3.13.17-macos-aarch64-none/lib/python3.13/subprocess.py", line 578, in run
+    raise CalledProcessError(retcode, process.args,
+                             output=stdout, stderr=stderr)
+subprocess.CalledProcessError: Command '['/Users/drivyaanshyadav/Desktop/Numek/validation/cg4/py313q.nosync/bin/python', '-B', '/Users/drivyaanshyadav/Desktop/Numek/validation/cg4/check_legacy_status_capture.py', '--capture-worker', '/private/tmp/numek-cg4-legacy-status-yainjivq', '--expected-source', '/Users/drivyaanshyadav/Desktop/Numek/validation/cg4/source-capsules.nosync/d8f73aaacf3d835d4323561e94336fccef453cdc6db5c985af2357b4084dcc46']' returned non-zero exit status 1.

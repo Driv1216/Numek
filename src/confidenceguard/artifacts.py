@@ -48,7 +48,10 @@ def view(data):
             elif m.get('data',{}).get('target'):label+=' · '+m['data']['target']
             uncertainty=m.get('uncertainty')
             interval_label=(f"{100*uncertainty.get('level',.95):.5g}% family confidence · Bonferroni m={uncertainty.get('family_size')}" if uncertainty and uncertainty.get('adjustment')=='bonferroni' else f"{100*uncertainty.get('level',.95):.5g}% pointwise" if uncertainty else '')
-            section['rows'].append({'run':m['run'],'scope':m['scope'],'metric':label,'value':value,'denominator':display(m['denominator']),'note':m.get('reason') or ('Limited observed support' if m.get('support_warning') else ''),'interval':uncertainty,'interval_label':interval_label})
+            note=m.get('reason') or ('Limited observed support' if m.get('support_warning') else '')
+            if data.get('methodology_id')=='policy_selection_v1' and m.get('evidence_basis'):
+                note=(note+' · ' if note else '')+m['evidence_basis']
+            section['rows'].append({'run':m['run'],'scope':m['scope'],'metric':label,'value':value,'denominator':display(m['denominator']),'note':note,'interval':uncertainty,'interval_label':interval_label})
             detail=m.get('data',{})
             if detail and len(section['details'])<(1 if cg2 else 2):
                 compact={k:(v[:4] if isinstance(v,list) else v) for k,v in detail.items()}
@@ -141,7 +144,11 @@ def generate_artifacts(result,path,*,format='html',html_path=None,json_path=None
     for target in (pdf_path,Path(json_path) if json_path else None):
         if target:compat.destination(target)
     private_result=private_manifest=None
-    if isinstance(result,EvaluationResult):
+    # CG4 learned gates, vectors and examples require an explicit local export.
+    # Keep the accepted CG1-CG3 reopening-bundle behavior unchanged.
+    retain_private=isinstance(result,EvaluationResult) and not (
+        audience=='shareable' and result.data.get('methodology_id') in {'failure_investigation_v1','policy_selection_v1','predictor_robustness_v1'})
+    if retain_private:
         directory=compat.protected_directory(canonical.parent/'.confidenceguard-private'/result.data['analysis_id'])
         private_result=directory/'result.json';private_manifest=directory/'manifest.json'
         compat.protect(sources,[*targets,private_result,private_manifest])
@@ -152,7 +159,7 @@ def generate_artifacts(result,path,*,format='html',html_path=None,json_path=None
     html=render_report(data).encode();reused=identical_or_publish(canonical,html)
     dd=digest(data.get('disclosure',{'audience':audience}))
     method_path=None
-    if isinstance(result,EvaluationResult) and result.private.get('fitted_methods'):
+    if retain_private and result.private.get('fitted_methods'):
         method_path=directory/'methods.json'
         compat.protect(sources,[method_path])
         identical_or_publish(method_path,json.dumps({'schema_version':'confidenceguard.fitted_collection/1.0','methods':result.private['fitted_methods'],'membership_sidecars':result.private.get('membership_sidecars',[])},sort_keys=True,indent=2,allow_nan=False).encode())

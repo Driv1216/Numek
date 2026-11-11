@@ -1,0 +1,240 @@
+// Research board data. Observations come from this lab's own captures
+// (research/captures, research/motion) and live inspection in a browser.
+// `frames` lists which captured frames the board shows; `status` is honest about
+// what was actually seen.
+
+export const refs = [
+  // ——— Reporting & data storytelling
+  {
+    id: 'pudding-hamilton', name: 'Every Line in Hamilton', by: 'Shirley Wu / The Pudding', url: 'https://pudding.cool/2017/03/hamilton/',
+    group: 'Reporting & data storytelling', status: 'live', frames: ['01-intro-3s', 's08', 's20', 's24'],
+    seen: 'Every dot is a real set of lines. The same marks gather into the show’s star, scatter, filter by character, then lay out as song timelines while the prose beside them highlights lyrics in the singer’s colour.',
+    take: 'Marks that persist and rearrange as the argument advances; prose and marks share one colour key, so a sentence and its evidence point at each other.',
+    leave: 'Decorative confetti density in the intro; the 1280px-only layout.',
+  },
+  {
+    id: 'both-sides', name: 'Extremists on Both Sides', by: 'The Seventh Eye (Awwwards data-viz)', url: 'https://both-sides.the7eye.org.il/',
+    group: 'Reporting & data storytelling', status: 'live', frames: ['01-intro-3s', 's04', 's28', 's32'],
+    seen: 'Each incident is one square. Two columns of squares fall along a central time spine and accumulate into diverging stacks; captions arrive as small framed notes.',
+    take: 'A central spine with two populations stacked either side: an exact grammar for comparing two versions or two sources.',
+    leave: 'Nothing borrowed visually beyond the unit-and-spine grammar.',
+  },
+  {
+    id: 'stateofaidesign', name: 'AI in Design Report 2026', by: '++hellohello for Designer Fund', url: 'https://stateofaidesign.com/',
+    group: 'Reporting & data storytelling', status: 'live', frames: ['00-intro-1s', '02-settled-6s', 's16', 's20'],
+    seen: 'A black cover square sits on an image collage, then compresses into the “AiiD 26” masthead chip. Chapters are full-bleed colour fields with a huge numeral, a two-column intro and an “In this chapter” list on hairlines, closed by a black full-width chapter button.',
+    take: 'A report as a publication: chapters own colour, numbering carries hierarchy, contents lists are part of the composition.',
+    leave: 'Its lilac/orange palette and processed-flower imagery.',
+  },
+  {
+    id: 'hellohello-stateofai', name: 'AI in Design — case study', by: '++hellohello', url: 'https://www.hellohello.is/case-studies/stateofai',
+    group: 'Reporting & data storytelling', status: 'live', frames: ['s04', 's16', 's24', 's36'],
+    seen: 'The studio built two tools: one restyles uploaded images in the brand language, one generates branded charts. The case shows charts as brand assets (stepped bars, proportional circles) and the printed report held in hands.',
+    take: 'The chart grammar is the identity. For NUMEK, the way evidence is drawn can be the brand, not decoration around it.',
+    leave: 'Halftone portrait treatments.',
+  },
+  {
+    id: 'lpas', name: 'LPAS Architecture + Interiors', by: 'Studio Naam', url: 'https://lpas.com/',
+    group: 'Reporting & data storytelling', status: 'live', frames: ['02-settled-6s', 's04', 's08', 's20'],
+    seen: 'Vertical scroll drives a horizontal sequence. Each sector panel is photograph above, solid colour below, sector name large at the panel foot with an index (2/6). Panels slide over the hero rather than replacing it.',
+    take: 'A category→colour system used as navigation, and horizontal progression for a set of parallel things.',
+    leave: 'Architectural photography as the content.',
+  },
+  {
+    id: 'naam-lpas', name: 'LPAS — case study', by: 'Studio Naam', url: 'https://studionaam.com/projects/lpas/',
+    group: 'Reporting & data storytelling', status: 'live', frames: ['02-settled-6s', 's20', 's24', 's28'],
+    seen: 'Shows the system behind the site: one named colour per sector with values, Aeonik weights, and the editorial module that lets readers go deeper without leaving the page.',
+    take: 'Colour as a documented system with meaning per category, not a mood.',
+    leave: 'Device mock-ups on felt.',
+  },
+  {
+    id: 'aw-arttech', name: 'ART+TECH Report 2023', by: 'MoreSleep (Awwwards page)', url: 'https://www.awwwards.com/sites/art-tech-report-2023',
+    group: 'Reporting & data storytelling', status: 'gallery', frames: ['02-settled-6s', 's08'],
+    seen: 'Only the Awwwards listing and its element previews were inspectable: an electric-blue report system with “key findings” overview panels.',
+    take: 'Minor: a single saturated field can carry an entire report.',
+    leave: 'Not used as a primary influence; the original site was not inspected.',
+  },
+  // ——— Studios & case studies
+  {
+    id: 'heron-ai', name: 'Heron AI', by: 'Bearplus (Awwwards SOTD)', url: 'https://heronaiapp.com/',
+    group: 'Studios & case studies', status: 'live', frames: ['02-settled-6s', 's20', 's28', 's32'],
+    seen: 'A building elevation draws itself in line, then a floor plan is drawn and annotated with red issue markers as the copy explains that the agent reviews the model and flags problems. Crosshair marks sit at grid intersections; caps grotesk; one red.',
+    take: 'The subject is drawn, then marked up in place. An issue is a mark on the actual artefact, not a card beside it.',
+    leave: 'Architecture as the subject; their red-on-warm-grey pairing exactly.',
+  },
+  {
+    id: 'freight-hyperbolic', name: 'Hyperbolic', by: 'Studio Freight', url: 'https://studiofreight.com/work/hyperbolic',
+    group: 'Studios & case studies', status: 'live', frames: ['01-intro-3s', '02-settled-6s'],
+    seen: 'The case sits in a white frame letterboxed by black, with mono navigation in the margins. A word repeats at stepped sizes (“Computing”) as a type study; line-art icons pair with 3D renders. Their stated aim: “AI-native without careening into sci-fi.” (Scrolling needed manual inspection; automated wheel capture stalled.)',
+    take: 'Object and its line drawing as a pair; quiet margins full of precise metadata.',
+    leave: 'GPU hardware renders.',
+  },
+  {
+    id: 'reform-micro', name: 'Micro', by: 'Reform Collective', url: 'https://www.reformcollective.com/work/micro',
+    group: 'Studios & case studies', status: 'live', frames: ['02-settled-6s', 's08', 's12', 's16'],
+    seen: 'A red curtain wipes to a bento of mixed-scale tiles. The product UI appears inside painted landscapes; the wordmark is cropped huge; chrome spheres and paper forms recur as connective objects.',
+    take: 'Framing real product UI inside a composed environment so the screen is the hero but not a floating rectangle.',
+    leave: 'Painted landscapes, chrome spheres.',
+  },
+  {
+    id: 'obys-experiment', name: 'Experiment Space', by: 'Obys', url: 'https://experiment.obys.agency/',
+    group: 'Studios & case studies', status: 'live', frames: ['01-intro-3s', '02-settled-6s', 's08'],
+    seen: 'One set of artefacts switches between named arrangements — Ring, Flower, Sphere, Cylinder — and flattens into a line on scroll. Headline set between hairline rules.',
+    take: 'The same items, re-arranged by named views. That is literally what an analyst does with a dataset.',
+    leave: '3D carousel as decoration.',
+  },
+  {
+    id: 'sonsanddaughters', name: 'Sons & Daughters', by: 'Independent (Awwwards)', url: 'https://sonsanddaughters.xyz/',
+    group: 'Studios & case studies', status: 'live', frames: ['01-intro-3s', 's04', 's12'],
+    seen: 'Warm paper, a full-width grotesk masthead, small serif prose that fades in line by line, then a giant chapter word (“GENERATIONS”) anchored to the bottom with a dotted leader “The Oxbow …… Café”.',
+    take: 'A chapter word as architecture; dotted leaders as an index device.',
+    leave: 'Documentary family photography.',
+  },
+  {
+    id: 'madewithgsap', name: 'Made With GSAP', by: 'Made With GSAP', url: 'https://madewithgsap.com/',
+    group: 'Studios & case studies', status: 'live', frames: ['01-intro-3s', 's04', 's12', 's16'],
+    seen: 'The headline “Unique JS effects | made with care” splits apart and a media window opens in the gap. Large lines resolve letter by letter as you scroll. An “ON SCREEN 000” counter tracks the viewport.',
+    take: 'A sentence that opens to reveal the product inside it; scroll-scrubbed type resolution.',
+    leave: 'Stacked cards, lime accents.',
+  },
+  {
+    id: 'phantom', name: 'Phantom', by: 'Phantom Studios', url: 'https://www.phantom.land/',
+    group: 'Studios & case studies', status: 'live', frames: ['01-intro-3s', '02-settled-6s'],
+    seen: 'A pixelated image resolves, then the whole site is an index wall of project tiles on black. The wall does not scroll in the ordinary sense.',
+    take: 'Little — a reminder that an index can be the whole homepage.',
+    leave: 'Wall-of-thumbnails for a product with one subject.',
+  },
+  {
+    id: 'null', name: 'Studio Null', by: 'Studio Null', url: 'https://www.madebynull.com/',
+    group: 'Studios & case studies', status: 'live', frames: ['00-intro-1s', '02-settled-6s'],
+    seen: 'One refractive blue prism on white with two tiny corner labels. Everything else is restraint.',
+    take: 'A single object can carry a homepage when everything around it is disciplined.',
+    leave: 'An abstract object with no meaning for NUMEK.',
+  },
+  {
+    id: 'gmb', name: 'Guillaume Maurin-Belay', by: 'GMB', url: 'https://www.gmbgraphic.com/',
+    group: 'Studios & case studies', status: 'partial', frames: ['01-intro-3s', '02-settled-6s'],
+    seen: 'Name split to opposite corners, project covers floating at depth on black. Scrolling did not advance in automated capture.',
+    take: 'Not used.', leave: '—',
+  },
+  {
+    id: 'unseen', name: 'Year in Review 2025', by: 'Unseen Studio', url: 'https://2025.unseen.co/',
+    group: 'Studios & case studies', status: 'partial', frames: ['00-intro-1s', '02-settled-6s'],
+    seen: 'The WebGL scene stayed at its loader (84%) in headless capture; only the loading mascot was observed.',
+    take: 'Not used — not properly inspected.', leave: '—',
+  },
+  // ——— Additional Awwwards projects
+  {
+    id: 'ottografie', name: 'Ottografie 2025', by: 'Exo Ape', url: 'https://ottografie.nl/',
+    group: 'Additional Awwwards projects', status: 'live', frames: ['00-intro-1s', '02-settled-6s', 's08', 's24'],
+    seen: 'A counter loader (00) with category names, then one huge serif word (“Beauty” with count 09) fixed at centre while photographs drift past at different depths and speeds. A pill at the bottom names the category.',
+    take: 'An anchored word with material passing in front of and behind it — depth through scroll speed, not 3D.',
+    leave: 'Fashion imagery.',
+  },
+  {
+    id: '14islands-cartier', name: 'Cartier 365', by: '14islands', url: 'https://develop.14islands.com/work/cartier365',
+    group: 'Additional Awwwards projects', status: 'live', frames: ['02-settled-6s', 's16', 's20', 's24'],
+    seen: 'A digital yearbook: chapter pages composed like print spreads inside grey frames, captions in small serif caps, pages arriving as whole compositions.',
+    take: 'Presenting a report’s pages as finished compositions, not screenshots.',
+    leave: 'Luxury imagery.',
+  },
+  {
+    id: 'immersive-chartogne', name: 'Chartogne-Taillet', by: 'Immersive Garden', url: 'https://immersive-g.com/projects/chartogne-taillet-1',
+    group: 'Additional Awwwards projects', status: 'live', frames: ['s08', 's24', 's28', 's32'],
+    seen: 'Engraved, hand-drawn maps of vineyard parcels; places named in widely spaced serif caps; a parcel index runs along the map’s foot and selecting a name moves the map.',
+    take: 'Named places in spaced caps; an index strip that drives a large drawn surface.',
+    leave: 'Cartography as a costume for a dataset.',
+  },
+  {
+    id: 'aw-elektra', name: 'Elektra Virtual Museum', by: 'Locomotive (Awwwards element)', url: 'https://www.awwwards.com/inspiration/exhibition-page',
+    group: 'Additional Awwwards projects', status: 'gallery', frames: ['00-intro-1s', '02-settled-6s'],
+    seen: 'The exhibition index is a large-type list (pavilion number, artwork, artist) on hairlines; the hovered row inverts to black and previews the work.',
+    take: 'An index list as a primary navigation surface for many items.',
+    leave: 'Inspected through the Awwwards element page only.',
+  },
+  {
+    id: 'aw-praetorian', name: 'Praetorian Aeronautics', by: 'KWP (Awwwards page)', url: 'https://www.awwwards.com/sites/praetorian-aeronautics',
+    group: 'Additional Awwwards projects', status: 'gallery', frames: ['02-settled-6s', 's12'],
+    seen: 'Element previews show a product spec sheet: a line drawing of the drone with dense, exact spec tables and bracketed UI chrome.',
+    take: 'Spec-sheet discipline: drawing + exact table, together.',
+    leave: 'Military tone, status-readout costume.',
+  },
+  {
+    id: 'siena', name: 'Siena Film Foundation', by: 'Niccolò Miranda', url: 'https://siena.film/',
+    group: 'Additional Awwwards projects', status: 'partial', frames: ['01-intro-3s'],
+    seen: 'Gated splash: logotype and an ENTER button. Automated capture did not enter.',
+    take: 'Not used.', leave: 'Gated intros — NUMEK should never make people wait to see the product.',
+  },
+  {
+    id: 'riotters-lidar', name: 'Aevion LiDAR inspection', by: 'Riotters (Awwwards SOTD)', url: 'https://drone.riotters.com/',
+    group: 'Additional Awwwards projects', status: 'live', frames: ['01-intro-3s', 's04', 's16', 's24'],
+    seen: 'An inspection product: a ghosted giant wordmark, then “Detecting cracks, deformations and structural risks before they become failures” resolving word by word. A half-dial gauge sits over three spec cells that light in turn (5 returns · ±2 cm · 450 m).',
+    take: 'Measured facts presented one at a time, each with its unit, and scroll-resolved sentences.',
+    leave: 'Drone hardware and dials.',
+  },
+  {
+    id: 'checkpoint-research', name: 'Checkpoint Research', by: 'Awwwards HM', url: 'https://www.checkpointresearch.ca/',
+    group: 'Additional Awwwards projects', status: 'live', frames: ['02-settled-6s', 's16', 's24'],
+    seen: 'Blueprint grid with crosshairs, bracket corners on cells, mono + wide grotesk, very large figures in cobalt bands.',
+    take: 'Grid registration marks as structure.',
+    leave: 'Stat-band marketing.',
+  },
+  {
+    id: 'wafer-ai', name: 'Wafer', by: 'Awwwards data-viz', url: 'https://www.wafer.ai/',
+    group: 'Additional Awwwards projects', status: 'live', frames: ['01-intro-3s', 's08', 's16'],
+    seen: 'A dithered painted sky with one thin measured line drawn across it (labelled tok/s points), then dark technical diagrams; giant wordmark footer.',
+    take: 'One true measurement laid over atmosphere beats a dashboard of fake ones.',
+    leave: 'Clouds, dark diagram aesthetic.',
+  },
+  {
+    id: 'state-of-gallery', name: 'The State of the Gallery', by: 'Majo Puterka / mesh3d (SOTD)', url: 'https://mesh3d.gallery/the-state-of-the-gallery',
+    group: 'Additional Awwwards projects', status: 'partial', frames: ['00-intro-1s', '02-settled-6s', 's08', 's16'],
+    seen: 'A WebGL particle landscape; numbers (564, 442, 122) form from particles behind the labels. Capture hung mid-scroll.',
+    take: 'Counter-example: particles that do not stand for anything. NUMEK marks must each be a real unit.',
+    leave: 'The particle field.',
+  },
+  {
+    id: 'cerebrium', name: 'Cerebrium', by: 'Awwwards data-viz', url: 'https://cerebrium.ai/',
+    group: 'Additional Awwwards projects', status: 'live', frames: ['01-intro-3s', 's16'],
+    seen: 'Magenta 3D ribbon hero, dark/light alternation, terminal and latency charts in light cards.',
+    take: 'Counter-example of the generic “AI infrastructure” look.', leave: 'All of it.',
+  },
+  {
+    id: 'edolus', name: 'Edolus', by: 'Awwwards SOTD', url: 'https://edolus.com/',
+    group: 'Additional Awwwards projects', status: 'live', frames: ['02-settled-6s', 's32'],
+    seen: 'A long logotype loader, then a cinematic WebGL scene with an “Initiate system” button and headphones prompt.',
+    take: 'Counter-example: spectacle before substance.', leave: 'All of it.',
+  },
+  // ——— Product interface references
+  {
+    id: 'linear', name: 'Linear', by: 'Linear', url: 'https://linear.app/',
+    group: 'Product references', status: 'live', frames: ['02-settled-6s', 's12', 's24'],
+    seen: 'The real app at near-true scale under a two-line headline; later sections pair a heading column with live UI fragments. Inter + Berkeley Mono.',
+    take: 'True-scale product UI as proof; restraint in marketing type.',
+    leave: 'Dark-glass SaaS look.',
+  },
+  {
+    id: 'raycast', name: 'Raycast', by: 'Raycast', url: 'https://www.raycast.com/',
+    group: 'Product references', status: 'live', frames: ['02-settled-6s', 's04', 's28'],
+    seen: 'Red light-blade hero, then the launcher shown working; keycaps (⌥ ⌘ L) as typographic objects.',
+    take: 'Keyboard affordances as visual material for a local tool.', leave: 'Glow.',
+  },
+  {
+    id: 'vercel', name: 'Vercel', by: 'Vercel', url: 'https://vercel.com/',
+    group: 'Product references', status: 'live', frames: ['02-settled-6s'],
+    seen: 'A hanging event container dominates; product proof sits in small modules around it.',
+    take: 'Little at this moment — the homepage was event-led on capture day.', leave: '—',
+  },
+  {
+    id: 'figma', name: 'Figma', by: 'Figma', url: 'https://www.figma.com/',
+    group: 'Product references', status: 'live', frames: ['02-settled-6s'],
+    seen: 'Captured; product canvas fragments as the hero.', take: 'Not a primary influence.', leave: '—',
+  },
+];
+
+export const discovery = [
+  { id: 'aw-websites', name: 'Awwwards — Websites', url: 'https://www.awwwards.com/websites/' },
+  { id: 'aw-experimental', name: 'Awwwards — Experimental', url: 'https://www.awwwards.com/websites/experimental/' },
+  { id: 'aw-dataviz', name: 'Awwwards — Data visualization', url: 'https://www.awwwards.com/websites/data-visualization/' },
+  { id: 'aw-portfolio', name: 'Awwwards — Portfolio', url: 'https://www.awwwards.com/websites/portfolio/' },
+];

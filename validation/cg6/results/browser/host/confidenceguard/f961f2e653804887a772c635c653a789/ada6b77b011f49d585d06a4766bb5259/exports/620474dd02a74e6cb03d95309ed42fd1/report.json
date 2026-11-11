@@ -1,0 +1,562 @@
+{
+  "analysis_id": "ada6b77b011f49d585d06a4766bb5259",
+  "cg6": {
+    "devices": {
+      "predictor": {
+        "allocator_peaks": {
+          "allocated_bytes": 512,
+          "driver_allocated_bytes": 25657344
+        },
+        "batches": 61,
+        "fallback_reason": null,
+        "index": 0,
+        "kind": "mps",
+        "loads": 1,
+        "qualification": "runtime_execution_not_yet_established",
+        "requested": {
+          "allow_cpu_fallback": false,
+          "deterministic": true,
+          "index": 0,
+          "kind": "mps",
+          "memory_bytes": 2147483648,
+          "onnx_mode": "strict",
+          "precision": "float32"
+        },
+        "retries": [],
+        "rows": 120,
+        "runtime": {
+          "implementation_sha256": {
+            "calibration.py": "013b9a19f1416dc70e9b073e3c791751b4590865d563f884fa285218769c0b48",
+            "conformal.py": "6bbff8e21513238cdf7e0aa6fdb93c870d2055e04e0fe6a47a5bc6a53e0079b7",
+            "execution/adapters.py": "d1cc6cbd46cc46dca898904f4fc778911afd96c643dd6a555948cb3f14cd221c",
+            "execution/contracts.py": "0e05ec02874eab87a129e9f8b6ea454f028481b42233d1a80107149a085dc719",
+            "execution/devices.py": "e4a9fea3f82f73e929fe46ffbf2dd4e092b2ec48b74aa21d61c2779e2c6a7149"
+          },
+          "platform": "macOS-27.0.1-arm64-arm-64bit-Mach-O",
+          "python": "3.13.17 (main, Oct 21 2026, 17:49:18) [Clang 23.1.3 ]",
+          "versions": {
+            "numpy": "2.4.6",
+            "onnxruntime": "1.26.0",
+            "onnxruntime-gpu": null,
+            "safetensors": "0.6.2",
+            "scikit-learn": "1.9.1",
+            "skops": "0.16.0",
+            "torch": "2.8.0"
+          }
+        },
+        "torch_device": "mps"
+      }
+    },
+    "evidence_level": "verified_experimental_behavior",
+    "exposure_checks": {
+      "external_history_verified": false,
+      "overlap": false,
+      "reasons": [],
+      "scope": "process_scoped"
+    },
+    "model_qualification": {
+      "predictor": "execution_and_batch_parity_verified_reference_unestablished"
+    },
+    "parity": {
+      "atol": 1e-06,
+      "batch_parity": "passed",
+      "details": [],
+      "qualification_scope": "recorded model/runtime/corpus only; no scientific improvement or universal device claim",
+      "reference_parity": "not_supplied",
+      "rtol": 1e-05,
+      "runtime_evidence": {
+        "predictor": {
+          "batch_test": "singleton_vs_batch_invariance",
+          "forward_batches": 1,
+          "usable_outputs": 60
+        }
+      }
+    },
+    "predictor_digests": {
+      "predictor": "56bebeb0d012457c11334c8e4c409b44c9016351df32dd10dc116d368257c56b"
+    },
+    "qualification": {
+      "cpu": "not_established_by_this_result",
+      "cuda": "not_run_hardware_unavailable",
+      "cuda_pending_is_nonblocking": true,
+      "mps": "execution_and_batch_parity_verified_reference_unestablished",
+      "scientific_qualification": "separate_from_device_execution"
+    },
+    "retention": {
+      "exact_input_reopening": true,
+      "inputs": "materialized_inputs",
+      "models": {
+        "predictor": "copy"
+      },
+      "reopening_executes_models": false
+    },
+    "stage": "qualification"
+  },
+  "checks": [],
+  "comparison": null,
+  "coverage": {
+    "complete_output_records": 60,
+    "limitations": [
+      "Experimental behavior concerns only identified scenarios, inputs and execution budgets; bounded search is not a robustness guarantee.",
+      "Variants of an original event are dependent observations. Unknown transformed outcomes cannot establish transformed accuracy.",
+      "Statistical claims require frozen populations, valid outcome relations, sampling, bounds and independent evidence.",
+      "Availability and contract tests do not establish device runtime qualification. NVIDIA qualification may remain pending hardware.",
+      "Trusted execution is not a security sandbox. Sampled resource limits can overshoot.",
+      "No universal robustness score, causal policy value, certification or production approval is established."
+    ],
+    "output_cells": 120,
+    "planned_roots": 60,
+    "population_provenance_version": "1.1",
+    "populations": [
+      {
+        "definition": "true",
+        "denominator": 60,
+        "denominator_kind": "eligible_records",
+        "id": "pop_75673411103bb8f0594424044e51f5f8",
+        "lineage": {
+          "context_snapshot": "6a0d21873f34be170f806937ad20da8d462eaaa459c5c13aed91175ef381cbae",
+          "declaration_digest": "d2352a4e6c2acffdb7821d4e99ac36efed7fd0ede0878d97911b1a80b0eb3ecd",
+          "kind": "normalized_run",
+          "normalization_version": "1",
+          "outcome_snapshot": "ba009b360145893aeffe80b268ad772b21f2d1a60dca7707b9fe7483d4c54134",
+          "probability_tolerance": 1e-06,
+          "run": "predictor",
+          "source_interpretation": {
+            "delimiter": ",",
+            "encoding": "utf-8-sig",
+            "format": "csv",
+            "id": "cg6_generated_1"
+          },
+          "source_sha256": "5bc7ee2f138a3999a3e044559e66bda476972013f1e3ad4a3f60d5ac7dde8541",
+          "task_digest": "b0e04825d2c59574072eee81c9cc7f2027e74cd2e9f371f6d0fd1584b60f276d"
+        },
+        "run": "predictor",
+        "scope": "overall"
+      },
+      {
+        "definition": "point IS NOT NULL",
+        "denominator": 60,
+        "denominator_kind": "eligible_records",
+        "id": "pop_037da5aaff8f5ba48ce3720eaf20db39",
+        "lineage": {
+          "context_snapshot": "6a0d21873f34be170f806937ad20da8d462eaaa459c5c13aed91175ef381cbae",
+          "declaration_digest": "d2352a4e6c2acffdb7821d4e99ac36efed7fd0ede0878d97911b1a80b0eb3ecd",
+          "kind": "normalized_run",
+          "normalization_version": "1",
+          "outcome_snapshot": "ba009b360145893aeffe80b268ad772b21f2d1a60dca7707b9fe7483d4c54134",
+          "probability_tolerance": 1e-06,
+          "run": "predictor",
+          "source_interpretation": {
+            "delimiter": ",",
+            "encoding": "utf-8-sig",
+            "format": "csv",
+            "id": "cg6_generated_1"
+          },
+          "source_sha256": "5bc7ee2f138a3999a3e044559e66bda476972013f1e3ad4a3f60d5ac7dde8541",
+          "task_digest": "b0e04825d2c59574072eee81c9cc7f2027e74cd2e9f371f6d0fd1584b60f276d"
+        },
+        "run": "predictor",
+        "scope": "overall"
+      },
+      {
+        "definition": "(true) AND outcome_valid AND point IS NOT NULL AND state IN ('issued','hypothetical')",
+        "denominator": 60,
+        "denominator_kind": "eligible_records",
+        "id": "pop_eebda71521fafd478fe81ab73b622daa",
+        "lineage": {
+          "context_snapshot": "6a0d21873f34be170f806937ad20da8d462eaaa459c5c13aed91175ef381cbae",
+          "declaration_digest": "d2352a4e6c2acffdb7821d4e99ac36efed7fd0ede0878d97911b1a80b0eb3ecd",
+          "kind": "normalized_run",
+          "normalization_version": "1",
+          "outcome_snapshot": "ba009b360145893aeffe80b268ad772b21f2d1a60dca7707b9fe7483d4c54134",
+          "probability_tolerance": 1e-06,
+          "run": "predictor",
+          "source_interpretation": {
+            "delimiter": ",",
+            "encoding": "utf-8-sig",
+            "format": "csv",
+            "id": "cg6_generated_1"
+          },
+          "source_sha256": "5bc7ee2f138a3999a3e044559e66bda476972013f1e3ad4a3f60d5ac7dde8541",
+          "task_digest": "b0e04825d2c59574072eee81c9cc7f2027e74cd2e9f371f6d0fd1584b60f276d"
+        },
+        "run": "predictor",
+        "scope": "overall"
+      }
+    ],
+    "retained_output_rows": 60
+  },
+  "findings": [],
+  "generated_at": "2026-11-07T04:57:21.059595+00:00",
+  "measurements": [
+    {
+      "applicability": "applicable",
+      "basis": "measured",
+      "data": {
+        "states": [
+          {
+            "count": 60,
+            "state": "issued"
+          }
+        ]
+      },
+      "denominator": 60,
+      "denominator_kind": "eligible_records",
+      "disclosure_group": "prediction_distributions",
+      "evidence_refs": [],
+      "execution": "completed",
+      "family": "prediction_distributions",
+      "id": "m1",
+      "interpretation": "descriptive",
+      "method_standing": "established_method",
+      "method_version": "1",
+      "metric": "recorded_decision_states",
+      "population_id": "pop_75673411103bb8f0594424044e51f5f8",
+      "reason": null,
+      "run": "predictor",
+      "scope": "overall",
+      "sensitive_counts": [
+        60
+      ],
+      "support_warning": true,
+      "units": null,
+      "value": null,
+      "value_state": "undefined"
+    },
+    {
+      "applicability": "applicable",
+      "basis": "measured",
+      "data": {
+        "interpretation": "Supplied native units; no probability interpretation inferred.",
+        "maximum": 2.9666666984558105,
+        "median": 1.9833333492279053,
+        "minimum": 1.0,
+        "q25": 1.4916666746139526,
+        "q75": 2.475000023841858
+      },
+      "denominator": 60,
+      "denominator_kind": "eligible_records",
+      "disclosure_group": "prediction_distributions",
+      "evidence_refs": [],
+      "execution": "completed",
+      "family": "prediction_distributions",
+      "id": "m2",
+      "interpretation": "descriptive",
+      "method_standing": "established_method",
+      "method_version": "1",
+      "metric": "point_prediction",
+      "population_id": "pop_037da5aaff8f5ba48ce3720eaf20db39",
+      "reason": null,
+      "run": "predictor",
+      "scope": "overall",
+      "sensitive_counts": [],
+      "support_warning": true,
+      "units": null,
+      "value": null,
+      "value_state": "undefined"
+    },
+    {
+      "applicability": "applicable",
+      "basis": "measured",
+      "data": {
+        "eligible_outcomes": 60,
+        "issuance_meaning": "recorded",
+        "issued": 60,
+        "records": 60
+      },
+      "denominator": 60,
+      "denominator_kind": "eligible_records",
+      "disclosure_group": "availability",
+      "evidence_refs": [],
+      "execution": "completed",
+      "family": "availability",
+      "id": "m3",
+      "interpretation": "descriptive",
+      "method_standing": "established_method",
+      "method_version": "1",
+      "metric": "population_coverage",
+      "population_id": "pop_75673411103bb8f0594424044e51f5f8",
+      "reason": null,
+      "run": "predictor",
+      "scope": "overall",
+      "sensitive_counts": [
+        60,
+        0,
+        60,
+        0
+      ],
+      "support_warning": true,
+      "units": null,
+      "value": 1.0,
+      "value_state": "finite"
+    },
+    {
+      "applicability": "applicable",
+      "basis": "measured",
+      "data": {},
+      "denominator": 60,
+      "denominator_kind": "eligible_records",
+      "disclosure_group": "performance",
+      "evidence_refs": [],
+      "execution": "completed",
+      "family": "performance",
+      "id": "m4",
+      "interpretation": "descriptive",
+      "method_standing": "established_method",
+      "method_version": "1",
+      "metric": "mae",
+      "population_id": "pop_eebda71521fafd478fe81ab73b622daa",
+      "reason": null,
+      "run": "predictor",
+      "scope": "overall",
+      "sensitive_counts": [],
+      "support_warning": true,
+      "units": "items",
+      "value": 1.4916666686534883,
+      "value_state": "finite"
+    },
+    {
+      "applicability": "applicable",
+      "basis": "measured",
+      "data": {},
+      "denominator": 60,
+      "denominator_kind": "eligible_records",
+      "disclosure_group": "performance",
+      "evidence_refs": [],
+      "execution": "completed",
+      "family": "performance",
+      "id": "m5",
+      "interpretation": "descriptive",
+      "method_standing": "established_method",
+      "method_version": "1",
+      "metric": "rmse",
+      "population_id": "pop_eebda71521fafd478fe81ab73b622daa",
+      "reason": null,
+      "run": "predictor",
+      "scope": "overall",
+      "sensitive_counts": [],
+      "support_warning": true,
+      "units": "items",
+      "value": 1.5193352620122145,
+      "value_state": "finite"
+    },
+    {
+      "applicability": "applicable",
+      "basis": "measured",
+      "data": {},
+      "denominator": 60,
+      "denominator_kind": "eligible_records",
+      "disclosure_group": "performance",
+      "evidence_refs": [],
+      "execution": "completed",
+      "family": "performance",
+      "id": "m6",
+      "interpretation": "descriptive",
+      "method_standing": "established_method",
+      "method_version": "1",
+      "metric": "bias",
+      "population_id": "pop_eebda71521fafd478fe81ab73b622daa",
+      "reason": null,
+      "run": "predictor",
+      "scope": "overall",
+      "sensitive_counts": [],
+      "support_warning": true,
+      "units": "items",
+      "value": 1.4916666686534883,
+      "value_state": "finite"
+    },
+    {
+      "applicability": "applicable",
+      "basis": "measured",
+      "data": {},
+      "denominator": 60,
+      "denominator_kind": "eligible_records",
+      "disclosure_group": "performance",
+      "evidence_refs": [],
+      "execution": "completed",
+      "family": "performance",
+      "id": "m7",
+      "interpretation": "descriptive",
+      "method_standing": "established_method",
+      "method_version": "1",
+      "metric": "median_absolute_error",
+      "population_id": "pop_eebda71521fafd478fe81ab73b622daa",
+      "reason": null,
+      "run": "predictor",
+      "scope": "overall",
+      "sensitive_counts": [],
+      "support_warning": true,
+      "units": "items",
+      "value": 1.4916666825612386,
+      "value_state": "finite"
+    },
+    {
+      "applicability": "applicable",
+      "basis": "measured",
+      "data": {},
+      "denominator": 60,
+      "denominator_kind": "eligible_records",
+      "disclosure_group": "performance",
+      "evidence_refs": [],
+      "execution": "completed",
+      "family": "performance",
+      "id": "m8",
+      "interpretation": "descriptive",
+      "method_standing": "established_method",
+      "method_version": "1",
+      "metric": "p90_absolute_error",
+      "population_id": "pop_eebda71521fafd478fe81ab73b622daa",
+      "reason": null,
+      "run": "predictor",
+      "scope": "overall",
+      "sensitive_counts": [],
+      "support_warning": true,
+      "units": "items",
+      "value": 1.8849999809265137,
+      "value_state": "finite"
+    },
+    {
+      "applicability": "applicable",
+      "basis": "measured",
+      "data": {},
+      "denominator": 60,
+      "denominator_kind": "eligible_records",
+      "disclosure_group": "performance",
+      "evidence_refs": [],
+      "execution": "completed",
+      "family": "performance",
+      "id": "m9",
+      "interpretation": "descriptive",
+      "method_standing": "established_method",
+      "method_version": "1",
+      "metric": "p95_absolute_error",
+      "population_id": "pop_eebda71521fafd478fe81ab73b622daa",
+      "reason": null,
+      "run": "predictor",
+      "scope": "overall",
+      "sensitive_counts": [],
+      "support_warning": true,
+      "units": "items",
+      "value": 1.9341667922337848,
+      "value_state": "finite"
+    },
+    {
+      "applicability": "applicable",
+      "basis": "measured",
+      "data": {},
+      "denominator": 60,
+      "denominator_kind": "eligible_records",
+      "disclosure_group": "performance",
+      "evidence_refs": [],
+      "execution": "completed",
+      "family": "performance",
+      "id": "m10",
+      "interpretation": "descriptive",
+      "method_standing": "established_method",
+      "method_version": "1",
+      "metric": "r2",
+      "population_id": "pop_eebda71521fafd478fe81ab73b622daa",
+      "reason": null,
+      "run": "predictor",
+      "scope": "overall",
+      "sensitive_counts": [],
+      "support_warning": true,
+      "units": null,
+      "value": -26.70825239750175,
+      "value_state": "finite"
+    },
+    {
+      "applicability": "applicable",
+      "basis": "measured",
+      "data": {
+        "absolute_quantiles": {
+          "p50": 1.4916666825612386,
+          "p90": 1.8849999809265137,
+          "p95": 1.9341667922337848
+        },
+        "signs": [
+          {
+            "count": 60,
+            "sign": "positive"
+          }
+        ]
+      },
+      "denominator": 60,
+      "denominator_kind": "eligible_records",
+      "disclosure_group": "residuals",
+      "evidence_refs": [],
+      "execution": "completed",
+      "family": "residuals",
+      "id": "m11",
+      "interpretation": "descriptive",
+      "method_standing": "established_method",
+      "method_version": "1",
+      "metric": "residual_distribution",
+      "population_id": "pop_eebda71521fafd478fe81ab73b622daa",
+      "reason": null,
+      "run": "predictor",
+      "scope": "overall",
+      "sensitive_counts": [
+        60
+      ],
+      "support_warning": true,
+      "units": null,
+      "value": null,
+      "value_state": "undefined"
+    }
+  ],
+  "methodology_id": "predictor_robustness_v1",
+  "name": "ConfidenceGuard predictor execution",
+  "outcomes": {
+    "authority": "input",
+    "canonical_content_digest": "50c01c001c4710e81bd6018e1e2c74a8b6c990fecab0f26afaba1ad3a9281b68",
+    "duplicate_rows": 0,
+    "effective_cutoff_ns": "1794027439757946000",
+    "invalid_keys": 0,
+    "scope": "observed_labels",
+    "snapshot_digest": "ba009b360145893aeffe80b268ad772b21f2d1a60dca7707b9fe7483d4c54134",
+    "timing": "supplied_snapshot_maturity_unestablished"
+  },
+  "runs": [
+    {
+      "display_name": "predictor",
+      "id": "predictor",
+      "model": {
+        "artifact_sha256": "56bebeb0d012457c11334c8e4c409b44c9016351df32dd10dc116d368257c56b",
+        "calibration": null,
+        "display_name": "",
+        "id": "predictor",
+        "preprocessing": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+        "version": "cg6"
+      },
+      "role": "experiment",
+      "scope": "original"
+    }
+  ],
+  "schema_version": "confidenceguard.execution_result/1.0",
+  "task": {
+    "classes": [],
+    "horizon": null,
+    "kind": "regression",
+    "material_error": null,
+    "outcome_definition": "Observed outcome",
+    "positive_class": null,
+    "units": "items"
+  },
+  "execution": {
+    "backend": "supervised_local",
+    "duration_seconds": 1.317139875027351,
+    "peak_spill_bytes": 0,
+    "peak_worker_rss_bytes": 362479616,
+    "peak_workspace_bytes": 315392,
+    "resource_limits_are_hard_quotas": false,
+    "serialized_bytes": 52992,
+    "status": "completed",
+    "whole_evaluation_atomic": true,
+    "whole_job_seconds": 2.1323387080337852
+  },
+  "binding": {
+    "analysis_digest": "3cfa18274334cbecfa4d478481e48825f08e6d15700bc81a61824085003930d7",
+    "private_manifest_digest": "f23c67de0c880369b0a7f9268e276c2be19fd4a052880922174e6454867748ee"
+  }
+}

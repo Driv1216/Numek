@@ -258,7 +258,7 @@ class OutcomeSnapshotSpec(Contract):
         object.__setattr__(self,'key_columns',tuple(self.key_columns))
         for v in self.key_columns:name(v)
         for attr in ('available_at','due_at','target_at'):nested(self,attr,ClockSpec,True)
-        if not isinstance(self.status_values,dict) or any(v not in {'final','observed','provisional','invalid','conflicting'} for v in self.status_values.values()): raise EvaluationError('Invalid outcome status mapping.')
+        if not isinstance(self.status_values,dict) or any(v not in {'final','observed','provisional','invalid','conflicting','pending','withdrawn'} for v in self.status_values.values()): raise EvaluationError('Invalid outcome status mapping.')
 
 
 @dataclass(frozen=True)
@@ -424,6 +424,14 @@ class EvaluationSpec(Contract):
             if rule.endswith('threshold') and self.task.kind!='binary_classification':raise EvaluationError('Threshold decisions require binary classification.')
             if rule=='score_argmax' and not r.score.columns:raise EvaluationError('Score argmax requires a complete class vector.')
         name(self.name)
+
+    @property
+    def effective_outcomes(self):
+        """The existing single-run inline authority rule; serialization is unchanged."""
+        if self.outcomes is not None:return self.outcomes
+        if len(self.runs)==1 and self.runs[0].inline_outcome:
+            run=self.runs[0];return OutcomeSnapshotSpec(run.source,run.inline_outcome,run.key_columns)
+        return None
 
     @classmethod
     def from_dict(cls,value,*,base_directory=None):

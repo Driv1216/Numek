@@ -1,0 +1,66 @@
+.........FF.............                                                 [100%]
+=================================== FAILURES ===================================
+_ test_old_or_invalid_retained_cutoff_is_unavailable_without_rewriting[absent] _
+
+tmp_path = PosixPath('/private/tmp/numek-cg4-corrections/new-regressions/test_old_or_invalid_retained_c0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x109cded70>
+packet_state = 'absent'
+
+    @pytest.mark.parametrize('packet_state',['absent','invalid'])
+    def test_old_or_invalid_retained_cutoff_is_unavailable_without_rewriting(tmp_path,monkeypatch,packet_state):
+        from confidenceguard.history_storage import EvidenceWriter
+        original=EvidenceWriter.add_features
+        def legacy(self,envelopes,field_ids):
+            def records():
+                for row in envelopes:
+                    row=copy.deepcopy(row)
+                    if row['kind']=='feature':
+                        if packet_state=='absent':row['payload'].pop('information_cutoff',None)
+                        else:row['payload']['information_cutoff']['tick_ns']='invalid'
+                        row['payload']['normalization']='typed_feature_v1'
+                        row['fact_digest']=digest({k:v for k,v in row.items() if k!='fact_digest'})
+                    yield row
+            return original(self,records(),field_ids)
+        monkeypatch.setattr(EvidenceWriter,'add_features',legacy)
+        ws,live,history=retained_input(tmp_path,cutoff='2026-01-03T00:00:00Z')
+        before={p.name:p.read_bytes() for p in (ws.path/'objects').iterdir()}
+        assert all(set(v)=={'observed'} for v in feature_states(live).values())
+>       assert all(set(v)=={'unavailable'} for v in feature_states(history).values())
+E       assert False
+E        +  where False = all(<generator object test_old_or_invalid_retained_cutoff_is_unavailable_without_rewriting.<locals>.<genexpr> at 0x10f4a9150>)
+
+tests/cg4/test_review_corrections.py:116: AssertionError
+_ test_old_or_invalid_retained_cutoff_is_unavailable_without_rewriting[invalid] _
+
+tmp_path = PosixPath('/private/tmp/numek-cg4-corrections/new-regressions/test_old_or_invalid_retained_c1')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x109cdefd0>
+packet_state = 'invalid'
+
+    @pytest.mark.parametrize('packet_state',['absent','invalid'])
+    def test_old_or_invalid_retained_cutoff_is_unavailable_without_rewriting(tmp_path,monkeypatch,packet_state):
+        from confidenceguard.history_storage import EvidenceWriter
+        original=EvidenceWriter.add_features
+        def legacy(self,envelopes,field_ids):
+            def records():
+                for row in envelopes:
+                    row=copy.deepcopy(row)
+                    if row['kind']=='feature':
+                        if packet_state=='absent':row['payload'].pop('information_cutoff',None)
+                        else:row['payload']['information_cutoff']['tick_ns']='invalid'
+                        row['payload']['normalization']='typed_feature_v1'
+                        row['fact_digest']=digest({k:v for k,v in row.items() if k!='fact_digest'})
+                    yield row
+            return original(self,records(),field_ids)
+        monkeypatch.setattr(EvidenceWriter,'add_features',legacy)
+        ws,live,history=retained_input(tmp_path,cutoff='2026-01-03T00:00:00Z')
+        before={p.name:p.read_bytes() for p in (ws.path/'objects').iterdir()}
+        assert all(set(v)=={'observed'} for v in feature_states(live).values())
+>       assert all(set(v)=={'unavailable'} for v in feature_states(history).values())
+E       assert False
+E        +  where False = all(<generator object test_old_or_invalid_retained_cutoff_is_unavailable_without_rewriting.<locals>.<genexpr> at 0x10f4a9150>)
+
+tests/cg4/test_review_corrections.py:116: AssertionError
+=========================== short test summary info ============================
+FAILED tests/cg4/test_review_corrections.py::test_old_or_invalid_retained_cutoff_is_unavailable_without_rewriting[absent]
+FAILED tests/cg4/test_review_corrections.py::test_old_or_invalid_retained_cutoff_is_unavailable_without_rewriting[invalid]
+2 failed, 22 passed in 83.43s (0:01:23)

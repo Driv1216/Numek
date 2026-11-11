@@ -1,0 +1,2375 @@
+{
+  "H_selected_effect_summary": {
+    "count": 169,
+    "maximum": 0.3348122148261594,
+    "median": 0.2889860311620733,
+    "minimum": 0.1862671086429879
+  },
+  "H_unavailable": {
+    "oracle_members": 0,
+    "total": 0
+  },
+  "aggregation_source_sha256": "b0198af985f5ef3d4104b7d916feacc59527242a4b7f5bae3409a5212174d4c2",
+  "anchor_criterion_met": true,
+  "assessment_states": {
+    "confirmed": 57,
+    "inconclusive": 112
+  },
+  "assessment_strengths": {
+    "finite_sample": 169
+  },
+  "objective": "calibration_residual",
+  "protocol": {
+    "assessments": "Authoritative frozen-region H effects measured separately from recovery; intervals remain finite or explicitly approximate and subject to qualification/refusal.",
+    "criterion": {
+      "H_precision": 0.7,
+      "H_recall": 0.7,
+      "minimum_successes_of_40": 32
+    },
+    "development_seed_range": [
+      0,
+      39
+    ],
+    "not_covered": [
+      "Historical-deterioration workspace panel",
+      "Natural-data recovery",
+      "Every registered metric from one representative objective"
+    ],
+    "panels": {
+      "calibration_bins": {
+        "contrast": "Frozen equal-width bin residual magnitude .30 versus zero",
+        "delta": 0.15,
+        "metric": "reliability_diagram"
+      },
+      "calibration_residual": {
+        "contrast": "Signed target residual +.30 versus zero at supplied p=.5",
+        "delta": 0.15,
+        "metric": "calibration_residual"
+      },
+      "false_negative": {
+        "contrast": ".40 versus .10 among actual positives",
+        "delta": 0.15,
+        "metric": "false_negative_rate"
+      },
+      "false_positive": {
+        "contrast": ".40 versus .10 among actual negatives",
+        "delta": 0.15,
+        "metric": "false_positive_rate"
+      },
+      "paired_degradation": {
+        "contrast": "Common-population candidate minus reference error .30 versus zero",
+        "delta": 0.15,
+        "metric": "error_rate"
+      },
+      "precision": {
+        "contrast": ".60 versus .90 among predicted positives",
+        "delta": 0.15,
+        "direction": "lower",
+        "metric": "precision"
+      },
+      "probability_quality": {
+        "contrast": "Brier .33 versus .09; high-confidence error mechanism",
+        "delta": 0.12,
+        "metric": "brier"
+      },
+      "ranking_ap": {
+        "contrast": "Reversed versus correctly ordered noisy scores at balanced label prevalence",
+        "delta": 0.2,
+        "direction": "lower",
+        "metric": "average_precision"
+      },
+      "ranking_auc": {
+        "contrast": "Reversed versus correctly ordered noisy score distributions",
+        "delta": 0.35,
+        "direction": "lower",
+        "metric": "roc_auc"
+      },
+      "regression_bias": {
+        "bounds": [
+          -1.0,
+          2.0
+        ],
+        "contrast": "Signed mean bias .90 versus zero with bounded independent noise",
+        "delta": 0.45,
+        "metric": "bias",
+        "units": "metres"
+      },
+      "regression_tail": {
+        "contrast": "Absolute error >1 metre: .60 versus .01",
+        "delta": 0.25,
+        "metric": "material_error_rate",
+        "units": "fraction"
+      },
+      "uncertainty_coverage": {
+        "contrast": "Prediction-interval miscoverage .60 versus .10",
+        "delta": 0.25,
+        "metric": "interval_miscoverage"
+      },
+      "uncertainty_efficiency": {
+        "bounds": [
+          1.0,
+          5.0
+        ],
+        "contrast": "Issued interval widths 4 versus 2 metres, with unchanged perfect coverage",
+        "delta": 1.0,
+        "metric": "interval_width",
+        "units": "metres"
+      }
+    },
+    "primary": "Positive-native-effect S-selected union evaluated on independent H; unavailable counts stay in planned recall.",
+    "qualification_seed_range": [
+      110000,
+      110039
+    ],
+    "region": "categorical a=1 AND continuous x>.5; expected prevalence .125",
+    "schema_version": "numek.cg4_objective_recovery_protocol/1.0",
+    "strategy_claims": "Unified runs do not qualify every strategy. Separate --strategies ablations retain the same profile and separate evidence.",
+    "units": 40000
+  },
+  "role_medians": {
+    "D": {
+      "IoU": 0.9898298210735587,
+      "precision": 0.9986011164220798,
+      "recall": 0.9946104734869758
+    },
+    "H": {
+      "IoU": 0.9899717366272376,
+      "precision": 0.9992412746585736,
+      "recall": 0.9952300906206949
+    },
+    "S": {
+      "IoU": 0.9908498438932518,
+      "precision": 0.9992045599745965,
+      "recall": 0.9963854906876048
+    }
+  },
+  "schema_version": "numek.cg4_objective_anchor_summary/1.0",
+  "scope": "The declared synthetic objective and unified-strategy operating profile only. H measures independently selected frozen gates. Planned membership stays in recovery denominators. Candidate effects overlap and are not independent replicates. No claim for other objectives, individual strategy superiority, external independence verification or milestone completion.",
+  "source_binding_sha256": "b67361194d65df040c3b3b7db879df7beb587f44763a84bd0bf2f41ff9621c3d",
+  "source_identity": "f56256e64c36257bdc39ba7de271898bb2fcb5b0cb432f2a4a11cc0a1f6afdf8",
+  "success_fraction_MC95": [
+    0.9119026971211976,
+    1.0
+  ],
+  "successes": 40,
+  "trials": [
+    {
+      "H_selected_native_effects": [
+        0.2603863978228169,
+        0.2612678859479791,
+        0.2878520533534957,
+        0.2892272355755052
+      ],
+      "assessment_states": [
+        "inconclusive",
+        "inconclusive",
+        "inconclusive",
+        "confirmed"
+      ],
+      "input_sha256": "35ae6c943b69949761ed60cc9e3bdd1840e089f0748668eedf8230101b7788af",
+      "path": "validation/cg4/results/objective-calibration-residual-qualification-v1/calibration_residual-110000.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.9896,
+          "false_negative": 26,
+          "false_positive": 0,
+          "planned": 20025,
+          "precision": 1.0,
+          "recall": 0.9896,
+          "true_positive": 2474,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9896995708154507,
+          "false_negative": 12,
+          "false_positive": 0,
+          "planned": 10064,
+          "precision": 1.0,
+          "recall": 0.9896995708154507,
+          "true_positive": 1153,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9942196531791907,
+          "false_negative": 7,
+          "false_positive": 0,
+          "planned": 9911,
+          "precision": 1.0,
+          "recall": 0.9942196531791907,
+          "true_positive": 1204,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 687.0245140840125,
+      "seed": 110000,
+      "sha256": "ce4339834e9443b6c285d2ad324fcf03b8d38a2e308737d0839d8092b1a3ecd6",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.3300223155736878,
+        0.3348122148261594,
+        0.3094102276076894,
+        0.302143982115623
+      ],
+      "assessment_states": [
+        "inconclusive",
+        "inconclusive",
+        "inconclusive",
+        "confirmed"
+      ],
+      "input_sha256": "3055ffa41480728a2e749fb587dfcfc49b600cd94bc54cf516681a3fabcdeaf3",
+      "path": "validation/cg4/results/objective-calibration-residual-qualification-v1/calibration_residual-110001.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.9979608482871125,
+          "false_negative": 0,
+          "false_positive": 5,
+          "planned": 19968,
+          "precision": 0.9979608482871125,
+          "recall": 1.0,
+          "true_positive": 2447,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9984164687252574,
+          "false_negative": 0,
+          "false_positive": 2,
+          "planned": 9973,
+          "precision": 0.9984164687252574,
+          "recall": 1.0,
+          "true_positive": 1261,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.997643362136685,
+          "false_negative": 0,
+          "false_positive": 3,
+          "planned": 10059,
+          "precision": 0.997643362136685,
+          "recall": 1.0,
+          "true_positive": 1270,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 681.9203951249947,
+      "seed": 110001,
+      "sha256": "beb3e53ad1a15ad21977f07b11cac4ebc0d9f60cb4191d1209ff78c6d36eb9ab",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.2999634636463281,
+        0.3088943702368456,
+        0.309679976873993,
+        0.31790281879404364,
+        0.3035590293467099
+      ],
+      "assessment_states": [
+        "inconclusive",
+        "confirmed",
+        "confirmed",
+        "confirmed",
+        "confirmed"
+      ],
+      "input_sha256": "c40ef24d4539105130ba05f07efa6a7d722aca4f00844c1b388aa53b66478b06",
+      "path": "validation/cg4/results/objective-calibration-residual-qualification-v1/calibration_residual-110002.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.9851272015655578,
+          "false_negative": 38,
+          "false_positive": 0,
+          "planned": 20035,
+          "precision": 1.0,
+          "recall": 0.9851272015655578,
+          "true_positive": 2517,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9766317485898469,
+          "false_negative": 29,
+          "false_positive": 0,
+          "planned": 9922,
+          "precision": 1.0,
+          "recall": 0.9766317485898469,
+          "true_positive": 1212,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9823576583801122,
+          "false_negative": 22,
+          "false_positive": 0,
+          "planned": 10043,
+          "precision": 1.0,
+          "recall": 0.9823576583801122,
+          "true_positive": 1225,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 759.0612108750211,
+      "seed": 110002,
+      "sha256": "294db2cdd891c238c86bfe6a57ef807ecfc7234c6f314dfba43cf813c9fd794f",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.29042988837962974,
+        0.28940173180026424,
+        0.2936387690617817,
+        0.3059999236968299,
+        0.2988511259681321,
+        0.31344160014680245
+      ],
+      "assessment_states": [
+        "inconclusive",
+        "inconclusive",
+        "inconclusive",
+        "confirmed",
+        "inconclusive",
+        "confirmed"
+      ],
+      "input_sha256": "cdcb4195f4c06102bdc4cdc09d84d76b6e5f4b731c0faeb68bfaa61a48ca23e2",
+      "path": "validation/cg4/results/objective-calibration-residual-qualification-v1/calibration_residual-110003.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.99251968503937,
+          "false_negative": 19,
+          "false_positive": 0,
+          "planned": 19982,
+          "precision": 1.0,
+          "recall": 0.99251968503937,
+          "true_positive": 2521,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9951534733441034,
+          "false_negative": 6,
+          "false_positive": 0,
+          "planned": 10031,
+          "precision": 1.0,
+          "recall": 0.9951534733441034,
+          "true_positive": 1232,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9943089430894309,
+          "false_negative": 7,
+          "false_positive": 0,
+          "planned": 9987,
+          "precision": 1.0,
+          "recall": 0.9943089430894309,
+          "true_positive": 1223,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 628.3685949170031,
+      "seed": 110003,
+      "sha256": "ea87c96ddbdecf11003e73e0efa37a9766895917acfaa9bcd39a1c735621c180",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.29645175290810943,
+        0.28759662878507763
+      ],
+      "assessment_states": [
+        "confirmed",
+        "inconclusive"
+      ],
+      "input_sha256": "990ae51a31db7f12b01a81c145a5687169b5b22fe1ae5fce274b051e52101433",
+      "path": "validation/cg4/results/objective-calibration-residual-qualification-v1/calibration_residual-110004.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.976254308693987,
+          "false_negative": 51,
+          "false_positive": 11,
+          "planned": 19988,
+          "precision": 0.995703125,
+          "recall": 0.9803846153846154,
+          "true_positive": 2549,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9824414715719063,
+          "false_negative": 19,
+          "false_positive": 2,
+          "planned": 9983,
+          "precision": 0.9983007646559049,
+          "recall": 0.9840871021775545,
+          "true_positive": 1175,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9801744647105471,
+          "false_negative": 24,
+          "false_positive": 1,
+          "planned": 10029,
+          "precision": 0.9991915925626516,
+          "recall": 0.9809523809523809,
+          "true_positive": 1236,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 675.1310797090118,
+      "seed": 110004,
+      "sha256": "1c02fc446c9da19c2cae829fca273280ceae1a231d7976306ce6e7ae13cc39e7",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.30222619607369205,
+        0.3095394657593068,
+        0.31946899396081896
+      ],
+      "assessment_states": [
+        "inconclusive",
+        "confirmed",
+        "confirmed"
+      ],
+      "input_sha256": "bf1320552d771a66966dee0b4aeffc353cb84baa6859aee3d79facdd0277533e",
+      "path": "validation/cg4/results/objective-calibration-residual-qualification-v1/calibration_residual-110005.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.9905660377358491,
+          "false_negative": 24,
+          "false_positive": 0,
+          "planned": 19937,
+          "precision": 1.0,
+          "recall": 0.9905660377358491,
+          "true_positive": 2520,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9951845906902087,
+          "false_negative": 6,
+          "false_positive": 0,
+          "planned": 10000,
+          "precision": 1.0,
+          "recall": 0.9951845906902087,
+          "true_positive": 1240,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9903381642512077,
+          "false_negative": 12,
+          "false_positive": 0,
+          "planned": 10063,
+          "precision": 1.0,
+          "recall": 0.9903381642512077,
+          "true_positive": 1230,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 666.4016142079781,
+      "seed": 110005,
+      "sha256": "d018269015f171109e729982ed6fda8c726ee502507f2916406a40b732378651",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.2511298487009537,
+        0.2553224815576797,
+        0.2656877059912083,
+        0.2690826035322838,
+        0.2659561301970719
+      ],
+      "assessment_states": [
+        "inconclusive",
+        "inconclusive",
+        "inconclusive",
+        "inconclusive",
+        "inconclusive"
+      ],
+      "input_sha256": "2677cbea156d3fc8203ce1395104e712218b433965fbee7f4789661add48e27e",
+      "path": "validation/cg4/results/objective-calibration-residual-qualification-v1/calibration_residual-110006.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.9829365079365079,
+          "false_negative": 43,
+          "false_positive": 0,
+          "planned": 19875,
+          "precision": 1.0,
+          "recall": 0.9829365079365079,
+          "true_positive": 2477,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9860655737704918,
+          "false_negative": 17,
+          "false_positive": 0,
+          "planned": 10009,
+          "precision": 1.0,
+          "recall": 0.9860655737704918,
+          "true_positive": 1203,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9821428571428571,
+          "false_negative": 22,
+          "false_positive": 0,
+          "planned": 10116,
+          "precision": 1.0,
+          "recall": 0.9821428571428571,
+          "true_positive": 1210,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 721.3052124580136,
+      "seed": 110006,
+      "sha256": "8214486a3c896241d060581fe6ee0b4af18b235e97ec2c9769c17f7fd2b2261c",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.28443687306101556,
+        0.29097989971042326,
+        0.3044068811426839,
+        0.31199434516925617,
+        0.3114606166852736,
+        0.315603736276222
+      ],
+      "assessment_states": [
+        "inconclusive",
+        "inconclusive",
+        "inconclusive",
+        "confirmed",
+        "confirmed",
+        "confirmed"
+      ],
+      "input_sha256": "0013f5d3e6cbe16386aca5aa98dc045340271257e5320ad93d148be46219fa5b",
+      "path": "validation/cg4/results/objective-calibration-residual-qualification-v1/calibration_residual-110007.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.9825981384055038,
+          "false_negative": 0,
+          "false_positive": 43,
+          "planned": 19991,
+          "precision": 0.9825981384055038,
+          "recall": 1.0,
+          "true_positive": 2428,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9838087895142636,
+          "false_negative": 0,
+          "false_positive": 21,
+          "planned": 10023,
+          "precision": 0.9838087895142636,
+          "recall": 1.0,
+          "true_positive": 1276,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9810543657331137,
+          "false_negative": 0,
+          "false_positive": 23,
+          "planned": 9986,
+          "precision": 0.9810543657331137,
+          "recall": 1.0,
+          "true_positive": 1191,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 680.4270028340106,
+      "seed": 110007,
+      "sha256": "366b25ce7ce6033aef6063af29b432cb2f6872724345298958f79b98e5484bb5",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.28842068360446654,
+        0.2711178099754007,
+        0.2654364574131431,
+        0.2788222546700753,
+        0.2759101568192043,
+        0.2828787736292674
+      ],
+      "assessment_states": [
+        "inconclusive",
+        "inconclusive",
+        "inconclusive",
+        "inconclusive",
+        "inconclusive",
+        "inconclusive"
+      ],
+      "input_sha256": "f701e3802cfdf68a2a255dab31b2cb4494c3ce66c78a0d2c27ed9917aef4ca4d",
+      "path": "validation/cg4/results/objective-calibration-residual-qualification-v1/calibration_residual-110008.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.9810351639668116,
+          "false_negative": 0,
+          "false_positive": 48,
+          "planned": 19937,
+          "precision": 0.9810351639668116,
+          "recall": 1.0,
+          "true_positive": 2483,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9854955680902499,
+          "false_negative": 0,
+          "false_positive": 18,
+          "planned": 10158,
+          "precision": 0.9854955680902499,
+          "recall": 1.0,
+          "true_positive": 1223,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9780736100234926,
+          "false_negative": 0,
+          "false_positive": 28,
+          "planned": 9905,
+          "precision": 0.9780736100234926,
+          "recall": 1.0,
+          "true_positive": 1249,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 627.3621220409987,
+      "seed": 110008,
+      "sha256": "68889c4ddd7f30e4fb68e1f63e2640dca92c1544003aedfec2331484b3a523d0",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.3077656197986127
+      ],
+      "assessment_states": [
+        "confirmed"
+      ],
+      "input_sha256": "2b7d7465ec753ea6362f49a8da0cb2178ccdf1708265b6ebfe2310cd093dd264",
+      "path": "validation/cg4/results/objective-calibration-residual-qualification-v1/calibration_residual-110009.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.9901458415451321,
+          "false_negative": 25,
+          "false_positive": 0,
+          "planned": 19969,
+          "precision": 1.0,
+          "recall": 0.9901458415451321,
+          "true_positive": 2512,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9916943521594684,
+          "false_negative": 10,
+          "false_positive": 0,
+          "planned": 10045,
+          "precision": 1.0,
+          "recall": 0.9916943521594684,
+          "true_positive": 1194,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9952718676122931,
+          "false_negative": 6,
+          "false_positive": 0,
+          "planned": 9986,
+          "precision": 1.0,
+          "recall": 0.9952718676122931,
+          "true_positive": 1263,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 548.892481042014,
+      "seed": 110009,
+      "sha256": "701e12b34e17bda36a38cb00a0511b506dc6cf8d659b6808e032c4c53eef3001",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.2724907791840316,
+        0.2739129262158572,
+        0.27938945733183024,
+        0.29293605700110736
+      ],
+      "assessment_states": [
+        "inconclusive",
+        "inconclusive",
+        "inconclusive",
+        "confirmed"
+      ],
+      "input_sha256": "85cbd2758b25d29e602d049a6cfca312d462ed43e5fd1a9f8d42fcbaf3cd0aaf",
+      "path": "validation/cg4/results/objective-calibration-residual-qualification-v1/calibration_residual-110010.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.9831173930113859,
+          "false_negative": 11,
+          "false_positive": 32,
+          "planned": 20023,
+          "precision": 0.9873817034700315,
+          "recall": 0.9956262425447316,
+          "true_positive": 2504,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.983753046303818,
+          "false_negative": 3,
+          "false_positive": 17,
+          "planned": 9965,
+          "precision": 0.9861563517915309,
+          "recall": 0.9975288303130149,
+          "true_positive": 1211,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9849921011058452,
+          "false_negative": 8,
+          "false_positive": 11,
+          "planned": 10012,
+          "precision": 0.9912559618441972,
+          "recall": 0.9936254980079682,
+          "true_positive": 1247,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 536.8945769170241,
+      "seed": 110010,
+      "sha256": "716908ab308ba227ec064dd74969dc2bfca04c16deadf75246668409e17f3845",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.28942450650746815,
+        0.2795923792645104,
+        0.28109153815396287,
+        0.2748540554144408
+      ],
+      "assessment_states": [
+        "inconclusive",
+        "inconclusive",
+        "inconclusive",
+        "inconclusive"
+      ],
+      "input_sha256": "50db3beab83f5a4a4c5f6a1d7a581e4daef9deecba8ad896763bba5bda0fa34f",
+      "path": "validation/cg4/results/objective-calibration-residual-qualification-v1/calibration_residual-110011.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.9983525535420099,
+          "false_negative": 4,
+          "false_positive": 0,
+          "planned": 19965,
+          "precision": 1.0,
+          "recall": 0.9983525535420099,
+          "true_positive": 2424,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9991694352159468,
+          "false_negative": 1,
+          "false_positive": 0,
+          "planned": 9964,
+          "precision": 1.0,
+          "recall": 0.9991694352159468,
+          "true_positive": 1203,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9975510204081632,
+          "false_negative": 3,
+          "false_positive": 0,
+          "planned": 10071,
+          "precision": 1.0,
+          "recall": 0.9975510204081632,
+          "true_positive": 1222,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 545.9782787919976,
+      "seed": 110011,
+      "sha256": "2e4e15d7c8620c6fb19bab42d1e6726014fcde8c7efcfb68c98672e8cf6c0d44",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.2724572949485912,
+        0.28961843368093676,
+        0.28602668407498427
+      ],
+      "assessment_states": [
+        "inconclusive",
+        "confirmed",
+        "inconclusive"
+      ],
+      "input_sha256": "9b7da2e524aa355adf8ba181376dc30321dc8f041a3fb71f42f4745154e2181d",
+      "path": "validation/cg4/results/objective-calibration-residual-qualification-v1/calibration_residual-110012.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.9935639581657281,
+          "false_negative": 0,
+          "false_positive": 16,
+          "planned": 19950,
+          "precision": 0.9935639581657281,
+          "recall": 1.0,
+          "true_positive": 2470,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9924559932942163,
+          "false_negative": 0,
+          "false_positive": 9,
+          "planned": 10030,
+          "precision": 0.9924559932942163,
+          "recall": 1.0,
+          "true_positive": 1184,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9929356357927787,
+          "false_negative": 0,
+          "false_positive": 9,
+          "planned": 10020,
+          "precision": 0.9929356357927787,
+          "recall": 1.0,
+          "true_positive": 1265,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 507.9290838750021,
+      "seed": 110012,
+      "sha256": "331e461f9bdcb5e2c8c43521c344e380888a7d8b959de0e0dbb22fe38756206d",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.3070015675113446,
+        0.310588690295312
+      ],
+      "assessment_states": [
+        "confirmed",
+        "confirmed"
+      ],
+      "input_sha256": "9709cf6bd54ff84e571b337506d7f55906161aaa371f37c4e605778051145e06",
+      "path": "validation/cg4/results/objective-calibration-residual-qualification-v1/calibration_residual-110013.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.9947068403908795,
+          "false_negative": 13,
+          "false_positive": 0,
+          "planned": 19977,
+          "precision": 1.0,
+          "recall": 0.9947068403908795,
+          "true_positive": 2443,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9932489451476794,
+          "false_negative": 8,
+          "false_positive": 0,
+          "planned": 9992,
+          "precision": 1.0,
+          "recall": 0.9932489451476794,
+          "true_positive": 1177,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9960443037974683,
+          "false_negative": 5,
+          "false_positive": 0,
+          "planned": 10031,
+          "precision": 1.0,
+          "recall": 0.9960443037974683,
+          "true_positive": 1259,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 538.0933059169911,
+      "seed": 110013,
+      "sha256": "a3af9ffbaa4d5a3335f26d837cc019d9eafbf0c018840f45ade4466c1d6d1cdf",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.256418596840584,
+        0.29919938291307585,
+        0.2918780879050369,
+        0.29937680372878206,
+        0.29974905150764275
+      ],
+      "assessment_states": [
+        "inconclusive",
+        "inconclusive",
+        "inconclusive",
+        "confirmed",
+        "confirmed"
+      ],
+      "input_sha256": "4c2da6495ab3c3ae1ef4ec6eb867fa9284d32c615f07cd6f0f1b9fb1afbd74e7",
+      "path": "validation/cg4/results/objective-calibration-residual-qualification-v1/calibration_residual-110014.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.9941245593419507,
+          "false_negative": 14,
+          "false_positive": 1,
+          "planned": 20037,
+          "precision": 0.9996061441512406,
+          "recall": 0.9945141065830722,
+          "true_positive": 2538,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9953524399690162,
+          "false_negative": 6,
+          "false_positive": 0,
+          "planned": 10039,
+          "precision": 1.0,
+          "recall": 0.9953524399690162,
+          "true_positive": 1285,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9884868421052632,
+          "false_negative": 14,
+          "false_positive": 0,
+          "planned": 9924,
+          "precision": 1.0,
+          "recall": 0.9884868421052632,
+          "true_positive": 1202,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 549.3624522500031,
+      "seed": 110014,
+      "sha256": "6db21172e11bdec7c64d86257b4f3bec0208da7a409d5740c10d82f5a08f608e",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.2806616480430338,
+        0.2970007802510884,
+        0.29915375896405,
+        0.3031810536105378
+      ],
+      "assessment_states": [
+        "inconclusive",
+        "confirmed",
+        "confirmed",
+        "confirmed"
+      ],
+      "input_sha256": "4dd56e2aea3156f01082ef5eae01ab0e9252aab94e4fdcace21c53e7eeff27ed",
+      "path": "validation/cg4/results/objective-calibration-residual-qualification-v1/calibration_residual-110015.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.9834450137958218,
+          "false_negative": 39,
+          "false_positive": 3,
+          "planned": 19985,
+          "precision": 0.9987990392313851,
+          "recall": 0.9846093133385951,
+          "true_positive": 2495,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9861111111111112,
+          "false_negative": 18,
+          "false_positive": 0,
+          "planned": 10060,
+          "precision": 1.0,
+          "recall": 0.9861111111111112,
+          "true_positive": 1278,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9818611987381703,
+          "false_negative": 23,
+          "false_positive": 0,
+          "planned": 9955,
+          "precision": 1.0,
+          "recall": 0.9818611987381703,
+          "true_positive": 1245,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 539.7732893339999,
+      "seed": 110015,
+      "sha256": "eae2ab4d8cfe01eb978f43a3ed53801b2af7cbe2ad19f2242dedffff1e4f020a",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.26392380615306654,
+        0.2636328593621469,
+        0.2677434827670141,
+        0.27113594137305647,
+        0.2825313492339429,
+        0.2949247614950916
+      ],
+      "assessment_states": [
+        "inconclusive",
+        "inconclusive",
+        "inconclusive",
+        "inconclusive",
+        "inconclusive",
+        "confirmed"
+      ],
+      "input_sha256": "5b232fd31bc5a2ce9c22a062293c895df17dd117ca607b96421fb25755592442",
+      "path": "validation/cg4/results/objective-calibration-residual-qualification-v1/calibration_residual-110016.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.9915117219078415,
+          "false_negative": 0,
+          "false_positive": 21,
+          "planned": 20081,
+          "precision": 0.9915117219078415,
+          "recall": 1.0,
+          "true_positive": 2453,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.985634477254589,
+          "false_negative": 0,
+          "false_positive": 18,
+          "planned": 9942,
+          "precision": 0.985634477254589,
+          "recall": 1.0,
+          "true_positive": 1235,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9944532488114105,
+          "false_negative": 0,
+          "false_positive": 7,
+          "planned": 9977,
+          "precision": 0.9944532488114105,
+          "recall": 1.0,
+          "true_positive": 1255,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 515.4514633750077,
+      "seed": 110016,
+      "sha256": "2e3c9695318037c79c013a8eaa8fc76f6a3f98c3c324f87a0cf2c7d047820adf",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.27985089560952525,
+        0.28120959919742233,
+        0.2867495068842445,
+        0.28923153928707435
+      ],
+      "assessment_states": [
+        "inconclusive",
+        "inconclusive",
+        "confirmed",
+        "inconclusive"
+      ],
+      "input_sha256": "71a15098d760fdf8730b54aefec3b347d258cccdf4997ff2defe5c8a358223f2",
+      "path": "validation/cg4/results/objective-calibration-residual-qualification-v1/calibration_residual-110017.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.9979740680713128,
+          "false_negative": 0,
+          "false_positive": 5,
+          "planned": 19881,
+          "precision": 0.9979740680713128,
+          "recall": 1.0,
+          "true_positive": 2463,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.997545008183306,
+          "false_negative": 0,
+          "false_positive": 3,
+          "planned": 10162,
+          "precision": 0.997545008183306,
+          "recall": 1.0,
+          "true_positive": 1219,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9968404423380727,
+          "false_negative": 0,
+          "false_positive": 4,
+          "planned": 9957,
+          "precision": 0.9968404423380727,
+          "recall": 1.0,
+          "true_positive": 1262,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 489.8353817919851,
+      "seed": 110017,
+      "sha256": "4dcfddeb29d442529124944d1e798e18c160903afa02090511243ec983ac4a58",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.31616502482644215,
+        0.3027718552601708,
+        0.2972487700881159
+      ],
+      "assessment_states": [
+        "inconclusive",
+        "confirmed",
+        "confirmed"
+      ],
+      "input_sha256": "987d603febc321517a3846b92f94f16358411cd974862169fd95b5fb9341bd7c",
+      "path": "validation/cg4/results/objective-calibration-residual-qualification-v1/calibration_residual-110018.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.9900596421471173,
+          "false_negative": 0,
+          "false_positive": 25,
+          "planned": 19889,
+          "precision": 0.9900596421471173,
+          "recall": 1.0,
+          "true_positive": 2490,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9891388673390225,
+          "false_negative": 0,
+          "false_positive": 14,
+          "planned": 10031,
+          "precision": 0.9891388673390225,
+          "recall": 1.0,
+          "true_positive": 1275,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9922178988326849,
+          "false_negative": 0,
+          "false_positive": 10,
+          "planned": 10080,
+          "precision": 0.9922178988326849,
+          "recall": 1.0,
+          "true_positive": 1275,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 514.8416620829958,
+      "seed": 110018,
+      "sha256": "2d3f2aa40709bda813bc19d85ff33b33b4b527d5b05bbb69572b631fadeb8bdc",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.32211472979811284,
+        0.2698011626936918,
+        0.27718445028045263,
+        0.2780813537903998,
+        0.2889860311620733,
+        0.2879959606721544,
+        0.29120780103448884
+      ],
+      "assessment_states": [
+        "inconclusive",
+        "inconclusive",
+        "inconclusive",
+        "inconclusive",
+        "inconclusive",
+        "inconclusive",
+        "confirmed"
+      ],
+      "input_sha256": "f8d80577e570b4e10d316b055c2bccc31d1039e10f6bef10729d62b1d16b1867",
+      "path": "validation/cg4/results/objective-calibration-residual-qualification-v1/calibration_residual-110019.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.9802293396599446,
+          "false_negative": 0,
+          "false_positive": 50,
+          "planned": 19947,
+          "precision": 0.9802293396599446,
+          "recall": 1.0,
+          "true_positive": 2479,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.986013986013986,
+          "false_negative": 0,
+          "false_positive": 18,
+          "planned": 10060,
+          "precision": 0.986013986013986,
+          "recall": 1.0,
+          "true_positive": 1269,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.971875,
+          "false_negative": 0,
+          "false_positive": 36,
+          "planned": 9993,
+          "precision": 0.971875,
+          "recall": 1.0,
+          "true_positive": 1244,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 499.6017439579882,
+      "seed": 110019,
+      "sha256": "4d53727ac83153182e69a1a3beff2de56d6f2270ce4b496ff8aeac601a75b598",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.2935968123623341,
+        0.2842725387612032,
+        0.2985572388297808,
+        0.2944512019815556
+      ],
+      "assessment_states": [
+        "inconclusive",
+        "inconclusive",
+        "inconclusive",
+        "confirmed"
+      ],
+      "input_sha256": "5d7bbdd1b4ac276f683230729a4cf1f8a18c677e9c603d3ca7a239153cf5e4a9",
+      "path": "validation/cg4/results/objective-calibration-residual-qualification-v1/calibration_residual-110020.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.9816549570647931,
+          "false_negative": 47,
+          "false_positive": 0,
+          "planned": 20011,
+          "precision": 1.0,
+          "recall": 0.9816549570647931,
+          "true_positive": 2515,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9903846153846154,
+          "false_negative": 12,
+          "false_positive": 0,
+          "planned": 10016,
+          "precision": 1.0,
+          "recall": 0.9903846153846154,
+          "true_positive": 1236,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.991207034372502,
+          "false_negative": 11,
+          "false_positive": 0,
+          "planned": 9973,
+          "precision": 1.0,
+          "recall": 0.991207034372502,
+          "true_positive": 1240,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 478.97953058301937,
+      "seed": 110020,
+      "sha256": "27f56fd83085e4e62004abcd7696fd190d614af47ffe4741acd98029dbef4788",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.2794852634677582,
+        0.275137525617517,
+        0.2784861638632664,
+        0.2760773037467039,
+        0.27308563046776585,
+        0.2918145671810946,
+        0.2882337072773857,
+        0.2996312516588936,
+        0.29771240086174594
+      ],
+      "assessment_states": [
+        "inconclusive",
+        "inconclusive",
+        "inconclusive",
+        "inconclusive",
+        "inconclusive",
+        "inconclusive",
+        "inconclusive",
+        "confirmed",
+        "confirmed"
+      ],
+      "input_sha256": "83082db99577e31e9bb87a430b5c846d2f9b40092fea95c508f11eb56c7b8bb4",
+      "path": "validation/cg4/results/objective-calibration-residual-qualification-v1/calibration_residual-110021.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.9874493927125506,
+          "false_negative": 0,
+          "false_positive": 31,
+          "planned": 19979,
+          "precision": 0.9874493927125506,
+          "recall": 1.0,
+          "true_positive": 2439,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9887820512820513,
+          "false_negative": 0,
+          "false_positive": 14,
+          "planned": 9991,
+          "precision": 0.9887820512820513,
+          "recall": 1.0,
+          "true_positive": 1234,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9858823529411764,
+          "false_negative": 0,
+          "false_positive": 18,
+          "planned": 10030,
+          "precision": 0.9858823529411764,
+          "recall": 1.0,
+          "true_positive": 1257,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 557.9654042089824,
+      "seed": 110021,
+      "sha256": "1626db163aec1865f36ce174b16e61e16822fc87c69b45b9f5b0951adbc3d01b",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.25786003995545476,
+        0.31223629513527196
+      ],
+      "assessment_states": [
+        "inconclusive",
+        "confirmed"
+      ],
+      "input_sha256": "38c9be0549d5c119c327517a4c97675da45ad910af0396d54189cb5e2e3e363f",
+      "path": "validation/cg4/results/objective-calibration-residual-qualification-v1/calibration_residual-110022.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.9806373537716822,
+          "false_negative": 48,
+          "false_positive": 0,
+          "planned": 20267,
+          "precision": 1.0,
+          "recall": 0.9806373537716822,
+          "true_positive": 2431,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.978441127694859,
+          "false_negative": 26,
+          "false_positive": 0,
+          "planned": 9885,
+          "precision": 1.0,
+          "recall": 0.978441127694859,
+          "true_positive": 1180,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9808811305070657,
+          "false_negative": 22,
+          "false_positive": 1,
+          "planned": 9848,
+          "precision": 0.9991532599491956,
+          "recall": 0.9816971713810316,
+          "true_positive": 1180,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 569.5397714590072,
+      "seed": 110022,
+      "sha256": "ab8434dca145a5d30abab402d67c1811881476905353eedb3bdc27acf6ae4067",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.26917315168340306,
+        0.2938019466690929,
+        0.3224744413033412,
+        0.30063735201169756
+      ],
+      "assessment_states": [
+        "inconclusive",
+        "inconclusive",
+        "confirmed",
+        "confirmed"
+      ],
+      "input_sha256": "099a83aa2f9eb58b25e59d8abe81df5b0f23a3aea6d1cd1c56401326e619522e",
+      "path": "validation/cg4/results/objective-calibration-residual-qualification-v1/calibration_residual-110023.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.9866247049567269,
+          "false_negative": 0,
+          "false_positive": 34,
+          "planned": 20078,
+          "precision": 0.9866247049567269,
+          "recall": 1.0,
+          "true_positive": 2508,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9878640776699029,
+          "false_negative": 0,
+          "false_positive": 15,
+          "planned": 10056,
+          "precision": 0.9878640776699029,
+          "recall": 1.0,
+          "true_positive": 1221,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9878345498783455,
+          "false_negative": 0,
+          "false_positive": 15,
+          "planned": 9866,
+          "precision": 0.9878345498783455,
+          "recall": 1.0,
+          "true_positive": 1218,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 527.7715928330144,
+      "seed": 110023,
+      "sha256": "a4b26a33b0c02c3445215a20558d0e05cd893e2f30b5f69192ff502be4da9f06",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.26717882070933824,
+        0.2732486457924547
+      ],
+      "assessment_states": [
+        "inconclusive",
+        "inconclusive"
+      ],
+      "input_sha256": "9f985247fff3074e745c1a2ba7243919b37953ac78b52fb7438787c189ffd0a3",
+      "path": "validation/cg4/results/objective-calibration-residual-qualification-v1/calibration_residual-110024.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.9840764331210191,
+          "false_negative": 40,
+          "false_positive": 0,
+          "planned": 19974,
+          "precision": 1.0,
+          "recall": 0.9840764331210191,
+          "true_positive": 2472,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9824701195219123,
+          "false_negative": 22,
+          "false_positive": 0,
+          "planned": 10106,
+          "precision": 1.0,
+          "recall": 0.9824701195219123,
+          "true_positive": 1233,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9904926534140017,
+          "false_negative": 11,
+          "false_positive": 0,
+          "planned": 9920,
+          "precision": 1.0,
+          "recall": 0.9904926534140017,
+          "true_positive": 1146,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 467.3581723750103,
+      "seed": 110024,
+      "sha256": "3ed21ca2f37256c8598c0c3c6d79b65fd190f1c5840f1e7230f7b237aa3fb19b",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.2776220253966418,
+        0.2791130699960814,
+        0.287642523363367,
+        0.29690043472432354,
+        0.2985612986900533
+      ],
+      "assessment_states": [
+        "inconclusive",
+        "inconclusive",
+        "inconclusive",
+        "confirmed",
+        "confirmed"
+      ],
+      "input_sha256": "43bd60b60e045aa89c3ed81cbc9524adfb2a879e7691d07cae785e35ba4799c7",
+      "path": "validation/cg4/results/objective-calibration-residual-qualification-v1/calibration_residual-110025.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.9976114649681529,
+          "false_negative": 0,
+          "false_positive": 6,
+          "planned": 19844,
+          "precision": 0.9976114649681529,
+          "recall": 1.0,
+          "true_positive": 2506,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9983416252072969,
+          "false_negative": 0,
+          "false_positive": 2,
+          "planned": 10016,
+          "precision": 0.9983416252072969,
+          "recall": 1.0,
+          "true_positive": 1204,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 1.0,
+          "false_negative": 0,
+          "false_positive": 0,
+          "planned": 10140,
+          "precision": 1.0,
+          "recall": 1.0,
+          "true_positive": 1301,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 411.7355959590059,
+      "seed": 110025,
+      "sha256": "9bddaa341af221f6a8f1a7f5861811f1fc0f5a2fd10e23044f6c4fd413600cce",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.25314862585131165,
+        0.2843840543687768,
+        0.288067615144709,
+        0.2859632842023614,
+        0.28520330269339345
+      ],
+      "assessment_states": [
+        "inconclusive",
+        "inconclusive",
+        "inconclusive",
+        "inconclusive",
+        "inconclusive"
+      ],
+      "input_sha256": "e86924e72fb92afead2e4d5149fc21413e75dfe51ae8b852a06476c0f61ed8a5",
+      "path": "validation/cg4/results/objective-calibration-residual-qualification-v1/calibration_residual-110026.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.9932619896948077,
+          "false_negative": 16,
+          "false_positive": 1,
+          "planned": 20057,
+          "precision": 0.9996011168727563,
+          "recall": 0.9936558287073751,
+          "true_positive": 2506,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9943548387096774,
+          "false_negative": 7,
+          "false_positive": 0,
+          "planned": 9995,
+          "precision": 1.0,
+          "recall": 0.9943548387096774,
+          "true_positive": 1233,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9967266775777414,
+          "false_negative": 4,
+          "false_positive": 0,
+          "planned": 9948,
+          "precision": 1.0,
+          "recall": 0.9967266775777414,
+          "true_positive": 1218,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 449.9390310840099,
+      "seed": 110026,
+      "sha256": "62b2494c6e03407a555990f0f6027c543692ccc6834fa6d08d7030b8f7695bfe",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.29053313403089187,
+        0.29792361460094113,
+        0.303797306558407,
+        0.3125757406787852,
+        0.3066044228602918
+      ],
+      "assessment_states": [
+        "inconclusive",
+        "inconclusive",
+        "confirmed",
+        "confirmed",
+        "confirmed"
+      ],
+      "input_sha256": "cd9d28e6620c7dc34b1d07fc73b57a94fc1c41a196e3cd2be191567c8ffc8f59",
+      "path": "validation/cg4/results/objective-calibration-residual-qualification-v1/calibration_residual-110027.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.9941882991088725,
+          "false_negative": 0,
+          "false_positive": 15,
+          "planned": 19973,
+          "precision": 0.9941882991088725,
+          "recall": 1.0,
+          "true_positive": 2566,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9959016393442623,
+          "false_negative": 0,
+          "false_positive": 5,
+          "planned": 10137,
+          "precision": 0.9959016393442623,
+          "recall": 1.0,
+          "true_positive": 1215,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9968,
+          "false_negative": 0,
+          "false_positive": 4,
+          "planned": 9890,
+          "precision": 0.9968,
+          "recall": 1.0,
+          "true_positive": 1246,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 456.52284583298024,
+      "seed": 110027,
+      "sha256": "cafaa0cc5d4b99af7c222b83fb80ce2e9a0765209fd16bbd6d29ed73f59665f5",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.22928972917731222,
+        0.30447133215071076,
+        0.28698020855501166,
+        0.3223083798423388
+      ],
+      "assessment_states": [
+        "inconclusive",
+        "inconclusive",
+        "inconclusive",
+        "confirmed"
+      ],
+      "input_sha256": "47d5823a00b8ee59a5c4db896d34c02bbe8f9cf9cb2eff4439f2913a44709ee0",
+      "path": "validation/cg4/results/objective-calibration-residual-qualification-v1/calibration_residual-110028.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.9921537857983523,
+          "false_negative": 19,
+          "false_positive": 1,
+          "planned": 19990,
+          "precision": 0.999604743083004,
+          "recall": 0.9925431711145997,
+          "true_positive": 2529,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.991283676703645,
+          "false_negative": 11,
+          "false_positive": 0,
+          "planned": 9885,
+          "precision": 1.0,
+          "recall": 0.991283676703645,
+          "true_positive": 1251,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9945482866043613,
+          "false_negative": 6,
+          "false_positive": 1,
+          "planned": 10125,
+          "precision": 0.9992175273865415,
+          "recall": 0.995323460639127,
+          "true_positive": 1277,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 474.57330783299403,
+      "seed": 110028,
+      "sha256": "de446804de694116e3df3c558d177fea51711c9763a3d3fe7d93bc10bcf97ac5",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.2881751686403169
+      ],
+      "assessment_states": [
+        "confirmed"
+      ],
+      "input_sha256": "55c92a5af144320d79c79ba3ad51a30ed46058a2a596a4d12703e6be06e26031",
+      "path": "validation/cg4/results/objective-calibration-residual-qualification-v1/calibration_residual-110029.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.9769749900754268,
+          "false_negative": 28,
+          "false_positive": 30,
+          "planned": 20053,
+          "precision": 0.9879566439181052,
+          "recall": 0.9887505022097228,
+          "true_positive": 2461,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9705654531371031,
+          "false_negative": 24,
+          "false_positive": 14,
+          "planned": 9941,
+          "precision": 0.988950276243094,
+          "recall": 0.9812059514487079,
+          "true_positive": 1253,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9769736842105263,
+          "false_negative": 18,
+          "false_positive": 10,
+          "planned": 10006,
+          "precision": 0.991652754590985,
+          "recall": 0.9850746268656716,
+          "true_positive": 1188,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 434.77139816698036,
+      "seed": 110029,
+      "sha256": "d4d7d005115243117e7d3b54dcaae9ce25c33bd174838c0e4239318b9da77656",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.303711059806788,
+        0.29200621961540735,
+        0.29361794188978896
+      ],
+      "assessment_states": [
+        "inconclusive",
+        "confirmed",
+        "confirmed"
+      ],
+      "input_sha256": "31edfe6da28eea532eadb9099d20bec1c7211891b6becf49883dba042c37283e",
+      "path": "validation/cg4/results/objective-calibration-residual-qualification-v1/calibration_residual-110030.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.991941982272361,
+          "false_negative": 0,
+          "false_positive": 20,
+          "planned": 19933,
+          "precision": 0.991941982272361,
+          "recall": 1.0,
+          "true_positive": 2462,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9902439024390244,
+          "false_negative": 0,
+          "false_positive": 12,
+          "planned": 9986,
+          "precision": 0.9902439024390244,
+          "recall": 1.0,
+          "true_positive": 1218,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9914263445050663,
+          "false_negative": 0,
+          "false_positive": 11,
+          "planned": 10081,
+          "precision": 0.9914263445050663,
+          "recall": 1.0,
+          "true_positive": 1272,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 667.0156687499839,
+      "seed": 110030,
+      "sha256": "10f8d5d9996ae858d24b8738b0fa54cae84024d34a3327c651f130d7d8e8802b",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.19323646714345788,
+        0.27533344712159985,
+        0.2776862927920573
+      ],
+      "assessment_states": [
+        "inconclusive",
+        "inconclusive",
+        "inconclusive"
+      ],
+      "input_sha256": "a37615f4e724200edca954787765d0d380242d7a13649e2d08351b2df73d38a5",
+      "path": "validation/cg4/results/objective-calibration-residual-qualification-v1/calibration_residual-110031.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.983387358184765,
+          "false_negative": 8,
+          "false_positive": 33,
+          "planned": 19973,
+          "precision": 0.9865853658536585,
+          "recall": 0.9967145790554415,
+          "true_positive": 2427,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9913725490196078,
+          "false_negative": 6,
+          "false_positive": 5,
+          "planned": 10102,
+          "precision": 0.996059889676911,
+          "recall": 0.9952755905511811,
+          "true_positive": 1264,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9934372436423298,
+          "false_negative": 2,
+          "false_positive": 6,
+          "planned": 9925,
+          "precision": 0.9950698438783895,
+          "recall": 0.998351195383347,
+          "true_positive": 1211,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 890.6636649580032,
+      "seed": 110031,
+      "sha256": "c8bec359f6ef03a220f2d34021fe8c22463273de637ad4ef670c3999258aa325",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.3176749532296904,
+        0.3025320599409547
+      ],
+      "assessment_states": [
+        "confirmed",
+        "confirmed"
+      ],
+      "input_sha256": "548715e82349143be515ed55724f6cca2e3f4f6d315d48f62b852078059974cd",
+      "path": "validation/cg4/results/objective-calibration-residual-qualification-v1/calibration_residual-110032.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.9738640932850824,
+          "false_negative": 0,
+          "false_positive": 65,
+          "planned": 19963,
+          "precision": 0.9738640932850824,
+          "recall": 1.0,
+          "true_positive": 2422,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9768,
+          "false_negative": 0,
+          "false_positive": 29,
+          "planned": 9967,
+          "precision": 0.9768,
+          "recall": 1.0,
+          "true_positive": 1221,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.982225656877898,
+          "false_negative": 0,
+          "false_positive": 23,
+          "planned": 10070,
+          "precision": 0.982225656877898,
+          "recall": 1.0,
+          "true_positive": 1271,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 832.2586136669852,
+      "seed": 110032,
+      "sha256": "141503c934350739a314f851c6b70a893ded1d90788a2c5698b1e2c9b3f06cca",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.22344526241790866,
+        0.2733759915477018,
+        0.27791017617822517,
+        0.284596730850012
+      ],
+      "assessment_states": [
+        "inconclusive",
+        "inconclusive",
+        "inconclusive",
+        "confirmed"
+      ],
+      "input_sha256": "a5eadffcaeaf74f6bca4ac8dfd843548319b89ac0953a7733d4794d28f7e7569",
+      "path": "validation/cg4/results/objective-calibration-residual-qualification-v1/calibration_residual-110033.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.9916930379746836,
+          "false_negative": 20,
+          "false_positive": 1,
+          "planned": 19917,
+          "precision": 0.9996012759170654,
+          "recall": 0.9920854768500198,
+          "true_positive": 2507,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.991869918699187,
+          "false_negative": 10,
+          "false_positive": 0,
+          "planned": 10157,
+          "precision": 1.0,
+          "recall": 0.991869918699187,
+          "true_positive": 1220,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9825811559778306,
+          "false_negative": 22,
+          "false_positive": 0,
+          "planned": 9926,
+          "precision": 1.0,
+          "recall": 0.9825811559778306,
+          "true_positive": 1241,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 629.3389569160063,
+      "seed": 110033,
+      "sha256": "afe68acc7aab826fcc17cebf27c4ff8d2c3e6262959c19aaf71a776d2163ed43",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.27330648922556516,
+        0.28203368014587576,
+        0.2826044589304615,
+        0.2753064325717937,
+        0.2930419464934493,
+        0.29277995118219186,
+        0.28029158546268784
+      ],
+      "assessment_states": [
+        "inconclusive",
+        "inconclusive",
+        "inconclusive",
+        "inconclusive",
+        "inconclusive",
+        "confirmed",
+        "inconclusive"
+      ],
+      "input_sha256": "45cb10c6a7d1a57999db4ff08e6ea1ad21c5fa9db59017370cbf14daa9b7ec73",
+      "path": "validation/cg4/results/objective-calibration-residual-qualification-v1/calibration_residual-110034.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.9829683698296837,
+          "false_negative": 41,
+          "false_positive": 1,
+          "planned": 19927,
+          "precision": 0.9995876288659794,
+          "recall": 0.983367139959432,
+          "true_positive": 2424,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.982995951417004,
+          "false_negative": 21,
+          "false_positive": 0,
+          "planned": 10013,
+          "precision": 1.0,
+          "recall": 0.982995951417004,
+          "true_positive": 1214,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9854368932038835,
+          "false_negative": 17,
+          "false_positive": 1,
+          "planned": 10060,
+          "precision": 0.9991796554552912,
+          "recall": 0.9862348178137652,
+          "true_positive": 1218,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 669.2962459170376,
+      "seed": 110034,
+      "sha256": "43688dbb669e68ec247a9b46b13a087ad978e1d59bdc063f18c97523b6240f68",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.1862671086429879,
+        0.26270023757716854,
+        0.2479880018458699,
+        0.2975195707320596
+      ],
+      "assessment_states": [
+        "inconclusive",
+        "inconclusive",
+        "inconclusive",
+        "confirmed"
+      ],
+      "input_sha256": "26c463b431f4408fff82062ed4e956ce8c7c72f6224615152cc85015ea2ece87",
+      "path": "validation/cg4/results/objective-calibration-residual-qualification-v1/calibration_residual-110035.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.9984031936127744,
+          "false_negative": 0,
+          "false_positive": 4,
+          "planned": 20076,
+          "precision": 0.9984031936127744,
+          "recall": 1.0,
+          "true_positive": 2501,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9984825493171472,
+          "false_negative": 0,
+          "false_positive": 2,
+          "planned": 10070,
+          "precision": 0.9984825493171472,
+          "recall": 1.0,
+          "true_positive": 1316,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 1.0,
+          "false_negative": 0,
+          "false_positive": 0,
+          "planned": 9854,
+          "precision": 1.0,
+          "recall": 1.0,
+          "true_positive": 1244,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 616.9888500410016,
+      "seed": 110035,
+      "sha256": "7ed79ff47250a4b15912b1ae51c57e4413bbfd4d41bc60732ea7eeb56ec796ad",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.2792674584255421,
+        0.27388643318599115,
+        0.2857950872656755,
+        0.29165884643611406,
+        0.3063940539395983,
+        0.30843300684430075
+      ],
+      "assessment_states": [
+        "inconclusive",
+        "inconclusive",
+        "inconclusive",
+        "inconclusive",
+        "confirmed",
+        "confirmed"
+      ],
+      "input_sha256": "32b63cecd676ade6179669aca8f1f7c58c498f340ef0a688fe5236cc543507b8",
+      "path": "validation/cg4/results/objective-calibration-residual-qualification-v1/calibration_residual-110036.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.995603517186251,
+          "false_negative": 0,
+          "false_positive": 11,
+          "planned": 20000,
+          "precision": 0.995603517186251,
+          "recall": 1.0,
+          "true_positive": 2491,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9936102236421726,
+          "false_negative": 0,
+          "false_positive": 8,
+          "planned": 9954,
+          "precision": 0.9936102236421726,
+          "recall": 1.0,
+          "true_positive": 1244,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9920823436262867,
+          "false_negative": 0,
+          "false_positive": 10,
+          "planned": 10046,
+          "precision": 0.9920823436262867,
+          "recall": 1.0,
+          "true_positive": 1253,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 532.0189264999935,
+      "seed": 110036,
+      "sha256": "9fedc103761d948dd094b32f7c403770a310cbb81c594ec1365cca0d2db3948a",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.26294138374675285,
+        0.2817236072927169,
+        0.28700446293520415,
+        0.2731559198183075,
+        0.3043762235581504,
+        0.2991937310064732
+      ],
+      "assessment_states": [
+        "inconclusive",
+        "inconclusive",
+        "inconclusive",
+        "inconclusive",
+        "confirmed",
+        "confirmed"
+      ],
+      "input_sha256": "11978805014f5ba655c83b7e3c6a465514c120185ade724acc2d5d747b3c27dc",
+      "path": "validation/cg4/results/objective-calibration-residual-qualification-v1/calibration_residual-110037.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.9803767660910518,
+          "false_negative": 50,
+          "false_positive": 0,
+          "planned": 19962,
+          "precision": 1.0,
+          "recall": 0.9803767660910518,
+          "true_positive": 2498,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9802683504340963,
+          "false_negative": 25,
+          "false_positive": 0,
+          "planned": 9972,
+          "precision": 1.0,
+          "recall": 0.9802683504340963,
+          "true_positive": 1242,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9753694581280788,
+          "false_negative": 30,
+          "false_positive": 0,
+          "planned": 10066,
+          "precision": 1.0,
+          "recall": 0.9753694581280788,
+          "true_positive": 1188,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 526.5314790830016,
+      "seed": 110037,
+      "sha256": "d4ca6afbd55d5978cb06f4454d384110486708816ad881f652e12bec4a47504f",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.28192089657940855,
+        0.29082309801309864,
+        0.29981258957116086,
+        0.3010136500445919,
+        0.2845527228083946
+      ],
+      "assessment_states": [
+        "inconclusive",
+        "inconclusive",
+        "confirmed",
+        "confirmed",
+        "inconclusive"
+      ],
+      "input_sha256": "6c919b8d2322f0e441e26e870c020c6164c0df443943736a145a757f02fa2ca2",
+      "path": "validation/cg4/results/objective-calibration-residual-qualification-v1/calibration_residual-110038.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.9931396287328491,
+          "false_negative": 17,
+          "false_positive": 0,
+          "planned": 19995,
+          "precision": 1.0,
+          "recall": 0.9931396287328491,
+          "true_positive": 2461,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.990506329113924,
+          "false_negative": 12,
+          "false_positive": 0,
+          "planned": 10011,
+          "precision": 1.0,
+          "recall": 0.990506329113924,
+          "true_positive": 1252,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9967266775777414,
+          "false_negative": 4,
+          "false_positive": 0,
+          "planned": 9994,
+          "precision": 1.0,
+          "recall": 0.9967266775777414,
+          "true_positive": 1218,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 536.7871070830151,
+      "seed": 110038,
+      "sha256": "2e81ad78f17fc56fd7bd80bc79b20e6c42fae94c79effe2ba92cb7d0ed16d452",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.3001802030195997,
+        0.29331294097501937,
+        0.2891619751177749,
+        0.29398829684258165
+      ],
+      "assessment_states": [
+        "inconclusive",
+        "inconclusive",
+        "confirmed",
+        "confirmed"
+      ],
+      "input_sha256": "ebc137da1bf9bde9d589bc3ce7844d23ac6414be73ba5632667f0f996d0e202b",
+      "path": "validation/cg4/results/objective-calibration-residual-qualification-v1/calibration_residual-110039.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.9800918836140888,
+          "false_negative": 52,
+          "false_positive": 0,
+          "planned": 19949,
+          "precision": 1.0,
+          "recall": 0.9800918836140888,
+          "true_positive": 2560,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9809917355371901,
+          "false_negative": 23,
+          "false_positive": 0,
+          "planned": 10047,
+          "precision": 1.0,
+          "recall": 0.9809917355371901,
+          "true_positive": 1187,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9788897576231431,
+          "false_negative": 27,
+          "false_positive": 0,
+          "planned": 10004,
+          "precision": 1.0,
+          "recall": 0.9788897576231431,
+          "true_positive": 1252,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 545.0314945410355,
+      "seed": 110039,
+      "sha256": "a60ce376cad32bb1b71fffebeae2fa784a8b441294725202962e8f76f9712df1",
+      "success": true
+    }
+  ]
+}

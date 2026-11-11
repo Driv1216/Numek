@@ -1,0 +1,1027 @@
+{
+  "H_outcomes_evaluated": false,
+  "development_seed": 7,
+  "import_origin": "/Users/drivyaanshyadav/Desktop/Numek/validation/cg4/source-capsules.nosync/59f6784386f6a7b1db909ddb59f564f5154283198175d2c8f32cf0489078955c/src/confidenceguard/__init__.py",
+  "records": {
+    "calibration_bins": {
+      "D_target_sha256": "7b56edd2823de8eabcd70ad14c6c33f5a51b6e2ba00688841556b25edd75593b",
+      "binary": false,
+      "bounds": [
+        -1.0,
+        1.0
+      ],
+      "eligible_sha256": "1075c5e6602ae3895f2ef94f007bcec3dd784e5a7c87c0a2c61200876e176d6b",
+      "input_sha256": "48ef4756469dde125eac2da24cbf0e60121fc5fc5eebb55009755835fbb8f0b2",
+      "key_sha256": "489ff4d09ff443d9f72d8809e04858fa1f0d4a1cdbdbec016045a7ebd677ed23",
+      "native_D": {
+        "metric_identity": {
+          "dimensions": {
+            "binning": "fixed_equal_width",
+            "calibration_partition": [
+              [
+                0.0,
+                0.1,
+                false
+              ],
+              [
+                0.1,
+                0.2,
+                false
+              ],
+              [
+                0.2,
+                0.3,
+                false
+              ],
+              [
+                0.3,
+                0.4,
+                false
+              ],
+              [
+                0.4,
+                0.5,
+                false
+              ],
+              [
+                0.5,
+                0.6,
+                false
+              ],
+              [
+                0.6,
+                0.7,
+                false
+              ],
+              [
+                0.7,
+                0.8,
+                false
+              ],
+              [
+                0.8,
+                0.9,
+                false
+              ],
+              [
+                0.9,
+                1.0,
+                true
+              ]
+            ],
+            "ece_definition": "sum_bin_mass_absolute_frequency_gap",
+            "target": "event"
+          },
+          "family": "calibration",
+          "method_version": "1",
+          "metric": "reliability_diagram",
+          "units": null
+        },
+        "support": 596,
+        "value": 0.057046979865771785,
+        "value_state": "finite"
+      },
+      "objective_identity": {
+        "authoritative_metric": "reliability_diagram",
+        "authoritative_transform": "identity",
+        "bounds": [],
+        "ceiling": null,
+        "comparator": "complement",
+        "conditional_denominator": "eligible_records",
+        "current_period": null,
+        "definition_version": "failure_objective_v1",
+        "direction": "higher",
+        "eligible_population": "outcome_valid AND prob_valid",
+        "id": "failure",
+        "interval": null,
+        "learning_target": "(y='1')::DOUBLE-probs[2]",
+        "material_error": null,
+        "metric": "reliability_diagram",
+        "metric_identity": {},
+        "nominal": null,
+        "paired_reference": null,
+        "practical_threshold": 0.15,
+        "proxy": "signed_calibration_residual_heads",
+        "reference_period": null,
+        "reference_run": null,
+        "run": "candidate",
+        "target": "1",
+        "task": {
+          "classes": [
+            "0",
+            "1"
+          ],
+          "horizon": null,
+          "kind": "binary_classification",
+          "material_error": null,
+          "outcome_definition": "synthetic_issued_error",
+          "positive_class": "1",
+          "units": null
+        },
+        "training_clip": 30.0,
+        "units": "fraction"
+      }
+    },
+    "calibration_residual": {
+      "D_target_sha256": "1883a0da348af9a261152953d58de2f83b3514ebdeeb9e606562c0b9795dd3f5",
+      "binary": false,
+      "bounds": [
+        -1.0,
+        1.0
+      ],
+      "eligible_sha256": "587998d1fb159cc551d8fd776559fa688b761590fe73ba9bea6f7b5286303680",
+      "input_sha256": "48ef4756469dde125eac2da24cbf0e60121fc5fc5eebb55009755835fbb8f0b2",
+      "key_sha256": "89962ccac2cb71cf7425f95084e621235e0f1cb09b383128eb502db2ea1b05c2",
+      "native_D": {
+        "metric_identity": {
+          "dimensions": {
+            "definition": "registered_additive_diagnostic_v1"
+          },
+          "family": "diagnostic",
+          "method_version": "1",
+          "metric": "calibration_residual",
+          "units": "fraction"
+        },
+        "support": 588,
+        "value": 0.05272108843537415,
+        "value_state": "finite"
+      },
+      "objective_identity": {
+        "authoritative_metric": "calibration_residual",
+        "authoritative_transform": "identity",
+        "bounds": [],
+        "ceiling": null,
+        "comparator": "complement",
+        "conditional_denominator": "eligible_records",
+        "current_period": null,
+        "definition_version": "failure_objective_v1",
+        "direction": "higher",
+        "eligible_population": "outcome_valid AND prob_valid",
+        "id": "failure",
+        "interval": null,
+        "learning_target": "(y='1')::DOUBLE-probs[2]",
+        "material_error": null,
+        "metric": "calibration_residual",
+        "metric_identity": {},
+        "nominal": null,
+        "paired_reference": null,
+        "practical_threshold": 0.15,
+        "proxy": "exact_additive_loss",
+        "reference_period": null,
+        "reference_run": null,
+        "run": "candidate",
+        "target": "1",
+        "task": {
+          "classes": [
+            "0",
+            "1"
+          ],
+          "horizon": null,
+          "kind": "binary_classification",
+          "material_error": null,
+          "outcome_definition": "synthetic_issued_error",
+          "positive_class": "1",
+          "units": null
+        },
+        "training_clip": 30.0,
+        "units": "fraction"
+      }
+    },
+    "false_negative": {
+      "D_target_sha256": "bbf5dcb9565c665001f431059f19c5cab05776974e1e8222289daf76d67a1130",
+      "binary": true,
+      "bounds": [
+        0.0,
+        1.0
+      ],
+      "eligible_sha256": "8f2b75c1d0673a431af25798463ac75373cdd5afb5834bf9b7c3d525c9aaac6c",
+      "input_sha256": "c4aedcac81099bb8ab54538bbe68fe71332e7a904c80f7b30d46c606dfdeb639",
+      "key_sha256": "b51aee235353a8f435fb40e771d0bd22a3823495eea736bfa1bd47696acc11de",
+      "native_D": {
+        "metric_identity": {
+          "dimensions": {},
+          "family": "performance",
+          "method_version": "1",
+          "metric": "recall",
+          "units": null
+        },
+        "support": 296,
+        "value": 0.09459459459459463,
+        "value_state": "finite"
+      },
+      "objective_identity": {
+        "authoritative_metric": "recall",
+        "authoritative_transform": "one_minus",
+        "bounds": [],
+        "ceiling": null,
+        "comparator": "complement",
+        "conditional_denominator": "class_conditional_records",
+        "current_period": null,
+        "definition_version": "failure_objective_v1",
+        "direction": "higher",
+        "eligible_population": "outcome_valid AND decision IS NOT NULL AND state IN ('issued','hypothetical') AND y='1'",
+        "id": "failure",
+        "interval": null,
+        "learning_target": "(decision<>'1')::DOUBLE",
+        "material_error": null,
+        "metric": "false_negative_rate",
+        "metric_identity": {},
+        "nominal": null,
+        "paired_reference": null,
+        "practical_threshold": 0.15,
+        "proxy": "exact_additive_loss",
+        "reference_period": null,
+        "reference_run": null,
+        "run": "candidate",
+        "target": null,
+        "task": {
+          "classes": [
+            "0",
+            "1"
+          ],
+          "horizon": null,
+          "kind": "binary_classification",
+          "material_error": null,
+          "outcome_definition": "synthetic_issued_error",
+          "positive_class": "1",
+          "units": null
+        },
+        "training_clip": 30.0,
+        "units": "fraction"
+      }
+    },
+    "false_positive": {
+      "D_target_sha256": "f96ceebb7770dba127103e74370a0ea07834588435e5db00b547a1d62334b59c",
+      "binary": true,
+      "bounds": [
+        0.0,
+        1.0
+      ],
+      "eligible_sha256": "1253ba5d109ed60b922bab2840e71c3365c00173ad73947e229b619393725869",
+      "input_sha256": "acd287e427a627dc784387b3d1119ddf245dd53397ed5736db9f856b9c5f7edd",
+      "key_sha256": "5d927890aa01b0c316f09622c242cd08aeeacac685bcfc9e0ac4f7d0b398169f",
+      "native_D": {
+        "metric_identity": {
+          "dimensions": {},
+          "family": "performance",
+          "method_version": "1",
+          "metric": "specificity",
+          "units": null
+        },
+        "support": 315,
+        "value": 0.13015873015873014,
+        "value_state": "finite"
+      },
+      "objective_identity": {
+        "authoritative_metric": "specificity",
+        "authoritative_transform": "one_minus",
+        "bounds": [],
+        "ceiling": null,
+        "comparator": "complement",
+        "conditional_denominator": "class_conditional_records",
+        "current_period": null,
+        "definition_version": "failure_objective_v1",
+        "direction": "higher",
+        "eligible_population": "outcome_valid AND decision IS NOT NULL AND state IN ('issued','hypothetical') AND y<>'1'",
+        "id": "failure",
+        "interval": null,
+        "learning_target": "(decision='1')::DOUBLE",
+        "material_error": null,
+        "metric": "false_positive_rate",
+        "metric_identity": {},
+        "nominal": null,
+        "paired_reference": null,
+        "practical_threshold": 0.15,
+        "proxy": "exact_additive_loss",
+        "reference_period": null,
+        "reference_run": null,
+        "run": "candidate",
+        "target": null,
+        "task": {
+          "classes": [
+            "0",
+            "1"
+          ],
+          "horizon": null,
+          "kind": "binary_classification",
+          "material_error": null,
+          "outcome_definition": "synthetic_issued_error",
+          "positive_class": "1",
+          "units": null
+        },
+        "training_clip": 30.0,
+        "units": "fraction"
+      }
+    },
+    "paired_degradation": {
+      "D_target_sha256": "79384fed62350fc5142e0eaffae53e2f96132114d5e26f542a02eecc3c9ec180",
+      "binary": true,
+      "bounds": [
+        0.0,
+        1.0
+      ],
+      "eligible_sha256": "14cd7fd4d8cd6e881bf19625926391688f1ebc0e56ec32dfaa292e9413fc523f",
+      "input_sha256": "86550d9c1a39122896e9d675206f89af1f0c8e5248a32204d802b31b3c68ac82",
+      "key_sha256": "cad714918a4de2b440ebabeada69ba4f99943240f9e4505249dba1c022d3c12e",
+      "native_D": {
+        "metric_identity": {
+          "dimensions": {},
+          "family": "performance",
+          "method_version": "1",
+          "metric": "accuracy",
+          "units": null
+        },
+        "support": 600,
+        "value": 0.1433333333333333,
+        "value_state": "finite"
+      },
+      "objective_identity": {
+        "authoritative_metric": "accuracy",
+        "authoritative_transform": "one_minus",
+        "bounds": [],
+        "ceiling": null,
+        "comparator": "paired",
+        "conditional_denominator": "eligible_records",
+        "current_period": null,
+        "definition_version": "failure_objective_v1",
+        "direction": "higher",
+        "eligible_population": "outcome_valid AND decision IS NOT NULL AND state IN ('issued','hypothetical')",
+        "id": "failure",
+        "interval": null,
+        "learning_target": "(decision<>y)::DOUBLE",
+        "material_error": null,
+        "metric": "error_rate",
+        "metric_identity": {},
+        "nominal": null,
+        "paired_reference": {
+          "authoritative_metric": "accuracy",
+          "authoritative_transform": "one_minus",
+          "bounds": [],
+          "ceiling": null,
+          "comparator": "complement",
+          "conditional_denominator": "eligible_records",
+          "current_period": null,
+          "definition_version": "failure_objective_v1",
+          "direction": "higher",
+          "eligible_population": "outcome_valid AND decision IS NOT NULL AND state IN ('issued','hypothetical')",
+          "id": "failure",
+          "interval": null,
+          "learning_target": "(decision<>y)::DOUBLE",
+          "material_error": null,
+          "metric": "error_rate",
+          "metric_identity": {},
+          "nominal": null,
+          "paired_reference": null,
+          "practical_threshold": 0.15,
+          "proxy": "exact_additive_loss",
+          "reference_period": null,
+          "reference_run": null,
+          "run": "reference",
+          "target": null,
+          "task": {
+            "classes": [
+              "0",
+              "1"
+            ],
+            "horizon": null,
+            "kind": "binary_classification",
+            "material_error": null,
+            "outcome_definition": "synthetic_issued_error",
+            "positive_class": "1",
+            "units": null
+          },
+          "training_clip": 30.0,
+          "units": "fraction"
+        },
+        "practical_threshold": 0.15,
+        "proxy": "paired_metric_specific_proposal_difference:exact_additive_loss",
+        "reference_period": null,
+        "reference_run": "reference",
+        "run": "candidate",
+        "target": null,
+        "task": {
+          "classes": [
+            "0",
+            "1"
+          ],
+          "horizon": null,
+          "kind": "binary_classification",
+          "material_error": null,
+          "outcome_definition": "synthetic_issued_error",
+          "positive_class": "1",
+          "units": null
+        },
+        "training_clip": 30.0,
+        "units": "fraction"
+      }
+    },
+    "paired_precision": {
+      "D_target_sha256": "b86a5e626fa65bc1123cddf1c13519ecfd77059577bb37cf57428ea767745c6e",
+      "binary": true,
+      "bounds": [
+        0.0,
+        1.0
+      ],
+      "eligible_sha256": "1075c5e6602ae3895f2ef94f007bcec3dd784e5a7c87c0a2c61200876e176d6b",
+      "input_sha256": "8d10c6d9ba8fe3288663c7ad78e7b99d9f6bed05fbdf6c16c30f5336744078ef",
+      "key_sha256": "13b2d942f37a518326700826f25130175b15ac96c7209f29d5989a9f82f35ef3",
+      "native_D": {
+        "metric_identity": {
+          "dimensions": {},
+          "family": "performance",
+          "method_version": "1",
+          "metric": "precision",
+          "units": null
+        },
+        "support": 326,
+        "value": 0.8496932515337423,
+        "value_state": "finite"
+      },
+      "objective_identity": {
+        "authoritative_metric": "precision",
+        "authoritative_transform": "identity",
+        "bounds": [],
+        "ceiling": null,
+        "comparator": "paired",
+        "conditional_denominator": "class_conditional_records",
+        "current_period": null,
+        "definition_version": "failure_objective_v2",
+        "direction": "lower",
+        "eligible_population": "outcome_valid AND decision IS NOT NULL AND state IN ('issued','hypothetical') AND decision='1'",
+        "id": "failure",
+        "interval": null,
+        "learning_target": "D-only difference of precision ratio influence proxies on the common issued base, with each model's own positive denominator; proposal proxy, not a subgroup precision estimator.",
+        "material_error": null,
+        "metric": "precision",
+        "metric_identity": {},
+        "nominal": null,
+        "paired_eligible_population": "outcome_valid AND decision IS NOT NULL AND state IN ('issued','hypothetical')",
+        "paired_population_version": "common_issued_base_distinct_positive_denominators_v2",
+        "paired_reference": {
+          "authoritative_metric": "precision",
+          "authoritative_transform": "identity",
+          "bounds": [],
+          "ceiling": null,
+          "comparator": "complement",
+          "conditional_denominator": "class_conditional_records",
+          "current_period": null,
+          "definition_version": "failure_objective_v1",
+          "direction": "lower",
+          "eligible_population": "outcome_valid AND decision IS NOT NULL AND state IN ('issued','hypothetical') AND decision='1'",
+          "id": "failure",
+          "interval": null,
+          "learning_target": "(y='1')::DOUBLE",
+          "material_error": null,
+          "metric": "precision",
+          "metric_identity": {},
+          "nominal": null,
+          "paired_reference": null,
+          "practical_threshold": 0.15,
+          "proxy": "exact_additive_loss",
+          "reference_period": null,
+          "reference_run": null,
+          "run": "reference",
+          "target": null,
+          "task": {
+            "classes": [
+              "0",
+              "1"
+            ],
+            "horizon": null,
+            "kind": "binary_classification",
+            "material_error": null,
+            "outcome_definition": "synthetic_issued_error",
+            "positive_class": "1",
+            "units": null
+          },
+          "training_clip": 30.0,
+          "units": "fraction"
+        },
+        "practical_threshold": 0.15,
+        "proxy": "paired_precision_ratio_influence_v2",
+        "reference_period": null,
+        "reference_run": "reference",
+        "run": "candidate",
+        "target": null,
+        "task": {
+          "classes": [
+            "0",
+            "1"
+          ],
+          "horizon": null,
+          "kind": "binary_classification",
+          "material_error": null,
+          "outcome_definition": "synthetic_issued_error",
+          "positive_class": "1",
+          "units": null
+        },
+        "training_clip": 30.0,
+        "units": "fraction"
+      }
+    },
+    "precision": {
+      "D_target_sha256": "2818b900ed5615294bd99ddc41e18989e063c223e7d01d592531a7ecc1fdd3cb",
+      "binary": true,
+      "bounds": [
+        0.0,
+        1.0
+      ],
+      "eligible_sha256": "5f830e04519a4a41f794b2c7209a2167dbf31e4198edfe0387355c332081ed86",
+      "input_sha256": "a1710d7023e09a904cf54ee30c3be768db9c9aab1ea0d11a140517ac6d850533",
+      "key_sha256": "63c9896aac07d2f20036b803e30a26facfb4ed9f5f540f61ec7eeb62a512ef57",
+      "native_D": {
+        "metric_identity": {
+          "dimensions": {},
+          "family": "performance",
+          "method_version": "1",
+          "metric": "precision",
+          "units": null
+        },
+        "support": 299,
+        "value": 0.8461538461538461,
+        "value_state": "finite"
+      },
+      "objective_identity": {
+        "authoritative_metric": "precision",
+        "authoritative_transform": "identity",
+        "bounds": [],
+        "ceiling": null,
+        "comparator": "complement",
+        "conditional_denominator": "class_conditional_records",
+        "current_period": null,
+        "definition_version": "failure_objective_v1",
+        "direction": "lower",
+        "eligible_population": "outcome_valid AND decision IS NOT NULL AND state IN ('issued','hypothetical') AND decision='1'",
+        "id": "failure",
+        "interval": null,
+        "learning_target": "(y='1')::DOUBLE",
+        "material_error": null,
+        "metric": "precision",
+        "metric_identity": {},
+        "nominal": null,
+        "paired_reference": null,
+        "practical_threshold": 0.15,
+        "proxy": "exact_additive_loss",
+        "reference_period": null,
+        "reference_run": null,
+        "run": "candidate",
+        "target": null,
+        "task": {
+          "classes": [
+            "0",
+            "1"
+          ],
+          "horizon": null,
+          "kind": "binary_classification",
+          "material_error": null,
+          "outcome_definition": "synthetic_issued_error",
+          "positive_class": "1",
+          "units": null
+        },
+        "training_clip": 30.0,
+        "units": "fraction"
+      }
+    },
+    "probability_quality": {
+      "D_target_sha256": "d6d3a67924a62fbddb45163f8a2fdafecb8515d5b67119543ccefd643dc18e11",
+      "binary": false,
+      "bounds": [
+        0.0,
+        1.0
+      ],
+      "eligible_sha256": "0f9e82350d027deea901f625fb85e31f67cc45936752babf72841cc89533498c",
+      "input_sha256": "2501b3982753e620be9a67dd02b2be0ac68db92efedb007f17fb8f37042f5bce",
+      "key_sha256": "a500d97a86d14986de6c41f0f69a39513c8b244445496dceeb9c840ccae820c4",
+      "native_D": {
+        "metric_identity": {
+          "dimensions": {
+            "definition": "binary_event_squared_error"
+          },
+          "family": "probability_quality",
+          "method_version": "1",
+          "metric": "brier",
+          "units": null
+        },
+        "support": 603,
+        "value": 0.1413432835820906,
+        "value_state": "finite"
+      },
+      "objective_identity": {
+        "authoritative_metric": "brier",
+        "authoritative_transform": "identity",
+        "bounds": [],
+        "ceiling": null,
+        "comparator": "complement",
+        "conditional_denominator": "eligible_records",
+        "current_period": null,
+        "definition_version": "failure_objective_v1",
+        "direction": "higher",
+        "eligible_population": "outcome_valid AND prob_valid",
+        "id": "failure",
+        "interval": null,
+        "learning_target": "brier",
+        "material_error": null,
+        "metric": "brier",
+        "metric_identity": {},
+        "nominal": null,
+        "paired_reference": null,
+        "practical_threshold": 0.12,
+        "proxy": "exact_additive_loss",
+        "reference_period": null,
+        "reference_run": null,
+        "run": "candidate",
+        "target": null,
+        "task": {
+          "classes": [
+            "0",
+            "1"
+          ],
+          "horizon": null,
+          "kind": "binary_classification",
+          "material_error": null,
+          "outcome_definition": "synthetic_issued_error",
+          "positive_class": "1",
+          "units": null
+        },
+        "training_clip": 30.0,
+        "units": "fraction"
+      }
+    },
+    "ranking_ap": {
+      "D_target_sha256": "f5aa4388040ef17282ac06247394ac803db1f8f433a01c7e94217a4163f0153e",
+      "binary": false,
+      "bounds": [],
+      "eligible_sha256": "26db4844dff9662a629502a338acb0f84d3521bd7398c24625f56250f66a59cc",
+      "input_sha256": "6eb1238a295564a7ce3867f944e85bb689201cda75115f4807e6bf0ae5306abe",
+      "key_sha256": "ad750ba12e1d8027576a17be478a4d5889a4c9105964671f6e094f2a43411c02",
+      "native_D": {
+        "metric_identity": {
+          "dimensions": {
+            "definition": "non_interpolated_recall_increment"
+          },
+          "family": "ranking",
+          "method_version": "1",
+          "metric": "average_precision",
+          "units": null
+        },
+        "support": 591,
+        "value": 0.8300971990323355,
+        "value_state": "finite"
+      },
+      "objective_identity": {
+        "authoritative_metric": "average_precision",
+        "authoritative_transform": "identity",
+        "bounds": [],
+        "ceiling": null,
+        "comparator": "complement",
+        "conditional_denominator": "eligible_records",
+        "current_period": null,
+        "definition_version": "failure_objective_v1",
+        "direction": "lower",
+        "eligible_population": "outcome_valid AND rank_score IS NOT NULL",
+        "id": "failure",
+        "interval": null,
+        "learning_target": "D-only target-specific ranking performance surrogate: one minus discordance / positive precision staircase",
+        "material_error": null,
+        "metric": "average_precision",
+        "metric_identity": {},
+        "nominal": null,
+        "paired_reference": null,
+        "practical_threshold": 0.2,
+        "proxy": "D_precision_staircase_and_discordance_proxy",
+        "reference_period": null,
+        "reference_run": null,
+        "run": "candidate",
+        "target": null,
+        "task": {
+          "classes": [
+            "0",
+            "1"
+          ],
+          "horizon": null,
+          "kind": "binary_classification",
+          "material_error": null,
+          "outcome_definition": "synthetic_issued_error",
+          "positive_class": "1",
+          "units": null
+        },
+        "training_clip": 30.0,
+        "units": "fraction"
+      }
+    },
+    "ranking_auc": {
+      "D_target_sha256": "70ee18d456806df3b99696a2084cbbbaf152a41a4c98cd1239b78737061ba2f4",
+      "binary": false,
+      "bounds": [],
+      "eligible_sha256": "bf445b5cf1e09280e946d6d4d4db213443c1970f871082fc72c3a92fe4e1e8ec",
+      "input_sha256": "6eb1238a295564a7ce3867f944e85bb689201cda75115f4807e6bf0ae5306abe",
+      "key_sha256": "9e833449104bc4f4809cdc4dcae25ed4dd909e581ad0011ea10c6106c38f4969",
+      "native_D": {
+        "metric_identity": {
+          "dimensions": {},
+          "family": "ranking",
+          "method_version": "1",
+          "metric": "roc_auc",
+          "units": null
+        },
+        "support": 608,
+        "value": 0.8345052083333333,
+        "value_state": "finite"
+      },
+      "objective_identity": {
+        "authoritative_metric": "roc_auc",
+        "authoritative_transform": "identity",
+        "bounds": [],
+        "ceiling": null,
+        "comparator": "complement",
+        "conditional_denominator": "eligible_records",
+        "current_period": null,
+        "definition_version": "failure_objective_v1",
+        "direction": "lower",
+        "eligible_population": "outcome_valid AND rank_score IS NOT NULL",
+        "id": "failure",
+        "interval": null,
+        "learning_target": "D-only target-specific ranking performance surrogate: one minus discordance / positive precision staircase",
+        "material_error": null,
+        "metric": "roc_auc",
+        "metric_identity": {},
+        "nominal": null,
+        "paired_reference": null,
+        "practical_threshold": 0.35,
+        "proxy": "fixed_D_discordance",
+        "reference_period": null,
+        "reference_run": null,
+        "run": "candidate",
+        "target": null,
+        "task": {
+          "classes": [
+            "0",
+            "1"
+          ],
+          "horizon": null,
+          "kind": "binary_classification",
+          "material_error": null,
+          "outcome_definition": "synthetic_issued_error",
+          "positive_class": "1",
+          "units": null
+        },
+        "training_clip": 30.0,
+        "units": "fraction"
+      }
+    },
+    "regression_bias": {
+      "D_target_sha256": "2f1575b378803e598288a718ad5103b73af24c2cc74af4ac0d4178d109879612",
+      "binary": false,
+      "bounds": [
+        -1.0,
+        2.0
+      ],
+      "eligible_sha256": "83b9366160d278e7173f1b9bc8ecfd580e6d003493736fa984c2f64a722d1a35",
+      "input_sha256": "2dadc40c5c9c74ae76230e5a7d072e3a799dec8071c487a32df96ba7a4c4cba1",
+      "key_sha256": "10b8b4212534e98364f52b0de4484c90df97bef2d28e3769a71e39737ac99cf2",
+      "native_D": {
+        "metric_identity": {
+          "dimensions": {},
+          "family": "performance",
+          "method_version": "1",
+          "metric": "bias",
+          "units": "metres"
+        },
+        "support": 589,
+        "value": 0.1275480063685671,
+        "value_state": "finite"
+      },
+      "objective_identity": {
+        "authoritative_metric": "bias",
+        "authoritative_transform": "identity",
+        "bounds": [
+          -1.0,
+          2.0
+        ],
+        "ceiling": null,
+        "comparator": "complement",
+        "conditional_denominator": "eligible_records",
+        "current_period": null,
+        "definition_version": "failure_objective_v1",
+        "direction": "higher",
+        "eligible_population": "outcome_valid AND point IS NOT NULL AND state IN ('issued','hypothetical') AND isfinite(point-y_num)",
+        "id": "failure",
+        "interval": null,
+        "learning_target": "point-y_num",
+        "material_error": null,
+        "metric": "bias",
+        "metric_identity": {},
+        "nominal": null,
+        "paired_reference": null,
+        "practical_threshold": 0.45,
+        "proxy": "exact_additive_loss",
+        "reference_period": null,
+        "reference_run": null,
+        "run": "candidate",
+        "target": null,
+        "task": {
+          "classes": [],
+          "horizon": null,
+          "kind": "regression",
+          "material_error": 1.0,
+          "outcome_definition": "Synthetic bounded continuous target",
+          "positive_class": null,
+          "units": "metres"
+        },
+        "training_clip": 30.0,
+        "units": "metres"
+      }
+    },
+    "regression_tail": {
+      "D_target_sha256": "0f12726eb0c3ae7b514f77682c5bbb02d9368ae3df3f737d0859e09e2a8a7b97",
+      "binary": true,
+      "bounds": [
+        0.0,
+        1.0
+      ],
+      "eligible_sha256": "1075c5e6602ae3895f2ef94f007bcec3dd784e5a7c87c0a2c61200876e176d6b",
+      "input_sha256": "2bbbb768504a1bec28504ce37a2900bd5cc498c4fb9c558a2b1b533cc5e9d381",
+      "key_sha256": "297734b432953f030b99447f2f55792c054a8b7ca9351a720b9cfe630d21874d",
+      "native_D": {
+        "metric_identity": {
+          "dimensions": {},
+          "family": "failures",
+          "method_version": "1",
+          "metric": "material_error_rate",
+          "units": null
+        },
+        "support": 596,
+        "value": 0.087248322147651,
+        "value_state": "finite"
+      },
+      "objective_identity": {
+        "authoritative_metric": "material_error_rate",
+        "authoritative_transform": "identity",
+        "bounds": [],
+        "ceiling": null,
+        "comparator": "complement",
+        "conditional_denominator": "eligible_records",
+        "current_period": null,
+        "definition_version": "failure_objective_v1",
+        "direction": "higher",
+        "eligible_population": "outcome_valid AND point IS NOT NULL AND state IN ('issued','hypothetical') AND isfinite(point-y_num)",
+        "id": "failure",
+        "interval": null,
+        "learning_target": "(abs(point-y_num)>1.0)::DOUBLE",
+        "material_error": null,
+        "metric": "material_error_rate",
+        "metric_identity": {},
+        "nominal": null,
+        "paired_reference": null,
+        "practical_threshold": 0.25,
+        "proxy": "exact_additive_loss",
+        "reference_period": null,
+        "reference_run": null,
+        "run": "candidate",
+        "target": null,
+        "task": {
+          "classes": [],
+          "horizon": null,
+          "kind": "regression",
+          "material_error": 1.0,
+          "outcome_definition": "Synthetic bounded continuous target",
+          "positive_class": null,
+          "units": "metres"
+        },
+        "training_clip": 30.0,
+        "units": "fraction"
+      }
+    },
+    "uncertainty_coverage": {
+      "D_target_sha256": "9c2bba27e01f1273561bcb2505957a8e4aa079ae3e5536d9d2a7c1225ecab881",
+      "binary": true,
+      "bounds": [
+        0.0,
+        1.0
+      ],
+      "eligible_sha256": "0f9e82350d027deea901f625fb85e31f67cc45936752babf72841cc89533498c",
+      "input_sha256": "0c34435afef2f5b2343d900c550d6caecbdd8a2c92f0b0ef8f5f1d559c7b92d9",
+      "key_sha256": "02eba6c893c3d48bd2da49818bfa3abb28e8e72637f8df7e2aa5223a6855efde",
+      "native_D": {
+        "metric_identity": {
+          "dimensions": {
+            "interval": "issued_interval",
+            "nominal": "0.9"
+          },
+          "family": "intervals",
+          "method_version": "1",
+          "metric": "interval_coverage",
+          "units": null
+        },
+        "support": 603,
+        "value": 0.154228855721393,
+        "value_state": "finite"
+      },
+      "objective_identity": {
+        "authoritative_metric": "interval_coverage",
+        "authoritative_transform": "one_minus",
+        "bounds": [],
+        "ceiling": null,
+        "comparator": "complement",
+        "conditional_denominator": "eligible_records",
+        "current_period": null,
+        "definition_version": "failure_objective_v1",
+        "direction": "higher",
+        "eligible_population": "outcome_valid AND l0 IS NOT NULL AND u0 IS NOT NULL",
+        "id": "failure",
+        "interval": "issued_interval",
+        "learning_target": "(y_num<l0 OR y_num>u0)::DOUBLE",
+        "material_error": null,
+        "metric": "interval_miscoverage",
+        "metric_identity": {},
+        "nominal": null,
+        "paired_reference": null,
+        "practical_threshold": 0.25,
+        "proxy": "exact_additive_loss",
+        "reference_period": null,
+        "reference_run": null,
+        "run": "candidate",
+        "target": null,
+        "task": {
+          "classes": [],
+          "horizon": null,
+          "kind": "regression",
+          "material_error": 1.0,
+          "outcome_definition": "Synthetic bounded continuous target",
+          "positive_class": null,
+          "units": "metres"
+        },
+        "training_clip": 30.0,
+        "units": "fraction"
+      }
+    },
+    "uncertainty_efficiency": {
+      "D_target_sha256": "750778546cbe5eb515eadfa804cefd8216adf0da8095ee2014fcf054b7fedc0c",
+      "binary": false,
+      "bounds": [
+        1.0,
+        5.0
+      ],
+      "eligible_sha256": "4dcce022459e4a94fb22b4dc6fc4edf941c8eb368fcaae2ca9766f385dd9ec72",
+      "input_sha256": "0a90728be63508252c21a0ee3678588c76cc8702fcb0ca27128d431c67a40df7",
+      "key_sha256": "6b611f30a7568616f73895bed77392a537ecefec20ed3fd3a8c6050ce827c288",
+      "native_D": {
+        "metric_identity": {
+          "dimensions": {
+            "interval": "issued_interval"
+          },
+          "family": "intervals",
+          "method_version": "1",
+          "metric": "interval_width",
+          "units": "metres"
+        },
+        "support": 597,
+        "value": 2.268006700167504,
+        "value_state": "finite"
+      },
+      "objective_identity": {
+        "authoritative_metric": "interval_width",
+        "authoritative_transform": "identity",
+        "bounds": [
+          1.0,
+          5.0
+        ],
+        "ceiling": null,
+        "comparator": "complement",
+        "conditional_denominator": "eligible_records",
+        "current_period": null,
+        "definition_version": "failure_objective_v1",
+        "direction": "higher",
+        "eligible_population": "outcome_valid AND l0 IS NOT NULL AND u0 IS NOT NULL",
+        "id": "failure",
+        "interval": "issued_interval",
+        "learning_target": "w0",
+        "material_error": null,
+        "metric": "interval_width",
+        "metric_identity": {},
+        "nominal": null,
+        "paired_reference": null,
+        "practical_threshold": 1.0,
+        "proxy": "exact_additive_loss",
+        "reference_period": null,
+        "reference_run": null,
+        "run": "candidate",
+        "target": null,
+        "task": {
+          "classes": [],
+          "horizon": null,
+          "kind": "regression",
+          "material_error": 1.0,
+          "outcome_definition": "Synthetic bounded continuous target",
+          "positive_class": null,
+          "units": "metres"
+        },
+        "training_clip": 30.0,
+        "units": "metres"
+      }
+    }
+  },
+  "scope": "One deterministic D/native-metric regression fixture per existing campaign objective. No discovery fit, selection, H reduction, method qualification, or claim that old source is the new source.",
+  "source_identity": "59f6784386f6a7b1db909ddb59f564f5154283198175d2c8f32cf0489078955c",
+  "units": 1200
+}

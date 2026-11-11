@@ -1,0 +1,23 @@
+...F                                                                     [100%]
+=================================== FAILURES ===================================
+_______ test_duplicate_driver_refuses_before_waiting_or_launching_trials _______
+
+tmp_path = PosixPath('/private/var/folders/cs/c15xvw9d3t53tzcws5yxjxcr0000gn/T/pytest-of-drivyaanshyadav/pytest-509/test_duplicate_driver_refuses_0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x10b0dfbd0>
+
+    def test_duplicate_driver_refuses_before_waiting_or_launching_trials(tmp_path,monkeypatch):
+        from confidenceguard.contracts import EvaluationError
+        module=tool(monkeypatch)
+        monkeypatch.setattr(module,'snapshot',lambda identity:(module.ROOT,identity))
+        monkeypatch.setattr(sys,'argv',['campaign','--source-identity','fixture','--broad-directory',str(tmp_path/'broad'),'--out',str(tmp_path)])
+        with module.file_lock(tmp_path/'.campaign.lock'):
+>           with pytest.raises(EvaluationError,match='locked'):module.main()
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           AssertionError: Regex pattern did not match.
+E             Expected regex: 'locked'
+E             Actual message: 'Workspace is busy; retry after the current operation.'
+
+tests/cg4/test_selection_campaign.py:53: AssertionError
+=========================== short test summary info ============================
+FAILED tests/cg4/test_selection_campaign.py::test_duplicate_driver_refuses_before_waiting_or_launching_trials
+1 failed, 3 passed in 1.67s

@@ -1,6 +1,131 @@
 # Numek Master Context
 
-Last updated: 2026-10-21
+## CG6 completion and founder acceptance — 2026-11-08
+
+The founder has explicitly confirmed that CG6 is done and accepted. CG1–CG6 are
+complete within their approved scopes. This decision supersedes earlier
+pending-review, pending-understanding and pending-founder-acceptance language;
+no further CG6 review, correction or understanding work is implied.
+
+The [final implementation explainer](../validation/cg6/CG6_FINAL_IMPLEMENTATION_EXPLAINER.md)
+is complete: all 16 requested areas, six Mermaid diagrams, every CG6-specific
+Python source file, end-to-end workflows, mathematics, hardware/evidence limits,
+R1–R6, glossary and 15 detailed technical questions. Documentation checks confirmed
+source references and the unchanged 230-file runtime identity
+`aa72f09caa5bc5b174db5b4253add54a9fba8b3ecec3309c99f0beb0608fbf6a`.
+No implementation tests or qualification campaigns were rerun for the explainer
+or this documentation update.
+
+CPU/MPS qualification remains scoped to recorded profiles; actual NVIDIA CUDA
+runtime qualification remains pending compatible hardware and nonblocking.
+Scientific assumptions, legitimate refusals, larger-workload exclusions and
+source-bound historical evidence remain unchanged. Sealed correction/closure
+receipts and their documentation hashes remain historical snapshots; subsequent
+living-document updates do not reseal or rewrite them. See
+[current completion status](../validation/cg6/IMPLEMENTATION_STATUS.md).
+CG7 work requires a separate founder instruction.
+
+## CG6 independent-review corrections — 2026-11-08
+
+Historical correction-pass status; the founder acceptance above supersedes its
+pending-acceptance language.
+
+The independent review required six bounded corrections, authorized by the founder:
+direct auxiliary admission; frozen ensemble semantics; authoritative imported CG2
+membership eligibility; output-bound gradient attacks; numeric missing sentinels;
+and deterministic CUDA startup prerequisites. Current implementation, verification
+and corrected source identity are in
+[the correction record](../validation/cg6/review-corrections-r1-r6/REVIEW_CORRECTIONS.md).
+Original source-bound receipts remain historical. This is not a new milestone or
+scientific campaign. CG1–CG5 acceptance is preserved; CG6 understanding/founder
+acceptance and actual NVIDIA runtime qualification remain separate.
+
+The bounded correction implementation and engineering verification are complete;
+this does not constitute independent re-review acceptance or founder acceptance.
+
+## Historical CG6 implementation checkpoint — 2026-11-07
+
+CG6 implements the approved controlled local execution architecture in three focused packages: `confidenceguard.execution`, `confidenceguard.auxiliary` and `confidenceguard.robustness`. Shared analytics, supervision, ownership, catalog v2, frozen CG2/CG4/CG5 semantics and canonical report projection remain authoritative. Implementation, hardware qualification, scientific method standing and experimental findings are separate. CUDA implementation/contracts are required; actual NVIDIA runtime qualification is pending compatible hardware and does not block unrelated closure. See [the CG6 guide](CG6_CONFIDENCEGUARD.md) and [verification checkpoint](../validation/cg6/IMPLEMENTATION_STATUS.md). Engineering verification is complete, including all 21 admitted named-Mac performance profiles; independent review and understanding follow it.
+
+## CG5 completion — 2026-11-06
+
+The founder has confirmed CG5 is fully completed, including implementation,
+independent review, R01–R09 and D1–D5 corrections, engineering verification and
+the implementation understanding gate. This decision supersedes pending-review,
+pending-understanding and pending-founder-acceptance language retained below.
+CG1–CG5 are complete within their approved scopes; scientific limitations and
+source-specific historical evidence remain unchanged. No CG6 work is implied.
+
+The [final implementation explainer](../validation/cg5/CG5_FINAL_IMPLEMENTATION_EXPLAINER.md) covers architecture, source files,
+policy semantics, optimization, statistical assessment, four execution scenarios,
+corrections, limitations, glossary and 15 technical questions. Its quick
+requirements review found all 13 requested areas present and no material issues
+in the technical spot-checks; no test suite was rerun for that document review.
+The explained 190-file runtime identity is
+`7d3f64affcbc9491223e23294482149848f3bd945a7aaefce33af4af7b3fc3b9`.
+
+## Current project decision — 2026-11-04
+
+CG1–CG4 are complete under the founder-approved scope, CG4 closure revision and
+review corrections. Older pending-acceptance statements below describe the historical
+review workflow and are superseded by that project decision. Scientific refusals
+and original qualification evidence remain unchanged.
+
+CG5 is **not founder-accepted**. The fresh independent review reproduced material
+optimization, identity, assessment, economic and historical-scope defects on the
+original verified source. The founder authorized a targeted R01–R09 correction pass,
+including historical constraint ledgers, hybrid routing/leaf optimization, MILP tie
+refinement and admission guidance. Corrections and current verification evidence are
+recorded in [the correction ledger](../validation/cg5/review-corrections-20261104/REVIEW_CORRECTIONS.md).
+The original 549-test gate and original workload measurements remain historical
+source-specific evidence. See [current CG5 contracts](CG5_CONFIDENCEGUARD.md).
+Focused independent re-review and founder acceptance remain separate; CG6, a ZIP
+and the educational implementation report are not part of this correction pass.
+
+The second focused independent CG5 re-review identified D1–D5. The authorized
+2026-11-05 correction pass addresses registered regression inference, global
+tolerance nomination, weighted RMSE tie bands, hybrid frontier standing and
+interpretable public claims. Current source identity, focused verification and
+remaining limits are recorded in [the D1–D5 correction report](../validation/cg5/defect-corrections-20261105/DEFECT_CORRECTIONS.md).
+This supersedes earlier correction readiness statements for the prior runtime.
+CG5 remains pending focused independent re-review and founder acceptance.
+
+## Historical CG4 review record
+
+## CG4 independent-review corrections — 2026-10-29
+
+The founder approved bounded closure with full investigation functionality and
+registered finite-sample confirmation. General inadequately qualified approximate
+mean/cluster/ranking methods refuse new formal claims; research failures remain
+visible. This is an explicit acceptance-scope revision, not passed qualification.
+No new statistical replacement research or automatic 28-panel campaign is authorized
+for closure. Read the CG4 scope, supported-method and qualification matrices.
+
+Original reviewed runtime: `2632e65e5b1b98a3902189fd67b441c35cf97b3239ffc36c78faca2f21997ab8`.
+The founder authorized the five independent-review findings H1/H2/M1/L1/D1 as
+a bounded correction scope. The correction record and new delivery identities
+are in `validation/cg4/REVIEW_CORRECTIONS.md`. Original evidence remains immutable.
+Corrected runtime: `2247a089ba23fe4c2ea19193c867f0b3f5c65152a9aa995d7b4ab56813339095`.
+Corrections are implemented and internally verified; targeted independent re-review
+and founder acceptance remain pending.
+Original closure: 289 passed / one optional schema-validator skip; the separate
+schema environment passed all 63 checks. Sixteen affected checks passed each on
+Python 3.12/3.14. Five current-selector synthetic recovery profiles each passed
+40/40 under unchanged thresholds. Other unfinished profiles remain unqualified;
+landmark promotion failed and the geometric fallback is retained. Old null results
+are reused through a documented conditional-independence bridge, not relabeled as
+new-selector simulations. Weak fidelity/power and negative evidence are retained.
+
+Original reviewed wheel SHA-256: `929d864aec8ebbcaed774d54e4ab120ae81577ff21a9eedc3e14f2906c36f3ad`.
+Delivery evidence is indexed by `validation/cg4/REVIEW_QUICKSTART.md` and the final
+closure receipt. Packaging-only documentation does not invalidate runtime evidence.
+Initial independent review is complete. Founder-authorized corrections and focused
+verification precede targeted independent re-review, the understanding gate and
+founder acceptance. No self-acceptance is claimed. CG5–CG7 are outside CG4.
+
+Follow `agents/skills/verify/skills.md`: reuse valid evidence and verify changes
+proportionally. Preserve `CG4_IMPLEMENTATION_FINDINGS.md`, its historical record,
+source identities, failed experiments and original artifact bytes.
 
 ConfidenceGuard now includes opt-in longitudinal reliability within the same product.
 CG3 adds protected projected-fact capture before eligibility filtering, frozen

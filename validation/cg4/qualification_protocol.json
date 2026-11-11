@@ -1,0 +1,70 @@
+{
+  "schema_version": "numek.cg4_qualification_protocol/1.0",
+  "status": "locked_before_qualification_execution",
+  "independent_review": "not_performed",
+  "seed_panels": {
+    "development": {"start": 0, "count": 40},
+    "recovery_qualification": {"start": 1000, "count": 40},
+    "finite_statistics": {"start": 10000, "count": 10000},
+    "reduced_full_pipeline_null": {"start": 30000, "count": 2000},
+    "default_full_pipeline_null": {"start": 40000, "count": 200},
+    "approximate_statistics": {"start": 50000, "count_per_scenario": 1000}
+  },
+  "strong_signal_anchor": {
+    "independent_units": 40000,
+    "role_proportions": [0.5, 0.25, 0.25],
+    "prevalence_range": [0.05, 0.20],
+    "background_failure_probability": 0.10,
+    "region_failure_probability": 0.40,
+    "material_effect_threshold": 0.15,
+    "required_precision": 0.70,
+    "required_recall": 0.70,
+    "required_successes_of_40": 32,
+    "primary_selection": "Native adverse effect on S; no H selection or oracle-guided gate selection.",
+    "primary_population_recovery": "Unique union of positive-effect S-selected shortlist regions, evaluated on independently generated H features; unavailable membership remains in planned-population recall.",
+    "secondary_population_recovery": "Each selected candidate separately; D and S recovery separately; oracle-best retained candidate is diagnostic only and cannot replace primary selection."
+  },
+  "required_archetypes": [
+    "interaction_without_marginals", "parity", "categorical_numeric_conjunction",
+    "rare_failure", "curved_region", "disconnected_regions", "heterogeneous_density",
+    "overlapping_mechanisms", "broad_moderate_and_narrow_severe", "high_dimensional_nuisance"
+  ],
+  "objective_panels": [
+    "decision_error", "false_negative", "false_positive", "precision",
+    "probability_quality", "calibration_residual_and_frozen_bins",
+    "regression_bias", "regression_tail", "ranking_AUC_and_AP",
+    "uncertainty_coverage_and_efficiency", "paired_degradation", "historical_deterioration"
+  ],
+  "landmark_promotion": {
+    "comparison_families": ["curved_region", "heterogeneous_density"],
+    "minimum_median_IoU_gain": 0.10,
+    "paired_uncertainty": "Bonferroni-adjusted paired bootstrap intervals over locked seeds; lower bounds must exceed zero for both families.",
+    "maximum_overall_median_regression": 0.05,
+    "maximum_runtime_ratio": 2.0,
+    "maximum_peak_memory_ratio": 1.5,
+    "failure_action": "Keep negative evidence and select a qualified geometric fallback. If neither representation method qualifies, the milestone remains unresolved."
+  },
+  "null_diagnostics": {
+    "alpha": 0.05,
+    "complete_null_practical_threshold": 0.0,
+    "diagnostic_test": "One-sided exact binomial test of excess error at nominal allocation; Holm adjustment across the predeclared diagnostic panel.",
+    "intervals": "Clopper-Pearson Monte Carlo intervals, including the limited resolution of 200 trials.",
+    "interpretation": "Non-rejection is not proof of nominal control. Finite guarantees derive from assumptions and mathematics; simulations detect execution defects.",
+    "include": ["complete_null", "partial_null", "overlapping_regions", "correlated_hypotheses", "families_1_10_32", "component_allocations_1_2_4", "BCa_extreme_tails", "invalid_replicates", "unequal_clusters", "repeated_use", "outcome_revisions"],
+    "negative_controls": ["adapted_H_hypotheses_refused", "unknown_independence_refused", "temporal_IID_misspecification_retained_as_negative_evidence", "selective_labels_do_not_establish_full_population_rates", "out_of_support_membership_not_silently_excluded"]
+  },
+  "resource_envelope": {
+    "threads": 2,
+    "RSS_bytes": 6442450944,
+    "DuckDB_bytes": 2147483648,
+    "operation_seconds": 1800,
+    "workspace_bytes": 68719476736,
+    "free_disk_reserve_bytes": 2147483648,
+    "feature_opportunity_panels": [100000, 1000000],
+    "vector_dimensions": [384, 768],
+    "qualification_budgets": "Every method comparison records its admitted node, fit, distance, wall-time and memory budgets. Relative efficiency requires matched useful work; admission estimates are not capacity guarantees."
+  },
+  "evidence_reuse": "Lock inputs, profiles, seeds, acceptance diagnostics and dependency/function identities; reuse unaffected evidence. Fixes invalidate affected results. Method changes receive new method/evaluation identities and a new untouched qualification panel; targets are never weakened after observing failure.",
+  "datasets": ["Bank Marketing", "Wine Quality", "AG News", "CIFAR-10"],
+  "dataset_policy": "Record acquisition URLs, hashes, provenance and licensing. Separate natural from injected failures. Predictor preparation is benchmark-only and outside the product execution API. Do not redistribute unauthorized data."
+}

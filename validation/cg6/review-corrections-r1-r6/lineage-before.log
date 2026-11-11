@@ -1,0 +1,149 @@
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+_____ test_r1_additional_fields_and_clocks_survive_completed_reuse[bridge] _____
+
+tmp_path = PosixPath('/private/var/folders/cs/c15xvw9d3t53tzcws5yxjxcr0000gn/T/pytest-of-drivyaanshyadav/pytest-785/test_r1_additional_fields_and_0')
+consumer = 'bridge'
+
+    @pytest.mark.parametrize('consumer',['bridge','restatement'])
+    def test_r1_additional_fields_and_clocks_survive_completed_reuse(tmp_path,consumer):
+        spec=execution(tmp_path,regression=True,n=8)
+        with open(spec.sources[0].path) as stream:records=list(csv.DictReader(stream))
+        for row in records:row.update(available='2025-12-31T00:00:00Z',cutoff='2026-01-01T00:00:00Z')
+        with open(spec.sources[0].path,'w',newline='') as stream:
+            writer=csv.DictWriter(stream,fieldnames=list(records[0]));writer.writeheader();writer.writerows(records)
+        spec=replace(spec,information_cutoff=ClockSpec('cutoff'))
+        artifact=auxiliary(spec,FeatureField('z','z','float',available_at=ClockSpec('available')))
+        result=apply_auxiliary(spec,artifact,CFG)
+        if consumer=='bridge':
+            linked=as_reliability_spec(result,scope='auxiliary_application',directory=tmp_path/'bridge')
+            with open(linked.evaluation.sources[0].path) as stream:rows=list(csv.DictReader(stream))
+>           assert rows and all(r['z']!='' and r['available']=='2025-12-31T00:00:00Z' for r in rows)
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/cg6/test_review_auxiliary_lineage.py:25: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+.0 = <list_iterator object at 0x10f2da500>
+
+>   assert rows and all(r['z']!='' and r['available']=='2025-12-31T00:00:00Z' for r in rows)
+                        ^^^^^^
+E   KeyError: 'z'
+
+tests/cg6/test_review_auxiliary_lineage.py:25: KeyError
+__ test_r1_additional_fields_and_clocks_survive_completed_reuse[restatement] ___
+
+operation = <function _worker at 0x10a0e93a0>
+arguments = (ExecutionResult(data={'schema_version': 'confidenceguard.execution_result/1.0', 'methodology_id': 'predictor_robustne...53tzcws5yxjxcr0000gn/T/numek-cg6-restate-5mq753nf', '39f456296ef1f7dbcb0ffb2bbe0d04b52ea2501f462cbc536931f0b6ef0fca39')
+config = EvaluationConfig(max_source_bytes=5368709120, max_combined_source_bytes=8589934592, max_rows=10000000, max_combined_ro...v1', minimum_denominator=10, minimum_component=10, display_labels={}, schema_version='confidenceguard.disclosure/1.0'))
+progress = None, cancel = None, deadline = None
+
+    def supervise(operation,arguments,config,*,progress=None,cancel=None,deadline=None):
+        from datatrust.worker import run_supervised
+        from datatrust.contracts import AnalysisError
+        limits=options(config)
+        if deadline is not None:
+            import time
+            from dataclasses import replace
+            remaining=deadline-time.monotonic()
+            if remaining<=0:raise EvaluationError('Operation deadline exhausted before the next phase.','deadline_exceeded')
+            limits=replace(limits,max_seconds=min(limits.max_seconds,remaining))
+>       try:return run_supervised(operation,arguments,limits,progress=progress,cancel=cancel)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+src/confidenceguard/compat.py:22: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+operation = <function _worker at 0x10a0e93a0>
+arguments = (ExecutionResult(data={'schema_version': 'confidenceguard.execution_result/1.0', 'methodology_id': 'predictor_robustne...53tzcws5yxjxcr0000gn/T/numek-cg6-restate-5mq753nf', '39f456296ef1f7dbcb0ffb2bbe0d04b52ea2501f462cbc536931f0b6ef0fca39')
+options = ExecutionOptions(backend='duckdb_local', max_source_bytes=5368709120, max_combined_source_bytes=8589934592, max_rows=1...88608, workspace_bytes=68719476736, free_disk_bytes=1, max_seconds=180, result_bytes=100663296, scratch_directory=None)
+progress = None, cancel = None, owned_snapshots = ()
+
+    def run_supervised(operation, arguments, options, *, progress=None, cancel=None, owned_snapshots=()):
+        context=multiprocessing.get_context('spawn');receiver,sender=context.Pipe(duplex=False)
+        process=context.Process(target=_entry,args=(sender,operation,arguments),daemon=True)
+        started=time.monotonic();process.start();sender.close();root=None;peak_rss=0;peak_workspace=0;peak_spill=0;result=None
+        try:
+            monitor=psutil.Process(process.pid)
+            while True:
+                if cancel is not None and cancel.is_set():fail('Analysis cancelled; no completed result was published.','cancelled')
+                if time.monotonic()-started>options.max_seconds:fail('Whole-job deadline exceeded; worker terminated.','deadline')
+                try:rss=monitor.memory_info().rss;peak_rss=max(peak_rss,rss)
+                except psutil.NoSuchProcess:rss=0
+                if rss>options.max_rss_bytes:fail(f'Worker RSS {rss} bytes exceeded configured termination threshold {options.max_rss_bytes}.','rss_limit')
+                if root and root.exists():
+                    owned,files=owned_inventory(root,owned_snapshots)
+                    peak_workspace=max(peak_workspace,owned)
+                    peak_spill=max(peak_spill,sum(f['bytes'] for f in files if f['file'].startswith('spill/')))
+                    if owned>options.workspace_bytes:fail(f'Workspace {owned} bytes exceeds budget {options.workspace_bytes}.')
+                    if available(root)<options.free_disk_bytes:fail('Scratch free-space reserve was breached during execution.','disk_exhausted')
+                    if any(available(path)<options.free_disk_bytes for path in owned_snapshots):fail('Owned-upload free-space reserve was breached.','disk_exhausted')
+                if receiver.poll(.1):
+                    try:kind,value=receiver.recv()
+                    except EOFError:break
+                    if kind=='progress':
+                        if 'owned_workspace' in value:root=Path(value.pop('owned_workspace'))
+                        if progress:progress(value)
+>                   elif kind=='error':raise AnalysisError(value['message'],code=value['code'],stage=value['stage'])
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E                   datatrust.contracts.AnalysisError: Mapped columns are absent; inspect source headers.
+
+src/datatrust/worker.py:49: AnalysisError
+
+The above exception was the direct cause of the following exception:
+
+tmp_path = PosixPath('/private/var/folders/cs/c15xvw9d3t53tzcws5yxjxcr0000gn/T/pytest-of-drivyaanshyadav/pytest-785/test_r1_additional_fields_and_1')
+consumer = 'restatement'
+
+    @pytest.mark.parametrize('consumer',['bridge','restatement'])
+    def test_r1_additional_fields_and_clocks_survive_completed_reuse(tmp_path,consumer):
+        spec=execution(tmp_path,regression=True,n=8)
+        with open(spec.sources[0].path) as stream:records=list(csv.DictReader(stream))
+        for row in records:row.update(available='2025-12-31T00:00:00Z',cutoff='2026-01-01T00:00:00Z')
+        with open(spec.sources[0].path,'w',newline='') as stream:
+            writer=csv.DictWriter(stream,fieldnames=list(records[0]));writer.writeheader();writer.writerows(records)
+        spec=replace(spec,information_cutoff=ClockSpec('cutoff'))
+        artifact=auxiliary(spec,FeatureField('z','z','float',available_at=ClockSpec('available')))
+        result=apply_auxiliary(spec,artifact,CFG)
+        if consumer=='bridge':
+            linked=as_reliability_spec(result,scope='auxiliary_application',directory=tmp_path/'bridge')
+            with open(linked.evaluation.sources[0].path) as stream:rows=list(csv.DictReader(stream))
+            assert rows and all(r['z']!='' and r['available']=='2025-12-31T00:00:00Z' for r in rows)
+        else:
+>           revised=restate_execution(result,ExecutionRestatementSpec(spec.sources,spec.outcomes,'R1 frozen-input control'),CFG)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/cg6/test_review_auxiliary_lineage.py:27: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/confidenceguard/execution/restatement.py:166: in restate_execution
+    result=compat.supervise(_worker,(parent,spec,config,roots,str(staging),inspected['fingerprint']),replace(config,result_bytes=config.private_bytes+config.result_bytes),progress=progress,cancel=cancel)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+operation = <function _worker at 0x10a0e93a0>
+arguments = (ExecutionResult(data={'schema_version': 'confidenceguard.execution_result/1.0', 'methodology_id': 'predictor_robustne...53tzcws5yxjxcr0000gn/T/numek-cg6-restate-5mq753nf', '39f456296ef1f7dbcb0ffb2bbe0d04b52ea2501f462cbc536931f0b6ef0fca39')
+config = EvaluationConfig(max_source_bytes=5368709120, max_combined_source_bytes=8589934592, max_rows=10000000, max_combined_ro...v1', minimum_denominator=10, minimum_component=10, display_labels={}, schema_version='confidenceguard.disclosure/1.0'))
+progress = None, cancel = None, deadline = None
+
+    def supervise(operation,arguments,config,*,progress=None,cancel=None,deadline=None):
+        from datatrust.worker import run_supervised
+        from datatrust.contracts import AnalysisError
+        limits=options(config)
+        if deadline is not None:
+            import time
+            from dataclasses import replace
+            remaining=deadline-time.monotonic()
+            if remaining<=0:raise EvaluationError('Operation deadline exhausted before the next phase.','deadline_exceeded')
+            limits=replace(limits,max_seconds=min(limits.max_seconds,remaining))
+        try:return run_supervised(operation,arguments,limits,progress=progress,cancel=cancel)
+        except AnalysisError as exc:
+            error=EvaluationError('Evaluation stopped; inspect the execution code and configured limits.',exc.code,exc.stage)
+            error.execution=getattr(exc,'execution',{})
+>           raise error from exc
+E           confidenceguard.contracts.EvaluationError: Evaluation stopped; inspect the execution code and configured limits.
+
+src/confidenceguard/compat.py:26: EvaluationError
+=========================== short test summary info ============================
+FAILED tests/cg6/test_review_auxiliary_lineage.py::test_r1_additional_fields_and_clocks_survive_completed_reuse[bridge]
+FAILED tests/cg6/test_review_auxiliary_lineage.py::test_r1_additional_fields_and_clocks_survive_completed_reuse[restatement]
+2 failed in 5.76s

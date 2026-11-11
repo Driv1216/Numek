@@ -8,6 +8,7 @@ from pathlib import Path
 import secrets
 import shutil
 import threading
+import time
 from urllib.parse import urlsplit
 import uuid
 from flask import Blueprint,abort,jsonify,request,send_file,session
@@ -22,6 +23,27 @@ from .methods import fit_methods,apply_methods,study
 
 PREFIX='/api/confidenceguard/v1'
 
+# Fixed public guidance only: exception text can contain protected input values.
+PUBLIC_CG4_ERRORS={
+    'legacy_information_cutoff_interpretation':'This discovery predates corrected information-cutoff semantics. Preserve the original and run a new investigation with the retained owner cutoffs.',
+    'session_replay_exposure_history_incomplete':'Earlier replay exposure has incomplete original-source provenance. Missing aliases do not establish fresh independent evidence; preserve the original and review the study provenance.',
+    'practical_threshold_required':'Set a finite, nonnegative material effect threshold for every selected hypothesis in its metric units, then freeze again.',
+    'exposure_history_gap_requires_current_declaration':'Exposure history changed or is incomplete. Review the current workspace gap and provide a new scoped declaration before freezing this study.',
+    'workspace_identity':'Use the same workspace that supplies the retained historical evidence.',
+    'numerical_retry_provenance':'The original numerical attempt has incomplete or changed workspace history. It cannot be continued as a verified numerical retry.',
+    'outcome_derived_membership':'This gate uses outcome-derived evidence and cannot define an independently confirmed hypothesis.',
+    'encoder_identity':'The installed encoder files or declared model digest do not match the pinned profile. Use the verified pinned local files and their matching weight digest, then inspect again.',
+    'encoder_runtime':'This encoder needs its exact supported runtime profile. Choose a qualified Python/runtime environment and inspect again; no model download runs here.',
+    'vector_shape':'Representation dimensions do not match the declared matrix or pinned encoder profile. Use 384 dimensions for E5 and 768 for DINOv2, or correct the supplied-vector declaration.',
+}
+
+
+def _root_aliases(roots):
+    labels=[Path(path).name or 'Local root' for path in roots]
+    ambiguous=len(set(labels))!=len(labels)
+    return [{'id':f'root_{i}','label':f'{label} [root_{i}]' if ambiguous else label}
+            for i,label in enumerate(labels)]
+
 
 def _export(result,path,format,audience,disclosure,*,progress=None):
     try:
@@ -30,6 +52,10 @@ def _export(result,path,format,audience,disclosure,*,progress=None):
     except Exception as exc:
         if not getattr(exc,'artifacts',None):raise EvaluationError('Artifact export failed.','export_failed') from exc
         output={'artifacts':asdict(exc.artifacts),'export_error':'pdf_or_json_export_failed_surviving_artifacts_retained'}
+    if audience=='shareable' and result.data.get('methodology_id') in {'failure_investigation_v1','policy_selection_v1'}:
+        # The coordinator may keep an owner-only reopening bundle locally.
+        # A shareable export does not publish download handles for that bundle.
+        for key in ('private_result_path','private_manifest_path','fitted_methods_path'):output['artifacts'][key]=None
     return Inspection(output,{'status':'completed','peak_workspace_bytes':0})
 
 
@@ -132,11 +158,11 @@ def register(app,workspace,roots,*,persistent_workspace=None,launch_token=None):
         code=exc.code if isinstance(exc,EvaluationError) else f'http_{status}' if isinstance(exc,HTTPException) else 'invalid_request' if status==422 else 'operation_failed'
         if code in {'workspace_busy','worker_busy','stale_confirmation','idempotency_conflict','stale_deletion','operation_incomplete'}:status=409
         if code in {'history_quota','history_record_limit','manifest_limit','history_scan_limit'}:status=413
-        return jsonify({'api_version':'v1','error':{'code':code,'message':'Request could not be completed; review the declared fields or resource state.','field_errors':[{'pointer':'/','code':code}] if status==422 else [],'request_id':uuid.uuid4().hex,'retryable':status==409}}),status
+        return jsonify({'api_version':'v1','error':{'code':code,'message':PUBLIC_CG4_ERRORS.get(code,'Request could not be completed; review the declared fields or resource state.'),'field_errors':[{'pointer':'/','code':code}] if status==422 else [],'request_id':uuid.uuid4().hex,'retryable':status==409}}),status
 
     @bp.get('/session')
     def bootstrap():
-        s=store.current();return response({'csrf_token':s['csrf'],'root_aliases':[{'id':f'root_{i}','label':Path(p).name} for i,p in enumerate(store.roots)],'session_lifetime':'local_process'})
+        s=store.current();return response({'csrf_token':s['csrf'],'root_aliases':_root_aliases(store.roots),'session_lifetime':'local_process'})
     @bp.get('/capabilities')
     def capabilities():return response({**schema.capabilities(),'upload_limit_bytes':app.config.get('MAX_CONTENT_LENGTH')})
     @bp.get('/schemas')
@@ -206,13 +232,21 @@ def register(app,workspace,roots,*,persistent_workspace=None,launch_token=None):
 
     @bp.post('/jobs')
     def submit():
+        if request.is_json:
+            preview=strict_json(request.get_data(as_text=True))
+            from .execution.web import KINDS as EXECUTION_KINDS
+            if isinstance(preview,dict) and preview.get('kind') in EXECUTION_KINDS:return app.extensions['confidenceguard_execution_submit'](preview)
+            from .policy_web import KINDS as POLICY_KINDS
+            if isinstance(preview,dict) and preview.get('kind') in POLICY_KINDS:return app.extensions['confidenceguard_policy_submit'](preview)
+            from .investigation_web import KINDS
+            if isinstance(preview,dict) and preview.get('kind') in KINDS:return app.extensions['confidenceguard_investigation_submit'](preview)
         value=body({'kind','client_request_id','evaluation_id','revision','fingerprint','result_id','format','audience','disclosure','reference','reveal_values'},{'kind','client_request_id'})
         state=store.current();choice(value['kind'],{'inspect','evaluate','fit','apply','study','export','resolve_evidence'},'job kind');name(value['client_request_id'])
         request_key=value['client_request_id'];request_digest=digest(value)
         if request_key in state['requests']:
             old_digest,jid=state['requests'][request_key]
             if old_digest!=request_digest:abort(409)
-            return response(job_view(state['jobs'][jid]),202)
+            return response(job_view(own('jobs',jid)),202)
         kind=value['kind'];eid=None;ev=None;item=None
         permitted={'kind','client_request_id'}|({'evaluation_id','revision'} if kind=='inspect' else {'evaluation_id','revision','fingerprint'} if kind in {'evaluate','fit','apply','study'} else {'result_id','format','audience','disclosure'} if kind=='export' else {'result_id','reference','reveal_values'})
         if set(value)-permitted:raise EvaluationError('Fields do not apply to this job kind.')
@@ -232,10 +266,16 @@ def register(app,workspace,roots,*,persistent_workspace=None,launch_token=None):
                 if 'disclosure' in value:DisclosureSpec.from_dict(value['disclosure'])
             elif not isinstance(item['result'],EvaluationResult):raise EvaluationError('Exact evidence is unavailable in a shareable import.')
             elif value.get('reference') not in item['result'].private['locators']:raise EvaluationError('Unknown evidence reference.')
+        tracking_workspace=None
+        if kind in {'evaluate','fit','apply','study'}:
+            attached=app.extensions['confidenceguard_attached_workspace']()
+            if attached is not None and attached.evidence_tracking()['enabled']:tracking_workspace=attached
+        grant=state.get('workspace_grant')
         if not store.worker_lock.acquire(blocking=False):
             return jsonify({'api_version':'v1','error':{'code':'worker_busy','message':'Another supervised operation is active.','request_id':uuid.uuid4().hex,'retryable':True}}),409
         jid=uuid.uuid4().hex
         j={'id':jid,'kind':kind,'state':'pending','revision':0,'progress':{},'output':{},'error':None,'evaluation_id':eid,'evaluation_revision':revision,'cancel':threading.Event()}
+        if tracking_workspace is not None:j['workspace_instance']=tracking_workspace.instance_id
         state['jobs'][jid]=j;state['requests'][request_key]=(request_digest,jid)
         def progress(p):
             with store.guard:
@@ -251,12 +291,20 @@ def register(app,workspace,roots,*,persistent_workspace=None,launch_token=None):
                         if j['cancel'].is_set():j['state']='cancelled'
                         else:ev['confirmation']=output['fingerprint'];j['output']=output;j['state']='succeeded'
                 elif kind in {'evaluate','fit','apply','study'}:
+                    deadline=time.monotonic()+config.max_seconds;reservation=None
+                    if tracking_workspace is not None:
+                        if state.get('workspace_grant')!=grant:raise EvaluationError('Workspace was detached.','workspace_access')
+                        reservation=tracking_workspace._reserve_live_exposure(spec,config,authorized,operation=kind,request_id='browser:'+request_key,
+                            progress=progress,cancel=j['cancel'],deadline=deadline)
                     operation={'evaluate':evaluate,'fit':fit_methods,'apply':apply_methods,'study':study}[kind]
-                    result=operation(spec,config,progress=progress,cancel=j['cancel'],allowed_roots=authorized,expected_fingerprint=fingerprint)
+                    result=operation(spec,config,progress=progress,cancel=j['cancel'],allowed_roots=authorized,expected_fingerprint=fingerprint,_deadline=deadline)
+                    if reservation is not None:
+                        result.private['evidence_use_reservation']=reservation;result.seal()
                     with store.guard:
                         if j['cancel'].is_set() and not result.execution.get('application_committed'):j['state']='cancelled'
                         else:
-                            rid=result.data['analysis_id'];state['results'][rid]={'result':result,'evaluation_id':eid,'revision':revision};j['output']={'result_id':rid}
+                            rid=result.data['analysis_id'];state['results'][rid]={'result':result,'evaluation_id':eid,'revision':revision,
+                                **({'workspace_instance':tracking_workspace.instance_id} if tracking_workspace is not None else {})};j['output']={'result_id':rid}
                             method_handles=[]
                             for method in result.private.get('fitted_methods',[]):
                                 handle=uuid.uuid4().hex;state['methods'][handle]={'method':method,'result_id':rid,'membership_sidecars':[v for v in result.private.get('membership_sidecars',[]) if method['artifact_digest'] in v['method_digests']]};method_handles.append(handle)
@@ -275,12 +323,14 @@ def register(app,workspace,roots,*,persistent_workspace=None,launch_token=None):
                     packet=compat.supervise(_export,(item['result'],str(path),value.get('format','html'),value.get('audience','shareable'),value.get('disclosure')),config,progress=progress,cancel=j['cancel'])
                     with store.guard:
                         ids=remember(state,rid,packet.data['artifacts'],value.get('audience','shareable'));j['output']={'artifact_ids':ids}
+                        if packet.data.get('export_error'):j['output']['export_error']=packet.data['export_error']
                         j['state']='failed' if packet.data.get('export_error') else 'succeeded';j['error']={'code':packet.data['export_error']} if packet.data.get('export_error') else None
                         if j['cancel'].is_set():j['state']='cancelled'
             except Exception as exc:
                 with store.guard:
                     j['state']='cancelled' if j['cancel'].is_set() or getattr(exc,'code',None)=='cancelled' else 'failed'
-                    j['error']={'code':getattr(exc,'code','operation_failed'),'stage':getattr(exc,'stage','job'),'message':'Operation stopped; inspect the declared input, ownership and resource settings.'}
+                    code=getattr(exc,'code','operation_failed')
+                    j['error']={'code':code,'stage':getattr(exc,'stage','job'),'message':PUBLIC_CG4_ERRORS.get(code,'Operation stopped; inspect the declared input, ownership and resource settings.')}
             finally:
                 with store.guard:j['revision']+=1
                 store.worker_lock.release()
@@ -388,6 +438,12 @@ def register(app,workspace,roots,*,persistent_workspace=None,launch_token=None):
 
     from .history_web import register as register_history
     register_history(bp,app,store,workspace_path=persistent_workspace,launch_token=launch_token)
+    from .investigation_web import register as register_investigations
+    register_investigations(bp,app,store,own=own,body=body,response=response,resolve_evaluation=resolve_spec,config_from=config_from,job_view=job_view,public_errors=PUBLIC_CG4_ERRORS)
+    from .policy_web import register as register_policies
+    register_policies(bp,app,store,own=own,body=body,response=response,resolve_evaluation=resolve_spec,config_from=config_from,job_view=job_view)
+    from .execution.web import register as register_execution
+    register_execution(bp,app,store,own=own,body=body,response=response,config_from=config_from,job_view=job_view)
     app.register_blueprint(bp)
     static=Blueprint('confidenceguard_client',__name__,static_folder='static',static_url_path='/confidenceguard/assets')
     @static.after_request

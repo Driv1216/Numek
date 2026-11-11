@@ -1,0 +1,96 @@
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+__ test_packaging_refuses_mixed_source_and_verifies_published_fixture[wheel] ___
+
+tmp_path = PosixPath('/private/var/folders/cs/c15xvw9d3t53tzcws5yxjxcr0000gn/T/pytest-of-drivyaanshyadav/pytest-487/test_packaging_refuses_mixed_s0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x10746fbb0>
+change_during_capture = 'wheel'
+
+    @pytest.mark.parametrize('change_during_capture',[False,True,'wheel','backup'])
+    def test_packaging_refuses_mixed_source_and_verifies_published_fixture(tmp_path,monkeypatch,change_during_capture):
+        module=tool('package_review');root=tmp_path/'repo';root.mkdir();inventory,files=bundle(root)
+        for name in ('src/confidenceguard','src/datatrust','tests','docs','constraints','validation/cg1/data',
+                     'validation/cg2','validation/cg3','validation/cg4/source-capsules.nosync'):
+            (root/name).mkdir(parents=True,exist_ok=True)
+        source=root/'src/confidenceguard/required.py';source.write_text('# frozen runtime\n')
+        for name in ('README.md','METHODOLOGY.md','pyproject.toml','setup.py','.python-version','.gitignore',
+                     'agents/skills/verify/skills.md','validation/__init__.py','validation/cg4/REVIEW_QUICKSTART.md'):
+            p=root/name;p.parent.mkdir(parents=True,exist_ok=True);p.write_text('# fixture\n')
+        (root/'validation/cg4/baseline.json').write_text(json.dumps({'head':'0'*40,'files':{}}))
+        wheel=tmp_path/'runtime.whl'
+        with zipfile.ZipFile(wheel,'w') as archive:archive.writestr('confidenceguard/required.py',source.read_bytes())
+        backup=tmp_path/'synthetic.tar.gz'
+        with tarfile.open(backup,'w:gz'):pass
+        original_inventory=module.source_inventory;original_wheel=module.verify_wheel
+        monkeypatch.setattr(module,'ROOT',root)
+        captured=False
+        def inventory_with_concurrent_delivery_change():
+            nonlocal captured
+            if not captured and change_during_capture in ('wheel','backup'):
+                (wheel if change_during_capture=='wheel' else backup).write_bytes(b'changed after initial validation\n')
+            captured=True
+            return original_inventory(root)
+        monkeypatch.setattr(module,'source_inventory',inventory_with_concurrent_delivery_change)
+        monkeypatch.setattr(module,'verify_wheel',lambda value:original_wheel(value,root))
+        def tracked_diff(command,*,cwd,stdout,check):
+            assert command[:6]==['git','diff','--binary','--no-ext-diff','--no-textconv','0'*40]
+            stdout.write(b'# tracked fixture patch\n')
+            if change_during_capture is True:source.write_text('# concurrent change\n')
+        monkeypatch.setattr(module.subprocess,'run',tracked_diff)
+        output=tmp_path/'review.zip';stage=tmp_path/'stage'
+        if change_during_capture:
+            reason='changed while packaging' if change_during_capture is True else 'Delivery input changed during capture'
+>           with pytest.raises(ValueError,match=reason):module.build(stage,output,wheel,backup)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           Failed: DID NOT RAISE ValueError
+
+tests/cg4/test_review_package.py:101: Failed
+__ test_packaging_refuses_mixed_source_and_verifies_published_fixture[backup] __
+
+tmp_path = PosixPath('/private/var/folders/cs/c15xvw9d3t53tzcws5yxjxcr0000gn/T/pytest-of-drivyaanshyadav/pytest-487/test_packaging_refuses_mixed_s1')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x10746f950>
+change_during_capture = 'backup'
+
+    @pytest.mark.parametrize('change_during_capture',[False,True,'wheel','backup'])
+    def test_packaging_refuses_mixed_source_and_verifies_published_fixture(tmp_path,monkeypatch,change_during_capture):
+        module=tool('package_review');root=tmp_path/'repo';root.mkdir();inventory,files=bundle(root)
+        for name in ('src/confidenceguard','src/datatrust','tests','docs','constraints','validation/cg1/data',
+                     'validation/cg2','validation/cg3','validation/cg4/source-capsules.nosync'):
+            (root/name).mkdir(parents=True,exist_ok=True)
+        source=root/'src/confidenceguard/required.py';source.write_text('# frozen runtime\n')
+        for name in ('README.md','METHODOLOGY.md','pyproject.toml','setup.py','.python-version','.gitignore',
+                     'agents/skills/verify/skills.md','validation/__init__.py','validation/cg4/REVIEW_QUICKSTART.md'):
+            p=root/name;p.parent.mkdir(parents=True,exist_ok=True);p.write_text('# fixture\n')
+        (root/'validation/cg4/baseline.json').write_text(json.dumps({'head':'0'*40,'files':{}}))
+        wheel=tmp_path/'runtime.whl'
+        with zipfile.ZipFile(wheel,'w') as archive:archive.writestr('confidenceguard/required.py',source.read_bytes())
+        backup=tmp_path/'synthetic.tar.gz'
+        with tarfile.open(backup,'w:gz'):pass
+        original_inventory=module.source_inventory;original_wheel=module.verify_wheel
+        monkeypatch.setattr(module,'ROOT',root)
+        captured=False
+        def inventory_with_concurrent_delivery_change():
+            nonlocal captured
+            if not captured and change_during_capture in ('wheel','backup'):
+                (wheel if change_during_capture=='wheel' else backup).write_bytes(b'changed after initial validation\n')
+            captured=True
+            return original_inventory(root)
+        monkeypatch.setattr(module,'source_inventory',inventory_with_concurrent_delivery_change)
+        monkeypatch.setattr(module,'verify_wheel',lambda value:original_wheel(value,root))
+        def tracked_diff(command,*,cwd,stdout,check):
+            assert command[:6]==['git','diff','--binary','--no-ext-diff','--no-textconv','0'*40]
+            stdout.write(b'# tracked fixture patch\n')
+            if change_during_capture is True:source.write_text('# concurrent change\n')
+        monkeypatch.setattr(module.subprocess,'run',tracked_diff)
+        output=tmp_path/'review.zip';stage=tmp_path/'stage'
+        if change_during_capture:
+            reason='changed while packaging' if change_during_capture is True else 'Delivery input changed during capture'
+>           with pytest.raises(ValueError,match=reason):module.build(stage,output,wheel,backup)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           Failed: DID NOT RAISE ValueError
+
+tests/cg4/test_review_package.py:101: Failed
+=========================== short test summary info ============================
+FAILED tests/cg4/test_review_package.py::test_packaging_refuses_mixed_source_and_verifies_published_fixture[wheel]
+FAILED tests/cg4/test_review_package.py::test_packaging_refuses_mixed_source_and_verifies_published_fixture[backup]
+2 failed in 0.21s

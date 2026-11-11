@@ -34,9 +34,17 @@ def token_digest(digest, row):
 
 def available(path):
     p = Path(path)
-    while not p.exists(): p = p.parent
-    stat = os.statvfs(p)
-    return stat.f_bavail * stat.f_frsize
+    while True:
+        try:
+            stat = os.statvfs(p)
+            return stat.f_bavail * stat.f_frsize
+        except (FileNotFoundError, NotADirectoryError):
+            # A completed child may remove its scratch root after the parent
+            # observes it. Measure the containing filesystem; never invent free
+            # capacity or mask permission/I/O failures.
+            parent = p.parent
+            if parent == p: raise
+            p = parent
 
 
 def owned_inventory(root, snapshots=()):

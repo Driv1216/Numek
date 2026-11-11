@@ -14,6 +14,14 @@ validation/dry_runs/packets/
 /validation/m3.zip
 /validation/m4.zip
 
+# CG4 owned qualification runtimes, downloaded assets and protected evidence.
+validation/cg4/*.nosync/
+validation/cg4/data/raw/
+validation/cg4/models/
+validation/cg4/results/private/
+validation/cg4/results/pdf_qa/
+validation/cg4/*Technical_Review.zip
+
 # Reproducible M5 corpus bytes are pinned by manifests and preparation scripts.
 validation/m5/data/raw/*.zip
 validation/m5/data/raw/*.pdf
@@ -80,3 +88,20 @@ node_modules/
 /build/
 *.tsbuildinfo
 /.claude/
+
+# CG5 generated synthetic inputs, protected packets and PDF QA scratch.
+validation/cg5/results/**/data/
+validation/cg5/results/**/workspace/
+validation/cg5/results/**/.confidenceguard-private/
+validation/cg5/results/browser-host/
+validation/cg5/results/pdf-qa/
+
+# Local review bundles duplicate the versioned source and validation evidence.
+validation/cg3/*Technical_Review.zip
+validation/cg4/*Review_Corrections_*.zip
+validation/cg5/*Technical_Review_*.zip
+
+# Reproducible CG6 benchmark inputs and transient qualification locks.
+validation/cg6/results/**/inputs.csv
+validation/cg6/results/performance/capacity/bridge/cg6_generated_*.csv
+validation/cg4/results/**/.campaign.lock

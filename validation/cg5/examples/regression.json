@@ -1,0 +1,80 @@
+{
+  "candidates": [
+    {
+      "fallback": {
+        "kind": "abstain"
+      },
+      "nodes": {
+        "root": {
+          "action": {
+            "kind": "numeric",
+            "source": {
+              "kind": "point"
+            }
+          },
+          "kind": "action"
+        }
+      },
+      "root": "root",
+      "run": "candidate",
+      "task": {
+        "classes": [],
+        "kind": "regression",
+        "outcome_definition": "Supplied reference outcome",
+        "positive_class": null
+      },
+      "unavailable": {
+        "kind": "unavailable"
+      }
+    }
+  ],
+  "input": {
+    "evaluation": {
+      "outcomes": {
+        "column": "outcome",
+        "key_columns": [
+          "id"
+        ],
+        "source": "predictions"
+      },
+      "runs": [
+        {
+          "id": "candidate",
+          "key_columns": [
+            "id"
+          ],
+          "model": {
+            "id": "model",
+            "version": "v1"
+          },
+          "prediction": "prediction",
+          "source": "predictions"
+        }
+      ],
+      "sources": [
+        {
+          "handle": "SOURCE_HANDLE",
+          "id": "predictions"
+        }
+      ],
+      "task": {
+        "classes": [],
+        "kind": "regression",
+        "outcome_definition": "Supplied reference outcome",
+        "positive_class": null
+      }
+    },
+    "roles": {
+      "column": "role",
+      "namespace": "policy-example"
+    }
+  },
+  "objectives": [
+    {
+      "basis": "operational",
+      "direction": "maximize",
+      "id": "coverage",
+      "metric": "issued_coverage"
+    }
+  ]
+}

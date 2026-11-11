@@ -1,0 +1,724 @@
+{
+  "schema_version": "confidenceguard.policy_result/1.0",
+  "methodology_id": "policy_selection_v1",
+  "analysis_id": "af4bec35f5364ddba70f6495a326d42e",
+  "generated_at": "2026-11-05T05:10:19.727172+00:00",
+  "name": "Decision policy study",
+  "task": {
+    "kind": "binary_classification",
+    "outcome_definition": "event",
+    "classes": [
+      "no",
+      "yes"
+    ],
+    "positive_class": "yes",
+    "units": null,
+    "horizon": null,
+    "material_error": null
+  },
+  "runs": [
+    {
+      "id": "policy_228a9f59fd91c308",
+      "display_name": "policy_228a9f59fd91c308",
+      "version_alias": "Frozen policy",
+      "model": {
+        "id": "supplied",
+        "version": "v1",
+        "display_name": "",
+        "artifact_sha256": null,
+        "preprocessing": null,
+        "calibration": null
+      },
+      "role": "evaluation",
+      "decision_provenance": {
+        "origin": "simulated",
+        "rule": "typed_policy",
+        "policy_digest": "228a9f59fd91c308d6a2f788e6bb7134aab1700b94399ad4f0cd123103fde15a"
+      },
+      "representations": {
+        "hard_prediction": true,
+        "probabilities": false,
+        "scores": false,
+        "intervals": 0
+      }
+    }
+  ],
+  "outcomes": {
+    "authority": "data",
+    "timing": "supplied_snapshot_maturity_unestablished",
+    "duplicate_rows": 0,
+    "invalid_keys": 0,
+    "canonical_content_digest": "6228eaf2dbe92a12299317407d16846c44316a028d38a5208c7f425a4f00a228",
+    "snapshot_digest": "782003a71760bc72526976fc4b73fbef4551694c5f3c9164915fee12cad15e62",
+    "effective_cutoff_ns": "1793855419282657000",
+    "scope": "observed_labels"
+  },
+  "comparison": null,
+  "measurements": [
+    {
+      "id": "policy_m1",
+      "run": "policy_228a9f59fd91c308",
+      "scope": "accuracy",
+      "family": "policy",
+      "metric": "issued_accuracy",
+      "population_id": "pop_46a7930fa2be4d573f9cba2d39dcba45",
+      "denominator": 40,
+      "denominator_kind": "eligible_records",
+      "value": 1.0,
+      "value_state": "finite",
+      "basis": "simulated",
+      "evidence_basis": "observed_outcome",
+      "units": "fraction",
+      "interpretation": "descriptive",
+      "applicability": "applicable",
+      "execution": "completed",
+      "reason": null,
+      "sensitive_counts": [
+        40,
+        0,
+        40,
+        0
+      ],
+      "data": {
+        "metric": "issued_accuracy",
+        "value": 1.0,
+        "value_state": "finite",
+        "denominator": 40,
+        "planned": 40,
+        "reason": null,
+        "basis": "observed_outcome",
+        "units": "fraction",
+        "statistic_kind": "mean",
+        "numerator": 40.0,
+        "cells": null,
+        "sensitive_counts": [
+          40,
+          0,
+          40,
+          0
+        ],
+        "definition_digest": "1d706fd28cfb5261826af37b3a36d4354c756eb72e8add1943b6fb55cb31d086"
+      },
+      "evidence_refs": []
+    },
+    {
+      "id": "policy_m2",
+      "run": "policy_228a9f59fd91c308",
+      "scope": "private cohort metric",
+      "family": "policy",
+      "metric": "issued_accuracy",
+      "population_id": "pop_7e8041b96c75094b25fc477fc6e76580",
+      "denominator": 20,
+      "denominator_kind": "eligible_records",
+      "value": 1.0,
+      "value_state": "finite",
+      "basis": "simulated",
+      "evidence_basis": "observed_outcome",
+      "units": "fraction",
+      "interpretation": "descriptive",
+      "applicability": "applicable",
+      "execution": "completed",
+      "reason": null,
+      "sensitive_counts": [
+        20,
+        0,
+        20,
+        0
+      ],
+      "data": {
+        "metric": "issued_accuracy",
+        "value": 1.0,
+        "value_state": "finite",
+        "denominator": 20,
+        "planned": 20,
+        "reason": null,
+        "basis": "observed_outcome",
+        "units": "fraction",
+        "statistic_kind": "mean",
+        "numerator": 20.0,
+        "cells": null,
+        "sensitive_counts": [
+          20,
+          0,
+          20,
+          0
+        ],
+        "definition_digest": "4f3d5cdb3fcc6c37d1f67fcd167c5b892511de96d9ecca81bf31839d16a6a662"
+      },
+      "evidence_refs": []
+    }
+  ],
+  "checks": [],
+  "findings": [],
+  "coverage": {
+    "population_provenance_version": "cg5_population_v1",
+    "populations": [
+      {
+        "id": "pop_46a7930fa2be4d573f9cba2d39dcba45",
+        "run": "policy_228a9f59fd91c308",
+        "scope": "accuracy",
+        "denominator": 40,
+        "denominator_kind": "eligible_records",
+        "lineage": {
+          "input_fingerprint": "d9b35e84ad7cf0fedaa2fb15488bc5e3276ac2bf1cc1c612ab6197ea9212e25e",
+          "policy_digest": "228a9f59fd91c308d6a2f788e6bb7134aab1700b94399ad4f0cd123103fde15a",
+          "role": "E",
+          "metric_definition": "1d706fd28cfb5261826af37b3a36d4354c756eb72e8add1943b6fb55cb31d086"
+        },
+        "definition": "Registered policy metric eligibility; planned opportunities are never silently dropped."
+      },
+      {
+        "id": "pop_7e8041b96c75094b25fc477fc6e76580",
+        "run": "policy_228a9f59fd91c308",
+        "scope": "private cohort metric",
+        "denominator": 20,
+        "denominator_kind": "eligible_records",
+        "lineage": {
+          "input_fingerprint": "d9b35e84ad7cf0fedaa2fb15488bc5e3276ac2bf1cc1c612ab6197ea9212e25e",
+          "policy_digest": "228a9f59fd91c308d6a2f788e6bb7134aab1700b94399ad4f0cd123103fde15a",
+          "role": "E",
+          "metric_definition": "4f3d5cdb3fcc6c37d1f67fcd167c5b892511de96d9ecca81bf31839d16a6a662"
+        },
+        "definition": "Registered policy metric eligibility; planned opportunities are never silently dropped."
+      }
+    ],
+    "limitations": [
+      "Policy decisions are hypothetical offline replay; no deployment approval or causal business-value guarantee.",
+      "Observed-outcome, model-implied, operational and missing-label bounds are different estimands.",
+      "Conditional selective risk, full-opportunity behavior and deferral workload have different denominators.",
+      "Independent support conditions on frozen policies and declared sampling, observation, bounds and exposure assumptions.",
+      "Historical stability does not establish future effectiveness. Conformal marginal coverage is not conditional policy coverage.",
+      "Sampled resource controls can overshoot; admission defaults are not capacity guarantees."
+    ],
+    "accounting": {
+      "version": "policy_countable_operations_v1",
+      "counts": {
+        "predicate_events": 40,
+        "action_cells": 40,
+        "contribution_cells": 60
+      },
+      "limits": {
+        "max_candidates": 4096,
+        "max_cutpoints": 1000000,
+        "max_search_states": 1000000,
+        "predicate_events": 100000000,
+        "action_cells": 100000000,
+        "contribution_cells": 100000000,
+        "metric_records": 65536,
+        "dominance_pairs": 10000000,
+        "max_cells": 32,
+        "max_options": 256,
+        "solver_variables": 8192,
+        "solver_rows": 8192,
+        "solver_nonzeros": 1000000,
+        "solver_calls": 64,
+        "solver_nodes": 100000,
+        "solver_seconds": 300,
+        "beam_width": 64,
+        "assessment_policies": 8,
+        "assessment_claims": 256,
+        "assessment_components": 4096,
+        "materialized_bytes": 1073741824
+      },
+      "materialized_limit_bytes": 1073741824,
+      "retained_allocation_bytes": 299036
+    },
+    "input_fingerprint": "d9b35e84ad7cf0fedaa2fb15488bc5e3276ac2bf1cc1c612ab6197ea9212e25e"
+  },
+  "policy": {
+    "stage": "assessment",
+    "assessment_family_digest": "004923b45e74ebf0f9f1f81683c4cb257bbcb1e13eb04a1c30e9be02ad31d44f",
+    "assessments": [
+      {
+        "id": "overall accuracy",
+        "policy_digest": "228a9f59fd91c308d6a2f788e6bb7134aab1700b94399ad4f0cd123103fde15a",
+        "metric": "issued_accuracy",
+        "operator": "ge",
+        "bound": 0.8,
+        "basis": "observed_outcome",
+        "scope": "overall",
+        "state": "supported",
+        "comparator": null,
+        "direction": "maximize",
+        "metric_definition": {
+          "id": "accuracy",
+          "metric": "issued_accuracy",
+          "direction": "maximize",
+          "basis": "observed_outcome",
+          "scope": "overall",
+          "target": null,
+          "interval": null,
+          "units": "fraction",
+          "weight": 1.0,
+          "cost": null,
+          "loss": "absolute",
+          "level": 0.5,
+          "bounds": []
+        },
+        "minimum_support": 1,
+        "family_size": 2,
+        "allocated_alpha": 0.025,
+        "required": true,
+        "estimate": 1.0,
+        "estimate_state": "finite",
+        "support": 40,
+        "support_counts": [
+          40,
+          0,
+          40,
+          0
+        ],
+        "lower": 0.8962367545996842,
+        "upper": 1.0,
+        "method": "registered_finite_component_composition",
+        "strength": "finite_sample_under_declared_assumptions",
+        "reason": null
+      },
+      {
+        "id": "private scoped claim",
+        "policy_digest": "228a9f59fd91c308d6a2f788e6bb7134aab1700b94399ad4f0cd123103fde15a",
+        "metric": "issued_accuracy",
+        "operator": "ge",
+        "bound": 0.8,
+        "basis": "observed_outcome",
+        "scope": "cohort_0/category_0",
+        "state": "supported",
+        "comparator": null,
+        "direction": "maximize",
+        "metric_definition": {
+          "id": "private cohort metric",
+          "metric": "issued_accuracy",
+          "direction": "maximize",
+          "basis": "observed_outcome",
+          "scope": "cohort_0/category_0",
+          "target": null,
+          "interval": null,
+          "units": "fraction",
+          "weight": 1.0,
+          "cost": null,
+          "loss": "absolute",
+          "level": 0.5,
+          "bounds": []
+        },
+        "minimum_support": 1,
+        "family_size": 2,
+        "allocated_alpha": 0.025,
+        "required": true,
+        "estimate": 1.0,
+        "estimate_state": "finite",
+        "support": 20,
+        "support_counts": [
+          20,
+          0,
+          20,
+          0
+        ],
+        "lower": 0.8032403202953746,
+        "upper": 1.0,
+        "method": "registered_finite_component_composition",
+        "strength": "finite_sample_under_declared_assumptions",
+        "reason": null
+      }
+    ],
+    "candidates": [
+      {
+        "policy_digest": "228a9f59fd91c308d6a2f788e6bb7134aab1700b94399ad4f0cd123103fde15a",
+        "metrics": {
+          "accuracy": {
+            "metric": "issued_accuracy",
+            "value": 1.0,
+            "value_state": "finite",
+            "denominator": 40,
+            "planned": 40,
+            "reason": null,
+            "basis": "observed_outcome",
+            "units": "fraction",
+            "statistic_kind": "mean",
+            "numerator": 40.0,
+            "cells": null,
+            "sensitive_counts": [
+              40,
+              0,
+              40,
+              0
+            ],
+            "definition_digest": "1d706fd28cfb5261826af37b3a36d4354c756eb72e8add1943b6fb55cb31d086"
+          },
+          "private cohort metric": {
+            "metric": "issued_accuracy",
+            "value": 1.0,
+            "value_state": "finite",
+            "denominator": 20,
+            "planned": 20,
+            "reason": null,
+            "basis": "observed_outcome",
+            "units": "fraction",
+            "statistic_kind": "mean",
+            "numerator": 20.0,
+            "cells": null,
+            "sensitive_counts": [
+              20,
+              0,
+              20,
+              0
+            ],
+            "definition_digest": "4f3d5cdb3fcc6c37d1f67fcd167c5b892511de96d9ecca81bf31839d16a6a662"
+          }
+        },
+        "constraints": [],
+        "baseline": false,
+        "observed_feasibility": "assessment_evidence"
+      }
+    ],
+    "assessment_plan_preview": null,
+    "assessment_digest": "81ca5493c03ba2cfbfd56ec889a907d11479fc47d485e0315623727178ae9e63",
+    "policy_support": {
+      "228a9f59fd91c308d6a2f788e6bb7134aab1700b94399ad4f0cd123103fde15a": "independently_supported_for_declared_claims"
+    },
+    "reservation": {
+      "kind": "session_and_external_declarations",
+      "cross_session_history_verified": false
+    },
+    "inspection": {
+      "schema_version": "confidenceguard.policy_assessment_inspection/1.0",
+      "assessment_family_digest": "004923b45e74ebf0f9f1f81683c4cb257bbcb1e13eb04a1c30e9be02ad31d44f",
+      "fingerprint": "d6e8e407aa2f549e019fcc54602757fe989a3e7c8eed414ce749c221d106f6e6",
+      "assessment_values_disclosed": false,
+      "resource_admission": "within_declared_source_and_role_limits",
+      "claims": [
+        {
+          "id": "overall accuracy",
+          "method_refusal": null,
+          "components": 1,
+          "allocated_alpha": 0.025
+        },
+        {
+          "id": "private scoped claim",
+          "method_refusal": null,
+          "components": 1,
+          "allocated_alpha": 0.025
+        }
+      ],
+      "family_size": 2,
+      "elementary_components": 2,
+      "admissibility_reasons": [],
+      "continuity": null,
+      "local_identity_scope": "live_source_keys_and_available_local_aliases"
+    },
+    "freshness_scope": "Observable event/entity non-overlap and declared external provenance; no global fork coordination.",
+    "behavior": {
+      "228a9f59fd91c308d6a2f788e6bb7134aab1700b94399ad4f0cd123103fde15a": {
+        "task": {
+          "kind": "binary_classification",
+          "outcome_definition": "event",
+          "classes": [
+            "no",
+            "yes"
+          ],
+          "positive_class": "yes",
+          "units": null,
+          "horizon": null,
+          "material_error": null
+        },
+        "run": "model",
+        "nodes": {
+          "root": {
+            "kind": "accept",
+            "when": {
+              "kind": "compare",
+              "value": {
+                "kind": "probability",
+                "target": "yes"
+              },
+              "op": "ge",
+              "constant": 0.65
+            },
+            "accepted": "yes",
+            "rejected": "no"
+          },
+          "yes": {
+            "kind": "action",
+            "action": {
+              "kind": "label",
+              "label": "yes"
+            }
+          },
+          "no": {
+            "kind": "action",
+            "action": {
+              "kind": "label",
+              "label": "no"
+            }
+          }
+        },
+        "root": "root",
+        "fallback": {
+          "kind": "abstain"
+        },
+        "unavailable": {
+          "kind": "abstain"
+        },
+        "decision_costs": {},
+        "input_identity": {
+          "version": "policy_input_semantics_v2",
+          "task": {
+            "kind": "binary_classification",
+            "outcome_definition": "event",
+            "classes": [
+              "no",
+              "yes"
+            ],
+            "positive_class": "yes",
+            "units": null,
+            "horizon": null,
+            "material_error": null
+          },
+          "model": {
+            "id": "supplied",
+            "version": "v1",
+            "artifact_sha256": null,
+            "preprocessing": null,
+            "calibration": null
+          },
+          "decision": {
+            "column": null,
+            "rule": "none",
+            "threshold": null,
+            "tie_policy": "abstain",
+            "state_column": null,
+            "state_values": {
+              "issued": "issued",
+              "abstained": "abstained",
+              "failed": "failed",
+              "missing": "missing"
+            },
+            "candidate_evaluation": false
+          },
+          "prediction": null,
+          "probability_tolerance": 1e-06,
+          "prediction_at": null,
+          "method_digest": null,
+          "representation": null,
+          "probability": {
+            "positive_column": "p",
+            "columns": {}
+          },
+          "score": null,
+          "selection": null,
+          "intervals": [],
+          "features": [],
+          "regions": [],
+          "region_representations": [],
+          "feature_time_view": "available_at_decision",
+          "feature_time_policy": "declared_information_cutoff_v2"
+        },
+        "schema_version": "confidenceguard.policy_spec/1.0"
+      }
+    },
+    "evaluation_economics": {
+      "costs": {},
+      "known_charges": {},
+      "metric_definitions": [
+        {
+          "id": "accuracy",
+          "metric": "issued_accuracy",
+          "direction": "maximize",
+          "basis": "observed_outcome",
+          "scope": "overall",
+          "target": null,
+          "interval": null,
+          "units": "fraction",
+          "weight": 1.0,
+          "cost": null,
+          "loss": "absolute",
+          "level": 0.5,
+          "bounds": []
+        },
+        {
+          "id": "accounting:issued_coverage",
+          "metric": "issued_coverage",
+          "direction": "minimize",
+          "basis": "operational",
+          "scope": "overall",
+          "target": null,
+          "interval": null,
+          "units": "fraction",
+          "weight": 1.0,
+          "cost": null,
+          "loss": "absolute",
+          "level": 0.5,
+          "bounds": []
+        },
+        {
+          "id": "accounting:abstention_rate",
+          "metric": "abstention_rate",
+          "direction": "minimize",
+          "basis": "operational",
+          "scope": "overall",
+          "target": null,
+          "interval": null,
+          "units": "fraction",
+          "weight": 1.0,
+          "cost": null,
+          "loss": "absolute",
+          "level": 0.5,
+          "bounds": []
+        },
+        {
+          "id": "accounting:deferral_rate",
+          "metric": "deferral_rate",
+          "direction": "minimize",
+          "basis": "operational",
+          "scope": "overall",
+          "target": null,
+          "interval": null,
+          "units": "fraction",
+          "weight": 1.0,
+          "cost": null,
+          "loss": "absolute",
+          "level": 0.5,
+          "bounds": []
+        },
+        {
+          "id": "accounting:unavailable_rate",
+          "metric": "unavailable_rate",
+          "direction": "minimize",
+          "basis": "operational",
+          "scope": "overall",
+          "target": null,
+          "interval": null,
+          "units": "fraction",
+          "weight": 1.0,
+          "cost": null,
+          "loss": "absolute",
+          "level": 0.5,
+          "bounds": []
+        },
+        {
+          "id": "accounting:input_unavailable_rate",
+          "metric": "input_unavailable_rate",
+          "direction": "minimize",
+          "basis": "operational",
+          "scope": "overall",
+          "target": null,
+          "interval": null,
+          "units": "fraction",
+          "weight": 1.0,
+          "cost": null,
+          "loss": "absolute",
+          "level": 0.5,
+          "bounds": []
+        },
+        {
+          "id": "accounting:issued_label_availability",
+          "metric": "issued_label_availability",
+          "direction": "minimize",
+          "basis": "observed_outcome",
+          "scope": "overall",
+          "target": null,
+          "interval": null,
+          "units": "fraction",
+          "weight": 1.0,
+          "cost": null,
+          "loss": "absolute",
+          "level": 0.5,
+          "bounds": []
+        },
+        {
+          "id": "accounting:labeled_issued_share",
+          "metric": "labeled_issued_share",
+          "direction": "minimize",
+          "basis": "observed_outcome",
+          "scope": "overall",
+          "target": null,
+          "interval": null,
+          "units": "fraction",
+          "weight": 1.0,
+          "cost": null,
+          "loss": "absolute",
+          "level": 0.5,
+          "bounds": []
+        },
+        {
+          "id": "accounting:selective_risk",
+          "metric": "selective_risk",
+          "direction": "minimize",
+          "basis": "observed_outcome",
+          "scope": "overall",
+          "target": null,
+          "interval": null,
+          "units": "fraction",
+          "weight": 1.0,
+          "cost": null,
+          "loss": "absolute",
+          "level": 0.5,
+          "bounds": []
+        },
+        {
+          "id": "accounting:correct_issue_rate",
+          "metric": "correct_issue_rate",
+          "direction": "minimize",
+          "basis": "observed_outcome",
+          "scope": "overall",
+          "target": null,
+          "interval": null,
+          "units": "fraction",
+          "weight": 1.0,
+          "cost": null,
+          "loss": "absolute",
+          "level": 0.5,
+          "bounds": []
+        }
+      ]
+    },
+    "baselines": []
+  },
+  "execution": {
+    "status": "completed",
+    "backend": "duckdb_local",
+    "peak_workspace_bytes": 143360,
+    "accounting": {
+      "version": "policy_countable_operations_v1",
+      "counts": {
+        "predicate_events": 40,
+        "action_cells": 40,
+        "contribution_cells": 60
+      },
+      "limits": {
+        "max_candidates": 4096,
+        "max_cutpoints": 1000000,
+        "max_search_states": 1000000,
+        "predicate_events": 100000000,
+        "action_cells": 100000000,
+        "contribution_cells": 100000000,
+        "metric_records": 65536,
+        "dominance_pairs": 10000000,
+        "max_cells": 32,
+        "max_options": 256,
+        "solver_variables": 8192,
+        "solver_rows": 8192,
+        "solver_nonzeros": 1000000,
+        "solver_calls": 64,
+        "solver_nodes": 100000,
+        "solver_seconds": 300,
+        "beam_width": 64,
+        "assessment_policies": 8,
+        "assessment_claims": 256,
+        "assessment_components": 4096,
+        "materialized_bytes": 1073741824
+      },
+      "materialized_limit_bytes": 1073741824,
+      "retained_allocation_bytes": 299036
+    },
+    "publication_policy": "whole_evaluation_atomic",
+    "resource_qualification": "Sampled supervision and explicit algorithm counters; no hard capacity guarantee.",
+    "peak_worker_rss_bytes": 223494144,
+    "whole_job_seconds": 0.8842547080712393,
+    "peak_spill_bytes": 0,
+    "serialized_bytes": 103815
+  },
+  "binding": {
+    "analysis_digest": "32c79d559708e1497a0e7737bd327144a8ad207e1a17baaaebb9e0eb311231a0",
+    "private_manifest_digest": "c8dd603a35b60201ce27f578f97b8a4a45a68e293d03092f763a65c5cdac97f2"
+  }
+}

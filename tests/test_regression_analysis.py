@@ -40,6 +40,17 @@ def test_frozen_unlabeled_evidence_and_report(tmp_path):
         r.execution['elapsed_seconds']=0
         value=r.to_dict()
         assert {k:value[k] for k in case['result']}==case['result']
+        # The golden HTML predates Python 3.12's smaller Unicode objects.
+        # Preserve actual measured memory in the product; normalize only this
+        # environment diagnostic in the historical rendering comparison.
+        import sys
+        frame=pd.read_csv(source)
+        measured=int(frame.memory_usage(index=True,deep=True).sum())
+        assert r.execution['frame_bytes']==measured
+        if sys.implementation.name=='cpython' and sys.version_info>=(3,12):
+            strings=[value for column in frame for value in frame[column] if isinstance(value,str)]
+            assert all(value.isascii() for value in strings)  # These immutable golden inputs are ASCII.
+            r.execution['frame_bytes']=measured+8*len(strings)
         assert hashlib.sha256(render_analysis_result(r).encode()).hexdigest()==case['html_sha256']
 
 

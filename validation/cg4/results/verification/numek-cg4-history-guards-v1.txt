@@ -1,0 +1,32 @@
+F.....                                                                   [100%]
+=================================== FAILURES ===================================
+_______ test_observable_label_source_alias_is_not_independent_membership _______
+
+tmp_path = PosixPath('/private/var/folders/cs/c15xvw9d3t53tzcws5yxjxcr0000gn/T/pytest-of-drivyaanshyadav/pytest-328/test_observable_label_source_a0')
+
+    def test_observable_label_source_alias_is_not_independent_membership(tmp_path):
+        spec=binary(tmp_path)
+        label_view=FeatureViewSpec('context',(FeatureField('label','y'),),source='copy')
+        identities={'data':{'sha256':'a'*64,'bytes':42},'copy':{'sha256':'a'*64,'bytes':42}}
+        assert outcome_bound_fields(spec.evaluation,[label_view],identities)=={'context.label'}
+        assert outcome_bound_fields(spec.evaluation,[label_view],{})==set()  # absence proves nothing
+        path=tmp_path/'predictions.csv'
+        with path.open() as stream:rows=list(csv.DictReader(stream))
+        for row in rows:row['decision']='0'
+        with path.open('w',newline='') as stream:
+            writer=csv.DictWriter(stream,fieldnames=rows[0]);writer.writeheader();writer.writerows(rows)
+        spec=replace(spec,features=(replace(label_view,source='data'),),
+                     evaluation=replace(spec.evaluation,runs=(replace(spec.evaluation.runs[0],probabilities=None),)))
+        result=investigate(spec)
+        assert result.private['known_outcome_features']==['context.label']
+        with pytest.raises(EvaluationError) as leakage:freeze_hypotheses(result)
+>       assert leakage.value.code=='outcome_derived_membership'
+E       AssertionError: assert 'invalid_specification' == 'outcome_derived_membership'
+E         
+E         - outcome_derived_membership
+E         + invalid_specification
+
+tests/cg4/test_admission_guards.py:60: AssertionError
+=========================== short test summary info ============================
+FAILED tests/cg4/test_admission_guards.py::test_observable_label_source_alias_is_not_independent_membership
+1 failed, 5 passed in 42.69s

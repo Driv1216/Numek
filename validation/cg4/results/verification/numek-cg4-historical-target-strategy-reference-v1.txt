@@ -1,0 +1,142 @@
+...FFF                                                                   [100%]
+=================================== FAILURES ===================================
+_ test_reference_only_deterioration_proposes_a_frozen_gate_when_current_risk_is_flat[structured] _
+
+historical = Objective(spec=FailureObjectiveSpec(id='deterioration', metric='error_rate', run='model', comparator='reference_period...abel=None, bounded=(), binary=False, proxy='exact_additive_loss', reference=None, loss_table=None, extra_metadata=None)
+tmp_path = PosixPath('/private/var/folders/cs/c15xvw9d3t53tzcws5yxjxcr0000gn/T/pytest-of-drivyaanshyadav/pytest-437/test_reference_only_deteriorat0')
+strategy = 'structured'
+
+    @pytest.mark.parametrize('strategy',['structured','catboost','geometric'])
+    def test_reference_only_deterioration_proposes_a_frozen_gate_when_current_risk_is_flat(historical,tmp_path,strategy):
+        """Functional target/membership reference, not an empirical recovery claim."""
+        from dataclasses import replace
+        from confidenceguard.feature_contracts import FeatureField
+        from confidenceguard.features import normalize
+        from confidenceguard.investigation import propose_diagnostic_targets
+        from confidenceguard.investigation_contracts import InvestigationLimits
+        from confidenceguard.investigation_membership import apply
+        historical.store.con.execute('DELETE FROM evidence');rows=[];hot_by_key={}
+        for entity in range(120):
+            hot=entity%2==0;current=float((entity//2)%2)
+            for period,loss in [('reference',0. if hot else current),('current',current)]:
+                key=f'{entity:03}-{period}';rows.append((key,str(entity),'D',period,True,loss));hot_by_key[key]=hot
+        historical.store.con.executemany('INSERT INTO evidence VALUES (?,?,?,?,?,?)',rows)
+        keys,targets=historical.discovery_targets();truth=np.array([hot_by_key[k] for k in keys])
+        field=FeatureField('hot','hot',kind='boolean')
+        features={'context.hot':[normalize('true' if flag else 'false',field) for flag in truth]}
+        representations={'vector':{'id':'vector','vectors':truth.astype(float)[:,None],'available':np.ones(len(keys),bool),'normalization':'none'}}
+>       limits=InvestigationLimits(minimum_discovery_support=10,max_nodes=1000,max_depth=1,landmarks=16,neighbors=4,stability_replicates=0)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/cg4/test_historical_targets.py:98: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+<string>:26: in __init__
+    ???
+src/confidenceguard/investigation_contracts.py:138: in __post_init__
+    for f in fields(self): positive(getattr(self,f.name),f.name)
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+value = 0, label = 'stability_replicates', integer = True
+
+    def positive(value, label, integer=True):
+        if isinstance(value, bool) or not isinstance(value, int if integer else (float,int)) or not math.isfinite(value) or value<=0:
+>           raise EvaluationError(f'{label} must be positive.')
+E           confidenceguard.contracts.EvaluationError: stability_replicates must be positive.
+
+src/confidenceguard/contracts.py:58: EvaluationError
+_ test_reference_only_deterioration_proposes_a_frozen_gate_when_current_risk_is_flat[catboost] _
+
+historical = Objective(spec=FailureObjectiveSpec(id='deterioration', metric='error_rate', run='model', comparator='reference_period...abel=None, bounded=(), binary=False, proxy='exact_additive_loss', reference=None, loss_table=None, extra_metadata=None)
+tmp_path = PosixPath('/private/var/folders/cs/c15xvw9d3t53tzcws5yxjxcr0000gn/T/pytest-of-drivyaanshyadav/pytest-437/test_reference_only_deteriorat1')
+strategy = 'catboost'
+
+    @pytest.mark.parametrize('strategy',['structured','catboost','geometric'])
+    def test_reference_only_deterioration_proposes_a_frozen_gate_when_current_risk_is_flat(historical,tmp_path,strategy):
+        """Functional target/membership reference, not an empirical recovery claim."""
+        from dataclasses import replace
+        from confidenceguard.feature_contracts import FeatureField
+        from confidenceguard.features import normalize
+        from confidenceguard.investigation import propose_diagnostic_targets
+        from confidenceguard.investigation_contracts import InvestigationLimits
+        from confidenceguard.investigation_membership import apply
+        historical.store.con.execute('DELETE FROM evidence');rows=[];hot_by_key={}
+        for entity in range(120):
+            hot=entity%2==0;current=float((entity//2)%2)
+            for period,loss in [('reference',0. if hot else current),('current',current)]:
+                key=f'{entity:03}-{period}';rows.append((key,str(entity),'D',period,True,loss));hot_by_key[key]=hot
+        historical.store.con.executemany('INSERT INTO evidence VALUES (?,?,?,?,?,?)',rows)
+        keys,targets=historical.discovery_targets();truth=np.array([hot_by_key[k] for k in keys])
+        field=FeatureField('hot','hot',kind='boolean')
+        features={'context.hot':[normalize('true' if flag else 'false',field) for flag in truth]}
+        representations={'vector':{'id':'vector','vectors':truth.astype(float)[:,None],'available':np.ones(len(keys),bool),'normalization':'none'}}
+>       limits=InvestigationLimits(minimum_discovery_support=10,max_nodes=1000,max_depth=1,landmarks=16,neighbors=4,stability_replicates=0)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/cg4/test_historical_targets.py:98: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+<string>:26: in __init__
+    ???
+src/confidenceguard/investigation_contracts.py:138: in __post_init__
+    for f in fields(self): positive(getattr(self,f.name),f.name)
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+value = 0, label = 'stability_replicates', integer = True
+
+    def positive(value, label, integer=True):
+        if isinstance(value, bool) or not isinstance(value, int if integer else (float,int)) or not math.isfinite(value) or value<=0:
+>           raise EvaluationError(f'{label} must be positive.')
+E           confidenceguard.contracts.EvaluationError: stability_replicates must be positive.
+
+src/confidenceguard/contracts.py:58: EvaluationError
+_ test_reference_only_deterioration_proposes_a_frozen_gate_when_current_risk_is_flat[geometric] _
+
+historical = Objective(spec=FailureObjectiveSpec(id='deterioration', metric='error_rate', run='model', comparator='reference_period...abel=None, bounded=(), binary=False, proxy='exact_additive_loss', reference=None, loss_table=None, extra_metadata=None)
+tmp_path = PosixPath('/private/var/folders/cs/c15xvw9d3t53tzcws5yxjxcr0000gn/T/pytest-of-drivyaanshyadav/pytest-437/test_reference_only_deteriorat2')
+strategy = 'geometric'
+
+    @pytest.mark.parametrize('strategy',['structured','catboost','geometric'])
+    def test_reference_only_deterioration_proposes_a_frozen_gate_when_current_risk_is_flat(historical,tmp_path,strategy):
+        """Functional target/membership reference, not an empirical recovery claim."""
+        from dataclasses import replace
+        from confidenceguard.feature_contracts import FeatureField
+        from confidenceguard.features import normalize
+        from confidenceguard.investigation import propose_diagnostic_targets
+        from confidenceguard.investigation_contracts import InvestigationLimits
+        from confidenceguard.investigation_membership import apply
+        historical.store.con.execute('DELETE FROM evidence');rows=[];hot_by_key={}
+        for entity in range(120):
+            hot=entity%2==0;current=float((entity//2)%2)
+            for period,loss in [('reference',0. if hot else current),('current',current)]:
+                key=f'{entity:03}-{period}';rows.append((key,str(entity),'D',period,True,loss));hot_by_key[key]=hot
+        historical.store.con.executemany('INSERT INTO evidence VALUES (?,?,?,?,?,?)',rows)
+        keys,targets=historical.discovery_targets();truth=np.array([hot_by_key[k] for k in keys])
+        field=FeatureField('hot','hot',kind='boolean')
+        features={'context.hot':[normalize('true' if flag else 'false',field) for flag in truth]}
+        representations={'vector':{'id':'vector','vectors':truth.astype(float)[:,None],'available':np.ones(len(keys),bool),'normalization':'none'}}
+>       limits=InvestigationLimits(minimum_discovery_support=10,max_nodes=1000,max_depth=1,landmarks=16,neighbors=4,stability_replicates=0)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/cg4/test_historical_targets.py:98: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+<string>:26: in __init__
+    ???
+src/confidenceguard/investigation_contracts.py:138: in __post_init__
+    for f in fields(self): positive(getattr(self,f.name),f.name)
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+value = 0, label = 'stability_replicates', integer = True
+
+    def positive(value, label, integer=True):
+        if isinstance(value, bool) or not isinstance(value, int if integer else (float,int)) or not math.isfinite(value) or value<=0:
+>           raise EvaluationError(f'{label} must be positive.')
+E           confidenceguard.contracts.EvaluationError: stability_replicates must be positive.
+
+src/confidenceguard/contracts.py:58: EvaluationError
+=========================== short test summary info ============================
+FAILED tests/cg4/test_historical_targets.py::test_reference_only_deterioration_proposes_a_frozen_gate_when_current_risk_is_flat[structured]
+FAILED tests/cg4/test_historical_targets.py::test_reference_only_deterioration_proposes_a_frozen_gate_when_current_risk_is_flat[catboost]
+FAILED tests/cg4/test_historical_targets.py::test_reference_only_deterioration_proposes_a_frozen_gate_when_current_risk_is_flat[geometric]
+3 failed, 3 passed in 2.53s

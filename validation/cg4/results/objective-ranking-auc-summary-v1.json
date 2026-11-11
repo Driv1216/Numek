@@ -1,0 +1,2118 @@
+{
+  "H_selected_effect_summary": {
+    "count": 41,
+    "maximum": 0.9613999743713407,
+    "median": 0.951417191573444,
+    "minimum": 0.9319568275975372
+  },
+  "H_unavailable": {
+    "oracle_members": 0,
+    "total": 0
+  },
+  "aggregation_source_sha256": "b0198af985f5ef3d4104b7d916feacc59527242a4b7f5bae3409a5212174d4c2",
+  "anchor_criterion_met": true,
+  "assessment_states": {
+    "confirmed": 41
+  },
+  "assessment_strengths": {
+    "approximate": 41
+  },
+  "objective": "ranking_auc",
+  "protocol": {
+    "assessments": "Authoritative frozen-region H effects measured separately from recovery; intervals remain finite or explicitly approximate and subject to qualification/refusal.",
+    "criterion": {
+      "H_precision": 0.7,
+      "H_recall": 0.7,
+      "minimum_successes_of_40": 32
+    },
+    "development_seed_range": [
+      0,
+      39
+    ],
+    "not_covered": [
+      "Historical-deterioration workspace panel",
+      "Natural-data recovery",
+      "Every registered metric from one representative objective"
+    ],
+    "panels": {
+      "calibration_bins": {
+        "contrast": "Frozen equal-width bin residual magnitude .30 versus zero",
+        "delta": 0.15,
+        "metric": "reliability_diagram"
+      },
+      "calibration_residual": {
+        "contrast": "Signed target residual +.30 versus zero at supplied p=.5",
+        "delta": 0.15,
+        "metric": "calibration_residual"
+      },
+      "false_negative": {
+        "contrast": ".40 versus .10 among actual positives",
+        "delta": 0.15,
+        "metric": "false_negative_rate"
+      },
+      "false_positive": {
+        "contrast": ".40 versus .10 among actual negatives",
+        "delta": 0.15,
+        "metric": "false_positive_rate"
+      },
+      "paired_degradation": {
+        "contrast": "Common-population candidate minus reference error .30 versus zero",
+        "delta": 0.15,
+        "metric": "error_rate"
+      },
+      "precision": {
+        "contrast": ".60 versus .90 among predicted positives",
+        "delta": 0.15,
+        "direction": "lower",
+        "metric": "precision"
+      },
+      "probability_quality": {
+        "contrast": "Brier .33 versus .09; high-confidence error mechanism",
+        "delta": 0.12,
+        "metric": "brier"
+      },
+      "ranking_ap": {
+        "contrast": "Reversed versus correctly ordered noisy scores at balanced label prevalence",
+        "delta": 0.2,
+        "direction": "lower",
+        "metric": "average_precision"
+      },
+      "ranking_auc": {
+        "contrast": "Reversed versus correctly ordered noisy score distributions",
+        "delta": 0.35,
+        "direction": "lower",
+        "metric": "roc_auc"
+      },
+      "regression_bias": {
+        "bounds": [
+          -1.0,
+          2.0
+        ],
+        "contrast": "Signed mean bias .90 versus zero with bounded independent noise",
+        "delta": 0.45,
+        "metric": "bias",
+        "units": "metres"
+      },
+      "regression_tail": {
+        "contrast": "Absolute error >1 metre: .60 versus .01",
+        "delta": 0.25,
+        "metric": "material_error_rate",
+        "units": "fraction"
+      },
+      "uncertainty_coverage": {
+        "contrast": "Prediction-interval miscoverage .60 versus .10",
+        "delta": 0.25,
+        "metric": "interval_miscoverage"
+      },
+      "uncertainty_efficiency": {
+        "bounds": [
+          1.0,
+          5.0
+        ],
+        "contrast": "Issued interval widths 4 versus 2 metres, with unchanged perfect coverage",
+        "delta": 1.0,
+        "metric": "interval_width",
+        "units": "metres"
+      }
+    },
+    "primary": "Positive-native-effect S-selected union evaluated on independent H; unavailable counts stay in planned recall.",
+    "qualification_seed_range": [
+      110000,
+      110039
+    ],
+    "region": "categorical a=1 AND continuous x>.5; expected prevalence .125",
+    "schema_version": "numek.cg4_objective_recovery_protocol/1.0",
+    "strategy_claims": "Unified runs do not qualify every strategy. Separate --strategies ablations retain the same profile and separate evidence.",
+    "units": 40000
+  },
+  "role_medians": {
+    "D": {
+      "IoU": 0.9929851813703015,
+      "precision": 0.997959819215765,
+      "recall": 0.998781972400276
+    },
+    "H": {
+      "IoU": 0.9930497786126392,
+      "precision": 0.9979676024075035,
+      "recall": 0.9991701244813278
+    },
+    "S": {
+      "IoU": 0.9939680119196408,
+      "precision": 0.998850224751774,
+      "recall": 0.9984301296440967
+    }
+  },
+  "schema_version": "numek.cg4_objective_anchor_summary/1.0",
+  "scope": "The declared synthetic objective and unified-strategy operating profile only. H measures independently selected frozen gates. Planned membership stays in recovery denominators. Candidate effects overlap and are not independent replicates. No claim for other objectives, individual strategy superiority, external independence verification or milestone completion.",
+  "source_binding_sha256": "811ff0202f1dcc28d3cbe36349ecf4643c163b2d39cdcd9d4b7800cb4914be9e",
+  "source_identity": "d8f73aaacf3d835d4323561e94336fccef453cdc6db5c985af2357b4084dcc46",
+  "success_fraction_MC95": [
+    0.9119026971211976,
+    1.0
+  ],
+  "successes": 40,
+  "trials": [
+    {
+      "H_selected_native_effects": [
+        0.943860274970486
+      ],
+      "assessment_states": [
+        "confirmed"
+      ],
+      "input_sha256": "aa4437c4939264c1a51faa945d4f9c20d19a433ce1c18a777d899b892b7dc47d",
+      "path": "validation/cg4/results/objective-ranking-group-v1/ranking_auc/ranking_auc-110000.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.9858814037918515,
+          "false_negative": 0,
+          "false_positive": 35,
+          "planned": 19944,
+          "precision": 0.9858814037918515,
+          "recall": 1.0,
+          "true_positive": 2444,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.982011447260834,
+          "false_negative": 0,
+          "false_positive": 22,
+          "planned": 10073,
+          "precision": 0.982011447260834,
+          "recall": 1.0,
+          "true_positive": 1201,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9903459372485921,
+          "false_negative": 0,
+          "false_positive": 12,
+          "planned": 9983,
+          "precision": 0.9903459372485921,
+          "recall": 1.0,
+          "true_positive": 1231,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 498.1273099160171,
+      "seed": 110000,
+      "sha256": "f30c19328d2b47457916da4ee46c0043a634190fafd35fc1088986cfa2dcad4a",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.9613999743713407
+      ],
+      "assessment_states": [
+        "confirmed"
+      ],
+      "input_sha256": "3d99f47d33620551a2df663fc320a327a6089a8160bd4250b71e242a77a306cc",
+      "path": "validation/cg4/results/objective-ranking-group-v1/ranking_auc/ranking_auc-110001.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.9920666402221341,
+          "false_negative": 20,
+          "false_positive": 0,
+          "planned": 20014,
+          "precision": 1.0,
+          "recall": 0.9920666402221341,
+          "true_positive": 2501,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9944044764188649,
+          "false_negative": 7,
+          "false_positive": 0,
+          "planned": 9950,
+          "precision": 1.0,
+          "recall": 0.9944044764188649,
+          "true_positive": 1244,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9958540630182421,
+          "false_negative": 5,
+          "false_positive": 0,
+          "planned": 10036,
+          "precision": 1.0,
+          "recall": 0.9958540630182421,
+          "true_positive": 1201,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 449.88267358299345,
+      "seed": 110001,
+      "sha256": "c7c9847a97af58c73f596a745642427bc8663e6761675b76bdc1616a0f6882b0",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.9541002848528264
+      ],
+      "assessment_states": [
+        "confirmed"
+      ],
+      "input_sha256": "2d41e8b9fd0a3d5178f4bebac040cf3523f870c46d7b436a9af112e2c459e3e8",
+      "path": "validation/cg4/results/objective-ranking-group-v1/ranking_auc/ranking_auc-110002.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.9905808477237049,
+          "false_negative": 24,
+          "false_positive": 0,
+          "planned": 20042,
+          "precision": 1.0,
+          "recall": 0.9905808477237049,
+          "true_positive": 2524,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9952456418383518,
+          "false_negative": 6,
+          "false_positive": 0,
+          "planned": 9906,
+          "precision": 1.0,
+          "recall": 0.9952456418383518,
+          "true_positive": 1256,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9935117599351176,
+          "false_negative": 8,
+          "false_positive": 0,
+          "planned": 10052,
+          "precision": 1.0,
+          "recall": 0.9935117599351176,
+          "true_positive": 1225,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 544.7070115420502,
+      "seed": 110002,
+      "sha256": "b3e09e7228a597bdea0a915e16913da53c3110f9970627628c69ad03ca2731df",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.9564985532085348
+      ],
+      "assessment_states": [
+        "confirmed"
+      ],
+      "input_sha256": "daaec0bbc975591687c31c19d74b65718d69d2cc40651030c048f00e1060d040",
+      "path": "validation/cg4/results/objective-ranking-group-v1/ranking_auc/ranking_auc-110003.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.997248427672956,
+          "false_negative": 0,
+          "false_positive": 7,
+          "planned": 19999,
+          "precision": 0.997248427672956,
+          "recall": 1.0,
+          "true_positive": 2537,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9975020815986678,
+          "false_negative": 0,
+          "false_positive": 3,
+          "planned": 9976,
+          "precision": 0.9975020815986678,
+          "recall": 1.0,
+          "true_positive": 1198,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9976489028213166,
+          "false_negative": 0,
+          "false_positive": 3,
+          "planned": 10025,
+          "precision": 0.9976489028213166,
+          "recall": 1.0,
+          "true_positive": 1273,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 637.9015079999808,
+      "seed": 110003,
+      "sha256": "5dd6e2db6c025bd7f191abaff22d22109c78f564062f6d0d4e839f3ac8db19ea",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.9598740780509951
+      ],
+      "assessment_states": [
+        "confirmed"
+      ],
+      "input_sha256": "d31683060db3a32cfc15d0d16964161cc7939199726cabdd5c4bf5119fba64fe",
+      "path": "validation/cg4/results/objective-ranking-group-v1/ranking_auc/ranking_auc-110004.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.9929769801014436,
+          "false_negative": 18,
+          "false_positive": 0,
+          "planned": 20151,
+          "precision": 1.0,
+          "recall": 0.9929769801014436,
+          "true_positive": 2545,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9944178628389154,
+          "false_negative": 7,
+          "false_positive": 0,
+          "planned": 9932,
+          "precision": 1.0,
+          "recall": 0.9944178628389154,
+          "true_positive": 1247,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.994341147938561,
+          "false_negative": 7,
+          "false_positive": 0,
+          "planned": 9917,
+          "precision": 1.0,
+          "recall": 0.994341147938561,
+          "true_positive": 1230,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 630.6715852079797,
+      "seed": 110004,
+      "sha256": "6c3ccca960906b6ba1886ea2785e339f3dc9ec2284c72b18280492a0db033c68",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.9565648729238115
+      ],
+      "assessment_states": [
+        "confirmed"
+      ],
+      "input_sha256": "16adafe69db85ee6a615c6d32ca5cd43dff83bd0f8695b89f4f485ca505f0d7e",
+      "path": "validation/cg4/results/objective-ranking-group-v1/ranking_auc/ranking_auc-110005.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.99481658692185,
+          "false_negative": 13,
+          "false_positive": 0,
+          "planned": 19975,
+          "precision": 1.0,
+          "recall": 0.99481658692185,
+          "true_positive": 2495,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9953051643192489,
+          "false_negative": 6,
+          "false_positive": 0,
+          "planned": 9948,
+          "precision": 1.0,
+          "recall": 0.9953051643192489,
+          "true_positive": 1272,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9919743178170144,
+          "false_negative": 10,
+          "false_positive": 0,
+          "planned": 10077,
+          "precision": 1.0,
+          "recall": 0.9919743178170144,
+          "true_positive": 1236,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 628.0664419580135,
+      "seed": 110005,
+      "sha256": "57b2e1f658db21742c13af7bc9f62ee8c2dd37dd4576559e8f0f2f23c54cd4da",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.9447413132290701
+      ],
+      "assessment_states": [
+        "confirmed"
+      ],
+      "input_sha256": "e3a2bdf2dd0e7de2983aea77116d856f9f46930b56861495f60c20544dc22ac3",
+      "path": "validation/cg4/results/objective-ranking-group-v1/ranking_auc/ranking_auc-110006.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.9944576405384006,
+          "false_negative": 14,
+          "false_positive": 0,
+          "planned": 20028,
+          "precision": 1.0,
+          "recall": 0.9944576405384006,
+          "true_positive": 2512,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9927942353883107,
+          "false_negative": 9,
+          "false_positive": 0,
+          "planned": 9960,
+          "precision": 1.0,
+          "recall": 0.9927942353883107,
+          "true_positive": 1240,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9949874686716792,
+          "false_negative": 6,
+          "false_positive": 0,
+          "planned": 10012,
+          "precision": 1.0,
+          "recall": 0.9949874686716792,
+          "true_positive": 1191,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 629.5454018329619,
+      "seed": 110006,
+      "sha256": "afbb5b8ca999fec013389789855b6fdbdd430c0f92f88d3f86e9bc41c9eca5a5",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.9484892669504752
+      ],
+      "assessment_states": [
+        "confirmed"
+      ],
+      "input_sha256": "2842b11009700bece8cfc38bf16b1d37c12418c747ff14fb7447de7524f41dcc",
+      "path": "validation/cg4/results/objective-ranking-group-v1/ranking_auc/ranking_auc-110007.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.9904610492845787,
+          "false_negative": 0,
+          "false_positive": 24,
+          "planned": 20053,
+          "precision": 0.9904610492845787,
+          "recall": 1.0,
+          "true_positive": 2492,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9919093851132686,
+          "false_negative": 0,
+          "false_positive": 10,
+          "planned": 10042,
+          "precision": 0.9919093851132686,
+          "recall": 1.0,
+          "true_positive": 1226,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9924114671163575,
+          "false_negative": 0,
+          "false_positive": 9,
+          "planned": 9905,
+          "precision": 0.9924114671163575,
+          "recall": 1.0,
+          "true_positive": 1177,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 627.9506566249765,
+      "seed": 110007,
+      "sha256": "ca9fb8105cf860a889122d4e63de9d5ccb8ae9ba5769d7da29946b444c4beaad",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.9364125145311784,
+        0.9319568275975372
+      ],
+      "assessment_states": [
+        "confirmed",
+        "confirmed"
+      ],
+      "input_sha256": "9dfcdd1548274a0ae6604c78f1d61498ce8c5e84ec8e3378df80960201023e30",
+      "path": "validation/cg4/results/objective-ranking-group-v1/ranking_auc/ranking_auc-110008.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.9666800481734243,
+          "false_negative": 46,
+          "false_positive": 37,
+          "planned": 19980,
+          "precision": 0.9848670756646217,
+          "recall": 0.9812550937245313,
+          "true_positive": 2408,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9715384615384616,
+          "false_negative": 24,
+          "false_positive": 13,
+          "planned": 10082,
+          "precision": 0.9898119122257053,
+          "recall": 0.9813519813519813,
+          "true_positive": 1263,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.970873786407767,
+          "false_negative": 14,
+          "false_positive": 22,
+          "planned": 9938,
+          "precision": 0.9819967266775778,
+          "recall": 0.9884678747940692,
+          "true_positive": 1200,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 652.5578632920515,
+      "seed": 110008,
+      "sha256": "9d56c3f3ecac2f9e43239f7e64f81c25af66876accdb49c9759a24bd49b2a3a1",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.9487809456463286
+      ],
+      "assessment_states": [
+        "confirmed"
+      ],
+      "input_sha256": "4bab1c66f8deb171069647186ee157d13ff610468e61712c28f5f38083aa2cac",
+      "path": "validation/cg4/results/objective-ranking-group-v1/ranking_auc/ranking_auc-110009.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.9897597479322567,
+          "false_negative": 26,
+          "false_positive": 0,
+          "planned": 19982,
+          "precision": 1.0,
+          "recall": 0.9897597479322567,
+          "true_positive": 2513,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9823434991974318,
+          "false_negative": 22,
+          "false_positive": 0,
+          "planned": 9914,
+          "precision": 1.0,
+          "recall": 0.9823434991974318,
+          "true_positive": 1224,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.986938775510204,
+          "false_negative": 16,
+          "false_positive": 0,
+          "planned": 10104,
+          "precision": 1.0,
+          "recall": 0.986938775510204,
+          "true_positive": 1209,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 614.7984258750221,
+      "seed": 110009,
+      "sha256": "67edae631a2280f47036328d242e3f5b21728764baa57dcd9d2b42878c8775a2",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.9472689036222192
+      ],
+      "assessment_states": [
+        "confirmed"
+      ],
+      "input_sha256": "3ee973336805bd5f793800454ab7e75c3f835d2a96e56a7176ef98f44f773499",
+      "path": "validation/cg4/results/objective-ranking-group-v1/ranking_auc/ranking_auc-110010.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.990596892886345,
+          "false_negative": 0,
+          "false_positive": 23,
+          "planned": 19804,
+          "precision": 0.990596892886345,
+          "recall": 1.0,
+          "true_positive": 2423,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9924924924924925,
+          "false_negative": 0,
+          "false_positive": 10,
+          "planned": 10151,
+          "precision": 0.9924924924924925,
+          "recall": 1.0,
+          "true_positive": 1322,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9927884615384616,
+          "false_negative": 0,
+          "false_positive": 9,
+          "planned": 10045,
+          "precision": 0.9927884615384616,
+          "recall": 1.0,
+          "true_positive": 1239,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 602.8529590839753,
+      "seed": 110010,
+      "sha256": "dea6c6618dfe969bf8ffb6eb611c40b2b5497145e77c7e1ee6a8ae1cf5b6c060",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.9508162686986585
+      ],
+      "assessment_states": [
+        "confirmed"
+      ],
+      "input_sha256": "90dcfe456a1ddd9649663e9a6dd2d1e0a58080c44c5cb1704a8ef6f93a3b5e81",
+      "path": "validation/cg4/results/objective-ranking-group-v1/ranking_auc/ranking_auc-110011.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.988491574188245,
+          "false_negative": 28,
+          "false_positive": 0,
+          "planned": 19812,
+          "precision": 1.0,
+          "recall": 0.988491574188245,
+          "true_positive": 2405,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9835255354200988,
+          "false_negative": 20,
+          "false_positive": 0,
+          "planned": 10010,
+          "precision": 1.0,
+          "recall": 0.9835255354200988,
+          "true_positive": 1194,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9900826446280991,
+          "false_negative": 12,
+          "false_positive": 0,
+          "planned": 10178,
+          "precision": 1.0,
+          "recall": 0.9900826446280991,
+          "true_positive": 1198,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 600.7725764579955,
+      "seed": 110011,
+      "sha256": "48675e6f30743b81cb503e1b1c3676dabbc7ef26481f226fec0636c9545dd705",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.9526749717595223
+      ],
+      "assessment_states": [
+        "confirmed"
+      ],
+      "input_sha256": "62d57980020b2f6fcb28b42a470d98340abfe3bc90c608ca3f2362d6370dfd78",
+      "path": "validation/cg4/results/objective-ranking-group-v1/ranking_auc/ranking_auc-110012.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.9959595959595959,
+          "false_negative": 10,
+          "false_positive": 0,
+          "planned": 19910,
+          "precision": 1.0,
+          "recall": 0.9959595959595959,
+          "true_positive": 2465,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9916943521594684,
+          "false_negative": 10,
+          "false_positive": 0,
+          "planned": 10015,
+          "precision": 1.0,
+          "recall": 0.9916943521594684,
+          "true_positive": 1194,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9951612903225806,
+          "false_negative": 6,
+          "false_positive": 0,
+          "planned": 10075,
+          "precision": 1.0,
+          "recall": 0.9951612903225806,
+          "true_positive": 1234,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 603.7582939169952,
+      "seed": 110012,
+      "sha256": "a8cff8cc326ddd656ea947f10846e73ff41071def55125eb24f8a3590ff5ea10",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.959061605267654
+      ],
+      "assessment_states": [
+        "confirmed"
+      ],
+      "input_sha256": "c972fd942343cbad93789d9e45111c3d73a31e3d20531c0c98f2f4744a4b6ca6",
+      "path": "validation/cg4/results/objective-ranking-group-v1/ranking_auc/ranking_auc-110013.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.9951671365283931,
+          "false_negative": 12,
+          "false_positive": 0,
+          "planned": 20060,
+          "precision": 1.0,
+          "recall": 0.9951671365283931,
+          "true_positive": 2471,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9940323955669225,
+          "false_negative": 7,
+          "false_positive": 0,
+          "planned": 9947,
+          "precision": 1.0,
+          "recall": 0.9940323955669225,
+          "true_positive": 1166,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9959967974379503,
+          "false_negative": 5,
+          "false_positive": 0,
+          "planned": 9993,
+          "precision": 1.0,
+          "recall": 0.9959967974379503,
+          "true_positive": 1244,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 618.1713869170053,
+      "seed": 110013,
+      "sha256": "52b1b5ecd8f01a8d83ca1b16e7e356a724daaf81e74a0b0d48bbead57fa7bf5c",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.9493064293791784
+      ],
+      "assessment_states": [
+        "confirmed"
+      ],
+      "input_sha256": "7ad7ff29664834bdab999f4942f84553d0dca3218514bedaa2c3f041c25f614a",
+      "path": "validation/cg4/results/objective-ranking-group-v1/ranking_auc/ranking_auc-110014.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.9951942330796957,
+          "false_negative": 0,
+          "false_positive": 12,
+          "planned": 19805,
+          "precision": 0.9951942330796957,
+          "recall": 1.0,
+          "true_positive": 2485,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9929961089494164,
+          "false_negative": 0,
+          "false_positive": 9,
+          "planned": 10202,
+          "precision": 0.9929961089494164,
+          "recall": 1.0,
+          "true_positive": 1276,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9969278033794163,
+          "false_negative": 0,
+          "false_positive": 4,
+          "planned": 9993,
+          "precision": 0.9969278033794163,
+          "recall": 1.0,
+          "true_positive": 1298,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 613.7901076250128,
+      "seed": 110014,
+      "sha256": "b28441ae9b8926febbe4ed86457ab00dcdf6126b7f250aaa7876f75b2ab11b21",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.9524636676697786
+      ],
+      "assessment_states": [
+        "confirmed"
+      ],
+      "input_sha256": "7cfa736993cab833e2ff424c212922691ad9d0d6c7b7f88dcc627080b080faf2",
+      "path": "validation/cg4/results/objective-ranking-group-v1/ranking_auc/ranking_auc-110015.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.9984579799537394,
+          "false_negative": 4,
+          "false_positive": 0,
+          "planned": 20139,
+          "precision": 1.0,
+          "recall": 0.9984579799537394,
+          "true_positive": 2590,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9983402489626556,
+          "false_negative": 2,
+          "false_positive": 0,
+          "planned": 9782,
+          "precision": 1.0,
+          "recall": 0.9983402489626556,
+          "true_positive": 1203,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9961508852963818,
+          "false_negative": 5,
+          "false_positive": 0,
+          "planned": 10079,
+          "precision": 1.0,
+          "recall": 0.9961508852963818,
+          "true_positive": 1294,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 575.3302263750229,
+      "seed": 110015,
+      "sha256": "69b14656d1ee5628296d642af7e4d677d24d669f9fbff0c518a40faad62d7628",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.9542595864964054
+      ],
+      "assessment_states": [
+        "confirmed"
+      ],
+      "input_sha256": "9c1573084635811e8ecad4c239e324b0cdbf704197e00203841c6fe4662b28c6",
+      "path": "validation/cg4/results/objective-ranking-group-v1/ranking_auc/ranking_auc-110016.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.9901234567901235,
+          "false_negative": 0,
+          "false_positive": 24,
+          "planned": 19803,
+          "precision": 0.9901234567901235,
+          "recall": 1.0,
+          "true_positive": 2406,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9899691358024691,
+          "false_negative": 0,
+          "false_positive": 13,
+          "planned": 10099,
+          "precision": 0.9899691358024691,
+          "recall": 1.0,
+          "true_positive": 1283,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9881796690307328,
+          "false_negative": 0,
+          "false_positive": 15,
+          "planned": 10098,
+          "precision": 0.9881796690307328,
+          "recall": 1.0,
+          "true_positive": 1254,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 599.1384885419975,
+      "seed": 110016,
+      "sha256": "ec8751d44a73dad19c4cfc40c03f7165108e0683170f180380427cf41e770ab3",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.9572210912043677
+      ],
+      "assessment_states": [
+        "confirmed"
+      ],
+      "input_sha256": "a40870458b130b6b2889025190ab3bc61f57005fea17bf549a370514f32f8808",
+      "path": "validation/cg4/results/objective-ranking-group-v1/ranking_auc/ranking_auc-110017.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.9987809833401057,
+          "false_negative": 3,
+          "false_positive": 0,
+          "planned": 19974,
+          "precision": 1.0,
+          "recall": 0.9987809833401057,
+          "true_positive": 2458,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 1.0,
+          "false_negative": 0,
+          "false_positive": 0,
+          "planned": 9974,
+          "precision": 1.0,
+          "recall": 1.0,
+          "true_positive": 1215,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.999211356466877,
+          "false_negative": 1,
+          "false_positive": 0,
+          "planned": 10052,
+          "precision": 1.0,
+          "recall": 0.999211356466877,
+          "true_positive": 1267,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 604.1052902499796,
+      "seed": 110017,
+      "sha256": "187a72e47b0ea8dc6eb18c2e8b42ef0b8a144966a15221a3b07c7da05966fe5b",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.9600882330279727
+      ],
+      "assessment_states": [
+        "confirmed"
+      ],
+      "input_sha256": "49a0e4fa6b9dbd98a1d7fff016fac8208f6a123f442ba0a96b9220fbdcd8693d",
+      "path": "validation/cg4/results/objective-ranking-group-v1/ranking_auc/ranking_auc-110018.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.9870992963252541,
+          "false_negative": 33,
+          "false_positive": 0,
+          "planned": 20189,
+          "precision": 1.0,
+          "recall": 0.9870992963252541,
+          "true_positive": 2525,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9893267651888341,
+          "false_negative": 13,
+          "false_positive": 0,
+          "planned": 9894,
+          "precision": 1.0,
+          "recall": 0.9893267651888341,
+          "true_positive": 1205,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9865506329113924,
+          "false_negative": 17,
+          "false_positive": 0,
+          "planned": 9917,
+          "precision": 1.0,
+          "recall": 0.9865506329113924,
+          "true_positive": 1247,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 595.9191985839861,
+      "seed": 110018,
+      "sha256": "a3483f93823a4ed21f5fc1197fd33c48146e9e4575f8da55a8eaa0ec38d6a2dc",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.9517116303669891
+      ],
+      "assessment_states": [
+        "confirmed"
+      ],
+      "input_sha256": "112cecdf2f5e5eda8fcaa4e7a443c9718b2c89e7ce35b385fc580cd06834b22c",
+      "path": "validation/cg4/results/objective-ranking-group-v1/ranking_auc/ranking_auc-110019.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.998048399687744,
+          "false_negative": 5,
+          "false_positive": 0,
+          "planned": 20057,
+          "precision": 1.0,
+          "recall": 0.998048399687744,
+          "true_positive": 2557,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9958677685950413,
+          "false_negative": 5,
+          "false_positive": 0,
+          "planned": 10018,
+          "precision": 1.0,
+          "recall": 0.9958677685950413,
+          "true_positive": 1205,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9959016393442623,
+          "false_negative": 5,
+          "false_positive": 0,
+          "planned": 9925,
+          "precision": 1.0,
+          "recall": 0.9959016393442623,
+          "true_positive": 1215,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 462.6189032080001,
+      "seed": 110019,
+      "sha256": "eaf7f6ac43bc2f719ffb7f50304bd3c0d0e40bfce49f7dda7f404a8930429796",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.9570580814161953
+      ],
+      "assessment_states": [
+        "confirmed"
+      ],
+      "input_sha256": "594824d22dd7289d9419c4aceab02e3aec02c853d18d5f852f7c16aec3a63bd6",
+      "path": "validation/cg4/results/objective-ranking-group-v1/ranking_auc/ranking_auc-110020.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.9979951884522855,
+          "false_negative": 0,
+          "false_positive": 5,
+          "planned": 19932,
+          "precision": 0.9979951884522855,
+          "recall": 1.0,
+          "true_positive": 2489,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.998406374501992,
+          "false_negative": 0,
+          "false_positive": 2,
+          "planned": 9957,
+          "precision": 0.998406374501992,
+          "recall": 1.0,
+          "true_positive": 1253,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9984859954579863,
+          "false_negative": 0,
+          "false_positive": 2,
+          "planned": 10111,
+          "precision": 0.9984859954579863,
+          "recall": 1.0,
+          "true_positive": 1319,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 338.888128584018,
+      "seed": 110020,
+      "sha256": "6815a4dc492b4ed4495b694247eb8d925b768fbae24d150f7e2851244ec6b3af",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.9523393265663641
+      ],
+      "assessment_states": [
+        "confirmed"
+      ],
+      "input_sha256": "6780179f90c666adc190097f404393075ee404a23860c7f8be2861dcfc5a421b",
+      "path": "validation/cg4/results/objective-ranking-group-v1/ranking_auc/ranking_auc-110021.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.9971819645732689,
+          "false_negative": 0,
+          "false_positive": 7,
+          "planned": 20026,
+          "precision": 0.9971819645732689,
+          "recall": 1.0,
+          "true_positive": 2477,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.99581589958159,
+          "false_negative": 0,
+          "false_positive": 5,
+          "planned": 9996,
+          "precision": 0.99581589958159,
+          "recall": 1.0,
+          "true_positive": 1190,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9960567823343849,
+          "false_negative": 0,
+          "false_positive": 5,
+          "planned": 9978,
+          "precision": 0.9960567823343849,
+          "recall": 1.0,
+          "true_positive": 1263,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 364.62438095896505,
+      "seed": 110021,
+      "sha256": "50e60ff535a208abe787b9e516e3c551b6fe09657ee695343df534a643234cd8",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.951417191573444
+      ],
+      "assessment_states": [
+        "confirmed"
+      ],
+      "input_sha256": "6d808f547c14496e7c49278ceb77aeead1a288b78f1f25cbf9d17b00cee6d3b9",
+      "path": "validation/cg4/results/objective-ranking-group-v1/ranking_auc/ranking_auc-110022.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.994770716009654,
+          "false_negative": 0,
+          "false_positive": 13,
+          "planned": 19995,
+          "precision": 0.994770716009654,
+          "recall": 1.0,
+          "true_positive": 2473,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9958711808422791,
+          "false_negative": 0,
+          "false_positive": 5,
+          "planned": 10039,
+          "precision": 0.9958711808422791,
+          "recall": 1.0,
+          "true_positive": 1206,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9958779884583677,
+          "false_negative": 0,
+          "false_positive": 5,
+          "planned": 9966,
+          "precision": 0.9958779884583677,
+          "recall": 1.0,
+          "true_positive": 1208,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 371.8137132920092,
+      "seed": 110022,
+      "sha256": "06124bc1f622d403f1d70546e5e80fbd474321b76c281d67b305ffa9b17890e4",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.9507942096317217
+      ],
+      "assessment_states": [
+        "confirmed"
+      ],
+      "input_sha256": "b2cfa03b884a741cf07715c69291a7afcf059e31f7acbb97e617b385f21a3558",
+      "path": "validation/cg4/results/objective-ranking-group-v1/ranking_auc/ranking_auc-110023.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.9947432268499797,
+          "false_negative": 0,
+          "false_positive": 13,
+          "planned": 19870,
+          "precision": 0.9947432268499797,
+          "recall": 1.0,
+          "true_positive": 2460,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9942481511914544,
+          "false_negative": 0,
+          "false_positive": 7,
+          "planned": 10124,
+          "precision": 0.9942481511914544,
+          "recall": 1.0,
+          "true_positive": 1210,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9914596273291926,
+          "false_negative": 0,
+          "false_positive": 11,
+          "planned": 10006,
+          "precision": 0.9914596273291926,
+          "recall": 1.0,
+          "true_positive": 1277,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 376.6034856250044,
+      "seed": 110023,
+      "sha256": "fd5aa839bcafee96b8a875153ef66308ef37073742a9a13c62d689d34950be9c",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.9497939354605953
+      ],
+      "assessment_states": [
+        "confirmed"
+      ],
+      "input_sha256": "c3060b996a154bb48d7065ff9dc4c36677f2fb2bf4b2eb97ec0e68f3d5153b10",
+      "path": "validation/cg4/results/objective-ranking-group-v1/ranking_auc/ranking_auc-110024.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.991304347826087,
+          "false_negative": 0,
+          "false_positive": 21,
+          "planned": 20057,
+          "precision": 0.991304347826087,
+          "recall": 1.0,
+          "true_positive": 2394,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.990023023791251,
+          "false_negative": 0,
+          "false_positive": 13,
+          "planned": 9995,
+          "precision": 0.990023023791251,
+          "recall": 1.0,
+          "true_positive": 1290,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9935897435897436,
+          "false_negative": 0,
+          "false_positive": 8,
+          "planned": 9948,
+          "precision": 0.9935897435897436,
+          "recall": 1.0,
+          "true_positive": 1240,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 427.41954183299094,
+      "seed": 110024,
+      "sha256": "1bfe0a74301d676981ed89563de0b63e4285c925e382ba4d3583958e41be232b",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.9503099412845488
+      ],
+      "assessment_states": [
+        "confirmed"
+      ],
+      "input_sha256": "60cade177cebe19d2a56a986f453e516fcf0ad9a58a4392a810f76a39d0ba766",
+      "path": "validation/cg4/results/objective-ranking-group-v1/ranking_auc/ranking_auc-110025.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.994492525570417,
+          "false_negative": 0,
+          "false_positive": 14,
+          "planned": 19918,
+          "precision": 0.994492525570417,
+          "recall": 1.0,
+          "true_positive": 2528,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9975288303130149,
+          "false_negative": 0,
+          "false_positive": 3,
+          "planned": 10026,
+          "precision": 0.9975288303130149,
+          "recall": 1.0,
+          "true_positive": 1211,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9992144540455616,
+          "false_negative": 0,
+          "false_positive": 1,
+          "planned": 10056,
+          "precision": 0.9992144540455616,
+          "recall": 1.0,
+          "true_positive": 1272,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 550.2510982090025,
+      "seed": 110025,
+      "sha256": "9421b6a28339f7a92015d9ce0c21565639ba2e89afc89f192aae6e393109b5ad",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.954894545328096
+      ],
+      "assessment_states": [
+        "confirmed"
+      ],
+      "input_sha256": "d481cba877559ee23e65f6e589bad29dd9c4ee5e2092ddc0c80aa1b391a1ce28",
+      "path": "validation/cg4/results/objective-ranking-group-v1/ranking_auc/ranking_auc-110026.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.9855305466237942,
+          "false_negative": 36,
+          "false_positive": 0,
+          "planned": 19913,
+          "precision": 1.0,
+          "recall": 0.9855305466237942,
+          "true_positive": 2452,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.988835725677831,
+          "false_negative": 14,
+          "false_positive": 0,
+          "planned": 10024,
+          "precision": 1.0,
+          "recall": 0.988835725677831,
+          "true_positive": 1240,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9855072463768116,
+          "false_negative": 18,
+          "false_positive": 0,
+          "planned": 10063,
+          "precision": 1.0,
+          "recall": 0.9855072463768116,
+          "true_positive": 1224,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 541.6703131250106,
+      "seed": 110026,
+      "sha256": "2c48d1f33ccbd01afb7175b718788996962239be8381105bea788ce8770bff78",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.935945322208996
+      ],
+      "assessment_states": [
+        "confirmed"
+      ],
+      "input_sha256": "1e072f7583c646f1ef1d7c21ab280c0698831071e44962655fa7bcb57b2fbc55",
+      "path": "validation/cg4/results/objective-ranking-group-v1/ranking_auc/ranking_auc-110027.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.9781225139220366,
+          "false_negative": 0,
+          "false_positive": 55,
+          "planned": 19974,
+          "precision": 0.9781225139220366,
+          "recall": 1.0,
+          "true_positive": 2459,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9817315329626688,
+          "false_negative": 0,
+          "false_positive": 23,
+          "planned": 9922,
+          "precision": 0.9817315329626688,
+          "recall": 1.0,
+          "true_positive": 1236,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9801324503311258,
+          "false_negative": 0,
+          "false_positive": 27,
+          "planned": 10104,
+          "precision": 0.9801324503311258,
+          "recall": 1.0,
+          "true_positive": 1332,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 541.8916354589746,
+      "seed": 110027,
+      "sha256": "8a8cfeed55cd4f27f3b1346643693f6873e1d591d8a071f43145cd7ff75e450b",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.9563768369760591
+      ],
+      "assessment_states": [
+        "confirmed"
+      ],
+      "input_sha256": "25cd7dd44c94549efbc6977769ff2be960413d6e6cceea124b377b0323c98089",
+      "path": "validation/cg4/results/objective-ranking-group-v1/ranking_auc/ranking_auc-110028.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.9929933826391593,
+          "false_negative": 18,
+          "false_positive": 0,
+          "planned": 20118,
+          "precision": 1.0,
+          "recall": 0.9929933826391593,
+          "true_positive": 2551,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9935794542536116,
+          "false_negative": 8,
+          "false_positive": 0,
+          "planned": 9998,
+          "precision": 1.0,
+          "recall": 0.9935794542536116,
+          "true_positive": 1238,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9960876369327074,
+          "false_negative": 5,
+          "false_positive": 0,
+          "planned": 9884,
+          "precision": 1.0,
+          "recall": 0.9960876369327074,
+          "true_positive": 1273,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 545.8410809169873,
+      "seed": 110028,
+      "sha256": "be8b7129bbe3a674ede72ebf97d37ee78932eb476c3aa888505e2ab1950ae0d9",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.9485990981997499
+      ],
+      "assessment_states": [
+        "confirmed"
+      ],
+      "input_sha256": "e358c632fcbe5584d2948388e7a76b1f55a7e84004602dfd73eebb10643949db",
+      "path": "validation/cg4/results/objective-ranking-group-v1/ranking_auc/ranking_auc-110029.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.9972144846796658,
+          "false_negative": 0,
+          "false_positive": 7,
+          "planned": 20057,
+          "precision": 0.9972144846796658,
+          "recall": 1.0,
+          "true_positive": 2506,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9932659932659933,
+          "false_negative": 0,
+          "false_positive": 8,
+          "planned": 9921,
+          "precision": 0.9932659932659933,
+          "recall": 1.0,
+          "true_positive": 1180,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9976726144297905,
+          "false_negative": 0,
+          "false_positive": 3,
+          "planned": 10022,
+          "precision": 0.9976726144297905,
+          "recall": 1.0,
+          "true_positive": 1286,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 543.4666766250157,
+      "seed": 110029,
+      "sha256": "a2da02b5bcf1cc5c77ca6a04ca5aba7312192704551ecf29946129d60fd25a51",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.9418027573960618
+      ],
+      "assessment_states": [
+        "confirmed"
+      ],
+      "input_sha256": "8bb249f8d6176ffe046b9df2ded2b4ea5334135ed14369e7fb3d1002072b425c",
+      "path": "validation/cg4/results/objective-ranking-group-v1/ranking_auc/ranking_auc-110030.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.9885330170027679,
+          "false_negative": 0,
+          "false_positive": 29,
+          "planned": 19988,
+          "precision": 0.9885330170027679,
+          "recall": 1.0,
+          "true_positive": 2500,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9830508474576272,
+          "false_negative": 0,
+          "false_positive": 21,
+          "planned": 10038,
+          "precision": 0.9830508474576272,
+          "recall": 1.0,
+          "true_positive": 1218,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9903691813804173,
+          "false_negative": 0,
+          "false_positive": 12,
+          "planned": 9974,
+          "precision": 0.9903691813804173,
+          "recall": 1.0,
+          "true_positive": 1234,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 542.7728649160126,
+      "seed": 110030,
+      "sha256": "c3fce34c709eafc1d30ab2a1ecb0dbfb7b96834b35d60b81fbd03afe42254acc",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.9458171867430691
+      ],
+      "assessment_states": [
+        "confirmed"
+      ],
+      "input_sha256": "2966d77c50def6f7d55dca90b575014c1acbe4d89cd520574e4dbf281d4d4022",
+      "path": "validation/cg4/results/objective-ranking-group-v1/ranking_auc/ranking_auc-110031.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.985649856498565,
+          "false_negative": 30,
+          "false_positive": 5,
+          "planned": 19952,
+          "precision": 0.9979244499792445,
+          "recall": 0.9876746096959738,
+          "true_positive": 2404,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9764035801464606,
+          "false_negative": 19,
+          "false_positive": 10,
+          "planned": 10066,
+          "precision": 0.9917355371900827,
+          "recall": 0.9844134536505332,
+          "true_positive": 1200,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9850393700787402,
+          "false_negative": 14,
+          "false_positive": 5,
+          "planned": 9982,
+          "precision": 0.9960191082802548,
+          "recall": 0.9889328063241106,
+          "true_positive": 1251,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 546.87831,
+      "seed": 110031,
+      "sha256": "c260890c1cd7737a2841a8fac401280ab9b7c03ae78d5c014a6c3cf87cf4ba4c",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.9500283026261389
+      ],
+      "assessment_states": [
+        "confirmed"
+      ],
+      "input_sha256": "7a13fa4741107d4f0570f458798be9f97a26b76d47ca4058cdfab473bff8200e",
+      "path": "validation/cg4/results/objective-ranking-group-v1/ranking_auc/ranking_auc-110032.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.983159582999198,
+          "false_negative": 0,
+          "false_positive": 42,
+          "planned": 20152,
+          "precision": 0.983159582999198,
+          "recall": 1.0,
+          "true_positive": 2452,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9862348178137652,
+          "false_negative": 0,
+          "false_positive": 17,
+          "planned": 9923,
+          "precision": 0.9862348178137652,
+          "recall": 1.0,
+          "true_positive": 1218,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9841772151898734,
+          "false_negative": 0,
+          "false_positive": 20,
+          "planned": 9925,
+          "precision": 0.9841772151898734,
+          "recall": 1.0,
+          "true_positive": 1244,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 513.6469042090466,
+      "seed": 110032,
+      "sha256": "0f8c7fa150de9673809833d63b97c593d57224bfea4979ca6140b4910494f508",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.949138095649679
+      ],
+      "assessment_states": [
+        "confirmed"
+      ],
+      "input_sha256": "3c2470c7c2d7d02657051530b166f558075ba099eff681e11f74b8e7931d8d4d",
+      "path": "validation/cg4/results/objective-ranking-group-v1/ranking_auc/ranking_auc-110033.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.9963768115942029,
+          "false_negative": 0,
+          "false_positive": 9,
+          "planned": 19918,
+          "precision": 0.9963768115942029,
+          "recall": 1.0,
+          "true_positive": 2475,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9952380952380953,
+          "false_negative": 0,
+          "false_positive": 6,
+          "planned": 10036,
+          "precision": 0.9952380952380953,
+          "recall": 1.0,
+          "true_positive": 1254,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9976816074188563,
+          "false_negative": 0,
+          "false_positive": 3,
+          "planned": 10046,
+          "precision": 0.9976816074188563,
+          "recall": 1.0,
+          "true_positive": 1291,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 496.36902924999595,
+      "seed": 110033,
+      "sha256": "7b2d44c51134ccfd320b76ea9856309a46f7feba3887738dc92c226e110fc287",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.9570934274331073
+      ],
+      "assessment_states": [
+        "confirmed"
+      ],
+      "input_sha256": "0d4a3c2b0f8e2b15e96ca225164acb00dbb492ac0573854f0ab4bd3e6f59b7ed",
+      "path": "validation/cg4/results/objective-ranking-group-v1/ranking_auc/ranking_auc-110034.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.9883907125700561,
+          "false_negative": 29,
+          "false_positive": 0,
+          "planned": 20005,
+          "precision": 1.0,
+          "recall": 0.9883907125700561,
+          "true_positive": 2469,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9885339885339886,
+          "false_negative": 14,
+          "false_positive": 0,
+          "planned": 10000,
+          "precision": 1.0,
+          "recall": 0.9885339885339886,
+          "true_positive": 1207,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9851973684210527,
+          "false_negative": 18,
+          "false_positive": 0,
+          "planned": 9995,
+          "precision": 1.0,
+          "recall": 0.9851973684210527,
+          "true_positive": 1198,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 498.20125375001226,
+      "seed": 110034,
+      "sha256": "1a1843b047f2da990bd0949ed2fe41966bf23a0f24c218fa405e5be048d639b8",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.9569544895763782
+      ],
+      "assessment_states": [
+        "confirmed"
+      ],
+      "input_sha256": "f822992675485eba7aa283b270543335081655191a82f84ec3f04eb68cf35183",
+      "path": "validation/cg4/results/objective-ranking-group-v1/ranking_auc/ranking_auc-110035.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.9964114832535885,
+          "false_negative": 9,
+          "false_positive": 0,
+          "planned": 19964,
+          "precision": 1.0,
+          "recall": 0.9964114832535885,
+          "true_positive": 2499,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.995301487862177,
+          "false_negative": 6,
+          "false_positive": 0,
+          "planned": 10012,
+          "precision": 1.0,
+          "recall": 0.995301487862177,
+          "true_positive": 1271,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9976489028213166,
+          "false_negative": 3,
+          "false_positive": 0,
+          "planned": 10024,
+          "precision": 1.0,
+          "recall": 0.9976489028213166,
+          "true_positive": 1273,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 497.23941275000107,
+      "seed": 110035,
+      "sha256": "b39920f185ea8a88fd8820d879246eeee27e56fd8defad486bcc7c39f97facad",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.9553909741478548
+      ],
+      "assessment_states": [
+        "confirmed"
+      ],
+      "input_sha256": "6ebdc9f11194aa3b8d86733754e27d8012a1525c587b5613128eb982a29e08b8",
+      "path": "validation/cg4/results/objective-ranking-group-v1/ranking_auc/ranking_auc-110036.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.9987829614604462,
+          "false_negative": 3,
+          "false_positive": 0,
+          "planned": 19867,
+          "precision": 1.0,
+          "recall": 0.9987829614604462,
+          "true_positive": 2462,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9976489028213166,
+          "false_negative": 3,
+          "false_positive": 0,
+          "planned": 10141,
+          "precision": 1.0,
+          "recall": 0.9976489028213166,
+          "true_positive": 1273,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9959903769045709,
+          "false_negative": 5,
+          "false_positive": 0,
+          "planned": 9992,
+          "precision": 1.0,
+          "recall": 0.9959903769045709,
+          "true_positive": 1242,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 495.8886977090151,
+      "seed": 110036,
+      "sha256": "72cc5a441c5a0f5c082c03f86fe2562f1bbe268ff5b81e476a3329e6dbfdfdeb",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.9483086856814953
+      ],
+      "assessment_states": [
+        "confirmed"
+      ],
+      "input_sha256": "d19721dc8a5fcd812ca9c2c244d560d9eb88b1fbe4e5e04036c194077f166ea3",
+      "path": "validation/cg4/results/objective-ranking-group-v1/ranking_auc/ranking_auc-110037.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.997163695299838,
+          "false_negative": 0,
+          "false_positive": 7,
+          "planned": 19866,
+          "precision": 0.997163695299838,
+          "recall": 1.0,
+          "true_positive": 2461,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.993103448275862,
+          "false_negative": 0,
+          "false_positive": 9,
+          "planned": 10050,
+          "precision": 0.993103448275862,
+          "recall": 1.0,
+          "true_positive": 1296,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9953198127925117,
+          "false_negative": 0,
+          "false_positive": 6,
+          "planned": 10084,
+          "precision": 0.9953198127925117,
+          "recall": 1.0,
+          "true_positive": 1276,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 499.6371395419701,
+      "seed": 110037,
+      "sha256": "8d84c7ad02b54e8a6c9f7f0035d8aa55d789646626b9c344a6e4e8f2cf768c1f",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.9505128952616034
+      ],
+      "assessment_states": [
+        "confirmed"
+      ],
+      "input_sha256": "2096e44e3fc7002467d475bf6db497cb1678163c027e43e86c12f74b8450b269",
+      "path": "validation/cg4/results/objective-ranking-group-v1/ranking_auc/ranking_auc-110038.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.991442542787286,
+          "false_negative": 0,
+          "false_positive": 21,
+          "planned": 19965,
+          "precision": 0.991442542787286,
+          "recall": 1.0,
+          "true_positive": 2433,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9907834101382489,
+          "false_negative": 0,
+          "false_positive": 12,
+          "planned": 10046,
+          "precision": 0.9907834101382489,
+          "recall": 1.0,
+          "true_positive": 1290,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9935948759007206,
+          "false_negative": 0,
+          "false_positive": 8,
+          "planned": 9989,
+          "precision": 0.9935948759007206,
+          "recall": 1.0,
+          "true_positive": 1241,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 500.6961285410216,
+      "seed": 110038,
+      "sha256": "8d878c206ca61d25db8dc2aae5b3cefb571f702db1f9b03f9c1b552418bd1c36",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.9557321709145177
+      ],
+      "assessment_states": [
+        "confirmed"
+      ],
+      "input_sha256": "6e3cd4d329b5537ed568ea680d11a66e1af1b9cac2fe6d78154e9270f1d80521",
+      "path": "validation/cg4/results/objective-ranking-group-v1/ranking_auc/ranking_auc-110039.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.9765294343978453,
+          "false_negative": 61,
+          "false_positive": 0,
+          "planned": 20183,
+          "precision": 1.0,
+          "recall": 0.9765294343978453,
+          "true_positive": 2538,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9850746268656716,
+          "false_negative": 19,
+          "false_positive": 0,
+          "planned": 9888,
+          "precision": 1.0,
+          "recall": 0.9850746268656716,
+          "true_positive": 1254,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9820992676973149,
+          "false_negative": 22,
+          "false_positive": 0,
+          "planned": 9929,
+          "precision": 1.0,
+          "recall": 0.9820992676973149,
+          "true_positive": 1207,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 496.7564243329689,
+      "seed": 110039,
+      "sha256": "80bfb6c6f440412a0b4e47afe3decfaefb82367c7cba6c7efe0b634efa76a81b",
+      "success": true
+    }
+  ]
+}

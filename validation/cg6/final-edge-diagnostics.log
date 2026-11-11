@@ -1,0 +1,67 @@
+....F...                                                                 [100%]
+=================================== FAILURES ===================================
+__________________ test_binary_codec_catalog_v2_backup_reopen __________________
+
+tmp_path = PosixPath('/private/var/folders/cs/c15xvw9d3t53tzcws5yxjxcr0000gn/T/pytest-of-drivyaanshyadav/pytest-770/test_binary_codec_catalog_v2_b0')
+
+    def test_binary_codec_catalog_v2_backup_reopen(tmp_path):
+        from .test_devices import torch_spec
+        s=torch_spec(tmp_path);ws=ReliabilityWorkspace.initialize(tmp_path/'workspace',config=WorkspaceConfig(saving=True))
+        result=execute_predictor(s,CFG,workspace=ws)
+        aid=result.data['analysis_id'];reopened=ws.open(aid)
+        assert ws.catalog.catalog_version==2
+        assert reopened.data==result.data
+        assert retained_predictor(ws,aid,'model').predictor_digest==s.predictors[0].predictor_digest
+        output=reopened.private['output_artifact']
+        assert output['path'].endswith('.cgblob')
+        from contextlib import closing
+        with closing(ws.catalog._connect()) as db:
+            assert db.execute("SELECT count(*) FROM objects WHERE encoding='opaque_artifact_bytes_v1'").fetchone()[0]>=2
+        # Reopening and report rendering must not construct an adapter.
+        import unittest.mock
+        with unittest.mock.patch('confidenceguard.execution.adapters.Adapter',side_effect=AssertionError('unexpected model load')):
+            ws.open(aid).generate_artifacts(tmp_path/'reopened.html',format='html',json_path=tmp_path/'reopened.json',audience='local')
+        ws.backup(tmp_path/'backup')
+        restored=ReliabilityWorkspace.restore(tmp_path/'backup',tmp_path/'restored')
+        rebound=restored.open(aid)
+        assert str(restored.path) in rebound.retained_path(rebound.private['output_artifact']['path'])
+        ref=next(iter(rebound.private['locators']))
+        assert rebound.resolve_evidence(ref,allowed_roots=(restored.path,),reveal_values=True)['verified']
+        from confidenceguard import ExecutionRestatementSpec
+        for f in s.predictors[0].files:__import__('pathlib').Path(f.path).unlink()
+        # Frozen outputs and copied immutable bytes suffice after relocation. No
+        # executable model or original model path is needed for outcome restatement.
+        declaration=ExecutionRestatementSpec(s.sources,s.outcomes,'Restored evidence outcome refresh')
+        revised=restored.restate_execution(aid,declaration,CFG,request_id='restatement-after-restore')
+        assert restored.restate_execution(aid,declaration,CFG,request_id='restatement-after-restore').data['analysis_id']==revised.data['analysis_id']
+        assert revised.data['cg6']['execution_repeated'] is False
+        plan=restored.deletion_preview(assessment_ids=(aid,))
+>       restored.delete(plan)
+
+tests/cg6/test_integration.py:67: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/confidenceguard/workspace.py:337: in delete
+    def delete(self, preview): return self.catalog.delete(preview)
+                                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <confidenceguard.history_storage.Catalog object at 0x1170a3ce0>
+plan = {'id': 'c44abf6be8954020806df27817d52bf5', 'instance_id': '8a1198c9c4fc4dcfac9102c5ea3af77b', 'catalog_sequence': 2, '...956', 'b6f6bb72a6b04d1eb62d2cdce67894f4', 'e03fe922fa6b4d7589b19029661eb9cc', 'ff153cf8d1e2415d8fb31983359ad348'], ...}
+
+    def delete(self, plan):
+        supplied = dict(plan); confirmation = supplied.pop('confirmation', None)
+        if confirmation != digest(supplied) or plan.get('instance_id') != self.instance_id:
+            raise EvaluationError('Deletion preview differs.', 'stale_deletion')
+        with self.operation(exclusive_objects=True), closing(self._connect()) as db:
+            if self.status()['catalog_sequence'] != plan['catalog_sequence']:
+                raise EvaluationError('Catalog changed; inspect a new deletion preview.', 'stale_deletion')
+            current=self.deletion_preview(object_ids=plan['object_ids'],assessment_ids=plan['assessment_ids'],batch_ids=plan['batch_ids'],purge=plan['purge'])
+            for field in ('object_ids','affected_batches','potentially_impacted_assessments'):
+>               if current[field]!=plan.get(field):raise EvaluationError('Deletion dependencies differ; inspect a new preview.','stale_deletion')
+                                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E               confidenceguard.contracts.EvaluationError: Deletion dependencies differ; inspect a new preview.
+
+src/confidenceguard/history_storage.py:923: EvaluationError
+=========================== short test summary info ============================
+FAILED tests/cg6/test_integration.py::test_binary_codec_catalog_v2_backup_reopen
+1 failed, 7 passed in 30.78s

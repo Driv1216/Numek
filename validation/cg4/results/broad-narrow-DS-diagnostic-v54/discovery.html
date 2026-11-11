@@ -1,0 +1,911 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Synthetic broad_moderate_and_narrow_severe — ConfidenceGuard</title><style>
+@page{size:A4;margin:17mm 14mm}*{box-sizing:border-box}body{font:11px/1.5 Arial,sans-serif;color:#182432;margin:0}main{max-width:1050px;margin:auto;padding:24px}h1{font-size:28px;line-height:1.15}h2{font-size:18px;margin-top:28px}h3{font-size:13px}p,td,th{overflow-wrap:anywhere}small,.note{color:#536375}header{border-bottom:3px solid #196d70;padding-bottom:16px}section{break-before:page}section:first-of-type{break-before:auto}table{width:100%;border-collapse:collapse;table-layout:fixed}th,td{padding:7px;text-align:left;vertical-align:top;border-bottom:1px solid #d7e1e5}th{background:#edf4f4}tr{break-inside:avoid}thead{display:table-header-group}pre{white-space:pre-wrap;overflow-wrap:anywhere;font:9px/1.4 monospace;border-left:2px solid #c4d8d8;padding-left:8px}figure{break-inside:avoid;margin:18px 0}svg{width:380px;max-width:100%;height:210px}details{margin:12px 0}.banner{padding:12px;background:#edf4f4}.value{font-variant-numeric:tabular-nums}@media print{main{padding:0}details{display:block}details>summary{font-weight:bold}details pre{display:block}a{color:inherit}}
+ .cg2 section,.cg4 section{break-before:auto}.cg2 h2,.cg4 h2,.cg4 h3{break-after:avoid}.cg4 article{break-inside:avoid}.cg4 .candidate-intro,.cg4 .overlap-intro{break-after:avoid}</style></head><body class="cg4"><main><header><p>NUMEK / ConfidenceGuard · Model Reliability Intelligence</p><h1>Synthetic broad_moderate_and_narrow_severe</h1><p>Binary Classification · 2026-10-27T09:29:12.799068+00:00</p><p>Method failure_investigation_v1 · confidenceguard.investigation_result/1.0</p><div class="banner">Exact protected local report — contains confidential aggregate evidence. No overall reliability score or production approval is defined.</div></header>
+<section><h2>Evaluation summary and priority investigations</h2><p><strong>benchmark_supplied_prediction</strong> · unknown · v1</p><p><strong>Review · exploratory discovery</strong> — D/S selection evidence is exploratory. Freeze hypotheses before independent assessment.</p></section>
+<section class="cg4"><h2>Failure discovery and investigation</h2>
+<p>Prepare evidence → discover on D → select on S → freeze claims → assess independently on H. These roles are separate from CG2 fitting, selection, calibration and evaluation.</p>
+<p>Stage: <strong>discovery</strong>. Discovery and selection evidence is exploratory. Learned models propose regions; shared ConfidenceGuard reducers define the reported metrics. A finding does not establish a cause or authorize a model change.</p>
+<h3>Search and method standing</h3><table><thead><tr><th>Strategy / objective</th><th>Execution and coverage</th><th>Qualification</th></tr></thead><tbody><tr><td>structured · error</td><td>completed · predicate search budget limited; incomplete · </td><td>Consult recorded recovery qualification; this search is not a recovery guarantee.</td></tr><tr><td>catboost · error</td><td>completed · </td><td>requires_objective_family_qualification</td></tr><tr><td>geometric · error</td><td>completed · </td><td>requires_qualification</td></tr></tbody></table><h3>Candidates and selection evidence</h3><p class="candidate-intro">542 retained candidates; up to 50 shown here. Matching JSON retains every disclosed candidate. Effects use their objective-specific conditional denominator and units.</p>
+<article><h3>fa51768273f842b5596ebca359977d27 · structured · exploratory</h3>
+<p>error_rate · adverse direction higher · fraction · comparator complement. Practical threshold: 0.15.</p><table><thead><tr><th>Population</th><th>Planned / applicable</th><th>Members / comparison / unavailable</th><th>Adverse effect</th></tr></thead><tbody><tr><td>D</td><td>20022 / 20022</td><td>569 / 19453 / 0<br>Conditional support 569 / 19453</td><td>0.5072715933686139</td></tr><tr><td>S</td><td>9902 / 9902</td><td>277 / 9625 / 0<br>Conditional support 277 / 9625</td><td>0.5573737165361714</td></tr></tbody></table>
+<pre>{
+  "clauses": [
+    {
+      "field": "context.a",
+      "kind": "categorical",
+      "op": "eq",
+      "value": "0"
+    },
+    {
+      "field": "context.x",
+      "kind": "float",
+      "op": "gt",
+      "value": "0x1.3fb286beaba48p-1"
+    },
+    {
+      "field": "context.y",
+      "kind": "float",
+      "op": "gt",
+      "value": "0x1.89d67364ce1a0p-2"
+    }
+  ]
+}</pre><p>Explanation: exact_predicate. The exact predicate defines membership, subject to the frozen availability rules.</p><pre>{
+  "coverage_guarantee": false,
+  "diagnostic_references": "Original D-only diagnostic targets fixed; refits resample whole admitted D units before the disclosed D cap.",
+  "matching": "Largest frozen membership IoU on S features, within strategy, representation and diagnostic head; no S outcome selection.",
+  "median_membership_IoU": 0.49016100178890876,
+  "method": "bounded_D_unit_bootstrap_refits_v2",
+  "profile": {
+    "D_row_limit": 20000,
+    "maximum_nodes": 100000,
+    "retained_candidates": 32
+  },
+  "replicates": 5,
+  "results": [
+    {
+      "applicable_fraction": 1.0,
+      "membership_IoU": 0.48939929328621906,
+      "refit_D_records": 20000,
+      "replicate": 0
+    },
+    {
+      "applicable_fraction": 1.0,
+      "membership_IoU": 0.4708904109589041,
+      "refit_D_records": 20000,
+      "replicate": 1
+    },
+    {
+      "applicable_fraction": 1.0,
+      "membership_IoU": 0.49016100178890876,
+      "refit_D_records": 20000,
+      "replicate": 2
+    },
+    {
+      "applicable_fraction": 1.0,
+      "membership_IoU": 0.49371633752244165,
+      "refit_D_records": 20000,
+      "replicate": 3
+    },
+    {
+      "applicable_fraction": 1.0,
+      "membership_IoU": 0.49094202898550726,
+      "refit_D_records": 20000,
+      "replicate": 4
+    }
+  ],
+  "scope": "Product perturbation diagnostic; full-method qualification is separate.",
+  "seed": 0
+}</pre><p>Protected evidence references: cg4_ref_d82e712e8d5c5ac98c473f24 (higher_diagnostic_loss_member); cg4_ref_148fbe1a97db870e944d599e (lower_diagnostic_loss_member); cg4_ref_ae9bad7d9849c9ca74c68fff (outside_comparison); cg4_ref_e087f0e4dc8b96bf4dec2b95 (representative_member); cg4_ref_f578ac7c1ebddf28ec31ee72 (representative_member). Resolve only with current authorized source access.</p></article><article><h3>ae9d4178da1a6fc72b551ee85385a1da · geometric · exploratory</h3>
+<p>error_rate · adverse direction higher · fraction · comparator complement. Practical threshold: 0.15.</p><table><thead><tr><th>Population</th><th>Planned / applicable</th><th>Members / comparison / unavailable</th><th>Adverse effect</th></tr></thead><tbody><tr><td>D</td><td>20022 / 20022</td><td>501 / 19521 / 0<br>Conditional support 501 / 19521</td><td>0.5105344865823908</td></tr><tr><td>S</td><td>9902 / 9902</td><td>214 / 9688 / 0<br>Conditional support 214 / 9688</td><td>0.5363172090725978</td></tr></tbody></table>
+<pre>"Frozen geometric membership"</pre><p>Explanation: approximate. Held-out S precision 0.7275862068965517, recall 0.985981308411215. The simplified explanation does not define learned membership.</p><pre>{
+  "coverage_guarantee": false,
+  "diagnostic_references": "Original D-only diagnostic targets fixed; refits resample whole admitted D units before the disclosed D cap.",
+  "matching": "Largest frozen membership IoU on S features, within strategy, representation and diagnostic head; no S outcome selection.",
+  "median_membership_IoU": 0.36450381679389315,
+  "method": "bounded_D_unit_bootstrap_refits_v2",
+  "profile": {
+    "D_row_limit": 20000,
+    "maximum_nodes": 100000,
+    "retained_candidates": 32
+  },
+  "replicates": 5,
+  "results": [
+    {
+      "applicable_fraction": 1.0,
+      "membership_IoU": 0.39878542510121456,
+      "refit_D_records": 20000,
+      "replicate": 0
+    },
+    {
+      "applicable_fraction": 1.0,
+      "membership_IoU": 0.36450381679389315,
+      "refit_D_records": 20000,
+      "replicate": 1
+    },
+    {
+      "applicable_fraction": 1.0,
+      "membership_IoU": 0.4152046783625731,
+      "refit_D_records": 20000,
+      "replicate": 2
+    },
+    {
+      "applicable_fraction": 1.0,
+      "membership_IoU": 0.2907608695652174,
+      "refit_D_records": 20000,
+      "replicate": 3
+    },
+    {
+      "applicable_fraction": 1.0,
+      "membership_IoU": 0.3404669260700389,
+      "refit_D_records": 20000,
+      "replicate": 4
+    }
+  ],
+  "scope": "Product perturbation diagnostic; full-method qualification is separate.",
+  "seed": 0
+}</pre><p>Protected evidence references: cg4_ref_9d98ae75bd7323d07225a238 (higher_diagnostic_loss_member); cg4_ref_373f315334ed268d92572ad2 (lower_diagnostic_loss_member); cg4_ref_4b8937d94a78a7dbcb43b1bb (boundary_case); cg4_ref_3f16007d23cf7c90e156791f (outside_comparison); cg4_ref_c7b7216c7f53cc447afe81ba (representative_member). Resolve only with current authorized source access.</p></article><article><h3>cabe3a87e1aba6ca76e5e90d8e13412e · structured · exploratory</h3>
+<p>error_rate · adverse direction higher · fraction · comparator complement. Practical threshold: 0.15.</p><table><thead><tr><th>Population</th><th>Planned / applicable</th><th>Members / comparison / unavailable</th><th>Adverse effect</th></tr></thead><tbody><tr><td>D</td><td>20022 / 20022</td><td>610 / 19412 / 0<br>Conditional support 610 / 19412</td><td>0.48838254518921875</td></tr><tr><td>S</td><td>9902 / 9902</td><td>298 / 9604 / 0<br>Conditional support 298 / 9604</td><td>0.5351230890931911</td></tr></tbody></table>
+<pre>{
+  "clauses": [
+    {
+      "field": "context.x",
+      "kind": "float",
+      "op": "interval",
+      "value": [
+        "0x1.3fb286beaba48p-1",
+        "0x1.be241b407874cp-1"
+      ]
+    },
+    {
+      "field": "context.y",
+      "kind": "float",
+      "op": "gt",
+      "value": "0x1.01ec2e624b8b8p-1"
+    }
+  ]
+}</pre><p>Explanation: exact_predicate. The exact predicate defines membership, subject to the frozen availability rules.</p><pre>{
+  "coverage_guarantee": false,
+  "diagnostic_references": "Original D-only diagnostic targets fixed; refits resample whole admitted D units before the disclosed D cap.",
+  "matching": "Largest frozen membership IoU on S features, within strategy, representation and diagnostic head; no S outcome selection.",
+  "median_membership_IoU": 0.5157894736842106,
+  "method": "bounded_D_unit_bootstrap_refits_v2",
+  "profile": {
+    "D_row_limit": 20000,
+    "maximum_nodes": 100000,
+    "retained_candidates": 32
+  },
+  "replicates": 5,
+  "results": [
+    {
+      "applicable_fraction": 1.0,
+      "membership_IoU": 0.5157894736842106,
+      "refit_D_records": 20000,
+      "replicate": 0
+    },
+    {
+      "applicable_fraction": 1.0,
+      "membership_IoU": 0.5120274914089347,
+      "refit_D_records": 20000,
+      "replicate": 1
+    },
+    {
+      "applicable_fraction": 1.0,
+      "membership_IoU": 0.5277280858676208,
+      "refit_D_records": 20000,
+      "replicate": 2
+    },
+    {
+      "applicable_fraction": 1.0,
+      "membership_IoU": 0.5150976909413855,
+      "refit_D_records": 20000,
+      "replicate": 3
+    },
+    {
+      "applicable_fraction": 1.0,
+      "membership_IoU": 0.6345291479820628,
+      "refit_D_records": 20000,
+      "replicate": 4
+    }
+  ],
+  "scope": "Product perturbation diagnostic; full-method qualification is separate.",
+  "seed": 0
+}</pre><p>Protected evidence references: cg4_ref_c2cfaba3ccb4f7fb11dfcd01 (higher_diagnostic_loss_member); cg4_ref_6cb295a971a27c93bd0ea7e7 (lower_diagnostic_loss_member); cg4_ref_45b6669ac9c45a5c4dbae1d7 (outside_comparison); cg4_ref_4a9ebb5594e2724925567ff8 (representative_member); cg4_ref_54bb022213b9d2216744e44f (representative_member). Resolve only with current authorized source access.</p></article><article><h3>21fa8a3e9199a7b468ad453830beb8bc · geometric · exploratory</h3>
+<p>error_rate · adverse direction higher · fraction · comparator complement. Practical threshold: 0.15.</p><table><thead><tr><th>Population</th><th>Planned / applicable</th><th>Members / comparison / unavailable</th><th>Adverse effect</th></tr></thead><tbody><tr><td>D</td><td>20022 / 20022</td><td>501 / 19521 / 0<br>Conditional support 501 / 19521</td><td>0.5105344865823908</td></tr><tr><td>S</td><td>9902 / 9902</td><td>221 / 9681 / 0<br>Conditional support 221 / 9681</td><td>0.532963527476734</td></tr></tbody></table>
+<pre>"Frozen geometric membership"</pre><p>Explanation: approximate. Held-out S precision 0.9519230769230769, recall 0.8959276018099548. The simplified explanation does not define learned membership.</p><p>Protected evidence references: cg4_ref_9c0405c8d09953222629f362 (higher_diagnostic_loss_member); cg4_ref_d65285b66e7ad04dbd759854 (lower_diagnostic_loss_member); cg4_ref_80039ad601c2cf35c1130e1e (boundary_case); cg4_ref_e9a3d08f434e68fc01f981f5 (outside_comparison); cg4_ref_9d764c0de1cc3a069565efe0 (representative_member). Resolve only with current authorized source access.</p></article><article><h3>edaece0b6857835435951faf34c4d159 · catboost · exploratory</h3>
+<p>error_rate · adverse direction higher · fraction · comparator complement. Practical threshold: 0.15.</p><table><thead><tr><th>Population</th><th>Planned / applicable</th><th>Members / comparison / unavailable</th><th>Adverse effect</th></tr></thead><tbody><tr><td>D</td><td>20022 / 20022</td><td>1002 / 19020 / 0<br>Conditional support 1002 / 19020</td><td>0.5733595899683284</td></tr><tr><td>S</td><td>9902 / 9902</td><td>493 / 9409 / 0<br>Conditional support 493 / 9409</td><td>0.5316216811102054</td></tr></tbody></table>
+<pre>"Frozen catboost membership"</pre><p>Explanation: approximate. Held-out S precision 0.8102836879432624, recall 0.9269776876267748. The simplified explanation does not define learned membership.</p><pre>{
+  "coverage_guarantee": false,
+  "diagnostic_references": "Original D-only diagnostic targets fixed; refits resample whole admitted D units before the disclosed D cap.",
+  "matching": "Largest frozen membership IoU on S features, within strategy, representation and diagnostic head; no S outcome selection.",
+  "median_membership_IoU": 0.8088235294117647,
+  "method": "bounded_D_unit_bootstrap_refits_v2",
+  "profile": {
+    "D_row_limit": 20000,
+    "maximum_nodes": 100000,
+    "retained_candidates": 32
+  },
+  "replicates": 5,
+  "results": [
+    {
+      "applicable_fraction": 1.0,
+      "membership_IoU": 0.7910447761194029,
+      "refit_D_records": 20000,
+      "replicate": 0
+    },
+    {
+      "applicable_fraction": 1.0,
+      "membership_IoU": 0.8309090909090909,
+      "refit_D_records": 20000,
+      "replicate": 1
+    },
+    {
+      "applicable_fraction": 1.0,
+      "membership_IoU": 0.7348353552859619,
+      "refit_D_records": 20000,
+      "replicate": 2
+    },
+    {
+      "applicable_fraction": 1.0,
+      "membership_IoU": 0.8324022346368715,
+      "refit_D_records": 20000,
+      "replicate": 3
+    },
+    {
+      "applicable_fraction": 1.0,
+      "membership_IoU": 0.8088235294117647,
+      "refit_D_records": 20000,
+      "replicate": 4
+    }
+  ],
+  "scope": "Product perturbation diagnostic; full-method qualification is separate.",
+  "seed": 0
+}</pre><p>Protected evidence references: cg4_ref_06a2b3dca579b4c67464ff31 (higher_diagnostic_loss_member); cg4_ref_5ea62434bf1caa99d2835c1a (lower_diagnostic_loss_member); cg4_ref_66327479cc6e819a1a106892 (boundary_case); cg4_ref_97fe6e2529d9f28a21b22f9e (outside_comparison); cg4_ref_6f3cd9a5c2e9a90fdca42375 (representative_member). Resolve only with current authorized source access.</p></article><article><h3>ff9e250074bf3a22c77b0b197383fa37 · structured · exploratory</h3>
+<p>error_rate · adverse direction higher · fraction · comparator complement. Practical threshold: 0.15.</p><table><thead><tr><th>Population</th><th>Planned / applicable</th><th>Members / comparison / unavailable</th><th>Adverse effect</th></tr></thead><tbody><tr><td>D</td><td>20022 / 20022</td><td>757 / 19265 / 0<br>Conditional support 757 / 19265</td><td>0.48900542767031885</td></tr><tr><td>S</td><td>9902 / 9902</td><td>369 / 9533 / 0<br>Conditional support 369 / 9533</td><td>0.5296341875618483</td></tr></tbody></table>
+<pre>{
+  "clauses": [
+    {
+      "field": "context.x",
+      "kind": "float",
+      "op": "interval",
+      "value": [
+        "0x1.3fb286beaba48p-1",
+        "0x1.be241b407874cp-1"
+      ]
+    },
+    {
+      "field": "context.y",
+      "kind": "float",
+      "op": "gt",
+      "value": "0x1.89d67364ce1a0p-2"
+    }
+  ]
+}</pre><p>Explanation: exact_predicate. The exact predicate defines membership, subject to the frozen availability rules.</p><p>Protected evidence references: cg4_ref_884a5b4dfde3f292f22588ff (higher_diagnostic_loss_member); cg4_ref_d29b5f440b64a01862887be4 (lower_diagnostic_loss_member); cg4_ref_3bcaa9bf58dea3ff9a46624c (outside_comparison); cg4_ref_33082ac4cc2cf8b769ec7c8a (representative_member); cg4_ref_f14e462b522658ef79d6ab28 (representative_member). Resolve only with current authorized source access.</p></article><article><h3>c055a80f4c38b9db13b959eda2ff02af · structured · exploratory</h3>
+<p>error_rate · adverse direction higher · fraction · comparator complement. Practical threshold: 0.15.</p><table><thead><tr><th>Population</th><th>Planned / applicable</th><th>Members / comparison / unavailable</th><th>Adverse effect</th></tr></thead><tbody><tr><td>D</td><td>20022 / 20022</td><td>1148 / 18874 / 0<br>Conditional support 1148 / 18874</td><td>0.5130956473130635</td></tr><tr><td>S</td><td>9902 / 9902</td><td>564 / 9338 / 0<br>Conditional support 564 / 9338</td><td>0.5274262564766249</td></tr></tbody></table>
+<pre>{
+  "clauses": [
+    {
+      "field": "context.x",
+      "kind": "float",
+      "op": "gt",
+      "value": "0x1.3fb286beaba48p-1"
+    },
+    {
+      "field": "context.y",
+      "kind": "float",
+      "op": "gt",
+      "value": "0x1.89d67364ce1a0p-2"
+    }
+  ]
+}</pre><p>Explanation: exact_predicate. The exact predicate defines membership, subject to the frozen availability rules.</p><p>Protected evidence references: cg4_ref_7d0d5d3e0c34c7a30944c7ee (higher_diagnostic_loss_member); cg4_ref_8deec57f2dc48fe113f16c02 (lower_diagnostic_loss_member); cg4_ref_4628c1134662a75badd12d6b (outside_comparison); cg4_ref_b319a91b5a3216dfc5a6c932 (representative_member); cg4_ref_b064d053177174c26b25cb3b (representative_member). Resolve only with current authorized source access.</p></article><article><h3>ee06476aa7ac4d56066b7b5fc1e285bd · geometric · exploratory</h3>
+<p>error_rate · adverse direction higher · fraction · comparator complement. Practical threshold: 0.15.</p><table><thead><tr><th>Population</th><th>Planned / applicable</th><th>Members / comparison / unavailable</th><th>Adverse effect</th></tr></thead><tbody><tr><td>D</td><td>20022 / 20022</td><td>1002 / 19020 / 0<br>Conditional support 1002 / 19020</td><td>0.5124259367699932</td></tr><tr><td>S</td><td>9902 / 9902</td><td>482 / 9420 / 0<br>Conditional support 482 / 9420</td><td>0.5252015223194227</td></tr></tbody></table>
+<pre>"Frozen geometric membership"</pre><p>Explanation: approximate. Held-out S precision 0.8846153846153846, recall 0.9066390041493776. The simplified explanation does not define learned membership.</p><p>Protected evidence references: cg4_ref_3abed545fffc0c6959063fc7 (higher_diagnostic_loss_member); cg4_ref_e71c1b1eff9eb0915a266b7a (lower_diagnostic_loss_member); cg4_ref_b675ff288e2474045585e043 (boundary_case); cg4_ref_83a0f82cc34fcd4fdad3d063 (outside_comparison); cg4_ref_cc159d1e9620aa8a4ef27fd2 (representative_member). Resolve only with current authorized source access.</p></article><article><h3>35acf1a964aaad76938259ffa9c8194d · geometric · exploratory</h3>
+<p>error_rate · adverse direction higher · fraction · comparator complement. Practical threshold: 0.15.</p><table><thead><tr><th>Population</th><th>Planned / applicable</th><th>Members / comparison / unavailable</th><th>Adverse effect</th></tr></thead><tbody><tr><td>D</td><td>20022 / 20022</td><td>1002 / 19020 / 0<br>Conditional support 1002 / 19020</td><td>0.5197799983628957</td></tr><tr><td>S</td><td>9902 / 9902</td><td>492 / 9410 / 0<br>Conditional support 492 / 9410</td><td>0.5201597504816706</td></tr></tbody></table>
+<pre>"Frozen geometric membership"</pre><p>Explanation: approximate. Held-out S precision 0.9258555133079848, recall 0.9898373983739838. The simplified explanation does not define learned membership.</p><p>Protected evidence references: cg4_ref_52f1bea51b5188671fa33a36 (higher_diagnostic_loss_member); cg4_ref_d46f4e4f74d2c64868c0e139 (lower_diagnostic_loss_member); cg4_ref_8db08e9fac9ecac95ce36c7b (boundary_case); cg4_ref_4de1d8fed455d7dbb17a3c3b (outside_comparison); cg4_ref_58c97c10063c9f1d62bb6b09 (representative_member). Resolve only with current authorized source access.</p></article><article><h3>c862bc1b63e0e68a8fd9c21d4c9d4cef · geometric · exploratory</h3>
+<p>error_rate · adverse direction higher · fraction · comparator complement. Practical threshold: 0.15.</p><table><thead><tr><th>Population</th><th>Planned / applicable</th><th>Members / comparison / unavailable</th><th>Adverse effect</th></tr></thead><tbody><tr><td>D</td><td>20022 / 20022</td><td>1145 / 18877 / 0<br>Conditional support 1145 / 18877</td><td>0.5092474310249783</td></tr><tr><td>S</td><td>9902 / 9902</td><td>568 / 9334 / 0<br>Conditional support 568 / 9334</td><td>0.5189893377837197</td></tr></tbody></table>
+<pre>"Frozen geometric membership"</pre><p>Explanation: approximate. Held-out S precision 0.9847908745247148, recall 0.9119718309859155. The simplified explanation does not define learned membership.</p><p>Protected evidence references: cg4_ref_5082f678d96fc865a84dddcd (higher_diagnostic_loss_member); cg4_ref_54b98133cca34e86cefc4ad0 (lower_diagnostic_loss_member); cg4_ref_f23fc9477e45064f23f97f12 (boundary_case); cg4_ref_36ec2f88ef6a2e39b702846a (outside_comparison); cg4_ref_c06bc62abe30d67fa9e5b2bc (representative_member). Resolve only with current authorized source access.</p></article><article><h3>b13673efa473e1cf632f7ff57c71d86c · geometric · exploratory</h3>
+<p>error_rate · adverse direction higher · fraction · comparator complement. Practical threshold: 0.15.</p><table><thead><tr><th>Population</th><th>Planned / applicable</th><th>Members / comparison / unavailable</th><th>Adverse effect</th></tr></thead><tbody><tr><td>D</td><td>20022 / 20022</td><td>1137 / 18885 / 0<br>Conditional support 1137 / 18885</td><td>0.51008387804815</td></tr><tr><td>S</td><td>9902 / 9902</td><td>566 / 9336 / 0<br>Conditional support 566 / 9336</td><td>0.5175717084366607</td></tr></tbody></table>
+<pre>"Frozen geometric membership"</pre><p>Explanation: approximate. Held-out S precision 0.9809885931558935, recall 0.911660777385159. The simplified explanation does not define learned membership.</p><p>Protected evidence references: cg4_ref_75886066a13a135a73bdcfaa (higher_diagnostic_loss_member); cg4_ref_ef20fd71e47c7ac879518115 (lower_diagnostic_loss_member); cg4_ref_2d4b4d8069808225f235ce71 (boundary_case); cg4_ref_c1644a5ac97099cba96120e9 (outside_comparison); cg4_ref_1f20bed50ab5d19e3c71fedf (representative_member). Resolve only with current authorized source access.</p></article><article><h3>e329e613fca0309f9c33115596f7c127 · geometric · exploratory</h3>
+<p>error_rate · adverse direction higher · fraction · comparator complement. Practical threshold: 0.15.</p><table><thead><tr><th>Population</th><th>Planned / applicable</th><th>Members / comparison / unavailable</th><th>Adverse effect</th></tr></thead><tbody><tr><td>D</td><td>20022 / 20022</td><td>1149 / 18873 / 0<br>Conditional support 1149 / 18873</td><td>0.5088344394626775</td></tr><tr><td>S</td><td>9902 / 9902</td><td>570 / 9332 / 0<br>Conditional support 570 / 9332</td><td>0.5166753145186155</td></tr></tbody></table>
+<pre>"Frozen geometric membership"</pre><p>Explanation: approximate. Held-out S precision 0.9847908745247148, recall 0.9087719298245615. The simplified explanation does not define learned membership.</p><p>Protected evidence references: cg4_ref_413e8d9ac5a5af0b70da06fa (higher_diagnostic_loss_member); cg4_ref_2b216d262758f7a9adfe420c (lower_diagnostic_loss_member); cg4_ref_f00cc16f349dec8d12b73b80 (boundary_case); cg4_ref_f95850b7afa173aa539b6264 (outside_comparison); cg4_ref_7f166dc034d6421a025427eb (representative_member). Resolve only with current authorized source access.</p></article><article><h3>7fb151de4b7208b279877c818417cdce · geometric · exploratory</h3>
+<p>error_rate · adverse direction higher · fraction · comparator complement. Practical threshold: 0.15.</p><table><thead><tr><th>Population</th><th>Planned / applicable</th><th>Members / comparison / unavailable</th><th>Adverse effect</th></tr></thead><tbody><tr><td>D</td><td>20022 / 20022</td><td>1151 / 18871 / 0<br>Conditional support 1151 / 18871</td><td>0.5058638326401103</td></tr><tr><td>S</td><td>9902 / 9902</td><td>572 / 9330 / 0<br>Conditional support 572 / 9330</td><td>0.5162326954931455</td></tr></tbody></table>
+<pre>"Frozen geometric membership"</pre><p>Explanation: approximate. Held-out S precision 0.9809885931558935, recall 0.9020979020979021. The simplified explanation does not define learned membership.</p><pre>{
+  "coverage_guarantee": false,
+  "diagnostic_references": "Original D-only diagnostic targets fixed; refits resample whole admitted D units before the disclosed D cap.",
+  "matching": "Largest frozen membership IoU on S features, within strategy, representation and diagnostic head; no S outcome selection.",
+  "median_membership_IoU": 0.833916083916084,
+  "method": "bounded_D_unit_bootstrap_refits_v2",
+  "profile": {
+    "D_row_limit": 20000,
+    "maximum_nodes": 100000,
+    "retained_candidates": 32
+  },
+  "replicates": 5,
+  "results": [
+    {
+      "applicable_fraction": 1.0,
+      "membership_IoU": 0.833916083916084,
+      "refit_D_records": 20000,
+      "replicate": 0
+    },
+    {
+      "applicable_fraction": 1.0,
+      "membership_IoU": 0.8758741258741258,
+      "refit_D_records": 20000,
+      "replicate": 1
+    },
+    {
+      "applicable_fraction": 1.0,
+      "membership_IoU": 0.9825783972125436,
+      "refit_D_records": 20000,
+      "replicate": 2
+    },
+    {
+      "applicable_fraction": 1.0,
+      "membership_IoU": 0.7771739130434783,
+      "refit_D_records": 20000,
+      "replicate": 3
+    },
+    {
+      "applicable_fraction": 1.0,
+      "membership_IoU": 0.8272251308900523,
+      "refit_D_records": 20000,
+      "replicate": 4
+    }
+  ],
+  "scope": "Product perturbation diagnostic; full-method qualification is separate.",
+  "seed": 0
+}</pre><p>Protected evidence references: cg4_ref_773f7fc59f3ddc4544e737c4 (higher_diagnostic_loss_member); cg4_ref_3fe66a0b0ce5cea8f29208fc (lower_diagnostic_loss_member); cg4_ref_d9ee0e0f9c56631f8b093210 (boundary_case); cg4_ref_1e9bc69539aa97170494d180 (outside_comparison); cg4_ref_8fffa1aaab3a7e08ca56884f (representative_member). Resolve only with current authorized source access.</p></article><article><h3>13385c368ea73b6fb45436142a68abb4 · geometric · exploratory</h3>
+<p>error_rate · adverse direction higher · fraction · comparator complement. Practical threshold: 0.15.</p><table><thead><tr><th>Population</th><th>Planned / applicable</th><th>Members / comparison / unavailable</th><th>Adverse effect</th></tr></thead><tbody><tr><td>D</td><td>20022 / 20022</td><td>1002 / 19020 / 0<br>Conditional support 1002 / 19020</td><td>0.5166282576802231</td></tr><tr><td>S</td><td>9902 / 9902</td><td>497 / 9405 / 0<br>Conditional support 497 / 9405</td><td>0.5071274002334046</td></tr></tbody></table>
+<pre>"Frozen geometric membership"</pre><p>Explanation: approximate. Held-out S precision 0.9149797570850202, recall 0.9094567404426559. The simplified explanation does not define learned membership.</p><p>Protected evidence references: cg4_ref_5d7e3f714fd61e4da36b30b8 (higher_diagnostic_loss_member); cg4_ref_16d04ec21189e393c6c83cca (lower_diagnostic_loss_member); cg4_ref_7ef6f77af76bf5c547fb7f3d (boundary_case); cg4_ref_cbf74eb493fb76905ad2daa7 (outside_comparison); cg4_ref_83d3016a481f76af835adcb8 (representative_member). Resolve only with current authorized source access.</p></article><article><h3>f3e28401165713e17e75da6029d446ba · geometric · exploratory</h3>
+<p>error_rate · adverse direction higher · fraction · comparator complement. Practical threshold: 0.15.</p><table><thead><tr><th>Population</th><th>Planned / applicable</th><th>Members / comparison / unavailable</th><th>Adverse effect</th></tr></thead><tbody><tr><td>D</td><td>20022 / 20022</td><td>1002 / 19020 / 0<br>Conditional support 1002 / 19020</td><td>0.49246491244640056</td></tr><tr><td>S</td><td>9902 / 9902</td><td>510 / 9392 / 0<br>Conditional support 510 / 9392</td><td>0.4863914219861709</td></tr></tbody></table>
+<pre>"Frozen geometric membership"</pre><p>Explanation: approximate. Held-out S precision 0.9649890590809628, recall 0.8647058823529412. The simplified explanation does not define learned membership.</p><p>Protected evidence references: cg4_ref_86a973b58680fce7bbf5a3cd (higher_diagnostic_loss_member); cg4_ref_ca75ae12b1faf7d1e2ded692 (lower_diagnostic_loss_member); cg4_ref_94b4c6a3951d4cfa3202de46 (boundary_case); cg4_ref_6f986e9d9143f43fa2174a69 (outside_comparison); cg4_ref_9c71e1a43ab7c1863b821591 (representative_member). Resolve only with current authorized source access.</p></article><article><h3>6e1230bafac7514fcd865bc74a7c3657 · structured · exploratory</h3>
+<p>error_rate · adverse direction higher · fraction · comparator complement. Practical threshold: 0.15.</p><table><thead><tr><th>Population</th><th>Planned / applicable</th><th>Members / comparison / unavailable</th><th>Adverse effect</th></tr></thead><tbody><tr><td>D</td><td>20022 / 20022</td><td>1378 / 18644 / 0<br>Conditional support 1378 / 18644</td><td>0.45687838653758195</td></tr><tr><td>S</td><td>9902 / 9902</td><td>686 / 9216 / 0<br>Conditional support 686 / 9216</td><td>0.4569297026846454</td></tr></tbody></table>
+<pre>{
+  "clauses": [
+    {
+      "field": "context.x",
+      "kind": "float",
+      "op": "gt",
+      "value": "0x1.3fb286beaba48p-1"
+    },
+    {
+      "field": "context.y",
+      "kind": "float",
+      "op": "gt",
+      "value": "0x1.0a8ffdffa7654p-2"
+    }
+  ]
+}</pre><p>Explanation: exact_predicate. The exact predicate defines membership, subject to the frozen availability rules.</p><p>Protected evidence references: cg4_ref_3bc7336e7ad678710a5629d7 (higher_diagnostic_loss_member); cg4_ref_1ada57fa329ffafdd12ed0fa (lower_diagnostic_loss_member); cg4_ref_ddfc2e0cf8d0f295ef4606ab (outside_comparison); cg4_ref_7255a604d278888c3c965cf1 (representative_member); cg4_ref_60982a092fafd31453de4049 (representative_member). Resolve only with current authorized source access.</p></article><article><h3>a014329edcf1609ec54c7faeef075d8a · geometric · exploratory</h3>
+<p>error_rate · adverse direction higher · fraction · comparator complement. Practical threshold: 0.15.</p><table><thead><tr><th>Population</th><th>Planned / applicable</th><th>Members / comparison / unavailable</th><th>Adverse effect</th></tr></thead><tbody><tr><td>D</td><td>20022 / 20022</td><td>1502 / 18520 / 0<br>Conditional support 1502 / 18520</td><td>0.4399936873225908</td></tr><tr><td>S</td><td>9902 / 9902</td><td>754 / 9148 / 0<br>Conditional support 754 / 9148</td><td>0.43886794115975547</td></tr></tbody></table>
+<pre>"Frozen geometric membership"</pre><p>Explanation: approximate. Held-out S precision 0.8813760379596679, recall 0.9854111405835544. The simplified explanation does not define learned membership.</p><p>Protected evidence references: cg4_ref_2b0c71c440b69a846fa8c92f (higher_diagnostic_loss_member); cg4_ref_c2093637836d0826dfdf8f98 (lower_diagnostic_loss_member); cg4_ref_9343ef629d5f79ea9fcb2bb4 (boundary_case); cg4_ref_4cea804dd9e24a9f89fab4f6 (outside_comparison); cg4_ref_d83b51a2e59253b3d7a37881 (representative_member). Resolve only with current authorized source access.</p></article><article><h3>5de659c38d177f463c0bd0e405fb50de · geometric · exploratory</h3>
+<p>error_rate · adverse direction higher · fraction · comparator complement. Practical threshold: 0.15.</p><table><thead><tr><th>Population</th><th>Planned / applicable</th><th>Members / comparison / unavailable</th><th>Adverse effect</th></tr></thead><tbody><tr><td>D</td><td>20022 / 20022</td><td>1502 / 18520 / 0<br>Conditional support 1502 / 18520</td><td>0.4335157155470173</td></tr><tr><td>S</td><td>9902 / 9902</td><td>767 / 9135 / 0<br>Conditional support 767 / 9135</td><td>0.42906368259962646</td></tr></tbody></table>
+<pre>"Frozen geometric membership"</pre><p>Explanation: approximate. Held-out S precision 0.8925233644859814, recall 0.9960886571056062. The simplified explanation does not define learned membership.</p><p>Protected evidence references: cg4_ref_f2e6cbf12c20b33f5c732754 (higher_diagnostic_loss_member); cg4_ref_089f81ad5820a29f732ad892 (lower_diagnostic_loss_member); cg4_ref_a2707e07bb3cd7ab54c42dbc (boundary_case); cg4_ref_9ee45027f5bc1cb920bf71cc (outside_comparison); cg4_ref_0d6dfe6f03eb7d413fbdb052 (representative_member). Resolve only with current authorized source access.</p></article><article><h3>1b646ae7f435a52004f069e4b3f558f2 · geometric · exploratory</h3>
+<p>error_rate · adverse direction higher · fraction · comparator complement. Practical threshold: 0.15.</p><table><thead><tr><th>Population</th><th>Planned / applicable</th><th>Members / comparison / unavailable</th><th>Adverse effect</th></tr></thead><tbody><tr><td>D</td><td>20022 / 20022</td><td>1557 / 18465 / 0<br>Conditional support 1557 / 18465</td><td>0.4272122387456976</td></tr><tr><td>S</td><td>9902 / 9902</td><td>789 / 9113 / 0<br>Conditional support 789 / 9113</td><td>0.42421020848362556</td></tr></tbody></table>
+<pre>"Frozen geometric membership"</pre><p>Explanation: approximate. Held-out S precision 0.9176610978520287, recall 0.9746514575411914. The simplified explanation does not define learned membership.</p><p>Protected evidence references: cg4_ref_c27ec28bdd8f5925976857cc (higher_diagnostic_loss_member); cg4_ref_f1fe15478059f8c59f4fe08b (lower_diagnostic_loss_member); cg4_ref_8de8547dff3d23c3ba93de9f (boundary_case); cg4_ref_070414e5f2e3c54ff8dab275 (outside_comparison); cg4_ref_690de1d54ddec063164b0dab (representative_member). Resolve only with current authorized source access.</p></article><article><h3>eea88868ee2e621279f30231042ac562 · structured · exploratory</h3>
+<p>error_rate · adverse direction higher · fraction · comparator complement. Practical threshold: 0.15.</p><table><thead><tr><th>Population</th><th>Planned / applicable</th><th>Members / comparison / unavailable</th><th>Adverse effect</th></tr></thead><tbody><tr><td>D</td><td>20022 / 20022</td><td>1604 / 18418 / 0<br>Conditional support 1604 / 18418</td><td>0.4275698391116355</td></tr><tr><td>S</td><td>9902 / 9902</td><td>801 / 9101 / 0<br>Conditional support 801 / 9101</td><td>0.4239122040203289</td></tr></tbody></table>
+<pre>{
+  "clauses": [
+    {
+      "field": "context.x",
+      "kind": "float",
+      "op": "gt",
+      "value": "0x1.3fb286beaba48p-1"
+    },
+    {
+      "field": "context.y",
+      "kind": "float",
+      "op": "gt",
+      "value": "0x1.18ed82f8fe1a8p-3"
+    }
+  ]
+}</pre><p>Explanation: exact_predicate. The exact predicate defines membership, subject to the frozen availability rules.</p><pre>{
+  "coverage_guarantee": false,
+  "diagnostic_references": "Original D-only diagnostic targets fixed; refits resample whole admitted D units before the disclosed D cap.",
+  "matching": "Largest frozen membership IoU on S features, within strategy, representation and diagnostic head; no S outcome selection.",
+  "median_membership_IoU": 0.9800498753117207,
+  "method": "bounded_D_unit_bootstrap_refits_v2",
+  "profile": {
+    "D_row_limit": 20000,
+    "maximum_nodes": 100000,
+    "retained_candidates": 32
+  },
+  "replicates": 5,
+  "results": [
+    {
+      "applicable_fraction": 1.0,
+      "membership_IoU": 0.9900621118012423,
+      "refit_D_records": 20000,
+      "replicate": 0
+    },
+    {
+      "applicable_fraction": 1.0,
+      "membership_IoU": 0.9636803874092009,
+      "refit_D_records": 20000,
+      "replicate": 1
+    },
+    {
+      "applicable_fraction": 1.0,
+      "membership_IoU": 0.9962546816479401,
+      "refit_D_records": 20000,
+      "replicate": 2
+    },
+    {
+      "applicable_fraction": 1.0,
+      "membership_IoU": 0.9777227722772277,
+      "refit_D_records": 20000,
+      "replicate": 3
+    },
+    {
+      "applicable_fraction": 1.0,
+      "membership_IoU": 0.9800498753117207,
+      "refit_D_records": 20000,
+      "replicate": 4
+    }
+  ],
+  "scope": "Product perturbation diagnostic; full-method qualification is separate.",
+  "seed": 0
+}</pre><p>Protected evidence references: cg4_ref_8560f1a42ea61aa2bcd5cdcd (higher_diagnostic_loss_member); cg4_ref_f0ab9707826176b209512c70 (lower_diagnostic_loss_member); cg4_ref_920587638fa5666cbc322817 (outside_comparison); cg4_ref_bd09b5f7530df27d0da59aee (representative_member); cg4_ref_4cefb0065426a436a96b300b (representative_member). Resolve only with current authorized source access.</p></article><article><h3>307ea91dac055490cdabaebc138eb519 · geometric · exploratory</h3>
+<p>error_rate · adverse direction higher · fraction · comparator complement. Practical threshold: 0.15.</p><table><thead><tr><th>Population</th><th>Planned / applicable</th><th>Members / comparison / unavailable</th><th>Adverse effect</th></tr></thead><tbody><tr><td>D</td><td>20022 / 20022</td><td>1590 / 18432 / 0<br>Conditional support 1590 / 18432</td><td>0.4188824603642558</td></tr><tr><td>S</td><td>9902 / 9902</td><td>803 / 9099 / 0<br>Conditional support 803 / 9099</td><td>0.4157335587765245</td></tr></tbody></table>
+<pre>"Frozen geometric membership"</pre><p>Explanation: approximate. Held-out S precision 0.9343675417661098, recall 0.975093399750934. The simplified explanation does not define learned membership.</p><p>Protected evidence references: cg4_ref_de0fbb02cb61d6dc51924cd8 (higher_diagnostic_loss_member); cg4_ref_2db5def1f65a5e375c3190e7 (lower_diagnostic_loss_member); cg4_ref_b378e8fdc49b80b82eab4e45 (boundary_case); cg4_ref_5f17731f897959e906400e79 (outside_comparison); cg4_ref_c7727c6c1ba195570a13974b (representative_member). Resolve only with current authorized source access.</p></article><article><h3>2176fc8e07a7b14b5a7d63402ec85c04 · geometric · exploratory</h3>
+<p>error_rate · adverse direction higher · fraction · comparator complement. Practical threshold: 0.15.</p><table><thead><tr><th>Population</th><th>Planned / applicable</th><th>Members / comparison / unavailable</th><th>Adverse effect</th></tr></thead><tbody><tr><td>D</td><td>20022 / 20022</td><td>1600 / 18422 / 0<br>Conditional support 1600 / 18422</td><td>0.41675584898490936</td></tr><tr><td>S</td><td>9902 / 9902</td><td>807 / 9095 / 0<br>Conditional support 807 / 9095</td><td>0.4129796114672808</td></tr></tbody></table>
+<pre>"Frozen geometric membership"</pre><p>Explanation: approximate. Held-out S precision 0.9323843416370107, recall 0.9739776951672863. The simplified explanation does not define learned membership.</p><p>Protected evidence references: cg4_ref_a38388e25c0bb531bef64564 (higher_diagnostic_loss_member); cg4_ref_9241a2982a48842ad4786eda (lower_diagnostic_loss_member); cg4_ref_fa58ae0136be7c9d8539bb15 (boundary_case); cg4_ref_8d383bee8beedf455236e711 (outside_comparison); cg4_ref_eef3677805495d6b282d7521 (representative_member). Resolve only with current authorized source access.</p></article><article><h3>4f378d3393b3c3968c5b10bafb5fb917 · geometric · exploratory</h3>
+<p>error_rate · adverse direction higher · fraction · comparator complement. Practical threshold: 0.15.</p><table><thead><tr><th>Population</th><th>Planned / applicable</th><th>Members / comparison / unavailable</th><th>Adverse effect</th></tr></thead><tbody><tr><td>D</td><td>20022 / 20022</td><td>1610 / 18412 / 0<br>Conditional support 1610 / 18412</td><td>0.41330532477468773</td></tr><tr><td>S</td><td>9902 / 9902</td><td>808 / 9094 / 0<br>Conditional support 808 / 9094</td><td>0.4122952898984642</td></tr></tbody></table>
+<pre>"Frozen geometric membership"</pre><p>Explanation: approximate. Held-out S precision 0.933570581257414, recall 0.974009900990099. The simplified explanation does not define learned membership.</p><p>Protected evidence references: cg4_ref_773c468f7fffd10b7f024944 (higher_diagnostic_loss_member); cg4_ref_86e7fc4c15ddfa1c7c9b33c2 (lower_diagnostic_loss_member); cg4_ref_eacb530bd412489a159c5cd6 (boundary_case); cg4_ref_fad576d98eecf0139b37f9bf (outside_comparison); cg4_ref_c570a886b3d189cb3a1e2bf4 (representative_member). Resolve only with current authorized source access.</p></article><article><h3>972b36ee7f462cdee15fc6ba502c9ba6 · geometric · exploratory</h3>
+<p>error_rate · adverse direction higher · fraction · comparator complement. Practical threshold: 0.15.</p><table><thead><tr><th>Population</th><th>Planned / applicable</th><th>Members / comparison / unavailable</th><th>Adverse effect</th></tr></thead><tbody><tr><td>D</td><td>20022 / 20022</td><td>1629 / 18393 / 0<br>Conditional support 1629 / 18393</td><td>0.4122094250965642</td></tr><tr><td>S</td><td>9902 / 9902</td><td>820 / 9082 / 0<br>Conditional support 820 / 9082</td><td>0.40686992765104923</td></tr></tbody></table>
+<pre>"Frozen geometric membership"</pre><p>Explanation: approximate. Held-out S precision 0.9454329774614472, recall 0.9719512195121951. The simplified explanation does not define learned membership.</p><p>Protected evidence references: cg4_ref_0d989f87ee7ea740b051390a (higher_diagnostic_loss_member); cg4_ref_59d16dfc3fdd0e4975ceb967 (lower_diagnostic_loss_member); cg4_ref_daff4b960c9a8e0dc40828fc (boundary_case); cg4_ref_7b5c5022cac3dd344a79cb14 (outside_comparison); cg4_ref_ddcb7a8c0e3442f053413a30 (representative_member). Resolve only with current authorized source access.</p></article><article><h3>64157dfd5b4d82fba34d75ee1abbcce7 · catboost · exploratory</h3>
+<p>error_rate · adverse direction higher · fraction · comparator complement. Practical threshold: 0.15.</p><table><thead><tr><th>Population</th><th>Planned / applicable</th><th>Members / comparison / unavailable</th><th>Adverse effect</th></tr></thead><tbody><tr><td>D</td><td>20022 / 20022</td><td>2003 / 18019 / 0<br>Conditional support 2003 / 18019</td><td>0.5340400520812654</td></tr><tr><td>S</td><td>9902 / 9902</td><td>980 / 8922 / 0<br>Conditional support 980 / 8922</td><td>0.3975657512500629</td></tr></tbody></table>
+<pre>"Frozen catboost membership"</pre><p>Explanation: approximate. Held-out S precision 0.8164794007490637, recall 0.6673469387755102. The simplified explanation does not define learned membership.</p><pre>{
+  "coverage_guarantee": false,
+  "diagnostic_references": "Original D-only diagnostic targets fixed; refits resample whole admitted D units before the disclosed D cap.",
+  "matching": "Largest frozen membership IoU on S features, within strategy, representation and diagnostic head; no S outcome selection.",
+  "median_membership_IoU": 0.6808888888888889,
+  "method": "bounded_D_unit_bootstrap_refits_v2",
+  "profile": {
+    "D_row_limit": 20000,
+    "maximum_nodes": 100000,
+    "retained_candidates": 32
+  },
+  "replicates": 5,
+  "results": [
+    {
+      "applicable_fraction": 1.0,
+      "membership_IoU": 0.6826923076923077,
+      "refit_D_records": 20000,
+      "replicate": 0
+    },
+    {
+      "applicable_fraction": 1.0,
+      "membership_IoU": 0.6786912751677853,
+      "refit_D_records": 20000,
+      "replicate": 1
+    },
+    {
+      "applicable_fraction": 1.0,
+      "membership_IoU": 0.6698113207547169,
+      "refit_D_records": 20000,
+      "replicate": 2
+    },
+    {
+      "applicable_fraction": 1.0,
+      "membership_IoU": 0.6963028169014085,
+      "refit_D_records": 20000,
+      "replicate": 3
+    },
+    {
+      "applicable_fraction": 1.0,
+      "membership_IoU": 0.6808888888888889,
+      "refit_D_records": 20000,
+      "replicate": 4
+    }
+  ],
+  "scope": "Product perturbation diagnostic; full-method qualification is separate.",
+  "seed": 0
+}</pre><p>Protected evidence references: cg4_ref_796ce482114368cc33447901 (higher_diagnostic_loss_member); cg4_ref_c3c88afb02e15d80878976cd (lower_diagnostic_loss_member); cg4_ref_30ce9481ef6c5af01387d9d1 (boundary_case); cg4_ref_1e397fb2e648e31421e9df1f (outside_comparison); cg4_ref_bd8131267ee69b446f16d65e (representative_member). Resolve only with current authorized source access.</p></article><article><h3>70a3d0001df0d69f6d6a07bd8c107ce8 · structured · exploratory</h3>
+<p>error_rate · adverse direction higher · fraction · comparator complement. Practical threshold: 0.15.</p><table><thead><tr><th>Population</th><th>Planned / applicable</th><th>Members / comparison / unavailable</th><th>Adverse effect</th></tr></thead><tbody><tr><td>D</td><td>20022 / 20022</td><td>1844 / 18178 / 0<br>Conditional support 1844 / 18178</td><td>0.39736586548684993</td></tr><tr><td>S</td><td>9902 / 9902</td><td>906 / 8996 / 0<br>Conditional support 906 / 8996</td><td>0.3973451040786339</td></tr></tbody></table>
+<pre>{
+  "clauses": [
+    {
+      "field": "context.x",
+      "kind": "float",
+      "op": "gt",
+      "value": "0x1.3fb286beaba48p-1"
+    },
+    {
+      "field": "context.y",
+      "kind": "float",
+      "op": "gt",
+      "value": "0x1.38433cf782000p-8"
+    }
+  ]
+}</pre><p>Explanation: exact_predicate. The exact predicate defines membership, subject to the frozen availability rules.</p><pre>{
+  "coverage_guarantee": false,
+  "diagnostic_references": "Original D-only diagnostic targets fixed; refits resample whole admitted D units before the disclosed D cap.",
+  "matching": "Largest frozen membership IoU on S features, within strategy, representation and diagnostic head; no S outcome selection.",
+  "median_membership_IoU": 0.9746974697469747,
+  "method": "bounded_D_unit_bootstrap_refits_v2",
+  "profile": {
+    "D_row_limit": 20000,
+    "maximum_nodes": 100000,
+    "retained_candidates": 32
+  },
+  "replicates": 5,
+  "results": [
+    {
+      "applicable_fraction": 1.0,
+      "membership_IoU": 0.986827661909989,
+      "refit_D_records": 20000,
+      "replicate": 0
+    },
+    {
+      "applicable_fraction": 1.0,
+      "membership_IoU": 0.9626068376068376,
+      "refit_D_records": 20000,
+      "replicate": 1
+    },
+    {
+      "applicable_fraction": 1.0,
+      "membership_IoU": 0.9933774834437086,
+      "refit_D_records": 20000,
+      "replicate": 2
+    },
+    {
+      "applicable_fraction": 1.0,
+      "membership_IoU": 0.9716157205240175,
+      "refit_D_records": 20000,
+      "replicate": 3
+    },
+    {
+      "applicable_fraction": 1.0,
+      "membership_IoU": 0.9746974697469747,
+      "refit_D_records": 20000,
+      "replicate": 4
+    }
+  ],
+  "scope": "Product perturbation diagnostic; full-method qualification is separate.",
+  "seed": 0
+}</pre><p>Protected evidence references: cg4_ref_56b67d029370466563751345 (higher_diagnostic_loss_member); cg4_ref_efb4caa13472991c35eaacb7 (lower_diagnostic_loss_member); cg4_ref_19b110c6f51ac29f58a25860 (outside_comparison); cg4_ref_a21267a3c41dbeec921969ff (representative_member); cg4_ref_a806e9228978fc33bd2cd141 (representative_member). Resolve only with current authorized source access.</p></article><article><h3>ccaea48e619089692f74cf724f60f88d · catboost · exploratory</h3>
+<p>error_rate · adverse direction higher · fraction · comparator complement. Practical threshold: 0.15.</p><table><thead><tr><th>Population</th><th>Planned / applicable</th><th>Members / comparison / unavailable</th><th>Adverse effect</th></tr></thead><tbody><tr><td>D</td><td>20022 / 20022</td><td>2003 / 18019 / 0<br>Conditional support 2003 / 18019</td><td>0.45471107396289434</td></tr><tr><td>S</td><td>9902 / 9902</td><td>1002 / 8900 / 0<br>Conditional support 1002 / 8900</td><td>0.3891670591401467</td></tr></tbody></table>
+<pre>"Frozen catboost membership"</pre><p>Explanation: approximate. Held-out S precision 0.908745247148289, recall 0.7155688622754491. The simplified explanation does not define learned membership.</p><p>Protected evidence references: cg4_ref_7eeb88e60f328a8db768dcb4 (higher_diagnostic_loss_member); cg4_ref_52b7c6327f4e37fd79df3c96 (lower_diagnostic_loss_member); cg4_ref_c180947e990e5530ffe1ce97 (boundary_case); cg4_ref_a8fc3243d0d601474136aab7 (outside_comparison); cg4_ref_d23bcb5d40aabaacff0eca67 (representative_member). Resolve only with current authorized source access.</p></article><article><h3>a3ca43878db1f99a176e7f76b9190680 · geometric · exploratory</h3>
+<p>error_rate · adverse direction higher · fraction · comparator complement. Practical threshold: 0.15.</p><table><thead><tr><th>Population</th><th>Planned / applicable</th><th>Members / comparison / unavailable</th><th>Adverse effect</th></tr></thead><tbody><tr><td>D</td><td>20022 / 20022</td><td>1502 / 18520 / 0<br>Conditional support 1502 / 18520</td><td>0.3939281102518456</td></tr><tr><td>S</td><td>9902 / 9902</td><td>771 / 9131 / 0<br>Conditional support 771 / 9131</td><td>0.3881357403216277</td></tr></tbody></table>
+<pre>"Frozen geometric membership"</pre><p>Explanation: approximate. Held-out S precision 0.9063670411985019, recall 0.9416342412451362. The simplified explanation does not define learned membership.</p><p>Protected evidence references: cg4_ref_963cf8148f540e6337723ebb (higher_diagnostic_loss_member); cg4_ref_e86920c594d74e824cd3ce1a (lower_diagnostic_loss_member); cg4_ref_9232198d74e8135eeaf78dd1 (boundary_case); cg4_ref_f7074a463ec53721d028e49a (outside_comparison); cg4_ref_a5097e9644bfa0307fc9caa2 (representative_member). Resolve only with current authorized source access.</p></article><article><h3>a95d9c17727952dd5f06859ae1fd67ff · geometric · exploratory</h3>
+<p>error_rate · adverse direction higher · fraction · comparator complement. Practical threshold: 0.15.</p><table><thead><tr><th>Population</th><th>Planned / applicable</th><th>Members / comparison / unavailable</th><th>Adverse effect</th></tr></thead><tbody><tr><td>D</td><td>20022 / 20022</td><td>1502 / 18520 / 0<br>Conditional support 1502 / 18520</td><td>0.39032923704319367</td></tr><tr><td>S</td><td>9902 / 9902</td><td>775 / 9127 / 0<br>Conditional support 775 / 9127</td><td>0.38399360988488607</td></tr></tbody></table>
+<pre>"Frozen geometric membership"</pre><p>Explanation: approximate. Held-out S precision 0.8635321100917431, recall 0.9716129032258064. The simplified explanation does not define learned membership.</p><p>Protected evidence references: cg4_ref_8c164d4e1cf28db591a7126b (higher_diagnostic_loss_member); cg4_ref_c3ed61ceb794d7b4cedbec0b (lower_diagnostic_loss_member); cg4_ref_58e351d359d77b41c6eb6359 (boundary_case); cg4_ref_c28a944f2e9f3f4d369d0588 (outside_comparison); cg4_ref_352cdb2301bd2f345c327ac5 (representative_member). Resolve only with current authorized source access.</p></article><article><h3>45a2ec79da92b4fd56978f1a00b698d0 · structured · exploratory</h3>
+<p>error_rate · adverse direction higher · fraction · comparator complement. Practical threshold: 0.15.</p><table><thead><tr><th>Population</th><th>Planned / applicable</th><th>Members / comparison / unavailable</th><th>Adverse effect</th></tr></thead><tbody><tr><td>D</td><td>20022 / 20022</td><td>2067 / 17955 / 0<br>Conditional support 2067 / 17955</td><td>0.3783816903975792</td></tr><tr><td>S</td><td>9902 / 9902</td><td>1034 / 8868 / 0<br>Conditional support 1034 / 8868</td><td>0.370719619539186</td></tr></tbody></table>
+<pre>{
+  "clauses": [
+    {
+      "field": "context.x",
+      "kind": "float",
+      "op": "gt",
+      "value": "0x1.3fb286beaba48p-1"
+    },
+    {
+      "field": "context.y",
+      "kind": "float",
+      "op": "gt",
+      "value": "-0x1.f3cf2b2b73550p-4"
+    }
+  ]
+}</pre><p>Explanation: exact_predicate. The exact predicate defines membership, subject to the frozen availability rules.</p><pre>{
+  "coverage_guarantee": false,
+  "diagnostic_references": "Original D-only diagnostic targets fixed; refits resample whole admitted D units before the disclosed D cap.",
+  "matching": "Largest frozen membership IoU on S features, within strategy, representation and diagnostic head; no S outcome selection.",
+  "median_membership_IoU": 0.9788053949903661,
+  "method": "bounded_D_unit_bootstrap_refits_v2",
+  "profile": {
+    "D_row_limit": 20000,
+    "maximum_nodes": 100000,
+    "retained_candidates": 32
+  },
+  "replicates": 5,
+  "results": [
+    {
+      "applicable_fraction": 1.0,
+      "membership_IoU": 0.9894026974951831,
+      "refit_D_records": 20000,
+      "replicate": 0
+    },
+    {
+      "applicable_fraction": 1.0,
+      "membership_IoU": 0.9524697110904008,
+      "refit_D_records": 20000,
+      "replicate": 1
+    },
+    {
+      "applicable_fraction": 1.0,
+      "membership_IoU": 0.995164410058027,
+      "refit_D_records": 20000,
+      "replicate": 2
+    },
+    {
+      "applicable_fraction": 1.0,
+      "membership_IoU": 0.9788053949903661,
+      "refit_D_records": 20000,
+      "replicate": 3
+    },
+    {
+      "applicable_fraction": 1.0,
+      "membership_IoU": 0.9777562862669246,
+      "refit_D_records": 20000,
+      "replicate": 4
+    }
+  ],
+  "scope": "Product perturbation diagnostic; full-method qualification is separate.",
+  "seed": 0
+}</pre><p>Protected evidence references: cg4_ref_39a4ef6c3f222ffd65f41db9 (higher_diagnostic_loss_member); cg4_ref_3f6c228708e508418af3eadf (lower_diagnostic_loss_member); cg4_ref_9472aac24e2423175e27d0a7 (outside_comparison); cg4_ref_36b3391be75c7bc88c6ad851 (representative_member); cg4_ref_2ad85c1822768427b0a93d88 (representative_member). Resolve only with current authorized source access.</p></article><article><h3>1d2fd025fa5baa2d009f30937038780f · geometric · exploratory</h3>
+<p>error_rate · adverse direction higher · fraction · comparator complement. Practical threshold: 0.15.</p><table><thead><tr><th>Population</th><th>Planned / applicable</th><th>Members / comparison / unavailable</th><th>Adverse effect</th></tr></thead><tbody><tr><td>D</td><td>20022 / 20022</td><td>1502 / 18520 / 0<br>Conditional support 1502 / 18520</td><td>0.3780930681337771</td></tr><tr><td>S</td><td>9902 / 9902</td><td>791 / 9111 / 0<br>Conditional support 791 / 9111</td><td>0.3705735734898188</td></tr></tbody></table>
+<pre>"Frozen geometric membership"</pre><p>Explanation: approximate. Held-out S precision 0.893348623853211, recall 0.9848293299620733. The simplified explanation does not define learned membership.</p><p>Protected evidence references: cg4_ref_3270a873a4be21ee7c09c5d9 (higher_diagnostic_loss_member); cg4_ref_1c7fabef6e9d6ee586faab48 (lower_diagnostic_loss_member); cg4_ref_751c1e90bf29cacf0e5c1129 (boundary_case); cg4_ref_e1a8d242199485435c3e7594 (outside_comparison); cg4_ref_e0b2c319b51386de4881fd54 (representative_member). Resolve only with current authorized source access.</p></article><article><h3>4adfdc199689a49e1f1f3164244c3e9d · structured · exploratory</h3>
+<p>error_rate · adverse direction higher · fraction · comparator complement. Practical threshold: 0.15.</p><table><thead><tr><th>Population</th><th>Planned / applicable</th><th>Members / comparison / unavailable</th><th>Adverse effect</th></tr></thead><tbody><tr><td>D</td><td>20022 / 20022</td><td>2315 / 17707 / 0<br>Conditional support 2315 / 17707</td><td>0.35776457700405484</td></tr><tr><td>S</td><td>9902 / 9902</td><td>1157 / 8745 / 0<br>Conditional support 1157 / 8745</td><td>0.3555912676116195</td></tr></tbody></table>
+<pre>{
+  "clauses": [
+    {
+      "field": "context.x",
+      "kind": "float",
+      "op": "gt",
+      "value": "0x1.3fb286beaba48p-1"
+    },
+    {
+      "field": "context.y",
+      "kind": "float",
+      "op": "gt",
+      "value": "-0x1.fa97244f8d5e0p-3"
+    }
+  ]
+}</pre><p>Explanation: exact_predicate. The exact predicate defines membership, subject to the frozen availability rules.</p><pre>{
+  "coverage_guarantee": false,
+  "diagnostic_references": "Original D-only diagnostic targets fixed; refits resample whole admitted D units before the disclosed D cap.",
+  "matching": "Largest frozen membership IoU on S features, within strategy, representation and diagnostic head; no S outcome selection.",
+  "median_membership_IoU": 0.881590319792567,
+  "method": "bounded_D_unit_bootstrap_refits_v2",
+  "profile": {
+    "D_row_limit": 20000,
+    "maximum_nodes": 100000,
+    "retained_candidates": 32
+  },
+  "replicates": 5,
+  "results": [
+    {
+      "applicable_fraction": 1.0,
+      "membership_IoU": 0.9871134020618557,
+      "refit_D_records": 20000,
+      "replicate": 0
+    },
+    {
+      "applicable_fraction": 1.0,
+      "membership_IoU": 0.8545150501672241,
+      "refit_D_records": 20000,
+      "replicate": 1
+    },
+    {
+      "applicable_fraction": 1.0,
+      "membership_IoU": 0.8893690579083837,
+      "refit_D_records": 20000,
+      "replicate": 2
+    },
+    {
+      "applicable_fraction": 1.0,
+      "membership_IoU": 0.881590319792567,
+      "refit_D_records": 20000,
+      "replicate": 3
+    },
+    {
+      "applicable_fraction": 1.0,
+      "membership_IoU": 0.8738115816767502,
+      "refit_D_records": 20000,
+      "replicate": 4
+    }
+  ],
+  "scope": "Product perturbation diagnostic; full-method qualification is separate.",
+  "seed": 0
+}</pre><p>Protected evidence references: cg4_ref_b6d2c2ef06e2a885d54973d5 (higher_diagnostic_loss_member); cg4_ref_c1e27e11e75dada85372de1a (lower_diagnostic_loss_member); cg4_ref_f0b230a3822e867e8e7e6a27 (outside_comparison); cg4_ref_f17f4fe4363c33c2cbfdfcb4 (representative_member); cg4_ref_6142684747857bc1f8609db9 (representative_member). Resolve only with current authorized source access.</p></article><article><h3>4ba4de550761ae9ad627ac49ab788fb4 · geometric · exploratory</h3>
+<p>error_rate · adverse direction higher · fraction · comparator complement. Practical threshold: 0.15.</p><table><thead><tr><th>Population</th><th>Planned / applicable</th><th>Members / comparison / unavailable</th><th>Adverse effect</th></tr></thead><tbody><tr><td>D</td><td>20022 / 20022</td><td>2002 / 18020 / 0<br>Conditional support 2002 / 18020</td><td>0.3556582706971164</td></tr><tr><td>S</td><td>9902 / 9902</td><td>1020 / 8882 / 0<br>Conditional support 1020 / 8882</td><td>0.351465841909833</td></tr></tbody></table>
+<pre>"Frozen geometric membership"</pre><p>Explanation: approximate. Held-out S precision 0.9222648752399232, recall 0.942156862745098. The simplified explanation does not define learned membership.</p><p>Protected evidence references: cg4_ref_73461e4535302521891348fe (higher_diagnostic_loss_member); cg4_ref_bb86c5364cb46e3c94ee6996 (lower_diagnostic_loss_member); cg4_ref_6db26c83df5f7e78553e5601 (boundary_case); cg4_ref_843b1ba117c6f5e80083e48f (outside_comparison); cg4_ref_704d18bc2bb95fed401016bd (representative_member). Resolve only with current authorized source access.</p></article><article><h3>1a693fd48805221d2c75ec2da174f9ee · structured · exploratory</h3>
+<p>error_rate · adverse direction higher · fraction · comparator complement. Practical threshold: 0.15.</p><table><thead><tr><th>Population</th><th>Planned / applicable</th><th>Members / comparison / unavailable</th><th>Adverse effect</th></tr></thead><tbody><tr><td>D</td><td>20022 / 20022</td><td>2574 / 17448 / 0<br>Conditional support 2574 / 17448</td><td>0.3378304791647295</td></tr><tr><td>S</td><td>9902 / 9902</td><td>1282 / 8620 / 0<br>Conditional support 1282 / 8620</td><td>0.34145693902002017</td></tr></tbody></table>
+<pre>{
+  "clauses": [
+    {
+      "field": "context.x",
+      "kind": "float",
+      "op": "gt",
+      "value": "0x1.3fb286beaba48p-1"
+    },
+    {
+      "field": "context.y",
+      "kind": "float",
+      "op": "gt",
+      "value": "-0x1.82fd4c4182478p-2"
+    }
+  ]
+}</pre><p>Explanation: exact_predicate. The exact predicate defines membership, subject to the frozen availability rules.</p><p>Protected evidence references: cg4_ref_f746eeeb05fcea121e43d655 (higher_diagnostic_loss_member); cg4_ref_bea03a921970bee9d2f809ba (lower_diagnostic_loss_member); cg4_ref_c3ef443549641423caafcf46 (outside_comparison); cg4_ref_b6dba4d9f22fe8484c832aab (representative_member); cg4_ref_a8878fd1f828909a8d56000d (representative_member). Resolve only with current authorized source access.</p></article><article><h3>88b442bc5b4ddf3ca43c3300999591f6 · geometric · exploratory</h3>
+<p>error_rate · adverse direction higher · fraction · comparator complement. Practical threshold: 0.15.</p><table><thead><tr><th>Population</th><th>Planned / applicable</th><th>Members / comparison / unavailable</th><th>Adverse effect</th></tr></thead><tbody><tr><td>D</td><td>20022 / 20022</td><td>2002 / 18020 / 0<br>Conditional support 2002 / 18020</td><td>0.3495533323502247</td></tr><tr><td>S</td><td>9902 / 9902</td><td>1024 / 8878 / 0<br>Conditional support 1024 / 8878</td><td>0.33429522942948864</td></tr></tbody></table>
+<pre>"Frozen geometric membership"</pre><p>Explanation: approximate. Held-out S precision 0.9932203389830508, recall 0.8583984375. The simplified explanation does not define learned membership.</p><p>Protected evidence references: cg4_ref_5f20ec84022d7a3e1418378b (higher_diagnostic_loss_member); cg4_ref_820a84ee5916f6cab7c610f7 (lower_diagnostic_loss_member); cg4_ref_4eb171eb9b2f6a38acf58db4 (boundary_case); cg4_ref_18e3bb03f03c7b162cacd08c (outside_comparison); cg4_ref_6054d1e77aec131b6c9102e6 (representative_member). Resolve only with current authorized source access.</p></article><article><h3>47a339eade5cd4383dc1ddcd0de65d80 · structured · exploratory</h3>
+<p>error_rate · adverse direction higher · fraction · comparator complement. Practical threshold: 0.15.</p><table><thead><tr><th>Population</th><th>Planned / applicable</th><th>Members / comparison / unavailable</th><th>Adverse effect</th></tr></thead><tbody><tr><td>D</td><td>20022 / 20022</td><td>2813 / 17209 / 0<br>Conditional support 2813 / 17209</td><td>0.32811983792159605</td></tr><tr><td>S</td><td>9902 / 9902</td><td>1394 / 8508 / 0<br>Conditional support 1394 / 8508</td><td>0.3297072415260782</td></tr></tbody></table>
+<pre>{
+  "clauses": [
+    {
+      "field": "context.x",
+      "kind": "float",
+      "op": "gt",
+      "value": "0x1.3fb286beaba48p-1"
+    },
+    {
+      "field": "context.y",
+      "kind": "float",
+      "op": "gt",
+      "value": "-0x1.017381630ca7cp-1"
+    }
+  ]
+}</pre><p>Explanation: exact_predicate. The exact predicate defines membership, subject to the frozen availability rules.</p><p>Protected evidence references: cg4_ref_7bbb1fbdf3e25078e91bb0e2 (higher_diagnostic_loss_member); cg4_ref_47b11367b0755a64a0420b72 (lower_diagnostic_loss_member); cg4_ref_3aee58b7f79ee1dd22fd8f95 (outside_comparison); cg4_ref_e437110391feb9a0e3f4adf3 (representative_member); cg4_ref_74474e35bb5a3b3cb82caa28 (representative_member). Resolve only with current authorized source access.</p></article><article><h3>cea1a0b6ccf0271bbc4c51871daa46d5 · structured · exploratory</h3>
+<p>error_rate · adverse direction higher · fraction · comparator complement. Practical threshold: 0.15.</p><table><thead><tr><th>Population</th><th>Planned / applicable</th><th>Members / comparison / unavailable</th><th>Adverse effect</th></tr></thead><tbody><tr><td>D</td><td>20022 / 20022</td><td>3052 / 16970 / 0<br>Conditional support 3052 / 16970</td><td>0.31501099388250486</td></tr><tr><td>S</td><td>9902 / 9902</td><td>1499 / 8403 / 0<br>Conditional support 1499 / 8403</td><td>0.31906740635611175</td></tr></tbody></table>
+<pre>{
+  "clauses": [
+    {
+      "field": "context.x",
+      "kind": "float",
+      "op": "gt",
+      "value": "0x1.3fb286beaba48p-1"
+    },
+    {
+      "field": "context.y",
+      "kind": "float",
+      "op": "gt",
+      "value": "-0x1.40f776e8756e2p-1"
+    }
+  ]
+}</pre><p>Explanation: exact_predicate. The exact predicate defines membership, subject to the frozen availability rules.</p><p>Protected evidence references: cg4_ref_a06f20a6504fd9f2a20cf8e4 (higher_diagnostic_loss_member); cg4_ref_0f1cd0807e9f29afc354afd5 (lower_diagnostic_loss_member); cg4_ref_fab227bf79c811a6dc08a9ff (outside_comparison); cg4_ref_406e91fa2eca1846c0cd5a12 (representative_member); cg4_ref_44b8e4e5b34bf13b77699c5c (representative_member). Resolve only with current authorized source access.</p></article><article><h3>e77b6c0dbb5b397c6b042abcafba92a9 · catboost · exploratory</h3>
+<p>error_rate · adverse direction higher · fraction · comparator complement. Practical threshold: 0.15.</p><table><thead><tr><th>Population</th><th>Planned / applicable</th><th>Members / comparison / unavailable</th><th>Adverse effect</th></tr></thead><tbody><tr><td>D</td><td>20022 / 20022</td><td>4005 / 16017 / 0<br>Conditional support 4005 / 16017</td><td>0.3104059614562149</td></tr><tr><td>S</td><td>9902 / 9902</td><td>1974 / 7928 / 0<br>Conditional support 1974 / 7928</td><td>0.3156252012796015</td></tr></tbody></table>
+<pre>"Frozen catboost membership"</pre><p>Explanation: approximate. Held-out S precision 0.9924771628156905, recall 0.9356636271529889. The simplified explanation does not define learned membership.</p><p>Protected evidence references: cg4_ref_5146676a0d59df7ed84b470e (higher_diagnostic_loss_member); cg4_ref_adcdbe7ad20fd1e888d1de21 (lower_diagnostic_loss_member); cg4_ref_d48e1ddc5b7987167afaa125 (boundary_case); cg4_ref_1d93e628c098fb859708f4af (outside_comparison); cg4_ref_e52271be980b244f8b39cf77 (representative_member). Resolve only with current authorized source access.</p></article><article><h3>9251ff9a48011cfa8cf8d5108fb3ec95 · structured · exploratory</h3>
+<p>error_rate · adverse direction higher · fraction · comparator complement. Practical threshold: 0.15.</p><table><thead><tr><th>Population</th><th>Planned / applicable</th><th>Members / comparison / unavailable</th><th>Adverse effect</th></tr></thead><tbody><tr><td>D</td><td>20022 / 20022</td><td>3273 / 16749 / 0<br>Conditional support 3273 / 16749</td><td>0.3120200508297444</td></tr><tr><td>S</td><td>9902 / 9902</td><td>1612 / 8290 / 0<br>Conditional support 1612 / 8290</td><td>0.3153222064911235</td></tr></tbody></table>
+<pre>{
+  "clauses": [
+    {
+      "field": "context.x",
+      "kind": "float",
+      "op": "gt",
+      "value": "0x1.3fb286beaba48p-1"
+    },
+    {
+      "field": "context.y",
+      "kind": "float",
+      "op": "gt",
+      "value": "-0x1.817459bc335cap-1"
+    }
+  ]
+}</pre><p>Explanation: exact_predicate. The exact predicate defines membership, subject to the frozen availability rules.</p><p>Protected evidence references: cg4_ref_d7182a96bb1191d83767ef3e (higher_diagnostic_loss_member); cg4_ref_9d719a368b9ea44001020b80 (lower_diagnostic_loss_member); cg4_ref_5937790b8285bc41bc70d722 (outside_comparison); cg4_ref_5bf6353be795d46bf454c568 (representative_member); cg4_ref_bacb91a3f91704806af9b8a3 (representative_member). Resolve only with current authorized source access.</p></article><article><h3>49978e100f5472dcfa1318c0c0bb68c1 · structured · exploratory</h3>
+<p>error_rate · adverse direction higher · fraction · comparator complement. Practical threshold: 0.15.</p><table><thead><tr><th>Population</th><th>Planned / applicable</th><th>Members / comparison / unavailable</th><th>Adverse effect</th></tr></thead><tbody><tr><td>D</td><td>20022 / 20022</td><td>3509 / 16513 / 0<br>Conditional support 3509 / 16513</td><td>0.3024583496543748</td></tr><tr><td>S</td><td>9902 / 9902</td><td>1734 / 8168 / 0<br>Conditional support 1734 / 8168</td><td>0.31514239042393477</td></tr></tbody></table>
+<pre>{
+  "clauses": [
+    {
+      "field": "context.x",
+      "kind": "float",
+      "op": "gt",
+      "value": "0x1.3fb286beaba48p-1"
+    },
+    {
+      "field": "context.y",
+      "kind": "float",
+      "op": "gt",
+      "value": "-0x1.c309002ea716cp-1"
+    }
+  ]
+}</pre><p>Explanation: exact_predicate. The exact predicate defines membership, subject to the frozen availability rules.</p><p>Protected evidence references: cg4_ref_81aed9c4f551f9c6e04413e6 (higher_diagnostic_loss_member); cg4_ref_09b8d8f0606a8cd64d534780 (lower_diagnostic_loss_member); cg4_ref_2b9496b6041250b0334226d0 (outside_comparison); cg4_ref_0555dfe9084d29fef018dfb6 (representative_member); cg4_ref_4fcf843c3a4e8eb45a45fb5d (representative_member). Resolve only with current authorized source access.</p></article><article><h3>a9bafed5a5f2197ce1a99044fc49e1bd · geometric · exploratory</h3>
+<p>error_rate · adverse direction higher · fraction · comparator complement. Practical threshold: 0.15.</p><table><thead><tr><th>Population</th><th>Planned / applicable</th><th>Members / comparison / unavailable</th><th>Adverse effect</th></tr></thead><tbody><tr><td>D</td><td>20022 / 20022</td><td>2002 / 18020 / 0<br>Conditional support 2002 / 18020</td><td>0.319583635010938</td></tr><tr><td>S</td><td>9902 / 9902</td><td>1028 / 8874 / 0<br>Conditional support 1028 / 8874</td><td>0.31290224842564607</td></tr></tbody></table>
+<pre>"Frozen geometric membership"</pre><p>Explanation: approximate. Held-out S precision 0.9046321525885559, recall 0.9688715953307393. The simplified explanation does not define learned membership.</p><p>Protected evidence references: cg4_ref_199f4593f855862a14405cd8 (higher_diagnostic_loss_member); cg4_ref_047935ae20ddeb41af3f2f43 (lower_diagnostic_loss_member); cg4_ref_277f916ec1b9e8bcdc77f427 (boundary_case); cg4_ref_a03b795c427a6076c6506fbf (outside_comparison); cg4_ref_a9240f909e47b75c3c0a28e0 (representative_member). Resolve only with current authorized source access.</p></article><article><h3>84cdcbb84b53b42e80d7459f14b5e1cf · structured · exploratory</h3>
+<p>error_rate · adverse direction higher · fraction · comparator complement. Practical threshold: 0.15.</p><table><thead><tr><th>Population</th><th>Planned / applicable</th><th>Members / comparison / unavailable</th><th>Adverse effect</th></tr></thead><tbody><tr><td>D</td><td>20022 / 20022</td><td>3754 / 16268 / 0<br>Conditional support 3754 / 16268</td><td>0.2989674549589527</td></tr><tr><td>S</td><td>9902 / 9902</td><td>1861 / 8041 / 0<br>Conditional support 1861 / 8041</td><td>0.30846546056511426</td></tr></tbody></table>
+<pre>{
+  "clauses": [
+    {
+      "field": "context.x",
+      "kind": "float",
+      "op": "gt",
+      "value": "0x1.3fb286beaba48p-1"
+    }
+  ]
+}</pre><p>Explanation: exact_predicate. The exact predicate defines membership, subject to the frozen availability rules.</p><p>Protected evidence references: cg4_ref_95dacbf0d2cb49651d286156 (higher_diagnostic_loss_member); cg4_ref_ba32360060994ab2d0fdc4f6 (lower_diagnostic_loss_member); cg4_ref_c7a2a624d293b95e23faa266 (outside_comparison); cg4_ref_36be6dae9f63906553a21e10 (representative_member); cg4_ref_6b2e22ebaec951e97f7b4052 (representative_member). Resolve only with current authorized source access.</p></article><article><h3>86be2b159eded96d6043fb83337e702b · structured · exploratory</h3>
+<p>error_rate · adverse direction higher · fraction · comparator complement. Practical threshold: 0.15.</p><table><thead><tr><th>Population</th><th>Planned / applicable</th><th>Members / comparison / unavailable</th><th>Adverse effect</th></tr></thead><tbody><tr><td>D</td><td>20022 / 20022</td><td>3901 / 16121 / 0<br>Conditional support 3901 / 16121</td><td>0.2862957319009928</td></tr><tr><td>S</td><td>9902 / 9902</td><td>1933 / 7969 / 0<br>Conditional support 1933 / 7969</td><td>0.2992233809270104</td></tr></tbody></table>
+<pre>{
+  "any_of": [
+    [
+      {
+        "field": "context.x",
+        "kind": "float",
+        "op": "gt",
+        "value": "0x1.3fb286beaba48p-1"
+      },
+      {
+        "field": "context.y",
+        "kind": "float",
+        "op": "gt",
+        "value": "-0x1.c309002ea716cp-1"
+      }
+    ],
+    [
+      {
+        "field": "context.x",
+        "kind": "float",
+        "op": "gt",
+        "value": "0x1.fe4231b31548cp-2"
+      },
+      {
+        "field": "context.y",
+        "kind": "float",
+        "op": "gt",
+        "value": "0x1.89d67364ce1a0p-2"
+      }
+    ]
+  ]
+}</pre><p>Explanation: exact_predicate. The exact predicate defines membership, subject to the frozen availability rules.</p><p>Protected evidence references: cg4_ref_313a8e04952368d93c373297 (higher_diagnostic_loss_member); cg4_ref_0d1236a08f482feb8f19f848 (lower_diagnostic_loss_member); cg4_ref_6ccbba1852dbac30caa319e7 (outside_comparison); cg4_ref_9e70ad452321a90c4363e0c9 (representative_member); cg4_ref_7378d45e195c337ea12fe244 (representative_member). Resolve only with current authorized source access.</p></article><article><h3>199af07c05c79660beaf7df4d1a6184d · structured · exploratory</h3>
+<p>error_rate · adverse direction higher · fraction · comparator complement. Practical threshold: 0.15.</p><table><thead><tr><th>Population</th><th>Planned / applicable</th><th>Members / comparison / unavailable</th><th>Adverse effect</th></tr></thead><tbody><tr><td>D</td><td>20022 / 20022</td><td>4146 / 15876 / 0<br>Conditional support 4146 / 15876</td><td>0.28465989493830446</td></tr><tr><td>S</td><td>9902 / 9902</td><td>2060 / 7842 / 0<br>Conditional support 2060 / 7842</td><td>0.2947639422279338</td></tr></tbody></table>
+<pre>{
+  "any_of": [
+    [
+      {
+        "field": "context.x",
+        "kind": "float",
+        "op": "gt",
+        "value": "0x1.3fb286beaba48p-1"
+      }
+    ],
+    [
+      {
+        "field": "context.x",
+        "kind": "float",
+        "op": "gt",
+        "value": "0x1.fe4231b31548cp-2"
+      },
+      {
+        "field": "context.y",
+        "kind": "float",
+        "op": "gt",
+        "value": "0x1.89d67364ce1a0p-2"
+      }
+    ]
+  ]
+}</pre><p>Explanation: exact_predicate. The exact predicate defines membership, subject to the frozen availability rules.</p><p>Protected evidence references: cg4_ref_865212f80062ee944e5f84b9 (higher_diagnostic_loss_member); cg4_ref_1448155a7038d016566e3cd9 (lower_diagnostic_loss_member); cg4_ref_54547e95609ec253b1c5a5bb (outside_comparison); cg4_ref_5b3ee49e0cd88be30da08569 (representative_member); cg4_ref_3f61e93d9abb7e9bcb2ab78e (representative_member). Resolve only with current authorized source access.</p></article><article><h3>5750ab949724e1d9469b45a1dc0510ee · structured · exploratory</h3>
+<p>error_rate · adverse direction higher · fraction · comparator complement. Practical threshold: 0.15.</p><table><thead><tr><th>Population</th><th>Planned / applicable</th><th>Members / comparison / unavailable</th><th>Adverse effect</th></tr></thead><tbody><tr><td>D</td><td>20022 / 20022</td><td>3752 / 16270 / 0<br>Conditional support 3752 / 16270</td><td>0.2621330414395666</td></tr><tr><td>S</td><td>9902 / 9902</td><td>1881 / 8021 / 0<br>Conditional support 1881 / 8021</td><td>0.26706463847127504</td></tr></tbody></table>
+<pre>{
+  "clauses": [
+    {
+      "field": "context.x",
+      "kind": "float",
+      "op": "gt",
+      "value": "0x1.fe4231b31548cp-2"
+    },
+    {
+      "field": "context.y",
+      "kind": "float",
+      "op": "gt",
+      "value": "-0x1.017381630ca7cp-1"
+    }
+  ]
+}</pre><p>Explanation: exact_predicate. The exact predicate defines membership, subject to the frozen availability rules.</p><p>Protected evidence references: cg4_ref_9b566b8b8e2e90ed26a7ed20 (higher_diagnostic_loss_member); cg4_ref_9a2cd47219ca1ac84db92570 (lower_diagnostic_loss_member); cg4_ref_e75233f7243fbd6560871537 (outside_comparison); cg4_ref_14aa8b9f69f24b6a86488657 (representative_member); cg4_ref_ede14889a25c8eb61805628c (representative_member). Resolve only with current authorized source access.</p></article><article><h3>449f6e365d4d33818a0871af7ff8e176 · structured · exploratory</h3>
+<p>error_rate · adverse direction higher · fraction · comparator complement. Practical threshold: 0.15.</p><table><thead><tr><th>Population</th><th>Planned / applicable</th><th>Members / comparison / unavailable</th><th>Adverse effect</th></tr></thead><tbody><tr><td>D</td><td>20022 / 20022</td><td>4075 / 15947 / 0<br>Conditional support 4075 / 15947</td><td>0.2511803785622697</td></tr><tr><td>S</td><td>9902 / 9902</td><td>2031 / 7871 / 0<br>Conditional support 2031 / 7871</td><td>0.25866431510920085</td></tr></tbody></table>
+<pre>{
+  "clauses": [
+    {
+      "field": "context.x",
+      "kind": "float",
+      "op": "gt",
+      "value": "0x1.fe4231b31548cp-2"
+    },
+    {
+      "field": "context.y",
+      "kind": "float",
+      "op": "gt",
+      "value": "-0x1.40f776e8756e2p-1"
+    }
+  ]
+}</pre><p>Explanation: exact_predicate. The exact predicate defines membership, subject to the frozen availability rules.</p><p>Protected evidence references: cg4_ref_e2ce1619107523a2f36d0397 (higher_diagnostic_loss_member); cg4_ref_ebe596b1210ff4f6d22e10c9 (lower_diagnostic_loss_member); cg4_ref_c4959c566ae8c16e3924753f (outside_comparison); cg4_ref_19feeef914a2aace65563ee4 (representative_member); cg4_ref_52050a5ec45728dac4b38dd2 (representative_member). Resolve only with current authorized source access.</p></article><article><h3>639ff1eae508d601e22d0589eb1586ae · structured · exploratory</h3>
+<p>error_rate · adverse direction higher · fraction · comparator complement. Practical threshold: 0.15.</p><table><thead><tr><th>Population</th><th>Planned / applicable</th><th>Members / comparison / unavailable</th><th>Adverse effect</th></tr></thead><tbody><tr><td>D</td><td>20022 / 20022</td><td>4682 / 15340 / 0<br>Conditional support 4682 / 15340</td><td>0.24213067104342023</td></tr><tr><td>S</td><td>9902 / 9902</td><td>2340 / 7562 / 0<br>Conditional support 2340 / 7562</td><td>0.2548804526455941</td></tr></tbody></table>
+<pre>{
+  "clauses": [
+    {
+      "field": "context.x",
+      "kind": "float",
+      "op": "gt",
+      "value": "0x1.fe4231b31548cp-2"
+    },
+    {
+      "field": "context.y",
+      "kind": "float",
+      "op": "gt",
+      "value": "-0x1.c309002ea716cp-1"
+    }
+  ]
+}</pre><p>Explanation: exact_predicate. The exact predicate defines membership, subject to the frozen availability rules.</p><p>Protected evidence references: cg4_ref_a34c070b067a3cb7fa5c1fdc (higher_diagnostic_loss_member); cg4_ref_e74ca4c197577ef38f17197e (lower_diagnostic_loss_member); cg4_ref_b8a8835353a894156711468b (outside_comparison); cg4_ref_e5eda8d5181822bec9a64cdf (representative_member); cg4_ref_272bcfa9d5ae5f342a397b67 (representative_member). Resolve only with current authorized source access.</p></article><article><h3>b0b450f3c610a4eeef1728b632bc02bc · structured · exploratory</h3>
+<p>error_rate · adverse direction higher · fraction · comparator complement. Practical threshold: 0.15.</p><table><thead><tr><th>Population</th><th>Planned / applicable</th><th>Members / comparison / unavailable</th><th>Adverse effect</th></tr></thead><tbody><tr><td>D</td><td>20022 / 20022</td><td>5006 / 15016 / 0<br>Conditional support 5006 / 15016</td><td>0.24116385324291723</td></tr><tr><td>S</td><td>9902 / 9902</td><td>2507 / 7395 / 0<br>Conditional support 2507 / 7395</td><td>0.2496380519939706</td></tr></tbody></table>
+<pre>{
+  "clauses": [
+    {
+      "field": "context.x",
+      "kind": "float",
+      "op": "gt",
+      "value": "0x1.fe4231b31548cp-2"
+    }
+  ]
+}</pre><p>Explanation: exact_predicate. The exact predicate defines membership, subject to the frozen availability rules.</p><p>Protected evidence references: cg4_ref_ec6f0779e73083c22bf63ea2 (higher_diagnostic_loss_member); cg4_ref_dc6f6349dc20336397bad1eb (lower_diagnostic_loss_member); cg4_ref_cc71bddbdb8158fb64a4f5d7 (outside_comparison); cg4_ref_aa02f16f60147e33b8f1bba5 (representative_member); cg4_ref_314e4eaee56780bdd9261d15 (representative_member). Resolve only with current authorized source access.</p></article><article><h3>6699835d96996f0ce5a013aed171b7e4 · catboost · exploratory</h3>
+<p>error_rate · adverse direction higher · fraction · comparator complement. Practical threshold: 0.15.</p><table><thead><tr><th>Population</th><th>Planned / applicable</th><th>Members / comparison / unavailable</th><th>Adverse effect</th></tr></thead><tbody><tr><td>D</td><td>20022 / 20022</td><td>8009 / 12013 / 0<br>Conditional support 8009 / 12013</td><td>0.1894083673473269</td></tr><tr><td>S</td><td>9902 / 9902</td><td>3916 / 5986 / 0<br>Conditional support 3916 / 5986</td><td>0.16341961683151052</td></tr></tbody></table>
+<pre>"Frozen catboost membership"</pre><p>Explanation: approximate. Held-out S precision 0.9214474845542807, recall 0.7997957099080695. The simplified explanation does not define learned membership.</p><p>Protected evidence references: cg4_ref_b7acd9dfcaeda34b31ca641f (higher_diagnostic_loss_member); cg4_ref_35bbb0b8a0a4050716e16998 (lower_diagnostic_loss_member); cg4_ref_913f9e729f9e4953e37b4f42 (boundary_case); cg4_ref_121636774aae8db263677fa2 (outside_comparison); cg4_ref_8a751bc2614dbaf8a4c9b437 (representative_member). Resolve only with current authorized source access.</p></article><article><h3>079807872b683a3f0ef1f883dd2ccb52 · catboost · exploratory</h3>
+<p>error_rate · adverse direction higher · fraction · comparator complement. Practical threshold: 0.15.</p><table><thead><tr><th>Population</th><th>Planned / applicable</th><th>Members / comparison / unavailable</th><th>Adverse effect</th></tr></thead><tbody><tr><td>D</td><td>20022 / 20022</td><td>8009 / 12013 / 0<br>Conditional support 8009 / 12013</td><td>0.26141189679882004</td></tr><tr><td>S</td><td>9902 / 9902</td><td>3977 / 5925 / 0<br>Conditional support 3977 / 5925</td><td>0.1613537757718696</td></tr></tbody></table>
+<pre>"Frozen catboost membership"</pre><p>Explanation: approximate. Held-out S precision 0.9935518538420204, recall 0.4649233090269047. The simplified explanation does not define learned membership.</p><p>Protected evidence references: cg4_ref_191b2ee3fb2f8903b403ce09 (higher_diagnostic_loss_member); cg4_ref_705869d4f0e46fdedfc71521 (lower_diagnostic_loss_member); cg4_ref_06dfcb11085df74fe221c952 (boundary_case); cg4_ref_70487a06b87fecd70d2b41ff (outside_comparison); cg4_ref_a5b1f466bffa3479e313a6ab (representative_member). Resolve only with current authorized source access.</p></article><h3>Overlap</h3><p class="overlap-intro">Shortlist union support: 1385 distinct opportunities. Overlapping supports are not summed.</p><p>Showing 40 of 1000 retained overlapping pairs. There are 145260 overlapping pairs in total; 144260 were omitted from retained pair detail. Absence from this table does not establish disjointness.</p><table><thead><tr><th>Regions</th><th>Intersection / union</th><th>Jaccard</th></tr></thead><tbody><tr><td>fa51768273f842b5596ebca359977d27 / ae9d4178da1a6fc72b551ee85385a1da</td><td>95 / 396</td><td>0.2398989898989899</td></tr><tr><td>fa51768273f842b5596ebca359977d27 / cabe3a87e1aba6ca76e5e90d8e13412e</td><td>144 / 431</td><td>0.33410672853828305</td></tr><tr><td>fa51768273f842b5596ebca359977d27 / edaece0b6857835435951faf34c4d159</td><td>222 / 548</td><td>0.4051094890510949</td></tr><tr><td>fa51768273f842b5596ebca359977d27 / 7fb151de4b7208b279877c818417cdce</td><td>258 / 591</td><td>0.4365482233502538</td></tr><tr><td>fa51768273f842b5596ebca359977d27 / eea88868ee2e621279f30231042ac562</td><td>277 / 801</td><td>0.34581772784019976</td></tr><tr><td>fa51768273f842b5596ebca359977d27 / 64157dfd5b4d82fba34d75ee1abbcce7</td><td>273 / 984</td><td>0.2774390243902439</td></tr><tr><td>fa51768273f842b5596ebca359977d27 / 70a3d0001df0d69f6d6a07bd8c107ce8</td><td>277 / 906</td><td>0.3057395143487859</td></tr><tr><td>fa51768273f842b5596ebca359977d27 / 45a2ec79da92b4fd56978f1a00b698d0</td><td>277 / 1034</td><td>0.2678916827852998</td></tr><tr><td>fa51768273f842b5596ebca359977d27 / 4adfdc199689a49e1f1f3164244c3e9d</td><td>277 / 1157</td><td>0.2394122731201383</td></tr><tr><td>ae9d4178da1a6fc72b551ee85385a1da / cabe3a87e1aba6ca76e5e90d8e13412e</td><td>128 / 384</td><td>0.3333333333333333</td></tr><tr><td>ae9d4178da1a6fc72b551ee85385a1da / edaece0b6857835435951faf34c4d159</td><td>195 / 512</td><td>0.380859375</td></tr><tr><td>ae9d4178da1a6fc72b551ee85385a1da / 7fb151de4b7208b279877c818417cdce</td><td>209 / 577</td><td>0.36221837088388215</td></tr><tr><td>ae9d4178da1a6fc72b551ee85385a1da / eea88868ee2e621279f30231042ac562</td><td>214 / 801</td><td>0.2671660424469413</td></tr><tr><td>ae9d4178da1a6fc72b551ee85385a1da / 64157dfd5b4d82fba34d75ee1abbcce7</td><td>214 / 980</td><td>0.21836734693877552</td></tr><tr><td>ae9d4178da1a6fc72b551ee85385a1da / 70a3d0001df0d69f6d6a07bd8c107ce8</td><td>214 / 906</td><td>0.23620309050772628</td></tr><tr><td>ae9d4178da1a6fc72b551ee85385a1da / 45a2ec79da92b4fd56978f1a00b698d0</td><td>214 / 1034</td><td>0.20696324951644102</td></tr><tr><td>ae9d4178da1a6fc72b551ee85385a1da / 4adfdc199689a49e1f1f3164244c3e9d</td><td>214 / 1157</td><td>0.18496110630942092</td></tr><tr><td>cabe3a87e1aba6ca76e5e90d8e13412e / edaece0b6857835435951faf34c4d159</td><td>230 / 561</td><td>0.40998217468805703</td></tr><tr><td>cabe3a87e1aba6ca76e5e90d8e13412e / 7fb151de4b7208b279877c818417cdce</td><td>289 / 581</td><td>0.4974182444061962</td></tr><tr><td>cabe3a87e1aba6ca76e5e90d8e13412e / eea88868ee2e621279f30231042ac562</td><td>298 / 801</td><td>0.37203495630461925</td></tr><tr><td>cabe3a87e1aba6ca76e5e90d8e13412e / 64157dfd5b4d82fba34d75ee1abbcce7</td><td>297 / 981</td><td>0.30275229357798167</td></tr><tr><td>cabe3a87e1aba6ca76e5e90d8e13412e / 70a3d0001df0d69f6d6a07bd8c107ce8</td><td>298 / 906</td><td>0.32891832229580575</td></tr><tr><td>cabe3a87e1aba6ca76e5e90d8e13412e / 45a2ec79da92b4fd56978f1a00b698d0</td><td>298 / 1034</td><td>0.28820116054158607</td></tr><tr><td>cabe3a87e1aba6ca76e5e90d8e13412e / 4adfdc199689a49e1f1f3164244c3e9d</td><td>298 / 1157</td><td>0.2575626620570441</td></tr><tr><td>edaece0b6857835435951faf34c4d159 / 7fb151de4b7208b279877c818417cdce</td><td>463 / 602</td><td>0.7691029900332226</td></tr><tr><td>edaece0b6857835435951faf34c4d159 / eea88868ee2e621279f30231042ac562</td><td>457 / 837</td><td>0.5459976105137395</td></tr><tr><td>edaece0b6857835435951faf34c4d159 / 64157dfd5b4d82fba34d75ee1abbcce7</td><td>493 / 980</td><td>0.503061224489796</td></tr><tr><td>edaece0b6857835435951faf34c4d159 / 70a3d0001df0d69f6d6a07bd8c107ce8</td><td>457 / 942</td><td>0.4851380042462845</td></tr><tr><td>edaece0b6857835435951faf34c4d159 / 45a2ec79da92b4fd56978f1a00b698d0</td><td>457 / 1070</td><td>0.42710280373831777</td></tr><tr><td>edaece0b6857835435951faf34c4d159 / 4adfdc199689a49e1f1f3164244c3e9d</td><td>457 / 1193</td><td>0.3830678960603521</td></tr><tr><td>7fb151de4b7208b279877c818417cdce / eea88868ee2e621279f30231042ac562</td><td>546 / 827</td><td>0.660217654171705</td></tr><tr><td>7fb151de4b7208b279877c818417cdce / 64157dfd5b4d82fba34d75ee1abbcce7</td><td>558 / 994</td><td>0.5613682092555332</td></tr><tr><td>7fb151de4b7208b279877c818417cdce / 70a3d0001df0d69f6d6a07bd8c107ce8</td><td>546 / 932</td><td>0.5858369098712446</td></tr><tr><td>7fb151de4b7208b279877c818417cdce / 45a2ec79da92b4fd56978f1a00b698d0</td><td>546 / 1060</td><td>0.5150943396226415</td></tr><tr><td>7fb151de4b7208b279877c818417cdce / 4adfdc199689a49e1f1f3164244c3e9d</td><td>546 / 1183</td><td>0.46153846153846156</td></tr><tr><td>eea88868ee2e621279f30231042ac562 / 64157dfd5b4d82fba34d75ee1abbcce7</td><td>654 / 1127</td><td>0.580301685891748</td></tr><tr><td>eea88868ee2e621279f30231042ac562 / 70a3d0001df0d69f6d6a07bd8c107ce8</td><td>801 / 906</td><td>0.8841059602649006</td></tr><tr><td>eea88868ee2e621279f30231042ac562 / 45a2ec79da92b4fd56978f1a00b698d0</td><td>801 / 1034</td><td>0.7746615087040619</td></tr><tr><td>eea88868ee2e621279f30231042ac562 / 4adfdc199689a49e1f1f3164244c3e9d</td><td>801 / 1157</td><td>0.6923076923076923</td></tr><tr><td>64157dfd5b4d82fba34d75ee1abbcce7 / 70a3d0001df0d69f6d6a07bd8c107ce8</td><td>683 / 1203</td><td>0.5677472984206151</td></tr></tbody></table><h3>Scope and limitations</h3><p>Unavailable membership remains visible against the planned population. Conditional results cannot be read as full-population findings. Observed labels do not establish unobserved outcomes. Local overlap checks do not verify external independence; missing exposure history never proves freshness. Error control is study scoped, with no automatic guarantee across overlapping workspace studies.</p>
+<p>Finite-sample procedures require their declared independence and observation assumptions. Approximate intervals require applicability assessment against the recorded method-qualification evidence. Temporal common shocks, arbitrary adaptive reuse, and CG3 moving-block bootstrap are not admitted CG4 confirmation routes. Historical restatements preserve original evidence and are descriptive unless an inferential schedule was frozen in advance.</p></section><section><h2>Methodology, coverage and limitations</h2><p>Metrics describe supplied outcomes and declared populations; ground truth and representativeness are not independently established.</p><p>Calibration bins and high-confidence settings are investigation definitions, not universal safety thresholds.</p><p>Policy replay is retrospective; different actions may change outcomes or their observation.</p><p>Statistical intervals, when enabled, are assumption-qualified; the recorded adjustment distinguishes pointwise and family confidence.</p><p>Sampled resource safeguards are not hard quotas or capacity guarantees.</p><p>No composite score, certification or production approval is defined.</p><p></p><p>Analytical bounds, retained-detail omissions, presentation omissions and privacy withholding are distinct. An unavailable metric is not zero. The protected local workbench contains exact retained evidence where supplied and eligible.</p><p>Analysis identity: 30f71fb0fee544c39e7b254518b49fea</p></section></main></body></html>

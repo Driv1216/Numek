@@ -1,0 +1,70 @@
+{
+  "local_definitions": [
+    {
+      "id": "risk",
+      "metric": "selective_risk",
+      "direction": "minimize",
+      "basis": "observed_outcome",
+      "scope": "overall",
+      "target": null,
+      "interval": null,
+      "units": "items",
+      "weight": 1.0,
+      "cost": null,
+      "loss": "absolute",
+      "level": 0.5,
+      "bounds": [
+        0,
+        10
+      ]
+    }
+  ],
+  "public": {
+    "stage": "assessment",
+    "interpretation": "Offline policy evidence; no deployment recommendation.",
+    "executable_definitions_exported": false,
+    "joint_withholding": false,
+    "assessments": [
+      {
+        "metric": "selective_risk",
+        "operator": "le",
+        "bound": 0.1,
+        "basis": "observed_outcome",
+        "scope": "overall",
+        "direction": "minimize",
+        "estimate": 0.0,
+        "estimate_state": "finite",
+        "support": 40,
+        "minimum_support": 1,
+        "state": "inconclusive",
+        "method": "bounded_mean_hoeffding",
+        "strength": "finite_sample_under_declared_assumptions",
+        "lower": 0,
+        "upper": 2.147347041733688,
+        "reason": null,
+        "family_size": 1,
+        "allocated_alpha": 0.05,
+        "required": true,
+        "units": "items",
+        "outcome_units": "items",
+        "loss": "absolute",
+        "id": "claim_1",
+        "policy_digest": "policy_1",
+        "comparator": null
+      }
+    ],
+    "withheld_assessments": 0,
+    "assessment_disclosure": "Only identified overall claims are shown; protected scopes, economics and uninterpretable unit definitions are withheld with their intervals.",
+    "searches": []
+  },
+  "public_task": {
+    "kind": "regression"
+  },
+  "true_loss_distribution": {
+    "0": 0.95,
+    "10": 0.05
+  },
+  "true_mean": 0.5,
+  "probability_all_40_zero": 0.12851215656510312,
+  "nominal_alpha": 0.05
+}

@@ -1,0 +1,26 @@
+--- prior/src/confidenceguard/investigation_history.py
++++ current/src/confidenceguard/investigation_history.py
+@@ -42,6 +42,10 @@
+     for event,opportunity,prediction,revision in owner_rows:
+         writer.add('prediction_origin',[prediction,revision],{'namespace':batch.namespace,'variant':variant,'opportunity_key':opportunity,
+             'original_event_key':event,'original_entity_key':entities.get(event),'prediction_key':prediction,'prediction_revision':revision})
++        for sid in dict.fromkeys((base.source,store.spec.outcomes.source if store.spec.outcomes else base.source)):
++            source=store.sources[sid];anchor={'path':source['path'],'signature':source['signature'][:2]}
++            writer.add('prediction_source_identity',[prediction,revision,digest(anchor)],{'namespace':batch.namespace,'variant':variant,
++                'opportunity_key':opportunity,'original_event_key':event,'original_entity_key':entities.get(event),'source':anchor})
+     views=[v for v in batch.feature_views if (v.run or batch.base.runs[0].id)==base.id]
+     feature_cells={};source_maps={}
+     for view in views:
+@@ -247,6 +251,12 @@
+             origins={f['opportunity_key']:f['original_event_key'] for f in origin_facts}
+             base.cg4_known_exposed_facts=exposed_facts;base.cg4_sidecars=sidecars;base.cg4_original_keys=origins
+             base.cg4_original_entities={f['opportunity_key']:f.get('original_entity_key') for f in origin_facts}
++            base.cg4_source_identities={}
++            for f in origin_facts:
++                base.cg4_source_identities.setdefault(f['opportunity_key'],[]).extend((info,f['original_event_key'],f.get('original_entity_key')) for info in f.get('source_identities',[]))
++            for fact in catalog.iter_facts('prediction_source_identity',sequence=feature_sequence,check=work.check):
++                f=fact['payload']
++                if f['namespace']==selection.namespace:base.cg4_source_identities.setdefault(f['opportunity_key'],[]).append((f['source'],f['original_event_key'],f.get('original_entity_key')))
+             class HistoricalPrepared(Prepared):
+                 def load_features(self):
+                     asof=instant(self.spec.as_of or selection.as_of)

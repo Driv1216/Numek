@@ -1,0 +1,108 @@
+{
+  "schema_version": "confidenceguard.confirmation_assessment/1.0",
+  "methodology_id": "failure_investigation_v1",
+  "analysis_id": "5339d80ddead48468400b3b66dcda2cf",
+  "generated_at": "2026-10-24T01:23:09.524526+00:00",
+  "execution": {
+    "duration_seconds": 2.414141417015344,
+    "end_to_end_seconds": 7.898070541996276,
+    "peak_spill_bytes": 0,
+    "peak_worker_rss_bytes": 238960640,
+    "peak_workspace_bytes": 1011712,
+    "requested_operation_deadline_seconds": 1800,
+    "serialized_bytes": 339168,
+    "status": "completed",
+    "whole_job_seconds": 4.948427458002698
+  },
+  "name": "Failure discovery and investigation",
+  "audience": "shareable",
+  "task": {
+    "kind": "regression",
+    "classes": []
+  },
+  "runs": [],
+  "outcomes": {
+    "scope": "Frozen declared outcome population"
+  },
+  "comparison": null,
+  "measurements": [],
+  "checks": [],
+  "findings": [
+    {
+      "code": "investigation_scope",
+      "priority": "Information",
+      "message": "Findings apply only to their recorded populations, assumptions and qualification envelope."
+    }
+  ],
+  "coverage": {
+    "qualification": "Conditional membership, observation and independence scopes apply.",
+    "withheld_related_family": false,
+    "populations": []
+  },
+  "investigation": {
+    "stage": "confirmation",
+    "candidates": [],
+    "assessments": [
+      {
+        "hypothesis": "region_1",
+        "state": "confirmed",
+        "strength": "finite_sample",
+        "membership_scope": "full_population",
+        "independence_qualification": {
+          "exposure_continuity": "unknown",
+          "external_exposure": "declared_unexposed",
+          "ledger_enabled": true,
+          "local_separation": "system_checked",
+          "upstream": "declared_independent"
+        },
+        "objective": {
+          "metric": "interval_miscoverage",
+          "direction": "higher",
+          "comparator": "complement",
+          "units": "fraction"
+        },
+        "interval": {
+          "adjustment": "bonferroni",
+          "confidence": 0.95,
+          "family_size": 1,
+          "lower": 0.9282836214639125,
+          "upper": 1.0
+        },
+        "effect": 1.0,
+        "effect_state": "finite",
+        "practical_threshold": 0.05,
+        "support": {
+          "available": 240,
+          "conditional_members": 120,
+          "conditional_nonmembers": 120,
+          "members": 120,
+          "nonmembers": 120,
+          "planned": 240,
+          "unavailable": 0
+        },
+        "reason": null,
+        "inference": {
+          "allocated_alpha": 0.05,
+          "elementary_intervals": 2,
+          "lower": 0.9282836214639125,
+          "method": "clopper_pearson_component_bonferroni",
+          "status": "available",
+          "strength": "finite_sample",
+          "upper": 1.0
+        }
+      }
+    ],
+    "strategies": [],
+    "overlap": [],
+    "history": [],
+    "notes": [],
+    "method_status": "Qualification is limited to recorded benchmark evidence."
+  },
+  "disclosure": {
+    "policy": "conservative_aggregates_v1",
+    "minimum_denominator": 10,
+    "minimum_component": 10,
+    "learned_artifacts_exported": false
+  },
+  "projection_digest": "07dbcfa7e53b1f12acfcb6eabb0963867923dbfec3f8bf35c8cff870834283aa"
+}

@@ -99,6 +99,8 @@ class PredictionBatchSpec(Contract):
     operation: str = 'ingest'
     name: str = 'Prediction batch'
     schema_version: str = 'confidenceguard.prediction_batch_spec/1.0'
+    feature_views: tuple = ()
+    discovery_representations: tuple = ()
 
     def __post_init__(self):
         object.__setattr__(self, 'evaluation', parse_spec(self.evaluation))
@@ -106,7 +108,11 @@ class PredictionBatchSpec(Contract):
         for attr in ('namespace', 'outcome_definition_version', 'authority', 'name'):
             name(getattr(self, attr))
         choice(self.operation, {'ingest', 'evaluate', 'study', 'fit', 'apply'}, 'recording operation')
-        choice(self.schema_version, {'confidenceguard.prediction_batch_spec/1.0'}, 'batch schema')
+        choice(self.schema_version, {'confidenceguard.prediction_batch_spec/1.0','confidenceguard.prediction_batch_spec/2.0'}, 'batch schema')
+        from .feature_contracts import FeatureViewSpec,DiscoveryRepresentationSpec
+        sequence(self,'feature_views',FeatureViewSpec);sequence(self,'discovery_representations',DiscoveryRepresentationSpec)
+        if (self.feature_views or self.discovery_representations) and self.schema_version!='confidenceguard.prediction_batch_spec/2.0':raise EvaluationError('Typed retention requires prediction batch version 2.0.')
+        if len({v.id for v in self.feature_views})!=len(self.feature_views) or len({r.id for r in self.discovery_representations})!=len(self.discovery_representations):raise EvaluationError('Duplicate typed retention identity.')
         if not isinstance(self.history_complete, bool):
             raise EvaluationError('history_complete must be boolean.')
         spec = self.base
@@ -119,11 +125,25 @@ class PredictionBatchSpec(Contract):
     def base(self):
         return getattr(self.evaluation, 'evaluation', self.evaluation)
 
+    def to_dict(self):
+        value=super().to_dict()
+        if self.schema_version=='confidenceguard.prediction_batch_spec/1.0':
+            value.pop('feature_views');value.pop('discovery_representations')
+        return value
+
     @classmethod
     def from_dict(cls, value, *, base_directory=None):
         value = dict(value)
         if 'evaluation' in value:
             value['evaluation'] = parse_spec(value['evaluation'], base_directory=base_directory)
+        if base_directory is not None and value.get('discovery_representations'):
+            from pathlib import Path
+            import copy
+            value['discovery_representations']=copy.deepcopy(value['discovery_representations'])
+            for rep in value['discovery_representations']:
+                for attr in ('matrix_path','model_directory'):
+                    if rep.get(attr):rep[attr]=str((Path(base_directory)/rep[attr]).absolute())
+                if rep.get('keys_source'):rep['keys_source']['path']=str((Path(base_directory)/rep['keys_source']['path']).absolute())
         return super().from_dict(value)
 
 

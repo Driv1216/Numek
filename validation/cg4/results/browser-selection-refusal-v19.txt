@@ -1,0 +1,254 @@
+- main:
+  - paragraph: NUMEK / local analytical workbench
+  - heading "ConfidenceGuard" [level=1]
+  - paragraph: Evaluate supplied predictions. No model execution or overall trust score.
+  - link "DataTrust":
+    - /url: /
+  - text: ·
+  - link "API contract":
+    - /url: /api/confidenceguard/v1/openapi.json
+  - navigation "ConfidenceGuard workspace":
+    - button "Evaluations & methods"
+    - button "Models & reliability history"
+    - button "Failure investigations"
+  - heading "Failure investigations" [level=2]
+  - paragraph: Discover on D, select on S, freeze claims, then assess independently on H. Candidate regions are diagnostic hypotheses. They do not establish causes or change a model.
+  - button "Use current evaluation"
+  - button "Use current historical selection"
+  - text: Name
+  - textbox "Name": Failure investigation
+  - heading "1 · Evidence and objective" [level=3]
+  - paragraph: Register prediction sources in Evaluations & methods. Historical selections use the authorized local workspace. Every objective has its own eligible denominator, adverse direction and units.
+  - text: Event/entity namespace
+  - textbox "Event/entity namespace": prediction-events
+  - text: Entity columns for copied evaluation
+  - textbox "Entity columns for copied evaluation":
+    - /placeholder: customer_id
+  - text: Partition unit
+  - combobox "Partition unit":
+    - option "Whole entities" [selected]
+    - option "Declared independent rows"
+  - text: Explicit D/S/H column (optional)
+  - textbox "Explicit D/S/H column (optional)"
+  - text: Partition seed
+  - spinbutton "Partition seed": "0"
+  - text: Failure objective
+  - combobox "Failure objective":
+    - option "error_rate" [selected]
+    - option "false_negative_rate"
+    - option "false_positive_rate"
+    - option "precision"
+    - option "recall"
+    - option "brier"
+    - option "log_loss"
+    - option "reliability_diagram"
+    - option "calibration_residual"
+    - option "bias"
+    - option "mae"
+    - option "mse"
+    - option "rmse"
+    - option "material_error_rate"
+    - option "roc_auc"
+    - option "average_precision"
+    - option "interval_miscoverage"
+    - option "interval_coverage"
+    - option "interval_width"
+    - option "central_interval_score"
+  - text: Adverse direction
+  - combobox "Adverse direction":
+    - option "Metric default (resolved at inspection)" [selected]
+    - option "Higher is worse"
+    - option "Lower is worse"
+    - option "Larger absolute bias/residual"
+    - option "Nominal coverage shortfall"
+  - text: "Units (blank: authoritative metric units)"
+  - 'textbox "Units (blank: authoritative metric units)"':
+    - /placeholder: Automatic from metric and task
+  - text: Material effect δ
+  - spinbutton "Material effect δ"
+  - text: Comparator
+  - combobox "Comparator":
+    - option "Complement within eligible scope" [selected]
+    - option "Whole eligible scope (overlapping)"
+    - option "Declared ceiling"
+    - option "Paired reference model"
+  - text: Ceiling
+  - spinbutton "Ceiling"
+  - text: Reference run ID
+  - textbox "Reference run ID"
+  - text: Target class
+  - textbox "Target class"
+  - text: Interval ID
+  - textbox "Interval ID"
+  - text: Nominal coverage
+  - spinbutton "Nominal coverage": "0.9"
+  - generic "Typed features and temporal provenance"
+  - option "categorical" [selected]
+  - option "boolean"
+  - option "integer"
+  - option "decimal"
+  - option "float"
+  - option "timestamp"
+  - option "text"
+  - option "asset"
+  - option "context" [selected]
+  - option "model_input"
+  - option "prediction_derived"
+  - option "retrospective"
+  - option "Unknown; membership unavailable" [selected]
+  - option "Declared available at decision"
+  - option "Dated; add clock binding below"
+  - option "Available at decision" [selected]
+  - option "Retrospective, label independent"
+  - generic "Supplied vectors and pinned offline encoders"
+  - option "Supplied keyed NPY vectors" [selected]
+  - option "Pinned multilingual E5-small"
+  - option "Pinned DINOv2-base"
+  - option "Retained representation"
+  - option "none" [selected]
+  - option "l2"
+  - option "Unknown" [selected]
+  - option "Declared at decision"
+  - option "Dated in key metadata"
+  - option "inputs" [selected]
+  - option "predictions.csv"
+  - heading "2 · Search and resources" [level=3]
+  - checkbox "Structured interactions" [checked]
+  - text: Structured interactions
+  - checkbox "CatBoost objective-specific diagnostics" [checked]
+  - text: CatBoost objective-specific diagnostics
+  - checkbox "Geometric nonlinear fallback" [checked]
+  - text: Geometric nonlinear fallback
+  - checkbox "Experimental NUMEK landmark method; promotion failed in the locked curved-region profile"
+  - text: Experimental NUMEK landmark method; promotion failed in the locked curved-region profile
+  - button "Compose complete specification"
+  - text: Complete investigation specification
+  - textbox "Complete investigation specification": "{ \"evaluation\": { \"as_of\": \"2026-02-01T00:00:00Z\", \"outcomes\": { \"available_at\": { \"column\": \"available\" }, \"column\": \"y\", \"key_columns\": [ \"id\" ], \"source\": \"data\" }, \"runs\": [ { \"entity_columns\": [ \"entity\" ], \"id\": \"model\", \"key_columns\": [ \"id\" ], \"model\": { \"id\": \"synthetic-review\", \"version\": \"v1\" }, \"prediction\": \"decision\", \"prediction_at\": { \"column\": \"when\" }, \"probabilities\": { \"positive_column\": \"p\" }, \"source\": \"data\" }, { \"entity_columns\": [ \"entity\" ], \"id\": \"reference\", \"key_columns\": [ \"id\" ], \"model\": { \"id\": \"synthetic-review-reference\", \"version\": \"v1\" }, \"prediction\": \"reference\", \"prediction_at\": { \"column\": \"when\" }, \"source\": \"data\" } ], \"sources\": [ { \"handle\": \"d60fc99acfaa4d93a9278c75e12444da\", \"id\": \"data\" } ], \"task\": { \"classes\": [ \"0\", \"1\" ], \"kind\": \"binary_classification\", \"outcome_definition\": \"Deterministic synthetic review fixture\", \"positive_class\": \"1\" } }, \"features\": [ { \"availability\": \"at_decision\", \"fields\": [ { \"column\": \"x\", \"id\": \"x\", \"kind\": \"categorical\" }, { \"column\": \"z\", \"id\": \"z\", \"kind\": \"categorical\" } ], \"id\": \"context\" } ], \"limits\": { \"candidates_per_strategy\": 8, \"max_depth\": 3, \"max_nodes\": 10000, \"shortlist\": 3, \"stability_replicates\": 1 }, \"name\": \"Previously exposed synthetic paired-precision selector check\", \"objectives\": [ { \"bounds\": [], \"ceiling\": null, \"comparator\": \"paired\", \"current_period\": null, \"direction\": \"lower\", \"id\": \"precision\", \"interval\": null, \"material_error\": null, \"metric\": \"precision\", \"metric_identity\": {}, \"nominal\": null, \"practical_threshold\": 0.1, \"reference_period\": null, \"reference_run\": \"reference\", \"run\": \"model\", \"target\": null, \"training_clip\": 30, \"units\": \"fraction\" } ], \"roles\": { \"column\": \"role\", \"namespace\": \"cg4-exposed-review-fixture-v1\", \"unit\": \"entity\" }, \"strategies\": [ \"structured\", \"catboost\" ] }"
+  - generic "Execution configuration and limits"
+  - checkbox "Retain this immutable investigation/assessment in the authorized workspace" [disabled]
+  - text: Retain this immutable investigation/assessment in the authorized workspace
+  - button "Inspect evidence and admitted search"
+  - button "Run discovery on D and selection on S"
+  - button "Cancel active job"
+  - status: "Planned 720: D 240, S 240, H 240. 2 typed fields, 0 representations. 2 threads, 6.0 GiB RSS, 30.0 minutes, 256 MiB result budget. H outcome metrics were sealed during this discovery inspection."
+  - generic "Complete inspection and admitted specification"
+  - heading "Previously exposed synthetic paired-precision selector check — independent assessment" [level=3]
+  - paragraph: "Outcome scope: observed labels only. These findings do not establish failure rates or reliability for unobserved outcomes."
+  - region "Scrollable investigation evidence table":
+    - table "Scroll horizontally to see all evidence when the table is wider than the view.":
+      - caption: Scroll horizontally to see all evidence when the table is wider than the view.
+      - rowgroup:
+        - row "Objective Finding Adverse effect Simultaneous interval / threshold Population and metric support Statistical strength":
+          - columnheader "Objective"
+          - columnheader "Finding"
+          - columnheader "Adverse effect"
+          - columnheader "Simultaneous interval / threshold"
+          - columnheader "Population and metric support"
+          - columnheader "Statistical strength"
+      - rowgroup:
+        - row "precision statistically inadmissible Not assessed No admissible interval Planned 240; applicable 240; members 120; metric Unavailable / Unavailable; membership unavailable 0 descriptive":
+          - cell "precision"
+          - cell "statistically inadmissible"
+          - cell "Not assessed"
+          - cell "No admissible interval"
+          - cell "Planned 240; applicable 240; members 120; metric Unavailable / Unavailable; membership unavailable 0"
+          - cell "descriptive"
+  - paragraph: "Local separation: system_checked. Upstream independence: declared_independent. External exposure: known_exposed. Exposure continuity: unknown. These checks do not establish workspace-wide or external guarantees."
+  - paragraph: "Finding limitation: known external exposure"
+  - generic "Complete assessment, population and provenance evidence"
+  - heading "3 · Freeze the complete family" [level=3]
+  - paragraph: Select up to 32 hypotheses. Set each candidate’s material effect threshold in its metric units; there is no universal default. Freeze thresholds, comparator, membership scope and assumptions before H. A score threshold chosen on S cannot be revised after seeing H.
+  - text: Inference method
+  - combobox "Inference method":
+    - option "Finite sample where registered" [selected]
+    - option "Joint BCa (formal confirmation currently refused)"
+    - option "Ranking percentile approximation (qualification scoped)"
+  - text: Independent sampling unit
+  - combobox "Independent sampling unit":
+    - option "Independent rows" [selected]
+    - option "Independent complete entities"
+    - option "Unsupported temporal dependence"
+    - option "Descriptive only"
+  - text: Membership scope
+  - combobox "Membership scope":
+    - option "Full planned population" [selected]
+    - option "Frozen supported population"
+  - text: Minimum applicable fraction
+  - spinbutton "Minimum applicable fraction": "1"
+  - text: Upstream independence
+  - combobox "Upstream independence":
+    - option "Unknown"
+    - option "Scoped upstream declaration" [selected]
+    - option "Known prohibited overlap"
+  - text: External prior exposure
+  - combobox "External prior exposure":
+    - option "Unknown"
+    - option "Scoped declaration of no exposure"
+    - option "Known prior exposure" [selected]
+  - text: Declaration author
+  - textbox "Declaration author": NUMEK synthetic verification
+  - text: Scoped reason / external provenance
+  - textbox "Scoped reason / external provenance": Previously exposed deterministic synthetic fixture; no fresh statistical confirmation claim. Supplied predictions are generated without fitting.
+  - text: Bootstrap baseline B
+  - spinbutton "Bootstrap baseline B": "20000"
+  - text: Maximum B
+  - spinbutton "Maximum B": "200000"
+  - text: Replication policy
+  - combobox "Replication policy":
+    - option "Admit nominal minimum within maximum" [selected]
+    - option "Fixed caller budget; refuse if inadequate"
+  - checkbox "Explicitly declare prior exposure history for the current workspace gap and this study"
+  - text: Explicitly declare prior exposure history for the current workspace gap and this study
+  - paragraph: This declaration requires the author and scoped reason above. It does not establish intact system history or override known prior use.
+  - button "Compose confirmation protocol"
+  - text: Complete ConfirmationSpec
+  - textbox "Complete ConfirmationSpec": "{ \"confidence\": 0.95, \"method\": \"finite\", \"sampling\": \"independent_rows\", \"upstream_independence\": \"declared_independent\", \"external_exposure\": \"known_exposed\", \"membership_scope\": \"full_population\", \"minimum_membership_coverage\": 1, \"replicates\": 20000, \"max_replicates\": 200000, \"replicate_policy\": \"nominal_admission\", \"declaration_author\": \"NUMEK synthetic verification\", \"declaration_reason\": \"Previously exposed deterministic synthetic fixture; no fresh statistical confirmation claim. Supplied predictions are generated without fitting.\" }"
+  - button "Freeze selected hypotheses"
+  - text: Import protected frozen hypotheses
+  - button "Import protected frozen hypotheses"
+  - generic: "{ \"confirmation\": { \"batch_alpha\": 0.05, \"confidence\": 0.95, \"declaration_author\": \"NUMEK synthetic verification\", \"declaration_reason\": \"Previously exposed deterministic synthetic fixture; no fresh statistical confirmation claim. Supplied predictions are generated without fitting.\", \"exposure_history_token\": null, \"external_exposure\": \"known_exposed\", \"known_common_shocks\": false, \"max_replicates\": 200000, \"membership_scope\": \"full_population\", \"method\": \"finite\", \"minimum_membership_coverage\": 1, \"minimum_tail\": 20, \"minimum_units\": 30, \"outcome_scope\": \"observed_labels\", \"replicate_policy\": \"nominal_admission\", \"replicates\": 20000, \"request_id\": null, \"restatement_schedule\": [], \"sampling\": \"independent_rows\", \"schema_version\": \"confidenceguard.confirmation_spec/1.0\", \"seed\": 0, \"study_alpha\": 0.05, \"study_id\": null, \"upstream_independence\": \"declared_independent\" }, \"content_digest\": \"26b325e8887c9c834f2f222cec6f7e1be919ce626d9f14de79219446af3f5f31\", \"family_digest\": \"0347db9d99ffb01154ab28d65499d14191476edc92bf3652ca08294e99550570\", \"handle\": \"669d1ff35a3f4c05b3d269489c86b85c\", \"hypotheses\": [ { \"candidate_id\": \"09b81b1aadb7409553d780c850799c0f\", \"id\": \"0ada8d7936b37225bf6b63d88d8e27e7469d9ecd058bd97754516fd42787fd1c\", \"membership_scope\": \"full_population\", \"objective\": { \"bounds\": [], \"ceiling\": null, \"comparator\": \"paired\", \"current_period\": null, \"direction\": \"lower\", \"id\": \"precision\", \"interval\": null, \"material_error\": null, \"metric\": \"precision\", \"metric_identity\": { \"dimensions\": {}, \"family\": \"performance\", \"method_version\": \"1\", \"metric\": \"precision\", \"units\": null }, \"nominal\": null, \"practical_threshold\": 0.1, \"reference_period\": null, \"reference_run\": \"reference\", \"run\": \"model\", \"target\": null, \"training_clip\": 30, \"units\": \"fraction\" } } ] }"
+  - link "Download protected frozen hypotheses":
+    - /url: /api/confidenceguard/v1/hypothesis-sets/669d1ff35a3f4c05b3d269489c86b85c/content
+  - heading "4 · Independent confirmation" [level=3]
+  - paragraph: The current inspected draft supplies H, including an explicitly configured future population when appropriate. Previously exposed H cannot become fresh through renaming or splitting. Missing provenance and unsupported dependence refuse formal claims.
+  - button "Inspect confirmation feasibility without H metrics"
+  - status: "1 frozen hypotheses; 2 elementary intervals. Finite procedure; bootstrap is not used. 240 declared sampling units. Numerical admission: nominally admitted. Claim admission: refused. known external exposure"
+  - region "Scrollable investigation evidence table":
+    - table "Scroll horizontally to see all evidence when the table is wider than the view.":
+      - caption: Scroll horizontally to see all evidence when the table is wider than the view.
+      - rowgroup:
+        - row "Hypothesis Planned H Applicable Members Nonmembers Unavailable Membership admission":
+          - columnheader "Hypothesis"
+          - columnheader "Planned H"
+          - columnheader "Applicable"
+          - columnheader "Members"
+          - columnheader "Nonmembers"
+          - columnheader "Unavailable"
+          - columnheader "Membership admission"
+      - rowgroup:
+        - row "0ada8d7936b37225bf6b63d88d8e27e7469d9ecd058bd97754516fd42787fd1c 240 240 120 120 0 No membership refusal":
+          - cell "0ada8d7936b37225bf6b63d88d8e27e7469d9ecd058bd97754516fd42787fd1c"
+          - cell "240"
+          - cell "240"
+          - cell "120"
+          - cell "120"
+          - cell "0"
+          - cell "No membership refusal"
+  - generic "Complete feasibility, assumptions and refusal reasons"
+  - button "Assess frozen claims independently on H" [active]
+  - heading "5 · Revisit and communicate immutable evidence" [level=3]
+  - generic "Historical replay, outcome restatement and private notes"
+  - generic "Retain typed enrichment and representations"
+  - option "predictions.csv"
+  - generic "Resolve recorded bootstrap numerical insufficiency"
+  - generic "Predeclared inferential outcome restatements"
+  - text: Audience
+  - combobox "Audience":
+    - option "Conservative shareable" [selected]
+    - option "Exact protected local"
+  - text: Format
+  - combobox "Format":
+    - option "html" [selected]
+    - option "pdf"
+  - button "Export canonical report and JSON"
+  - status: Immutable assessment opened. Finding states apply to the displayed population, practical threshold and assumptions.

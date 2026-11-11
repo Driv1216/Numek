@@ -1,0 +1,30 @@
+--- prior/src/confidenceguard/investigation.py
++++ current/src/confidenceguard/investigation.py
+@@ -355,13 +355,14 @@
+         used={c['membership_artifact'] for c in candidates};artifacts={k:v for k,v in artifacts.items() if k in used}
+         from .investigation_membership import dependency_digests
+         used_models=set().union(*(dependency_digests(a) for a in artifacts.values())) if artifacts else set()
++        from .evidence_use import population_identifiers
++        ds_events,ds_units=population_identifiers(p,[i for i,k in enumerate(p.keys) if p.roles[k] in {'D','S'}])
+         private={'schema':'confidenceguard.investigation_private/1.0','analysis_id':data['analysis_id'],'config':config.to_dict(),
+                  'investigation_spec':spec.to_dict(),'spec':spec.evaluation.to_dict() if spec.evaluation else {},'files':p.files,
+                  'artifacts':artifacts,'models':{k:v for k,v in models.items() if k in used_models},'locators':locators,
+                  'memberships':{k:v for k,v in memberships.items() if k in used},
+                  'population_event_hashes':{role:[digest([spec.roles.namespace,p.keys[i]]) for i in np.flatnonzero(p.selected[role])] for role in ('D','S')},
+-                 'D_S_units':sorted({digest([spec.roles.namespace,r.get('entity_key') if spec.roles.unit=='entity' else r['event_key']]) for r in p.records if p.roles[r['event_key']] in {'D','S'}}),
+-                 'D_S_events':sorted(digest([spec.roles.namespace,k]) for k in p.keys if p.roles[k] in {'D','S'}),
++                 'D_S_units':ds_units,'D_S_events':ds_events,
+                  'history_binding':p.history}
+         if p.history:private['workspace_path']=p.history['workspace_path']
+         p.verify();return InvestigationResult(data,private,{'status':'completed','peak_workspace_bytes':p.work.peak,'duration_seconds':time.monotonic()-started}).seal()
+@@ -369,8 +370,8 @@
+ 
+ def _discovery_population(spec,config,roots,*,progress=None):
+     with prepared(spec,config,roots,progress,identity_only=True) as p:
+-        events=[digest([spec.roles.namespace,k]) for k in p.keys if p.roles[k] in {'D','S'}]
+-        units=sorted({digest([spec.roles.namespace,r.get('entity_key') if spec.roles.unit=='entity' else r['event_key']]) for r in p.records if p.roles[r['event_key']] in {'D','S'}})
++        from .evidence_use import population_identifiers
++        events,units=population_identifiers(p,[i for i,k in enumerate(p.keys) if p.roles[k] in {'D','S'}])
+         return Inspection({'fingerprint':p.fingerprint,'effective_spec':p.spec.to_dict(),'events':events,'units':units,'population_digest':digest([events,units,p.fingerprint])},{'status':'completed','peak_workspace_bytes':p.work.peak})
+ 
+ 

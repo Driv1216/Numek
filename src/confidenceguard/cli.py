@@ -17,7 +17,7 @@ def specifications(path,config):
 
 @click.group()
 def main():
-    """Evaluate local prediction artifacts; no model execution or universal trust score."""
+    """Evaluate predictions, execute trusted models, and investigate reliability."""
 
 
 @main.command('inspect')
@@ -83,5 +83,11 @@ from .method_cli import register as _register_methods
 _register_methods(main)
 from .history_cli import register as _register_history
 _register_history(main)
+from .investigation_cli import register as _register_investigations
+_register_investigations(main)
+from .policy_cli import register as _register_policies
+_register_policies(main)
+from .execution.cli import register as _register_execution
+_register_execution(main)
 
 if __name__=='__main__':main()

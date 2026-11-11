@@ -9,7 +9,7 @@ import time
 
 from datatrust.image_assets import capture,decode,error
 from datatrust.image_contracts import ImageAuditResult
-from datatrust.text_models import RUNTIME
+from datatrust.text_models import RUNTIME,pinned_runtime
 from datatrust.text_normalization import strict_json
 
 MODELS={'facebook/dinov2-small':'ed25f3a31f01632728cabb09d1542f84ab7b0056','facebook/dinov2-base':'f9e44c814b77203eaa57a6bdbbd535f21ede1415','google/siglip-base-patch16-224':'7fd15f0689c79d79e38b1c2e2e2370a7bf2761ed'}
@@ -20,10 +20,7 @@ def registry(): return json.loads(Path(__file__).with_name('image_model_artifact
 
 def preflight(options,*,benchmark=False):
     if options.directory is None: return None
-    for package,version in RUNTIME.items():
-        try:
-            if importlib.metadata.version(package)!=version: raise ValueError('Install the pinned image-embeddings extra.')
-        except importlib.metadata.PackageNotFoundError as exc: raise ValueError('Install the pinned image-embeddings extra.') from exc
+    runtime=pinned_runtime('image-embeddings')
     root=Path(options.directory).absolute()
     manifest,raw,_=capture(root/'datatrust-model.json',(root,),max_bytes=1024**2)
     if raw is None: raise ValueError('Model manifest exceeds its limit.')
@@ -44,7 +41,7 @@ def preflight(options,*,benchmark=False):
         observed=info['sha256'] if pinned['algorithm']=='sha256' else hashlib.sha1(b'blob '+str(len(raw)).encode()+b'\0'+raw).hexdigest()
         if observed!=pinned['digest']: raise ValueError('Image model bytes differ from the pinned publisher artifacts.')
         files[name]=info
-    return {'model':model,'revision':MODELS[model],'files':files,'manifest':manifest,'runtime':RUNTIME,'license':'Apache-2.0','license_identity':official['models'][model].get('license_identity'),'device':'cpu','dtype':'float32','pooling':'l2_normalized_cls' if 'dinov2' in model else 'l2_normalized_vision_pooler','operating_point':official.get('selection',{}).get(options.mode,{}).get('threshold'),'review_evidence':official.get('review_evidence',{}) if model==official.get('selection',{}).get('default',{}).get('model') else {}}
+    return {'model':model,'revision':MODELS[model],'files':files,'manifest':manifest,'runtime':runtime,'license':'Apache-2.0','license_identity':official['models'][model].get('license_identity'),'device':'cpu','dtype':'float32','pooling':'l2_normalized_cls' if 'dinov2' in model else 'l2_normalized_vision_pooler','operating_point':official.get('selection',{}).get(options.mode,{}).get('threshold'),'review_evidence':official.get('review_evidence',{}) if model==official.get('selection',{}).get('default',{}).get('model') else {}}
 
 
 def selection(store,e):

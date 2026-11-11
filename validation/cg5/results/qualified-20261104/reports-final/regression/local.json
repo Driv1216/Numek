@@ -1,0 +1,5289 @@
+{
+  "analysis_id": "0b24d302adcc4a94ac388208df639cda",
+  "checks": [],
+  "comparison": null,
+  "coverage": {
+    "accounting": {
+      "counts": {
+        "contribution_cells": 37800,
+        "dominance_pairs": 10,
+        "max_candidates": 4,
+        "max_search_states": 4,
+        "metric_records": 54
+      },
+      "limits": {
+        "action_cells": 100000000,
+        "assessment_claims": 256,
+        "assessment_components": 4096,
+        "assessment_policies": 8,
+        "beam_width": 64,
+        "contribution_cells": 100000000,
+        "dominance_pairs": 10000000,
+        "materialized_bytes": 1073741824,
+        "max_candidates": 4096,
+        "max_cells": 32,
+        "max_cutpoints": 1000000,
+        "max_options": 256,
+        "max_search_states": 1000000,
+        "metric_records": 65536,
+        "predicate_events": 100000000,
+        "solver_calls": 64,
+        "solver_nodes": 100000,
+        "solver_nonzeros": 1000000,
+        "solver_rows": 8192,
+        "solver_seconds": 300,
+        "solver_variables": 8192
+      },
+      "materialized_limit_bytes": 1073741824,
+      "retained_allocation_bytes": 4157144,
+      "version": "policy_countable_operations_v1"
+    },
+    "input_fingerprint": "06506495aba159c0d25d6c8a618521e62c8da6ccbb650168966cb164cb1e9e4c",
+    "limitations": [
+      "Policy decisions are hypothetical offline replay; no deployment approval or causal business-value guarantee.",
+      "Observed-outcome, model-implied, operational and missing-label bounds are different estimands.",
+      "Conditional selective risk, full-opportunity behavior and deferral workload have different denominators.",
+      "Independent support conditions on frozen policies and declared sampling, observation, bounds and exposure assumptions.",
+      "Historical stability does not establish future effectiveness. Conformal marginal coverage is not conditional policy coverage.",
+      "Sampled resource controls can overshoot; admission defaults are not capacity guarantees."
+    ],
+    "population_provenance_version": "cg5_population_v1",
+    "populations": [
+      {
+        "definition": "true",
+        "denominator": 600,
+        "denominator_kind": "eligible_records",
+        "id": "pop_d7c5ba541afde9febd2901d5ca8cfe48",
+        "lineage": {
+          "input_fingerprint": "06506495aba159c0d25d6c8a618521e62c8da6ccbb650168966cb164cb1e9e4c",
+          "kind": "frozen_policy_replay",
+          "policy_digest": "52f0f584e9ea5c73f84afa389f3675396716a13b4331cc409531f3e75cfc30f3",
+          "role": "S"
+        },
+        "run": "policy_52f0f584e9ea5c73",
+        "scope": "overall"
+      },
+      {
+        "definition": "(true) AND outcome_valid AND point IS NOT NULL AND state IN ('issued','hypothetical')",
+        "denominator": 600,
+        "denominator_kind": "eligible_records",
+        "id": "pop_0f3443af9f271dba484124bb49985314",
+        "lineage": {
+          "input_fingerprint": "06506495aba159c0d25d6c8a618521e62c8da6ccbb650168966cb164cb1e9e4c",
+          "kind": "frozen_policy_replay",
+          "policy_digest": "52f0f584e9ea5c73f84afa389f3675396716a13b4331cc409531f3e75cfc30f3",
+          "role": "S"
+        },
+        "run": "policy_52f0f584e9ea5c73",
+        "scope": "overall"
+      },
+      {
+        "definition": "Registered policy metric eligibility; planned opportunities are never silently dropped.",
+        "denominator": 600,
+        "denominator_kind": "eligible_records",
+        "id": "pop_8915ac9d554606eebd91801970c5f092",
+        "lineage": {
+          "input_fingerprint": "06506495aba159c0d25d6c8a618521e62c8da6ccbb650168966cb164cb1e9e4c",
+          "metric_definition": "54cf210bd3c297cd62edf3b121b6319779c95bed4f8c30e4d72b5c5f1ca3227c",
+          "policy_digest": "8655301920984adcd699bda85ca32106b2443be7d9521f81dd9a676968626a72",
+          "role": "S"
+        },
+        "run": "policy_8655301920984adc",
+        "scope": "quantity_cost"
+      },
+      {
+        "definition": "Registered policy metric eligibility; planned opportunities are never silently dropped.",
+        "denominator": 600,
+        "denominator_kind": "eligible_records",
+        "id": "pop_63567145c21b4ac11ac7a1233b4d4c04",
+        "lineage": {
+          "input_fingerprint": "06506495aba159c0d25d6c8a618521e62c8da6ccbb650168966cb164cb1e9e4c",
+          "metric_definition": "698ccff8d9593f17d9b489b87303e1d92725e220d9640e7971ac20e2d04d57bd",
+          "policy_digest": "8655301920984adcd699bda85ca32106b2443be7d9521f81dd9a676968626a72",
+          "role": "S"
+        },
+        "run": "policy_8655301920984adc",
+        "scope": "accounting:issued_coverage"
+      },
+      {
+        "definition": "Registered policy metric eligibility; planned opportunities are never silently dropped.",
+        "denominator": 600,
+        "denominator_kind": "eligible_records",
+        "id": "pop_b4a72ea88c496d59eb69d27b01b8d128",
+        "lineage": {
+          "input_fingerprint": "06506495aba159c0d25d6c8a618521e62c8da6ccbb650168966cb164cb1e9e4c",
+          "metric_definition": "591861596c0f1402ab48eeafa697f51514a5e347f1d932d04375fc0659549c17",
+          "policy_digest": "8655301920984adcd699bda85ca32106b2443be7d9521f81dd9a676968626a72",
+          "role": "S"
+        },
+        "run": "policy_8655301920984adc",
+        "scope": "accounting:abstention_rate"
+      },
+      {
+        "definition": "Registered policy metric eligibility; planned opportunities are never silently dropped.",
+        "denominator": 600,
+        "denominator_kind": "eligible_records",
+        "id": "pop_344cfb475f1411ccb85acef36f987b9f",
+        "lineage": {
+          "input_fingerprint": "06506495aba159c0d25d6c8a618521e62c8da6ccbb650168966cb164cb1e9e4c",
+          "metric_definition": "256e1c541221842f42ed09c1c6463eea5c86a3963af8a3403334aef786823c95",
+          "policy_digest": "8655301920984adcd699bda85ca32106b2443be7d9521f81dd9a676968626a72",
+          "role": "S"
+        },
+        "run": "policy_8655301920984adc",
+        "scope": "accounting:deferral_rate"
+      },
+      {
+        "definition": "Registered policy metric eligibility; planned opportunities are never silently dropped.",
+        "denominator": 600,
+        "denominator_kind": "eligible_records",
+        "id": "pop_57ebfad051ef34460f258db6947149cb",
+        "lineage": {
+          "input_fingerprint": "06506495aba159c0d25d6c8a618521e62c8da6ccbb650168966cb164cb1e9e4c",
+          "metric_definition": "8292f3af71906a96883b73569a04454c660e17f9a1d218ed2b779ae5b3566351",
+          "policy_digest": "8655301920984adcd699bda85ca32106b2443be7d9521f81dd9a676968626a72",
+          "role": "S"
+        },
+        "run": "policy_8655301920984adc",
+        "scope": "accounting:unavailable_rate"
+      },
+      {
+        "definition": "Registered policy metric eligibility; planned opportunities are never silently dropped.",
+        "denominator": 600,
+        "denominator_kind": "eligible_records",
+        "id": "pop_1c73d3cda824534cc75ad2c0c21adf48",
+        "lineage": {
+          "input_fingerprint": "06506495aba159c0d25d6c8a618521e62c8da6ccbb650168966cb164cb1e9e4c",
+          "metric_definition": "4cfb695c59dd58461527b864621a3a37f0a20afc5055614cc0956c3b9a45f72f",
+          "policy_digest": "8655301920984adcd699bda85ca32106b2443be7d9521f81dd9a676968626a72",
+          "role": "S"
+        },
+        "run": "policy_8655301920984adc",
+        "scope": "accounting:input_unavailable_rate"
+      },
+      {
+        "definition": "Registered policy metric eligibility; planned opportunities are never silently dropped.",
+        "denominator": 600,
+        "denominator_kind": "eligible_records",
+        "id": "pop_a6406932a5417923d6d94e8513f13a8f",
+        "lineage": {
+          "input_fingerprint": "06506495aba159c0d25d6c8a618521e62c8da6ccbb650168966cb164cb1e9e4c",
+          "metric_definition": "2a59ad5b58b12786ecd8824eccea5290a7318936ee810fe013d474935bf5a7bb",
+          "policy_digest": "8655301920984adcd699bda85ca32106b2443be7d9521f81dd9a676968626a72",
+          "role": "S"
+        },
+        "run": "policy_8655301920984adc",
+        "scope": "accounting:issued_label_availability"
+      },
+      {
+        "definition": "Registered policy metric eligibility; planned opportunities are never silently dropped.",
+        "denominator": 600,
+        "denominator_kind": "eligible_records",
+        "id": "pop_e7e46bea75bfddeb797f0626e810dc36",
+        "lineage": {
+          "input_fingerprint": "06506495aba159c0d25d6c8a618521e62c8da6ccbb650168966cb164cb1e9e4c",
+          "metric_definition": "81b8a118aba859081a6c40b4bcba40d98f65af3eaa03eeb2fa11debb8843ab9d",
+          "policy_digest": "8655301920984adcd699bda85ca32106b2443be7d9521f81dd9a676968626a72",
+          "role": "S"
+        },
+        "run": "policy_8655301920984adc",
+        "scope": "accounting:labeled_issued_share"
+      },
+      {
+        "definition": "Registered policy metric eligibility; planned opportunities are never silently dropped.",
+        "denominator": 600,
+        "denominator_kind": "eligible_records",
+        "id": "pop_125541f346e571ec0960409baca75149",
+        "lineage": {
+          "input_fingerprint": "06506495aba159c0d25d6c8a618521e62c8da6ccbb650168966cb164cb1e9e4c",
+          "metric_definition": "a7bb3be3f5ec692c9308a2db69c4482602cef011b1e7c6be50ee1a6971442389",
+          "policy_digest": "8655301920984adcd699bda85ca32106b2443be7d9521f81dd9a676968626a72",
+          "role": "S"
+        },
+        "run": "policy_8655301920984adc",
+        "scope": "accounting:selective_risk"
+      },
+      {
+        "definition": "Registered policy metric eligibility; planned opportunities are never silently dropped.",
+        "denominator": 600,
+        "denominator_kind": "eligible_records",
+        "id": "pop_7c1bd6debdcf4cf96ccd15c0d6e46d3f",
+        "lineage": {
+          "input_fingerprint": "06506495aba159c0d25d6c8a618521e62c8da6ccbb650168966cb164cb1e9e4c",
+          "metric_definition": "54cf210bd3c297cd62edf3b121b6319779c95bed4f8c30e4d72b5c5f1ca3227c",
+          "policy_digest": "3206e30d5c5ba8a790fcbee6cf149178053468c1f47ff0035b8225260f916052",
+          "role": "S"
+        },
+        "run": "policy_3206e30d5c5ba8a7",
+        "scope": "quantity_cost"
+      },
+      {
+        "definition": "Registered policy metric eligibility; planned opportunities are never silently dropped.",
+        "denominator": 600,
+        "denominator_kind": "eligible_records",
+        "id": "pop_5718f881237a2bc73d0f0e34eeda0f8f",
+        "lineage": {
+          "input_fingerprint": "06506495aba159c0d25d6c8a618521e62c8da6ccbb650168966cb164cb1e9e4c",
+          "metric_definition": "698ccff8d9593f17d9b489b87303e1d92725e220d9640e7971ac20e2d04d57bd",
+          "policy_digest": "3206e30d5c5ba8a790fcbee6cf149178053468c1f47ff0035b8225260f916052",
+          "role": "S"
+        },
+        "run": "policy_3206e30d5c5ba8a7",
+        "scope": "accounting:issued_coverage"
+      },
+      {
+        "definition": "Registered policy metric eligibility; planned opportunities are never silently dropped.",
+        "denominator": 600,
+        "denominator_kind": "eligible_records",
+        "id": "pop_cf7fbfb1f9d5df8570d86d57c699984b",
+        "lineage": {
+          "input_fingerprint": "06506495aba159c0d25d6c8a618521e62c8da6ccbb650168966cb164cb1e9e4c",
+          "metric_definition": "591861596c0f1402ab48eeafa697f51514a5e347f1d932d04375fc0659549c17",
+          "policy_digest": "3206e30d5c5ba8a790fcbee6cf149178053468c1f47ff0035b8225260f916052",
+          "role": "S"
+        },
+        "run": "policy_3206e30d5c5ba8a7",
+        "scope": "accounting:abstention_rate"
+      },
+      {
+        "definition": "Registered policy metric eligibility; planned opportunities are never silently dropped.",
+        "denominator": 600,
+        "denominator_kind": "eligible_records",
+        "id": "pop_6f828fc92e508d30d47f30674fd57900",
+        "lineage": {
+          "input_fingerprint": "06506495aba159c0d25d6c8a618521e62c8da6ccbb650168966cb164cb1e9e4c",
+          "metric_definition": "256e1c541221842f42ed09c1c6463eea5c86a3963af8a3403334aef786823c95",
+          "policy_digest": "3206e30d5c5ba8a790fcbee6cf149178053468c1f47ff0035b8225260f916052",
+          "role": "S"
+        },
+        "run": "policy_3206e30d5c5ba8a7",
+        "scope": "accounting:deferral_rate"
+      },
+      {
+        "definition": "Registered policy metric eligibility; planned opportunities are never silently dropped.",
+        "denominator": 600,
+        "denominator_kind": "eligible_records",
+        "id": "pop_5df93c9e6ceae3b4617ff8bd99ec1fd8",
+        "lineage": {
+          "input_fingerprint": "06506495aba159c0d25d6c8a618521e62c8da6ccbb650168966cb164cb1e9e4c",
+          "metric_definition": "8292f3af71906a96883b73569a04454c660e17f9a1d218ed2b779ae5b3566351",
+          "policy_digest": "3206e30d5c5ba8a790fcbee6cf149178053468c1f47ff0035b8225260f916052",
+          "role": "S"
+        },
+        "run": "policy_3206e30d5c5ba8a7",
+        "scope": "accounting:unavailable_rate"
+      },
+      {
+        "definition": "Registered policy metric eligibility; planned opportunities are never silently dropped.",
+        "denominator": 600,
+        "denominator_kind": "eligible_records",
+        "id": "pop_4c002ad4c5d5044de3384b6e671c2713",
+        "lineage": {
+          "input_fingerprint": "06506495aba159c0d25d6c8a618521e62c8da6ccbb650168966cb164cb1e9e4c",
+          "metric_definition": "4cfb695c59dd58461527b864621a3a37f0a20afc5055614cc0956c3b9a45f72f",
+          "policy_digest": "3206e30d5c5ba8a790fcbee6cf149178053468c1f47ff0035b8225260f916052",
+          "role": "S"
+        },
+        "run": "policy_3206e30d5c5ba8a7",
+        "scope": "accounting:input_unavailable_rate"
+      },
+      {
+        "definition": "Registered policy metric eligibility; planned opportunities are never silently dropped.",
+        "denominator": 0,
+        "denominator_kind": "eligible_records",
+        "id": "pop_9ff5f2de20f8473a3859e6672d414e0c",
+        "lineage": {
+          "input_fingerprint": "06506495aba159c0d25d6c8a618521e62c8da6ccbb650168966cb164cb1e9e4c",
+          "metric_definition": "2a59ad5b58b12786ecd8824eccea5290a7318936ee810fe013d474935bf5a7bb",
+          "policy_digest": "3206e30d5c5ba8a790fcbee6cf149178053468c1f47ff0035b8225260f916052",
+          "role": "S"
+        },
+        "run": "policy_3206e30d5c5ba8a7",
+        "scope": "accounting:issued_label_availability"
+      },
+      {
+        "definition": "Registered policy metric eligibility; planned opportunities are never silently dropped.",
+        "denominator": 600,
+        "denominator_kind": "eligible_records",
+        "id": "pop_41e03f8491b71373254b72c945736514",
+        "lineage": {
+          "input_fingerprint": "06506495aba159c0d25d6c8a618521e62c8da6ccbb650168966cb164cb1e9e4c",
+          "metric_definition": "81b8a118aba859081a6c40b4bcba40d98f65af3eaa03eeb2fa11debb8843ab9d",
+          "policy_digest": "3206e30d5c5ba8a790fcbee6cf149178053468c1f47ff0035b8225260f916052",
+          "role": "S"
+        },
+        "run": "policy_3206e30d5c5ba8a7",
+        "scope": "accounting:labeled_issued_share"
+      },
+      {
+        "definition": "Registered policy metric eligibility; planned opportunities are never silently dropped.",
+        "denominator": 0,
+        "denominator_kind": "eligible_records",
+        "id": "pop_dd7394d8245152ed1a2f1c030193730c",
+        "lineage": {
+          "input_fingerprint": "06506495aba159c0d25d6c8a618521e62c8da6ccbb650168966cb164cb1e9e4c",
+          "metric_definition": "a7bb3be3f5ec692c9308a2db69c4482602cef011b1e7c6be50ee1a6971442389",
+          "policy_digest": "3206e30d5c5ba8a790fcbee6cf149178053468c1f47ff0035b8225260f916052",
+          "role": "S"
+        },
+        "run": "policy_3206e30d5c5ba8a7",
+        "scope": "accounting:selective_risk"
+      },
+      {
+        "definition": "Registered policy metric eligibility; planned opportunities are never silently dropped.",
+        "denominator": 600,
+        "denominator_kind": "eligible_records",
+        "id": "pop_cbe64cb549784c38d4efdce39c1f3447",
+        "lineage": {
+          "input_fingerprint": "06506495aba159c0d25d6c8a618521e62c8da6ccbb650168966cb164cb1e9e4c",
+          "metric_definition": "54cf210bd3c297cd62edf3b121b6319779c95bed4f8c30e4d72b5c5f1ca3227c",
+          "policy_digest": "2843e6e4686883025f13d1de1d20a094320fd11aab805adf04f9dcd415987a07",
+          "role": "S"
+        },
+        "run": "policy_2843e6e468688302",
+        "scope": "quantity_cost"
+      },
+      {
+        "definition": "Registered policy metric eligibility; planned opportunities are never silently dropped.",
+        "denominator": 600,
+        "denominator_kind": "eligible_records",
+        "id": "pop_ee08392621570f8f95edc4d8f6840b24",
+        "lineage": {
+          "input_fingerprint": "06506495aba159c0d25d6c8a618521e62c8da6ccbb650168966cb164cb1e9e4c",
+          "metric_definition": "698ccff8d9593f17d9b489b87303e1d92725e220d9640e7971ac20e2d04d57bd",
+          "policy_digest": "2843e6e4686883025f13d1de1d20a094320fd11aab805adf04f9dcd415987a07",
+          "role": "S"
+        },
+        "run": "policy_2843e6e468688302",
+        "scope": "accounting:issued_coverage"
+      },
+      {
+        "definition": "Registered policy metric eligibility; planned opportunities are never silently dropped.",
+        "denominator": 600,
+        "denominator_kind": "eligible_records",
+        "id": "pop_664beca2669eb3693779565750a0362c",
+        "lineage": {
+          "input_fingerprint": "06506495aba159c0d25d6c8a618521e62c8da6ccbb650168966cb164cb1e9e4c",
+          "metric_definition": "591861596c0f1402ab48eeafa697f51514a5e347f1d932d04375fc0659549c17",
+          "policy_digest": "2843e6e4686883025f13d1de1d20a094320fd11aab805adf04f9dcd415987a07",
+          "role": "S"
+        },
+        "run": "policy_2843e6e468688302",
+        "scope": "accounting:abstention_rate"
+      },
+      {
+        "definition": "Registered policy metric eligibility; planned opportunities are never silently dropped.",
+        "denominator": 600,
+        "denominator_kind": "eligible_records",
+        "id": "pop_51adab44724f21ebd89c6b31971c7153",
+        "lineage": {
+          "input_fingerprint": "06506495aba159c0d25d6c8a618521e62c8da6ccbb650168966cb164cb1e9e4c",
+          "metric_definition": "256e1c541221842f42ed09c1c6463eea5c86a3963af8a3403334aef786823c95",
+          "policy_digest": "2843e6e4686883025f13d1de1d20a094320fd11aab805adf04f9dcd415987a07",
+          "role": "S"
+        },
+        "run": "policy_2843e6e468688302",
+        "scope": "accounting:deferral_rate"
+      },
+      {
+        "definition": "Registered policy metric eligibility; planned opportunities are never silently dropped.",
+        "denominator": 600,
+        "denominator_kind": "eligible_records",
+        "id": "pop_7eb9b1796d386061569615e62741e31a",
+        "lineage": {
+          "input_fingerprint": "06506495aba159c0d25d6c8a618521e62c8da6ccbb650168966cb164cb1e9e4c",
+          "metric_definition": "8292f3af71906a96883b73569a04454c660e17f9a1d218ed2b779ae5b3566351",
+          "policy_digest": "2843e6e4686883025f13d1de1d20a094320fd11aab805adf04f9dcd415987a07",
+          "role": "S"
+        },
+        "run": "policy_2843e6e468688302",
+        "scope": "accounting:unavailable_rate"
+      },
+      {
+        "definition": "Registered policy metric eligibility; planned opportunities are never silently dropped.",
+        "denominator": 600,
+        "denominator_kind": "eligible_records",
+        "id": "pop_db9d103715dcc1a758044837805fb85d",
+        "lineage": {
+          "input_fingerprint": "06506495aba159c0d25d6c8a618521e62c8da6ccbb650168966cb164cb1e9e4c",
+          "metric_definition": "4cfb695c59dd58461527b864621a3a37f0a20afc5055614cc0956c3b9a45f72f",
+          "policy_digest": "2843e6e4686883025f13d1de1d20a094320fd11aab805adf04f9dcd415987a07",
+          "role": "S"
+        },
+        "run": "policy_2843e6e468688302",
+        "scope": "accounting:input_unavailable_rate"
+      },
+      {
+        "definition": "Registered policy metric eligibility; planned opportunities are never silently dropped.",
+        "denominator": 600,
+        "denominator_kind": "eligible_records",
+        "id": "pop_8a24862ccb0d79f16c066926c088ea9c",
+        "lineage": {
+          "input_fingerprint": "06506495aba159c0d25d6c8a618521e62c8da6ccbb650168966cb164cb1e9e4c",
+          "metric_definition": "2a59ad5b58b12786ecd8824eccea5290a7318936ee810fe013d474935bf5a7bb",
+          "policy_digest": "2843e6e4686883025f13d1de1d20a094320fd11aab805adf04f9dcd415987a07",
+          "role": "S"
+        },
+        "run": "policy_2843e6e468688302",
+        "scope": "accounting:issued_label_availability"
+      },
+      {
+        "definition": "Registered policy metric eligibility; planned opportunities are never silently dropped.",
+        "denominator": 600,
+        "denominator_kind": "eligible_records",
+        "id": "pop_be64ba4869ac7e7646591c290a967d8c",
+        "lineage": {
+          "input_fingerprint": "06506495aba159c0d25d6c8a618521e62c8da6ccbb650168966cb164cb1e9e4c",
+          "metric_definition": "81b8a118aba859081a6c40b4bcba40d98f65af3eaa03eeb2fa11debb8843ab9d",
+          "policy_digest": "2843e6e4686883025f13d1de1d20a094320fd11aab805adf04f9dcd415987a07",
+          "role": "S"
+        },
+        "run": "policy_2843e6e468688302",
+        "scope": "accounting:labeled_issued_share"
+      },
+      {
+        "definition": "Registered policy metric eligibility; planned opportunities are never silently dropped.",
+        "denominator": 600,
+        "denominator_kind": "eligible_records",
+        "id": "pop_dccfee1cb538f073b7d516b292c18b3f",
+        "lineage": {
+          "input_fingerprint": "06506495aba159c0d25d6c8a618521e62c8da6ccbb650168966cb164cb1e9e4c",
+          "metric_definition": "a7bb3be3f5ec692c9308a2db69c4482602cef011b1e7c6be50ee1a6971442389",
+          "policy_digest": "2843e6e4686883025f13d1de1d20a094320fd11aab805adf04f9dcd415987a07",
+          "role": "S"
+        },
+        "run": "policy_2843e6e468688302",
+        "scope": "accounting:selective_risk"
+      },
+      {
+        "definition": "Registered policy metric eligibility; planned opportunities are never silently dropped.",
+        "denominator": 600,
+        "denominator_kind": "eligible_records",
+        "id": "pop_197711048366c879c19da00ede3935ea",
+        "lineage": {
+          "input_fingerprint": "06506495aba159c0d25d6c8a618521e62c8da6ccbb650168966cb164cb1e9e4c",
+          "metric_definition": "54cf210bd3c297cd62edf3b121b6319779c95bed4f8c30e4d72b5c5f1ca3227c",
+          "policy_digest": "2a11341d9be30a72335477d61dcb0bde6d38429ec1b3d1add0b63c8db78fdc73",
+          "role": "S"
+        },
+        "run": "policy_2a11341d9be30a72",
+        "scope": "quantity_cost"
+      },
+      {
+        "definition": "Registered policy metric eligibility; planned opportunities are never silently dropped.",
+        "denominator": 600,
+        "denominator_kind": "eligible_records",
+        "id": "pop_3c767509ac7ce6a6dd2fc377f5bcc385",
+        "lineage": {
+          "input_fingerprint": "06506495aba159c0d25d6c8a618521e62c8da6ccbb650168966cb164cb1e9e4c",
+          "metric_definition": "698ccff8d9593f17d9b489b87303e1d92725e220d9640e7971ac20e2d04d57bd",
+          "policy_digest": "2a11341d9be30a72335477d61dcb0bde6d38429ec1b3d1add0b63c8db78fdc73",
+          "role": "S"
+        },
+        "run": "policy_2a11341d9be30a72",
+        "scope": "accounting:issued_coverage"
+      },
+      {
+        "definition": "Registered policy metric eligibility; planned opportunities are never silently dropped.",
+        "denominator": 600,
+        "denominator_kind": "eligible_records",
+        "id": "pop_d6bd3229ed1032a44719552d4ece53ad",
+        "lineage": {
+          "input_fingerprint": "06506495aba159c0d25d6c8a618521e62c8da6ccbb650168966cb164cb1e9e4c",
+          "metric_definition": "591861596c0f1402ab48eeafa697f51514a5e347f1d932d04375fc0659549c17",
+          "policy_digest": "2a11341d9be30a72335477d61dcb0bde6d38429ec1b3d1add0b63c8db78fdc73",
+          "role": "S"
+        },
+        "run": "policy_2a11341d9be30a72",
+        "scope": "accounting:abstention_rate"
+      },
+      {
+        "definition": "Registered policy metric eligibility; planned opportunities are never silently dropped.",
+        "denominator": 600,
+        "denominator_kind": "eligible_records",
+        "id": "pop_9efa63ba0800fbb9e293d1d2bfe59bb4",
+        "lineage": {
+          "input_fingerprint": "06506495aba159c0d25d6c8a618521e62c8da6ccbb650168966cb164cb1e9e4c",
+          "metric_definition": "256e1c541221842f42ed09c1c6463eea5c86a3963af8a3403334aef786823c95",
+          "policy_digest": "2a11341d9be30a72335477d61dcb0bde6d38429ec1b3d1add0b63c8db78fdc73",
+          "role": "S"
+        },
+        "run": "policy_2a11341d9be30a72",
+        "scope": "accounting:deferral_rate"
+      },
+      {
+        "definition": "Registered policy metric eligibility; planned opportunities are never silently dropped.",
+        "denominator": 600,
+        "denominator_kind": "eligible_records",
+        "id": "pop_7b78b9f1b4c1dcb19cccbf1c0ed53e67",
+        "lineage": {
+          "input_fingerprint": "06506495aba159c0d25d6c8a618521e62c8da6ccbb650168966cb164cb1e9e4c",
+          "metric_definition": "8292f3af71906a96883b73569a04454c660e17f9a1d218ed2b779ae5b3566351",
+          "policy_digest": "2a11341d9be30a72335477d61dcb0bde6d38429ec1b3d1add0b63c8db78fdc73",
+          "role": "S"
+        },
+        "run": "policy_2a11341d9be30a72",
+        "scope": "accounting:unavailable_rate"
+      },
+      {
+        "definition": "Registered policy metric eligibility; planned opportunities are never silently dropped.",
+        "denominator": 600,
+        "denominator_kind": "eligible_records",
+        "id": "pop_1f0c21a252c5f45c8417d2dea122a514",
+        "lineage": {
+          "input_fingerprint": "06506495aba159c0d25d6c8a618521e62c8da6ccbb650168966cb164cb1e9e4c",
+          "metric_definition": "4cfb695c59dd58461527b864621a3a37f0a20afc5055614cc0956c3b9a45f72f",
+          "policy_digest": "2a11341d9be30a72335477d61dcb0bde6d38429ec1b3d1add0b63c8db78fdc73",
+          "role": "S"
+        },
+        "run": "policy_2a11341d9be30a72",
+        "scope": "accounting:input_unavailable_rate"
+      },
+      {
+        "definition": "Registered policy metric eligibility; planned opportunities are never silently dropped.",
+        "denominator": 600,
+        "denominator_kind": "eligible_records",
+        "id": "pop_1505e4a894a1b75ccc104ac31d6d9a3d",
+        "lineage": {
+          "input_fingerprint": "06506495aba159c0d25d6c8a618521e62c8da6ccbb650168966cb164cb1e9e4c",
+          "metric_definition": "2a59ad5b58b12786ecd8824eccea5290a7318936ee810fe013d474935bf5a7bb",
+          "policy_digest": "2a11341d9be30a72335477d61dcb0bde6d38429ec1b3d1add0b63c8db78fdc73",
+          "role": "S"
+        },
+        "run": "policy_2a11341d9be30a72",
+        "scope": "accounting:issued_label_availability"
+      },
+      {
+        "definition": "Registered policy metric eligibility; planned opportunities are never silently dropped.",
+        "denominator": 600,
+        "denominator_kind": "eligible_records",
+        "id": "pop_8d82174bf18502599216ff542df61504",
+        "lineage": {
+          "input_fingerprint": "06506495aba159c0d25d6c8a618521e62c8da6ccbb650168966cb164cb1e9e4c",
+          "metric_definition": "81b8a118aba859081a6c40b4bcba40d98f65af3eaa03eeb2fa11debb8843ab9d",
+          "policy_digest": "2a11341d9be30a72335477d61dcb0bde6d38429ec1b3d1add0b63c8db78fdc73",
+          "role": "S"
+        },
+        "run": "policy_2a11341d9be30a72",
+        "scope": "accounting:labeled_issued_share"
+      },
+      {
+        "definition": "Registered policy metric eligibility; planned opportunities are never silently dropped.",
+        "denominator": 600,
+        "denominator_kind": "eligible_records",
+        "id": "pop_476f00a34c2e45dcad6b604413add34c",
+        "lineage": {
+          "input_fingerprint": "06506495aba159c0d25d6c8a618521e62c8da6ccbb650168966cb164cb1e9e4c",
+          "metric_definition": "a7bb3be3f5ec692c9308a2db69c4482602cef011b1e7c6be50ee1a6971442389",
+          "policy_digest": "2a11341d9be30a72335477d61dcb0bde6d38429ec1b3d1add0b63c8db78fdc73",
+          "role": "S"
+        },
+        "run": "policy_2a11341d9be30a72",
+        "scope": "accounting:selective_risk"
+      },
+      {
+        "definition": "Registered policy metric eligibility; planned opportunities are never silently dropped.",
+        "denominator": 600,
+        "denominator_kind": "eligible_records",
+        "id": "pop_540c1b24221c5960bcf182e6cb34f276",
+        "lineage": {
+          "input_fingerprint": "06506495aba159c0d25d6c8a618521e62c8da6ccbb650168966cb164cb1e9e4c",
+          "metric_definition": "54cf210bd3c297cd62edf3b121b6319779c95bed4f8c30e4d72b5c5f1ca3227c",
+          "policy_digest": "0c9642c0868e674a3dac254ad0ddef6540ae780dae2d2ba6d88143e2a2f9ef57",
+          "role": "S"
+        },
+        "run": "policy_0c9642c0868e674a",
+        "scope": "quantity_cost"
+      },
+      {
+        "definition": "Registered policy metric eligibility; planned opportunities are never silently dropped.",
+        "denominator": 600,
+        "denominator_kind": "eligible_records",
+        "id": "pop_ad55c1e212ff1d4b675663ffd3eefd40",
+        "lineage": {
+          "input_fingerprint": "06506495aba159c0d25d6c8a618521e62c8da6ccbb650168966cb164cb1e9e4c",
+          "metric_definition": "698ccff8d9593f17d9b489b87303e1d92725e220d9640e7971ac20e2d04d57bd",
+          "policy_digest": "0c9642c0868e674a3dac254ad0ddef6540ae780dae2d2ba6d88143e2a2f9ef57",
+          "role": "S"
+        },
+        "run": "policy_0c9642c0868e674a",
+        "scope": "accounting:issued_coverage"
+      },
+      {
+        "definition": "Registered policy metric eligibility; planned opportunities are never silently dropped.",
+        "denominator": 600,
+        "denominator_kind": "eligible_records",
+        "id": "pop_84eca53b363d78bee98d2944263ce11f",
+        "lineage": {
+          "input_fingerprint": "06506495aba159c0d25d6c8a618521e62c8da6ccbb650168966cb164cb1e9e4c",
+          "metric_definition": "591861596c0f1402ab48eeafa697f51514a5e347f1d932d04375fc0659549c17",
+          "policy_digest": "0c9642c0868e674a3dac254ad0ddef6540ae780dae2d2ba6d88143e2a2f9ef57",
+          "role": "S"
+        },
+        "run": "policy_0c9642c0868e674a",
+        "scope": "accounting:abstention_rate"
+      },
+      {
+        "definition": "Registered policy metric eligibility; planned opportunities are never silently dropped.",
+        "denominator": 600,
+        "denominator_kind": "eligible_records",
+        "id": "pop_8725297bbe16a0ebb8bb9c957622b36e",
+        "lineage": {
+          "input_fingerprint": "06506495aba159c0d25d6c8a618521e62c8da6ccbb650168966cb164cb1e9e4c",
+          "metric_definition": "256e1c541221842f42ed09c1c6463eea5c86a3963af8a3403334aef786823c95",
+          "policy_digest": "0c9642c0868e674a3dac254ad0ddef6540ae780dae2d2ba6d88143e2a2f9ef57",
+          "role": "S"
+        },
+        "run": "policy_0c9642c0868e674a",
+        "scope": "accounting:deferral_rate"
+      },
+      {
+        "definition": "Registered policy metric eligibility; planned opportunities are never silently dropped.",
+        "denominator": 600,
+        "denominator_kind": "eligible_records",
+        "id": "pop_160b699640e481c2b96330e8f8b5e9f2",
+        "lineage": {
+          "input_fingerprint": "06506495aba159c0d25d6c8a618521e62c8da6ccbb650168966cb164cb1e9e4c",
+          "metric_definition": "8292f3af71906a96883b73569a04454c660e17f9a1d218ed2b779ae5b3566351",
+          "policy_digest": "0c9642c0868e674a3dac254ad0ddef6540ae780dae2d2ba6d88143e2a2f9ef57",
+          "role": "S"
+        },
+        "run": "policy_0c9642c0868e674a",
+        "scope": "accounting:unavailable_rate"
+      },
+      {
+        "definition": "Registered policy metric eligibility; planned opportunities are never silently dropped.",
+        "denominator": 600,
+        "denominator_kind": "eligible_records",
+        "id": "pop_af54a87cbee63533042fade5f4a31a9e",
+        "lineage": {
+          "input_fingerprint": "06506495aba159c0d25d6c8a618521e62c8da6ccbb650168966cb164cb1e9e4c",
+          "metric_definition": "4cfb695c59dd58461527b864621a3a37f0a20afc5055614cc0956c3b9a45f72f",
+          "policy_digest": "0c9642c0868e674a3dac254ad0ddef6540ae780dae2d2ba6d88143e2a2f9ef57",
+          "role": "S"
+        },
+        "run": "policy_0c9642c0868e674a",
+        "scope": "accounting:input_unavailable_rate"
+      },
+      {
+        "definition": "Registered policy metric eligibility; planned opportunities are never silently dropped.",
+        "denominator": 600,
+        "denominator_kind": "eligible_records",
+        "id": "pop_18ee096555af379cf06776898d250b40",
+        "lineage": {
+          "input_fingerprint": "06506495aba159c0d25d6c8a618521e62c8da6ccbb650168966cb164cb1e9e4c",
+          "metric_definition": "2a59ad5b58b12786ecd8824eccea5290a7318936ee810fe013d474935bf5a7bb",
+          "policy_digest": "0c9642c0868e674a3dac254ad0ddef6540ae780dae2d2ba6d88143e2a2f9ef57",
+          "role": "S"
+        },
+        "run": "policy_0c9642c0868e674a",
+        "scope": "accounting:issued_label_availability"
+      },
+      {
+        "definition": "Registered policy metric eligibility; planned opportunities are never silently dropped.",
+        "denominator": 600,
+        "denominator_kind": "eligible_records",
+        "id": "pop_39a435706b615816ac417a9cbf2723ff",
+        "lineage": {
+          "input_fingerprint": "06506495aba159c0d25d6c8a618521e62c8da6ccbb650168966cb164cb1e9e4c",
+          "metric_definition": "81b8a118aba859081a6c40b4bcba40d98f65af3eaa03eeb2fa11debb8843ab9d",
+          "policy_digest": "0c9642c0868e674a3dac254ad0ddef6540ae780dae2d2ba6d88143e2a2f9ef57",
+          "role": "S"
+        },
+        "run": "policy_0c9642c0868e674a",
+        "scope": "accounting:labeled_issued_share"
+      },
+      {
+        "definition": "Registered policy metric eligibility; planned opportunities are never silently dropped.",
+        "denominator": 600,
+        "denominator_kind": "eligible_records",
+        "id": "pop_0b91d24c5d46fb41bdd84056181ec54a",
+        "lineage": {
+          "input_fingerprint": "06506495aba159c0d25d6c8a618521e62c8da6ccbb650168966cb164cb1e9e4c",
+          "metric_definition": "a7bb3be3f5ec692c9308a2db69c4482602cef011b1e7c6be50ee1a6971442389",
+          "policy_digest": "0c9642c0868e674a3dac254ad0ddef6540ae780dae2d2ba6d88143e2a2f9ef57",
+          "role": "S"
+        },
+        "run": "policy_0c9642c0868e674a",
+        "scope": "accounting:selective_risk"
+      },
+      {
+        "definition": "Registered policy metric eligibility; planned opportunities are never silently dropped.",
+        "denominator": 600,
+        "denominator_kind": "eligible_records",
+        "id": "pop_5b9b481007d87e0a1df2a46a0f29b1b6",
+        "lineage": {
+          "input_fingerprint": "06506495aba159c0d25d6c8a618521e62c8da6ccbb650168966cb164cb1e9e4c",
+          "metric_definition": "54cf210bd3c297cd62edf3b121b6319779c95bed4f8c30e4d72b5c5f1ca3227c",
+          "policy_digest": "52f0f584e9ea5c73f84afa389f3675396716a13b4331cc409531f3e75cfc30f3",
+          "role": "S"
+        },
+        "run": "policy_52f0f584e9ea5c73",
+        "scope": "quantity_cost"
+      },
+      {
+        "definition": "Registered policy metric eligibility; planned opportunities are never silently dropped.",
+        "denominator": 600,
+        "denominator_kind": "eligible_records",
+        "id": "pop_f4e8a918ea3502eae27b47e8bb3e54f0",
+        "lineage": {
+          "input_fingerprint": "06506495aba159c0d25d6c8a618521e62c8da6ccbb650168966cb164cb1e9e4c",
+          "metric_definition": "698ccff8d9593f17d9b489b87303e1d92725e220d9640e7971ac20e2d04d57bd",
+          "policy_digest": "52f0f584e9ea5c73f84afa389f3675396716a13b4331cc409531f3e75cfc30f3",
+          "role": "S"
+        },
+        "run": "policy_52f0f584e9ea5c73",
+        "scope": "accounting:issued_coverage"
+      },
+      {
+        "definition": "Registered policy metric eligibility; planned opportunities are never silently dropped.",
+        "denominator": 600,
+        "denominator_kind": "eligible_records",
+        "id": "pop_f116f7ef2cdd50fca1db204675a52dab",
+        "lineage": {
+          "input_fingerprint": "06506495aba159c0d25d6c8a618521e62c8da6ccbb650168966cb164cb1e9e4c",
+          "metric_definition": "591861596c0f1402ab48eeafa697f51514a5e347f1d932d04375fc0659549c17",
+          "policy_digest": "52f0f584e9ea5c73f84afa389f3675396716a13b4331cc409531f3e75cfc30f3",
+          "role": "S"
+        },
+        "run": "policy_52f0f584e9ea5c73",
+        "scope": "accounting:abstention_rate"
+      },
+      {
+        "definition": "Registered policy metric eligibility; planned opportunities are never silently dropped.",
+        "denominator": 600,
+        "denominator_kind": "eligible_records",
+        "id": "pop_f866a9a61150d65c65cf7b5116a197e2",
+        "lineage": {
+          "input_fingerprint": "06506495aba159c0d25d6c8a618521e62c8da6ccbb650168966cb164cb1e9e4c",
+          "metric_definition": "256e1c541221842f42ed09c1c6463eea5c86a3963af8a3403334aef786823c95",
+          "policy_digest": "52f0f584e9ea5c73f84afa389f3675396716a13b4331cc409531f3e75cfc30f3",
+          "role": "S"
+        },
+        "run": "policy_52f0f584e9ea5c73",
+        "scope": "accounting:deferral_rate"
+      },
+      {
+        "definition": "Registered policy metric eligibility; planned opportunities are never silently dropped.",
+        "denominator": 600,
+        "denominator_kind": "eligible_records",
+        "id": "pop_b87236d1568ef795f7a0d3784aaf1f02",
+        "lineage": {
+          "input_fingerprint": "06506495aba159c0d25d6c8a618521e62c8da6ccbb650168966cb164cb1e9e4c",
+          "metric_definition": "8292f3af71906a96883b73569a04454c660e17f9a1d218ed2b779ae5b3566351",
+          "policy_digest": "52f0f584e9ea5c73f84afa389f3675396716a13b4331cc409531f3e75cfc30f3",
+          "role": "S"
+        },
+        "run": "policy_52f0f584e9ea5c73",
+        "scope": "accounting:unavailable_rate"
+      },
+      {
+        "definition": "Registered policy metric eligibility; planned opportunities are never silently dropped.",
+        "denominator": 600,
+        "denominator_kind": "eligible_records",
+        "id": "pop_7cc6923a34df84f234977aaff38324c9",
+        "lineage": {
+          "input_fingerprint": "06506495aba159c0d25d6c8a618521e62c8da6ccbb650168966cb164cb1e9e4c",
+          "metric_definition": "4cfb695c59dd58461527b864621a3a37f0a20afc5055614cc0956c3b9a45f72f",
+          "policy_digest": "52f0f584e9ea5c73f84afa389f3675396716a13b4331cc409531f3e75cfc30f3",
+          "role": "S"
+        },
+        "run": "policy_52f0f584e9ea5c73",
+        "scope": "accounting:input_unavailable_rate"
+      },
+      {
+        "definition": "Registered policy metric eligibility; planned opportunities are never silently dropped.",
+        "denominator": 600,
+        "denominator_kind": "eligible_records",
+        "id": "pop_9e6d9ff85b79570dec599420b4434bce",
+        "lineage": {
+          "input_fingerprint": "06506495aba159c0d25d6c8a618521e62c8da6ccbb650168966cb164cb1e9e4c",
+          "metric_definition": "2a59ad5b58b12786ecd8824eccea5290a7318936ee810fe013d474935bf5a7bb",
+          "policy_digest": "52f0f584e9ea5c73f84afa389f3675396716a13b4331cc409531f3e75cfc30f3",
+          "role": "S"
+        },
+        "run": "policy_52f0f584e9ea5c73",
+        "scope": "accounting:issued_label_availability"
+      },
+      {
+        "definition": "Registered policy metric eligibility; planned opportunities are never silently dropped.",
+        "denominator": 600,
+        "denominator_kind": "eligible_records",
+        "id": "pop_a1931b4dc774df2c71f25018dc26956d",
+        "lineage": {
+          "input_fingerprint": "06506495aba159c0d25d6c8a618521e62c8da6ccbb650168966cb164cb1e9e4c",
+          "metric_definition": "81b8a118aba859081a6c40b4bcba40d98f65af3eaa03eeb2fa11debb8843ab9d",
+          "policy_digest": "52f0f584e9ea5c73f84afa389f3675396716a13b4331cc409531f3e75cfc30f3",
+          "role": "S"
+        },
+        "run": "policy_52f0f584e9ea5c73",
+        "scope": "accounting:labeled_issued_share"
+      },
+      {
+        "definition": "Registered policy metric eligibility; planned opportunities are never silently dropped.",
+        "denominator": 600,
+        "denominator_kind": "eligible_records",
+        "id": "pop_a1cb20ce345a7f887df29b69373277bc",
+        "lineage": {
+          "input_fingerprint": "06506495aba159c0d25d6c8a618521e62c8da6ccbb650168966cb164cb1e9e4c",
+          "metric_definition": "a7bb3be3f5ec692c9308a2db69c4482602cef011b1e7c6be50ee1a6971442389",
+          "policy_digest": "52f0f584e9ea5c73f84afa389f3675396716a13b4331cc409531f3e75cfc30f3",
+          "role": "S"
+        },
+        "run": "policy_52f0f584e9ea5c73",
+        "scope": "accounting:selective_risk"
+      }
+    ]
+  },
+  "findings": [],
+  "generated_at": "2026-11-03T20:57:58.589572+00:00",
+  "measurements": [
+    {
+      "applicability": "applicable",
+      "basis": "simulated",
+      "data": {
+        "eligible_outcomes": 600,
+        "issuance_meaning": "unestablished",
+        "issued": 0,
+        "records": 600
+      },
+      "denominator": 600,
+      "denominator_kind": "eligible_records",
+      "disclosure_group": "availability",
+      "evidence_refs": [],
+      "execution": "completed",
+      "family": "availability",
+      "id": "m1",
+      "interpretation": "descriptive",
+      "method_standing": "established_method",
+      "method_version": "1",
+      "metric": "population_coverage",
+      "population_id": "pop_d7c5ba541afde9febd2901d5ca8cfe48",
+      "reason": null,
+      "run": "policy_52f0f584e9ea5c73",
+      "scope": "overall",
+      "sensitive_counts": [
+        600,
+        0,
+        0,
+        600
+      ],
+      "support_warning": false,
+      "units": null,
+      "value": 1.0,
+      "value_state": "finite"
+    },
+    {
+      "applicability": "applicable",
+      "basis": "simulated",
+      "data": {},
+      "denominator": 600,
+      "denominator_kind": "eligible_records",
+      "disclosure_group": "performance",
+      "evidence_refs": [],
+      "execution": "completed",
+      "family": "performance",
+      "id": "m2",
+      "interpretation": "descriptive",
+      "method_standing": "established_method",
+      "method_version": "1",
+      "metric": "mae",
+      "population_id": "pop_0f3443af9f271dba484124bb49985314",
+      "reason": null,
+      "run": "policy_52f0f584e9ea5c73",
+      "scope": "overall",
+      "sensitive_counts": [],
+      "support_warning": false,
+      "units": "items",
+      "value": 3.7,
+      "value_state": "finite"
+    },
+    {
+      "applicability": "applicable",
+      "basis": "simulated",
+      "data": {},
+      "denominator": 600,
+      "denominator_kind": "eligible_records",
+      "disclosure_group": "performance",
+      "evidence_refs": [],
+      "execution": "completed",
+      "family": "performance",
+      "id": "m3",
+      "interpretation": "descriptive",
+      "method_standing": "established_method",
+      "method_version": "1",
+      "metric": "rmse",
+      "population_id": "pop_0f3443af9f271dba484124bb49985314",
+      "reason": null,
+      "run": "policy_52f0f584e9ea5c73",
+      "scope": "overall",
+      "sensitive_counts": [],
+      "support_warning": false,
+      "units": "items",
+      "value": 4.527692569068709,
+      "value_state": "finite"
+    },
+    {
+      "applicability": "applicable",
+      "basis": "simulated",
+      "data": {},
+      "denominator": 600,
+      "denominator_kind": "eligible_records",
+      "disclosure_group": "performance",
+      "evidence_refs": [],
+      "execution": "completed",
+      "family": "performance",
+      "id": "m4",
+      "interpretation": "descriptive",
+      "method_standing": "established_method",
+      "method_version": "1",
+      "metric": "bias",
+      "population_id": "pop_0f3443af9f271dba484124bb49985314",
+      "reason": null,
+      "run": "policy_52f0f584e9ea5c73",
+      "scope": "overall",
+      "sensitive_counts": [],
+      "support_warning": false,
+      "units": "items",
+      "value": 3.5,
+      "value_state": "finite"
+    },
+    {
+      "applicability": "applicable",
+      "basis": "simulated",
+      "data": {},
+      "denominator": 600,
+      "denominator_kind": "eligible_records",
+      "disclosure_group": "performance",
+      "evidence_refs": [],
+      "execution": "completed",
+      "family": "performance",
+      "id": "m5",
+      "interpretation": "descriptive",
+      "method_standing": "established_method",
+      "method_version": "1",
+      "metric": "median_absolute_error",
+      "population_id": "pop_0f3443af9f271dba484124bb49985314",
+      "reason": null,
+      "run": "policy_52f0f584e9ea5c73",
+      "scope": "overall",
+      "sensitive_counts": [],
+      "support_warning": false,
+      "units": "items",
+      "value": 3.5,
+      "value_state": "finite"
+    },
+    {
+      "applicability": "applicable",
+      "basis": "simulated",
+      "data": {},
+      "denominator": 600,
+      "denominator_kind": "eligible_records",
+      "disclosure_group": "performance",
+      "evidence_refs": [],
+      "execution": "completed",
+      "family": "performance",
+      "id": "m6",
+      "interpretation": "descriptive",
+      "method_standing": "established_method",
+      "method_version": "1",
+      "metric": "p90_absolute_error",
+      "population_id": "pop_0f3443af9f271dba484124bb49985314",
+      "reason": null,
+      "run": "policy_52f0f584e9ea5c73",
+      "scope": "overall",
+      "sensitive_counts": [],
+      "support_warning": false,
+      "units": "items",
+      "value": 7.100000000000023,
+      "value_state": "finite"
+    },
+    {
+      "applicability": "applicable",
+      "basis": "simulated",
+      "data": {},
+      "denominator": 600,
+      "denominator_kind": "eligible_records",
+      "disclosure_group": "performance",
+      "evidence_refs": [],
+      "execution": "completed",
+      "family": "performance",
+      "id": "m7",
+      "interpretation": "descriptive",
+      "method_standing": "established_method",
+      "method_version": "1",
+      "metric": "p95_absolute_error",
+      "population_id": "pop_0f3443af9f271dba484124bb49985314",
+      "reason": null,
+      "run": "policy_52f0f584e9ea5c73",
+      "scope": "overall",
+      "sensitive_counts": [],
+      "support_warning": false,
+      "units": "items",
+      "value": 8.0,
+      "value_state": "finite"
+    },
+    {
+      "applicability": "applicable",
+      "basis": "simulated",
+      "data": {},
+      "denominator": 600,
+      "denominator_kind": "eligible_records",
+      "disclosure_group": "performance",
+      "evidence_refs": [],
+      "execution": "completed",
+      "family": "performance",
+      "id": "m8",
+      "interpretation": "descriptive",
+      "method_standing": "established_method",
+      "method_version": "1",
+      "metric": "r2",
+      "population_id": "pop_0f3443af9f271dba484124bb49985314",
+      "reason": null,
+      "run": "policy_52f0f584e9ea5c73",
+      "scope": "overall",
+      "sensitive_counts": [],
+      "support_warning": false,
+      "units": null,
+      "value": -1.4848484848484835,
+      "value_state": "finite"
+    },
+    {
+      "applicability": "applicable",
+      "basis": "simulated",
+      "data": {
+        "absolute_quantiles": {
+          "p50": 3.5,
+          "p90": 7.100000000000023,
+          "p95": 8.0
+        },
+        "signs": [
+          {
+            "count": 480,
+            "sign": "positive"
+          },
+          {
+            "count": 60,
+            "sign": "negative"
+          },
+          {
+            "count": 60,
+            "sign": "zero"
+          }
+        ]
+      },
+      "denominator": 600,
+      "denominator_kind": "eligible_records",
+      "disclosure_group": "residuals",
+      "evidence_refs": [],
+      "execution": "completed",
+      "family": "residuals",
+      "id": "m9",
+      "interpretation": "descriptive",
+      "method_standing": "established_method",
+      "method_version": "1",
+      "metric": "residual_distribution",
+      "population_id": "pop_0f3443af9f271dba484124bb49985314",
+      "reason": null,
+      "run": "policy_52f0f584e9ea5c73",
+      "scope": "overall",
+      "sensitive_counts": [
+        480,
+        60,
+        60
+      ],
+      "support_warning": false,
+      "units": null,
+      "value": null,
+      "value_state": "undefined"
+    },
+    {
+      "applicability": "applicable",
+      "basis": "simulated",
+      "data": {
+        "basis": "observed_outcome",
+        "cells": null,
+        "definition_digest": "54cf210bd3c297cd62edf3b121b6319779c95bed4f8c30e4d72b5c5f1ca3227c",
+        "denominator": 600,
+        "metric": "empirical_cost",
+        "numerator": 23.99999999999999,
+        "planned": 600,
+        "reason": null,
+        "sensitive_counts": [
+          600,
+          0
+        ],
+        "statistic_kind": "mean",
+        "units": "cost_units",
+        "value": 0.03999999999999998,
+        "value_state": "finite"
+      },
+      "denominator": 600,
+      "denominator_kind": "eligible_records",
+      "evidence_basis": "observed_outcome",
+      "evidence_refs": [],
+      "execution": "completed",
+      "family": "policy",
+      "id": "policy_m10",
+      "interpretation": "descriptive",
+      "metric": "empirical_cost",
+      "population_id": "pop_8915ac9d554606eebd91801970c5f092",
+      "reason": null,
+      "run": "policy_8655301920984adc",
+      "scope": "quantity_cost",
+      "sensitive_counts": [
+        600,
+        0
+      ],
+      "units": "cost_units",
+      "value": 0.03999999999999998,
+      "value_state": "finite"
+    },
+    {
+      "applicability": "applicable",
+      "basis": "simulated",
+      "data": {
+        "basis": "operational",
+        "cells": null,
+        "definition_digest": "698ccff8d9593f17d9b489b87303e1d92725e220d9640e7971ac20e2d04d57bd",
+        "denominator": 600,
+        "metric": "issued_coverage",
+        "numerator": 600.0,
+        "planned": 600,
+        "reason": null,
+        "sensitive_counts": [
+          600,
+          0,
+          600,
+          0
+        ],
+        "statistic_kind": "mean",
+        "units": "fraction",
+        "value": 1.0,
+        "value_state": "finite"
+      },
+      "denominator": 600,
+      "denominator_kind": "eligible_records",
+      "evidence_basis": "operational",
+      "evidence_refs": [],
+      "execution": "completed",
+      "family": "policy",
+      "id": "policy_m11",
+      "interpretation": "descriptive",
+      "metric": "issued_coverage",
+      "population_id": "pop_63567145c21b4ac11ac7a1233b4d4c04",
+      "reason": null,
+      "run": "policy_8655301920984adc",
+      "scope": "accounting:issued_coverage",
+      "sensitive_counts": [
+        600,
+        0,
+        600,
+        0
+      ],
+      "units": "fraction",
+      "value": 1.0,
+      "value_state": "finite"
+    },
+    {
+      "applicability": "applicable",
+      "basis": "simulated",
+      "data": {
+        "basis": "operational",
+        "cells": null,
+        "definition_digest": "591861596c0f1402ab48eeafa697f51514a5e347f1d932d04375fc0659549c17",
+        "denominator": 600,
+        "metric": "abstention_rate",
+        "numerator": 0.0,
+        "planned": 600,
+        "reason": null,
+        "sensitive_counts": [
+          600,
+          0,
+          0,
+          600
+        ],
+        "statistic_kind": "mean",
+        "units": "fraction",
+        "value": 0.0,
+        "value_state": "finite"
+      },
+      "denominator": 600,
+      "denominator_kind": "eligible_records",
+      "evidence_basis": "operational",
+      "evidence_refs": [],
+      "execution": "completed",
+      "family": "policy",
+      "id": "policy_m12",
+      "interpretation": "descriptive",
+      "metric": "abstention_rate",
+      "population_id": "pop_b4a72ea88c496d59eb69d27b01b8d128",
+      "reason": null,
+      "run": "policy_8655301920984adc",
+      "scope": "accounting:abstention_rate",
+      "sensitive_counts": [
+        600,
+        0,
+        0,
+        600
+      ],
+      "units": "fraction",
+      "value": 0.0,
+      "value_state": "finite"
+    },
+    {
+      "applicability": "applicable",
+      "basis": "simulated",
+      "data": {
+        "basis": "operational",
+        "cells": null,
+        "definition_digest": "256e1c541221842f42ed09c1c6463eea5c86a3963af8a3403334aef786823c95",
+        "denominator": 600,
+        "metric": "deferral_rate",
+        "numerator": 0.0,
+        "planned": 600,
+        "reason": null,
+        "sensitive_counts": [
+          600,
+          0,
+          0,
+          600
+        ],
+        "statistic_kind": "mean",
+        "units": "fraction",
+        "value": 0.0,
+        "value_state": "finite"
+      },
+      "denominator": 600,
+      "denominator_kind": "eligible_records",
+      "evidence_basis": "operational",
+      "evidence_refs": [],
+      "execution": "completed",
+      "family": "policy",
+      "id": "policy_m13",
+      "interpretation": "descriptive",
+      "metric": "deferral_rate",
+      "population_id": "pop_344cfb475f1411ccb85acef36f987b9f",
+      "reason": null,
+      "run": "policy_8655301920984adc",
+      "scope": "accounting:deferral_rate",
+      "sensitive_counts": [
+        600,
+        0,
+        0,
+        600
+      ],
+      "units": "fraction",
+      "value": 0.0,
+      "value_state": "finite"
+    },
+    {
+      "applicability": "applicable",
+      "basis": "simulated",
+      "data": {
+        "basis": "operational",
+        "cells": null,
+        "definition_digest": "8292f3af71906a96883b73569a04454c660e17f9a1d218ed2b779ae5b3566351",
+        "denominator": 600,
+        "metric": "unavailable_rate",
+        "numerator": 0.0,
+        "planned": 600,
+        "reason": null,
+        "sensitive_counts": [
+          600,
+          0,
+          0,
+          600
+        ],
+        "statistic_kind": "mean",
+        "units": "fraction",
+        "value": 0.0,
+        "value_state": "finite"
+      },
+      "denominator": 600,
+      "denominator_kind": "eligible_records",
+      "evidence_basis": "operational",
+      "evidence_refs": [],
+      "execution": "completed",
+      "family": "policy",
+      "id": "policy_m14",
+      "interpretation": "descriptive",
+      "metric": "unavailable_rate",
+      "population_id": "pop_57ebfad051ef34460f258db6947149cb",
+      "reason": null,
+      "run": "policy_8655301920984adc",
+      "scope": "accounting:unavailable_rate",
+      "sensitive_counts": [
+        600,
+        0,
+        0,
+        600
+      ],
+      "units": "fraction",
+      "value": 0.0,
+      "value_state": "finite"
+    },
+    {
+      "applicability": "applicable",
+      "basis": "simulated",
+      "data": {
+        "basis": "operational",
+        "cells": null,
+        "definition_digest": "4cfb695c59dd58461527b864621a3a37f0a20afc5055614cc0956c3b9a45f72f",
+        "denominator": 600,
+        "metric": "input_unavailable_rate",
+        "numerator": 0.0,
+        "planned": 600,
+        "reason": null,
+        "sensitive_counts": [
+          600,
+          0,
+          0,
+          600
+        ],
+        "statistic_kind": "mean",
+        "units": "fraction",
+        "value": 0.0,
+        "value_state": "finite"
+      },
+      "denominator": 600,
+      "denominator_kind": "eligible_records",
+      "evidence_basis": "operational",
+      "evidence_refs": [],
+      "execution": "completed",
+      "family": "policy",
+      "id": "policy_m15",
+      "interpretation": "descriptive",
+      "metric": "input_unavailable_rate",
+      "population_id": "pop_1c73d3cda824534cc75ad2c0c21adf48",
+      "reason": null,
+      "run": "policy_8655301920984adc",
+      "scope": "accounting:input_unavailable_rate",
+      "sensitive_counts": [
+        600,
+        0,
+        0,
+        600
+      ],
+      "units": "fraction",
+      "value": 0.0,
+      "value_state": "finite"
+    },
+    {
+      "applicability": "applicable",
+      "basis": "simulated",
+      "data": {
+        "basis": "observed_outcome",
+        "cells": null,
+        "definition_digest": "2a59ad5b58b12786ecd8824eccea5290a7318936ee810fe013d474935bf5a7bb",
+        "denominator": 600,
+        "metric": "issued_label_availability",
+        "numerator": 600.0,
+        "planned": 600,
+        "reason": null,
+        "sensitive_counts": [
+          600,
+          0,
+          600,
+          0
+        ],
+        "statistic_kind": "mean",
+        "units": "fraction",
+        "value": 1.0,
+        "value_state": "finite"
+      },
+      "denominator": 600,
+      "denominator_kind": "eligible_records",
+      "evidence_basis": "observed_outcome",
+      "evidence_refs": [],
+      "execution": "completed",
+      "family": "policy",
+      "id": "policy_m16",
+      "interpretation": "descriptive",
+      "metric": "issued_label_availability",
+      "population_id": "pop_a6406932a5417923d6d94e8513f13a8f",
+      "reason": null,
+      "run": "policy_8655301920984adc",
+      "scope": "accounting:issued_label_availability",
+      "sensitive_counts": [
+        600,
+        0,
+        600,
+        0
+      ],
+      "units": "fraction",
+      "value": 1.0,
+      "value_state": "finite"
+    },
+    {
+      "applicability": "applicable",
+      "basis": "simulated",
+      "data": {
+        "basis": "observed_outcome",
+        "cells": null,
+        "definition_digest": "81b8a118aba859081a6c40b4bcba40d98f65af3eaa03eeb2fa11debb8843ab9d",
+        "denominator": 600,
+        "metric": "labeled_issued_share",
+        "numerator": 600.0,
+        "planned": 600,
+        "reason": null,
+        "sensitive_counts": [
+          600,
+          0,
+          600,
+          0
+        ],
+        "statistic_kind": "mean",
+        "units": "fraction",
+        "value": 1.0,
+        "value_state": "finite"
+      },
+      "denominator": 600,
+      "denominator_kind": "eligible_records",
+      "evidence_basis": "observed_outcome",
+      "evidence_refs": [],
+      "execution": "completed",
+      "family": "policy",
+      "id": "policy_m17",
+      "interpretation": "descriptive",
+      "metric": "labeled_issued_share",
+      "population_id": "pop_e7e46bea75bfddeb797f0626e810dc36",
+      "reason": null,
+      "run": "policy_8655301920984adc",
+      "scope": "accounting:labeled_issued_share",
+      "sensitive_counts": [
+        600,
+        0,
+        600,
+        0
+      ],
+      "units": "fraction",
+      "value": 1.0,
+      "value_state": "finite"
+    },
+    {
+      "applicability": "applicable",
+      "basis": "simulated",
+      "data": {
+        "basis": "observed_outcome",
+        "cells": null,
+        "definition_digest": "a7bb3be3f5ec692c9308a2db69c4482602cef011b1e7c6be50ee1a6971442389",
+        "denominator": 600,
+        "metric": "selective_risk",
+        "numerator": 119.99999999999997,
+        "planned": 600,
+        "reason": null,
+        "sensitive_counts": [
+          600,
+          0
+        ],
+        "statistic_kind": "mean",
+        "units": "native_loss_units",
+        "value": 0.19999999999999996,
+        "value_state": "finite"
+      },
+      "denominator": 600,
+      "denominator_kind": "eligible_records",
+      "evidence_basis": "observed_outcome",
+      "evidence_refs": [],
+      "execution": "completed",
+      "family": "policy",
+      "id": "policy_m18",
+      "interpretation": "descriptive",
+      "metric": "selective_risk",
+      "population_id": "pop_125541f346e571ec0960409baca75149",
+      "reason": null,
+      "run": "policy_8655301920984adc",
+      "scope": "accounting:selective_risk",
+      "sensitive_counts": [
+        600,
+        0
+      ],
+      "units": "native_loss_units",
+      "value": 0.19999999999999996,
+      "value_state": "finite"
+    },
+    {
+      "applicability": "applicable",
+      "basis": "simulated",
+      "data": {
+        "basis": "observed_outcome",
+        "cells": null,
+        "definition_digest": "54cf210bd3c297cd62edf3b121b6319779c95bed4f8c30e4d72b5c5f1ca3227c",
+        "denominator": 600,
+        "metric": "empirical_cost",
+        "numerator": 1800.0,
+        "planned": 600,
+        "reason": null,
+        "sensitive_counts": [
+          600,
+          0
+        ],
+        "statistic_kind": "mean",
+        "units": "cost_units",
+        "value": 3.0,
+        "value_state": "finite"
+      },
+      "denominator": 600,
+      "denominator_kind": "eligible_records",
+      "evidence_basis": "observed_outcome",
+      "evidence_refs": [],
+      "execution": "completed",
+      "family": "policy",
+      "id": "policy_m19",
+      "interpretation": "descriptive",
+      "metric": "empirical_cost",
+      "population_id": "pop_7c1bd6debdcf4cf96ccd15c0d6e46d3f",
+      "reason": null,
+      "run": "policy_3206e30d5c5ba8a7",
+      "scope": "quantity_cost",
+      "sensitive_counts": [
+        600,
+        0
+      ],
+      "units": "cost_units",
+      "value": 3.0,
+      "value_state": "finite"
+    },
+    {
+      "applicability": "applicable",
+      "basis": "simulated",
+      "data": {
+        "basis": "operational",
+        "cells": null,
+        "definition_digest": "698ccff8d9593f17d9b489b87303e1d92725e220d9640e7971ac20e2d04d57bd",
+        "denominator": 600,
+        "metric": "issued_coverage",
+        "numerator": 0.0,
+        "planned": 600,
+        "reason": null,
+        "sensitive_counts": [
+          600,
+          0,
+          0,
+          600
+        ],
+        "statistic_kind": "mean",
+        "units": "fraction",
+        "value": 0.0,
+        "value_state": "finite"
+      },
+      "denominator": 600,
+      "denominator_kind": "eligible_records",
+      "evidence_basis": "operational",
+      "evidence_refs": [],
+      "execution": "completed",
+      "family": "policy",
+      "id": "policy_m20",
+      "interpretation": "descriptive",
+      "metric": "issued_coverage",
+      "population_id": "pop_5718f881237a2bc73d0f0e34eeda0f8f",
+      "reason": null,
+      "run": "policy_3206e30d5c5ba8a7",
+      "scope": "accounting:issued_coverage",
+      "sensitive_counts": [
+        600,
+        0,
+        0,
+        600
+      ],
+      "units": "fraction",
+      "value": 0.0,
+      "value_state": "finite"
+    },
+    {
+      "applicability": "applicable",
+      "basis": "simulated",
+      "data": {
+        "basis": "operational",
+        "cells": null,
+        "definition_digest": "591861596c0f1402ab48eeafa697f51514a5e347f1d932d04375fc0659549c17",
+        "denominator": 600,
+        "metric": "abstention_rate",
+        "numerator": 600.0,
+        "planned": 600,
+        "reason": null,
+        "sensitive_counts": [
+          600,
+          0,
+          600,
+          0
+        ],
+        "statistic_kind": "mean",
+        "units": "fraction",
+        "value": 1.0,
+        "value_state": "finite"
+      },
+      "denominator": 600,
+      "denominator_kind": "eligible_records",
+      "evidence_basis": "operational",
+      "evidence_refs": [],
+      "execution": "completed",
+      "family": "policy",
+      "id": "policy_m21",
+      "interpretation": "descriptive",
+      "metric": "abstention_rate",
+      "population_id": "pop_cf7fbfb1f9d5df8570d86d57c699984b",
+      "reason": null,
+      "run": "policy_3206e30d5c5ba8a7",
+      "scope": "accounting:abstention_rate",
+      "sensitive_counts": [
+        600,
+        0,
+        600,
+        0
+      ],
+      "units": "fraction",
+      "value": 1.0,
+      "value_state": "finite"
+    },
+    {
+      "applicability": "applicable",
+      "basis": "simulated",
+      "data": {
+        "basis": "operational",
+        "cells": null,
+        "definition_digest": "256e1c541221842f42ed09c1c6463eea5c86a3963af8a3403334aef786823c95",
+        "denominator": 600,
+        "metric": "deferral_rate",
+        "numerator": 0.0,
+        "planned": 600,
+        "reason": null,
+        "sensitive_counts": [
+          600,
+          0,
+          0,
+          600
+        ],
+        "statistic_kind": "mean",
+        "units": "fraction",
+        "value": 0.0,
+        "value_state": "finite"
+      },
+      "denominator": 600,
+      "denominator_kind": "eligible_records",
+      "evidence_basis": "operational",
+      "evidence_refs": [],
+      "execution": "completed",
+      "family": "policy",
+      "id": "policy_m22",
+      "interpretation": "descriptive",
+      "metric": "deferral_rate",
+      "population_id": "pop_6f828fc92e508d30d47f30674fd57900",
+      "reason": null,
+      "run": "policy_3206e30d5c5ba8a7",
+      "scope": "accounting:deferral_rate",
+      "sensitive_counts": [
+        600,
+        0,
+        0,
+        600
+      ],
+      "units": "fraction",
+      "value": 0.0,
+      "value_state": "finite"
+    },
+    {
+      "applicability": "applicable",
+      "basis": "simulated",
+      "data": {
+        "basis": "operational",
+        "cells": null,
+        "definition_digest": "8292f3af71906a96883b73569a04454c660e17f9a1d218ed2b779ae5b3566351",
+        "denominator": 600,
+        "metric": "unavailable_rate",
+        "numerator": 0.0,
+        "planned": 600,
+        "reason": null,
+        "sensitive_counts": [
+          600,
+          0,
+          0,
+          600
+        ],
+        "statistic_kind": "mean",
+        "units": "fraction",
+        "value": 0.0,
+        "value_state": "finite"
+      },
+      "denominator": 600,
+      "denominator_kind": "eligible_records",
+      "evidence_basis": "operational",
+      "evidence_refs": [],
+      "execution": "completed",
+      "family": "policy",
+      "id": "policy_m23",
+      "interpretation": "descriptive",
+      "metric": "unavailable_rate",
+      "population_id": "pop_5df93c9e6ceae3b4617ff8bd99ec1fd8",
+      "reason": null,
+      "run": "policy_3206e30d5c5ba8a7",
+      "scope": "accounting:unavailable_rate",
+      "sensitive_counts": [
+        600,
+        0,
+        0,
+        600
+      ],
+      "units": "fraction",
+      "value": 0.0,
+      "value_state": "finite"
+    },
+    {
+      "applicability": "applicable",
+      "basis": "simulated",
+      "data": {
+        "basis": "operational",
+        "cells": null,
+        "definition_digest": "4cfb695c59dd58461527b864621a3a37f0a20afc5055614cc0956c3b9a45f72f",
+        "denominator": 600,
+        "metric": "input_unavailable_rate",
+        "numerator": 0.0,
+        "planned": 600,
+        "reason": null,
+        "sensitive_counts": [
+          600,
+          0,
+          0,
+          600
+        ],
+        "statistic_kind": "mean",
+        "units": "fraction",
+        "value": 0.0,
+        "value_state": "finite"
+      },
+      "denominator": 600,
+      "denominator_kind": "eligible_records",
+      "evidence_basis": "operational",
+      "evidence_refs": [],
+      "execution": "completed",
+      "family": "policy",
+      "id": "policy_m24",
+      "interpretation": "descriptive",
+      "metric": "input_unavailable_rate",
+      "population_id": "pop_4c002ad4c5d5044de3384b6e671c2713",
+      "reason": null,
+      "run": "policy_3206e30d5c5ba8a7",
+      "scope": "accounting:input_unavailable_rate",
+      "sensitive_counts": [
+        600,
+        0,
+        0,
+        600
+      ],
+      "units": "fraction",
+      "value": 0.0,
+      "value_state": "finite"
+    },
+    {
+      "applicability": "blocked",
+      "basis": "simulated",
+      "data": {
+        "basis": "observed_outcome",
+        "cells": null,
+        "definition_digest": "2a59ad5b58b12786ecd8824eccea5290a7318936ee810fe013d474935bf5a7bb",
+        "denominator": 0,
+        "metric": "issued_label_availability",
+        "numerator": null,
+        "planned": 600,
+        "reason": "zero_denominator",
+        "sensitive_counts": [
+          0,
+          600,
+          0,
+          0
+        ],
+        "statistic_kind": "mean",
+        "units": "fraction",
+        "value": null,
+        "value_state": "undefined"
+      },
+      "denominator": 0,
+      "denominator_kind": "eligible_records",
+      "evidence_basis": "observed_outcome",
+      "evidence_refs": [],
+      "execution": "completed",
+      "family": "policy",
+      "id": "policy_m25",
+      "interpretation": "descriptive",
+      "metric": "issued_label_availability",
+      "population_id": "pop_9ff5f2de20f8473a3859e6672d414e0c",
+      "reason": "zero_denominator",
+      "run": "policy_3206e30d5c5ba8a7",
+      "scope": "accounting:issued_label_availability",
+      "sensitive_counts": [
+        0,
+        600,
+        0,
+        0
+      ],
+      "units": "fraction",
+      "value": null,
+      "value_state": "undefined"
+    },
+    {
+      "applicability": "applicable",
+      "basis": "simulated",
+      "data": {
+        "basis": "observed_outcome",
+        "cells": null,
+        "definition_digest": "81b8a118aba859081a6c40b4bcba40d98f65af3eaa03eeb2fa11debb8843ab9d",
+        "denominator": 600,
+        "metric": "labeled_issued_share",
+        "numerator": 0.0,
+        "planned": 600,
+        "reason": null,
+        "sensitive_counts": [
+          600,
+          0,
+          0,
+          600
+        ],
+        "statistic_kind": "mean",
+        "units": "fraction",
+        "value": 0.0,
+        "value_state": "finite"
+      },
+      "denominator": 600,
+      "denominator_kind": "eligible_records",
+      "evidence_basis": "observed_outcome",
+      "evidence_refs": [],
+      "execution": "completed",
+      "family": "policy",
+      "id": "policy_m26",
+      "interpretation": "descriptive",
+      "metric": "labeled_issued_share",
+      "population_id": "pop_41e03f8491b71373254b72c945736514",
+      "reason": null,
+      "run": "policy_3206e30d5c5ba8a7",
+      "scope": "accounting:labeled_issued_share",
+      "sensitive_counts": [
+        600,
+        0,
+        0,
+        600
+      ],
+      "units": "fraction",
+      "value": 0.0,
+      "value_state": "finite"
+    },
+    {
+      "applicability": "blocked",
+      "basis": "simulated",
+      "data": {
+        "basis": "observed_outcome",
+        "cells": null,
+        "definition_digest": "a7bb3be3f5ec692c9308a2db69c4482602cef011b1e7c6be50ee1a6971442389",
+        "denominator": 0,
+        "metric": "selective_risk",
+        "numerator": null,
+        "planned": 600,
+        "reason": "zero_denominator",
+        "sensitive_counts": [
+          0,
+          600,
+          0,
+          0
+        ],
+        "statistic_kind": "mean",
+        "units": "native_loss_units",
+        "value": null,
+        "value_state": "undefined"
+      },
+      "denominator": 0,
+      "denominator_kind": "eligible_records",
+      "evidence_basis": "observed_outcome",
+      "evidence_refs": [],
+      "execution": "completed",
+      "family": "policy",
+      "id": "policy_m27",
+      "interpretation": "descriptive",
+      "metric": "selective_risk",
+      "population_id": "pop_dd7394d8245152ed1a2f1c030193730c",
+      "reason": "zero_denominator",
+      "run": "policy_3206e30d5c5ba8a7",
+      "scope": "accounting:selective_risk",
+      "sensitive_counts": [
+        0,
+        600,
+        0,
+        0
+      ],
+      "units": "native_loss_units",
+      "value": null,
+      "value_state": "undefined"
+    },
+    {
+      "applicability": "applicable",
+      "basis": "simulated",
+      "data": {
+        "basis": "observed_outcome",
+        "cells": null,
+        "definition_digest": "54cf210bd3c297cd62edf3b121b6319779c95bed4f8c30e4d72b5c5f1ca3227c",
+        "denominator": 600,
+        "metric": "empirical_cost",
+        "numerator": 1380.0,
+        "planned": 600,
+        "reason": null,
+        "sensitive_counts": [
+          600,
+          0
+        ],
+        "statistic_kind": "mean",
+        "units": "cost_units",
+        "value": 2.3,
+        "value_state": "finite"
+      },
+      "denominator": 600,
+      "denominator_kind": "eligible_records",
+      "evidence_basis": "observed_outcome",
+      "evidence_refs": [],
+      "execution": "completed",
+      "family": "policy",
+      "id": "policy_m28",
+      "interpretation": "descriptive",
+      "metric": "empirical_cost",
+      "population_id": "pop_cbe64cb549784c38d4efdce39c1f3447",
+      "reason": null,
+      "run": "policy_2843e6e468688302",
+      "scope": "quantity_cost",
+      "sensitive_counts": [
+        600,
+        0
+      ],
+      "units": "cost_units",
+      "value": 2.3,
+      "value_state": "finite"
+    },
+    {
+      "applicability": "applicable",
+      "basis": "simulated",
+      "data": {
+        "basis": "operational",
+        "cells": null,
+        "definition_digest": "698ccff8d9593f17d9b489b87303e1d92725e220d9640e7971ac20e2d04d57bd",
+        "denominator": 600,
+        "metric": "issued_coverage",
+        "numerator": 600.0,
+        "planned": 600,
+        "reason": null,
+        "sensitive_counts": [
+          600,
+          0,
+          600,
+          0
+        ],
+        "statistic_kind": "mean",
+        "units": "fraction",
+        "value": 1.0,
+        "value_state": "finite"
+      },
+      "denominator": 600,
+      "denominator_kind": "eligible_records",
+      "evidence_basis": "operational",
+      "evidence_refs": [],
+      "execution": "completed",
+      "family": "policy",
+      "id": "policy_m29",
+      "interpretation": "descriptive",
+      "metric": "issued_coverage",
+      "population_id": "pop_ee08392621570f8f95edc4d8f6840b24",
+      "reason": null,
+      "run": "policy_2843e6e468688302",
+      "scope": "accounting:issued_coverage",
+      "sensitive_counts": [
+        600,
+        0,
+        600,
+        0
+      ],
+      "units": "fraction",
+      "value": 1.0,
+      "value_state": "finite"
+    },
+    {
+      "applicability": "applicable",
+      "basis": "simulated",
+      "data": {
+        "basis": "operational",
+        "cells": null,
+        "definition_digest": "591861596c0f1402ab48eeafa697f51514a5e347f1d932d04375fc0659549c17",
+        "denominator": 600,
+        "metric": "abstention_rate",
+        "numerator": 0.0,
+        "planned": 600,
+        "reason": null,
+        "sensitive_counts": [
+          600,
+          0,
+          0,
+          600
+        ],
+        "statistic_kind": "mean",
+        "units": "fraction",
+        "value": 0.0,
+        "value_state": "finite"
+      },
+      "denominator": 600,
+      "denominator_kind": "eligible_records",
+      "evidence_basis": "operational",
+      "evidence_refs": [],
+      "execution": "completed",
+      "family": "policy",
+      "id": "policy_m30",
+      "interpretation": "descriptive",
+      "metric": "abstention_rate",
+      "population_id": "pop_664beca2669eb3693779565750a0362c",
+      "reason": null,
+      "run": "policy_2843e6e468688302",
+      "scope": "accounting:abstention_rate",
+      "sensitive_counts": [
+        600,
+        0,
+        0,
+        600
+      ],
+      "units": "fraction",
+      "value": 0.0,
+      "value_state": "finite"
+    },
+    {
+      "applicability": "applicable",
+      "basis": "simulated",
+      "data": {
+        "basis": "operational",
+        "cells": null,
+        "definition_digest": "256e1c541221842f42ed09c1c6463eea5c86a3963af8a3403334aef786823c95",
+        "denominator": 600,
+        "metric": "deferral_rate",
+        "numerator": 0.0,
+        "planned": 600,
+        "reason": null,
+        "sensitive_counts": [
+          600,
+          0,
+          0,
+          600
+        ],
+        "statistic_kind": "mean",
+        "units": "fraction",
+        "value": 0.0,
+        "value_state": "finite"
+      },
+      "denominator": 600,
+      "denominator_kind": "eligible_records",
+      "evidence_basis": "operational",
+      "evidence_refs": [],
+      "execution": "completed",
+      "family": "policy",
+      "id": "policy_m31",
+      "interpretation": "descriptive",
+      "metric": "deferral_rate",
+      "population_id": "pop_51adab44724f21ebd89c6b31971c7153",
+      "reason": null,
+      "run": "policy_2843e6e468688302",
+      "scope": "accounting:deferral_rate",
+      "sensitive_counts": [
+        600,
+        0,
+        0,
+        600
+      ],
+      "units": "fraction",
+      "value": 0.0,
+      "value_state": "finite"
+    },
+    {
+      "applicability": "applicable",
+      "basis": "simulated",
+      "data": {
+        "basis": "operational",
+        "cells": null,
+        "definition_digest": "8292f3af71906a96883b73569a04454c660e17f9a1d218ed2b779ae5b3566351",
+        "denominator": 600,
+        "metric": "unavailable_rate",
+        "numerator": 0.0,
+        "planned": 600,
+        "reason": null,
+        "sensitive_counts": [
+          600,
+          0,
+          0,
+          600
+        ],
+        "statistic_kind": "mean",
+        "units": "fraction",
+        "value": 0.0,
+        "value_state": "finite"
+      },
+      "denominator": 600,
+      "denominator_kind": "eligible_records",
+      "evidence_basis": "operational",
+      "evidence_refs": [],
+      "execution": "completed",
+      "family": "policy",
+      "id": "policy_m32",
+      "interpretation": "descriptive",
+      "metric": "unavailable_rate",
+      "population_id": "pop_7eb9b1796d386061569615e62741e31a",
+      "reason": null,
+      "run": "policy_2843e6e468688302",
+      "scope": "accounting:unavailable_rate",
+      "sensitive_counts": [
+        600,
+        0,
+        0,
+        600
+      ],
+      "units": "fraction",
+      "value": 0.0,
+      "value_state": "finite"
+    },
+    {
+      "applicability": "applicable",
+      "basis": "simulated",
+      "data": {
+        "basis": "operational",
+        "cells": null,
+        "definition_digest": "4cfb695c59dd58461527b864621a3a37f0a20afc5055614cc0956c3b9a45f72f",
+        "denominator": 600,
+        "metric": "input_unavailable_rate",
+        "numerator": 0.0,
+        "planned": 600,
+        "reason": null,
+        "sensitive_counts": [
+          600,
+          0,
+          0,
+          600
+        ],
+        "statistic_kind": "mean",
+        "units": "fraction",
+        "value": 0.0,
+        "value_state": "finite"
+      },
+      "denominator": 600,
+      "denominator_kind": "eligible_records",
+      "evidence_basis": "operational",
+      "evidence_refs": [],
+      "execution": "completed",
+      "family": "policy",
+      "id": "policy_m33",
+      "interpretation": "descriptive",
+      "metric": "input_unavailable_rate",
+      "population_id": "pop_db9d103715dcc1a758044837805fb85d",
+      "reason": null,
+      "run": "policy_2843e6e468688302",
+      "scope": "accounting:input_unavailable_rate",
+      "sensitive_counts": [
+        600,
+        0,
+        0,
+        600
+      ],
+      "units": "fraction",
+      "value": 0.0,
+      "value_state": "finite"
+    },
+    {
+      "applicability": "applicable",
+      "basis": "simulated",
+      "data": {
+        "basis": "observed_outcome",
+        "cells": null,
+        "definition_digest": "2a59ad5b58b12786ecd8824eccea5290a7318936ee810fe013d474935bf5a7bb",
+        "denominator": 600,
+        "metric": "issued_label_availability",
+        "numerator": 600.0,
+        "planned": 600,
+        "reason": null,
+        "sensitive_counts": [
+          600,
+          0,
+          600,
+          0
+        ],
+        "statistic_kind": "mean",
+        "units": "fraction",
+        "value": 1.0,
+        "value_state": "finite"
+      },
+      "denominator": 600,
+      "denominator_kind": "eligible_records",
+      "evidence_basis": "observed_outcome",
+      "evidence_refs": [],
+      "execution": "completed",
+      "family": "policy",
+      "id": "policy_m34",
+      "interpretation": "descriptive",
+      "metric": "issued_label_availability",
+      "population_id": "pop_8a24862ccb0d79f16c066926c088ea9c",
+      "reason": null,
+      "run": "policy_2843e6e468688302",
+      "scope": "accounting:issued_label_availability",
+      "sensitive_counts": [
+        600,
+        0,
+        600,
+        0
+      ],
+      "units": "fraction",
+      "value": 1.0,
+      "value_state": "finite"
+    },
+    {
+      "applicability": "applicable",
+      "basis": "simulated",
+      "data": {
+        "basis": "observed_outcome",
+        "cells": null,
+        "definition_digest": "81b8a118aba859081a6c40b4bcba40d98f65af3eaa03eeb2fa11debb8843ab9d",
+        "denominator": 600,
+        "metric": "labeled_issued_share",
+        "numerator": 600.0,
+        "planned": 600,
+        "reason": null,
+        "sensitive_counts": [
+          600,
+          0,
+          600,
+          0
+        ],
+        "statistic_kind": "mean",
+        "units": "fraction",
+        "value": 1.0,
+        "value_state": "finite"
+      },
+      "denominator": 600,
+      "denominator_kind": "eligible_records",
+      "evidence_basis": "observed_outcome",
+      "evidence_refs": [],
+      "execution": "completed",
+      "family": "policy",
+      "id": "policy_m35",
+      "interpretation": "descriptive",
+      "metric": "labeled_issued_share",
+      "population_id": "pop_be64ba4869ac7e7646591c290a967d8c",
+      "reason": null,
+      "run": "policy_2843e6e468688302",
+      "scope": "accounting:labeled_issued_share",
+      "sensitive_counts": [
+        600,
+        0,
+        600,
+        0
+      ],
+      "units": "fraction",
+      "value": 1.0,
+      "value_state": "finite"
+    },
+    {
+      "applicability": "applicable",
+      "basis": "simulated",
+      "data": {
+        "basis": "observed_outcome",
+        "cells": null,
+        "definition_digest": "a7bb3be3f5ec692c9308a2db69c4482602cef011b1e7c6be50ee1a6971442389",
+        "denominator": 600,
+        "metric": "selective_risk",
+        "numerator": 1860.0,
+        "planned": 600,
+        "reason": null,
+        "sensitive_counts": [
+          600,
+          0
+        ],
+        "statistic_kind": "mean",
+        "units": "native_loss_units",
+        "value": 3.1,
+        "value_state": "finite"
+      },
+      "denominator": 600,
+      "denominator_kind": "eligible_records",
+      "evidence_basis": "observed_outcome",
+      "evidence_refs": [],
+      "execution": "completed",
+      "family": "policy",
+      "id": "policy_m36",
+      "interpretation": "descriptive",
+      "metric": "selective_risk",
+      "population_id": "pop_dccfee1cb538f073b7d516b292c18b3f",
+      "reason": null,
+      "run": "policy_2843e6e468688302",
+      "scope": "accounting:selective_risk",
+      "sensitive_counts": [
+        600,
+        0
+      ],
+      "units": "native_loss_units",
+      "value": 3.1,
+      "value_state": "finite"
+    },
+    {
+      "applicability": "applicable",
+      "basis": "simulated",
+      "data": {
+        "basis": "observed_outcome",
+        "cells": null,
+        "definition_digest": "54cf210bd3c297cd62edf3b121b6319779c95bed4f8c30e4d72b5c5f1ca3227c",
+        "denominator": 600,
+        "metric": "empirical_cost",
+        "numerator": 840.0,
+        "planned": 600,
+        "reason": null,
+        "sensitive_counts": [
+          600,
+          0
+        ],
+        "statistic_kind": "mean",
+        "units": "cost_units",
+        "value": 1.4,
+        "value_state": "finite"
+      },
+      "denominator": 600,
+      "denominator_kind": "eligible_records",
+      "evidence_basis": "observed_outcome",
+      "evidence_refs": [],
+      "execution": "completed",
+      "family": "policy",
+      "id": "policy_m37",
+      "interpretation": "descriptive",
+      "metric": "empirical_cost",
+      "population_id": "pop_197711048366c879c19da00ede3935ea",
+      "reason": null,
+      "run": "policy_2a11341d9be30a72",
+      "scope": "quantity_cost",
+      "sensitive_counts": [
+        600,
+        0
+      ],
+      "units": "cost_units",
+      "value": 1.4,
+      "value_state": "finite"
+    },
+    {
+      "applicability": "applicable",
+      "basis": "simulated",
+      "data": {
+        "basis": "operational",
+        "cells": null,
+        "definition_digest": "698ccff8d9593f17d9b489b87303e1d92725e220d9640e7971ac20e2d04d57bd",
+        "denominator": 600,
+        "metric": "issued_coverage",
+        "numerator": 600.0,
+        "planned": 600,
+        "reason": null,
+        "sensitive_counts": [
+          600,
+          0,
+          600,
+          0
+        ],
+        "statistic_kind": "mean",
+        "units": "fraction",
+        "value": 1.0,
+        "value_state": "finite"
+      },
+      "denominator": 600,
+      "denominator_kind": "eligible_records",
+      "evidence_basis": "operational",
+      "evidence_refs": [],
+      "execution": "completed",
+      "family": "policy",
+      "id": "policy_m38",
+      "interpretation": "descriptive",
+      "metric": "issued_coverage",
+      "population_id": "pop_3c767509ac7ce6a6dd2fc377f5bcc385",
+      "reason": null,
+      "run": "policy_2a11341d9be30a72",
+      "scope": "accounting:issued_coverage",
+      "sensitive_counts": [
+        600,
+        0,
+        600,
+        0
+      ],
+      "units": "fraction",
+      "value": 1.0,
+      "value_state": "finite"
+    },
+    {
+      "applicability": "applicable",
+      "basis": "simulated",
+      "data": {
+        "basis": "operational",
+        "cells": null,
+        "definition_digest": "591861596c0f1402ab48eeafa697f51514a5e347f1d932d04375fc0659549c17",
+        "denominator": 600,
+        "metric": "abstention_rate",
+        "numerator": 0.0,
+        "planned": 600,
+        "reason": null,
+        "sensitive_counts": [
+          600,
+          0,
+          0,
+          600
+        ],
+        "statistic_kind": "mean",
+        "units": "fraction",
+        "value": 0.0,
+        "value_state": "finite"
+      },
+      "denominator": 600,
+      "denominator_kind": "eligible_records",
+      "evidence_basis": "operational",
+      "evidence_refs": [],
+      "execution": "completed",
+      "family": "policy",
+      "id": "policy_m39",
+      "interpretation": "descriptive",
+      "metric": "abstention_rate",
+      "population_id": "pop_d6bd3229ed1032a44719552d4ece53ad",
+      "reason": null,
+      "run": "policy_2a11341d9be30a72",
+      "scope": "accounting:abstention_rate",
+      "sensitive_counts": [
+        600,
+        0,
+        0,
+        600
+      ],
+      "units": "fraction",
+      "value": 0.0,
+      "value_state": "finite"
+    },
+    {
+      "applicability": "applicable",
+      "basis": "simulated",
+      "data": {
+        "basis": "operational",
+        "cells": null,
+        "definition_digest": "256e1c541221842f42ed09c1c6463eea5c86a3963af8a3403334aef786823c95",
+        "denominator": 600,
+        "metric": "deferral_rate",
+        "numerator": 0.0,
+        "planned": 600,
+        "reason": null,
+        "sensitive_counts": [
+          600,
+          0,
+          0,
+          600
+        ],
+        "statistic_kind": "mean",
+        "units": "fraction",
+        "value": 0.0,
+        "value_state": "finite"
+      },
+      "denominator": 600,
+      "denominator_kind": "eligible_records",
+      "evidence_basis": "operational",
+      "evidence_refs": [],
+      "execution": "completed",
+      "family": "policy",
+      "id": "policy_m40",
+      "interpretation": "descriptive",
+      "metric": "deferral_rate",
+      "population_id": "pop_9efa63ba0800fbb9e293d1d2bfe59bb4",
+      "reason": null,
+      "run": "policy_2a11341d9be30a72",
+      "scope": "accounting:deferral_rate",
+      "sensitive_counts": [
+        600,
+        0,
+        0,
+        600
+      ],
+      "units": "fraction",
+      "value": 0.0,
+      "value_state": "finite"
+    },
+    {
+      "applicability": "applicable",
+      "basis": "simulated",
+      "data": {
+        "basis": "operational",
+        "cells": null,
+        "definition_digest": "8292f3af71906a96883b73569a04454c660e17f9a1d218ed2b779ae5b3566351",
+        "denominator": 600,
+        "metric": "unavailable_rate",
+        "numerator": 0.0,
+        "planned": 600,
+        "reason": null,
+        "sensitive_counts": [
+          600,
+          0,
+          0,
+          600
+        ],
+        "statistic_kind": "mean",
+        "units": "fraction",
+        "value": 0.0,
+        "value_state": "finite"
+      },
+      "denominator": 600,
+      "denominator_kind": "eligible_records",
+      "evidence_basis": "operational",
+      "evidence_refs": [],
+      "execution": "completed",
+      "family": "policy",
+      "id": "policy_m41",
+      "interpretation": "descriptive",
+      "metric": "unavailable_rate",
+      "population_id": "pop_7b78b9f1b4c1dcb19cccbf1c0ed53e67",
+      "reason": null,
+      "run": "policy_2a11341d9be30a72",
+      "scope": "accounting:unavailable_rate",
+      "sensitive_counts": [
+        600,
+        0,
+        0,
+        600
+      ],
+      "units": "fraction",
+      "value": 0.0,
+      "value_state": "finite"
+    },
+    {
+      "applicability": "applicable",
+      "basis": "simulated",
+      "data": {
+        "basis": "operational",
+        "cells": null,
+        "definition_digest": "4cfb695c59dd58461527b864621a3a37f0a20afc5055614cc0956c3b9a45f72f",
+        "denominator": 600,
+        "metric": "input_unavailable_rate",
+        "numerator": 0.0,
+        "planned": 600,
+        "reason": null,
+        "sensitive_counts": [
+          600,
+          0,
+          0,
+          600
+        ],
+        "statistic_kind": "mean",
+        "units": "fraction",
+        "value": 0.0,
+        "value_state": "finite"
+      },
+      "denominator": 600,
+      "denominator_kind": "eligible_records",
+      "evidence_basis": "operational",
+      "evidence_refs": [],
+      "execution": "completed",
+      "family": "policy",
+      "id": "policy_m42",
+      "interpretation": "descriptive",
+      "metric": "input_unavailable_rate",
+      "population_id": "pop_1f0c21a252c5f45c8417d2dea122a514",
+      "reason": null,
+      "run": "policy_2a11341d9be30a72",
+      "scope": "accounting:input_unavailable_rate",
+      "sensitive_counts": [
+        600,
+        0,
+        0,
+        600
+      ],
+      "units": "fraction",
+      "value": 0.0,
+      "value_state": "finite"
+    },
+    {
+      "applicability": "applicable",
+      "basis": "simulated",
+      "data": {
+        "basis": "observed_outcome",
+        "cells": null,
+        "definition_digest": "2a59ad5b58b12786ecd8824eccea5290a7318936ee810fe013d474935bf5a7bb",
+        "denominator": 600,
+        "metric": "issued_label_availability",
+        "numerator": 600.0,
+        "planned": 600,
+        "reason": null,
+        "sensitive_counts": [
+          600,
+          0,
+          600,
+          0
+        ],
+        "statistic_kind": "mean",
+        "units": "fraction",
+        "value": 1.0,
+        "value_state": "finite"
+      },
+      "denominator": 600,
+      "denominator_kind": "eligible_records",
+      "evidence_basis": "observed_outcome",
+      "evidence_refs": [],
+      "execution": "completed",
+      "family": "policy",
+      "id": "policy_m43",
+      "interpretation": "descriptive",
+      "metric": "issued_label_availability",
+      "population_id": "pop_1505e4a894a1b75ccc104ac31d6d9a3d",
+      "reason": null,
+      "run": "policy_2a11341d9be30a72",
+      "scope": "accounting:issued_label_availability",
+      "sensitive_counts": [
+        600,
+        0,
+        600,
+        0
+      ],
+      "units": "fraction",
+      "value": 1.0,
+      "value_state": "finite"
+    },
+    {
+      "applicability": "applicable",
+      "basis": "simulated",
+      "data": {
+        "basis": "observed_outcome",
+        "cells": null,
+        "definition_digest": "81b8a118aba859081a6c40b4bcba40d98f65af3eaa03eeb2fa11debb8843ab9d",
+        "denominator": 600,
+        "metric": "labeled_issued_share",
+        "numerator": 600.0,
+        "planned": 600,
+        "reason": null,
+        "sensitive_counts": [
+          600,
+          0,
+          600,
+          0
+        ],
+        "statistic_kind": "mean",
+        "units": "fraction",
+        "value": 1.0,
+        "value_state": "finite"
+      },
+      "denominator": 600,
+      "denominator_kind": "eligible_records",
+      "evidence_basis": "observed_outcome",
+      "evidence_refs": [],
+      "execution": "completed",
+      "family": "policy",
+      "id": "policy_m44",
+      "interpretation": "descriptive",
+      "metric": "labeled_issued_share",
+      "population_id": "pop_8d82174bf18502599216ff542df61504",
+      "reason": null,
+      "run": "policy_2a11341d9be30a72",
+      "scope": "accounting:labeled_issued_share",
+      "sensitive_counts": [
+        600,
+        0,
+        600,
+        0
+      ],
+      "units": "fraction",
+      "value": 1.0,
+      "value_state": "finite"
+    },
+    {
+      "applicability": "applicable",
+      "basis": "simulated",
+      "data": {
+        "basis": "observed_outcome",
+        "cells": null,
+        "definition_digest": "a7bb3be3f5ec692c9308a2db69c4482602cef011b1e7c6be50ee1a6971442389",
+        "denominator": 600,
+        "metric": "selective_risk",
+        "numerator": 1500.0,
+        "planned": 600,
+        "reason": null,
+        "sensitive_counts": [
+          600,
+          0
+        ],
+        "statistic_kind": "mean",
+        "units": "native_loss_units",
+        "value": 2.5,
+        "value_state": "finite"
+      },
+      "denominator": 600,
+      "denominator_kind": "eligible_records",
+      "evidence_basis": "observed_outcome",
+      "evidence_refs": [],
+      "execution": "completed",
+      "family": "policy",
+      "id": "policy_m45",
+      "interpretation": "descriptive",
+      "metric": "selective_risk",
+      "population_id": "pop_476f00a34c2e45dcad6b604413add34c",
+      "reason": null,
+      "run": "policy_2a11341d9be30a72",
+      "scope": "accounting:selective_risk",
+      "sensitive_counts": [
+        600,
+        0
+      ],
+      "units": "native_loss_units",
+      "value": 2.5,
+      "value_state": "finite"
+    },
+    {
+      "applicability": "applicable",
+      "basis": "simulated",
+      "data": {
+        "basis": "observed_outcome",
+        "cells": null,
+        "definition_digest": "54cf210bd3c297cd62edf3b121b6319779c95bed4f8c30e4d72b5c5f1ca3227c",
+        "denominator": 600,
+        "metric": "empirical_cost",
+        "numerator": 540.0,
+        "planned": 600,
+        "reason": null,
+        "sensitive_counts": [
+          600,
+          0
+        ],
+        "statistic_kind": "mean",
+        "units": "cost_units",
+        "value": 0.9,
+        "value_state": "finite"
+      },
+      "denominator": 600,
+      "denominator_kind": "eligible_records",
+      "evidence_basis": "observed_outcome",
+      "evidence_refs": [],
+      "execution": "completed",
+      "family": "policy",
+      "id": "policy_m46",
+      "interpretation": "descriptive",
+      "metric": "empirical_cost",
+      "population_id": "pop_540c1b24221c5960bcf182e6cb34f276",
+      "reason": null,
+      "run": "policy_0c9642c0868e674a",
+      "scope": "quantity_cost",
+      "sensitive_counts": [
+        600,
+        0
+      ],
+      "units": "cost_units",
+      "value": 0.9,
+      "value_state": "finite"
+    },
+    {
+      "applicability": "applicable",
+      "basis": "simulated",
+      "data": {
+        "basis": "operational",
+        "cells": null,
+        "definition_digest": "698ccff8d9593f17d9b489b87303e1d92725e220d9640e7971ac20e2d04d57bd",
+        "denominator": 600,
+        "metric": "issued_coverage",
+        "numerator": 600.0,
+        "planned": 600,
+        "reason": null,
+        "sensitive_counts": [
+          600,
+          0,
+          600,
+          0
+        ],
+        "statistic_kind": "mean",
+        "units": "fraction",
+        "value": 1.0,
+        "value_state": "finite"
+      },
+      "denominator": 600,
+      "denominator_kind": "eligible_records",
+      "evidence_basis": "operational",
+      "evidence_refs": [],
+      "execution": "completed",
+      "family": "policy",
+      "id": "policy_m47",
+      "interpretation": "descriptive",
+      "metric": "issued_coverage",
+      "population_id": "pop_ad55c1e212ff1d4b675663ffd3eefd40",
+      "reason": null,
+      "run": "policy_0c9642c0868e674a",
+      "scope": "accounting:issued_coverage",
+      "sensitive_counts": [
+        600,
+        0,
+        600,
+        0
+      ],
+      "units": "fraction",
+      "value": 1.0,
+      "value_state": "finite"
+    },
+    {
+      "applicability": "applicable",
+      "basis": "simulated",
+      "data": {
+        "basis": "operational",
+        "cells": null,
+        "definition_digest": "591861596c0f1402ab48eeafa697f51514a5e347f1d932d04375fc0659549c17",
+        "denominator": 600,
+        "metric": "abstention_rate",
+        "numerator": 0.0,
+        "planned": 600,
+        "reason": null,
+        "sensitive_counts": [
+          600,
+          0,
+          0,
+          600
+        ],
+        "statistic_kind": "mean",
+        "units": "fraction",
+        "value": 0.0,
+        "value_state": "finite"
+      },
+      "denominator": 600,
+      "denominator_kind": "eligible_records",
+      "evidence_basis": "operational",
+      "evidence_refs": [],
+      "execution": "completed",
+      "family": "policy",
+      "id": "policy_m48",
+      "interpretation": "descriptive",
+      "metric": "abstention_rate",
+      "population_id": "pop_84eca53b363d78bee98d2944263ce11f",
+      "reason": null,
+      "run": "policy_0c9642c0868e674a",
+      "scope": "accounting:abstention_rate",
+      "sensitive_counts": [
+        600,
+        0,
+        0,
+        600
+      ],
+      "units": "fraction",
+      "value": 0.0,
+      "value_state": "finite"
+    },
+    {
+      "applicability": "applicable",
+      "basis": "simulated",
+      "data": {
+        "basis": "operational",
+        "cells": null,
+        "definition_digest": "256e1c541221842f42ed09c1c6463eea5c86a3963af8a3403334aef786823c95",
+        "denominator": 600,
+        "metric": "deferral_rate",
+        "numerator": 0.0,
+        "planned": 600,
+        "reason": null,
+        "sensitive_counts": [
+          600,
+          0,
+          0,
+          600
+        ],
+        "statistic_kind": "mean",
+        "units": "fraction",
+        "value": 0.0,
+        "value_state": "finite"
+      },
+      "denominator": 600,
+      "denominator_kind": "eligible_records",
+      "evidence_basis": "operational",
+      "evidence_refs": [],
+      "execution": "completed",
+      "family": "policy",
+      "id": "policy_m49",
+      "interpretation": "descriptive",
+      "metric": "deferral_rate",
+      "population_id": "pop_8725297bbe16a0ebb8bb9c957622b36e",
+      "reason": null,
+      "run": "policy_0c9642c0868e674a",
+      "scope": "accounting:deferral_rate",
+      "sensitive_counts": [
+        600,
+        0,
+        0,
+        600
+      ],
+      "units": "fraction",
+      "value": 0.0,
+      "value_state": "finite"
+    },
+    {
+      "applicability": "applicable",
+      "basis": "simulated",
+      "data": {
+        "basis": "operational",
+        "cells": null,
+        "definition_digest": "8292f3af71906a96883b73569a04454c660e17f9a1d218ed2b779ae5b3566351",
+        "denominator": 600,
+        "metric": "unavailable_rate",
+        "numerator": 0.0,
+        "planned": 600,
+        "reason": null,
+        "sensitive_counts": [
+          600,
+          0,
+          0,
+          600
+        ],
+        "statistic_kind": "mean",
+        "units": "fraction",
+        "value": 0.0,
+        "value_state": "finite"
+      },
+      "denominator": 600,
+      "denominator_kind": "eligible_records",
+      "evidence_basis": "operational",
+      "evidence_refs": [],
+      "execution": "completed",
+      "family": "policy",
+      "id": "policy_m50",
+      "interpretation": "descriptive",
+      "metric": "unavailable_rate",
+      "population_id": "pop_160b699640e481c2b96330e8f8b5e9f2",
+      "reason": null,
+      "run": "policy_0c9642c0868e674a",
+      "scope": "accounting:unavailable_rate",
+      "sensitive_counts": [
+        600,
+        0,
+        0,
+        600
+      ],
+      "units": "fraction",
+      "value": 0.0,
+      "value_state": "finite"
+    },
+    {
+      "applicability": "applicable",
+      "basis": "simulated",
+      "data": {
+        "basis": "operational",
+        "cells": null,
+        "definition_digest": "4cfb695c59dd58461527b864621a3a37f0a20afc5055614cc0956c3b9a45f72f",
+        "denominator": 600,
+        "metric": "input_unavailable_rate",
+        "numerator": 0.0,
+        "planned": 600,
+        "reason": null,
+        "sensitive_counts": [
+          600,
+          0,
+          0,
+          600
+        ],
+        "statistic_kind": "mean",
+        "units": "fraction",
+        "value": 0.0,
+        "value_state": "finite"
+      },
+      "denominator": 600,
+      "denominator_kind": "eligible_records",
+      "evidence_basis": "operational",
+      "evidence_refs": [],
+      "execution": "completed",
+      "family": "policy",
+      "id": "policy_m51",
+      "interpretation": "descriptive",
+      "metric": "input_unavailable_rate",
+      "population_id": "pop_af54a87cbee63533042fade5f4a31a9e",
+      "reason": null,
+      "run": "policy_0c9642c0868e674a",
+      "scope": "accounting:input_unavailable_rate",
+      "sensitive_counts": [
+        600,
+        0,
+        0,
+        600
+      ],
+      "units": "fraction",
+      "value": 0.0,
+      "value_state": "finite"
+    },
+    {
+      "applicability": "applicable",
+      "basis": "simulated",
+      "data": {
+        "basis": "observed_outcome",
+        "cells": null,
+        "definition_digest": "2a59ad5b58b12786ecd8824eccea5290a7318936ee810fe013d474935bf5a7bb",
+        "denominator": 600,
+        "metric": "issued_label_availability",
+        "numerator": 600.0,
+        "planned": 600,
+        "reason": null,
+        "sensitive_counts": [
+          600,
+          0,
+          600,
+          0
+        ],
+        "statistic_kind": "mean",
+        "units": "fraction",
+        "value": 1.0,
+        "value_state": "finite"
+      },
+      "denominator": 600,
+      "denominator_kind": "eligible_records",
+      "evidence_basis": "observed_outcome",
+      "evidence_refs": [],
+      "execution": "completed",
+      "family": "policy",
+      "id": "policy_m52",
+      "interpretation": "descriptive",
+      "metric": "issued_label_availability",
+      "population_id": "pop_18ee096555af379cf06776898d250b40",
+      "reason": null,
+      "run": "policy_0c9642c0868e674a",
+      "scope": "accounting:issued_label_availability",
+      "sensitive_counts": [
+        600,
+        0,
+        600,
+        0
+      ],
+      "units": "fraction",
+      "value": 1.0,
+      "value_state": "finite"
+    },
+    {
+      "applicability": "applicable",
+      "basis": "simulated",
+      "data": {
+        "basis": "observed_outcome",
+        "cells": null,
+        "definition_digest": "81b8a118aba859081a6c40b4bcba40d98f65af3eaa03eeb2fa11debb8843ab9d",
+        "denominator": 600,
+        "metric": "labeled_issued_share",
+        "numerator": 600.0,
+        "planned": 600,
+        "reason": null,
+        "sensitive_counts": [
+          600,
+          0,
+          600,
+          0
+        ],
+        "statistic_kind": "mean",
+        "units": "fraction",
+        "value": 1.0,
+        "value_state": "finite"
+      },
+      "denominator": 600,
+      "denominator_kind": "eligible_records",
+      "evidence_basis": "observed_outcome",
+      "evidence_refs": [],
+      "execution": "completed",
+      "family": "policy",
+      "id": "policy_m53",
+      "interpretation": "descriptive",
+      "metric": "labeled_issued_share",
+      "population_id": "pop_39a435706b615816ac417a9cbf2723ff",
+      "reason": null,
+      "run": "policy_0c9642c0868e674a",
+      "scope": "accounting:labeled_issued_share",
+      "sensitive_counts": [
+        600,
+        0,
+        600,
+        0
+      ],
+      "units": "fraction",
+      "value": 1.0,
+      "value_state": "finite"
+    },
+    {
+      "applicability": "applicable",
+      "basis": "simulated",
+      "data": {
+        "basis": "observed_outcome",
+        "cells": null,
+        "definition_digest": "a7bb3be3f5ec692c9308a2db69c4482602cef011b1e7c6be50ee1a6971442389",
+        "denominator": 600,
+        "metric": "selective_risk",
+        "numerator": 1620.0,
+        "planned": 600,
+        "reason": null,
+        "sensitive_counts": [
+          600,
+          0
+        ],
+        "statistic_kind": "mean",
+        "units": "native_loss_units",
+        "value": 2.7,
+        "value_state": "finite"
+      },
+      "denominator": 600,
+      "denominator_kind": "eligible_records",
+      "evidence_basis": "observed_outcome",
+      "evidence_refs": [],
+      "execution": "completed",
+      "family": "policy",
+      "id": "policy_m54",
+      "interpretation": "descriptive",
+      "metric": "selective_risk",
+      "population_id": "pop_0b91d24c5d46fb41bdd84056181ec54a",
+      "reason": null,
+      "run": "policy_0c9642c0868e674a",
+      "scope": "accounting:selective_risk",
+      "sensitive_counts": [
+        600,
+        0
+      ],
+      "units": "native_loss_units",
+      "value": 2.7,
+      "value_state": "finite"
+    },
+    {
+      "applicability": "applicable",
+      "basis": "simulated",
+      "data": {
+        "basis": "observed_outcome",
+        "cells": null,
+        "definition_digest": "54cf210bd3c297cd62edf3b121b6319779c95bed4f8c30e4d72b5c5f1ca3227c",
+        "denominator": 600,
+        "metric": "empirical_cost",
+        "numerator": 479.9999999999999,
+        "planned": 600,
+        "reason": null,
+        "sensitive_counts": [
+          600,
+          0
+        ],
+        "statistic_kind": "mean",
+        "units": "cost_units",
+        "value": 0.7999999999999998,
+        "value_state": "finite"
+      },
+      "denominator": 600,
+      "denominator_kind": "eligible_records",
+      "evidence_basis": "observed_outcome",
+      "evidence_refs": [],
+      "execution": "completed",
+      "family": "policy",
+      "id": "policy_m55",
+      "interpretation": "descriptive",
+      "metric": "empirical_cost",
+      "population_id": "pop_5b9b481007d87e0a1df2a46a0f29b1b6",
+      "reason": null,
+      "run": "policy_52f0f584e9ea5c73",
+      "scope": "quantity_cost",
+      "sensitive_counts": [
+        600,
+        0
+      ],
+      "units": "cost_units",
+      "value": 0.7999999999999998,
+      "value_state": "finite"
+    },
+    {
+      "applicability": "applicable",
+      "basis": "simulated",
+      "data": {
+        "basis": "operational",
+        "cells": null,
+        "definition_digest": "698ccff8d9593f17d9b489b87303e1d92725e220d9640e7971ac20e2d04d57bd",
+        "denominator": 600,
+        "metric": "issued_coverage",
+        "numerator": 600.0,
+        "planned": 600,
+        "reason": null,
+        "sensitive_counts": [
+          600,
+          0,
+          600,
+          0
+        ],
+        "statistic_kind": "mean",
+        "units": "fraction",
+        "value": 1.0,
+        "value_state": "finite"
+      },
+      "denominator": 600,
+      "denominator_kind": "eligible_records",
+      "evidence_basis": "operational",
+      "evidence_refs": [],
+      "execution": "completed",
+      "family": "policy",
+      "id": "policy_m56",
+      "interpretation": "descriptive",
+      "metric": "issued_coverage",
+      "population_id": "pop_f4e8a918ea3502eae27b47e8bb3e54f0",
+      "reason": null,
+      "run": "policy_52f0f584e9ea5c73",
+      "scope": "accounting:issued_coverage",
+      "sensitive_counts": [
+        600,
+        0,
+        600,
+        0
+      ],
+      "units": "fraction",
+      "value": 1.0,
+      "value_state": "finite"
+    },
+    {
+      "applicability": "applicable",
+      "basis": "simulated",
+      "data": {
+        "basis": "operational",
+        "cells": null,
+        "definition_digest": "591861596c0f1402ab48eeafa697f51514a5e347f1d932d04375fc0659549c17",
+        "denominator": 600,
+        "metric": "abstention_rate",
+        "numerator": 0.0,
+        "planned": 600,
+        "reason": null,
+        "sensitive_counts": [
+          600,
+          0,
+          0,
+          600
+        ],
+        "statistic_kind": "mean",
+        "units": "fraction",
+        "value": 0.0,
+        "value_state": "finite"
+      },
+      "denominator": 600,
+      "denominator_kind": "eligible_records",
+      "evidence_basis": "operational",
+      "evidence_refs": [],
+      "execution": "completed",
+      "family": "policy",
+      "id": "policy_m57",
+      "interpretation": "descriptive",
+      "metric": "abstention_rate",
+      "population_id": "pop_f116f7ef2cdd50fca1db204675a52dab",
+      "reason": null,
+      "run": "policy_52f0f584e9ea5c73",
+      "scope": "accounting:abstention_rate",
+      "sensitive_counts": [
+        600,
+        0,
+        0,
+        600
+      ],
+      "units": "fraction",
+      "value": 0.0,
+      "value_state": "finite"
+    },
+    {
+      "applicability": "applicable",
+      "basis": "simulated",
+      "data": {
+        "basis": "operational",
+        "cells": null,
+        "definition_digest": "256e1c541221842f42ed09c1c6463eea5c86a3963af8a3403334aef786823c95",
+        "denominator": 600,
+        "metric": "deferral_rate",
+        "numerator": 0.0,
+        "planned": 600,
+        "reason": null,
+        "sensitive_counts": [
+          600,
+          0,
+          0,
+          600
+        ],
+        "statistic_kind": "mean",
+        "units": "fraction",
+        "value": 0.0,
+        "value_state": "finite"
+      },
+      "denominator": 600,
+      "denominator_kind": "eligible_records",
+      "evidence_basis": "operational",
+      "evidence_refs": [],
+      "execution": "completed",
+      "family": "policy",
+      "id": "policy_m58",
+      "interpretation": "descriptive",
+      "metric": "deferral_rate",
+      "population_id": "pop_f866a9a61150d65c65cf7b5116a197e2",
+      "reason": null,
+      "run": "policy_52f0f584e9ea5c73",
+      "scope": "accounting:deferral_rate",
+      "sensitive_counts": [
+        600,
+        0,
+        0,
+        600
+      ],
+      "units": "fraction",
+      "value": 0.0,
+      "value_state": "finite"
+    },
+    {
+      "applicability": "applicable",
+      "basis": "simulated",
+      "data": {
+        "basis": "operational",
+        "cells": null,
+        "definition_digest": "8292f3af71906a96883b73569a04454c660e17f9a1d218ed2b779ae5b3566351",
+        "denominator": 600,
+        "metric": "unavailable_rate",
+        "numerator": 0.0,
+        "planned": 600,
+        "reason": null,
+        "sensitive_counts": [
+          600,
+          0,
+          0,
+          600
+        ],
+        "statistic_kind": "mean",
+        "units": "fraction",
+        "value": 0.0,
+        "value_state": "finite"
+      },
+      "denominator": 600,
+      "denominator_kind": "eligible_records",
+      "evidence_basis": "operational",
+      "evidence_refs": [],
+      "execution": "completed",
+      "family": "policy",
+      "id": "policy_m59",
+      "interpretation": "descriptive",
+      "metric": "unavailable_rate",
+      "population_id": "pop_b87236d1568ef795f7a0d3784aaf1f02",
+      "reason": null,
+      "run": "policy_52f0f584e9ea5c73",
+      "scope": "accounting:unavailable_rate",
+      "sensitive_counts": [
+        600,
+        0,
+        0,
+        600
+      ],
+      "units": "fraction",
+      "value": 0.0,
+      "value_state": "finite"
+    },
+    {
+      "applicability": "applicable",
+      "basis": "simulated",
+      "data": {
+        "basis": "operational",
+        "cells": null,
+        "definition_digest": "4cfb695c59dd58461527b864621a3a37f0a20afc5055614cc0956c3b9a45f72f",
+        "denominator": 600,
+        "metric": "input_unavailable_rate",
+        "numerator": 0.0,
+        "planned": 600,
+        "reason": null,
+        "sensitive_counts": [
+          600,
+          0,
+          0,
+          600
+        ],
+        "statistic_kind": "mean",
+        "units": "fraction",
+        "value": 0.0,
+        "value_state": "finite"
+      },
+      "denominator": 600,
+      "denominator_kind": "eligible_records",
+      "evidence_basis": "operational",
+      "evidence_refs": [],
+      "execution": "completed",
+      "family": "policy",
+      "id": "policy_m60",
+      "interpretation": "descriptive",
+      "metric": "input_unavailable_rate",
+      "population_id": "pop_7cc6923a34df84f234977aaff38324c9",
+      "reason": null,
+      "run": "policy_52f0f584e9ea5c73",
+      "scope": "accounting:input_unavailable_rate",
+      "sensitive_counts": [
+        600,
+        0,
+        0,
+        600
+      ],
+      "units": "fraction",
+      "value": 0.0,
+      "value_state": "finite"
+    },
+    {
+      "applicability": "applicable",
+      "basis": "simulated",
+      "data": {
+        "basis": "observed_outcome",
+        "cells": null,
+        "definition_digest": "2a59ad5b58b12786ecd8824eccea5290a7318936ee810fe013d474935bf5a7bb",
+        "denominator": 600,
+        "metric": "issued_label_availability",
+        "numerator": 600.0,
+        "planned": 600,
+        "reason": null,
+        "sensitive_counts": [
+          600,
+          0,
+          600,
+          0
+        ],
+        "statistic_kind": "mean",
+        "units": "fraction",
+        "value": 1.0,
+        "value_state": "finite"
+      },
+      "denominator": 600,
+      "denominator_kind": "eligible_records",
+      "evidence_basis": "observed_outcome",
+      "evidence_refs": [],
+      "execution": "completed",
+      "family": "policy",
+      "id": "policy_m61",
+      "interpretation": "descriptive",
+      "metric": "issued_label_availability",
+      "population_id": "pop_9e6d9ff85b79570dec599420b4434bce",
+      "reason": null,
+      "run": "policy_52f0f584e9ea5c73",
+      "scope": "accounting:issued_label_availability",
+      "sensitive_counts": [
+        600,
+        0,
+        600,
+        0
+      ],
+      "units": "fraction",
+      "value": 1.0,
+      "value_state": "finite"
+    },
+    {
+      "applicability": "applicable",
+      "basis": "simulated",
+      "data": {
+        "basis": "observed_outcome",
+        "cells": null,
+        "definition_digest": "81b8a118aba859081a6c40b4bcba40d98f65af3eaa03eeb2fa11debb8843ab9d",
+        "denominator": 600,
+        "metric": "labeled_issued_share",
+        "numerator": 600.0,
+        "planned": 600,
+        "reason": null,
+        "sensitive_counts": [
+          600,
+          0,
+          600,
+          0
+        ],
+        "statistic_kind": "mean",
+        "units": "fraction",
+        "value": 1.0,
+        "value_state": "finite"
+      },
+      "denominator": 600,
+      "denominator_kind": "eligible_records",
+      "evidence_basis": "observed_outcome",
+      "evidence_refs": [],
+      "execution": "completed",
+      "family": "policy",
+      "id": "policy_m62",
+      "interpretation": "descriptive",
+      "metric": "labeled_issued_share",
+      "population_id": "pop_a1931b4dc774df2c71f25018dc26956d",
+      "reason": null,
+      "run": "policy_52f0f584e9ea5c73",
+      "scope": "accounting:labeled_issued_share",
+      "sensitive_counts": [
+        600,
+        0,
+        600,
+        0
+      ],
+      "units": "fraction",
+      "value": 1.0,
+      "value_state": "finite"
+    },
+    {
+      "applicability": "applicable",
+      "basis": "simulated",
+      "data": {
+        "basis": "observed_outcome",
+        "cells": null,
+        "definition_digest": "a7bb3be3f5ec692c9308a2db69c4482602cef011b1e7c6be50ee1a6971442389",
+        "denominator": 600,
+        "metric": "selective_risk",
+        "numerator": 2220.0,
+        "planned": 600,
+        "reason": null,
+        "sensitive_counts": [
+          600,
+          0
+        ],
+        "statistic_kind": "mean",
+        "units": "native_loss_units",
+        "value": 3.7,
+        "value_state": "finite"
+      },
+      "denominator": 600,
+      "denominator_kind": "eligible_records",
+      "evidence_basis": "observed_outcome",
+      "evidence_refs": [],
+      "execution": "completed",
+      "family": "policy",
+      "id": "policy_m63",
+      "interpretation": "descriptive",
+      "metric": "selective_risk",
+      "population_id": "pop_a1cb20ce345a7f887df29b69373277bc",
+      "reason": null,
+      "run": "policy_52f0f584e9ea5c73",
+      "scope": "accounting:selective_risk",
+      "sensitive_counts": [
+        600,
+        0
+      ],
+      "units": "native_loss_units",
+      "value": 3.7,
+      "value_state": "finite"
+    }
+  ],
+  "methodology_id": "policy_selection_v1",
+  "name": "Synthetic regression policy record",
+  "outcomes": {
+    "authority": "data",
+    "canonical_content_digest": "1858af502eda85b6a2839bc138d544c9f62018071ae681046668faaf7d3a44e3",
+    "duplicate_rows": 0,
+    "effective_cutoff_ns": "1793739473570493000",
+    "invalid_keys": 0,
+    "scope": "observed_labels",
+    "snapshot_digest": "2b7fff5b31f3993d00819ed7b4945cf3d006b6852614780e87943b65f6595bdd",
+    "timing": "supplied_snapshot_maturity_unestablished"
+  },
+  "policy": {
+    "assessment_state": "not_assessed",
+    "baselines": [
+      {
+        "comparison_role": "supplied_trace_only",
+        "policy_digest": "8655301920984adcd699bda85ca32106b2443be7d9521f81dd9a676968626a72"
+      },
+      {
+        "comparison_role": "declared_or_conventional_task_baseline",
+        "policy_digest": "3206e30d5c5ba8a790fcbee6cf149178053468c1f47ff0035b8225260f916052"
+      }
+    ],
+    "behavior": {
+      "52f0f584e9ea5c73f84afa389f3675396716a13b4331cc409531f3e75cfc30f3": {
+        "decision_costs": {},
+        "fallback": {
+          "kind": "abstain"
+        },
+        "input_identity": {
+          "feature_time_policy": "declared_information_cutoff_v2",
+          "feature_time_view": "available_at_decision",
+          "features": [],
+          "intervals": [],
+          "method_digest": null,
+          "model": {
+            "artifact_sha256": null,
+            "calibration": null,
+            "id": "synthetic",
+            "preprocessing": null,
+            "version": "v1"
+          },
+          "probability": null,
+          "region_representations": [],
+          "regions": [],
+          "representation": null,
+          "score": null,
+          "selection": null,
+          "task": {
+            "classes": [],
+            "horizon": null,
+            "kind": "regression",
+            "material_error": null,
+            "outcome_definition": "Synthetic engineering outcome",
+            "positive_class": null,
+            "units": "items"
+          },
+          "version": "policy_input_semantics_v1"
+        },
+        "nodes": {
+          "root": {
+            "action": {
+              "kind": "numeric",
+              "value": 8.0
+            },
+            "kind": "action"
+          }
+        },
+        "root": "root",
+        "run": "model",
+        "schema_version": "confidenceguard.policy_spec/1.0",
+        "task": {
+          "classes": [],
+          "horizon": null,
+          "kind": "regression",
+          "material_error": null,
+          "outcome_definition": "Synthetic engineering outcome",
+          "positive_class": null,
+          "units": "items"
+        },
+        "unavailable": {
+          "kind": "unavailable"
+        }
+      }
+    },
+    "candidates": [
+      {
+        "baseline": true,
+        "comparison_role": "supplied_trace_only",
+        "complexity": [
+          1,
+          0
+        ],
+        "constraints": [],
+        "metrics": {
+          "accounting:abstention_rate": {
+            "basis": "operational",
+            "cells": null,
+            "definition_digest": "591861596c0f1402ab48eeafa697f51514a5e347f1d932d04375fc0659549c17",
+            "denominator": 600,
+            "metric": "abstention_rate",
+            "numerator": 0.0,
+            "planned": 600,
+            "reason": null,
+            "sensitive_counts": [
+              600,
+              0,
+              0,
+              600
+            ],
+            "statistic_kind": "mean",
+            "units": "fraction",
+            "value": 0.0,
+            "value_state": "finite"
+          },
+          "accounting:deferral_rate": {
+            "basis": "operational",
+            "cells": null,
+            "definition_digest": "256e1c541221842f42ed09c1c6463eea5c86a3963af8a3403334aef786823c95",
+            "denominator": 600,
+            "metric": "deferral_rate",
+            "numerator": 0.0,
+            "planned": 600,
+            "reason": null,
+            "sensitive_counts": [
+              600,
+              0,
+              0,
+              600
+            ],
+            "statistic_kind": "mean",
+            "units": "fraction",
+            "value": 0.0,
+            "value_state": "finite"
+          },
+          "accounting:input_unavailable_rate": {
+            "basis": "operational",
+            "cells": null,
+            "definition_digest": "4cfb695c59dd58461527b864621a3a37f0a20afc5055614cc0956c3b9a45f72f",
+            "denominator": 600,
+            "metric": "input_unavailable_rate",
+            "numerator": 0.0,
+            "planned": 600,
+            "reason": null,
+            "sensitive_counts": [
+              600,
+              0,
+              0,
+              600
+            ],
+            "statistic_kind": "mean",
+            "units": "fraction",
+            "value": 0.0,
+            "value_state": "finite"
+          },
+          "accounting:issued_coverage": {
+            "basis": "operational",
+            "cells": null,
+            "definition_digest": "698ccff8d9593f17d9b489b87303e1d92725e220d9640e7971ac20e2d04d57bd",
+            "denominator": 600,
+            "metric": "issued_coverage",
+            "numerator": 600.0,
+            "planned": 600,
+            "reason": null,
+            "sensitive_counts": [
+              600,
+              0,
+              600,
+              0
+            ],
+            "statistic_kind": "mean",
+            "units": "fraction",
+            "value": 1.0,
+            "value_state": "finite"
+          },
+          "accounting:issued_label_availability": {
+            "basis": "observed_outcome",
+            "cells": null,
+            "definition_digest": "2a59ad5b58b12786ecd8824eccea5290a7318936ee810fe013d474935bf5a7bb",
+            "denominator": 600,
+            "metric": "issued_label_availability",
+            "numerator": 600.0,
+            "planned": 600,
+            "reason": null,
+            "sensitive_counts": [
+              600,
+              0,
+              600,
+              0
+            ],
+            "statistic_kind": "mean",
+            "units": "fraction",
+            "value": 1.0,
+            "value_state": "finite"
+          },
+          "accounting:labeled_issued_share": {
+            "basis": "observed_outcome",
+            "cells": null,
+            "definition_digest": "81b8a118aba859081a6c40b4bcba40d98f65af3eaa03eeb2fa11debb8843ab9d",
+            "denominator": 600,
+            "metric": "labeled_issued_share",
+            "numerator": 600.0,
+            "planned": 600,
+            "reason": null,
+            "sensitive_counts": [
+              600,
+              0,
+              600,
+              0
+            ],
+            "statistic_kind": "mean",
+            "units": "fraction",
+            "value": 1.0,
+            "value_state": "finite"
+          },
+          "accounting:selective_risk": {
+            "basis": "observed_outcome",
+            "cells": null,
+            "definition_digest": "a7bb3be3f5ec692c9308a2db69c4482602cef011b1e7c6be50ee1a6971442389",
+            "denominator": 600,
+            "metric": "selective_risk",
+            "numerator": 119.99999999999997,
+            "planned": 600,
+            "reason": null,
+            "sensitive_counts": [
+              600,
+              0
+            ],
+            "statistic_kind": "mean",
+            "units": "native_loss_units",
+            "value": 0.19999999999999996,
+            "value_state": "finite"
+          },
+          "accounting:unavailable_rate": {
+            "basis": "operational",
+            "cells": null,
+            "definition_digest": "8292f3af71906a96883b73569a04454c660e17f9a1d218ed2b779ae5b3566351",
+            "denominator": 600,
+            "metric": "unavailable_rate",
+            "numerator": 0.0,
+            "planned": 600,
+            "reason": null,
+            "sensitive_counts": [
+              600,
+              0,
+              0,
+              600
+            ],
+            "statistic_kind": "mean",
+            "units": "fraction",
+            "value": 0.0,
+            "value_state": "finite"
+          },
+          "quantity_cost": {
+            "basis": "observed_outcome",
+            "cells": null,
+            "definition_digest": "54cf210bd3c297cd62edf3b121b6319779c95bed4f8c30e4d72b5c5f1ca3227c",
+            "denominator": 600,
+            "metric": "empirical_cost",
+            "numerator": 23.99999999999999,
+            "planned": 600,
+            "reason": null,
+            "sensitive_counts": [
+              600,
+              0
+            ],
+            "statistic_kind": "mean",
+            "units": "cost_units",
+            "value": 0.03999999999999998,
+            "value_state": "finite"
+          }
+        },
+        "observed_feasibility": "feasible",
+        "policy_digest": "8655301920984adcd699bda85ca32106b2443be7d9521f81dd9a676968626a72",
+        "trace": {
+          "capacity": [],
+          "fallback_events": {},
+          "overlap_events": {},
+          "routes": {
+            "root": 600
+          },
+          "unknown_routes": {},
+          "unresolved_predicates": {}
+        }
+      },
+      {
+        "baseline": true,
+        "comparison_role": "declared_or_conventional_task_baseline",
+        "complexity": [
+          1,
+          0
+        ],
+        "constraints": [],
+        "metrics": {
+          "accounting:abstention_rate": {
+            "basis": "operational",
+            "cells": null,
+            "definition_digest": "591861596c0f1402ab48eeafa697f51514a5e347f1d932d04375fc0659549c17",
+            "denominator": 600,
+            "metric": "abstention_rate",
+            "numerator": 600.0,
+            "planned": 600,
+            "reason": null,
+            "sensitive_counts": [
+              600,
+              0,
+              600,
+              0
+            ],
+            "statistic_kind": "mean",
+            "units": "fraction",
+            "value": 1.0,
+            "value_state": "finite"
+          },
+          "accounting:deferral_rate": {
+            "basis": "operational",
+            "cells": null,
+            "definition_digest": "256e1c541221842f42ed09c1c6463eea5c86a3963af8a3403334aef786823c95",
+            "denominator": 600,
+            "metric": "deferral_rate",
+            "numerator": 0.0,
+            "planned": 600,
+            "reason": null,
+            "sensitive_counts": [
+              600,
+              0,
+              0,
+              600
+            ],
+            "statistic_kind": "mean",
+            "units": "fraction",
+            "value": 0.0,
+            "value_state": "finite"
+          },
+          "accounting:input_unavailable_rate": {
+            "basis": "operational",
+            "cells": null,
+            "definition_digest": "4cfb695c59dd58461527b864621a3a37f0a20afc5055614cc0956c3b9a45f72f",
+            "denominator": 600,
+            "metric": "input_unavailable_rate",
+            "numerator": 0.0,
+            "planned": 600,
+            "reason": null,
+            "sensitive_counts": [
+              600,
+              0,
+              0,
+              600
+            ],
+            "statistic_kind": "mean",
+            "units": "fraction",
+            "value": 0.0,
+            "value_state": "finite"
+          },
+          "accounting:issued_coverage": {
+            "basis": "operational",
+            "cells": null,
+            "definition_digest": "698ccff8d9593f17d9b489b87303e1d92725e220d9640e7971ac20e2d04d57bd",
+            "denominator": 600,
+            "metric": "issued_coverage",
+            "numerator": 0.0,
+            "planned": 600,
+            "reason": null,
+            "sensitive_counts": [
+              600,
+              0,
+              0,
+              600
+            ],
+            "statistic_kind": "mean",
+            "units": "fraction",
+            "value": 0.0,
+            "value_state": "finite"
+          },
+          "accounting:issued_label_availability": {
+            "basis": "observed_outcome",
+            "cells": null,
+            "definition_digest": "2a59ad5b58b12786ecd8824eccea5290a7318936ee810fe013d474935bf5a7bb",
+            "denominator": 0,
+            "metric": "issued_label_availability",
+            "numerator": null,
+            "planned": 600,
+            "reason": "zero_denominator",
+            "sensitive_counts": [
+              0,
+              600,
+              0,
+              0
+            ],
+            "statistic_kind": "mean",
+            "units": "fraction",
+            "value": null,
+            "value_state": "undefined"
+          },
+          "accounting:labeled_issued_share": {
+            "basis": "observed_outcome",
+            "cells": null,
+            "definition_digest": "81b8a118aba859081a6c40b4bcba40d98f65af3eaa03eeb2fa11debb8843ab9d",
+            "denominator": 600,
+            "metric": "labeled_issued_share",
+            "numerator": 0.0,
+            "planned": 600,
+            "reason": null,
+            "sensitive_counts": [
+              600,
+              0,
+              0,
+              600
+            ],
+            "statistic_kind": "mean",
+            "units": "fraction",
+            "value": 0.0,
+            "value_state": "finite"
+          },
+          "accounting:selective_risk": {
+            "basis": "observed_outcome",
+            "cells": null,
+            "definition_digest": "a7bb3be3f5ec692c9308a2db69c4482602cef011b1e7c6be50ee1a6971442389",
+            "denominator": 0,
+            "metric": "selective_risk",
+            "numerator": null,
+            "planned": 600,
+            "reason": "zero_denominator",
+            "sensitive_counts": [
+              0,
+              600,
+              0,
+              0
+            ],
+            "statistic_kind": "mean",
+            "units": "native_loss_units",
+            "value": null,
+            "value_state": "undefined"
+          },
+          "accounting:unavailable_rate": {
+            "basis": "operational",
+            "cells": null,
+            "definition_digest": "8292f3af71906a96883b73569a04454c660e17f9a1d218ed2b779ae5b3566351",
+            "denominator": 600,
+            "metric": "unavailable_rate",
+            "numerator": 0.0,
+            "planned": 600,
+            "reason": null,
+            "sensitive_counts": [
+              600,
+              0,
+              0,
+              600
+            ],
+            "statistic_kind": "mean",
+            "units": "fraction",
+            "value": 0.0,
+            "value_state": "finite"
+          },
+          "quantity_cost": {
+            "basis": "observed_outcome",
+            "cells": null,
+            "definition_digest": "54cf210bd3c297cd62edf3b121b6319779c95bed4f8c30e4d72b5c5f1ca3227c",
+            "denominator": 600,
+            "metric": "empirical_cost",
+            "numerator": 1800.0,
+            "planned": 600,
+            "reason": null,
+            "sensitive_counts": [
+              600,
+              0
+            ],
+            "statistic_kind": "mean",
+            "units": "cost_units",
+            "value": 3.0,
+            "value_state": "finite"
+          }
+        },
+        "observed_feasibility": "feasible",
+        "policy_digest": "3206e30d5c5ba8a790fcbee6cf149178053468c1f47ff0035b8225260f916052",
+        "trace": {
+          "capacity": [],
+          "fallback_events": {},
+          "overlap_events": {},
+          "routes": {
+            "root": 600
+          },
+          "unknown_routes": {},
+          "unresolved_predicates": {}
+        }
+      },
+      {
+        "baseline": false,
+        "complexity": [
+          1,
+          0
+        ],
+        "constraints": [],
+        "metrics": {
+          "accounting:abstention_rate": {
+            "basis": "operational",
+            "cells": null,
+            "definition_digest": "591861596c0f1402ab48eeafa697f51514a5e347f1d932d04375fc0659549c17",
+            "denominator": 600,
+            "metric": "abstention_rate",
+            "numerator": 0.0,
+            "planned": 600,
+            "reason": null,
+            "sensitive_counts": [
+              600,
+              0,
+              0,
+              600
+            ],
+            "statistic_kind": "mean",
+            "units": "fraction",
+            "value": 0.0,
+            "value_state": "finite"
+          },
+          "accounting:deferral_rate": {
+            "basis": "operational",
+            "cells": null,
+            "definition_digest": "256e1c541221842f42ed09c1c6463eea5c86a3963af8a3403334aef786823c95",
+            "denominator": 600,
+            "metric": "deferral_rate",
+            "numerator": 0.0,
+            "planned": 600,
+            "reason": null,
+            "sensitive_counts": [
+              600,
+              0,
+              0,
+              600
+            ],
+            "statistic_kind": "mean",
+            "units": "fraction",
+            "value": 0.0,
+            "value_state": "finite"
+          },
+          "accounting:input_unavailable_rate": {
+            "basis": "operational",
+            "cells": null,
+            "definition_digest": "4cfb695c59dd58461527b864621a3a37f0a20afc5055614cc0956c3b9a45f72f",
+            "denominator": 600,
+            "metric": "input_unavailable_rate",
+            "numerator": 0.0,
+            "planned": 600,
+            "reason": null,
+            "sensitive_counts": [
+              600,
+              0,
+              0,
+              600
+            ],
+            "statistic_kind": "mean",
+            "units": "fraction",
+            "value": 0.0,
+            "value_state": "finite"
+          },
+          "accounting:issued_coverage": {
+            "basis": "operational",
+            "cells": null,
+            "definition_digest": "698ccff8d9593f17d9b489b87303e1d92725e220d9640e7971ac20e2d04d57bd",
+            "denominator": 600,
+            "metric": "issued_coverage",
+            "numerator": 600.0,
+            "planned": 600,
+            "reason": null,
+            "sensitive_counts": [
+              600,
+              0,
+              600,
+              0
+            ],
+            "statistic_kind": "mean",
+            "units": "fraction",
+            "value": 1.0,
+            "value_state": "finite"
+          },
+          "accounting:issued_label_availability": {
+            "basis": "observed_outcome",
+            "cells": null,
+            "definition_digest": "2a59ad5b58b12786ecd8824eccea5290a7318936ee810fe013d474935bf5a7bb",
+            "denominator": 600,
+            "metric": "issued_label_availability",
+            "numerator": 600.0,
+            "planned": 600,
+            "reason": null,
+            "sensitive_counts": [
+              600,
+              0,
+              600,
+              0
+            ],
+            "statistic_kind": "mean",
+            "units": "fraction",
+            "value": 1.0,
+            "value_state": "finite"
+          },
+          "accounting:labeled_issued_share": {
+            "basis": "observed_outcome",
+            "cells": null,
+            "definition_digest": "81b8a118aba859081a6c40b4bcba40d98f65af3eaa03eeb2fa11debb8843ab9d",
+            "denominator": 600,
+            "metric": "labeled_issued_share",
+            "numerator": 600.0,
+            "planned": 600,
+            "reason": null,
+            "sensitive_counts": [
+              600,
+              0,
+              600,
+              0
+            ],
+            "statistic_kind": "mean",
+            "units": "fraction",
+            "value": 1.0,
+            "value_state": "finite"
+          },
+          "accounting:selective_risk": {
+            "basis": "observed_outcome",
+            "cells": null,
+            "definition_digest": "a7bb3be3f5ec692c9308a2db69c4482602cef011b1e7c6be50ee1a6971442389",
+            "denominator": 600,
+            "metric": "selective_risk",
+            "numerator": 1860.0,
+            "planned": 600,
+            "reason": null,
+            "sensitive_counts": [
+              600,
+              0
+            ],
+            "statistic_kind": "mean",
+            "units": "native_loss_units",
+            "value": 3.1,
+            "value_state": "finite"
+          },
+          "accounting:unavailable_rate": {
+            "basis": "operational",
+            "cells": null,
+            "definition_digest": "8292f3af71906a96883b73569a04454c660e17f9a1d218ed2b779ae5b3566351",
+            "denominator": 600,
+            "metric": "unavailable_rate",
+            "numerator": 0.0,
+            "planned": 600,
+            "reason": null,
+            "sensitive_counts": [
+              600,
+              0,
+              0,
+              600
+            ],
+            "statistic_kind": "mean",
+            "units": "fraction",
+            "value": 0.0,
+            "value_state": "finite"
+          },
+          "quantity_cost": {
+            "basis": "observed_outcome",
+            "cells": null,
+            "definition_digest": "54cf210bd3c297cd62edf3b121b6319779c95bed4f8c30e4d72b5c5f1ca3227c",
+            "denominator": 600,
+            "metric": "empirical_cost",
+            "numerator": 1380.0,
+            "planned": 600,
+            "reason": null,
+            "sensitive_counts": [
+              600,
+              0
+            ],
+            "statistic_kind": "mean",
+            "units": "cost_units",
+            "value": 2.3,
+            "value_state": "finite"
+          }
+        },
+        "observed_feasibility": "feasible",
+        "parameters": {
+          "action": {
+            "action": {
+              "kind": "numeric",
+              "value": 2.0
+            },
+            "kind": "action"
+          }
+        },
+        "policy_digest": "2843e6e4686883025f13d1de1d20a094320fd11aab805adf04f9dcd415987a07",
+        "trace": {
+          "capacity": [],
+          "fallback_events": {},
+          "overlap_events": {},
+          "routes": {
+            "root": 600
+          },
+          "unknown_routes": {},
+          "unresolved_predicates": {}
+        }
+      },
+      {
+        "baseline": false,
+        "complexity": [
+          1,
+          0
+        ],
+        "constraints": [],
+        "metrics": {
+          "accounting:abstention_rate": {
+            "basis": "operational",
+            "cells": null,
+            "definition_digest": "591861596c0f1402ab48eeafa697f51514a5e347f1d932d04375fc0659549c17",
+            "denominator": 600,
+            "metric": "abstention_rate",
+            "numerator": 0.0,
+            "planned": 600,
+            "reason": null,
+            "sensitive_counts": [
+              600,
+              0,
+              0,
+              600
+            ],
+            "statistic_kind": "mean",
+            "units": "fraction",
+            "value": 0.0,
+            "value_state": "finite"
+          },
+          "accounting:deferral_rate": {
+            "basis": "operational",
+            "cells": null,
+            "definition_digest": "256e1c541221842f42ed09c1c6463eea5c86a3963af8a3403334aef786823c95",
+            "denominator": 600,
+            "metric": "deferral_rate",
+            "numerator": 0.0,
+            "planned": 600,
+            "reason": null,
+            "sensitive_counts": [
+              600,
+              0,
+              0,
+              600
+            ],
+            "statistic_kind": "mean",
+            "units": "fraction",
+            "value": 0.0,
+            "value_state": "finite"
+          },
+          "accounting:input_unavailable_rate": {
+            "basis": "operational",
+            "cells": null,
+            "definition_digest": "4cfb695c59dd58461527b864621a3a37f0a20afc5055614cc0956c3b9a45f72f",
+            "denominator": 600,
+            "metric": "input_unavailable_rate",
+            "numerator": 0.0,
+            "planned": 600,
+            "reason": null,
+            "sensitive_counts": [
+              600,
+              0,
+              0,
+              600
+            ],
+            "statistic_kind": "mean",
+            "units": "fraction",
+            "value": 0.0,
+            "value_state": "finite"
+          },
+          "accounting:issued_coverage": {
+            "basis": "operational",
+            "cells": null,
+            "definition_digest": "698ccff8d9593f17d9b489b87303e1d92725e220d9640e7971ac20e2d04d57bd",
+            "denominator": 600,
+            "metric": "issued_coverage",
+            "numerator": 600.0,
+            "planned": 600,
+            "reason": null,
+            "sensitive_counts": [
+              600,
+              0,
+              600,
+              0
+            ],
+            "statistic_kind": "mean",
+            "units": "fraction",
+            "value": 1.0,
+            "value_state": "finite"
+          },
+          "accounting:issued_label_availability": {
+            "basis": "observed_outcome",
+            "cells": null,
+            "definition_digest": "2a59ad5b58b12786ecd8824eccea5290a7318936ee810fe013d474935bf5a7bb",
+            "denominator": 600,
+            "metric": "issued_label_availability",
+            "numerator": 600.0,
+            "planned": 600,
+            "reason": null,
+            "sensitive_counts": [
+              600,
+              0,
+              600,
+              0
+            ],
+            "statistic_kind": "mean",
+            "units": "fraction",
+            "value": 1.0,
+            "value_state": "finite"
+          },
+          "accounting:labeled_issued_share": {
+            "basis": "observed_outcome",
+            "cells": null,
+            "definition_digest": "81b8a118aba859081a6c40b4bcba40d98f65af3eaa03eeb2fa11debb8843ab9d",
+            "denominator": 600,
+            "metric": "labeled_issued_share",
+            "numerator": 600.0,
+            "planned": 600,
+            "reason": null,
+            "sensitive_counts": [
+              600,
+              0,
+              600,
+              0
+            ],
+            "statistic_kind": "mean",
+            "units": "fraction",
+            "value": 1.0,
+            "value_state": "finite"
+          },
+          "accounting:selective_risk": {
+            "basis": "observed_outcome",
+            "cells": null,
+            "definition_digest": "a7bb3be3f5ec692c9308a2db69c4482602cef011b1e7c6be50ee1a6971442389",
+            "denominator": 600,
+            "metric": "selective_risk",
+            "numerator": 1500.0,
+            "planned": 600,
+            "reason": null,
+            "sensitive_counts": [
+              600,
+              0
+            ],
+            "statistic_kind": "mean",
+            "units": "native_loss_units",
+            "value": 2.5,
+            "value_state": "finite"
+          },
+          "accounting:unavailable_rate": {
+            "basis": "operational",
+            "cells": null,
+            "definition_digest": "8292f3af71906a96883b73569a04454c660e17f9a1d218ed2b779ae5b3566351",
+            "denominator": 600,
+            "metric": "unavailable_rate",
+            "numerator": 0.0,
+            "planned": 600,
+            "reason": null,
+            "sensitive_counts": [
+              600,
+              0,
+              0,
+              600
+            ],
+            "statistic_kind": "mean",
+            "units": "fraction",
+            "value": 0.0,
+            "value_state": "finite"
+          },
+          "quantity_cost": {
+            "basis": "observed_outcome",
+            "cells": null,
+            "definition_digest": "54cf210bd3c297cd62edf3b121b6319779c95bed4f8c30e4d72b5c5f1ca3227c",
+            "denominator": 600,
+            "metric": "empirical_cost",
+            "numerator": 840.0,
+            "planned": 600,
+            "reason": null,
+            "sensitive_counts": [
+              600,
+              0
+            ],
+            "statistic_kind": "mean",
+            "units": "cost_units",
+            "value": 1.4,
+            "value_state": "finite"
+          }
+        },
+        "observed_feasibility": "feasible",
+        "parameters": {
+          "action": {
+            "action": {
+              "kind": "numeric",
+              "value": 4.0
+            },
+            "kind": "action"
+          }
+        },
+        "policy_digest": "2a11341d9be30a72335477d61dcb0bde6d38429ec1b3d1add0b63c8db78fdc73",
+        "trace": {
+          "capacity": [],
+          "fallback_events": {},
+          "overlap_events": {},
+          "routes": {
+            "root": 600
+          },
+          "unknown_routes": {},
+          "unresolved_predicates": {}
+        }
+      },
+      {
+        "baseline": false,
+        "complexity": [
+          1,
+          0
+        ],
+        "constraints": [],
+        "metrics": {
+          "accounting:abstention_rate": {
+            "basis": "operational",
+            "cells": null,
+            "definition_digest": "591861596c0f1402ab48eeafa697f51514a5e347f1d932d04375fc0659549c17",
+            "denominator": 600,
+            "metric": "abstention_rate",
+            "numerator": 0.0,
+            "planned": 600,
+            "reason": null,
+            "sensitive_counts": [
+              600,
+              0,
+              0,
+              600
+            ],
+            "statistic_kind": "mean",
+            "units": "fraction",
+            "value": 0.0,
+            "value_state": "finite"
+          },
+          "accounting:deferral_rate": {
+            "basis": "operational",
+            "cells": null,
+            "definition_digest": "256e1c541221842f42ed09c1c6463eea5c86a3963af8a3403334aef786823c95",
+            "denominator": 600,
+            "metric": "deferral_rate",
+            "numerator": 0.0,
+            "planned": 600,
+            "reason": null,
+            "sensitive_counts": [
+              600,
+              0,
+              0,
+              600
+            ],
+            "statistic_kind": "mean",
+            "units": "fraction",
+            "value": 0.0,
+            "value_state": "finite"
+          },
+          "accounting:input_unavailable_rate": {
+            "basis": "operational",
+            "cells": null,
+            "definition_digest": "4cfb695c59dd58461527b864621a3a37f0a20afc5055614cc0956c3b9a45f72f",
+            "denominator": 600,
+            "metric": "input_unavailable_rate",
+            "numerator": 0.0,
+            "planned": 600,
+            "reason": null,
+            "sensitive_counts": [
+              600,
+              0,
+              0,
+              600
+            ],
+            "statistic_kind": "mean",
+            "units": "fraction",
+            "value": 0.0,
+            "value_state": "finite"
+          },
+          "accounting:issued_coverage": {
+            "basis": "operational",
+            "cells": null,
+            "definition_digest": "698ccff8d9593f17d9b489b87303e1d92725e220d9640e7971ac20e2d04d57bd",
+            "denominator": 600,
+            "metric": "issued_coverage",
+            "numerator": 600.0,
+            "planned": 600,
+            "reason": null,
+            "sensitive_counts": [
+              600,
+              0,
+              600,
+              0
+            ],
+            "statistic_kind": "mean",
+            "units": "fraction",
+            "value": 1.0,
+            "value_state": "finite"
+          },
+          "accounting:issued_label_availability": {
+            "basis": "observed_outcome",
+            "cells": null,
+            "definition_digest": "2a59ad5b58b12786ecd8824eccea5290a7318936ee810fe013d474935bf5a7bb",
+            "denominator": 600,
+            "metric": "issued_label_availability",
+            "numerator": 600.0,
+            "planned": 600,
+            "reason": null,
+            "sensitive_counts": [
+              600,
+              0,
+              600,
+              0
+            ],
+            "statistic_kind": "mean",
+            "units": "fraction",
+            "value": 1.0,
+            "value_state": "finite"
+          },
+          "accounting:labeled_issued_share": {
+            "basis": "observed_outcome",
+            "cells": null,
+            "definition_digest": "81b8a118aba859081a6c40b4bcba40d98f65af3eaa03eeb2fa11debb8843ab9d",
+            "denominator": 600,
+            "metric": "labeled_issued_share",
+            "numerator": 600.0,
+            "planned": 600,
+            "reason": null,
+            "sensitive_counts": [
+              600,
+              0,
+              600,
+              0
+            ],
+            "statistic_kind": "mean",
+            "units": "fraction",
+            "value": 1.0,
+            "value_state": "finite"
+          },
+          "accounting:selective_risk": {
+            "basis": "observed_outcome",
+            "cells": null,
+            "definition_digest": "a7bb3be3f5ec692c9308a2db69c4482602cef011b1e7c6be50ee1a6971442389",
+            "denominator": 600,
+            "metric": "selective_risk",
+            "numerator": 1620.0,
+            "planned": 600,
+            "reason": null,
+            "sensitive_counts": [
+              600,
+              0
+            ],
+            "statistic_kind": "mean",
+            "units": "native_loss_units",
+            "value": 2.7,
+            "value_state": "finite"
+          },
+          "accounting:unavailable_rate": {
+            "basis": "operational",
+            "cells": null,
+            "definition_digest": "8292f3af71906a96883b73569a04454c660e17f9a1d218ed2b779ae5b3566351",
+            "denominator": 600,
+            "metric": "unavailable_rate",
+            "numerator": 0.0,
+            "planned": 600,
+            "reason": null,
+            "sensitive_counts": [
+              600,
+              0,
+              0,
+              600
+            ],
+            "statistic_kind": "mean",
+            "units": "fraction",
+            "value": 0.0,
+            "value_state": "finite"
+          },
+          "quantity_cost": {
+            "basis": "observed_outcome",
+            "cells": null,
+            "definition_digest": "54cf210bd3c297cd62edf3b121b6319779c95bed4f8c30e4d72b5c5f1ca3227c",
+            "denominator": 600,
+            "metric": "empirical_cost",
+            "numerator": 540.0,
+            "planned": 600,
+            "reason": null,
+            "sensitive_counts": [
+              600,
+              0
+            ],
+            "statistic_kind": "mean",
+            "units": "cost_units",
+            "value": 0.9,
+            "value_state": "finite"
+          }
+        },
+        "observed_feasibility": "feasible",
+        "parameters": {
+          "action": {
+            "action": {
+              "kind": "numeric",
+              "value": 6.0
+            },
+            "kind": "action"
+          }
+        },
+        "policy_digest": "0c9642c0868e674a3dac254ad0ddef6540ae780dae2d2ba6d88143e2a2f9ef57",
+        "trace": {
+          "capacity": [],
+          "fallback_events": {},
+          "overlap_events": {},
+          "routes": {
+            "root": 600
+          },
+          "unknown_routes": {},
+          "unresolved_predicates": {}
+        }
+      },
+      {
+        "baseline": false,
+        "complexity": [
+          1,
+          0
+        ],
+        "constraints": [],
+        "metrics": {
+          "accounting:abstention_rate": {
+            "basis": "operational",
+            "cells": null,
+            "definition_digest": "591861596c0f1402ab48eeafa697f51514a5e347f1d932d04375fc0659549c17",
+            "denominator": 600,
+            "metric": "abstention_rate",
+            "numerator": 0.0,
+            "planned": 600,
+            "reason": null,
+            "sensitive_counts": [
+              600,
+              0,
+              0,
+              600
+            ],
+            "statistic_kind": "mean",
+            "units": "fraction",
+            "value": 0.0,
+            "value_state": "finite"
+          },
+          "accounting:deferral_rate": {
+            "basis": "operational",
+            "cells": null,
+            "definition_digest": "256e1c541221842f42ed09c1c6463eea5c86a3963af8a3403334aef786823c95",
+            "denominator": 600,
+            "metric": "deferral_rate",
+            "numerator": 0.0,
+            "planned": 600,
+            "reason": null,
+            "sensitive_counts": [
+              600,
+              0,
+              0,
+              600
+            ],
+            "statistic_kind": "mean",
+            "units": "fraction",
+            "value": 0.0,
+            "value_state": "finite"
+          },
+          "accounting:input_unavailable_rate": {
+            "basis": "operational",
+            "cells": null,
+            "definition_digest": "4cfb695c59dd58461527b864621a3a37f0a20afc5055614cc0956c3b9a45f72f",
+            "denominator": 600,
+            "metric": "input_unavailable_rate",
+            "numerator": 0.0,
+            "planned": 600,
+            "reason": null,
+            "sensitive_counts": [
+              600,
+              0,
+              0,
+              600
+            ],
+            "statistic_kind": "mean",
+            "units": "fraction",
+            "value": 0.0,
+            "value_state": "finite"
+          },
+          "accounting:issued_coverage": {
+            "basis": "operational",
+            "cells": null,
+            "definition_digest": "698ccff8d9593f17d9b489b87303e1d92725e220d9640e7971ac20e2d04d57bd",
+            "denominator": 600,
+            "metric": "issued_coverage",
+            "numerator": 600.0,
+            "planned": 600,
+            "reason": null,
+            "sensitive_counts": [
+              600,
+              0,
+              600,
+              0
+            ],
+            "statistic_kind": "mean",
+            "units": "fraction",
+            "value": 1.0,
+            "value_state": "finite"
+          },
+          "accounting:issued_label_availability": {
+            "basis": "observed_outcome",
+            "cells": null,
+            "definition_digest": "2a59ad5b58b12786ecd8824eccea5290a7318936ee810fe013d474935bf5a7bb",
+            "denominator": 600,
+            "metric": "issued_label_availability",
+            "numerator": 600.0,
+            "planned": 600,
+            "reason": null,
+            "sensitive_counts": [
+              600,
+              0,
+              600,
+              0
+            ],
+            "statistic_kind": "mean",
+            "units": "fraction",
+            "value": 1.0,
+            "value_state": "finite"
+          },
+          "accounting:labeled_issued_share": {
+            "basis": "observed_outcome",
+            "cells": null,
+            "definition_digest": "81b8a118aba859081a6c40b4bcba40d98f65af3eaa03eeb2fa11debb8843ab9d",
+            "denominator": 600,
+            "metric": "labeled_issued_share",
+            "numerator": 600.0,
+            "planned": 600,
+            "reason": null,
+            "sensitive_counts": [
+              600,
+              0,
+              600,
+              0
+            ],
+            "statistic_kind": "mean",
+            "units": "fraction",
+            "value": 1.0,
+            "value_state": "finite"
+          },
+          "accounting:selective_risk": {
+            "basis": "observed_outcome",
+            "cells": null,
+            "definition_digest": "a7bb3be3f5ec692c9308a2db69c4482602cef011b1e7c6be50ee1a6971442389",
+            "denominator": 600,
+            "metric": "selective_risk",
+            "numerator": 2220.0,
+            "planned": 600,
+            "reason": null,
+            "sensitive_counts": [
+              600,
+              0
+            ],
+            "statistic_kind": "mean",
+            "units": "native_loss_units",
+            "value": 3.7,
+            "value_state": "finite"
+          },
+          "accounting:unavailable_rate": {
+            "basis": "operational",
+            "cells": null,
+            "definition_digest": "8292f3af71906a96883b73569a04454c660e17f9a1d218ed2b779ae5b3566351",
+            "denominator": 600,
+            "metric": "unavailable_rate",
+            "numerator": 0.0,
+            "planned": 600,
+            "reason": null,
+            "sensitive_counts": [
+              600,
+              0,
+              0,
+              600
+            ],
+            "statistic_kind": "mean",
+            "units": "fraction",
+            "value": 0.0,
+            "value_state": "finite"
+          },
+          "quantity_cost": {
+            "basis": "observed_outcome",
+            "cells": null,
+            "definition_digest": "54cf210bd3c297cd62edf3b121b6319779c95bed4f8c30e4d72b5c5f1ca3227c",
+            "denominator": 600,
+            "metric": "empirical_cost",
+            "numerator": 479.9999999999999,
+            "planned": 600,
+            "reason": null,
+            "sensitive_counts": [
+              600,
+              0
+            ],
+            "statistic_kind": "mean",
+            "units": "cost_units",
+            "value": 0.7999999999999998,
+            "value_state": "finite"
+          }
+        },
+        "observed_feasibility": "feasible",
+        "parameters": {
+          "action": {
+            "action": {
+              "kind": "numeric",
+              "value": 8.0
+            },
+            "kind": "action"
+          }
+        },
+        "policy_digest": "52f0f584e9ea5c73f84afa389f3675396716a13b4331cc409531f3e75cfc30f3",
+        "trace": {
+          "capacity": [],
+          "fallback_events": {},
+          "overlap_events": {},
+          "routes": {
+            "root": 600
+          },
+          "unknown_routes": {},
+          "unresolved_predicates": {}
+        }
+      }
+    ],
+    "conclusion": "Observed-data policy selection only; independently supported feasibility and improvement require separate assessment.",
+    "evaluation_economics": {
+      "costs": {
+        "quantity": {
+          "kind": "numeric_loss",
+          "level": 0.8,
+          "loss": "pinball",
+          "nonissued": {
+            "abstained": 3,
+            "unavailable": 5
+          }
+        }
+      },
+      "known_charges": {},
+      "metric_definitions": [
+        {
+          "basis": "observed_outcome",
+          "bounds": [
+            0,
+            10
+          ],
+          "cost": "quantity",
+          "direction": "minimize",
+          "id": "quantity_cost",
+          "interval": null,
+          "level": 0.5,
+          "loss": "absolute",
+          "metric": "empirical_cost",
+          "scope": "overall",
+          "target": null,
+          "units": "cost_units",
+          "weight": 1.0
+        },
+        {
+          "basis": "operational",
+          "bounds": [],
+          "cost": null,
+          "direction": "minimize",
+          "id": "accounting:issued_coverage",
+          "interval": null,
+          "level": 0.5,
+          "loss": "absolute",
+          "metric": "issued_coverage",
+          "scope": "overall",
+          "target": null,
+          "units": "fraction",
+          "weight": 1.0
+        },
+        {
+          "basis": "operational",
+          "bounds": [],
+          "cost": null,
+          "direction": "minimize",
+          "id": "accounting:abstention_rate",
+          "interval": null,
+          "level": 0.5,
+          "loss": "absolute",
+          "metric": "abstention_rate",
+          "scope": "overall",
+          "target": null,
+          "units": "fraction",
+          "weight": 1.0
+        },
+        {
+          "basis": "operational",
+          "bounds": [],
+          "cost": null,
+          "direction": "minimize",
+          "id": "accounting:deferral_rate",
+          "interval": null,
+          "level": 0.5,
+          "loss": "absolute",
+          "metric": "deferral_rate",
+          "scope": "overall",
+          "target": null,
+          "units": "fraction",
+          "weight": 1.0
+        },
+        {
+          "basis": "operational",
+          "bounds": [],
+          "cost": null,
+          "direction": "minimize",
+          "id": "accounting:unavailable_rate",
+          "interval": null,
+          "level": 0.5,
+          "loss": "absolute",
+          "metric": "unavailable_rate",
+          "scope": "overall",
+          "target": null,
+          "units": "fraction",
+          "weight": 1.0
+        },
+        {
+          "basis": "operational",
+          "bounds": [],
+          "cost": null,
+          "direction": "minimize",
+          "id": "accounting:input_unavailable_rate",
+          "interval": null,
+          "level": 0.5,
+          "loss": "absolute",
+          "metric": "input_unavailable_rate",
+          "scope": "overall",
+          "target": null,
+          "units": "fraction",
+          "weight": 1.0
+        },
+        {
+          "basis": "observed_outcome",
+          "bounds": [],
+          "cost": null,
+          "direction": "minimize",
+          "id": "accounting:issued_label_availability",
+          "interval": null,
+          "level": 0.5,
+          "loss": "absolute",
+          "metric": "issued_label_availability",
+          "scope": "overall",
+          "target": null,
+          "units": "fraction",
+          "weight": 1.0
+        },
+        {
+          "basis": "observed_outcome",
+          "bounds": [],
+          "cost": null,
+          "direction": "minimize",
+          "id": "accounting:labeled_issued_share",
+          "interval": null,
+          "level": 0.5,
+          "loss": "absolute",
+          "metric": "labeled_issued_share",
+          "scope": "overall",
+          "target": null,
+          "units": "fraction",
+          "weight": 1.0
+        },
+        {
+          "basis": "observed_outcome",
+          "bounds": [],
+          "cost": null,
+          "direction": "minimize",
+          "id": "accounting:selective_risk",
+          "interval": null,
+          "level": 0.5,
+          "loss": "absolute",
+          "metric": "selective_risk",
+          "scope": "overall",
+          "target": null,
+          "units": "native_loss_units",
+          "weight": 1.0
+        }
+      ]
+    },
+    "frontier": {
+      "axes": [
+        {
+          "basis": "observed_outcome",
+          "bounds": [
+            0,
+            10
+          ],
+          "cost": "quantity",
+          "direction": "minimize",
+          "id": "quantity_cost",
+          "interval": null,
+          "level": 0.5,
+          "loss": "absolute",
+          "metric": "empirical_cost",
+          "scope": "overall",
+          "target": null,
+          "units": "cost_units",
+          "weight": 1.0
+        }
+      ],
+      "dominance_complete_for_retained_pool": true,
+      "interpretation": "Empirical trade-offs; conditional risk, full-opportunity behavior and workload retain distinct denominators. No statistical distinguishability claim.",
+      "plot": null,
+      "policies": [
+        "8655301920984adcd699bda85ca32106b2443be7d9521f81dd9a676968626a72"
+      ],
+      "standing": "complete_empirical_frontier"
+    },
+    "nomination": {
+      "empirical_optimum": [
+        0.7999999999999998
+      ],
+      "nominated_objective": [
+        0.7999999999999998
+      ],
+      "policy_digest": "52f0f584e9ea5c73f84afa389f3675396716a13b4331cc409531f3e75cfc30f3",
+      "rationale": "Feasible development objectives, then declared numerical tie tolerance, structural complexity and canonical definition order.",
+      "within_selection_tolerance": false
+    },
+    "reservation": {
+      "cross_session_history_verified": false,
+      "kind": "session_and_external_declarations"
+    },
+    "retention": {
+      "evaluated_candidates": 6,
+      "omitted_candidate_detail": 0,
+      "retained_candidates": 6
+    },
+    "searches": [
+      {
+        "backend": "enumerate",
+        "certificate_scope": "Declared finite development family only.",
+        "declared_parameter_space": 4,
+        "domain_digest": "8cfee22639c364f0f9a50674b3fa5d5b6ce9ec83eaef301a3b4b7acb302d17d0",
+        "evaluated": 4,
+        "family": "quantities",
+        "search_coverage": "complete",
+        "solution_standing": "exact_finite_enumeration"
+      }
+    ],
+    "selection_record_digest": "ddcdefbc12b92e1e84631e40296d6aa6a1256f685dcb64c5514ae5502a88e67b",
+    "stage": "selection",
+    "study_design_digest": "9813205d83ce2eb05ba514e8c16c3e557657d9daf79b196d1bbd409fc5e2034c"
+  },
+  "runs": [
+    {
+      "decision_provenance": {
+        "origin": "simulated",
+        "policy_digest": "8655301920984adcd699bda85ca32106b2443be7d9521f81dd9a676968626a72",
+        "rule": "typed_policy"
+      },
+      "display_name": "policy_8655301920984adc",
+      "id": "policy_8655301920984adc",
+      "model": {
+        "artifact_sha256": null,
+        "calibration": null,
+        "display_name": "",
+        "id": "synthetic",
+        "preprocessing": null,
+        "version": "v1"
+      },
+      "representations": {
+        "hard_prediction": false,
+        "intervals": 0,
+        "probabilities": false,
+        "scores": false
+      },
+      "role": "selection",
+      "version_alias": "Frozen policy"
+    },
+    {
+      "decision_provenance": {
+        "origin": "simulated",
+        "policy_digest": "3206e30d5c5ba8a790fcbee6cf149178053468c1f47ff0035b8225260f916052",
+        "rule": "typed_policy"
+      },
+      "display_name": "policy_3206e30d5c5ba8a7",
+      "id": "policy_3206e30d5c5ba8a7",
+      "model": {
+        "artifact_sha256": null,
+        "calibration": null,
+        "display_name": "",
+        "id": "synthetic",
+        "preprocessing": null,
+        "version": "v1"
+      },
+      "representations": {
+        "hard_prediction": false,
+        "intervals": 0,
+        "probabilities": false,
+        "scores": false
+      },
+      "role": "selection",
+      "version_alias": "Frozen policy"
+    },
+    {
+      "decision_provenance": {
+        "origin": "simulated",
+        "policy_digest": "2843e6e4686883025f13d1de1d20a094320fd11aab805adf04f9dcd415987a07",
+        "rule": "typed_policy"
+      },
+      "display_name": "policy_2843e6e468688302",
+      "id": "policy_2843e6e468688302",
+      "model": {
+        "artifact_sha256": null,
+        "calibration": null,
+        "display_name": "",
+        "id": "synthetic",
+        "preprocessing": null,
+        "version": "v1"
+      },
+      "representations": {
+        "hard_prediction": false,
+        "intervals": 0,
+        "probabilities": false,
+        "scores": false
+      },
+      "role": "selection",
+      "version_alias": "Frozen policy"
+    },
+    {
+      "decision_provenance": {
+        "origin": "simulated",
+        "policy_digest": "2a11341d9be30a72335477d61dcb0bde6d38429ec1b3d1add0b63c8db78fdc73",
+        "rule": "typed_policy"
+      },
+      "display_name": "policy_2a11341d9be30a72",
+      "id": "policy_2a11341d9be30a72",
+      "model": {
+        "artifact_sha256": null,
+        "calibration": null,
+        "display_name": "",
+        "id": "synthetic",
+        "preprocessing": null,
+        "version": "v1"
+      },
+      "representations": {
+        "hard_prediction": false,
+        "intervals": 0,
+        "probabilities": false,
+        "scores": false
+      },
+      "role": "selection",
+      "version_alias": "Frozen policy"
+    },
+    {
+      "decision_provenance": {
+        "origin": "simulated",
+        "policy_digest": "0c9642c0868e674a3dac254ad0ddef6540ae780dae2d2ba6d88143e2a2f9ef57",
+        "rule": "typed_policy"
+      },
+      "display_name": "policy_0c9642c0868e674a",
+      "id": "policy_0c9642c0868e674a",
+      "model": {
+        "artifact_sha256": null,
+        "calibration": null,
+        "display_name": "",
+        "id": "synthetic",
+        "preprocessing": null,
+        "version": "v1"
+      },
+      "representations": {
+        "hard_prediction": false,
+        "intervals": 0,
+        "probabilities": false,
+        "scores": false
+      },
+      "role": "selection",
+      "version_alias": "Frozen policy"
+    },
+    {
+      "decision_provenance": {
+        "origin": "simulated",
+        "policy_digest": "52f0f584e9ea5c73f84afa389f3675396716a13b4331cc409531f3e75cfc30f3",
+        "rule": "typed_policy"
+      },
+      "display_name": "policy_52f0f584e9ea5c73",
+      "id": "policy_52f0f584e9ea5c73",
+      "model": {
+        "artifact_sha256": null,
+        "calibration": null,
+        "display_name": "",
+        "id": "synthetic",
+        "preprocessing": null,
+        "version": "v1"
+      },
+      "representations": {
+        "hard_prediction": false,
+        "intervals": 0,
+        "probabilities": false,
+        "scores": false
+      },
+      "role": "selection",
+      "version_alias": "Frozen policy"
+    }
+  ],
+  "schema_version": "confidenceguard.policy_result/1.0",
+  "task": {
+    "classes": [],
+    "horizon": null,
+    "kind": "regression",
+    "material_error": null,
+    "outcome_definition": "Synthetic engineering outcome",
+    "positive_class": null,
+    "units": "items"
+  },
+  "execution": {
+    "accounting": {
+      "counts": {
+        "contribution_cells": 37800,
+        "dominance_pairs": 10,
+        "max_candidates": 4,
+        "max_search_states": 4,
+        "metric_records": 54
+      },
+      "limits": {
+        "action_cells": 100000000,
+        "assessment_claims": 256,
+        "assessment_components": 4096,
+        "assessment_policies": 8,
+        "beam_width": 64,
+        "contribution_cells": 100000000,
+        "dominance_pairs": 10000000,
+        "materialized_bytes": 1073741824,
+        "max_candidates": 4096,
+        "max_cells": 32,
+        "max_cutpoints": 1000000,
+        "max_options": 256,
+        "max_search_states": 1000000,
+        "metric_records": 65536,
+        "predicate_events": 100000000,
+        "solver_calls": 64,
+        "solver_nodes": 100000,
+        "solver_nonzeros": 1000000,
+        "solver_rows": 8192,
+        "solver_seconds": 300,
+        "solver_variables": 8192
+      },
+      "materialized_limit_bytes": 1073741824,
+      "retained_allocation_bytes": 4157144,
+      "version": "policy_countable_operations_v1"
+    },
+    "backend": "duckdb_local",
+    "peak_spill_bytes": 0,
+    "peak_worker_rss_bytes": 166166528,
+    "peak_workspace_bytes": 2682880,
+    "publication_policy": "whole_evaluation_atomic",
+    "resource_qualification": "Sampled supervision and explicit algorithm counters; no hard capacity guarantee.",
+    "serialized_bytes": 772609,
+    "status": "completed",
+    "whole_job_seconds": 5.459839375107549
+  },
+  "binding": {
+    "analysis_digest": "6a22b91b86af4b3c8cf7bb7c045b767fa41adad315ff90ab3c28a989e0d7bd2b",
+    "private_manifest_digest": "b6e27f285cb7cfc072793e4431a6345fabf5aa82e6b6383964eeb813a1fa2071"
+  }
+}

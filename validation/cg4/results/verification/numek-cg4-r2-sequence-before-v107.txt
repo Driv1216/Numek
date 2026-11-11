@@ -1,0 +1,20 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+__ test_sequence_uses_fresh_locked_panels_and_does_not_repeat_existing_broad ___
+
+tmp_path = PosixPath('/private/var/folders/cs/c15xvw9d3t53tzcws5yxjxcr0000gn/T/pytest-of-drivyaanshyadav/pytest-567/test_sequence_uses_fresh_locke0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x1094fec40>
+
+    def test_sequence_uses_fresh_locked_panels_and_does_not_repeat_existing_broad(tmp_path,monkeypatch):
+        module=tool(monkeypatch);protocol,jobs=module.panels(module.ROOT,tmp_path)
+        assert protocol['seed_panels']['recovery_qualification']['start']==300000
+        assert not any(kind=='recovery' and name==module.BROAD for kind,name,*_ in jobs)
+        objectives=[name for kind,name,*_ in jobs if kind=='objective']
+>       assert len(objectives)==14 and 'paired_precision' in objectives
+E       AssertionError: assert (15 == 14)
+E        +  where 15 = len(['false_negative', 'false_positive', 'precision', 'probability_quality', 'calibration_residual', 'calibration_bins', ...])
+
+tests/cg4/test_selection_campaign.py:21: AssertionError
+=========================== short test summary info ============================
+FAILED tests/cg4/test_selection_campaign.py::test_sequence_uses_fresh_locked_panels_and_does_not_repeat_existing_broad
+1 failed in 0.99s

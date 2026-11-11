@@ -43,6 +43,7 @@ def safe_checks(raw,spec,runs,intervals):
 def harden_shared(data):
     """Re-export legacy conservative projections safely, without inventing lost evidence."""
     data=copy.deepcopy(data)
+    if data.get('schema_version') in {'confidenceguard.investigation_result/1.0','confidenceguard.confirmation_assessment/1.0'}:return data
     if data.get('schema_version')=='confidenceguard.evaluation_result/1.1':return data
     if data.get('disclosure',{}).get('policy')!='conservative_aggregates_v1' or data.get('coverage',{}).get('projection_revision')==PROJECTION_REVISION:return data
     data['measurements']=[m for m in data['measurements'] if m['metric'] not in RANKING_DETAILS]

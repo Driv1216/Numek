@@ -1,0 +1,602 @@
+.guided {
+  --ink: #24392f;
+  --muted: #68746c;
+  --line: #d7dcd3;
+  --accent: #315c45;
+  background: #f6f5ee;
+  color: var(--ink);
+  font:
+    14px/1.5 "Avenir Next",
+    "Segoe UI",
+    sans-serif;
+  min-height: 100vh;
+}
+.g-header {
+  height: 85px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 4%;
+  border-bottom: 1px solid var(--line);
+  gap: 15px;
+}
+.g-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+  letter-spacing: 1px;
+}
+.g-brand small {
+  display: block;
+  font-weight: 400;
+  letter-spacing: 0;
+  font-size: 11px;
+}
+.g-symbol {
+  font: 25px Georgia;
+  border: 1px solid #6d8071;
+  border-radius: 50%;
+  height: 39px;
+  width: 39px;
+  display: grid;
+  place-items: center;
+}
+.g-local {
+  font-size: 12px;
+  color: var(--muted);
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.guided button {
+  background: none;
+  border: 0;
+  color: inherit;
+  padding: 10px 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.g-header > button {
+  border: 1px solid var(--line);
+  border-radius: 3px;
+}
+.g-stages {
+  display: flex;
+  justify-content: center;
+  padding: 22px 4%;
+  border-bottom: 1px solid var(--line);
+  gap: 8px;
+}
+.g-stages button {
+  font-size: 13px;
+  position: relative;
+  padding: 7px 20px;
+  gap: 10px;
+  color: var(--muted);
+}
+.g-stages button > span {
+  font-size: 11px;
+  border: 1px solid var(--line);
+  height: 25px;
+  width: 25px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+}
+.g-stages button.current {
+  color: var(--accent);
+  font-weight: 600;
+}
+.g-stages button.current > span {
+  background: var(--accent);
+  color: white;
+  border-color: var(--accent);
+}
+.g-stage-arrow {
+  margin-left: 25px;
+  color: #a1a99e;
+}
+.g-work {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 260px;
+  max-width: 1250px;
+  margin: auto;
+  gap: 70px;
+  padding: 38px 5% 55px;
+}
+.g-main {
+  animation: g-enter 0.25s ease;
+}
+.g-eyebrow {
+  font-size: 10px;
+  letter-spacing: 1.6px;
+  color: var(--muted);
+  display: flex;
+  justify-content: space-between;
+  gap: 15px;
+  margin-bottom: 23px;
+}
+.g-eyebrow > span {
+  font-size: 9px;
+}
+.guided h1 {
+  font-size: clamp(30px, 3.5vw, 44px);
+  line-height: 1.14;
+  font-weight: 500;
+  letter-spacing: -1.7px;
+  margin-bottom: 16px;
+}
+.g-lead {
+  color: var(--muted);
+  max-width: 650px;
+  font-size: 15px;
+  margin-bottom: 30px;
+}
+.g-purpose {
+  display: grid;
+  gap: 12px;
+}
+.g-purpose > button {
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  text-align: left;
+  padding: 22px;
+  gap: 20px;
+  align-items: start;
+  background: #fff9;
+}
+.g-purpose > button.selected {
+  background: #edf1e8;
+  border-color: #688471;
+}
+.g-purpose h3,
+.g-source h3 {
+  margin: 0 0 7px;
+  font-size: 16px;
+  font-weight: 500;
+}
+.g-purpose p,
+.g-source p {
+  color: var(--muted);
+  font-size: 12px;
+  margin: 0;
+}
+.g-purpose > button > span:last-child {
+  margin-left: auto;
+}
+.guided details {
+  border-block: 1px solid var(--line);
+  padding: 16px 0;
+  margin: 24px 0;
+  font-size: 12px;
+}
+.guided summary {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.guided details p {
+  margin-top: 16px;
+}
+.guided .g-primary {
+  background: var(--accent);
+  color: white;
+  border-radius: 3px;
+  padding: 13px 20px;
+  margin-top: 18px;
+}
+.g-actions {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  flex-wrap: wrap;
+  margin-top: 25px;
+}
+.g-actions > button:not(.g-primary),
+.g-actions > a {
+  border-bottom: 1px solid var(--line);
+  padding: 10px 0;
+  text-decoration: none;
+  font-size: 12px;
+}
+.g-context {
+  border-left: 1px solid var(--line);
+  padding-left: 30px;
+  position: relative;
+}
+.g-context-line {
+  width: 30px;
+  height: 2px;
+  background: #829078;
+  margin: 40px 0 22px;
+}
+.g-context h2 {
+  font:
+    27px/1.2 Georgia,
+    serif;
+  letter-spacing: -0.7px;
+}
+.g-context p {
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.75;
+}
+.g-aside-note {
+  margin-top: 45px;
+}
+.g-aside-note h4 {
+  font-size: 12px;
+  margin-bottom: 9px;
+}
+.g-context > button {
+  font-size: 11px;
+  padding-left: 0;
+  text-align: left;
+}
+.g-margin-index {
+  display: block;
+  font: 70px Georgia;
+  color: #c6cdc0;
+  margin-top: 30px;
+}
+.g-footer {
+  display: flex;
+  justify-content: space-between;
+  padding: 20px 5%;
+  font-size: 10px;
+  color: var(--muted);
+  border-top: 1px solid var(--line);
+  gap: 10px;
+}
+.g-source {
+  width: 100%;
+  border: 1px solid var(--line) !important;
+  padding: 24px !important;
+  gap: 20px !important;
+  text-align: left;
+  background: #fff8 !important;
+  margin-bottom: 25px;
+}
+.g-source > span {
+  margin-left: auto;
+  font-size: 12px;
+}
+.g-table {
+  overflow: auto;
+  margin-top: 20px;
+}
+.g-table table {
+  width: 100%;
+  font-size: 11px;
+  white-space: nowrap;
+}
+.g-table td,
+.g-table th {
+  padding: 10px 13px;
+  border-bottom: 1px solid var(--line);
+}
+.g-table th {
+  font-weight: 500;
+  background: #e9ede4;
+}
+.g-field {
+  display: block;
+  font-size: 12px;
+  margin: 24px 0 15px;
+}
+.g-field input,
+.g-field select,
+.g-field textarea {
+  display: block;
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #bcc7b9;
+  background: #fff9;
+  border-radius: 3px;
+  color: var(--ink);
+  margin-top: 8px;
+}
+.g-field textarea {
+  min-height: 75px;
+}
+.g-callout {
+  border-left: 2px solid #6d8a74;
+  padding: 8px 18px;
+  margin: 20px 0;
+  background: #eaf0e5;
+}
+.g-callout p {
+  font-size: 12px;
+  margin: 8px 0;
+}
+.g-mapping {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  background: #e9eee5;
+  padding: 20px;
+  font-size: 12px;
+}
+.g-facts {
+  display: flex;
+  gap: 25px;
+  flex-wrap: wrap;
+  font-size: 12px;
+}
+.g-facts span b {
+  display: block;
+  margin-top: 7px;
+}
+.g-confirm {
+  background: #eaeee6;
+  padding: 25px;
+}
+.g-confirm dl {
+  display: grid;
+  grid-template-columns: 100px 1fr;
+  gap: 14px;
+  font-size: 12px;
+}
+.g-confirm dd {
+  margin: 0;
+}
+.g-check {
+  display: flex;
+  align-items: start;
+  gap: 12px;
+  font-size: 12px;
+  margin-top: 22px;
+}
+.g-check input {
+  accent-color: #315c45;
+}
+.g-result-strip {
+  display: flex;
+  border-block: 1px solid var(--line);
+  padding: 24px 0;
+  gap: 45px;
+  margin-bottom: 18px;
+}
+.g-result-strip b {
+  font-size: 34px;
+  font-weight: 500;
+  letter-spacing: -1px;
+}
+.g-result-strip b span {
+  font-size: 14px;
+  letter-spacing: 0;
+  color: var(--muted);
+  margin-left: 5px;
+}
+.g-result-strip p {
+  font-size: 11px;
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+.g-tabs {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 20px;
+  border-bottom: 1px solid var(--line);
+  flex-wrap: wrap;
+}
+.g-tabs button {
+  font-size: 11px;
+  padding: 13px 0;
+}
+.g-tabs .active {
+  border-bottom: 2px solid var(--accent);
+}
+.g-tabs button:last-child {
+  margin-left: auto;
+}
+.g-findings section {
+  border-bottom: 1px solid var(--line);
+}
+.g-findings section > button {
+  width: 100%;
+  text-align: left;
+  padding: 16px 0;
+  gap: 17px;
+  align-items: start;
+}
+.g-findings h3 {
+  font-size: 15px;
+  font-weight: 500;
+  margin: 0 0 5px;
+}
+.g-findings p {
+  font-size: 11px;
+  color: var(--muted);
+  margin: 0;
+}
+.g-findings section > button > svg {
+  margin-left: auto;
+}
+.g-order {
+  color: #748570;
+  font-size: 12px;
+  padding-top: 2px;
+}
+.g-detail {
+  padding: 10px 10px 25px 34px;
+}
+.g-detail > p {
+  font-size: 12px;
+}
+.g-detail h4 {
+  font-size: 11px;
+  margin: 16px 0 5px;
+}
+.g-detail small {
+  font-size: 10px;
+  color: #6a7568;
+  display: block;
+  margin-top: 15px;
+}
+.g-small {
+  font-size: 10px !important;
+  color: var(--muted);
+  margin-top: 12px !important;
+}
+.g-evidence {
+  display: grid;
+  grid-template-columns: 1fr 1.1fr;
+  gap: 25px;
+}
+.g-evidence p {
+  font-size: 12px;
+}
+.g-evidence article {
+  background: #fff9;
+  border: 1px solid var(--line);
+  padding: 20px;
+  margin-bottom: 12px;
+}
+.g-evidence article h4 {
+  font-size: 12px;
+  margin: 10px 0;
+}
+.g-evidence article pre {
+  font: 10px/1.6 monospace;
+  color: var(--muted);
+  background: #f1f1e9;
+  padding: 10px;
+}
+.g-evidence a {
+  font-size: 11px;
+}
+.g-status {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  display: block;
+  margin-bottom: 12px;
+  color: #85552e;
+}
+.g-method {
+  border-bottom: 1px solid var(--line);
+  padding: 18px 0;
+}
+.g-method h3 {
+  font-size: 16px;
+  font-weight: 500;
+}
+.g-method p {
+  font-size: 12px;
+  color: var(--muted);
+}
+@keyframes g-enter {
+  from {
+    opacity: 0;
+    transform: translateY(5px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@media (max-width: 900px) {
+  .g-work {
+    gap: 28px;
+    grid-template-columns: 1fr 200px;
+  }
+  .g-stages button {
+    padding: 5px 10px;
+  }
+  .g-stage-arrow {
+    margin-left: 4px;
+  }
+  .g-local {
+    display: none;
+  }
+}
+@media (max-width: 650px) {
+  .g-work {
+    display: block;
+    padding: 25px 22px;
+  }
+  .g-context {
+    margin-top: 40px;
+    border-left: 0;
+    border-top: 1px solid var(--line);
+    padding: 25px 0;
+  }
+  .g-context-line,
+  .g-margin-index {
+    display: none;
+  }
+  .g-aside-note {
+    margin-top: 20px;
+  }
+  .g-stages {
+    overflow: auto;
+    justify-content: start;
+    gap: 2px;
+    padding: 15px 10px;
+  }
+  .g-stages button {
+    font-size: 10px;
+    padding: 5px 7px;
+    gap: 6px;
+  }
+  .g-stage-arrow {
+    display: none;
+  }
+  .g-stages button > span {
+    width: 20px;
+    height: 20px;
+  }
+  .g-header {
+    height: 70px;
+  }
+  .g-eyebrow > span {
+    display: none;
+  }
+  .g-result-strip {
+    gap: 22px;
+  }
+  .g-result-strip b {
+    font-size: 26px;
+  }
+  .g-tabs {
+    gap: 14px;
+  }
+  .g-tabs button:last-child {
+    margin-left: 0;
+  }
+  .g-evidence {
+    grid-template-columns: 1fr;
+  }
+  .g-purpose > button {
+    padding: 16px;
+    gap: 13px;
+  }
+  .g-purpose h3 {
+    font-size: 14px;
+  }
+  .g-mapping {
+    flex-wrap: wrap;
+  }
+}
+@media (max-width: 650px) {
+  .g-stages button {
+    font-size: 0;
+    flex: 0 0 auto;
+    padding: 5px 13px;
+    gap: 0;
+  }
+  .g-stages button.current {
+    font-size: 10px;
+    gap: 7px;
+  }
+  .g-stages button > span {
+    font-size: 9px;
+  }
+  .g-main {
+    animation: none;
+  }
+}

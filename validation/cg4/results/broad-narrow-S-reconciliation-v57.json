@@ -1,0 +1,281 @@
+{
+  "first_severity_gate_preserved": true,
+  "harness_sha256": "7fb60dfa34c64ac458d0fec6eb05e1126972d4798fc665dee266d563286e4db7",
+  "original_diagnostic_sha256": "f679cccd6e7b8536f0ca8b35e6e876168f0d504059824688442668a4b599f4b8",
+  "original_shortlist": [
+    "fa51768273f842b5596ebca359977d27",
+    "ae9d4178da1a6fc72b551ee85385a1da",
+    "cabe3a87e1aba6ca76e5e90d8e13412e",
+    "edaece0b6857835435951faf34c4d159",
+    "7fb151de4b7208b279877c818417cdce",
+    "eea88868ee2e621279f30231042ac562",
+    "64157dfd5b4d82fba34d75ee1abbcce7",
+    "70a3d0001df0d69f6d6a07bd8c107ce8",
+    "45a2ec79da92b4fd56978f1a00b698d0",
+    "4adfdc199689a49e1f1f3164244c3e9d"
+  ],
+  "original_source_identity": "d8f73aaacf3d835d4323561e94336fccef453cdc6db5c985af2357b4084dcc46",
+  "protected_manifest_sha256": "ce5b5fcd110ab3e64d0fd959f83e40dc1c75a1c421036eef62afd4247c11f66f",
+  "protected_result_sha256": "d8ee6653b4fda64809bb0f11960eeb79693c17c663d4acd7d939889eda7b1e2e",
+  "revised_shortlist": [
+    "fa51768273f842b5596ebca359977d27",
+    "e77b6c0dbb5b397c6b042abcafba92a9"
+  ],
+  "roles": {
+    "D": {
+      "original": {
+        "members": 2780,
+        "oracle_IoU": 0.6813349814585908,
+        "oracle_precision": 0.9913669064748202,
+        "oracle_recall": 0.6854016413827406,
+        "planned": 20022
+      },
+      "revised": {
+        "members": 4005,
+        "oracle_IoU": 0.982217831563349,
+        "oracle_precision": 0.9930087390761548,
+        "oracle_recall": 0.9890574483959215,
+        "planned": 20022
+      }
+    },
+    "S": {
+      "original": {
+        "members": 1385,
+        "oracle_IoU": 0.6910365548322484,
+        "oracle_precision": 0.9963898916967509,
+        "oracle_recall": 0.6927710843373494,
+        "planned": 9902
+      },
+      "revised": {
+        "members": 1974,
+        "oracle_IoU": 0.9800299550673989,
+        "oracle_precision": 0.9944275582573455,
+        "oracle_recall": 0.9854417670682731,
+        "planned": 9902
+      }
+    }
+  },
+  "schema_version": "numek.cg4_S_selection_replay/1.0",
+  "scope": "Post-hoc D/S-only development comparison from original frozen candidate masks. Uses current shared marginal reducers; all original masks, effects and models remain unchanged. No model fit, H membership/effect evaluation, new independent claim or qualification conclusion.",
+  "seed": 100000,
+  "selected_S_evidence": [
+    {
+      "conditional_members": 277,
+      "effect": 0.5573737165361714,
+      "id": "fa51768273f842b5596ebca359977d27",
+      "marginal": null,
+      "reason": "severity_anchor"
+    },
+    {
+      "conditional_members": 1974,
+      "effect": 0.3156252012796015,
+      "id": "e77b6c0dbb5b397c6b042abcafba92a9",
+      "marginal": {
+        "admission_threshold": 0.15,
+        "admitted": true,
+        "evidence": {
+          "available": 9625,
+          "comparator_metric": {
+            "measurement": {
+              "applicability": "applicable",
+              "basis": "measured",
+              "data": {},
+              "denominator": 7928,
+              "denominator_kind": "eligible_records",
+              "disclosure_group": "S",
+              "evidence_refs": [],
+              "execution": "completed",
+              "family": "performance",
+              "id": "m1",
+              "interpretation": "descriptive",
+              "method_standing": "established_method",
+              "method_version": "1",
+              "metric": "accuracy",
+              "population_id": "pop_2794b2abf8813902cb466ed796b2bd34",
+              "reason": null,
+              "run": "candidate",
+              "scope": "S/comparator",
+              "sensitive_counts": [
+                7141,
+                787
+              ],
+              "support_warning": false,
+              "units": null,
+              "value": 0.9007315842583249,
+              "value_state": "finite"
+            },
+            "metric_identity": {
+              "dimensions": {},
+              "family": "performance",
+              "method_version": "1",
+              "metric": "accuracy",
+              "units": null
+            },
+            "objective_identity": {
+              "authoritative_metric": "accuracy",
+              "authoritative_transform": "one_minus",
+              "bounds": [],
+              "ceiling": null,
+              "comparator": "complement",
+              "conditional_denominator": "eligible_records",
+              "current_period": null,
+              "definition_version": "failure_objective_v1",
+              "direction": "higher",
+              "eligible_population": "outcome_valid AND decision IS NOT NULL AND state IN ('issued','hypothetical')",
+              "id": "error",
+              "interval": null,
+              "learning_target": "(decision<>y)::DOUBLE",
+              "material_error": null,
+              "metric": "error_rate",
+              "metric_identity": {},
+              "nominal": null,
+              "paired_reference": null,
+              "practical_threshold": 0.15,
+              "proxy": "exact_additive_loss",
+              "reference_period": null,
+              "reference_run": null,
+              "run": "candidate",
+              "target": null,
+              "task": {
+                "classes": [
+                  "0",
+                  "1"
+                ],
+                "horizon": null,
+                "kind": "binary_classification",
+                "material_error": null,
+                "outcome_definition": "synthetic_issued_error",
+                "positive_class": "1",
+                "units": null
+              },
+              "training_clip": 30.0,
+              "units": "fraction"
+            },
+            "population_id": "pop_2794b2abf8813902cb466ed796b2bd34",
+            "reason": null,
+            "support": 7928,
+            "value": 0.09926841574167511,
+            "value_state": "finite"
+          },
+          "conditional_members": 1697,
+          "conditional_nonmembers": 7928,
+          "effect": 0.2684393037633337,
+          "effect_state": "finite",
+          "member_metric": {
+            "measurement": {
+              "applicability": "applicable",
+              "basis": "measured",
+              "data": {},
+              "denominator": 1697,
+              "denominator_kind": "eligible_records",
+              "disclosure_group": "S",
+              "evidence_refs": [],
+              "execution": "completed",
+              "family": "performance",
+              "id": "m1",
+              "interpretation": "descriptive",
+              "method_standing": "established_method",
+              "method_version": "1",
+              "metric": "accuracy",
+              "population_id": "pop_e780036255dd6d7d81d9544d79e4b9f9",
+              "reason": null,
+              "run": "candidate",
+              "scope": "S/members",
+              "sensitive_counts": [
+                1073,
+                624
+              ],
+              "support_warning": false,
+              "units": null,
+              "value": 0.6322922804949912,
+              "value_state": "finite"
+            },
+            "metric_identity": {
+              "dimensions": {},
+              "family": "performance",
+              "method_version": "1",
+              "metric": "accuracy",
+              "units": null
+            },
+            "objective_identity": {
+              "authoritative_metric": "accuracy",
+              "authoritative_transform": "one_minus",
+              "bounds": [],
+              "ceiling": null,
+              "comparator": "complement",
+              "conditional_denominator": "eligible_records",
+              "current_period": null,
+              "definition_version": "failure_objective_v1",
+              "direction": "higher",
+              "eligible_population": "outcome_valid AND decision IS NOT NULL AND state IN ('issued','hypothetical')",
+              "id": "error",
+              "interval": null,
+              "learning_target": "(decision<>y)::DOUBLE",
+              "material_error": null,
+              "metric": "error_rate",
+              "metric_identity": {},
+              "nominal": null,
+              "paired_reference": null,
+              "practical_threshold": 0.15,
+              "proxy": "exact_additive_loss",
+              "reference_period": null,
+              "reference_run": null,
+              "run": "candidate",
+              "target": null,
+              "task": {
+                "classes": [
+                  "0",
+                  "1"
+                ],
+                "horizon": null,
+                "kind": "binary_classification",
+                "material_error": null,
+                "outcome_definition": "synthetic_issued_error",
+                "positive_class": "1",
+                "units": null
+              },
+              "training_clip": 30.0,
+              "units": "fraction"
+            },
+            "population_id": "pop_e780036255dd6d7d81d9544d79e4b9f9",
+            "reason": null,
+            "support": 1697,
+            "value": 0.3677077195050088,
+            "value_state": "finite"
+          },
+          "members": 1697,
+          "membership_unavailable_reasons": {
+            "already_covered_by_selected_candidates": 277
+          },
+          "nonmembers": 7928,
+          "outcome_observation_states": {
+            "observed_eligible": 9902
+          },
+          "planned": 9902,
+          "sensitive_counts": [
+            1073,
+            624,
+            7141,
+            787,
+            9902
+          ],
+          "unavailable": 277
+        },
+        "interpretation": "Exploratory selection only; the original candidate gate and its original population remain unchanged.",
+        "minimum_conditional_support": 30,
+        "population": "S excluding already covered members, requiring all preceding memberships applicable",
+        "practical_threshold": 0.15,
+        "previous_candidates": [
+          "fa51768273f842b5596ebca359977d27"
+        ],
+        "threshold_basis": "declared_material_effect"
+      },
+      "reason": "material_excess_support_anchor"
+    }
+  ],
+  "selection_policy": "severity_material_excess_support_frontier_v2",
+  "sources": {
+    "src/confidenceguard/investigation.py": "5fbadc4d7a9ced65c864244f91950976d4acbda15108c03d800a0f6763b84a9e",
+    "src/confidenceguard/investigation_reconciliation.py": "007c5bd2f22301b77f037e6a55143c59f480be102111614077e8b0da44497ef0"
+  }
+}

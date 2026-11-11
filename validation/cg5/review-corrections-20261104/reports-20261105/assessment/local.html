@@ -1,0 +1,339 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Decision policy study — ConfidenceGuard</title><style>
+@page{size:A4;margin:17mm 14mm}*{box-sizing:border-box}body{font:11px/1.5 Arial,sans-serif;color:#182432;margin:0}main{max-width:1050px;margin:auto;padding:24px}h1{font-size:28px;line-height:1.15}h2{font-size:18px;margin-top:28px}h3{font-size:13px}p,td,th{overflow-wrap:anywhere}small,.note{color:#536375}header{border-bottom:3px solid #196d70;padding-bottom:16px}section{break-before:page}section:first-of-type{break-before:auto}table{width:100%;border-collapse:collapse;table-layout:fixed}th,td{padding:7px;text-align:left;vertical-align:top;border-bottom:1px solid #d7e1e5}th{background:#edf4f4}tr{break-inside:avoid}thead{display:table-header-group}pre{white-space:pre-wrap;overflow-wrap:anywhere;font:9px/1.4 monospace;border-left:2px solid #c4d8d8;padding-left:8px}figure{break-inside:avoid;margin:18px 0}svg{width:380px;max-width:100%;height:210px}details{margin:12px 0}.banner{padding:12px;background:#edf4f4}.value{font-variant-numeric:tabular-nums}@media print{main{padding:0}details{display:block}details>summary{font-weight:bold}details pre{display:block}a{color:inherit}}
+ .cg2 section,.cg4 section{break-before:auto}.cg2 h2,.cg4 h2,.cg4 h3{break-after:avoid}.cg4 article{break-inside:avoid}.cg4 .candidate-intro,.cg4 .overlap-intro{break-after:avoid}</style></head><body class=""><main><header><p>NUMEK / ConfidenceGuard · Model Reliability Intelligence</p><h1>Decision policy study</h1><p>Binary Classification · 2026-11-05T05:10:19.727172+00:00</p><p>Method policy_selection_v1 · confidenceguard.policy_result/1.0</p><div class="banner">Exact protected local report — contains confidential aggregate evidence. No overall reliability score or production approval is defined.</div></header>
+<section class="cg5"><h2>Decision record · assessment</h2><p>Executable policies, empirical feasibility, search completeness and independent statistical support are separate conclusions. This record authorizes no deployment.</p>
+<h3>Frozen behavior, decision economics and input dependencies</h3><p>Exact definitions and decision costs appear only in this protected audience. Replaying supplied actions does not recover a production rule.</p><pre>{
+  "228a9f59fd91c308d6a2f788e6bb7134aab1700b94399ad4f0cd123103fde15a": {
+    "decision_costs": {},
+    "fallback": {
+      "kind": "abstain"
+    },
+    "input_identity": {
+      "decision": {
+        "candidate_evaluation": false,
+        "column": null,
+        "rule": "none",
+        "state_column": null,
+        "state_values": {
+          "abstained": "abstained",
+          "failed": "failed",
+          "issued": "issued",
+          "missing": "missing"
+        },
+        "threshold": null,
+        "tie_policy": "abstain"
+      },
+      "feature_time_policy": "declared_information_cutoff_v2",
+      "feature_time_view": "available_at_decision",
+      "features": [],
+      "intervals": [],
+      "method_digest": null,
+      "model": {
+        "artifact_sha256": null,
+        "calibration": null,
+        "id": "supplied",
+        "preprocessing": null,
+        "version": "v1"
+      },
+      "prediction": null,
+      "prediction_at": null,
+      "probability": {
+        "columns": {},
+        "positive_column": "p"
+      },
+      "probability_tolerance": 1e-06,
+      "region_representations": [],
+      "regions": [],
+      "representation": null,
+      "score": null,
+      "selection": null,
+      "task": {
+        "classes": [
+          "no",
+          "yes"
+        ],
+        "horizon": null,
+        "kind": "binary_classification",
+        "material_error": null,
+        "outcome_definition": "event",
+        "positive_class": "yes",
+        "units": null
+      },
+      "version": "policy_input_semantics_v2"
+    },
+    "nodes": {
+      "no": {
+        "action": {
+          "kind": "label",
+          "label": "no"
+        },
+        "kind": "action"
+      },
+      "root": {
+        "accepted": "yes",
+        "kind": "accept",
+        "rejected": "no",
+        "when": {
+          "constant": 0.65,
+          "kind": "compare",
+          "op": "ge",
+          "value": {
+            "kind": "probability",
+            "target": "yes"
+          }
+        }
+      },
+      "yes": {
+        "action": {
+          "kind": "label",
+          "label": "yes"
+        },
+        "kind": "action"
+      }
+    },
+    "root": "root",
+    "run": "model",
+    "schema_version": "confidenceguard.policy_spec/1.0",
+    "task": {
+      "classes": [
+        "no",
+        "yes"
+      ],
+      "horizon": null,
+      "kind": "binary_classification",
+      "material_error": null,
+      "outcome_definition": "event",
+      "positive_class": "yes",
+      "units": null
+    },
+    "unavailable": {
+      "kind": "abstain"
+    }
+  }
+}</pre><h3>Evaluation economics and estimand definitions</h3><pre>{
+  "costs": {},
+  "known_charges": {},
+  "metric_definitions": [
+    {
+      "basis": "observed_outcome",
+      "bounds": [],
+      "cost": null,
+      "direction": "maximize",
+      "id": "accuracy",
+      "interval": null,
+      "level": 0.5,
+      "loss": "absolute",
+      "metric": "issued_accuracy",
+      "scope": "overall",
+      "target": null,
+      "units": "fraction",
+      "weight": 1.0
+    },
+    {
+      "basis": "operational",
+      "bounds": [],
+      "cost": null,
+      "direction": "minimize",
+      "id": "accounting:issued_coverage",
+      "interval": null,
+      "level": 0.5,
+      "loss": "absolute",
+      "metric": "issued_coverage",
+      "scope": "overall",
+      "target": null,
+      "units": "fraction",
+      "weight": 1.0
+    },
+    {
+      "basis": "operational",
+      "bounds": [],
+      "cost": null,
+      "direction": "minimize",
+      "id": "accounting:abstention_rate",
+      "interval": null,
+      "level": 0.5,
+      "loss": "absolute",
+      "metric": "abstention_rate",
+      "scope": "overall",
+      "target": null,
+      "units": "fraction",
+      "weight": 1.0
+    },
+    {
+      "basis": "operational",
+      "bounds": [],
+      "cost": null,
+      "direction": "minimize",
+      "id": "accounting:deferral_rate",
+      "interval": null,
+      "level": 0.5,
+      "loss": "absolute",
+      "metric": "deferral_rate",
+      "scope": "overall",
+      "target": null,
+      "units": "fraction",
+      "weight": 1.0
+    },
+    {
+      "basis": "operational",
+      "bounds": [],
+      "cost": null,
+      "direction": "minimize",
+      "id": "accounting:unavailable_rate",
+      "interval": null,
+      "level": 0.5,
+      "loss": "absolute",
+      "metric": "unavailable_rate",
+      "scope": "overall",
+      "target": null,
+      "units": "fraction",
+      "weight": 1.0
+    },
+    {
+      "basis": "operational",
+      "bounds": [],
+      "cost": null,
+      "direction": "minimize",
+      "id": "accounting:input_unavailable_rate",
+      "interval": null,
+      "level": 0.5,
+      "loss": "absolute",
+      "metric": "input_unavailable_rate",
+      "scope": "overall",
+      "target": null,
+      "units": "fraction",
+      "weight": 1.0
+    },
+    {
+      "basis": "observed_outcome",
+      "bounds": [],
+      "cost": null,
+      "direction": "minimize",
+      "id": "accounting:issued_label_availability",
+      "interval": null,
+      "level": 0.5,
+      "loss": "absolute",
+      "metric": "issued_label_availability",
+      "scope": "overall",
+      "target": null,
+      "units": "fraction",
+      "weight": 1.0
+    },
+    {
+      "basis": "observed_outcome",
+      "bounds": [],
+      "cost": null,
+      "direction": "minimize",
+      "id": "accounting:labeled_issued_share",
+      "interval": null,
+      "level": 0.5,
+      "loss": "absolute",
+      "metric": "labeled_issued_share",
+      "scope": "overall",
+      "target": null,
+      "units": "fraction",
+      "weight": 1.0
+    },
+    {
+      "basis": "observed_outcome",
+      "bounds": [],
+      "cost": null,
+      "direction": "minimize",
+      "id": "accounting:selective_risk",
+      "interval": null,
+      "level": 0.5,
+      "loss": "absolute",
+      "metric": "selective_risk",
+      "scope": "overall",
+      "target": null,
+      "units": "fraction",
+      "weight": 1.0
+    },
+    {
+      "basis": "observed_outcome",
+      "bounds": [],
+      "cost": null,
+      "direction": "minimize",
+      "id": "accounting:correct_issue_rate",
+      "interval": null,
+      "level": 0.5,
+      "loss": "absolute",
+      "metric": "correct_issue_rate",
+      "scope": "overall",
+      "target": null,
+      "units": "fraction",
+      "weight": 1.0
+    }
+  ]
+}</pre><h3>Replayed policy evidence</h3><p>1 of 1 retained candidates shown. Protected JSON retains all admitted detail; presentation limits do not change search completeness.</p><article><h3>228a9f59fd91c308d6a2f788e6bb7134aab1700b94399ad4f0cd123103fde15a</h3><p>assessment_evidence</p><table><thead><tr><th>Metric / basis</th><th>Value / state</th><th>Denominator</th></tr></thead><tbody><tr><td>accuracy · issued_accuracy<br>observed_outcome · fraction</td><td>1.0 · finite</td><td>40<br></td></tr><tr><td>private cohort metric · issued_accuracy<br>observed_outcome · fraction</td><td>1.0 · finite</td><td>20<br></td></tr></tbody></table></article><h3>Frozen independent assessment</h3><p>Refused claims retain their multiplicity allocation. Feasibility requires support for every required constraint on its named population.</p><table><thead><tr><th>Claim / estimand / requirement</th><th>Conclusion / simultaneous interval</th><th>Support / method</th></tr></thead><tbody><tr><td>overall accuracy · 228a9f59fd91c308d6a2f788e6bb7134aab1700b94399ad4f0cd123103fde15a<br>issued_accuracy · observed_outcome<br>Scope: overall<br>ge 0.8</td><td>supported<br>0.8962367545996842 – 1.0<br>Required</td><td>40 eligible<br>registered_finite_component_composition<br>None<br>Family 2 · alpha 0.025</td></tr><tr><td>private scoped claim · 228a9f59fd91c308d6a2f788e6bb7134aab1700b94399ad4f0cd123103fde15a<br>issued_accuracy · observed_outcome<br>Scope: cohort_0/category_0<br>ge 0.8</td><td>supported<br>0.8032403202953746 – 1.0<br>Required</td><td>20 eligible<br>registered_finite_component_composition<br>None<br>Family 2 · alpha 0.025</td></tr></tbody></table><h3>Economics and observation</h3><p>Observed-outcome costs are historical proxies. Model-implied expected costs use supplied predictive distributions. Known charges measure workload costs. Missing-label envelopes provide ranges without imputed outcomes. These quantities may use different populations and are not automatically net economic value.</p><p>Deferral supplies no reviewer effectiveness. Selective labels identify observed-label performance unless valid bounds or an admitted observation design support more.</p><h3>Countable execution</h3><pre>{
+  "counts": {
+    "action_cells": 40,
+    "contribution_cells": 60,
+    "predicate_events": 40
+  },
+  "limits": {
+    "action_cells": 100000000,
+    "assessment_claims": 256,
+    "assessment_components": 4096,
+    "assessment_policies": 8,
+    "beam_width": 64,
+    "contribution_cells": 100000000,
+    "dominance_pairs": 10000000,
+    "materialized_bytes": 1073741824,
+    "max_candidates": 4096,
+    "max_cells": 32,
+    "max_cutpoints": 1000000,
+    "max_options": 256,
+    "max_search_states": 1000000,
+    "metric_records": 65536,
+    "predicate_events": 100000000,
+    "solver_calls": 64,
+    "solver_nodes": 100000,
+    "solver_nonzeros": 1000000,
+    "solver_rows": 8192,
+    "solver_seconds": 300,
+    "solver_variables": 8192
+  },
+  "materialized_limit_bytes": 1073741824,
+  "retained_allocation_bytes": 299036,
+  "version": "policy_countable_operations_v1"
+}</pre></section><section><h2>Policy</h2><p class="note">2 of 2 retained measurement rows displayed. Omitted presentation detail remains in the matching JSON; privacy-withheld detail is absent from this projection.</p><table><thead><tr><th>Run / population</th><th>Measurement</th><th>Value</th><th>Denominator / qualification</th></tr></thead><tbody><tr><td>policy_228a9f59fd91c308<br>accuracy</td><td>issued accuracy</td><td class="value">1</td><td>40<br>observed_outcome</td></tr><tr><td>policy_228a9f59fd91c308<br>private cohort metric</td><td>issued accuracy</td><td class="value">1</td><td>20<br>observed_outcome</td></tr></tbody></table>
+<details open><summary>policy_m1 · issued accuracy</summary><pre>{
+  &#34;metric&#34;: &#34;issued_accuracy&#34;,
+  &#34;value&#34;: 1.0,
+  &#34;value_state&#34;: &#34;finite&#34;,
+  &#34;denominator&#34;: 40,
+  &#34;planned&#34;: 40,
+  &#34;reason&#34;: null,
+  &#34;basis&#34;: &#34;observed_outcome&#34;,
+  &#34;units&#34;: &#34;fraction&#34;,
+  &#34;statistic_kind&#34;: &#34;mean&#34;,
+  &#34;numerator&#34;: 40.0,
+  &#34;cells&#34;: null,
+  &#34;sensitive_counts&#34;: [
+    40,
+    0,
+    40,
+    0
+  ],
+  &#34;definition_digest&#34;: &#34;1d706fd28cfb5261826af37b3a36d4354c756eb72e8add1943b6fb55cb31d086&#34;
+}</pre></details><details open><summary>policy_m2 · issued accuracy</summary><pre>{
+  &#34;metric&#34;: &#34;issued_accuracy&#34;,
+  &#34;value&#34;: 1.0,
+  &#34;value_state&#34;: &#34;finite&#34;,
+  &#34;denominator&#34;: 20,
+  &#34;planned&#34;: 20,
+  &#34;reason&#34;: null,
+  &#34;basis&#34;: &#34;observed_outcome&#34;,
+  &#34;units&#34;: &#34;fraction&#34;,
+  &#34;statistic_kind&#34;: &#34;mean&#34;,
+  &#34;numerator&#34;: 20.0,
+  &#34;cells&#34;: null,
+  &#34;sensitive_counts&#34;: [
+    20,
+    0,
+    20,
+    0
+  ],
+  &#34;definition_digest&#34;: &#34;4f3d5cdb3fcc6c37d1f67fcd167c5b892511de96d9ecca81bf31839d16a6a662&#34;
+}</pre></details></section><section><h2>Methodology, coverage and limitations</h2><p>Policy decisions are hypothetical offline replay; no deployment approval or causal business-value guarantee.</p><p>Observed-outcome, model-implied, operational and missing-label bounds are different estimands.</p><p>Conditional selective risk, full-opportunity behavior and deferral workload have different denominators.</p><p>Independent support conditions on frozen policies and declared sampling, observation, bounds and exposure assumptions.</p><p>Historical stability does not establish future effectiveness. Conformal marginal coverage is not conditional policy coverage.</p><p>Sampled resource controls can overshoot; admission defaults are not capacity guarantees.</p><p>Metrics describe supplied outcomes and declared populations; ground truth and representativeness are not independently established.</p><p>Calibration bins and high-confidence settings are investigation definitions, not universal safety thresholds.</p><p>Policy replay is retrospective; different actions may change outcomes or their observation.</p><p>Statistical intervals, when enabled, are assumption-qualified; the recorded adjustment distinguishes pointwise and family confidence.</p><p>Sampled resource safeguards are not hard quotas or capacity guarantees.</p><p>No composite score, certification or production approval is defined.</p><p></p><p>Analytical bounds, retained-detail omissions, presentation omissions and privacy withholding are distinct. An unavailable metric is not zero. The protected local workbench contains exact retained evidence where supplied and eligible.</p><p>Analysis identity: af4bec35f5364ddba70f6495a326d42e</p></section></main></body></html>

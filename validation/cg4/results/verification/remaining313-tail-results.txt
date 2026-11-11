@@ -1,0 +1,28 @@
+........................................................................ [ 33%]
+................................F
+=================================== FAILURES ===================================
+__________________ test_frozen_unlabeled_evidence_and_report ___________________
+
+tmp_path = PosixPath('/private/var/folders/cs/c15xvw9d3t53tzcws5yxjxcr0000gn/T/pytest-of-drivyaanshyadav/pytest-239/test_frozen_unlabeled_evidence0')
+
+    @pytest.mark.usefixtures('frozen_string_storage')
+    def test_frozen_unlabeled_evidence_and_report(tmp_path):
+        baseline=json.loads(Path('tests/fixtures/m1_unlabeled_baseline.json').read_text())
+        for case in baseline.values():
+            source=tmp_path/'source.csv';source.write_text(case['raw'])
+            r=DataTrust.from_spec(DatasetSpec(source,dataset_name='M1 parity'),TaskSpec('dataset_profile')).analyze_result()
+            r.generated_at='2026-10-09T00:00:00+00:00'
+            r.execution['elapsed_seconds']=0
+            value=r.to_dict()
+            assert {k:value[k] for k in case['result']}==case['result']
+>           assert hashlib.sha256(render_analysis_result(r).encode()).hexdigest()==case['html_sha256']
+E           AssertionError: assert '05b6204b568a...c5c5688ca8a82' == '4167bfe2f0cf...04c0b1e8f7a06'
+E             
+E             - 4167bfe2f0cff0fa54ec3ced55d5a90135eecd423f49a60cc6704c0b1e8f7a06
+E             + 05b6204b568a6a555eaac19ed8025cf7822bab9e2d570ba86bec5c5688ca8a82
+
+tests/test_regression_analysis.py:43: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_regression_analysis.py::test_frozen_unlabeled_evidence_and_report
+!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!
+1 failed, 104 passed in 6.42s

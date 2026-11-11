@@ -60,6 +60,10 @@ def rank_stat(y,left,right,metric):
         cp=np.cumsum(positive); cn=np.cumsum(counts)
         return float(np.sum(np.divide(positive*cp,cn,out=np.zeros_like(cp),where=cn>0))/total)
     def statistic(weights):return side(weights,plans[1])-side(weights,plans[0])
+    # Expose the same tied-group reductions to CG4 subgroup resampling. The
+    # existing paired statistic and all old numerical operations are unchanged.
+    statistic.left_value=lambda weights:side(weights,plans[0])
+    statistic.right_value=lambda weights:side(weights,plans[1])
     return statistic
 
 
@@ -110,7 +114,7 @@ def smooth_bootstrap(contributions,spec,*,family_size,check,root=False,available
     return _replicates(spec,admission,n,n,None,statistic,ratio_stat(values.sum(axis=0),root),values,'paired_bca',check,root=root)
 
 
-def _replicates(spec,admission,units,n,unit_index,statistic,estimate,unit_values,method,check,root=False):
+def _replicates(spec,admission,units,n,unit_index,statistic,estimate,unit_values,method,check,root=False,totals_statistic=None):
     if not math.isfinite(estimate):return {**admission,'status':'unavailable','execution':'not_run','reason':'undefined_original_statistic'}
     rng=np.random.Generator(np.random.PCG64(spec.seed)); draws=np.empty(spec.replicates)
     probabilities=np.full(units,1/units)
@@ -134,7 +138,7 @@ def _replicates(spec,admission,units,n,unit_index,statistic,estimate,unit_values
             return {**base,'status':'unavailable','reason':'statistics_unavailable'}
         check('exact sufficient-statistic jackknife')
         totals=unit_values.sum(axis=0)
-        jack=np.array([ratio_stat(totals-v,root) for v in unit_values])
+        jack=np.array([(totals_statistic(totals-v) if totals_statistic is not None else ratio_stat(totals-v,root)) for v in unit_values])
         if not np.all(np.isfinite(jack)):return {**base,'status':'unavailable','reason':'undefined_jackknife'}
         deviations=jack.mean()-jack;scale=np.max(np.abs(deviations))
         if not scale:return {**base,'status':'unavailable','reason':'degenerate_jackknife'}

@@ -1,0 +1,109 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Binary pinned prediction evaluation — ConfidenceGuard</title><style>
+@page{size:A4;margin:17mm 14mm}*{box-sizing:border-box}body{font:11px/1.5 Arial,sans-serif;color:#182432;margin:0}main{max-width:1050px;margin:auto;padding:24px}h1{font-size:28px;line-height:1.15}h2{font-size:18px;margin-top:28px}h3{font-size:13px}p,td,th{overflow-wrap:anywhere}small,.note{color:#536375}header{border-bottom:3px solid #196d70;padding-bottom:16px}section{break-before:page}section:first-of-type{break-before:auto}table{width:100%;border-collapse:collapse;table-layout:fixed}th,td{padding:7px;text-align:left;vertical-align:top;border-bottom:1px solid #d7e1e5}th{background:#edf4f4}tr{break-inside:avoid}thead{display:table-header-group}pre{white-space:pre-wrap;overflow-wrap:anywhere;font:9px/1.4 monospace;border-left:2px solid #c4d8d8;padding-left:8px}figure{break-inside:avoid;margin:18px 0}svg{width:380px;max-width:100%;height:210px}details{margin:12px 0}.banner{padding:12px;background:#edf4f4}.value{font-variant-numeric:tabular-nums}@media print{main{padding:0}details{display:block}details>summary{font-weight:bold}details pre{display:block}a{color:inherit}}
+</style></head><body><main><header><p>NUMEK / ConfidenceGuard · Model Reliability Intelligence</p><h1>Binary pinned prediction evaluation</h1><p>Binary Classification · 2026-10-17T18:26:18.003931+00:00</p><p>Method prediction_evaluation_v1 · confidenceguard.evaluation_result/1.0</p><div class="banner">Shareable projection — disclosure settings apply to all report formats. No overall reliability score or production approval is defined.</div></header>
+<section><h2>Evaluation summary and priority investigations</h2><p><strong>Binary model 1</strong> · evaluation · Version 1</p><p><strong>Binary model 2</strong> · evaluation · Version 2</p><p><strong>Information · withheld breakdowns</strong> — Some related breakdowns are withheld under the selected disclosure policy.</p><h3>Paired comparison</h3><p>matched supplied predictions; no isolated causal model or generalization claim. Timing: unestablished.</p><p>Disclosure policy: conservative_aggregates_v1. Related breakdowns withheld</p><h3>Whole-population measurements</h3><p>Each row uses its own eligible denominator. Paired comparisons later use common eligible events. Lower losses and higher accuracy have different interpretations; no automatic winner is declared.</p><table><thead><tr><th>Run</th><th>Measurement</th><th>Value</th><th>Denominator / basis</th></tr></thead><tbody><tr><td>run_1</td><td>brier</td><td>0.19666274</td><td>200 · measured</td></tr><tr><td>run_1</td><td>log loss</td><td>0.58051186</td><td>200 · measured</td></tr><tr><td>run_2</td><td>brier</td><td>0.19658489</td><td>200 · measured</td></tr><tr><td>run_2</td><td>log loss</td><td>0.58021164</td><td>200 · measured</td></tr></tbody></table></section>
+<section><h2>Availability</h2><p class="note">2 of 2 retained measurement rows displayed. Omitted presentation detail remains in the matching JSON; privacy-withheld detail is absent from this projection.</p><table><thead><tr><th>Run / population</th><th>Measurement</th><th>Value</th><th>Denominator / qualification</th></tr></thead><tbody><tr><td>run_1<br>overall</td><td>population coverage</td><td class="value">1</td><td>200<br></td></tr><tr><td>run_2<br>overall</td><td>population coverage</td><td class="value">1</td><td>200<br></td></tr></tbody></table>
+<details open><summary>m4 · population coverage</summary><pre>{
+  &#34;records&#34;: 200,
+  &#34;eligible_outcomes&#34;: 200,
+  &#34;issued&#34;: 200,
+  &#34;issuance_meaning&#34;: &#34;recorded&#34;
+}</pre></details><details open><summary>m73 · population coverage</summary><pre>{
+  &#34;records&#34;: 200,
+  &#34;eligible_outcomes&#34;: 200,
+  &#34;issued&#34;: 200,
+  &#34;issuance_meaning&#34;: &#34;recorded&#34;
+}</pre></details></section><section><h2>Failures</h2><p class="note">2 of 2 retained measurement rows displayed. Omitted presentation detail remains in the matching JSON; privacy-withheld detail is absent from this projection.</p><table><thead><tr><th>Run / population</th><th>Measurement</th><th>Value</th><th>Denominator / qualification</th></tr></thead><tbody><tr><td>run_1<br>overall</td><td>issued errors</td><td class="value">56</td><td>200<br></td></tr><tr><td>run_2<br>overall</td><td>issued errors</td><td class="value">56</td><td>200<br></td></tr></tbody></table>
+</section><section><h2>Ranking</h2><p class="note">4 of 4 retained measurement rows displayed. Omitted presentation detail remains in the matching JSON; privacy-withheld detail is absent from this projection.</p><table><thead><tr><th>Run / population</th><th>Measurement</th><th>Value</th><th>Denominator / qualification</th></tr></thead><tbody><tr><td>run_1<br>overall</td><td>roc auc</td><td class="value">0.64464286</td><td>200<br></td></tr><tr><td>run_1<br>overall</td><td>average precision</td><td class="value">0.46937002</td><td>200<br></td></tr><tr><td>run_2<br>overall</td><td>roc auc</td><td class="value">0.64428571</td><td>200<br></td></tr><tr><td>run_2<br>overall</td><td>average precision</td><td class="value">0.46633043</td><td>200<br></td></tr></tbody></table>
+<details open><summary>m17 · average precision</summary><pre>{
+  &#34;prevalence&#34;: 0.3,
+  &#34;definition&#34;: &#34;non_interpolated_recall_increment&#34;
+}</pre></details><details open><summary>m86 · average precision</summary><pre>{
+  &#34;prevalence&#34;: 0.3,
+  &#34;definition&#34;: &#34;non_interpolated_recall_increment&#34;
+}</pre></details></section><section><h2>Ranking Curve</h2><p class="note">2 of 2 retained measurement rows displayed. Omitted presentation detail remains in the matching JSON; privacy-withheld detail is absent from this projection.</p><table><thead><tr><th>Run / population</th><th>Measurement</th><th>Value</th><th>Denominator / qualification</th></tr></thead><tbody><tr><td>run_1<br>overall</td><td>roc pr curve</td><td class="value">Structured evidence</td><td>200<br></td></tr><tr><td>run_2<br>overall</td><td>roc pr curve</td><td class="value">Structured evidence</td><td>200<br></td></tr></tbody></table>
+<figure><svg viewBox="0 0 400 210" role="img" aria-label="FPR / TPR · retained score groups"><path d="M40 25V180H370" fill="none" stroke="#a7b8bd"/><polyline points="40.000,180.000 40.000,177.667 42.286,175.333 44.571,173.000 44.571,168.333 46.857,166.000 49.143,163.667 51.429,161.333 51.429,156.667 53.714,154.333 58.286,154.333 60.571,152.000 60.571,147.333 62.857,145.000 67.429,145.000 72.000,145.000 76.571,145.000 78.857,142.667 81.143,140.333 83.429,138.000 83.429,133.333 85.714,131.000 90.286,131.000 92.571,128.667 94.857,126.333 97.143,124.000 101.714,124.000 106.286,124.000 108.571,121.667 113.143,121.667 117.714,121.667 117.714,117.000 120.000,114.667 122.286,112.333 126.857,112.333 129.143,110.000 131.429,107.667 136.000,107.667 140.571,107.667 145.143,107.667 149.714,107.667 152.000,105.333 156.571,105.333 156.571,100.667 158.857,98.333 163.429,98.333 168.000,98.333 172.571,98.333 177.143,98.333 181.714,98.333 184.000,96.000 184.000,91.333 188.571,91.333 190.857,89.000 193.143,86.667 195.429,84.333 197.714,82.000 202.286,82.000 206.857,82.000 211.429,82.000 216.000,82.000 218.286,79.667 222.857,79.667 225.143,77.333 229.714,77.333 232.000,75.000 234.286,72.667 238.857,72.667 243.429,72.667 243.429,68.000 243.429,63.333 248.000,63.333 250.286,61.000 254.857,61.000 259.429,61.000 261.714,58.667 266.286,58.667 270.857,58.667 273.143,56.333 275.429,54.000 280.000,54.000 284.571,54.000 289.143,54.000 293.714,54.000 298.286,54.000 302.857,54.000 307.429,54.000 312.000,54.000 314.286,51.667 318.857,51.667 321.143,49.333 325.714,49.333 328.000,47.000 332.571,47.000 334.857,44.667 339.429,44.667 344.000,44.667 344.000,40.000 348.571,40.000 353.143,40.000 357.714,40.000 360.000,40.000" stroke="#22787b" fill="none" stroke-width="2"/></svg><figcaption>FPR / TPR · retained score groups</figcaption></figure><figure><svg viewBox="0 0 400 210" role="img" aria-label="FPR / TPR · retained score groups"><path d="M40 25V180H370" fill="none" stroke="#a7b8bd"/><polyline points="40.000,180.000 40.000,177.667 42.286,175.333 44.571,173.000 46.857,170.667 46.857,166.000 49.143,163.667 51.429,161.333 51.429,156.667 53.714,154.333 58.286,154.333 60.571,152.000 60.571,147.333 62.857,145.000 67.429,145.000 72.000,145.000 76.571,145.000 78.857,142.667 81.143,140.333 83.429,138.000 83.429,133.333 85.714,131.000 90.286,131.000 92.571,128.667 92.571,124.000 97.143,124.000 101.714,124.000 106.286,124.000 108.571,121.667 113.143,121.667 117.714,121.667 117.714,117.000 120.000,114.667 124.571,114.667 126.857,112.333 129.143,110.000 131.429,107.667 136.000,107.667 140.571,107.667 145.143,107.667 149.714,107.667 154.286,107.667 156.571,105.333 158.857,103.000 158.857,98.333 163.429,98.333 168.000,98.333 172.571,98.333 177.143,98.333 181.714,98.333 184.000,96.000 184.000,91.333 188.571,91.333 190.857,89.000 190.857,84.333 195.429,84.333 197.714,82.000 202.286,82.000 206.857,82.000 211.429,82.000 216.000,82.000 218.286,79.667 220.571,77.333 225.143,77.333 229.714,77.333 232.000,75.000 236.571,75.000 238.857,72.667 243.429,72.667 243.429,68.000 245.714,65.667 245.714,61.000 250.286,61.000 254.857,61.000 257.143,58.667 261.714,58.667 266.286,58.667 270.857,58.667 270.857,54.000 275.429,54.000 280.000,54.000 284.571,54.000 289.143,54.000 293.714,54.000 298.286,54.000 302.857,54.000 307.429,54.000 312.000,54.000 314.286,51.667 318.857,51.667 321.143,49.333 325.714,49.333 330.286,49.333 332.571,47.000 334.857,44.667 339.429,44.667 344.000,44.667 344.000,40.000 348.571,40.000 353.143,40.000 357.714,40.000 360.000,40.000" stroke="#22787b" fill="none" stroke-width="2"/></svg><figcaption>FPR / TPR · retained score groups</figcaption></figure><details open><summary>m18 · roc pr curve</summary><pre>{
+  &#34;points&#34;: [
+    {
+      &#34;threshold&#34;: null,
+      &#34;state&#34;: &#34;none&#34;,
+      &#34;tpr&#34;: 0.0,
+      &#34;fpr&#34;: 0.0,
+      &#34;precision&#34;: null,
+      &#34;recall&#34;: 0.0
+    },
+    {
+      &#34;threshold&#34;: 0.7250790711686748,
+      &#34;state&#34;: &#34;finite&#34;,
+      &#34;tpr&#34;: 0.016666666666666666,
+      &#34;fpr&#34;: 0.0,
+      &#34;precision&#34;: 1.0,
+      &#34;recall&#34;: 0.016666666666666666
+    },
+    {
+      &#34;threshold&#34;: 0.669714476845046,
+      &#34;state&#34;: &#34;finite&#34;,
+      &#34;tpr&#34;: 0.03333333333333333,
+      &#34;fpr&#34;: 0.007142857142857143,
+      &#34;precision&#34;: 0.6666666666666666,
+      &#34;recall&#34;: 0.03333333333333333
+    },
+    {
+      &#34;threshold&#34;: 0.6333566571305302,
+      &#34;state&#34;: &#34;finite&#34;,
+      &#34;tpr&#34;: 0.05,
+      &#34;fpr&#34;: 0.014285714285714285,
+      &#34;precision&#34;: 0.6,
+      &#34;recall&#34;: 0.05
+    }
+  ],
+  &#34;full_score_groups&#34;: 200,
+  &#34;retained_points&#34;: 102,
+  &#34;selection&#34;: &#34;label_independent_score_group_order&#34;,
+  &#34;scalar_metrics_use_all_groups&#34;: true
+}</pre><p>Display excerpt shortened. Matching JSON retains this record's detail.</p></details><details open><summary>m87 · roc pr curve</summary><pre>{
+  &#34;points&#34;: [
+    {
+      &#34;threshold&#34;: null,
+      &#34;state&#34;: &#34;none&#34;,
+      &#34;tpr&#34;: 0.0,
+      &#34;fpr&#34;: 0.0,
+      &#34;precision&#34;: null,
+      &#34;recall&#34;: 0.0
+    },
+    {
+      &#34;threshold&#34;: 0.7200206730104411,
+      &#34;state&#34;: &#34;finite&#34;,
+      &#34;tpr&#34;: 0.016666666666666666,
+      &#34;fpr&#34;: 0.0,
+      &#34;precision&#34;: 1.0,
+      &#34;recall&#34;: 0.016666666666666666
+    },
+    {
+      &#34;threshold&#34;: 0.6682983632761237,
+      &#34;state&#34;: &#34;finite&#34;,
+      &#34;tpr&#34;: 0.03333333333333333,
+      &#34;fpr&#34;: 0.007142857142857143,
+      &#34;precision&#34;: 0.6666666666666666,
+      &#34;recall&#34;: 0.03333333333333333
+    },
+    {
+      &#34;threshold&#34;: 0.6296895367711959,
+      &#34;state&#34;: &#34;finite&#34;,
+      &#34;tpr&#34;: 0.05,
+      &#34;fpr&#34;: 0.014285714285714285,
+      &#34;precision&#34;: 0.6,
+      &#34;recall&#34;: 0.05
+    }
+  ],
+  &#34;full_score_groups&#34;: 200,
+  &#34;retained_points&#34;: 102,
+  &#34;selection&#34;: &#34;label_independent_score_group_order&#34;,
+  &#34;scalar_metrics_use_all_groups&#34;: true
+}</pre><p>Display excerpt shortened. Matching JSON retains this record's detail.</p></details></section><section><h2>Probability Quality</h2><p class="note">4 of 4 retained measurement rows displayed. Omitted presentation detail remains in the matching JSON; privacy-withheld detail is absent from this projection.</p><table><thead><tr><th>Run / population</th><th>Measurement</th><th>Value</th><th>Denominator / qualification</th></tr></thead><tbody><tr><td>run_1<br>overall</td><td>brier</td><td class="value">0.19666274</td><td>200<br></td></tr><tr><td>run_1<br>overall</td><td>log loss</td><td class="value">0.58051186</td><td>200<br></td></tr><tr><td>run_2<br>overall</td><td>brier</td><td class="value">0.19658489</td><td>200<br></td></tr><tr><td>run_2<br>overall</td><td>log loss</td><td class="value">0.58021164</td><td>200<br></td></tr></tbody></table>
+<details open><summary>m19 · brier</summary><pre>{
+  &#34;definition&#34;: &#34;binary_event_squared_error&#34;
+}</pre></details><details open><summary>m20 · log loss</summary><pre>{
+  &#34;zero_true_class_probability&#34;: 0,
+  &#34;logarithm&#34;: &#34;natural&#34;
+}</pre></details></section><section><h2>Methodology, coverage and limitations</h2><p>Metrics describe supplied outcomes and declared populations; ground truth and representativeness are not independently established.</p><p>Calibration bins and high-confidence settings are investigation definitions, not universal safety thresholds.</p><p>Policy replay is retrospective; different actions may change outcomes or their observation.</p><p>Statistical intervals, when enabled, are pointwise and assumption-qualified.</p><p>Sampled resource safeguards are not hard quotas or capacity guarantees.</p><p>No composite score, certification or production approval is defined.</p><p>Completed admitted populations; exact coverage is retained in the protected bundle.</p><p>Related breakdowns withheld</p><p>Analytical bounds, retained-detail omissions, presentation omissions and privacy withholding are distinct. An unavailable metric is not zero. The protected local workbench contains exact retained evidence where supplied and eligible.</p><p>Analysis identity: b1d25ec605d24aa9b864e7a5ceb8f830</p></section></main></body></html>

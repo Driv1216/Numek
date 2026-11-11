@@ -685,12 +685,45 @@ def _inspect_history(root,spec,sequence,effective_as_of,*,progress=None):
     finally:work.close()
 
 
-def analyze(root, spec, *, progress=None, cancel=None):
+def exposure_population(root,spec,sequence,effective_as_of,*,progress=None):
+    """Identity-only preflight for ledger-enabled historical disclosures."""
+    from .result import Inspection
+    work=compat.workspace(spec.config,512*1024**2,progress)
+    try:
+        variants,_=load_history(work,root,spec,sequence)
+        cutoff=select_history(work,spec,effective_as_of);context_links(work,root,sequence,spec.max_scan_records)
+        events=set();units=set()
+        for variant,metadata in variants.items():
+            for window in spec.windows:
+                store=HistoryStore(work,spec,variant,metadata,window,cutoff)
+                for event,entity in store.con.execute(f'SELECT event_key,entity_key FROM {store.table}').fetchall():
+                    events.add(digest([spec.namespace,event]));units.add(digest([spec.namespace,entity or event]))
+                    if (len(events)+len(units))*192>spec.config.max_rss_bytes//8:raise EvaluationError('Historical exposure identities exceed admitted parent memory.','evidence_use_capacity')
+        from .history_storage import Catalog
+        for origin in Catalog(root).iter_facts('prediction_origin',sequence=spec.prediction_catalog_sequence or sequence,check=work.check):
+            packet=origin['payload']
+            if packet.get('namespace')==spec.namespace and digest([spec.namespace,packet['opportunity_key']]) in events:
+                events.add(digest([spec.namespace,packet['original_event_key']]))
+                if packet.get('original_entity_key') is not None:units.add(digest([spec.namespace,packet['original_entity_key']]))
+                from .evidence_use import source_aliases
+                for info in packet.get('source_identities',[]):
+                    ee,uu=source_aliases(info,packet['original_event_key'],packet.get('original_entity_key'));events.update(ee);units.update(uu)
+        for fact in Catalog(root).iter_facts('prediction_source_identity',sequence=spec.prediction_catalog_sequence or sequence,check=work.check):
+            packet=fact['payload']
+            if packet['namespace']==spec.namespace and digest([spec.namespace,packet['opportunity_key']]) in events:
+                from .evidence_use import source_aliases
+                ee,uu=source_aliases(packet['source'],packet['original_event_key'],packet.get('original_entity_key'));events.update(ee);units.update(uu)
+        return Inspection({'events':sorted(events),'units':sorted(units),'population_digest':digest([sorted(events),sorted(units)])},
+                          {'status':'completed','peak_workspace_bytes':work.peak})
+    finally:work.close()
+
+
+def analyze(root, spec, *, progress=None, cancel=None,_deadline=None):
     if isinstance(spec, dict): spec = LongitudinalSpec.from_dict(spec)
     sequence = spec.catalog_sequence
     if sequence is None: raise EvaluationError('Parent must freeze the catalog snapshot before execution.')
     result = compat.supervise(_execute_history, (str(root), spec, sequence, spec.as_of or now()),
-                              replace(spec.config, result_bytes=spec.config.private_bytes+spec.config.result_bytes), progress=progress, cancel=cancel)
+                              replace(spec.config, result_bytes=spec.config.private_bytes+spec.config.result_bytes), progress=progress, cancel=cancel,deadline=_deadline)
     if cancel is not None and cancel.is_set(): raise EvaluationError('Cancelled before assessment commit.', 'cancelled')
     result.seal(); LongitudinalResult.from_dict(result.to_private_dict(), private=result.private)
     if len(json.dumps(result.to_dict()).encode()) > spec.config.result_bytes: raise EvaluationError('Shareable historical result exceeds budget.', 'result_limit')

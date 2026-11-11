@@ -1,0 +1,98 @@
+{
+ "parquet_types": {
+  "code": "VARCHAR",
+  "when": "TIMESTAMP",
+  "amount": "BIGINT",
+  "price": "DOUBLE",
+  "tags": "VARCHAR[]",
+  "flag": "BOOLEAN"
+ },
+ "parquet_leading_zeros_kept": true,
+ "parquet_nulls": 6,
+ "read_csv_pandas_s": 0.311,
+ "read_parquet_pandas_s": 0.497,
+ "read_csv_duckdb_s": 0.133,
+ "read_parquet_duckdb_s": 0.001,
+ "bytes_csv": 47838862,
+ "bytes_parquet": 11245348,
+ "excel": {
+  "sheets": [
+   "Summary",
+   "Data"
+  ],
+  "default_header_row": [
+   "Quarterly export (draft)",
+   "Unnamed: 1",
+   "Unnamed: 2"
+  ],
+  "with_header_row_3": [
+   "id",
+   "opened",
+   "amount",
+   "total",
+   "region"
+  ],
+  "leading_zero_ids": [
+   0,
+   1,
+   2
+  ],
+  "dates_dtype": "datetime64[us]",
+  "formula_values_without_excel_recalculation": [
+   null,
+   null,
+   null
+  ],
+  "merged_region_values": [
+   "North",
+   NaN,
+   NaN,
+   NaN,
+   NaN
+  ]
+ },
+ "excel_read_100k_x10_s": 2.75,
+ "excel_rss_growth_mb": -176,
+ "csv_read_100k_x10_s": 0.062,
+ "jsonl_duckdb_schema": [
+  [
+   "id",
+   "JSON"
+  ],
+  [
+   "user",
+   "STRUCT(age JSON, city VARCHAR)"
+  ],
+  [
+   "items",
+   "BIGINT[]"
+  ],
+  [
+   "y",
+   "VARCHAR"
+  ],
+  [
+   "extra",
+   "BOOLEAN"
+  ]
+ ],
+ "jsonl_pandas_columns": [
+  "id",
+  "user",
+  "items",
+  "y",
+  "extra"
+ ],
+ "json_normalize_columns": [
+  "id",
+  "items",
+  "y",
+  "user.age",
+  "user.city",
+  "extra"
+ ],
+ "markdown": {
+  "escaped_pipe_and_short_row": 5,
+  "parser_available_locally": false
+ }
+}

@@ -1,0 +1,33 @@
+F
+=================================== FAILURES ===================================
+______ test_deleted_exposure_releases_only_its_owned_session_identifiers _______
+
+tmp_path = PosixPath('/private/var/folders/cs/c15xvw9d3t53tzcws5yxjxcr0000gn/T/pytest-of-drivyaanshyadav/pytest-356/test_deleted_exposure_releases0')
+
+    def test_deleted_exposure_releases_only_its_owned_session_identifiers(tmp_path):
+        first=workspace(tmp_path/'first');second=workspace(tmp_path/'second')
+        ledger=EvidenceUseLedger(first)
+        erased=digest([str(tmp_path),'erase']);kept=digest([str(tmp_path),'keep']);shared=digest([str(tmp_path),'shared'])
+        def record(target,event,request):
+            return target.record('outcome_disclosure',events=[event],units=[],population_digest=digest('same-population'),request_id=request)
+        removed=record(ledger,erased,'removed');record(ledger,kept,'retained');other=record(EvidenceUseLedger(second),shared,'other')
+        removed_shared=record(ledger,shared,'shared')
+        assert session_overlap([erased],[]) and session_overlap([kept],[])
+        first.delete(first.deletion_preview(object_ids=[use_object(first,removed),use_object(first,removed_shared)]))
+        assert not session_overlap([erased],[])
+        assert session_overlap([kept],[]) and session_overlap([shared],[])
+        # Idempotent old receipts remain historical records, never a way to retain
+        # deleted membership again. Missing history still forbids freshness claims.
+        assert record(ledger,erased,'removed')==removed
+        assert not session_overlap([erased],[])
+        assert ledger.status()['continuity']=='incomplete'
+>       assert 'exposure_history_incomplete' in ledger.overlap([erased],[])
+E       AssertionError: assert 'exposure_history_incomplete' in ['exposure_history_unavailable']
+E        +  where ['exposure_history_unavailable'] = overlap(['1838ae80226b46bb12c0fc2f6d357b6c2b275a07527b4d27b670b704c005a20f'], [])
+E        +    where overlap = <confidenceguard.evidence_use.EvidenceUseLedger object at 0x1077e42d0>.overlap
+
+tests/cg4/test_exposure_deletion.py:36: AssertionError
+=========================== short test summary info ============================
+FAILED tests/cg4/test_exposure_deletion.py::test_deleted_exposure_releases_only_its_owned_session_identifiers
+!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!
+1 failed in 0.50s

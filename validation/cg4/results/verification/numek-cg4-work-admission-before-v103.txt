@@ -1,0 +1,51 @@
+FFF.                                                                     [100%]
+=================================== FAILURES ===================================
+______ test_ranking_inspection_includes_the_registered_kernel_setup_cost _______
+
+    def test_ranking_inspection_includes_the_registered_kernel_setup_cost():
+        protocol = ConfirmationSpec(method='percentile', replicate_policy='fixed')
+        records, units, family = 8000, 8000, 10
+        expected = family*kernel_work(protocol, records=records, units=units, family=family, ranked=True)
+        result = feasibility(protocol, family, [1]*family, units=units, records=records,
+            work_budget=expected-1, available_bytes=10**9, ranked=True).to_dict()
+>       assert result['estimated_work_units'] == expected
+E       assert 6400640000 == 6402714530
+
+tests/cg4/test_confirmation_work_admission.py:25: AssertionError
+___ test_absolute_component_calls_are_not_counted_as_one_joint_call[counts0] ___
+
+counts = [2]
+
+    @pytest.mark.parametrize('counts', [[2], [1, 2, 1]])
+    def test_absolute_component_calls_are_not_counted_as_one_joint_call(counts):
+        protocol = ConfirmationSpec(method='bca', replicate_policy='fixed')
+        records, units, family = 400, 200, len(counts)
+        expected = sum(c*kernel_work(protocol, records=records, units=units,
+            family=family, components=c) for c in counts)
+        result = feasibility(protocol, family, counts, units=units, records=records,
+            work_budget=expected-1, available_bytes=10**9).to_dict()
+>       assert result['estimated_work_units'] == expected
+E       assert 16002400 == 32004800
+
+tests/cg4/test_confirmation_work_admission.py:37: AssertionError
+___ test_absolute_component_calls_are_not_counted_as_one_joint_call[counts1] ___
+
+counts = [1, 2, 1]
+
+    @pytest.mark.parametrize('counts', [[2], [1, 2, 1]])
+    def test_absolute_component_calls_are_not_counted_as_one_joint_call(counts):
+        protocol = ConfirmationSpec(method='bca', replicate_policy='fixed')
+        records, units, family = 400, 200, len(counts)
+        expected = sum(c*kernel_work(protocol, records=records, units=units,
+            family=family, components=c) for c in counts)
+        result = feasibility(protocol, family, counts, units=units, records=records,
+            work_budget=expected-1, available_bytes=10**9).to_dict()
+>       assert result['estimated_work_units'] == expected
+E       assert 48007200 == 64009600
+
+tests/cg4/test_confirmation_work_admission.py:37: AssertionError
+=========================== short test summary info ============================
+FAILED tests/cg4/test_confirmation_work_admission.py::test_ranking_inspection_includes_the_registered_kernel_setup_cost
+FAILED tests/cg4/test_confirmation_work_admission.py::test_absolute_component_calls_are_not_counted_as_one_joint_call[counts0]
+FAILED tests/cg4/test_confirmation_work_admission.py::test_absolute_component_calls_are_not_counted_as_one_joint_call[counts1]
+3 failed, 1 passed in 0.19s

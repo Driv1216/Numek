@@ -1,0 +1,82 @@
+FFF                                                                      [100%]
+=================================== FAILURES ===================================
+_ test_unregistered_finite_route_refuses_before_H[error_rate-independent_entities-finite_row_methods_do_not_correct_entity_dependence] _
+
+tmp_path = PosixPath('/private/var/folders/cs/c15xvw9d3t53tzcws5yxjxcr0000gn/T/pytest-of-drivyaanshyadav/pytest-516/test_unregistered_finite_route0')
+metric = 'error_rate', sampling = 'independent_entities'
+reason = 'finite_row_methods_do_not_correct_entity_dependence'
+
+    @pytest.mark.parametrize(('metric', 'sampling', 'reason'), [
+        ('error_rate', 'independent_entities', 'finite_row_methods_do_not_correct_entity_dependence'),
+        ('roc_auc', 'independent_rows', 'ranking_finite_method_not_registered'),
+        ('log_loss', 'independent_rows', 'finite_inference_requires_registered_bounded_contributions'),
+    ])
+    def test_unregistered_finite_route_refuses_before_H(tmp_path, metric, sampling, reason):
+        spec = binary(tmp_path)
+        spec = replace(spec, objectives=(replace(spec.objectives[0], metric=metric, direction='auto', units=None),))
+        result = investigate(spec)
+        protocol = ConfirmationSpec(sampling=sampling, upstream_independence='declared_independent',
+            external_exposure='declared_unexposed', declaration_author='synthetic fixture',
+            declaration_reason='Isolated independent synthetic entities for method-admission checks.')
+        frozen = freeze_hypotheses(result, [result.data['investigation']['shortlist'][0]], confirmation=protocol)
+        preview = inspect_confirmation(frozen)
+        assert not preview['H_outcomes_disclosed']
+>       assert reason in preview['membership'][0]['admissibility_reasons']
+E       AssertionError: assert 'finite_row_methods_do_not_correct_entity_dependence' in []
+
+tests/cg4/test_confirmation_method_admission.py:26: AssertionError
+_ test_unregistered_finite_route_refuses_before_H[roc_auc-independent_rows-ranking_finite_method_not_registered] _
+
+tmp_path = PosixPath('/private/var/folders/cs/c15xvw9d3t53tzcws5yxjxcr0000gn/T/pytest-of-drivyaanshyadav/pytest-516/test_unregistered_finite_route1')
+metric = 'roc_auc', sampling = 'independent_rows'
+reason = 'ranking_finite_method_not_registered'
+
+    @pytest.mark.parametrize(('metric', 'sampling', 'reason'), [
+        ('error_rate', 'independent_entities', 'finite_row_methods_do_not_correct_entity_dependence'),
+        ('roc_auc', 'independent_rows', 'ranking_finite_method_not_registered'),
+        ('log_loss', 'independent_rows', 'finite_inference_requires_registered_bounded_contributions'),
+    ])
+    def test_unregistered_finite_route_refuses_before_H(tmp_path, metric, sampling, reason):
+        spec = binary(tmp_path)
+        spec = replace(spec, objectives=(replace(spec.objectives[0], metric=metric, direction='auto', units=None),))
+        result = investigate(spec)
+        protocol = ConfirmationSpec(sampling=sampling, upstream_independence='declared_independent',
+            external_exposure='declared_unexposed', declaration_author='synthetic fixture',
+            declaration_reason='Isolated independent synthetic entities for method-admission checks.')
+        frozen = freeze_hypotheses(result, [result.data['investigation']['shortlist'][0]], confirmation=protocol)
+        preview = inspect_confirmation(frozen)
+        assert not preview['H_outcomes_disclosed']
+>       assert reason in preview['membership'][0]['admissibility_reasons']
+E       AssertionError: assert 'ranking_finite_method_not_registered' in []
+
+tests/cg4/test_confirmation_method_admission.py:26: AssertionError
+_ test_unregistered_finite_route_refuses_before_H[log_loss-independent_rows-finite_inference_requires_registered_bounded_contributions] _
+
+tmp_path = PosixPath('/private/var/folders/cs/c15xvw9d3t53tzcws5yxjxcr0000gn/T/pytest-of-drivyaanshyadav/pytest-516/test_unregistered_finite_route2')
+metric = 'log_loss', sampling = 'independent_rows'
+reason = 'finite_inference_requires_registered_bounded_contributions'
+
+    @pytest.mark.parametrize(('metric', 'sampling', 'reason'), [
+        ('error_rate', 'independent_entities', 'finite_row_methods_do_not_correct_entity_dependence'),
+        ('roc_auc', 'independent_rows', 'ranking_finite_method_not_registered'),
+        ('log_loss', 'independent_rows', 'finite_inference_requires_registered_bounded_contributions'),
+    ])
+    def test_unregistered_finite_route_refuses_before_H(tmp_path, metric, sampling, reason):
+        spec = binary(tmp_path)
+        spec = replace(spec, objectives=(replace(spec.objectives[0], metric=metric, direction='auto', units=None),))
+        result = investigate(spec)
+        protocol = ConfirmationSpec(sampling=sampling, upstream_independence='declared_independent',
+            external_exposure='declared_unexposed', declaration_author='synthetic fixture',
+            declaration_reason='Isolated independent synthetic entities for method-admission checks.')
+        frozen = freeze_hypotheses(result, [result.data['investigation']['shortlist'][0]], confirmation=protocol)
+        preview = inspect_confirmation(frozen)
+        assert not preview['H_outcomes_disclosed']
+>       assert reason in preview['membership'][0]['admissibility_reasons']
+E       AssertionError: assert 'finite_inference_requires_registered_bounded_contributions' in []
+
+tests/cg4/test_confirmation_method_admission.py:26: AssertionError
+=========================== short test summary info ============================
+FAILED tests/cg4/test_confirmation_method_admission.py::test_unregistered_finite_route_refuses_before_H[error_rate-independent_entities-finite_row_methods_do_not_correct_entity_dependence]
+FAILED tests/cg4/test_confirmation_method_admission.py::test_unregistered_finite_route_refuses_before_H[roc_auc-independent_rows-ranking_finite_method_not_registered]
+FAILED tests/cg4/test_confirmation_method_admission.py::test_unregistered_finite_route_refuses_before_H[log_loss-independent_rows-finite_inference_requires_registered_bounded_contributions]
+3 failed in 9.10s

@@ -1,0 +1,332 @@
+{
+  "as_of": null,
+  "evaluation": {
+    "as_of": "2026-02-01T00:00:00Z",
+    "cohorts": [],
+    "comparison": null,
+    "context": null,
+    "name": "ConfidenceGuard evaluation",
+    "outcomes": {
+      "available_at": {
+        "ambiguity": "unresolved",
+        "column": "available",
+        "encoding": "iso",
+        "epoch_unit": null,
+        "format": null,
+        "timezone": null
+      },
+      "column": "y",
+      "due_at": null,
+      "key_columns": [
+        "id"
+      ],
+      "snapshot_name": null,
+      "source": "data",
+      "status_column": null,
+      "status_values": {
+        "conflicting": "conflicting",
+        "final": "final",
+        "invalid": "invalid",
+        "observed": "observed",
+        "provisional": "provisional"
+      },
+      "target_at": null
+    },
+    "policies": [],
+    "runs": [
+      {
+        "decision": {
+          "candidate_evaluation": false,
+          "column": null,
+          "rule": "none",
+          "state_column": null,
+          "state_values": {
+            "abstained": "abstained",
+            "failed": "failed",
+            "issued": "issued",
+            "missing": "missing"
+          },
+          "threshold": null,
+          "tie_policy": "abstain"
+        },
+        "entity_columns": [
+          "entity"
+        ],
+        "generated_at": null,
+        "horizon": null,
+        "id": "model",
+        "inline_outcome": null,
+        "inline_outcome_role": "agreement_assertion",
+        "intervals": [],
+        "key_columns": [
+          "id"
+        ],
+        "model": {
+          "artifact_sha256": null,
+          "calibration": null,
+          "display_name": "",
+          "id": "synthetic-review",
+          "preprocessing": null,
+          "version": "v1"
+        },
+        "prediction": "decision",
+        "prediction_at": {
+          "ambiguity": "unresolved",
+          "column": "when",
+          "encoding": "iso",
+          "epoch_unit": null,
+          "format": null,
+          "timezone": null
+        },
+        "probabilities": {
+          "columns": {},
+          "positive_column": "p"
+        },
+        "role": "unknown",
+        "score": null,
+        "selection": null,
+        "source": "data"
+      },
+      {
+        "decision": {
+          "candidate_evaluation": false,
+          "column": null,
+          "rule": "none",
+          "state_column": null,
+          "state_values": {
+            "abstained": "abstained",
+            "failed": "failed",
+            "issued": "issued",
+            "missing": "missing"
+          },
+          "threshold": null,
+          "tie_policy": "abstain"
+        },
+        "entity_columns": [
+          "entity"
+        ],
+        "generated_at": null,
+        "horizon": null,
+        "id": "reference",
+        "inline_outcome": null,
+        "inline_outcome_role": "agreement_assertion",
+        "intervals": [],
+        "key_columns": [
+          "id"
+        ],
+        "model": {
+          "artifact_sha256": null,
+          "calibration": null,
+          "display_name": "",
+          "id": "synthetic-review-reference",
+          "preprocessing": null,
+          "version": "v1"
+        },
+        "prediction": "reference",
+        "prediction_at": {
+          "ambiguity": "unresolved",
+          "column": "when",
+          "encoding": "iso",
+          "epoch_unit": null,
+          "format": null,
+          "timezone": null
+        },
+        "probabilities": null,
+        "role": "unknown",
+        "score": null,
+        "selection": null,
+        "source": "data"
+      }
+    ],
+    "schema_version": "confidenceguard.evaluation_spec/1.0",
+    "sources": [
+      {
+        "delimiter": ",",
+        "encoding": "utf-8-sig",
+        "format": "csv",
+        "id": "data",
+        "path": "/Users/drivyaanshyadav/Desktop/Numek/validation/cg4/results/review-reproduction-final-v117/inputs/predictions.csv"
+      }
+    ],
+    "task": {
+      "classes": [
+        "0",
+        "1"
+      ],
+      "horizon": null,
+      "kind": "binary_classification",
+      "material_error": null,
+      "outcome_definition": "Deterministic synthetic review fixture",
+      "positive_class": "1",
+      "units": null
+    }
+  },
+  "feature_time_view": "available_at_decision",
+  "features": [
+    {
+      "authority": "supplied",
+      "availability": "at_decision",
+      "available_at": null,
+      "fields": [
+        {
+          "available_at": null,
+          "boolean_false": [
+            "false",
+            "0",
+            "False"
+          ],
+          "boolean_true": [
+            "true",
+            "1",
+            "True"
+          ],
+          "column": "x",
+          "effective_at": null,
+          "id": "x",
+          "kind": "categorical",
+          "missing_values": [
+            ""
+          ],
+          "outcome_derived": false,
+          "role": "context",
+          "units": null
+        },
+        {
+          "available_at": null,
+          "boolean_false": [
+            "false",
+            "0",
+            "False"
+          ],
+          "boolean_true": [
+            "true",
+            "1",
+            "True"
+          ],
+          "column": "z",
+          "effective_at": null,
+          "id": "z",
+          "kind": "categorical",
+          "missing_values": [
+            ""
+          ],
+          "outcome_derived": false,
+          "role": "context",
+          "units": null
+        }
+      ],
+      "id": "context",
+      "information_cutoff": null,
+      "key_columns": [],
+      "owner": "opportunity",
+      "predecessor": null,
+      "reason": null,
+      "revision": "initial",
+      "run": null,
+      "schema_version": "confidenceguard.feature_view_spec/1.0",
+      "source": null
+    }
+  ],
+  "history": null,
+  "limits": {
+    "candidates_per_strategy": 8,
+    "categorical_values": 32,
+    "diagnostic_fits": 512,
+    "diagnostic_rows": 100000,
+    "examples_per_candidate": 5,
+    "geometric_rows": 20000,
+    "inference_work_units": 10000000000,
+    "landmarks": 16,
+    "max_artifact_bytes": 67108864,
+    "max_depth": 3,
+    "max_distance_operations": 2000000000,
+    "max_encoder_pixels": 4000000000,
+    "max_encoder_tokens": 20000000,
+    "max_encoder_windows": 100000,
+    "max_hypotheses": 32,
+    "max_nodes": 10000,
+    "max_vector_dimensions": 16384,
+    "minimum_discovery_support": 30,
+    "neighbors": 4,
+    "numeric_bins": 16,
+    "pca_dimensions": 64,
+    "shortlist": 3,
+    "stability_replicates": 1
+  },
+  "name": "Previously exposed synthetic CG4 review reproduction",
+  "objectives": [
+    {
+      "bounds": [],
+      "ceiling": null,
+      "comparator": "paired",
+      "current_period": null,
+      "direction": "lower",
+      "id": "precision",
+      "interval": null,
+      "material_error": null,
+      "metric": "precision",
+      "metric_identity": {},
+      "nominal": null,
+      "practical_threshold": 0.1,
+      "reference_period": null,
+      "reference_run": "reference",
+      "run": "model",
+      "target": null,
+      "training_clip": 30.0,
+      "units": "fraction"
+    }
+  ],
+  "representations": [
+    {
+      "availability": "at_decision",
+      "available_at": null,
+      "content_available_at": null,
+      "dimensions": 8,
+      "field": null,
+      "id": "geometry",
+      "key_columns": [
+        "id"
+      ],
+      "keys_source": {
+        "delimiter": ",",
+        "encoding": "utf-8-sig",
+        "format": "csv",
+        "id": "keys",
+        "path": "/Users/drivyaanshyadav/Desktop/Numek/validation/cg4/results/review-reproduction-final-v117/inputs/predictions.csv"
+      },
+      "kind": "supplied",
+      "matrix_path": "/Users/drivyaanshyadav/Desktop/Numek/validation/cg4/results/review-reproduction-final-v117/inputs/coordinates.npy",
+      "max_windows_per_event": 32,
+      "model_digest": null,
+      "model_directory": null,
+      "normalization": "none",
+      "producer": "NUMEK deterministic synthetic context",
+      "run": null,
+      "runtime_profile": "encoders_cpu_v1",
+      "schema_version": "confidenceguard.discovery_representation_spec/1.0"
+    }
+  ],
+  "roles": {
+    "column": "role",
+    "namespace": "cg4-exposed-review-fixture-v1-paired-precision",
+    "partitions": {},
+    "proportions": [
+      0.5,
+      0.25,
+      0.25
+    ],
+    "seed": 0,
+    "unit": "entity",
+    "values": {
+      "D": "D",
+      "H": "H",
+      "S": "S"
+    }
+  },
+  "schema_version": "confidenceguard.investigation_spec/1.0",
+  "strategies": [
+    "structured",
+    "catboost",
+    "geometric"
+  ]
+}

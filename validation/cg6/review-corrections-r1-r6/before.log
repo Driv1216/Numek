@@ -1,0 +1,617 @@
+FFFFFFFFFFFF.FFF.FFFFFF..                                                [100%]
+=================================== FAILURES ===================================
+___________ test_r1_additional_auxiliary_feature_is_projected[False] ___________
+
+tmp_path = PosixPath('/private/var/folders/cs/c15xvw9d3t53tzcws5yxjxcr0000gn/T/pytest-of-drivyaanshyadav/pytest-780/test_r1_additional_auxiliary_f0')
+assess = False
+
+    @pytest.mark.parametrize('assess', [False, True])
+    def test_r1_additional_auxiliary_feature_is_projected(tmp_path, assess):
+        spec = execution(tmp_path, regression=True, n=8)
+        artifact = auxiliary(spec, FeatureField('z','z','float',role='model_input'))
+        result = assess_auxiliary(spec, artifact, CFG) if assess else apply_auxiliary(spec, artifact, CFG, role='E')
+        assert result.private['output_rows']
+>       assert all('z' in row['input_record'] for row in result.private['output_rows'])
+E       assert False
+E        +  where False = all(<generator object test_r1_additional_auxiliary_feature_is_projected.<locals>.<genexpr> at 0x109a2eb50>)
+
+tests/cg6/test_review_corrections.py:37: AssertionError
+___________ test_r1_additional_auxiliary_feature_is_projected[True] ____________
+
+tmp_path = PosixPath('/private/var/folders/cs/c15xvw9d3t53tzcws5yxjxcr0000gn/T/pytest-of-drivyaanshyadav/pytest-780/test_r1_additional_auxiliary_f1')
+assess = True
+
+    @pytest.mark.parametrize('assess', [False, True])
+    def test_r1_additional_auxiliary_feature_is_projected(tmp_path, assess):
+        spec = execution(tmp_path, regression=True, n=8)
+        artifact = auxiliary(spec, FeatureField('z','z','float',role='model_input'))
+        result = assess_auxiliary(spec, artifact, CFG) if assess else apply_auxiliary(spec, artifact, CFG, role='E')
+        assert result.private['output_rows']
+>       assert all('z' in row['input_record'] for row in result.private['output_rows'])
+E       assert False
+E        +  where False = all(<generator object test_r1_additional_auxiliary_feature_is_projected.<locals>.<genexpr> at 0x10ea66c20>)
+
+tests/cg6/test_review_corrections.py:37: AssertionError
+_______ test_r1_prohibited_artifact_inputs_refuse_before_preparation[id] _______
+
+tmp_path = PosixPath('/private/var/folders/cs/c15xvw9d3t53tzcws5yxjxcr0000gn/T/pytest-of-drivyaanshyadav/pytest-780/test_r1_prohibited_artifact_in0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x10ead6c40>
+column = 'id'
+
+    @pytest.mark.parametrize('column', ['id', 'entity', 'role', 'y'])
+    def test_r1_prohibited_artifact_inputs_refuse_before_preparation(tmp_path, monkeypatch, column):
+        spec = execution(tmp_path, regression=True, n=8)
+        artifact = auxiliary(spec, FeatureField('bad',column,'float',role='model_input'))
+        prepared = Mock(side_effect=AssertionError('source preparation must not start'))
+        monkeypatch.setattr('confidenceguard.execution.services.PreparedExecution', prepared)
+>       with pytest.raises(EvaluationError) as error:
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE EvaluationError
+
+tests/cg6/test_review_corrections.py:47: Failed
+_____ test_r1_prohibited_artifact_inputs_refuse_before_preparation[entity] _____
+
+tmp_path = PosixPath('/private/var/folders/cs/c15xvw9d3t53tzcws5yxjxcr0000gn/T/pytest-of-drivyaanshyadav/pytest-780/test_r1_prohibited_artifact_in1')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x10ead6fd0>
+column = 'entity'
+
+    @pytest.mark.parametrize('column', ['id', 'entity', 'role', 'y'])
+    def test_r1_prohibited_artifact_inputs_refuse_before_preparation(tmp_path, monkeypatch, column):
+        spec = execution(tmp_path, regression=True, n=8)
+        artifact = auxiliary(spec, FeatureField('bad',column,'float',role='model_input'))
+        prepared = Mock(side_effect=AssertionError('source preparation must not start'))
+        monkeypatch.setattr('confidenceguard.execution.services.PreparedExecution', prepared)
+>       with pytest.raises(EvaluationError) as error:
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE EvaluationError
+
+tests/cg6/test_review_corrections.py:47: Failed
+______ test_r1_prohibited_artifact_inputs_refuse_before_preparation[role] ______
+
+tmp_path = PosixPath('/private/var/folders/cs/c15xvw9d3t53tzcws5yxjxcr0000gn/T/pytest-of-drivyaanshyadav/pytest-780/test_r1_prohibited_artifact_in2')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x10eb12b10>
+column = 'role'
+
+    @pytest.mark.parametrize('column', ['id', 'entity', 'role', 'y'])
+    def test_r1_prohibited_artifact_inputs_refuse_before_preparation(tmp_path, monkeypatch, column):
+        spec = execution(tmp_path, regression=True, n=8)
+        artifact = auxiliary(spec, FeatureField('bad',column,'float',role='model_input'))
+        prepared = Mock(side_effect=AssertionError('source preparation must not start'))
+        monkeypatch.setattr('confidenceguard.execution.services.PreparedExecution', prepared)
+>       with pytest.raises(EvaluationError) as error:
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE EvaluationError
+
+tests/cg6/test_review_corrections.py:47: Failed
+_______ test_r1_prohibited_artifact_inputs_refuse_before_preparation[y] ________
+
+tmp_path = PosixPath('/private/var/folders/cs/c15xvw9d3t53tzcws5yxjxcr0000gn/T/pytest-of-drivyaanshyadav/pytest-780/test_r1_prohibited_artifact_in3')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x10eac39b0>
+column = 'y'
+
+    @pytest.mark.parametrize('column', ['id', 'entity', 'role', 'y'])
+    def test_r1_prohibited_artifact_inputs_refuse_before_preparation(tmp_path, monkeypatch, column):
+        spec = execution(tmp_path, regression=True, n=8)
+        artifact = auxiliary(spec, FeatureField('bad',column,'float',role='model_input'))
+        prepared = Mock(side_effect=AssertionError('source preparation must not start'))
+        monkeypatch.setattr('confidenceguard.execution.services.PreparedExecution', prepared)
+>       with pytest.raises(EvaluationError) as error:
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE EvaluationError
+
+tests/cg6/test_review_corrections.py:47: Failed
+_______ test_r1_auxiliary_availability_is_enforced[2026-01-02T00:00:00Z] _______
+
+tmp_path = PosixPath('/private/var/folders/cs/c15xvw9d3t53tzcws5yxjxcr0000gn/T/pytest-of-drivyaanshyadav/pytest-780/test_r1_auxiliary_availability0')
+availability = '2026-01-02T00:00:00Z'
+
+    @pytest.mark.parametrize('availability', ['2026-01-02T00:00:00Z', '', 'invalid'])
+    def test_r1_auxiliary_availability_is_enforced(tmp_path, availability):
+        spec = execution(tmp_path, regression=True, n=8)
+        with open(spec.sources[0].path) as stream: records=list(csv.DictReader(stream))
+        for row in records: row.update(available=availability, cutoff='2026-01-01T00:00:00Z')
+        with open(spec.sources[0].path,'w',newline='') as stream:
+            writer=csv.DictWriter(stream,fieldnames=list(records[0]));writer.writeheader();writer.writerows(records)
+        spec=replace(spec,information_cutoff=ClockSpec('cutoff'))
+        artifact=auxiliary(spec,FeatureField('z','z','float',role='model_input',available_at=ClockSpec('available')))
+        result=apply_auxiliary(spec,artifact,CFG,role='E')
+>       assert all('scale' not in r['channels'] and r['channel_failures'] for r in result.private['output_rows'])
+E       assert False
+E        +  where False = all(<generator object test_r1_auxiliary_availability_is_enforced.<locals>.<genexpr> at 0x10eb5b030>)
+
+tests/cg6/test_review_corrections.py:63: AssertionError
+_________________ test_r1_auxiliary_availability_is_enforced[] _________________
+
+tmp_path = PosixPath('/private/var/folders/cs/c15xvw9d3t53tzcws5yxjxcr0000gn/T/pytest-of-drivyaanshyadav/pytest-780/test_r1_auxiliary_availability1')
+availability = ''
+
+    @pytest.mark.parametrize('availability', ['2026-01-02T00:00:00Z', '', 'invalid'])
+    def test_r1_auxiliary_availability_is_enforced(tmp_path, availability):
+        spec = execution(tmp_path, regression=True, n=8)
+        with open(spec.sources[0].path) as stream: records=list(csv.DictReader(stream))
+        for row in records: row.update(available=availability, cutoff='2026-01-01T00:00:00Z')
+        with open(spec.sources[0].path,'w',newline='') as stream:
+            writer=csv.DictWriter(stream,fieldnames=list(records[0]));writer.writeheader();writer.writerows(records)
+        spec=replace(spec,information_cutoff=ClockSpec('cutoff'))
+        artifact=auxiliary(spec,FeatureField('z','z','float',role='model_input',available_at=ClockSpec('available')))
+        result=apply_auxiliary(spec,artifact,CFG,role='E')
+>       assert all('scale' not in r['channels'] and r['channel_failures'] for r in result.private['output_rows'])
+E       assert False
+E        +  where False = all(<generator object test_r1_auxiliary_availability_is_enforced.<locals>.<genexpr> at 0x10ebc01e0>)
+
+tests/cg6/test_review_corrections.py:63: AssertionError
+_____________ test_r1_auxiliary_availability_is_enforced[invalid] ______________
+
+tmp_path = PosixPath('/private/var/folders/cs/c15xvw9d3t53tzcws5yxjxcr0000gn/T/pytest-of-drivyaanshyadav/pytest-780/test_r1_auxiliary_availability2')
+availability = 'invalid'
+
+    @pytest.mark.parametrize('availability', ['2026-01-02T00:00:00Z', '', 'invalid'])
+    def test_r1_auxiliary_availability_is_enforced(tmp_path, availability):
+        spec = execution(tmp_path, regression=True, n=8)
+        with open(spec.sources[0].path) as stream: records=list(csv.DictReader(stream))
+        for row in records: row.update(available=availability, cutoff='2026-01-01T00:00:00Z')
+        with open(spec.sources[0].path,'w',newline='') as stream:
+            writer=csv.DictWriter(stream,fieldnames=list(records[0]));writer.writeheader();writer.writerows(records)
+        spec=replace(spec,information_cutoff=ClockSpec('cutoff'))
+        artifact=auxiliary(spec,FeatureField('z','z','float',role='model_input',available_at=ClockSpec('available')))
+        result=apply_auxiliary(spec,artifact,CFG,role='E')
+>       assert all('scale' not in r['channels'] and r['channel_failures'] for r in result.private['output_rows'])
+E       assert False
+E        +  where False = all(<generator object test_r1_auxiliary_availability_is_enforced.<locals>.<genexpr> at 0x10ebc36b0>)
+
+tests/cg6/test_review_corrections.py:63: AssertionError
+________________ test_r2_frozen_ensemble_changes_refuse[member] ________________
+
+tmp_path = PosixPath('/private/var/folders/cs/c15xvw9d3t53tzcws5yxjxcr0000gn/T/pytest-of-drivyaanshyadav/pytest-780/test_r2_frozen_ensemble_change0')
+change = 'member'
+
+    @pytest.mark.parametrize('change', ['member','order','decision'])
+    def test_r2_frozen_ensemble_changes_refuse(tmp_path, change):
+        spec,protocol=frozen_ensemble(execution(tmp_path,regression=True))
+        group={'id':'mean','members':['model','b']}
+        if change=='member':group['members']=['model','c']
+        elif change=='order':group['members']=['b','model']
+        else:group['decision']={'tie_policy':'class_order'}
+>       with pytest.raises(EvaluationError) as error:
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE EvaluationError
+
+tests/cg6/test_review_corrections.py:86: Failed
+________________ test_r2_frozen_ensemble_changes_refuse[order] _________________
+
+tmp_path = PosixPath('/private/var/folders/cs/c15xvw9d3t53tzcws5yxjxcr0000gn/T/pytest-of-drivyaanshyadav/pytest-780/test_r2_frozen_ensemble_change1')
+change = 'order'
+
+    @pytest.mark.parametrize('change', ['member','order','decision'])
+    def test_r2_frozen_ensemble_changes_refuse(tmp_path, change):
+        spec,protocol=frozen_ensemble(execution(tmp_path,regression=True))
+        group={'id':'mean','members':['model','b']}
+        if change=='member':group['members']=['model','c']
+        elif change=='order':group['members']=['b','model']
+        else:group['decision']={'tie_policy':'class_order'}
+>       with pytest.raises(EvaluationError) as error:
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE EvaluationError
+
+tests/cg6/test_review_corrections.py:86: Failed
+_______________ test_r2_frozen_ensemble_changes_refuse[decision] _______________
+
+tmp_path = PosixPath('/private/var/folders/cs/c15xvw9d3t53tzcws5yxjxcr0000gn/T/pytest-of-drivyaanshyadav/pytest-780/test_r2_frozen_ensemble_change2')
+change = 'decision'
+
+    @pytest.mark.parametrize('change', ['member','order','decision'])
+    def test_r2_frozen_ensemble_changes_refuse(tmp_path, change):
+        spec,protocol=frozen_ensemble(execution(tmp_path,regression=True))
+        group={'id':'mean','members':['model','b']}
+        if change=='member':group['members']=['model','c']
+        elif change=='order':group['members']=['b','model']
+        else:group['decision']={'tie_policy':'class_order'}
+>       with pytest.raises(EvaluationError) as error:
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE EvaluationError
+
+tests/cg6/test_review_corrections.py:86: Failed
+____________ test_r3_imported_membership_uses_cg2_eligibility[None] ____________
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x10ec12690>
+status = None
+
+    @pytest.mark.parametrize('status', [None,'unavailable','contradicted','passed'])
+    def test_r3_imported_membership_uses_cg2_eligibility(monkeypatch, status):
+        from confidenceguard.execution.provenance import assessment_reasons
+        from confidenceguard.membership import assessment_membership_passed
+        methods=[{'id':'cal','definition':{'run':'base','parent':None}},
+                 {'id':'child','definition':{'run':'base','parent':'cal'}}]
+        checks={} if status is None else {'cal':{'status':status}}
+        checks['child']={'status':'passed'}
+        spec=SimpleNamespace(namespace='review',predictors=[SimpleNamespace(id='base',provenance={})],
+                             auxiliaries=[],ensembles=[],fitted_methods=methods)
+        prepared=SimpleNamespace(spec=spec,con=None,original_table='unused',method_membership=checks)
+        monkeypatch.setattr('confidenceguard.execution.provenance.rows',lambda *a,**k:iter([('event','entity')]))
+        reasons=assessment_reasons(prepared)
+        fitted={m['id']:m for m in methods}
+        for mid in fitted:
+            eligible=assessment_membership_passed(mid,fitted,set(fitted),checks)
+>           assert (mid not in reasons)==eligible
+E           AssertionError: assert ('cal' not in {}) == False
+
+tests/cg6/test_review_corrections.py:113: AssertionError
+________ test_r3_imported_membership_uses_cg2_eligibility[unavailable] _________
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x10ebab650>
+status = 'unavailable'
+
+    @pytest.mark.parametrize('status', [None,'unavailable','contradicted','passed'])
+    def test_r3_imported_membership_uses_cg2_eligibility(monkeypatch, status):
+        from confidenceguard.execution.provenance import assessment_reasons
+        from confidenceguard.membership import assessment_membership_passed
+        methods=[{'id':'cal','definition':{'run':'base','parent':None}},
+                 {'id':'child','definition':{'run':'base','parent':'cal'}}]
+        checks={} if status is None else {'cal':{'status':status}}
+        checks['child']={'status':'passed'}
+        spec=SimpleNamespace(namespace='review',predictors=[SimpleNamespace(id='base',provenance={})],
+                             auxiliaries=[],ensembles=[],fitted_methods=methods)
+        prepared=SimpleNamespace(spec=spec,con=None,original_table='unused',method_membership=checks)
+        monkeypatch.setattr('confidenceguard.execution.provenance.rows',lambda *a,**k:iter([('event','entity')]))
+        reasons=assessment_reasons(prepared)
+        fitted={m['id']:m for m in methods}
+        for mid in fitted:
+            eligible=assessment_membership_passed(mid,fitted,set(fitted),checks)
+>           assert (mid not in reasons)==eligible
+E           AssertionError: assert ('cal' not in {}) == False
+
+tests/cg6/test_review_corrections.py:113: AssertionError
+________ test_r3_imported_membership_uses_cg2_eligibility[contradicted] ________
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x10eab3c50>
+status = 'contradicted'
+
+    @pytest.mark.parametrize('status', [None,'unavailable','contradicted','passed'])
+    def test_r3_imported_membership_uses_cg2_eligibility(monkeypatch, status):
+        from confidenceguard.execution.provenance import assessment_reasons
+        from confidenceguard.membership import assessment_membership_passed
+        methods=[{'id':'cal','definition':{'run':'base','parent':None}},
+                 {'id':'child','definition':{'run':'base','parent':'cal'}}]
+        checks={} if status is None else {'cal':{'status':status}}
+        checks['child']={'status':'passed'}
+        spec=SimpleNamespace(namespace='review',predictors=[SimpleNamespace(id='base',provenance={})],
+                             auxiliaries=[],ensembles=[],fitted_methods=methods)
+        prepared=SimpleNamespace(spec=spec,con=None,original_table='unused',method_membership=checks)
+        monkeypatch.setattr('confidenceguard.execution.provenance.rows',lambda *a,**k:iter([('event','entity')]))
+        reasons=assessment_reasons(prepared)
+        fitted={m['id']:m for m in methods}
+        for mid in fitted:
+            eligible=assessment_membership_passed(mid,fitted,set(fitted),checks)
+>           assert (mid not in reasons)==eligible
+E           AssertionError: assert ('child' not in {'cal': 'known_frozen_method_assessment_overlap'}) == False
+
+tests/cg6/test_review_corrections.py:113: AssertionError
+_______ test_r4_mapped_attacks_match_equivalent_complete_outputs[False] ________
+
+tmp_path = PosixPath('/private/var/folders/cs/c15xvw9d3t53tzcws5yxjxcr0000gn/T/pytest-of-drivyaanshyadav/pytest-780/test_r4_mapped_attacks_match_e0')
+regression = False
+
+    @pytest.mark.parametrize('regression', [False,True])
+    def test_r4_mapped_attacks_match_equivalent_complete_outputs(tmp_path, regression):
+        from confidenceguard import AttackSpec
+        from confidenceguard.robustness.attacks import search,objective
+        from confidenceguard.execution.services import predict_batch
+        spec=execution(tmp_path,regression=regression)
+        event={'event_key':'r','entity_key':'r','record':{'x':.2},'truth':{'valid':True,'value':0. if regression else 'yes'},'unavailable_fields':[]}
+        attack=AttackSpec('fgsm',('x',),objective='output_change' if regression else 'misclassification',
+                          access='white_box',epsilon=.4,queries_per_root=4)
+        results=[]
+        for mapped in (False,True):
+            adapter,baseline=attack_adapter(spec,mapped=mapped,regression=regression)
+            prepared=SimpleNamespace(spec=replace(spec,limits=ExecutionLimits(cache_bytes=0)),
+                config=EvaluationConfig(),work=SimpleNamespace(check=lambda *a:None))
+>           best,record=search(event,baseline,attack,adapter,prepared,0)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/cg6/test_review_corrections.py:156: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+event = {'event_key': 'r', 'entity_key': 'r', 'record': {'x': 0.2}, 'truth': {'valid': True, 'value': 'yes'}, ...}
+baseline = {'channels': {'probabilities': [0.40131233845548236, 0.5986876615445177]}, 'channel_failures': {}, 'execution': 'completed', 'original_outputs': {'heads': [0.20000000298023224, -0.20000000298023224]}, ...}
+attack = AttackSpec(algorithm='fgsm', fields=('x',), objective='misclassification', access='white_box', norm='linf', epsilon=0....es_per_root=4, step_size=0.01, threshold=0.0, target_class=None, domains={}, constraints={}, stage='raw', relations=())
+adapter = <cg6.test_review_corrections.attack_adapter.<locals>.Adapter object at 0x109b1cec0>
+prepared = namespace(spec=ExecutionSpec(predictors=(PredictorSpec(id='model', task=TaskDefinition(kind='binary_classification', o...function test_r4_mapped_attacks_match_equivalent_complete_outputs.<locals>.<lambda> at 0x118900180>), attack_queries=2)
+seed = 0
+
+    def search(event,baseline,attack,adapter,prepared,seed):
+        if adapter.spec.preprocessing.get('kind')=='image' and attack.algorithm in {'fgsm','pgd'}:
+            from .image_attacks import search_image
+            return search_image(event,baseline,attack,adapter,prepared,seed)
+        task=prepared.spec.task;rng=np.random.Generator(np.random.PCG64(seed))
+        if attack.objective in {'misclassification','loss_increase'} and not event['truth']['valid']:
+            return copy.deepcopy(event),{'eligible':False,'reason':'authoritative_outcome_unavailable','queries':0,'success':None}
+        if attack.objective=='misclassification' and (not event.get('baseline_truth',event['truth'])['valid'] or decision(baseline,task)!=event.get('baseline_truth',event['truth'])['value']):
+            return copy.deepcopy(event),{'eligible':False,'reason':'baseline_not_correct','queries':0,'success':None}
+        if attack.objective=='targeted' and decision(baseline,task)==attack.target_class:
+            return copy.deepcopy(event),{'eligible':False,'reason':'baseline_already_target','queries':0,'success':None}
+        if attack.queries_per_root<2:raise EvaluationError('Attack budget must reserve final end-to-end verification.','attack_budget')
+        best=copy.deepcopy(event);best_score,_=objective(baseline,baseline,event,attack,task)
+        if best_score is None:best_score=-float('inf')
+        original_score=best_score;random_baseline=None;last_evaluation=None
+        queries=0;invalid=0;attempted=0;success=False;coverage='bounded';history=[];gradient_steps=0
+        def evaluate(candidate):
+            nonlocal queries,invalid,attempted,best,best_score,success,last_evaluation
+            if queries>=attack.queries_per_root-1 or attempted>=attack.queries_per_root-1:return False
+            attempted+=1
+            valid,_,_=feasible(event['record'],candidate['record'],attack.constraints,attack.relations)
+            if valid and attack.norm in {'linf','l2'}:
+                try:
+                    difference=np.concatenate([(np.asarray(candidate['record'][f],float)-np.asarray(event['record'][f],float)).reshape(-1) for f in attack.fields])
+                    valid=np.max(np.abs(difference))<=attack.epsilon+1e-12 if attack.norm=='linf' else np.linalg.norm(difference)<=attack.epsilon+1e-12
+                except (ValueError,TypeError):valid=False
+            if not valid:invalid+=1;last_evaluation={'state':'infeasible'};return True
+            queries+=1
+            prepared.attack_queries=getattr(prepared,'attack_queries',0)+1
+            if prepared.attack_queries>prepared.spec.limits.max_queries:raise EvaluationError('Global attack query admission exceeded.','attack_budget')
+            out=predict_batch(adapter,[candidate],prepared)[0];value,won=objective(out,baseline,event,attack,task)
+            last_evaluation={'state':'evaluated','objective':value,'success':bool(won)}
+            if value is not None and value>best_score:best=copy.deepcopy(candidate);best_score=value;success=bool(won)
+            if len(history)<32:history.append({'queries':queries,'best_objective':best_score if np.isfinite(best_score) else None})
+            return True
+        if attack.algorithm in {'fgsm','pgd'}:
+            tensor_domain=adapter.spec.preprocessing.get('kind')=='tensor'
+            if adapter.spec.adapter!='torch' or adapter.spec.preprocessing.get('kind','numeric') not in {'numeric','tabular','tensor'}:
+                raise EvaluationError('This gradient attack requires a verified continuous numeric Torch path.','gradient_unavailable')
+            if tensor_domain and (attack.stage!='tensor' or len(attack.fields)!=1 or attack.fields[0]!=adapter.spec.inputs[0].column):raise EvaluationError('Prepared-vector attacks require an explicitly declared tensor domain.','gradient_unavailable')
+            if not tensor_domain and attack.stage!='raw':raise EvaluationError('Numeric gradients require the declared raw numeric input stage.','gradient_unavailable')
+            if any(f.kind in {'categorical','integer','boolean','text','asset'} for f in adapter.spec.inputs if f.column in attack.fields) or adapter.spec.preprocessing.get('categories'):
+                raise EvaluationError('Discrete preprocessing cannot inherit a continuous attack.','gradient_unavailable')
+            import torch
+            tensor_shape=np.asarray(event['record'][attack.fields[0]]).shape if tensor_domain else None
+            original=np.asarray(event['record'][attack.fields[0]],float).reshape(-1) if tensor_domain else np.asarray([float(event['record'][f]) for f in attack.fields],float)
+            def assign(candidate,values):
+                if tensor_domain:candidate['record'][attack.fields[0]]=values.reshape(tensor_shape).tolist()
+                else:
+                    for f,v in zip(attack.fields,values):candidate['record'][f]=float(v)
+            # One seeded random-input control shares the exact feasibility, query
+            # and replay accounting of the attack. It is never free hidden work.
+            random_delta=rng.uniform(-attack.epsilon,attack.epsilon,len(original))
+            if attack.norm=='l2':random_delta*=min(1,attack.epsilon/max(np.linalg.norm(random_delta),1e-30))
+            random_candidate=copy.deepcopy(event);assign(random_candidate,original+random_delta)
+            if evaluate(random_candidate):random_baseline=last_evaluation
+            for restart in range(1 if attack.algorithm=='fgsm' else attack.restarts):
+                x=original.copy()
+                if restart:x+=rng.uniform(-attack.epsilon,attack.epsilon,len(x))
+                for step in range(1 if attack.algorithm=='fgsm' else attack.steps):
+                    if queries>=attack.queries_per_root-1:break
+                    candidate=copy.deepcopy(event)
+                    assign(candidate,x)
+                    prepared_input=adapter.prepare([{**candidate['record'],'_cg6_event_key':candidate['event_key']}]);raw,tensor=adapter.predict_raw(prepared_input,gradients=True)
+                    gradient_steps+=1
+                    prepared.attack_queries=getattr(prepared,'attack_queries',0)+1
+                    if prepared.attack_queries>prepared.spec.limits.max_queries:raise EvaluationError('Global gradient work admission exceeded.','attack_budget')
+>                   if raw.ndim==1:raw=raw[:,None]
+                       ^^^^^^^^
+E                   AttributeError: 'dict' object has no attribute 'ndim'
+
+src/confidenceguard/robustness/attacks.py:113: AttributeError
+________ test_r4_mapped_attacks_match_equivalent_complete_outputs[True] ________
+
+tmp_path = PosixPath('/private/var/folders/cs/c15xvw9d3t53tzcws5yxjxcr0000gn/T/pytest-of-drivyaanshyadav/pytest-780/test_r4_mapped_attacks_match_e1')
+regression = True
+
+    @pytest.mark.parametrize('regression', [False,True])
+    def test_r4_mapped_attacks_match_equivalent_complete_outputs(tmp_path, regression):
+        from confidenceguard import AttackSpec
+        from confidenceguard.robustness.attacks import search,objective
+        from confidenceguard.execution.services import predict_batch
+        spec=execution(tmp_path,regression=regression)
+        event={'event_key':'r','entity_key':'r','record':{'x':.2},'truth':{'valid':True,'value':0. if regression else 'yes'},'unavailable_fields':[]}
+        attack=AttackSpec('fgsm',('x',),objective='output_change' if regression else 'misclassification',
+                          access='white_box',epsilon=.4,queries_per_root=4)
+        results=[]
+        for mapped in (False,True):
+            adapter,baseline=attack_adapter(spec,mapped=mapped,regression=regression)
+            prepared=SimpleNamespace(spec=replace(spec,limits=ExecutionLimits(cache_bytes=0)),
+                config=EvaluationConfig(),work=SimpleNamespace(check=lambda *a:None))
+>           best,record=search(event,baseline,attack,adapter,prepared,0)
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/cg6/test_review_corrections.py:156: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+event = {'event_key': 'r', 'entity_key': 'r', 'record': {'x': 0.2}, 'truth': {'valid': True, 'value': 0.0}, ...}
+baseline = {'channels': {'point': 0.20000000298023224}, 'channel_failures': {}, 'execution': 'completed', 'original_outputs': {'heads': [-20.0, 0.20000000298023224]}, ...}
+attack = AttackSpec(algorithm='fgsm', fields=('x',), objective='output_change', access='white_box', norm='linf', epsilon=0.4, s...es_per_root=4, step_size=0.01, threshold=0.0, target_class=None, domains={}, constraints={}, stage='raw', relations=())
+adapter = <cg6.test_review_corrections.attack_adapter.<locals>.Adapter object at 0x109b1cad0>
+prepared = namespace(spec=ExecutionSpec(predictors=(PredictorSpec(id='model', task=TaskDefinition(kind='regression', outcome_defi...function test_r4_mapped_attacks_match_equivalent_complete_outputs.<locals>.<lambda> at 0x118902200>), attack_queries=2)
+seed = 0
+
+    def search(event,baseline,attack,adapter,prepared,seed):
+        if adapter.spec.preprocessing.get('kind')=='image' and attack.algorithm in {'fgsm','pgd'}:
+            from .image_attacks import search_image
+            return search_image(event,baseline,attack,adapter,prepared,seed)
+        task=prepared.spec.task;rng=np.random.Generator(np.random.PCG64(seed))
+        if attack.objective in {'misclassification','loss_increase'} and not event['truth']['valid']:
+            return copy.deepcopy(event),{'eligible':False,'reason':'authoritative_outcome_unavailable','queries':0,'success':None}
+        if attack.objective=='misclassification' and (not event.get('baseline_truth',event['truth'])['valid'] or decision(baseline,task)!=event.get('baseline_truth',event['truth'])['value']):
+            return copy.deepcopy(event),{'eligible':False,'reason':'baseline_not_correct','queries':0,'success':None}
+        if attack.objective=='targeted' and decision(baseline,task)==attack.target_class:
+            return copy.deepcopy(event),{'eligible':False,'reason':'baseline_already_target','queries':0,'success':None}
+        if attack.queries_per_root<2:raise EvaluationError('Attack budget must reserve final end-to-end verification.','attack_budget')
+        best=copy.deepcopy(event);best_score,_=objective(baseline,baseline,event,attack,task)
+        if best_score is None:best_score=-float('inf')
+        original_score=best_score;random_baseline=None;last_evaluation=None
+        queries=0;invalid=0;attempted=0;success=False;coverage='bounded';history=[];gradient_steps=0
+        def evaluate(candidate):
+            nonlocal queries,invalid,attempted,best,best_score,success,last_evaluation
+            if queries>=attack.queries_per_root-1 or attempted>=attack.queries_per_root-1:return False
+            attempted+=1
+            valid,_,_=feasible(event['record'],candidate['record'],attack.constraints,attack.relations)
+            if valid and attack.norm in {'linf','l2'}:
+                try:
+                    difference=np.concatenate([(np.asarray(candidate['record'][f],float)-np.asarray(event['record'][f],float)).reshape(-1) for f in attack.fields])
+                    valid=np.max(np.abs(difference))<=attack.epsilon+1e-12 if attack.norm=='linf' else np.linalg.norm(difference)<=attack.epsilon+1e-12
+                except (ValueError,TypeError):valid=False
+            if not valid:invalid+=1;last_evaluation={'state':'infeasible'};return True
+            queries+=1
+            prepared.attack_queries=getattr(prepared,'attack_queries',0)+1
+            if prepared.attack_queries>prepared.spec.limits.max_queries:raise EvaluationError('Global attack query admission exceeded.','attack_budget')
+            out=predict_batch(adapter,[candidate],prepared)[0];value,won=objective(out,baseline,event,attack,task)
+            last_evaluation={'state':'evaluated','objective':value,'success':bool(won)}
+            if value is not None and value>best_score:best=copy.deepcopy(candidate);best_score=value;success=bool(won)
+            if len(history)<32:history.append({'queries':queries,'best_objective':best_score if np.isfinite(best_score) else None})
+            return True
+        if attack.algorithm in {'fgsm','pgd'}:
+            tensor_domain=adapter.spec.preprocessing.get('kind')=='tensor'
+            if adapter.spec.adapter!='torch' or adapter.spec.preprocessing.get('kind','numeric') not in {'numeric','tabular','tensor'}:
+                raise EvaluationError('This gradient attack requires a verified continuous numeric Torch path.','gradient_unavailable')
+            if tensor_domain and (attack.stage!='tensor' or len(attack.fields)!=1 or attack.fields[0]!=adapter.spec.inputs[0].column):raise EvaluationError('Prepared-vector attacks require an explicitly declared tensor domain.','gradient_unavailable')
+            if not tensor_domain and attack.stage!='raw':raise EvaluationError('Numeric gradients require the declared raw numeric input stage.','gradient_unavailable')
+            if any(f.kind in {'categorical','integer','boolean','text','asset'} for f in adapter.spec.inputs if f.column in attack.fields) or adapter.spec.preprocessing.get('categories'):
+                raise EvaluationError('Discrete preprocessing cannot inherit a continuous attack.','gradient_unavailable')
+            import torch
+            tensor_shape=np.asarray(event['record'][attack.fields[0]]).shape if tensor_domain else None
+            original=np.asarray(event['record'][attack.fields[0]],float).reshape(-1) if tensor_domain else np.asarray([float(event['record'][f]) for f in attack.fields],float)
+            def assign(candidate,values):
+                if tensor_domain:candidate['record'][attack.fields[0]]=values.reshape(tensor_shape).tolist()
+                else:
+                    for f,v in zip(attack.fields,values):candidate['record'][f]=float(v)
+            # One seeded random-input control shares the exact feasibility, query
+            # and replay accounting of the attack. It is never free hidden work.
+            random_delta=rng.uniform(-attack.epsilon,attack.epsilon,len(original))
+            if attack.norm=='l2':random_delta*=min(1,attack.epsilon/max(np.linalg.norm(random_delta),1e-30))
+            random_candidate=copy.deepcopy(event);assign(random_candidate,original+random_delta)
+            if evaluate(random_candidate):random_baseline=last_evaluation
+            for restart in range(1 if attack.algorithm=='fgsm' else attack.restarts):
+                x=original.copy()
+                if restart:x+=rng.uniform(-attack.epsilon,attack.epsilon,len(x))
+                for step in range(1 if attack.algorithm=='fgsm' else attack.steps):
+                    if queries>=attack.queries_per_root-1:break
+                    candidate=copy.deepcopy(event)
+                    assign(candidate,x)
+                    prepared_input=adapter.prepare([{**candidate['record'],'_cg6_event_key':candidate['event_key']}]);raw,tensor=adapter.predict_raw(prepared_input,gradients=True)
+                    gradient_steps+=1
+                    prepared.attack_queries=getattr(prepared,'attack_queries',0)+1
+                    if prepared.attack_queries>prepared.spec.limits.max_queries:raise EvaluationError('Global gradient work admission exceeded.','attack_budget')
+>                   if raw.ndim==1:raw=raw[:,None]
+                       ^^^^^^^^
+E                   AttributeError: 'dict' object has no attribute 'ndim'
+
+src/confidenceguard/robustness/attacks.py:113: AttributeError
+_______________ test_r5_numeric_missing_sentinel_fit_statistics ________________
+
+    def test_r5_numeric_missing_sentinel_fit_statistics():
+        from confidenceguard.auxiliary.fitting import preprocessing,matrix
+        field=FeatureField('x','x','float',missing_values=('','-999'))
+        events=[{'record':{'x':v}} for v in ['1','3','-999']]
+        pre=preprocessing(events,(field,))
+>       assert pre['fill']==[2.] and pre['mean']==[2.] and pre['scale']==[1.]
+E       assert ([1.0] == [2.0]
+E         
+E         At index 0 diff: 1.0 != 2.0
+E         Use -v to get more diff)
+
+tests/cg6/test_review_corrections.py:171: AssertionError
+_________ test_r6_cuda_startup_prerequisite_before_native_calls[None] __________
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x118997020>
+setting = None
+
+    @pytest.mark.parametrize('setting', [None,'',':1:1',':4096:8',':16:8'])
+    def test_r6_cuda_startup_prerequisite_before_native_calls(monkeypatch, setting):
+        import torch
+        from confidenceguard.execution.devices import configure_torch
+        if setting is None:monkeypatch.delenv('CUBLAS_WORKSPACE_CONFIG',raising=False)
+        else:monkeypatch.setenv('CUBLAS_WORKSPACE_CONFIG',setting)
+        calls=[]
+        cuda=SimpleNamespace(**{k:Mock(return_value=v) for k,v in {
+            'device_count':1,'set_device':None,'manual_seed_all':None,'set_per_process_memory_fraction':None,
+            'get_device_properties':SimpleNamespace(total_memory=1024**3)}.items()})
+        monkeypatch.setattr(torch,'cuda',cuda)
+        for name in ('set_num_threads','manual_seed','use_deterministic_algorithms'):
+            monkeypatch.setattr(torch,name,Mock(side_effect=lambda *a,n=name,**k:calls.append(n)))
+        spec=DeviceSpec('cuda')
+        if setting in {':4096:8',':16:8'}:
+            assert configure_torch(spec,EvaluationConfig(),{'kind':'cuda','index':0})==torch.float32
+            cuda.set_device.assert_called_once_with(0)
+        else:
+>           with pytest.raises(EvaluationError) as error:configure_torch(spec,EvaluationConfig(),{'kind':'cuda','index':0})
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           Failed: DID NOT RAISE EvaluationError
+
+tests/cg6/test_review_corrections.py:194: Failed
+___________ test_r6_cuda_startup_prerequisite_before_native_calls[] ____________
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x118b28050>
+setting = ''
+
+    @pytest.mark.parametrize('setting', [None,'',':1:1',':4096:8',':16:8'])
+    def test_r6_cuda_startup_prerequisite_before_native_calls(monkeypatch, setting):
+        import torch
+        from confidenceguard.execution.devices import configure_torch
+        if setting is None:monkeypatch.delenv('CUBLAS_WORKSPACE_CONFIG',raising=False)
+        else:monkeypatch.setenv('CUBLAS_WORKSPACE_CONFIG',setting)
+        calls=[]
+        cuda=SimpleNamespace(**{k:Mock(return_value=v) for k,v in {
+            'device_count':1,'set_device':None,'manual_seed_all':None,'set_per_process_memory_fraction':None,
+            'get_device_properties':SimpleNamespace(total_memory=1024**3)}.items()})
+        monkeypatch.setattr(torch,'cuda',cuda)
+        for name in ('set_num_threads','manual_seed','use_deterministic_algorithms'):
+            monkeypatch.setattr(torch,name,Mock(side_effect=lambda *a,n=name,**k:calls.append(n)))
+        spec=DeviceSpec('cuda')
+        if setting in {':4096:8',':16:8'}:
+            assert configure_torch(spec,EvaluationConfig(),{'kind':'cuda','index':0})==torch.float32
+            cuda.set_device.assert_called_once_with(0)
+        else:
+>           with pytest.raises(EvaluationError) as error:configure_torch(spec,EvaluationConfig(),{'kind':'cuda','index':0})
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           Failed: DID NOT RAISE EvaluationError
+
+tests/cg6/test_review_corrections.py:194: Failed
+_________ test_r6_cuda_startup_prerequisite_before_native_calls[:1:1] __________
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x118b28c90>
+setting = ':1:1'
+
+    @pytest.mark.parametrize('setting', [None,'',':1:1',':4096:8',':16:8'])
+    def test_r6_cuda_startup_prerequisite_before_native_calls(monkeypatch, setting):
+        import torch
+        from confidenceguard.execution.devices import configure_torch
+        if setting is None:monkeypatch.delenv('CUBLAS_WORKSPACE_CONFIG',raising=False)
+        else:monkeypatch.setenv('CUBLAS_WORKSPACE_CONFIG',setting)
+        calls=[]
+        cuda=SimpleNamespace(**{k:Mock(return_value=v) for k,v in {
+            'device_count':1,'set_device':None,'manual_seed_all':None,'set_per_process_memory_fraction':None,
+            'get_device_properties':SimpleNamespace(total_memory=1024**3)}.items()})
+        monkeypatch.setattr(torch,'cuda',cuda)
+        for name in ('set_num_threads','manual_seed','use_deterministic_algorithms'):
+            monkeypatch.setattr(torch,name,Mock(side_effect=lambda *a,n=name,**k:calls.append(n)))
+        spec=DeviceSpec('cuda')
+        if setting in {':4096:8',':16:8'}:
+            assert configure_torch(spec,EvaluationConfig(),{'kind':'cuda','index':0})==torch.float32
+            cuda.set_device.assert_called_once_with(0)
+        else:
+>           with pytest.raises(EvaluationError) as error:configure_torch(spec,EvaluationConfig(),{'kind':'cuda','index':0})
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           Failed: DID NOT RAISE EvaluationError
+
+tests/cg6/test_review_corrections.py:194: Failed
+=========================== short test summary info ============================
+FAILED tests/cg6/test_review_corrections.py::test_r1_additional_auxiliary_feature_is_projected[False]
+FAILED tests/cg6/test_review_corrections.py::test_r1_additional_auxiliary_feature_is_projected[True]
+FAILED tests/cg6/test_review_corrections.py::test_r1_prohibited_artifact_inputs_refuse_before_preparation[id]
+FAILED tests/cg6/test_review_corrections.py::test_r1_prohibited_artifact_inputs_refuse_before_preparation[entity]
+FAILED tests/cg6/test_review_corrections.py::test_r1_prohibited_artifact_inputs_refuse_before_preparation[role]
+FAILED tests/cg6/test_review_corrections.py::test_r1_prohibited_artifact_inputs_refuse_before_preparation[y]
+FAILED tests/cg6/test_review_corrections.py::test_r1_auxiliary_availability_is_enforced[2026-01-02T00:00:00Z]
+FAILED tests/cg6/test_review_corrections.py::test_r1_auxiliary_availability_is_enforced[]
+FAILED tests/cg6/test_review_corrections.py::test_r1_auxiliary_availability_is_enforced[invalid]
+FAILED tests/cg6/test_review_corrections.py::test_r2_frozen_ensemble_changes_refuse[member]
+FAILED tests/cg6/test_review_corrections.py::test_r2_frozen_ensemble_changes_refuse[order]
+FAILED tests/cg6/test_review_corrections.py::test_r2_frozen_ensemble_changes_refuse[decision]
+FAILED tests/cg6/test_review_corrections.py::test_r3_imported_membership_uses_cg2_eligibility[None]
+FAILED tests/cg6/test_review_corrections.py::test_r3_imported_membership_uses_cg2_eligibility[unavailable]
+FAILED tests/cg6/test_review_corrections.py::test_r3_imported_membership_uses_cg2_eligibility[contradicted]
+FAILED tests/cg6/test_review_corrections.py::test_r4_mapped_attacks_match_equivalent_complete_outputs[False]
+FAILED tests/cg6/test_review_corrections.py::test_r4_mapped_attacks_match_equivalent_complete_outputs[True]
+FAILED tests/cg6/test_review_corrections.py::test_r5_numeric_missing_sentinel_fit_statistics
+FAILED tests/cg6/test_review_corrections.py::test_r6_cuda_startup_prerequisite_before_native_calls[None]
+FAILED tests/cg6/test_review_corrections.py::test_r6_cuda_startup_prerequisite_before_native_calls[]
+FAILED tests/cg6/test_review_corrections.py::test_r6_cuda_startup_prerequisite_before_native_calls[:1:1]
+21 failed, 4 passed in 21.85s

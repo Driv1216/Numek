@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>NUMEK v3 · Research and directions</title>
+  <link rel="stylesheet" href="./board.css" />
+</head>
+<body>
+  <header class="top">
+    <div class="top__mark">NUMEK <span>visual lab v3</span></div>
+    <nav><a href="#directions">Five directions</a><a href="#board">Research board</a><a href="#method">Method</a></nav>
+  </header>
+
+  <section class="intro">
+    <p class="kicker">Creative-direction checkpoint · approved 16 October 2026 · prototypes built — <a href="/">open the launcher</a></p>
+    <h1>Five ways NUMEK could look, each derived from what the research actually showed.</h1>
+    <div class="intro__cols">
+      <p><strong>What we are designing.</strong> NUMEK is an AI reliability verification company; DataTrust is its one implemented product: local, evidence-first reliability analysis for tabular, regression, temporal, text, image and connected-document datasets, ending in HTML/PDF/JSON reports. ConfidenceGuard and HallucinationGuard are direction only and appear nowhere as products.</p>
+      <p><strong>Shared content.</strong> Every concept uses the same real material: the Adult audit (48,842 × 15, final 69.0 Elevated after the critical-sub-score guardrail; evidence score 89.15) as the primary result, and the same run list — Bike hour regression (no score by design), SMS text, COCO subset, M9 finance records↔PDFs, plus German Credit and Bank Marketing classification runs. Differences you see are design, not invented features.</p>
+    </div>
+  </section>
+
+  <section id="directions" class="directions"></section>
+
+  <section class="matrix-wrap">
+    <h2 class="sec">How the five differ</h2>
+    <div class="matrix" id="matrix"></div>
+  </section>
+
+  <section id="board" class="board">
+    <h2 class="sec">Research board</h2>
+    <p class="note">Frames are genuine headless-Chromium captures at 1440×900 (intro at 1 s, 3 s, 6 s, then every ~1,000 px of wheel scroll). Hover a card to play its screen recording. Status: <b>live</b> = original site inspected; <b>gallery</b> = only its Awwwards page could be inspected; <b>partial</b> = loader/gate or a stalled capture, not used as an influence.</p>
+    <div id="refs"></div>
+    <h3 class="sub">Discovery pages used to find individual projects</h3>
+    <div id="discovery" class="disc"></div>
+  </section>
+
+  <section id="method" class="method">
+    <h2 class="sec">Method and limits</h2>
+    <ul>
+      <li>39 reference pages captured by <code>research/scripts/capture-refs.mjs</code> (Playwright, real wheel events so smooth-scroll libraries respond). 38 short recordings in <code>research/motion/</code>.</li>
+      <li>Key sites were also driven live in the in-app browser (LPAS, Pudding, Studio Freight, hellohello, State of AI Design).</li>
+      <li>Fonts and libraries per site come from the page itself (<code>document.fonts</code>, window globals) and are listed on each card.</li>
+      <li>Not inspected properly: Unseen 2025 (stuck at its loader), Siena (gated), GMB (scroll not advanced), Orchid and Mesh3D (capture hung on WebGL). ART+TECH, Praetorian and Elektra were seen only through Awwwards pages.</li>
+      <li>References are research only. No reference brand assets, logos or compositions are reused for NUMEK.</li>
+    </ul>
+  </section>
+
+  <script type="module" src="./board.js"></script>
+</body>
+</html>

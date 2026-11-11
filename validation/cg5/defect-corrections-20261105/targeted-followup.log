@@ -1,0 +1,26 @@
+..F..                                                                    [100%]
+=================================== FAILURES ===================================
+______ test_D2_nomination_resource_limit_never_inherits_complete_standing ______
+
+tmp_path = PosixPath('/private/var/folders/cs/c15xvw9d3t53tzcws5yxjxcr0000gn/T/pytest-of-drivyaanshyadav/pytest-734/test_D2_nomination_resource_li0')
+
+    def test_D2_nomination_resource_limit_never_inherits_complete_standing(tmp_path):
+        s, f, p = problem(tmp_path)
+        s = replace(s, families=(f,), objectives=(PolicyMetricSpec('correct', 'correct_issue_rate', 'maximize'),))
+        def no_room(*args):
+            raise EvaluationError('Synthetic nomination memory admission', 'policy_selection_state_limit')
+        actual, runs = milp_family(f, domains(f, p), s, p, on_candidate=no_room, global_nomination=True)
+        standing = milp_standing(runs, actual)
+        assert standing['search_coverage'] == 'incomplete'
+        assert standing['solution_standing'] == 'solver_optimal_objectives_tie_incomplete'
+        limited, _ = nomination_fixture(tmp_path / 'limited')
+        result = optimize_policies(replace(limited, limits=replace(limited.limits, solver_calls=1)), CFG)
+        assert result.data['policy']['searches'][0]['search_coverage'] == 'incomplete'
+>       assert result.data['policy']['nomination']['tie_coverage'] == 'incomplete_best_found'
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       KeyError: 'tie_coverage'
+
+tests/cg5/test_defect_corrections.py:187: KeyError
+=========================== short test summary info ============================
+FAILED tests/cg5/test_defect_corrections.py::test_D2_nomination_resource_limit_never_inherits_complete_standing
+1 failed, 4 passed, 25 deselected in 16.79s

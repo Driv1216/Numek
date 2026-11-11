@@ -1,0 +1,53 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+____ test_retained_one_event_per_period_can_confirm_with_entity_separation _____
+
+tmp_path = PosixPath('/private/var/folders/cs/c15xvw9d3t53tzcws5yxjxcr0000gn/T/pytest-of-drivyaanshyadav/pytest-537/test_retained_one_event_per_pe0')
+
+    def test_retained_one_event_per_period_can_confirm_with_entity_separation(tmp_path):
+        from confidenceguard import ReliabilityWorkspace, WorkspaceConfig
+        source = tmp_path/'periods.csv'
+        records = []
+        for entity in range(600):
+            hot = (entity//2)%2 == 1
+            y = entity%2
+            for period, when in [('reference', '2026-01-01T00:00:00Z'), ('current', '2026-02-01T00:00:00Z')]:
+                error = period == 'current' or not hot
+                records.append({'id': f'{period}-{entity}', 'entity': str(entity), 'y': str(y),
+                    'decision': str(y^int(error)), 'hot': str(hot).lower(), 'when': when,
+                    'available': '2026-03-01T00:00:00Z'})
+        with source.open('w', newline='') as stream:
+            writer = csv.DictWriter(stream, fieldnames=records[0]); writer.writeheader(); writer.writerows(records)
+        namespace = 'entity-arm-history-'+tmp_path.name
+        evaluation = {'task': {'kind': 'binary_classification', 'outcome_definition': 'Synthetic paired periods',
+            'classes': ['0', '1'], 'positive_class': '1'}, 'sources': [{'id': 'data', 'path': str(source)}],
+            'runs': [{'id': 'model', 'source': 'data', 'model': {'id': 'fixed', 'version': '1'},
+                'key_columns': ['id'], 'entity_columns': ['entity'], 'prediction': 'decision', 'prediction_at': {'column': 'when'}}],
+            'outcomes': {'source': 'data', 'column': 'y', 'key_columns': ['id'], 'available_at': {'column': 'available'}}}
+        view = {'id': 'context', 'availability': 'at_decision',
+            'fields': [{'id': 'hot', 'column': 'hot', 'kind': 'boolean'}]}
+        workspace = ReliabilityWorkspace.initialize(tmp_path/'workspace', WorkspaceConfig(saving=True, free_disk_bytes=1))
+        workspace.evidence_tracking(True)
+        workspace.ingest({'schema_version': 'confidenceguard.prediction_batch_spec/2.0', 'namespace': namespace,
+            'evaluation': evaluation, 'outcome_definition_version': 'v1', 'bindings': [{'run': 'model'}], 'feature_views': [view]})
+        variant = workspace.models()[0]['id']
+        spec = InvestigationSpec.from_dict({'history': {'workspace_path': str(workspace.path), 'selection': {
+            'namespace': namespace, 'variants': [variant], 'as_of': '2026-04-01T00:00:00Z', 'windows': [
+                {'id': 'reference', 'start': '2026-01-01T00:00:00Z', 'end': '2026-02-01T00:00:00Z'},
+                {'id': 'current', 'start': '2026-02-01T00:00:00Z', 'end': '2026-03-01T00:00:00Z'}]}},
+            'roles': {'namespace': namespace, 'unit': 'entity'}, 'features': [view], 'strategies': ['structured'],
+            'objectives': [{'id': 'deterioration', 'metric': 'error_rate', 'run': variant,
+                'comparator': 'reference_period', 'reference_period': 'reference', 'current_period': 'current',
+                'practical_threshold': .15}],
+            'limits': {'max_depth': 1, 'max_nodes': 1000, 'candidates_per_strategy': 16, 'stability_replicates': 1}})
+        discovered = workspace.investigate(spec)
+        frozen = freeze_hypotheses(discovered, [broad_failure(discovered)['id']], confirmation=protocol())
+        original = frozen.to_dict()
+>       preview = workspace.inspect_confirmation(frozen)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: 'ReliabilityWorkspace' object has no attribute 'inspect_confirmation'. Did you mean: 'restate_confirmation'?
+
+tests/cg4/test_entity_arm_confirmation.py:186: AttributeError
+=========================== short test summary info ============================
+FAILED tests/cg4/test_entity_arm_confirmation.py::test_retained_one_event_per_period_can_confirm_with_entity_separation
+1 failed, 8 deselected in 11.47s

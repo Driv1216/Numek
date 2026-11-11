@@ -1,0 +1,106 @@
+{
+  "evaluation": {
+    "name": "ConfidenceGuard evaluation",
+    "outcomes": {
+      "column": "y",
+      "key_columns": [
+        "id"
+      ],
+      "source": "source1"
+    },
+    "runs": [
+      {
+        "decision": {
+          "rule": "none",
+          "tie_policy": "abstain"
+        },
+        "entity_columns": [
+          "entity"
+        ],
+        "id": "run1",
+        "key_columns": [
+          "id"
+        ],
+        "model": {
+          "display_name": "Model 1",
+          "id": "model1",
+          "version": "v1"
+        },
+        "prediction": "decision",
+        "probabilities": {
+          "positive_column": "p"
+        },
+        "role": "unknown",
+        "source": "source1"
+      }
+    ],
+    "sources": [
+      {
+        "handle": "9da330a7dc1843068ff85a07effef23c",
+        "id": "source1"
+      }
+    ],
+    "task": {
+      "classes": [
+        "0",
+        "1"
+      ],
+      "kind": "binary_classification",
+      "outcome_definition": "Supplied reference outcome",
+      "positive_class": "1"
+    }
+  },
+  "feature_time_view": "available_at_decision",
+  "features": [
+    {
+      "availability": "at_decision",
+      "fields": [
+        {
+          "column": "x",
+          "id": "x",
+          "kind": "categorical"
+        },
+        {
+          "column": "z",
+          "id": "z",
+          "kind": "categorical"
+        }
+      ],
+      "id": "context"
+    }
+  ],
+  "name": "Failure investigation",
+  "objectives": [
+    {
+      "bounds": [],
+      "ceiling": null,
+      "comparator": "complement",
+      "current_period": null,
+      "direction": "lower",
+      "id": "objective",
+      "interval": null,
+      "material_error": null,
+      "metric": "roc_auc",
+      "metric_identity": {},
+      "nominal": null,
+      "practical_threshold": 0.1,
+      "reference_period": null,
+      "reference_run": null,
+      "run": "run1",
+      "target": null,
+      "training_clip": 30,
+      "units": "fraction"
+    }
+  ],
+  "representations": [],
+  "roles": {
+    "column": "role",
+    "namespace": "known-exposed-final-closure-v114",
+    "seed": 0,
+    "unit": "entity"
+  },
+  "schema_version": "confidenceguard.investigation_spec/1.0",
+  "strategies": [
+    "structured"
+  ]
+}

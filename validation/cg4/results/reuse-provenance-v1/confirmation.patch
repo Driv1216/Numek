@@ -1,0 +1,39 @@
+--- prior/src/confidenceguard/confirmation.py
++++ current/src/confidenceguard/confirmation.py
+@@ -236,7 +236,8 @@
+         entities=[r.get('entity_key') for r in records]
+         units=len(set(entities)) if protocol.sampling=='independent_entities' and None not in entities else len(records)
+         events=[digest([spec.roles.namespace,p.keys[i]]) for i in indices]
+-        unit_ids=[digest([spec.roles.namespace,p.records[i].get('entity_key') if spec.roles.unit=='entity' else p.keys[i]]) for i in indices]
++        from .evidence_use import population_identifiers
++        exposure_events,unit_ids=population_identifiers(p,indices)
+         reasons=[]
+         if any(r.get('cg_role') in {'F','S','C'} for r in records):reasons.append('observable_CG2_F_S_C_overlap')
+         if any(r.get('history_fact') in getattr(p.store,'cg4_known_exposed_facts',set()) for r in records):reasons.append('previously_assessed_historical_evidence')
+@@ -249,7 +250,7 @@
+                 original_entity=getattr(p.store,'cg4_original_entities',{}).get(record['event_key'])
+                 if (original_key is not None and key_digest(spec.roles.namespace,original_key) in prior_events) or key_digest(spec.roles.namespace,record.get('entity_key')) in prior_entities or original_entity is not None and key_digest(spec.roles.namespace,original_entity) in prior_entities:
+                     reasons.append('observable_upstream_method_membership_overlap');break
+-        if set(events)&set(frozen.data['D_S_events']) or set(unit_ids)&set(frozen.data['D_S_units']):reasons.append('observable_D_S_H_overlap')
++        if set(exposure_events)&set(frozen.data['D_S_events']) or set(unit_ids)&set(frozen.data['D_S_units']):reasons.append('observable_D_S_H_overlap')
+         if protocol.sampling=='independent_rows' and any(e is not None for e in entities) and len(set(entities))<len(entities):reasons.append('repeated_entities_in_independent_row_design')
+         if protocol.sampling=='independent_entities' and None in entities:reasons.append('entity_keys_required')
+         if protocol.sampling in {'descriptive','unsupported_temporal'} or protocol.known_common_shocks:reasons.append('unsupported_confirmation_dependence')
+@@ -283,7 +284,7 @@
+                 'producer_runtime':{k:provenance.get(k) for k in ('producer','model','revision','runtime','profile')}})
+         snapshot=hashlib.sha256()
+         for record in records:snapshot.update(digest({k:v for k,v in record.items() if k not in {'ordinal','cg4_member','cg4_available'}}).encode())
+-        population=digest({'events':sorted(events),'units':sorted(set(unit_ids)),'H_snapshot':snapshot.hexdigest(),
++        population=digest({'events':exposure_events,'units':sorted(set(unit_ids)),'H_snapshot':snapshot.hexdigest(),
+                            'features':digest(features),'representations':vector_snapshots,'family':frozen.family_digest})
+         if scheduled:reasons=[r for r in reasons if r!='previously_assessed_historical_evidence']
+         fingerprint=digest({'family':frozen.data['content_digest'],'input':p.fingerprint,'feasibility':feasibility_data,'membership':membership,'scheduled_look':scheduled['look'] if scheduled else None})
+@@ -293,7 +294,7 @@
+             'independence':{'local_separation':'failed' if any(reason in reasons for reason in ('observable_D_S_H_overlap','observable_CG2_F_S_C_overlap','observable_upstream_method_membership_overlap')) else 'system_checked',
+                             'upstream':protocol.upstream_independence,'external_exposure':protocol.external_exposure,'exposure_continuity':'unknown'},
+             'H_outcomes_disclosed':False,'confirmation_look':scheduled['look'] if scheduled else None,'_effective_spec':p.spec.to_dict(),
+-            '_protected_population':{'events':events,'units':sorted(set(unit_ids)),'population_digest':population}},
++            '_protected_population':{'events':exposure_events,'units':sorted(set(unit_ids)),'population_digest':population}},
+             {'status':'completed','peak_workspace_bytes':p.work.peak})
+ 
+ 

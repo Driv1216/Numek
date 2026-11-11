@@ -1,4 +1,625 @@
 {
+  "execution": {
+    "execution": {
+      "predictors": [
+        {
+          "id": "reference",
+          "task": {
+            "kind": "regression",
+            "outcome_definition": "Synthetic observed response",
+            "units": "items"
+          },
+          "adapter": "constant",
+          "inputs": [
+            {
+              "id": "x",
+              "column": "x",
+              "kind": "float",
+              "role": "model_input"
+            }
+          ],
+          "outputs": [
+            {
+              "channel": "point"
+            }
+          ],
+          "architecture": {
+            "values": {
+              "output": 0.0
+            }
+          }
+        }
+      ],
+      "sources": [
+        {
+          "id": "input",
+          "handle": "SOURCE_HANDLE"
+        }
+      ],
+      "input_source": "input",
+      "key_columns": [
+        "id"
+      ],
+      "namespace": "synthetic-cg6-events",
+      "outcomes": {
+        "source": "input",
+        "column": "y",
+        "key_columns": [
+          "id"
+        ]
+      },
+      "roles": {
+        "namespace": "synthetic-cg6-events",
+        "column": "role",
+        "unit": "event"
+      },
+      "device": {
+        "kind": "cpu"
+      }
+    },
+    "auxiliary": {
+      "execution": {
+        "predictors": [
+          {
+            "id": "reference",
+            "task": {
+              "kind": "regression",
+              "outcome_definition": "Synthetic observed response",
+              "units": "items"
+            },
+            "adapter": "constant",
+            "inputs": [
+              {
+                "id": "x",
+                "column": "x",
+                "kind": "float",
+                "role": "model_input"
+              }
+            ],
+            "outputs": [
+              {
+                "channel": "point"
+              }
+            ],
+            "architecture": {
+              "values": {
+                "output": 0.0
+              }
+            }
+          }
+        ],
+        "sources": [
+          {
+            "id": "input",
+            "handle": "SOURCE_HANDLE"
+          }
+        ],
+        "input_source": "input",
+        "key_columns": [
+          "id"
+        ],
+        "namespace": "synthetic-cg6-events",
+        "outcomes": {
+          "source": "input",
+          "column": "y",
+          "key_columns": [
+            "id"
+          ]
+        },
+        "roles": {
+          "namespace": "synthetic-cg6-events",
+          "column": "role",
+          "unit": "event"
+        },
+        "device": {
+          "kind": "cpu"
+        }
+      },
+      "kind": "scale",
+      "base_predictor": "reference",
+      "candidates": [
+        {
+          "id": "baseline",
+          "family": "constant"
+        },
+        {
+          "id": "histogram",
+          "family": "histogram"
+        }
+      ]
+    },
+    "robustness": {
+      "execution": {
+        "predictors": [
+          {
+            "id": "reference",
+            "task": {
+              "kind": "regression",
+              "outcome_definition": "Synthetic observed response",
+              "units": "items"
+            },
+            "adapter": "constant",
+            "inputs": [
+              {
+                "id": "x",
+                "column": "x",
+                "kind": "float",
+                "role": "model_input"
+              }
+            ],
+            "outputs": [
+              {
+                "channel": "point"
+              }
+            ],
+            "architecture": {
+              "values": {
+                "output": 0.0
+              }
+            }
+          }
+        ],
+        "sources": [
+          {
+            "id": "input",
+            "handle": "SOURCE_HANDLE"
+          }
+        ],
+        "input_source": "input",
+        "key_columns": [
+          "id"
+        ],
+        "namespace": "synthetic-cg6-events",
+        "outcomes": {
+          "source": "input",
+          "column": "y",
+          "key_columns": [
+            "id"
+          ]
+        },
+        "roles": {
+          "namespace": "synthetic-cg6-events",
+          "column": "role",
+          "unit": "event"
+        },
+        "device": {
+          "kind": "cpu"
+        }
+      },
+      "scenarios": [
+        {
+          "id": "measurement_noise",
+          "transformations": [
+            {
+              "id": "noise",
+              "operation": "noise",
+              "fields": [
+                "x"
+              ],
+              "parameters": {
+                "scale": 0.1
+              }
+            }
+          ],
+          "outcome_relation": "label_preserving",
+          "outcome_reason": "Synthetic sensor measurement corruption"
+        }
+      ]
+    },
+    "assessment": {
+      "protocol_handle": "PROTOCOL_HANDLE",
+      "execution": {
+        "predictors": [
+          {
+            "id": "reference",
+            "task": {
+              "kind": "regression",
+              "outcome_definition": "Synthetic observed response",
+              "units": "items"
+            },
+            "adapter": "constant",
+            "inputs": [
+              {
+                "id": "x",
+                "column": "x",
+                "kind": "float",
+                "role": "model_input"
+              }
+            ],
+            "outputs": [
+              {
+                "channel": "point"
+              }
+            ],
+            "architecture": {
+              "values": {
+                "output": 0.0
+              }
+            }
+          }
+        ],
+        "sources": [
+          {
+            "id": "input",
+            "handle": "SOURCE_HANDLE"
+          }
+        ],
+        "input_source": "input",
+        "key_columns": [
+          "id"
+        ],
+        "namespace": "synthetic-cg6-events",
+        "outcomes": {
+          "source": "input",
+          "column": "y",
+          "key_columns": [
+            "id"
+          ]
+        },
+        "roles": {
+          "namespace": "synthetic-cg6-events",
+          "column": "role",
+          "unit": "event"
+        },
+        "device": {
+          "kind": "cpu"
+        }
+      }
+    },
+    "restatement": {
+      "result_id": "RESULT_ID",
+      "spec": {
+        "sources": [
+          {
+            "id": "later",
+            "handle": "LATER_OUTCOME_HANDLE"
+          }
+        ],
+        "outcomes": {
+          "source": "later",
+          "column": "y",
+          "key_columns": [
+            "id"
+          ]
+        },
+        "reason": "Later authoritative outcomes"
+      }
+    },
+    "job": {
+      "kind": "cg6_execute",
+      "draft_id": "DRAFT_ID",
+      "revision": 1,
+      "fingerprint": "CONFIRMATION_FINGERPRINT",
+      "client_request_id": "cg6-execute-1"
+    }
+  },
+  "policies": {
+    "binary_classification": {
+      "input": {
+        "evaluation": {
+          "task": {
+            "kind": "binary_classification",
+            "outcome_definition": "Supplied reference outcome",
+            "classes": [
+              "0",
+              "1"
+            ],
+            "positive_class": "1"
+          },
+          "sources": [
+            {
+              "id": "predictions",
+              "handle": "SOURCE_HANDLE"
+            }
+          ],
+          "runs": [
+            {
+              "id": "candidate",
+              "source": "predictions",
+              "model": {
+                "id": "model",
+                "version": "v1"
+              },
+              "key_columns": [
+                "id"
+              ],
+              "prediction": "prediction"
+            }
+          ],
+          "outcomes": {
+            "source": "predictions",
+            "column": "outcome",
+            "key_columns": [
+              "id"
+            ]
+          }
+        },
+        "roles": {
+          "namespace": "policy-example",
+          "column": "role"
+        }
+      },
+      "candidates": [
+        {
+          "task": {
+            "kind": "binary_classification",
+            "outcome_definition": "Supplied reference outcome",
+            "classes": [
+              "0",
+              "1"
+            ],
+            "positive_class": "1"
+          },
+          "run": "candidate",
+          "nodes": {
+            "root": {
+              "kind": "action",
+              "action": {
+                "kind": "supplied"
+              }
+            }
+          },
+          "root": "root",
+          "fallback": {
+            "kind": "abstain"
+          },
+          "unavailable": {
+            "kind": "unavailable"
+          }
+        }
+      ],
+      "objectives": [
+        {
+          "id": "coverage",
+          "metric": "issued_coverage",
+          "direction": "maximize",
+          "basis": "operational"
+        }
+      ]
+    },
+    "multiclass_classification": {
+      "input": {
+        "evaluation": {
+          "task": {
+            "kind": "multiclass_classification",
+            "outcome_definition": "Supplied reference outcome",
+            "classes": [
+              "a",
+              "b",
+              "c"
+            ],
+            "positive_class": null
+          },
+          "sources": [
+            {
+              "id": "predictions",
+              "handle": "SOURCE_HANDLE"
+            }
+          ],
+          "runs": [
+            {
+              "id": "candidate",
+              "source": "predictions",
+              "model": {
+                "id": "model",
+                "version": "v1"
+              },
+              "key_columns": [
+                "id"
+              ],
+              "prediction": "prediction"
+            }
+          ],
+          "outcomes": {
+            "source": "predictions",
+            "column": "outcome",
+            "key_columns": [
+              "id"
+            ]
+          }
+        },
+        "roles": {
+          "namespace": "policy-example",
+          "column": "role"
+        }
+      },
+      "candidates": [
+        {
+          "task": {
+            "kind": "multiclass_classification",
+            "outcome_definition": "Supplied reference outcome",
+            "classes": [
+              "a",
+              "b",
+              "c"
+            ],
+            "positive_class": null
+          },
+          "run": "candidate",
+          "nodes": {
+            "root": {
+              "kind": "action",
+              "action": {
+                "kind": "supplied"
+              }
+            }
+          },
+          "root": "root",
+          "fallback": {
+            "kind": "abstain"
+          },
+          "unavailable": {
+            "kind": "unavailable"
+          }
+        }
+      ],
+      "objectives": [
+        {
+          "id": "coverage",
+          "metric": "issued_coverage",
+          "direction": "maximize",
+          "basis": "operational"
+        }
+      ]
+    },
+    "regression": {
+      "input": {
+        "evaluation": {
+          "task": {
+            "kind": "regression",
+            "outcome_definition": "Supplied reference outcome",
+            "classes": [],
+            "positive_class": null
+          },
+          "sources": [
+            {
+              "id": "predictions",
+              "handle": "SOURCE_HANDLE"
+            }
+          ],
+          "runs": [
+            {
+              "id": "candidate",
+              "source": "predictions",
+              "model": {
+                "id": "model",
+                "version": "v1"
+              },
+              "key_columns": [
+                "id"
+              ],
+              "prediction": "prediction"
+            }
+          ],
+          "outcomes": {
+            "source": "predictions",
+            "column": "outcome",
+            "key_columns": [
+              "id"
+            ]
+          }
+        },
+        "roles": {
+          "namespace": "policy-example",
+          "column": "role"
+        }
+      },
+      "candidates": [
+        {
+          "task": {
+            "kind": "regression",
+            "outcome_definition": "Supplied reference outcome",
+            "classes": [],
+            "positive_class": null
+          },
+          "run": "candidate",
+          "nodes": {
+            "root": {
+              "kind": "action",
+              "action": {
+                "kind": "numeric",
+                "source": {
+                  "kind": "point"
+                }
+              }
+            }
+          },
+          "root": "root",
+          "fallback": {
+            "kind": "abstain"
+          },
+          "unavailable": {
+            "kind": "unavailable"
+          }
+        }
+      ],
+      "objectives": [
+        {
+          "id": "coverage",
+          "metric": "issued_coverage",
+          "direction": "maximize",
+          "basis": "operational"
+        }
+      ]
+    }
+  },
+  "investigation": {
+    "spec": {
+      "schema_version": "confidenceguard.investigation_spec/1.0",
+      "evaluation": {
+        "task": {
+          "kind": "binary_classification",
+          "outcome_definition": "Supplied reference outcome",
+          "classes": [
+            "0",
+            "1"
+          ],
+          "positive_class": "1"
+        },
+        "sources": [
+          {
+            "id": "predictions",
+            "handle": "SOURCE_HANDLE"
+          }
+        ],
+        "runs": [
+          {
+            "id": "candidate",
+            "source": "predictions",
+            "model": {
+              "id": "model",
+              "version": "v1"
+            },
+            "key_columns": [
+              "id"
+            ],
+            "prediction": "prediction"
+          }
+        ],
+        "outcomes": {
+          "source": "predictions",
+          "column": "outcome",
+          "key_columns": [
+            "id"
+          ]
+        }
+      },
+      "roles": {
+        "namespace": "prediction-events",
+        "unit": "entity"
+      },
+      "features": [
+        {
+          "id": "context",
+          "availability": "at_decision",
+          "fields": [
+            {
+              "id": "region",
+              "column": "region",
+              "kind": "categorical"
+            }
+          ]
+        }
+      ],
+      "objectives": [
+        {
+          "id": "errors",
+          "metric": "error_rate",
+          "run": "candidate",
+          "direction": "higher",
+          "units": "fraction",
+          "practical_threshold": 0.05
+        }
+      ],
+      "strategies": [
+        "structured",
+        "catboost",
+        "geometric"
+      ]
+    },
+    "config": {},
+    "qualification": "Synthetic configuration; declare entity columns before execution. No measured result."
+  },
   "label": "Synthetic contract examples, not measured results",
   "evaluations": {
     "binary_classification": {

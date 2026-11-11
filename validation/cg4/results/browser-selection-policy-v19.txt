@@ -1,0 +1,428 @@
+- main:
+  - paragraph: NUMEK / local analytical workbench
+  - heading "ConfidenceGuard" [level=1]
+  - paragraph: Evaluate supplied predictions. No model execution or overall trust score.
+  - link "DataTrust":
+    - /url: /
+  - text: ·
+  - link "API contract":
+    - /url: /api/confidenceguard/v1/openapi.json
+  - navigation "ConfidenceGuard workspace":
+    - button "Evaluations & methods"
+    - button "Models & reliability history"
+    - button "Failure investigations"
+  - heading "Failure investigations" [level=2]
+  - paragraph: Discover on D, select on S, freeze claims, then assess independently on H. Candidate regions are diagnostic hypotheses. They do not establish causes or change a model.
+  - button "Use current evaluation"
+  - button "Use current historical selection"
+  - text: Name
+  - textbox "Name": Failure investigation
+  - heading "1 · Evidence and objective" [level=3]
+  - paragraph: Register prediction sources in Evaluations & methods. Historical selections use the authorized local workspace. Every objective has its own eligible denominator, adverse direction and units.
+  - text: Event/entity namespace
+  - textbox "Event/entity namespace": prediction-events
+  - text: Entity columns for copied evaluation
+  - textbox "Entity columns for copied evaluation":
+    - /placeholder: customer_id
+  - text: Partition unit
+  - combobox "Partition unit":
+    - option "Whole entities" [selected]
+    - option "Declared independent rows"
+  - text: Explicit D/S/H column (optional)
+  - textbox "Explicit D/S/H column (optional)"
+  - text: Partition seed
+  - spinbutton "Partition seed": "0"
+  - text: Failure objective
+  - combobox "Failure objective":
+    - option "error_rate" [selected]
+    - option "false_negative_rate"
+    - option "false_positive_rate"
+    - option "precision"
+    - option "recall"
+    - option "brier"
+    - option "log_loss"
+    - option "reliability_diagram"
+    - option "calibration_residual"
+    - option "bias"
+    - option "mae"
+    - option "mse"
+    - option "rmse"
+    - option "material_error_rate"
+    - option "roc_auc"
+    - option "average_precision"
+    - option "interval_miscoverage"
+    - option "interval_coverage"
+    - option "interval_width"
+    - option "central_interval_score"
+  - text: Adverse direction
+  - combobox "Adverse direction":
+    - option "Metric default (resolved at inspection)" [selected]
+    - option "Higher is worse"
+    - option "Lower is worse"
+    - option "Larger absolute bias/residual"
+    - option "Nominal coverage shortfall"
+  - text: "Units (blank: authoritative metric units)"
+  - 'textbox "Units (blank: authoritative metric units)"':
+    - /placeholder: Automatic from metric and task
+  - text: Material effect δ
+  - spinbutton "Material effect δ"
+  - text: Comparator
+  - combobox "Comparator":
+    - option "Complement within eligible scope" [selected]
+    - option "Whole eligible scope (overlapping)"
+    - option "Declared ceiling"
+    - option "Paired reference model"
+  - text: Ceiling
+  - spinbutton "Ceiling"
+  - text: Reference run ID
+  - textbox "Reference run ID"
+  - text: Target class
+  - textbox "Target class"
+  - text: Interval ID
+  - textbox "Interval ID"
+  - text: Nominal coverage
+  - spinbutton "Nominal coverage": "0.9"
+  - generic "Typed features and temporal provenance"
+  - option "categorical" [selected]
+  - option "boolean"
+  - option "integer"
+  - option "decimal"
+  - option "float"
+  - option "timestamp"
+  - option "text"
+  - option "asset"
+  - option "context" [selected]
+  - option "model_input"
+  - option "prediction_derived"
+  - option "retrospective"
+  - option "Unknown; membership unavailable" [selected]
+  - option "Declared available at decision"
+  - option "Dated; add clock binding below"
+  - option "Available at decision" [selected]
+  - option "Retrospective, label independent"
+  - generic "Supplied vectors and pinned offline encoders"
+  - option "Supplied keyed NPY vectors" [selected]
+  - option "Pinned multilingual E5-small"
+  - option "Pinned DINOv2-base"
+  - option "Retained representation"
+  - option "none" [selected]
+  - option "l2"
+  - option "Unknown" [selected]
+  - option "Declared at decision"
+  - option "Dated in key metadata"
+  - option "inputs" [selected]
+  - option "predictions.csv"
+  - heading "2 · Search and resources" [level=3]
+  - checkbox "Structured interactions" [checked]
+  - text: Structured interactions
+  - checkbox "CatBoost objective-specific diagnostics" [checked]
+  - text: CatBoost objective-specific diagnostics
+  - checkbox "Geometric nonlinear fallback" [checked]
+  - text: Geometric nonlinear fallback
+  - checkbox "Experimental NUMEK landmark method; promotion failed in the locked curved-region profile"
+  - text: Experimental NUMEK landmark method; promotion failed in the locked curved-region profile
+  - button "Compose complete specification"
+  - text: Complete investigation specification
+  - textbox "Complete investigation specification": "{ \"evaluation\": { \"as_of\": \"2026-02-01T00:00:00Z\", \"outcomes\": { \"available_at\": { \"column\": \"available\" }, \"column\": \"y\", \"key_columns\": [ \"id\" ], \"source\": \"data\" }, \"runs\": [ { \"entity_columns\": [ \"entity\" ], \"id\": \"model\", \"key_columns\": [ \"id\" ], \"model\": { \"id\": \"synthetic-review\", \"version\": \"v1\" }, \"prediction\": \"decision\", \"prediction_at\": { \"column\": \"when\" }, \"probabilities\": { \"positive_column\": \"p\" }, \"source\": \"data\" }, { \"entity_columns\": [ \"entity\" ], \"id\": \"reference\", \"key_columns\": [ \"id\" ], \"model\": { \"id\": \"synthetic-review-reference\", \"version\": \"v1\" }, \"prediction\": \"reference\", \"prediction_at\": { \"column\": \"when\" }, \"source\": \"data\" } ], \"sources\": [ { \"handle\": \"d60fc99acfaa4d93a9278c75e12444da\", \"id\": \"data\" } ], \"task\": { \"classes\": [ \"0\", \"1\" ], \"kind\": \"binary_classification\", \"outcome_definition\": \"Deterministic synthetic review fixture\", \"positive_class\": \"1\" } }, \"features\": [ { \"availability\": \"at_decision\", \"fields\": [ { \"column\": \"x\", \"id\": \"x\", \"kind\": \"categorical\" }, { \"column\": \"z\", \"id\": \"z\", \"kind\": \"categorical\" } ], \"id\": \"context\" } ], \"limits\": { \"candidates_per_strategy\": 8, \"max_depth\": 3, \"max_nodes\": 10000, \"shortlist\": 3, \"stability_replicates\": 1 }, \"name\": \"Previously exposed synthetic paired-precision selector check\", \"objectives\": [ { \"bounds\": [], \"ceiling\": null, \"comparator\": \"paired\", \"current_period\": null, \"direction\": \"lower\", \"id\": \"precision\", \"interval\": null, \"material_error\": null, \"metric\": \"precision\", \"metric_identity\": {}, \"nominal\": null, \"practical_threshold\": 0.1, \"reference_period\": null, \"reference_run\": \"reference\", \"run\": \"model\", \"target\": null, \"training_clip\": 30, \"units\": \"fraction\" } ], \"roles\": { \"column\": \"role\", \"namespace\": \"cg4-exposed-review-fixture-v1\", \"unit\": \"entity\" }, \"strategies\": [ \"structured\", \"catboost\" ] }"
+  - generic "Execution configuration and limits"
+  - checkbox "Retain this immutable investigation/assessment in the authorized workspace" [disabled]
+  - text: Retain this immutable investigation/assessment in the authorized workspace
+  - button "Inspect evidence and admitted search"
+  - button "Run discovery on D and selection on S"
+  - button "Cancel active job"
+  - status: "Planned 720: D 240, S 240, H 240. 2 typed fields, 0 representations. 2 threads, 6.0 GiB RSS, 30.0 minutes, 256 MiB result budget. H outcome metrics were sealed during this discovery inspection."
+  - generic "Complete inspection and admitted specification"
+  - heading "Previously exposed synthetic paired-precision selector check" [level=3]
+  - paragraph: Exploratory evidence. D 240, S 240, sealed H 240. 1 proposed hypothesis is shortlisted; every retained candidate remains available below.
+  - paragraph: "Selection uses S only: preserve the severity extreme, then prioritize (adverse effect minus the declared practical threshold) × conditional support when another slot is available. Remaining gates use the effect/support/complexity frontier and marginal-coverage checks. This is an investigation heuristic, not a statistical or causal guarantee."
+  - generic "Complete assessment, population and provenance evidence"
+  - region "Scrollable investigation evidence table":
+    - table "Scroll horizontally to see all evidence when the table is wider than the view.":
+      - caption: Scroll horizontally to see all evidence when the table is wider than the view.
+      - rowgroup:
+        - row "Freeze Candidate Strategy Objective Material effect δ S adverse effect Members / applicable / planned Evidence":
+          - columnheader "Freeze"
+          - columnheader "Candidate"
+          - columnheader "Strategy"
+          - columnheader "Objective"
+          - columnheader "Material effect δ"
+          - columnheader "S adverse effect"
+          - columnheader "Members / applicable / planned"
+          - columnheader "Evidence"
+      - rowgroup:
+        - row "Select hypothesis 09b81b1aadb7409553d780c850799c0f 09b81b1aadb7409553d780c850799c0f structured precision 0.5 120 / 240 / 240; unavailable 0":
+          - cell "Select hypothesis 09b81b1aadb7409553d780c850799c0f":
+            - checkbox "Select hypothesis 09b81b1aadb7409553d780c850799c0f" [checked]
+          - cell "09b81b1aadb7409553d780c850799c0f"
+          - cell "structured"
+          - cell "precision"
+          - cell:
+            - spinbutton "Material effect threshold for 09b81b1aadb7409553d780c850799c0f": "0.1"
+          - cell "0.5"
+          - cell "120 / 240 / 240; unavailable 0"
+          - cell:
+            - generic "Gate, denominators, fidelity, stability and evidence"
+            - generic: "{ \"D\": { \"available\": 240, \"comparator_metric\": { \"measurement\": { \"applicability\": \"applicable\", \"basis\": \"measured\", \"data\": {}, \"denominator\": 60, \"denominator_kind\": \"class_conditional_records\", \"disclosure_group\": \"D\", \"evidence_refs\": [], \"execution\": \"completed\", \"family\": \"performance\", \"id\": \"m7\", \"interpretation\": \"descriptive\", \"method_standing\": \"established_method\", \"method_version\": \"1\", \"metric\": \"precision\", \"population_id\": \"pop_253a575b3918fc80a38739f8a2a7f1f3\", \"reason\": null, \"run\": \"reference\", \"scope\": \"D/paired_reference\", \"sensitive_counts\": [ 60, 0 ], \"support_warning\": true, \"units\": null, \"value\": 1, \"value_state\": \"finite\" }, \"metric_identity\": { \"dimensions\": {}, \"family\": \"performance\", \"method_version\": \"1\", \"metric\": \"precision\", \"units\": null }, \"objective_identity\": { \"authoritative_metric\": \"precision\", \"authoritative_transform\": \"identity\", \"bounds\": [], \"ceiling\": null, \"comparator\": \"complement\", \"conditional_denominator\": \"class_conditional_records\", \"current_period\": null, \"definition_version\": \"failure_objective_v1\", \"direction\": \"lower\", \"eligible_population\": \"outcome_valid AND decision IS NOT NULL AND state IN ('issued','hypothetical') AND decision='1'\", \"id\": \"precision\", \"interval\": null, \"learning_target\": \"(y='1')::DOUBLE\", \"material_error\": null, \"metric\": \"precision\", \"metric_identity\": {}, \"nominal\": null, \"paired_reference\": null, \"practical_threshold\": 0.1, \"proxy\": \"exact_additive_loss\", \"reference_period\": null, \"reference_run\": null, \"run\": \"reference\", \"target\": null, \"task\": { \"classes\": [ \"0\", \"1\" ], \"horizon\": null, \"kind\": \"binary_classification\", \"material_error\": null, \"outcome_definition\": \"Deterministic synthetic review fixture\", \"positive_class\": \"1\", \"units\": null }, \"training_clip\": 30, \"units\": \"fraction\" }, \"population_id\": \"pop_253a575b3918fc80a38739f8a2a7f1f3\", \"reason\": null, \"support\": 60, \"value\": 1, \"value_state\": \"finite\" }, \"conditional_members\": 120, \"conditional_nonmembers\": 60, \"effect\": 0.5, \"effect_state\": \"finite\", \"member_metric\": { \"measurement\": { \"applicability\": \"applicable\", \"basis\": \"measured\", \"data\": {}, \"denominator\": 120, \"denominator_kind\": \"class_conditional_records\", \"disclosure_group\": \"D\", \"evidence_refs\": [], \"execution\": \"completed\", \"family\": \"performance\", \"id\": \"m7\", \"interpretation\": \"descriptive\", \"method_standing\": \"established_method\", \"method_version\": \"1\", \"metric\": \"precision\", \"population_id\": \"pop_f6a512a3373243bb402faf41352b8604\", \"reason\": null, \"run\": \"model\", \"scope\": \"D/members\", \"sensitive_counts\": [ 60, 60 ], \"support_warning\": false, \"units\": null, \"value\": 0.5, \"value_state\": \"finite\" }, \"metric_identity\": { \"dimensions\": {}, \"family\": \"performance\", \"method_version\": \"1\", \"metric\": \"precision\", \"units\": null }, \"objective_identity\": { \"authoritative_metric\": \"precision\", \"authoritative_transform\": \"identity\", \"bounds\": [], \"ceiling\": null, \"comparator\": \"paired\", \"conditional_denominator\": \"class_conditional_records\", \"current_period\": null, \"definition_version\": \"failure_objective_v2\", \"direction\": \"lower\", \"eligible_population\": \"outcome_valid AND decision IS NOT NULL AND state IN ('issued','hypothetical') AND decision='1'\", \"id\": \"precision\", \"interval\": null, \"learning_target\": \"D-only difference of precision ratio influence proxies on the common issued base, with each model's own positive denominator; proposal proxy, not a subgroup precision estimator.\", \"material_error\": null, \"metric\": \"precision\", \"metric_identity\": {}, \"nominal\": null, \"paired_eligible_population\": \"outcome_valid AND decision IS NOT NULL AND state IN ('issued','hypothetical')\", \"paired_population_version\": \"common_issued_base_distinct_positive_denominators_v2\", \"paired_reference\": { \"authoritative_metric\": \"precision\", \"authoritative_transform\": \"identity\", \"bounds\": [], \"ceiling\": null, \"comparator\": \"complement\", \"conditional_denominator\": \"class_conditional_records\", \"current_period\": null, \"definition_version\": \"failure_objective_v1\", \"direction\": \"lower\", \"eligible_population\": \"outcome_valid AND decision IS NOT NULL AND state IN ('issued','hypothetical') AND decision='1'\", \"id\": \"precision\", \"interval\": null, \"learning_target\": \"(y='1')::DOUBLE\", \"material_error\": null, \"metric\": \"precision\", \"metric_identity\": {}, \"nominal\": null, \"paired_reference\": null, \"practical_threshold\": 0.1, \"proxy\": \"exact_additive_loss\", \"reference_period\": null, \"reference_run\": null, \"run\": \"reference\", \"target\": null, \"task\": { \"classes\": [ \"0\", \"1\" ], \"horizon\": null, \"kind\": \"binary_classification\", \"material_error\": null, \"outcome_definition\": \"Deterministic synthetic review fixture\", \"positive_class\": \"1\", \"units\": null }, \"training_clip\": 30, \"units\": \"fraction\" }, \"practical_threshold\": 0.1, \"proxy\": \"paired_precision_ratio_influence_v2\", \"reference_period\": null, \"reference_run\": \"reference\", \"run\": \"model\", \"target\": null, \"task\": { \"classes\": [ \"0\", \"1\" ], \"horizon\": null, \"kind\": \"binary_classification\", \"material_error\": null, \"outcome_definition\": \"Deterministic synthetic review fixture\", \"positive_class\": \"1\", \"units\": null }, \"training_clip\": 30, \"units\": \"fraction\" }, \"population_id\": \"pop_f6a512a3373243bb402faf41352b8604\", \"reason\": null, \"support\": 120, \"value\": 0.5, \"value_state\": \"finite\" }, \"members\": 120, \"membership_unavailable_reasons\": {}, \"nonmembers\": 120, \"outcome_observation_states\": { \"observed_eligible\": 240 }, \"planned\": 240, \"sensitive_counts\": [ 60, 60, 60, 0, 240 ], \"unavailable\": 0 }, \"H_assessed\": false, \"S\": { \"available\": 240, \"comparator_metric\": { \"measurement\": { \"applicability\": \"applicable\", \"basis\": \"measured\", \"data\": {}, \"denominator\": 60, \"denominator_kind\": \"class_conditional_records\", \"disclosure_group\": \"S\", \"evidence_refs\": [], \"execution\": \"completed\", \"family\": \"performance\", \"id\": \"m7\", \"interpretation\": \"descriptive\", \"method_standing\": \"established_method\", \"method_version\": \"1\", \"metric\": \"precision\", \"population_id\": \"pop_5ab4e0b9b897c9b25921815c8d33b2c4\", \"reason\": null, \"run\": \"reference\", \"scope\": \"S/paired_reference\", \"sensitive_counts\": [ 60, 0 ], \"support_warning\": true, \"units\": null, \"value\": 1, \"value_state\": \"finite\" }, \"metric_identity\": { \"dimensions\": {}, \"family\": \"performance\", \"method_version\": \"1\", \"metric\": \"precision\", \"units\": null }, \"objective_identity\": { \"authoritative_metric\": \"precision\", \"authoritative_transform\": \"identity\", \"bounds\": [], \"ceiling\": null, \"comparator\": \"complement\", \"conditional_denominator\": \"class_conditional_records\", \"current_period\": null, \"definition_version\": \"failure_objective_v1\", \"direction\": \"lower\", \"eligible_population\": \"outcome_valid AND decision IS NOT NULL AND state IN ('issued','hypothetical') AND decision='1'\", \"id\": \"precision\", \"interval\": null, \"learning_target\": \"(y='1')::DOUBLE\", \"material_error\": null, \"metric\": \"precision\", \"metric_identity\": {}, \"nominal\": null, \"paired_reference\": null, \"practical_threshold\": 0.1, \"proxy\": \"exact_additive_loss\", \"reference_period\": null, \"reference_run\": null, \"run\": \"reference\", \"target\": null, \"task\": { \"classes\": [ \"0\", \"1\" ], \"horizon\": null, \"kind\": \"binary_classification\", \"material_error\": null, \"outcome_definition\": \"Deterministic synthetic review fixture\", \"positive_class\": \"1\", \"units\": null }, \"training_clip\": 30, \"units\": \"fraction\" }, \"population_id\": \"pop_5ab4e0b9b897c9b25921815c8d33b2c4\", \"reason\": null, \"support\": 60, \"value\": 1, \"value_state\": \"finite\" }, \"conditional_members\": 120, \"conditional_nonmembers\": 60, \"effect\": 0.5, \"effect_state\": \"finite\", \"member_metric\": { \"measurement\": { \"applicability\": \"applicable\", \"basis\": \"measured\", \"data\": {}, \"denominator\": 120, \"denominator_kind\": \"class_conditional_records\", \"disclosure_group\": \"S\", \"evidence_refs\": [], \"execution\": \"completed\", \"family\": \"performance\", \"id\": \"m7\", \"interpretation\": \"descriptive\", \"method_standing\": \"established_method\", \"method_version\": \"1\", \"metric\": \"precision\", \"population_id\": \"pop_b95e97f4592802063a606481a7de269d\", \"reason\": null, \"run\": \"model\", \"scope\": \"S/members\", \"sensitive_counts\": [ 60, 60 ], \"support_warning\": false, \"units\": null, \"value\": 0.5, \"value_state\": \"finite\" }, \"metric_identity\": { \"dimensions\": {}, \"family\": \"performance\", \"method_version\": \"1\", \"metric\": \"precision\", \"units\": null }, \"objective_identity\": { \"authoritative_metric\": \"precision\", \"authoritative_transform\": \"identity\", \"bounds\": [], \"ceiling\": null, \"comparator\": \"paired\", \"conditional_denominator\": \"class_conditional_records\", \"current_period\": null, \"definition_version\": \"failure_objective_v2\", \"direction\": \"lower\", \"eligible_population\": \"outcome_valid AND decision IS NOT NULL AND state IN ('issued','hypothetical') AND decision='1'\", \"id\": \"precision\", \"interval\": null, \"learning_target\": \"D-only difference of precision ratio influence proxies on the common issued base, with each model's own positive denominator; proposal proxy, not a subgroup precision estimator.\", \"material_error\": null, \"metric\": \"precision\", \"metric_identity\": {}, \"nominal\": null, \"paired_eligible_population\": \"outcome_valid AND decision IS NOT NULL AND state IN ('issued','hypothetical')\", \"paired_population_version\": \"common_issued_base_distinct_positive_denominators_v2\", \"paired_reference\": { \"authoritative_metric\": \"precision\", \"authoritative_transform\": \"identity\", \"bounds\": [], \"ceiling\": null, \"comparator\": \"complement\", \"conditional_denominator\": \"class_conditional_records\", \"current_period\": null, \"definition_version\": \"failure_objective_v1\", \"direction\": \"lower\", \"eligible_population\": \"outcome_valid AND decision IS NOT NULL AND state IN ('issued','hypothetical') AND decision='1'\", \"id\": \"precision\", \"interval\": null, \"learning_target\": \"(y='1')::DOUBLE\", \"material_error\": null, \"metric\": \"precision\", \"metric_identity\": {}, \"nominal\": null, \"paired_reference\": null, \"practical_threshold\": 0.1, \"proxy\": \"exact_additive_loss\", \"reference_period\": null, \"reference_run\": null, \"run\": \"reference\", \"target\": null, \"task\": { \"classes\": [ \"0\", \"1\" ], \"horizon\": null, \"kind\": \"binary_classification\", \"material_error\": null, \"outcome_definition\": \"Deterministic synthetic review fixture\", \"positive_class\": \"1\", \"units\": null }, \"training_clip\": 30, \"units\": \"fraction\" }, \"practical_threshold\": 0.1, \"proxy\": \"paired_precision_ratio_influence_v2\", \"reference_period\": null, \"reference_run\": \"reference\", \"run\": \"model\", \"target\": null, \"task\": { \"classes\": [ \"0\", \"1\" ], \"horizon\": null, \"kind\": \"binary_classification\", \"material_error\": null, \"outcome_definition\": \"Deterministic synthetic review fixture\", \"positive_class\": \"1\", \"units\": null }, \"training_clip\": 30, \"units\": \"fraction\" }, \"population_id\": \"pop_b95e97f4592802063a606481a7de269d\", \"reason\": null, \"support\": 120, \"value\": 0.5, \"value_state\": \"finite\" }, \"members\": 120, \"membership_unavailable_reasons\": {}, \"nonmembers\": 120, \"outcome_observation_states\": { \"observed_eligible\": 240 }, \"planned\": 240, \"sensitive_counts\": [ 60, 60, 60, 0, 240 ], \"unavailable\": 0 }, \"complexity\": 1, \"definition\": { \"clauses\": [ { \"field\": \"context.x\", \"kind\": \"categorical\", \"op\": \"eq\", \"value\": \"1\" } ] }, \"examples\": [ { \"outcome_values_disclosed\": false, \"reference\": \"cg4_ref_24212be318f23f45fb88be21\", \"selection\": \"higher_diagnostic_loss_member\" }, { \"outcome_values_disclosed\": false, \"reference\": \"cg4_ref_16909b5824fc81261641b4dc\", \"selection\": \"lower_diagnostic_loss_member\" }, { \"outcome_values_disclosed\": false, \"reference\": \"cg4_ref_a01ff64437e3035779576344\", \"selection\": \"outside_comparison\" }, { \"outcome_values_disclosed\": false, \"reference\": \"cg4_ref_b8f8510d093c896c263d05ff\", \"selection\": \"representative_member\" }, { \"outcome_values_disclosed\": false, \"reference\": \"cg4_ref_21f828c0a1f87b603ca8368a\", \"selection\": \"representative_member\" } ], \"explanation\": { \"causal_interpretation\": false, \"defines_membership\": true, \"evaluation_population\": \"S\", \"fidelity\": { \"available\": 240, \"basis\": \"exact_definition_identity\", \"disagreement_rate\": 0, \"false_negative\": 0, \"false_positive\": 0, \"gate_available\": 240, \"gate_members_without_surrogate\": 0, \"jointly_available\": 240, \"planned\": 240, \"precision\": 1, \"recall\": 1, \"scope\": \"Fidelity is conditional on joint applicability. Unavailable membership remains visible against planned support; these counts do not establish future fidelity.\", \"surrogate_available\": 240, \"true_negative\": 120, \"true_positive\": 120, \"unavailable\": 0 }, \"kind\": \"exact_predicate\", \"scope\": \"The predicate is the gate itself; these identity counts are not an empirical surrogate accuracy estimate.\" }, \"frontier\": 0, \"head\": \"negative\", \"id\": \"09b81b1aadb7409553d780c850799c0f\", \"membership_artifact\": \"bdc64b999e48a99e624c36aa64a8ba709d3d23d30bb6589dede799adfaccf5aa\", \"objective\": { \"bounds\": [], \"ceiling\": null, \"comparator\": \"paired\", \"current_period\": null, \"direction\": \"lower\", \"id\": \"precision\", \"interval\": null, \"material_error\": null, \"metric\": \"precision\", \"metric_identity\": {}, \"nominal\": null, \"practical_threshold\": 0.1, \"reference_period\": null, \"reference_run\": \"reference\", \"run\": \"model\", \"target\": null, \"training_clip\": 30, \"units\": \"fraction\" }, \"selection_population\": \"S\", \"selection_reason\": \"severity_anchor\", \"shortlisted\": true, \"stability\": { \"coverage_guarantee\": false, \"diagnostic_references\": \"Original D-only diagnostic targets fixed; refits resample whole admitted D units before the disclosed D cap.\", \"matching\": \"Largest frozen membership IoU on S features, within strategy, representation and diagnostic head; no S outcome selection.\", \"median_membership_IoU\": 1, \"method\": \"bounded_D_unit_bootstrap_refits_v2\", \"profile\": { \"D_row_limit\": 20000, \"maximum_nodes\": 10000, \"retained_candidates\": 8 }, \"replicates\": 1, \"results\": [ { \"applicable_fraction\": 1, \"membership_IoU\": 1, \"refit_D_records\": 240, \"replicate\": 0 } ], \"scope\": \"Product perturbation diagnostic; full-method qualification is separate.\", \"seed\": 0 }, \"state\": \"exploratory\", \"strategy\": \"structured\" }"
+            - button "Resolve higher_diagnostic_loss_member"
+            - button "Resolve lower_diagnostic_loss_member"
+            - button "Resolve outside_comparison"
+            - button "Resolve representative_member"
+            - button "Resolve representative_member"
+        - row "Select hypothesis 4cc8bf5730c2b56baa01d038bbb2a510 4cc8bf5730c2b56baa01d038bbb2a510 structured precision 0.4 180 / 240 / 240; unavailable 0":
+          - cell "Select hypothesis 4cc8bf5730c2b56baa01d038bbb2a510":
+            - checkbox "Select hypothesis 4cc8bf5730c2b56baa01d038bbb2a510"
+          - cell "4cc8bf5730c2b56baa01d038bbb2a510"
+          - cell "structured"
+          - cell "precision"
+          - cell:
+            - spinbutton "Material effect threshold for 4cc8bf5730c2b56baa01d038bbb2a510": "0.1"
+          - cell "0.4"
+          - cell "180 / 240 / 240; unavailable 0"
+          - cell:
+            - generic "Gate, denominators, fidelity, stability and evidence"
+        - row "Select hypothesis cd2107cd03fe1b1618fe07459ed60775 cd2107cd03fe1b1618fe07459ed60775 structured precision 0.4 180 / 240 / 240; unavailable 0":
+          - cell "Select hypothesis cd2107cd03fe1b1618fe07459ed60775":
+            - checkbox "Select hypothesis cd2107cd03fe1b1618fe07459ed60775"
+          - cell "cd2107cd03fe1b1618fe07459ed60775"
+          - cell "structured"
+          - cell "precision"
+          - cell:
+            - spinbutton "Material effect threshold for cd2107cd03fe1b1618fe07459ed60775": "0.1"
+          - cell "0.4"
+          - cell "180 / 240 / 240; unavailable 0"
+          - cell:
+            - generic "Gate, denominators, fidelity, stability and evidence"
+        - row "Select hypothesis d86fcb9d188c1e27456b58542e01c372 d86fcb9d188c1e27456b58542e01c372 catboost precision 0.33333333333333337 240 / 240 / 240; unavailable 0":
+          - cell "Select hypothesis d86fcb9d188c1e27456b58542e01c372":
+            - checkbox "Select hypothesis d86fcb9d188c1e27456b58542e01c372"
+          - cell "d86fcb9d188c1e27456b58542e01c372"
+          - cell "catboost"
+          - cell "precision"
+          - cell:
+            - spinbutton "Material effect threshold for d86fcb9d188c1e27456b58542e01c372": "0.1"
+          - cell "0.33333333333333337"
+          - cell "240 / 240 / 240; unavailable 0"
+          - cell:
+            - generic "Gate, denominators, fidelity, stability and evidence"
+        - row "Select hypothesis e97e49103ecbb8c288f10c7ff86310e9 e97e49103ecbb8c288f10c7ff86310e9 structured precision 0.5 120 / 240 / 240; unavailable 0":
+          - cell "Select hypothesis e97e49103ecbb8c288f10c7ff86310e9":
+            - checkbox "Select hypothesis e97e49103ecbb8c288f10c7ff86310e9"
+          - cell "e97e49103ecbb8c288f10c7ff86310e9"
+          - cell "structured"
+          - cell "precision"
+          - cell:
+            - spinbutton "Material effect threshold for e97e49103ecbb8c288f10c7ff86310e9": "0.1"
+          - cell "0.5"
+          - cell "120 / 240 / 240; unavailable 0"
+          - cell:
+            - generic "Gate, denominators, fidelity, stability and evidence"
+        - row "Select hypothesis efb35d88842cf8728e82682339744c9d efb35d88842cf8728e82682339744c9d structured precision 0.5 120 / 240 / 240; unavailable 0":
+          - cell "Select hypothesis efb35d88842cf8728e82682339744c9d":
+            - checkbox "Select hypothesis efb35d88842cf8728e82682339744c9d"
+          - cell "efb35d88842cf8728e82682339744c9d"
+          - cell "structured"
+          - cell "precision"
+          - cell:
+            - spinbutton "Material effect threshold for efb35d88842cf8728e82682339744c9d": "0.1"
+          - cell "0.5"
+          - cell "120 / 240 / 240; unavailable 0"
+          - cell:
+            - generic "Gate, denominators, fidelity, stability and evidence"
+        - row "Select hypothesis 4fad0e1b3788de5482418cf341a77739 4fad0e1b3788de5482418cf341a77739 structured precision 0.5 60 / 240 / 240; unavailable 0":
+          - cell "Select hypothesis 4fad0e1b3788de5482418cf341a77739":
+            - checkbox "Select hypothesis 4fad0e1b3788de5482418cf341a77739"
+          - cell "4fad0e1b3788de5482418cf341a77739"
+          - cell "structured"
+          - cell "precision"
+          - cell:
+            - spinbutton "Material effect threshold for 4fad0e1b3788de5482418cf341a77739": "0.1"
+          - cell "0.5"
+          - cell "60 / 240 / 240; unavailable 0"
+          - cell:
+            - generic "Gate, denominators, fidelity, stability and evidence"
+        - row "Select hypothesis c1cf785b51a58780e7f6724ff80ea78a c1cf785b51a58780e7f6724ff80ea78a structured precision 0.5 60 / 240 / 240; unavailable 0":
+          - cell "Select hypothesis c1cf785b51a58780e7f6724ff80ea78a":
+            - checkbox "Select hypothesis c1cf785b51a58780e7f6724ff80ea78a"
+          - cell "c1cf785b51a58780e7f6724ff80ea78a"
+          - cell "structured"
+          - cell "precision"
+          - cell:
+            - spinbutton "Material effect threshold for c1cf785b51a58780e7f6724ff80ea78a": "0.1"
+          - cell "0.5"
+          - cell "60 / 240 / 240; unavailable 0"
+          - cell:
+            - generic "Gate, denominators, fidelity, stability and evidence"
+        - row "Select hypothesis 39954de95f882060398487c67e75baef 39954de95f882060398487c67e75baef catboost precision 0.33333333333333337 240 / 240 / 240; unavailable 0":
+          - cell "Select hypothesis 39954de95f882060398487c67e75baef":
+            - checkbox "Select hypothesis 39954de95f882060398487c67e75baef"
+          - cell "39954de95f882060398487c67e75baef"
+          - cell "catboost"
+          - cell "precision"
+          - cell:
+            - spinbutton "Material effect threshold for 39954de95f882060398487c67e75baef": "0.1"
+          - cell "0.33333333333333337"
+          - cell "240 / 240 / 240; unavailable 0"
+          - cell:
+            - generic "Gate, denominators, fidelity, stability and evidence"
+        - row "Select hypothesis eb49658007549416fd5ba98defdafb63 eb49658007549416fd5ba98defdafb63 structured precision 0.5 120 / 240 / 240; unavailable 0":
+          - cell "Select hypothesis eb49658007549416fd5ba98defdafb63":
+            - checkbox "Select hypothesis eb49658007549416fd5ba98defdafb63"
+          - cell "eb49658007549416fd5ba98defdafb63"
+          - cell "structured"
+          - cell "precision"
+          - cell:
+            - spinbutton "Material effect threshold for eb49658007549416fd5ba98defdafb63": "0.1"
+          - cell "0.5"
+          - cell "120 / 240 / 240; unavailable 0"
+          - cell:
+            - generic "Gate, denominators, fidelity, stability and evidence"
+        - row "Select hypothesis 90fa64a82c53abf8d19391de17d20059 90fa64a82c53abf8d19391de17d20059 catboost precision 0.5 120 / 240 / 240; unavailable 0":
+          - cell "Select hypothesis 90fa64a82c53abf8d19391de17d20059":
+            - checkbox "Select hypothesis 90fa64a82c53abf8d19391de17d20059"
+          - cell "90fa64a82c53abf8d19391de17d20059"
+          - cell "catboost"
+          - cell "precision"
+          - cell:
+            - spinbutton "Material effect threshold for 90fa64a82c53abf8d19391de17d20059": "0.1"
+          - cell "0.5"
+          - cell "120 / 240 / 240; unavailable 0"
+          - cell:
+            - generic "Gate, denominators, fidelity, stability and evidence"
+        - row "Select hypothesis 9ec312c18a71723152f408977f908a97 9ec312c18a71723152f408977f908a97 catboost precision 0.5 120 / 240 / 240; unavailable 0":
+          - cell "Select hypothesis 9ec312c18a71723152f408977f908a97":
+            - checkbox "Select hypothesis 9ec312c18a71723152f408977f908a97"
+          - cell "9ec312c18a71723152f408977f908a97"
+          - cell "catboost"
+          - cell "precision"
+          - cell:
+            - spinbutton "Material effect threshold for 9ec312c18a71723152f408977f908a97": "0.1"
+          - cell "0.5"
+          - cell "120 / 240 / 240; unavailable 0"
+          - cell:
+            - generic "Gate, denominators, fidelity, stability and evidence"
+        - row "Select hypothesis 4364a5a8f1d8b47e56f1a4004ae52b0e 4364a5a8f1d8b47e56f1a4004ae52b0e catboost precision 0.5 60 / 240 / 240; unavailable 0":
+          - cell "Select hypothesis 4364a5a8f1d8b47e56f1a4004ae52b0e":
+            - checkbox "Select hypothesis 4364a5a8f1d8b47e56f1a4004ae52b0e"
+          - cell "4364a5a8f1d8b47e56f1a4004ae52b0e"
+          - cell "catboost"
+          - cell "precision"
+          - cell:
+            - spinbutton "Material effect threshold for 4364a5a8f1d8b47e56f1a4004ae52b0e": "0.1"
+          - cell "0.5"
+          - cell "60 / 240 / 240; unavailable 0"
+          - cell:
+            - generic "Gate, denominators, fidelity, stability and evidence"
+        - row "Select hypothesis b969db59331524d0004a7c72f9a0f3ac b969db59331524d0004a7c72f9a0f3ac catboost precision 0.5 60 / 240 / 240; unavailable 0":
+          - cell "Select hypothesis b969db59331524d0004a7c72f9a0f3ac":
+            - checkbox "Select hypothesis b969db59331524d0004a7c72f9a0f3ac"
+          - cell "b969db59331524d0004a7c72f9a0f3ac"
+          - cell "catboost"
+          - cell "precision"
+          - cell:
+            - spinbutton "Material effect threshold for b969db59331524d0004a7c72f9a0f3ac": "0.1"
+          - cell "0.5"
+          - cell "60 / 240 / 240; unavailable 0"
+          - cell:
+            - generic "Gate, denominators, fidelity, stability and evidence"
+        - row "Select hypothesis 51ef968757ac0519ef289f6ba85b02a6 51ef968757ac0519ef289f6ba85b02a6 catboost precision 0 120 / 240 / 240; unavailable 0":
+          - cell "Select hypothesis 51ef968757ac0519ef289f6ba85b02a6":
+            - checkbox "Select hypothesis 51ef968757ac0519ef289f6ba85b02a6"
+          - cell "51ef968757ac0519ef289f6ba85b02a6"
+          - cell "catboost"
+          - cell "precision"
+          - cell:
+            - spinbutton "Material effect threshold for 51ef968757ac0519ef289f6ba85b02a6": "0.1"
+          - cell "0"
+          - cell "120 / 240 / 240; unavailable 0"
+          - cell:
+            - generic "Gate, denominators, fidelity, stability and evidence"
+        - row "Select hypothesis b08f24cb1972115353e6484f37b1d8ac b08f24cb1972115353e6484f37b1d8ac catboost precision 0 120 / 240 / 240; unavailable 0":
+          - cell "Select hypothesis b08f24cb1972115353e6484f37b1d8ac":
+            - checkbox "Select hypothesis b08f24cb1972115353e6484f37b1d8ac"
+          - cell "b08f24cb1972115353e6484f37b1d8ac"
+          - cell "catboost"
+          - cell "precision"
+          - cell:
+            - spinbutton "Material effect threshold for b08f24cb1972115353e6484f37b1d8ac": "0.1"
+          - cell "0"
+          - cell "120 / 240 / 240; unavailable 0"
+          - cell:
+            - generic "Gate, denominators, fidelity, stability and evidence"
+  - button "More candidates" [disabled]
+  - checkbox "Reveal a bounded private evidence excerpt"
+  - text: Reveal a bounded private evidence excerpt
+  - generic "Strategy execution, qualification and negative evidence"
+  - generic "Overlap and unique union support"
+  - heading "3 · Freeze the complete family" [level=3]
+  - paragraph: Select up to 32 hypotheses. Set each candidate’s material effect threshold in its metric units; there is no universal default. Freeze thresholds, comparator, membership scope and assumptions before H. A score threshold chosen on S cannot be revised after seeing H.
+  - text: Inference method
+  - combobox "Inference method":
+    - option "Finite sample where registered" [selected]
+    - option "Joint BCa (formal confirmation currently refused)"
+    - option "Ranking percentile approximation (qualification scoped)"
+  - text: Independent sampling unit
+  - combobox "Independent sampling unit":
+    - option "Independent rows" [selected]
+    - option "Independent complete entities"
+    - option "Unsupported temporal dependence"
+    - option "Descriptive only"
+  - text: Membership scope
+  - combobox "Membership scope":
+    - option "Full planned population" [selected]
+    - option "Frozen supported population"
+  - text: Minimum applicable fraction
+  - spinbutton "Minimum applicable fraction": "1"
+  - text: Upstream independence
+  - combobox "Upstream independence":
+    - option "Unknown" [selected]
+    - option "Scoped upstream declaration"
+    - option "Known prohibited overlap"
+  - text: External prior exposure
+  - combobox "External prior exposure":
+    - option "Unknown" [selected]
+    - option "Scoped declaration of no exposure"
+    - option "Known prior exposure"
+  - text: Declaration author
+  - textbox "Declaration author"
+  - text: Scoped reason / external provenance
+  - textbox "Scoped reason / external provenance"
+  - text: Bootstrap baseline B
+  - spinbutton "Bootstrap baseline B": "20000"
+  - text: Maximum B
+  - spinbutton "Maximum B": "200000"
+  - text: Replication policy
+  - combobox "Replication policy":
+    - option "Admit nominal minimum within maximum" [selected]
+    - option "Fixed caller budget; refuse if inadequate"
+  - checkbox "Explicitly declare prior exposure history for the current workspace gap and this study"
+  - text: Explicitly declare prior exposure history for the current workspace gap and this study
+  - paragraph: This declaration requires the author and scoped reason above. It does not establish intact system history or override known prior use.
+  - button "Compose confirmation protocol"
+  - text: Complete ConfirmationSpec
+  - textbox "Complete ConfirmationSpec": "{}"
+  - button "Freeze selected hypotheses"
+  - text: Import protected frozen hypotheses
+  - button "Import protected frozen hypotheses"
+  - generic: Selection, thresholds or confirmation protocol changed; freeze again.
+  - heading "4 · Independent confirmation" [level=3]
+  - paragraph: The current inspected draft supplies H, including an explicitly configured future population when appropriate. Previously exposed H cannot become fresh through renaming or splitting. Missing provenance and unsupported dependence refuse formal claims.
+  - button "Inspect confirmation feasibility without H metrics"
+  - status
+  - generic "Complete feasibility, assumptions and refusal reasons"
+  - button "Assess frozen claims independently on H"
+  - heading "5 · Revisit and communicate immutable evidence" [level=3]
+  - generic "Historical replay, outcome restatement and private notes"
+  - generic "Retain typed enrichment and representations"
+  - option "predictions.csv"
+  - generic "Resolve recorded bootstrap numerical insufficiency"
+  - generic "Predeclared inferential outcome restatements"
+  - text: Audience
+  - combobox "Audience":
+    - option "Conservative shareable" [selected]
+    - option "Exact protected local"
+  - text: Format
+  - combobox "Format":
+    - option "html" [selected]
+    - option "pdf"
+  - button "Export canonical report and JSON"
+  - status: Immutable evidence opened. Candidate effects are exploratory until independently assessed.

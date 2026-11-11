@@ -1,0 +1,60 @@
+{
+  "harness_sha256": "358fbbc8ae943b76cd47c20ab55c6d6c36a268903f787001b8c6965beb8d9a1d",
+  "method_sha256": "7b6802c6906e364d03679a79de8f81ff1b79bd401b07c1b0372b86a5fdaf0da4",
+  "panel": "negative",
+  "protocol": {
+    "allocation": "alpha / frozen family size / elementary components, two tails inside each scalar interval. Four components for contrasts, two for ceilings.",
+    "development_seeds": [
+      0,
+      9
+    ],
+    "diagnostics": "For each scenario and frozen family size, exact binomial excess-noncoverage and directional-error diagnostics use unconditional trial denominators and allocated alpha or alpha/2. Holm across all 90 diagnostics only after every locked trial completes. Conditional diagnostics and refusal counts also reported.",
+    "family_assignment": "1,10,32 cyclically by seed within each unchanged scenario; every claim retains its full allocation.",
+    "family_sizes": [
+      1,
+      10,
+      32
+    ],
+    "independent_units": 400,
+    "method": "fixed_n_catoni_variance_bound_candidate_v1",
+    "negative_controls": {
+      "scenarios": [
+        "understated_heavy_variance",
+        "shared_unmodelled_shock"
+      ],
+      "scope": "Deliberately false variance or independence assumptions; outside the guarantee. Preserve every interval/error. These are not counted as valid-envelope qualification, and the method cannot detect all such violations.",
+      "seeds": [
+        270000,
+        270199
+      ]
+    },
+    "qualification_seeds": [
+      260000,
+      260999
+    ],
+    "remaining": "Full joint-family simulations, separately locked power/resource/full-pipeline qualification and explicit frozen assumption/provenance contracts would be required before any product proposal. No repair of previously frozen BCa hypotheses or evidence reuse guarantees.",
+    "sampling": "IID units with random Bernoulli(.5) membership. Paired units share heavy outcomes; complete IID entities use size-weighted sums. Event-weighted ratios remain the estimand.",
+    "scenarios": [
+      "normal_contrast",
+      "exponential_contrast",
+      "lognormal_contrast",
+      "heavy_member_light_comparator",
+      "light_member_heavy_comparator",
+      "unequal_complete_clusters",
+      "paired_common_heavy",
+      "normal_ceiling",
+      "exponential_ceiling",
+      "lognormal_ceiling"
+    ],
+    "schema_version": "numek.cg4_fixed_time_variance_candidate_panel/1.0",
+    "screen": "All 10000 qualification trials complete; no rejected error diagnostic; simultaneous exact availability lower bounds exceed .90 for all 30 scenario/family strata. These are implementation/operating-envelope screens, not a proof or power qualification.",
+    "study_alpha": 0.05,
+    "variance_bounds": "Exact unconditional unit-contribution population variances of the declared generator, plus 1e-12 for constant denominators. Never empirical variance, outcome extrema, or conditional loss variance used in place of zero-inflated unit contributions.",
+    "width": "Report interval widths and truth-relative errors; conservative or uninformative intervals do not establish useful power."
+  },
+  "runtime": {
+    "numpy": "2.4.6",
+    "scipy": "1.18.1",
+    "threadpoolctl": "3.6.0"
+  }
+}

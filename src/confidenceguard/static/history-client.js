@@ -71,6 +71,7 @@
   el('cancel').onclick = action(async () => { if (active) await api('/jobs/' + active + '/cancel', { method: 'POST', body: {} }); });
   async function open(identifier) {
     assessment = identifier; result = await api('/workspace/assessments/' + identifier); el('result').hidden = false; el('result-title').textContent = result.name;
+    if(result.investigation && window.openConfidenceGuardInvestigation){el('result').hidden=true;await window.openConfidenceGuardInvestigation(identifier,true);return;}
     el('metric').replaceChildren(); const definitions = new Map(result.measurements.map(m => [m.metric_key || m.metric, m]));
     definitions.forEach((m, key) => el('metric').add(new Option(m.metric_label || m.metric, key)));
     const accuracy = [...definitions].find(([, m]) => m.metric === 'accuracy');

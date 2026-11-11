@@ -1,0 +1,41 @@
+{"name": "tabular-25k", "elapsed_seconds": 621.0134310829453, "passed": true}
+{"name": "streaming-100k", "elapsed_seconds": 227.5469047499355, "passed": true}
+{"name": "device-cpu", "elapsed_seconds": 176.8657105419552, "passed": true}
+{"name": "device-mps", "elapsed_seconds": 178.7721047080122, "passed": true}
+{"name": "text-cpu", "elapsed_seconds": 4.499400665983558, "passed": true}
+{"name": "text-mps", "elapsed_seconds": 4.3010537079535425, "passed": true}
+{"name": "image-cpu", "elapsed_seconds": 42.69303137494717, "passed": true}
+{"name": "image-mps", "elapsed_seconds": 43.46638774999883, "passed": true}
+{"name": "attacks-cpu", "elapsed_seconds": 13.379607749986462, "passed": true}
+{"name": "attacks-mps", "elapsed_seconds": 61.062836791039445, "passed": true}
+{"name": "capacity", "elapsed_seconds": 157.4157150409883, "passed": true}
+{"name": "scale-histogram", "elapsed_seconds": 92.56997545808554, "passed": true}
+{"name": "scale-mlp", "elapsed_seconds": 91.18362770800013, "passed": true}
+Traceback (most recent call last):
+  File "/Users/drivyaanshyadav/Desktop/Numek/validation/cg6/performance.py", line 144, in <module>
+    if args.mode=='calibrate':
+                        ^^^^^^
+  File "/Users/drivyaanshyadav/Desktop/Numek/validation/cg6/performance.py", line 140, in main
+  File "/Users/drivyaanshyadav/Desktop/Numek/validation/cg6/performance.py", line 91, in run_one
+    row['y']='yes' if (i//4)%2 else 'no';writer.writerow(row)
+  File "/Users/drivyaanshyadav/Desktop/Numek/src/confidenceguard/auxiliary/services.py", line 250, in fit_auxiliary
+    return service(execution,config,operation='auxiliary_fit',options={'study':study.to_dict()},**kwargs)
+  File "/Users/drivyaanshyadav/Desktop/Numek/src/confidenceguard/execution/services.py", line 397, in service
+    identity=compat.supervise(identity_worker,(spec,config,roots,roles,options),budget,progress=progress,cancel=cancel,deadline=deadline).data
+             ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/drivyaanshyadav/Desktop/Numek/src/confidenceguard/compat.py", line 22, in supervise
+    try:return run_supervised(operation,arguments,limits,progress=progress,cancel=cancel)
+               ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/drivyaanshyadav/Desktop/Numek/src/datatrust/worker.py", line 43, in run_supervised
+    if receiver.poll(.1):
+       ~~~~~~~~~~~~~^^^^
+  File "/Users/drivyaanshyadav/Desktop/Numek/validation/cg4/runtime.nosync/cpython-3.13.17-macos-aarch64-none/lib/python3.13/multiprocessing/connection.py", line 262, in poll
+    return self._poll(timeout)
+           ~~~~~~~~~~^^^^^^^^^
+  File "/Users/drivyaanshyadav/Desktop/Numek/validation/cg4/runtime.nosync/cpython-3.13.17-macos-aarch64-none/lib/python3.13/multiprocessing/connection.py", line 445, in _poll
+    r = wait([self], timeout)
+  File "/Users/drivyaanshyadav/Desktop/Numek/validation/cg4/runtime.nosync/cpython-3.13.17-macos-aarch64-none/lib/python3.13/multiprocessing/connection.py", line 1174, in wait
+    ready = selector.select(timeout)
+  File "/Users/drivyaanshyadav/Desktop/Numek/validation/cg4/runtime.nosync/cpython-3.13.17-macos-aarch64-none/lib/python3.13/selectors.py", line 398, in select
+    fd_event_list = self._selector.poll(timeout)
+KeyboardInterrupt

@@ -1,0 +1,49 @@
+...F........................                                             [100%]
+=================================== FAILURES ===================================
+___ test_synthetic_recovery_generator_uses_finite_lexical_float_coordinates ____
+
+tmp_path = PosixPath('/private/var/folders/cs/c15xvw9d3t53tzcws5yxjxcr0000gn/T/pytest-of-drivyaanshyadav/pytest-501/test_synthetic_recovery_genera0')
+
+    def test_synthetic_recovery_generator_uses_finite_lexical_float_coordinates(tmp_path):
+        path = Path(__file__).resolve().parents[2]/'validation/cg4/qualify_pipeline.py'
+        module_spec = importlib.util.spec_from_file_location('_cg4_qualification_generator', path)
+>       module = importlib.util.module_from_spec(module_spec); module_spec.loader.exec_module(module)
+                                                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/cg4/test_qualification_inputs.py:15: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+<frozen importlib._bootstrap_external>:1027: in exec_module
+    ???
+<frozen importlib._bootstrap>:488: in _call_with_frames_removed
+    ???
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+    """Reproducible synthetic discovery-to-confirmation campaign.
+    
+    Each trial runs in a fresh process with a unique synthetic namespace. Development
+    seeds never count as locked recovery evidence. Resume only reuses records whose
+    complete runtime-source, protocol, profile and seed identities match. This is
+    benchmark tooling, not a product predictor-execution interface.
+    """
+    import argparse
+    import csv
+    from dataclasses import replace
+    from datetime import datetime,timezone
+    import hashlib
+    import importlib.metadata
+    import json
+    from pathlib import Path
+    import subprocess
+    import sys
+    import tempfile
+    import time
+    import traceback
+    import zipfile
+    import numpy as np
+>   import qualification_diagnostics as diagnostics
+E   ModuleNotFoundError: No module named 'qualification_diagnostics'
+
+validation/cg4/qualify_pipeline.py:23: ModuleNotFoundError
+=========================== short test summary info ============================
+FAILED tests/cg4/test_qualification_inputs.py::test_synthetic_recovery_generator_uses_finite_lexical_float_coordinates
+1 failed, 27 passed in 7.47s

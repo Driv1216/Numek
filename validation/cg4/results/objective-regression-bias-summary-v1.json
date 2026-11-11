@@ -1,0 +1,2127 @@
+{
+  "H_selected_effect_summary": {
+    "count": 45,
+    "maximum": 0.9251971133816917,
+    "median": 0.8952012956913775,
+    "minimum": 0.7648377899780783
+  },
+  "H_unavailable": {
+    "oracle_members": 0,
+    "total": 0
+  },
+  "aggregation_source_sha256": "b0198af985f5ef3d4104b7d916feacc59527242a4b7f5bae3409a5212174d4c2",
+  "anchor_criterion_met": true,
+  "assessment_states": {
+    "confirmed": 44,
+    "inconclusive": 1
+  },
+  "assessment_strengths": {
+    "finite_sample": 45
+  },
+  "objective": "regression_bias",
+  "protocol": {
+    "assessments": "Authoritative frozen-region H effects measured separately from recovery; intervals remain finite or explicitly approximate and subject to qualification/refusal.",
+    "criterion": {
+      "H_precision": 0.7,
+      "H_recall": 0.7,
+      "minimum_successes_of_40": 32
+    },
+    "development_seed_range": [
+      0,
+      39
+    ],
+    "not_covered": [
+      "Historical-deterioration workspace panel",
+      "Natural-data recovery",
+      "Every registered metric from one representative objective"
+    ],
+    "panels": {
+      "calibration_bins": {
+        "contrast": "Frozen equal-width bin residual magnitude .30 versus zero",
+        "delta": 0.15,
+        "metric": "reliability_diagram"
+      },
+      "calibration_residual": {
+        "contrast": "Signed target residual +.30 versus zero at supplied p=.5",
+        "delta": 0.15,
+        "metric": "calibration_residual"
+      },
+      "false_negative": {
+        "contrast": ".40 versus .10 among actual positives",
+        "delta": 0.15,
+        "metric": "false_negative_rate"
+      },
+      "false_positive": {
+        "contrast": ".40 versus .10 among actual negatives",
+        "delta": 0.15,
+        "metric": "false_positive_rate"
+      },
+      "paired_degradation": {
+        "contrast": "Common-population candidate minus reference error .30 versus zero",
+        "delta": 0.15,
+        "metric": "error_rate"
+      },
+      "precision": {
+        "contrast": ".60 versus .90 among predicted positives",
+        "delta": 0.15,
+        "direction": "lower",
+        "metric": "precision"
+      },
+      "probability_quality": {
+        "contrast": "Brier .33 versus .09; high-confidence error mechanism",
+        "delta": 0.12,
+        "metric": "brier"
+      },
+      "ranking_ap": {
+        "contrast": "Reversed versus correctly ordered noisy scores at balanced label prevalence",
+        "delta": 0.2,
+        "direction": "lower",
+        "metric": "average_precision"
+      },
+      "ranking_auc": {
+        "contrast": "Reversed versus correctly ordered noisy score distributions",
+        "delta": 0.35,
+        "direction": "lower",
+        "metric": "roc_auc"
+      },
+      "regression_bias": {
+        "bounds": [
+          -1.0,
+          2.0
+        ],
+        "contrast": "Signed mean bias .90 versus zero with bounded independent noise",
+        "delta": 0.45,
+        "metric": "bias",
+        "units": "metres"
+      },
+      "regression_tail": {
+        "contrast": "Absolute error >1 metre: .60 versus .01",
+        "delta": 0.25,
+        "metric": "material_error_rate",
+        "units": "fraction"
+      },
+      "uncertainty_coverage": {
+        "contrast": "Prediction-interval miscoverage .60 versus .10",
+        "delta": 0.25,
+        "metric": "interval_miscoverage"
+      },
+      "uncertainty_efficiency": {
+        "bounds": [
+          1.0,
+          5.0
+        ],
+        "contrast": "Issued interval widths 4 versus 2 metres, with unchanged perfect coverage",
+        "delta": 1.0,
+        "metric": "interval_width",
+        "units": "metres"
+      }
+    },
+    "primary": "Positive-native-effect S-selected union evaluated on independent H; unavailable counts stay in planned recall.",
+    "qualification_seed_range": [
+      110000,
+      110039
+    ],
+    "region": "categorical a=1 AND continuous x>.5; expected prevalence .125",
+    "schema_version": "numek.cg4_objective_recovery_protocol/1.0",
+    "strategy_claims": "Unified runs do not qualify every strategy. Separate --strategies ablations retain the same profile and separate evidence.",
+    "units": 40000
+  },
+  "role_medians": {
+    "D": {
+      "IoU": 0.9904904883649162,
+      "precision": 1.0,
+      "recall": 0.9954405065378564
+    },
+    "H": {
+      "IoU": 0.9906999036205162,
+      "precision": 1.0,
+      "recall": 0.9971900163160343
+    },
+    "S": {
+      "IoU": 0.9885572624541396,
+      "precision": 1.0,
+      "recall": 0.9971570916767961
+    }
+  },
+  "schema_version": "numek.cg4_objective_anchor_summary/1.0",
+  "scope": "The declared synthetic objective and unified-strategy operating profile only. H measures independently selected frozen gates. Planned membership stays in recovery denominators. Candidate effects overlap and are not independent replicates. No claim for other objectives, individual strategy superiority, external independence verification or milestone completion.",
+  "source_binding_sha256": "66e26232919a868a1a32593ae7632836002cf93715704a82d9906f8ac370c983",
+  "source_identity": "4a9a0d10d38c8fb733e9923b257abb68a0783f775815a009f4cc10b213ab140c",
+  "success_fraction_MC95": [
+    0.9119026971211976,
+    1.0
+  ],
+  "successes": 40,
+  "trials": [
+    {
+      "H_selected_native_effects": [
+        0.885290293311374
+      ],
+      "assessment_states": [
+        "confirmed"
+      ],
+      "input_sha256": "0e9ef024ac8d4c61de7ecd35bc1ee675b2dd389493eeef66cffa32ee862df4b8",
+      "path": "validation/cg4/results/objective-continuous-uncertainty-group-v1/regression_bias/regression_bias-110000.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.9892695006190673,
+          "false_negative": 0,
+          "false_positive": 26,
+          "planned": 19968,
+          "precision": 0.9892695006190673,
+          "recall": 1.0,
+          "true_positive": 2397,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9952380952380953,
+          "false_negative": 0,
+          "false_positive": 6,
+          "planned": 10056,
+          "precision": 0.9952380952380953,
+          "recall": 1.0,
+          "true_positive": 1254,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9943181818181818,
+          "false_negative": 0,
+          "false_positive": 7,
+          "planned": 9976,
+          "precision": 0.9943181818181818,
+          "recall": 1.0,
+          "true_positive": 1225,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 817.7553969589935,
+      "seed": 110000,
+      "sha256": "f53988c311f3441b773a25af0dcc47d77bff2c39d2145631a5f6647d16335a79",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.9024798840185103
+      ],
+      "assessment_states": [
+        "confirmed"
+      ],
+      "input_sha256": "3b6a66278a9765e9d4f1ce82395abbc9af0571156927f2c52d984c2a6094714d",
+      "path": "validation/cg4/results/objective-continuous-uncertainty-group-v1/regression_bias/regression_bias-110001.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.999189298743413,
+          "false_negative": 2,
+          "false_positive": 0,
+          "planned": 20056,
+          "precision": 1.0,
+          "recall": 0.999189298743413,
+          "true_positive": 2465,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9975825946817083,
+          "false_negative": 3,
+          "false_positive": 0,
+          "planned": 9873,
+          "precision": 1.0,
+          "recall": 0.9975825946817083,
+          "true_positive": 1238,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9984251968503937,
+          "false_negative": 2,
+          "false_positive": 0,
+          "planned": 10071,
+          "precision": 1.0,
+          "recall": 0.9984251968503937,
+          "true_positive": 1268,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 917.5722116669931,
+      "seed": 110001,
+      "sha256": "cf29ff10c4207ef5341df6cee27d61e933120bb005359daef847c41bf99651c3",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.8852903006930424
+      ],
+      "assessment_states": [
+        "confirmed"
+      ],
+      "input_sha256": "3ba5aa0cb76fc4f330e2552e2dc3394c7d0afc3e4636ac5e5582c7dba0cd5f68",
+      "path": "validation/cg4/results/objective-continuous-uncertainty-group-v1/regression_bias/regression_bias-110002.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.975049504950495,
+          "false_negative": 63,
+          "false_positive": 0,
+          "planned": 19888,
+          "precision": 1.0,
+          "recall": 0.975049504950495,
+          "true_positive": 2462,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9750778816199377,
+          "false_negative": 32,
+          "false_positive": 0,
+          "planned": 10082,
+          "precision": 1.0,
+          "recall": 0.9750778816199377,
+          "true_positive": 1252,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9692058346839546,
+          "false_negative": 38,
+          "false_positive": 0,
+          "planned": 10030,
+          "precision": 1.0,
+          "recall": 0.9692058346839546,
+          "true_positive": 1196,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 656.4352197090338,
+      "seed": 110002,
+      "sha256": "cdeaf45125b7c79e86b1c4924e04318f71542fb43a50feb50d8eedd03c53dab3",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.909847801838444
+      ],
+      "assessment_states": [
+        "confirmed"
+      ],
+      "input_sha256": "975fe11aee58f5b80f009a586b61f61ae1275d5c00156d437c42b56ccb8a5cf4",
+      "path": "validation/cg4/results/objective-continuous-uncertainty-group-v1/regression_bias/regression_bias-110003.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.9849861714737258,
+          "false_negative": 0,
+          "false_positive": 38,
+          "planned": 20107,
+          "precision": 0.9849861714737258,
+          "recall": 1.0,
+          "true_positive": 2493,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.990953947368421,
+          "false_negative": 0,
+          "false_positive": 11,
+          "planned": 9867,
+          "precision": 0.990953947368421,
+          "recall": 1.0,
+          "true_positive": 1205,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.987189148455162,
+          "false_negative": 0,
+          "false_positive": 17,
+          "planned": 10026,
+          "precision": 0.987189148455162,
+          "recall": 1.0,
+          "true_positive": 1310,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 658.3096764580114,
+      "seed": 110003,
+      "sha256": "313e99ad7d4cac096012c86e134b4a8566e7d87973f94994225b1580eab363fd",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.8952012956913775
+      ],
+      "assessment_states": [
+        "confirmed"
+      ],
+      "input_sha256": "d35ea0c8b79dfc4468185c682de55a0ff4f75b5fd6c94f95aaf8caff85abff36",
+      "path": "validation/cg4/results/objective-continuous-uncertainty-group-v1/regression_bias/regression_bias-110004.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.9931396287328491,
+          "false_negative": 17,
+          "false_positive": 0,
+          "planned": 19703,
+          "precision": 1.0,
+          "recall": 0.9931396287328491,
+          "true_positive": 2461,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9893939393939394,
+          "false_negative": 14,
+          "false_positive": 0,
+          "planned": 10106,
+          "precision": 1.0,
+          "recall": 0.9893939393939394,
+          "true_positive": 1306,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9920382165605095,
+          "false_negative": 10,
+          "false_positive": 0,
+          "planned": 10191,
+          "precision": 1.0,
+          "recall": 0.9920382165605095,
+          "true_positive": 1246,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 611.0851730409777,
+      "seed": 110004,
+      "sha256": "90035fe0fe33dd9b8ec58d55a4cb11dc4d34a2c572a06eed3e1afb0569a4e167",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.7648377899780783,
+        0.8871070626941853
+      ],
+      "assessment_states": [
+        "inconclusive",
+        "confirmed"
+      ],
+      "input_sha256": "6117c67da369d28f126cd5cb7390826349f75f67e5b527abd6a743b910996bc1",
+      "path": "validation/cg4/results/objective-continuous-uncertainty-group-v1/regression_bias/regression_bias-110005.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.9872255489021956,
+          "false_negative": 0,
+          "false_positive": 32,
+          "planned": 19903,
+          "precision": 0.9872255489021956,
+          "recall": 1.0,
+          "true_positive": 2473,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9931454683929931,
+          "false_negative": 0,
+          "false_positive": 9,
+          "planned": 10082,
+          "precision": 0.9931454683929931,
+          "recall": 1.0,
+          "true_positive": 1304,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9850863422291993,
+          "false_negative": 0,
+          "false_positive": 19,
+          "planned": 10015,
+          "precision": 0.9850863422291993,
+          "recall": 1.0,
+          "true_positive": 1255,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 576.1150212499779,
+      "seed": 110005,
+      "sha256": "2575d11130d131666da47503c2942c8f91f90d72eb9d820203f383815bf65d22",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.8918332772760159
+      ],
+      "assessment_states": [
+        "confirmed"
+      ],
+      "input_sha256": "03af11ed1006052c04d177a790ecab5c588aef83ab05797447e288439709cb4a",
+      "path": "validation/cg4/results/objective-continuous-uncertainty-group-v1/regression_bias/regression_bias-110006.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.9931781701444623,
+          "false_negative": 17,
+          "false_positive": 0,
+          "planned": 20011,
+          "precision": 1.0,
+          "recall": 0.9931781701444623,
+          "true_positive": 2475,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9894736842105263,
+          "false_negative": 13,
+          "false_positive": 0,
+          "planned": 10013,
+          "precision": 1.0,
+          "recall": 0.9894736842105263,
+          "true_positive": 1222,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9975903614457832,
+          "false_negative": 3,
+          "false_positive": 0,
+          "planned": 9976,
+          "precision": 1.0,
+          "recall": 0.9975903614457832,
+          "true_positive": 1242,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 560.4792222499964,
+      "seed": 110006,
+      "sha256": "5c96fdd6647b094160ddeb0cfe9159156b9915e37b34c848607d966e0059df7e",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.8889447709145306
+      ],
+      "assessment_states": [
+        "confirmed"
+      ],
+      "input_sha256": "2bf8007f5db4024c3cc8000dfd030cc922917463680db6105afb3f3c550ee43a",
+      "path": "validation/cg4/results/objective-continuous-uncertainty-group-v1/regression_bias/regression_bias-110007.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.9882113821138211,
+          "false_negative": 0,
+          "false_positive": 29,
+          "planned": 19821,
+          "precision": 0.9882113821138211,
+          "recall": 1.0,
+          "true_positive": 2431,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9865824782951855,
+          "false_negative": 0,
+          "false_positive": 17,
+          "planned": 10039,
+          "precision": 0.9865824782951855,
+          "recall": 1.0,
+          "true_positive": 1250,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.988599348534202,
+          "false_negative": 0,
+          "false_positive": 14,
+          "planned": 10140,
+          "precision": 0.988599348534202,
+          "recall": 1.0,
+          "true_positive": 1214,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 555.9967932919972,
+      "seed": 110007,
+      "sha256": "ad2844a3d2a169e77cae40d88852f53470b5bd604ce81068159677bd3a2df14d",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.892338853521601
+      ],
+      "assessment_states": [
+        "confirmed"
+      ],
+      "input_sha256": "b31ad039257cd7a613073c7189bac175847def3614973c7b3acfd098c225c182",
+      "path": "validation/cg4/results/objective-continuous-uncertainty-group-v1/regression_bias/regression_bias-110008.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.9796650717703349,
+          "false_negative": 51,
+          "false_positive": 0,
+          "planned": 19931,
+          "precision": 1.0,
+          "recall": 0.9796650717703349,
+          "true_positive": 2457,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9811937857726901,
+          "false_negative": 23,
+          "false_positive": 0,
+          "planned": 9962,
+          "precision": 1.0,
+          "recall": 0.9811937857726901,
+          "true_positive": 1200,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9820261437908496,
+          "false_negative": 22,
+          "false_positive": 0,
+          "planned": 10107,
+          "precision": 1.0,
+          "recall": 0.9820261437908496,
+          "true_positive": 1202,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 593.1262197500328,
+      "seed": 110008,
+      "sha256": "a820fb5a4fa52e1a92c86640496ec0f3801ec9952bc56dd36d4d60b10eea0300",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.8831911093428837
+      ],
+      "assessment_states": [
+        "confirmed"
+      ],
+      "input_sha256": "6445e35fe8e0404b7798ac7b0091c36ae48ba8c6d081c71906de647723ee8e44",
+      "path": "validation/cg4/results/objective-continuous-uncertainty-group-v1/regression_bias/regression_bias-110009.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.9874706342991386,
+          "false_negative": 32,
+          "false_positive": 0,
+          "planned": 20095,
+          "precision": 1.0,
+          "recall": 0.9874706342991386,
+          "true_positive": 2522,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9918367346938776,
+          "false_negative": 10,
+          "false_positive": 0,
+          "planned": 9953,
+          "precision": 1.0,
+          "recall": 0.9918367346938776,
+          "true_positive": 1215,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9878147847278635,
+          "false_negative": 15,
+          "false_positive": 0,
+          "planned": 9952,
+          "precision": 1.0,
+          "recall": 0.9878147847278635,
+          "true_positive": 1216,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 569.1346569999587,
+      "seed": 110009,
+      "sha256": "669007b0f9778551023c103b7ee12f081f92a0de67fefd8e191ee40c227ba908",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.904809620500035
+      ],
+      "assessment_states": [
+        "confirmed"
+      ],
+      "input_sha256": "b7ae35d54056abd429384407f405ac782b16eddcf307f5ecc023378215dee59f",
+      "path": "validation/cg4/results/objective-continuous-uncertainty-group-v1/regression_bias/regression_bias-110010.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.9893742621015348,
+          "false_negative": 27,
+          "false_positive": 0,
+          "planned": 19992,
+          "precision": 1.0,
+          "recall": 0.9893742621015348,
+          "true_positive": 2514,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9901800327332242,
+          "false_negative": 12,
+          "false_positive": 0,
+          "planned": 10011,
+          "precision": 1.0,
+          "recall": 0.9901800327332242,
+          "true_positive": 1210,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9860769860769861,
+          "false_negative": 17,
+          "false_positive": 0,
+          "planned": 9997,
+          "precision": 1.0,
+          "recall": 0.9860769860769861,
+          "true_positive": 1204,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 463.7309879999957,
+      "seed": 110010,
+      "sha256": "4b71f514c3949aeb877d2db780f5cd285744cd6c435d1c21c3ae17971198c844",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.8767314959995107,
+        0.8757690710765202,
+        0.8689739597882491
+      ],
+      "assessment_states": [
+        "confirmed",
+        "confirmed",
+        "confirmed"
+      ],
+      "input_sha256": "c49ec811189d3653a8c70fc54b9347c482c6a737d272669b6eab909a7e381997",
+      "path": "validation/cg4/results/objective-continuous-uncertainty-group-v1/regression_bias/regression_bias-110011.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.9748971193415638,
+          "false_negative": 11,
+          "false_positive": 50,
+          "planned": 20012,
+          "precision": 0.9793303017775941,
+          "recall": 0.9953781512605042,
+          "true_positive": 2369,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9783132530120482,
+          "false_negative": 4,
+          "false_positive": 23,
+          "planned": 10027,
+          "precision": 0.9814665592264303,
+          "recall": 0.9967266775777414,
+          "true_positive": 1218,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.975800156128025,
+          "false_negative": 5,
+          "false_positive": 26,
+          "planned": 9961,
+          "precision": 0.9796238244514106,
+          "recall": 0.9960159362549801,
+          "true_positive": 1250,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 514.0809761249693,
+      "seed": 110011,
+      "sha256": "ed4f6f671053875b164af4ebc7ee4d2b8f92ddfa144407dac750d87dfbbeac3a",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.9025793063281508
+      ],
+      "assessment_states": [
+        "confirmed"
+      ],
+      "input_sha256": "ba1fb310cb4c186826ce0c2dfd00eaab15cee98fb673ead2dd51f8e6485ad025",
+      "path": "validation/cg4/results/objective-continuous-uncertainty-group-v1/regression_bias/regression_bias-110012.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.9955028618152085,
+          "false_negative": 11,
+          "false_positive": 0,
+          "planned": 19976,
+          "precision": 1.0,
+          "recall": 0.9955028618152085,
+          "true_positive": 2435,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9944532488114105,
+          "false_negative": 7,
+          "false_positive": 0,
+          "planned": 9977,
+          "precision": 1.0,
+          "recall": 0.9944532488114105,
+          "true_positive": 1255,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9966969446738233,
+          "false_negative": 4,
+          "false_positive": 0,
+          "planned": 10047,
+          "precision": 1.0,
+          "recall": 0.9966969446738233,
+          "true_positive": 1207,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 612.4892662079656,
+      "seed": 110012,
+      "sha256": "06e2f07876763c25c8f33c6bf67d5c4977fc8682f6ac53d542f2db83026aa778",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.8917491516896945
+      ],
+      "assessment_states": [
+        "confirmed"
+      ],
+      "input_sha256": "72b8eb73b7a2796865df97b742ee47fcff429073bb4aa5c6ed1808db0d500cfc",
+      "path": "validation/cg4/results/objective-continuous-uncertainty-group-v1/regression_bias/regression_bias-110013.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.9983606557377049,
+          "false_negative": 0,
+          "false_positive": 4,
+          "planned": 19894,
+          "precision": 0.9983606557377049,
+          "recall": 1.0,
+          "true_positive": 2436,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9959349593495935,
+          "false_negative": 0,
+          "false_positive": 5,
+          "planned": 10001,
+          "precision": 0.9959349593495935,
+          "recall": 1.0,
+          "true_positive": 1225,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9983948635634029,
+          "false_negative": 0,
+          "false_positive": 2,
+          "planned": 10105,
+          "precision": 0.9983948635634029,
+          "recall": 1.0,
+          "true_positive": 1244,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 669.3976585420314,
+      "seed": 110013,
+      "sha256": "61f00b88df9364de862bc3651806af62c87b47da6e815d0bfc88b1e6ac85b29c",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.8975888247014135
+      ],
+      "assessment_states": [
+        "confirmed"
+      ],
+      "input_sha256": "39565ca7ba06c035c50bf01cd44e7fcb3e343e3f52e99a2444f4114c4430c8d5",
+      "path": "validation/cg4/results/objective-continuous-uncertainty-group-v1/regression_bias/regression_bias-110014.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.9835076427996782,
+          "false_negative": 0,
+          "false_positive": 41,
+          "planned": 19991,
+          "precision": 0.9835076427996782,
+          "recall": 1.0,
+          "true_positive": 2445,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9865871833084948,
+          "false_negative": 0,
+          "false_positive": 18,
+          "planned": 9992,
+          "precision": 0.9865871833084948,
+          "recall": 1.0,
+          "true_positive": 1324,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9877488514548239,
+          "false_negative": 0,
+          "false_positive": 16,
+          "planned": 10017,
+          "precision": 0.9877488514548239,
+          "recall": 1.0,
+          "true_positive": 1290,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 645.9540197089664,
+      "seed": 110014,
+      "sha256": "90956bcc8e6d7cd754e1fe7739b4076642454ade20c3fe4f6f311d2a8e024e3a",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.9049342746684453
+      ],
+      "assessment_states": [
+        "confirmed"
+      ],
+      "input_sha256": "805da41764732e84b2af10014609ab0738671cf8d2baa32b387faac860084981",
+      "path": "validation/cg4/results/objective-continuous-uncertainty-group-v1/regression_bias/regression_bias-110015.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.9937082186394023,
+          "false_negative": 0,
+          "false_positive": 16,
+          "planned": 19963,
+          "precision": 0.9937082186394023,
+          "recall": 1.0,
+          "true_positive": 2527,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9945694336695112,
+          "false_negative": 0,
+          "false_positive": 7,
+          "planned": 9997,
+          "precision": 0.9945694336695112,
+          "recall": 1.0,
+          "true_positive": 1282,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9945987654320988,
+          "false_negative": 0,
+          "false_positive": 7,
+          "planned": 10040,
+          "precision": 0.9945987654320988,
+          "recall": 1.0,
+          "true_positive": 1289,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 642.9292455409886,
+      "seed": 110015,
+      "sha256": "7ae2c50e8183c7a603aefe32de1cbfc4c27938796d65286ba24c16f1ed23c6fe",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.9251971133816917
+      ],
+      "assessment_states": [
+        "confirmed"
+      ],
+      "input_sha256": "0be3265569f47eb7a2dbd6f55a372f7fd3ff372939cedcba7abad7dbeb6367e8",
+      "path": "validation/cg4/results/objective-continuous-uncertainty-group-v1/regression_bias/regression_bias-110016.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.999597099113618,
+          "false_negative": 1,
+          "false_positive": 0,
+          "planned": 19886,
+          "precision": 1.0,
+          "recall": 0.999597099113618,
+          "true_positive": 2481,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9992217898832685,
+          "false_negative": 1,
+          "false_positive": 0,
+          "planned": 10142,
+          "precision": 1.0,
+          "recall": 0.9992217898832685,
+          "true_positive": 1284,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9974489795918368,
+          "false_negative": 3,
+          "false_positive": 0,
+          "planned": 9972,
+          "precision": 1.0,
+          "recall": 0.9974489795918368,
+          "true_positive": 1173,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 640.5419352080207,
+      "seed": 110016,
+      "sha256": "34c341cd60e3be47b22f3689bf8fcf21ee5b99266bc5ec7f70c3cd10f5b3987c",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.8952022654075258
+      ],
+      "assessment_states": [
+        "confirmed"
+      ],
+      "input_sha256": "66df6405363fd29f4ccc44ada6e3bff89913d319732cdeba1d7f4a52b5b9ef4c",
+      "path": "validation/cg4/results/objective-continuous-uncertainty-group-v1/regression_bias/regression_bias-110017.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.9983457402812241,
+          "false_negative": 4,
+          "false_positive": 0,
+          "planned": 19876,
+          "precision": 1.0,
+          "recall": 0.9983457402812241,
+          "true_positive": 2414,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9992107340173638,
+          "false_negative": 1,
+          "false_positive": 0,
+          "planned": 10072,
+          "precision": 1.0,
+          "recall": 0.9992107340173638,
+          "true_positive": 1266,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9968228752978554,
+          "false_negative": 4,
+          "false_positive": 0,
+          "planned": 10052,
+          "precision": 1.0,
+          "recall": 0.9968228752978554,
+          "true_positive": 1255,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 644.2995799170458,
+      "seed": 110017,
+      "sha256": "866e92c488cee4924c519c59cf140bbcc06b00fd14ac78d5897ca0643d11ba90",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.8848615125313157
+      ],
+      "assessment_states": [
+        "confirmed"
+      ],
+      "input_sha256": "6bd57d6e415aa557f0e601cdb2135bd3b4a402d8d6eaf453feb07bf589c2420a",
+      "path": "validation/cg4/results/objective-continuous-uncertainty-group-v1/regression_bias/regression_bias-110018.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.9939807383627608,
+          "false_negative": 15,
+          "false_positive": 0,
+          "planned": 20031,
+          "precision": 1.0,
+          "recall": 0.9939807383627608,
+          "true_positive": 2477,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9944968553459119,
+          "false_negative": 7,
+          "false_positive": 0,
+          "planned": 10016,
+          "precision": 1.0,
+          "recall": 0.9944968553459119,
+          "true_positive": 1265,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9968652037617555,
+          "false_negative": 4,
+          "false_positive": 0,
+          "planned": 9953,
+          "precision": 1.0,
+          "recall": 0.9968652037617555,
+          "true_positive": 1272,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 610.4937388749677,
+      "seed": 110018,
+      "sha256": "f479613cae2020eb0c6bf41bca35f202f0f6de4836a82923c2d6d569014e2957",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.886176369270612
+      ],
+      "assessment_states": [
+        "confirmed"
+      ],
+      "input_sha256": "2a43796439a4a052d9aed0418bc8968f53657e83f4e7ce9e4f74204b8e91f699",
+      "path": "validation/cg4/results/objective-continuous-uncertainty-group-v1/regression_bias/regression_bias-110019.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.991636798088411,
+          "false_negative": 0,
+          "false_positive": 21,
+          "planned": 19966,
+          "precision": 0.991636798088411,
+          "recall": 1.0,
+          "true_positive": 2490,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9904458598726115,
+          "false_negative": 0,
+          "false_positive": 12,
+          "planned": 9986,
+          "precision": 0.9904458598726115,
+          "recall": 1.0,
+          "true_positive": 1244,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9936808846761453,
+          "false_negative": 0,
+          "false_positive": 8,
+          "planned": 10048,
+          "precision": 0.9936808846761453,
+          "recall": 1.0,
+          "true_positive": 1258,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 391.9507762499852,
+      "seed": 110019,
+      "sha256": "8692b70484dbeab03f0c4f7fa2d25c35d3703cc8c8cfc9f1851052b5a6e0fa00",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.8925077178914297
+      ],
+      "assessment_states": [
+        "confirmed"
+      ],
+      "input_sha256": "15c9ed94f47375a19933994ac508a30676c3b58526dd7f81d15fb846c1282594",
+      "path": "validation/cg4/results/objective-continuous-uncertainty-group-v1/regression_bias/regression_bias-110020.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.9821073558648111,
+          "false_negative": 45,
+          "false_positive": 0,
+          "planned": 20003,
+          "precision": 1.0,
+          "recall": 0.9821073558648111,
+          "true_positive": 2470,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9889676910953507,
+          "false_negative": 14,
+          "false_positive": 0,
+          "planned": 9872,
+          "precision": 1.0,
+          "recall": 0.9889676910953507,
+          "true_positive": 1255,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9882537196554424,
+          "false_negative": 15,
+          "false_positive": 0,
+          "planned": 10125,
+          "precision": 1.0,
+          "recall": 0.9882537196554424,
+          "true_positive": 1262,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 392.2039729169919,
+      "seed": 110020,
+      "sha256": "1005e383833e5329b9ac89c2589ca985bd4bc8c425196e23d69a53532423d2da",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.895510802675926,
+        0.9158543983327734
+      ],
+      "assessment_states": [
+        "confirmed",
+        "confirmed"
+      ],
+      "input_sha256": "11c89f21447ac64b42c30b20d9f3de9b078ec82a354c3d7a60a450caf15df4b5",
+      "path": "validation/cg4/results/objective-continuous-uncertainty-group-v1/regression_bias/regression_bias-110021.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.9931368591037545,
+          "false_negative": 0,
+          "false_positive": 17,
+          "planned": 19951,
+          "precision": 0.9931368591037545,
+          "recall": 1.0,
+          "true_positive": 2460,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9914196567862714,
+          "false_negative": 0,
+          "false_positive": 11,
+          "planned": 10063,
+          "precision": 0.9914196567862714,
+          "recall": 1.0,
+          "true_positive": 1271,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9835931091058244,
+          "false_negative": 0,
+          "false_positive": 20,
+          "planned": 9986,
+          "precision": 0.9835931091058244,
+          "recall": 1.0,
+          "true_positive": 1199,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 401.99655041703954,
+      "seed": 110021,
+      "sha256": "8f963e371f269787b47ad129f5f2bee2e5be6be208f45717a36e220f59bbce4e",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.8903669386170208,
+        0.8850784677555241
+      ],
+      "assessment_states": [
+        "confirmed",
+        "confirmed"
+      ],
+      "input_sha256": "13d857c9a5e24edbef97af7e2beb6fc38ad0413a73b47a44356ee14c95996d81",
+      "path": "validation/cg4/results/objective-continuous-uncertainty-group-v1/regression_bias/regression_bias-110022.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.9940143655227454,
+          "false_negative": 0,
+          "false_positive": 15,
+          "planned": 20104,
+          "precision": 0.9940143655227454,
+          "recall": 1.0,
+          "true_positive": 2491,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9900249376558603,
+          "false_negative": 0,
+          "false_positive": 12,
+          "planned": 9844,
+          "precision": 0.9900249376558603,
+          "recall": 1.0,
+          "true_positive": 1191,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9885151763740772,
+          "false_negative": 0,
+          "false_positive": 14,
+          "planned": 10052,
+          "precision": 0.9885151763740772,
+          "recall": 1.0,
+          "true_positive": 1205,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 378.7488780830172,
+      "seed": 110022,
+      "sha256": "d504d91d1f5ca3b0db58b2b686a6b5894ecc8cafd406ff1c9a22085351a86793",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.9018186583229714
+      ],
+      "assessment_states": [
+        "confirmed"
+      ],
+      "input_sha256": "e1f7625d4394a897d52464fbb4da9a7bae63b37e3a9d3f42697a9fc3ff5cb107",
+      "path": "validation/cg4/results/objective-continuous-uncertainty-group-v1/regression_bias/regression_bias-110023.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.9939879759519038,
+          "false_negative": 0,
+          "false_positive": 15,
+          "planned": 19924,
+          "precision": 0.9939879759519038,
+          "recall": 1.0,
+          "true_positive": 2480,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9959150326797386,
+          "false_negative": 0,
+          "false_positive": 5,
+          "planned": 9997,
+          "precision": 0.9959150326797386,
+          "recall": 1.0,
+          "true_positive": 1219,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9960095770151636,
+          "false_negative": 0,
+          "false_positive": 5,
+          "planned": 10079,
+          "precision": 0.9960095770151636,
+          "recall": 1.0,
+          "true_positive": 1248,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 379.1957526669721,
+      "seed": 110023,
+      "sha256": "af1dc4f64d7cec043ded0cdc061f8f84c5ffc882db9d00ad1cd858b878ddfd2b",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.890005814512724
+      ],
+      "assessment_states": [
+        "confirmed"
+      ],
+      "input_sha256": "b0d300adb55295c54072f49a21f6f5cadf81dc91c81f699acba197ca1a832d8b",
+      "path": "validation/cg4/results/objective-continuous-uncertainty-group-v1/regression_bias/regression_bias-110024.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.9991806636624334,
+          "false_negative": 0,
+          "false_positive": 2,
+          "planned": 19909,
+          "precision": 0.9991806636624334,
+          "recall": 1.0,
+          "true_positive": 2439,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 1.0,
+          "false_negative": 0,
+          "false_positive": 0,
+          "planned": 10179,
+          "precision": 1.0,
+          "recall": 1.0,
+          "true_positive": 1272,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 1.0,
+          "false_negative": 0,
+          "false_positive": 0,
+          "planned": 9912,
+          "precision": 1.0,
+          "recall": 1.0,
+          "true_positive": 1213,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 385.0239221670199,
+      "seed": 110024,
+      "sha256": "09234a6ab9fdb65051f4ff3beb9488898b73fbfe363c85d2c90129742194b7f3",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.9003338125138113
+      ],
+      "assessment_states": [
+        "confirmed"
+      ],
+      "input_sha256": "dc653ceae9ae1459da3cb0291b3efc344509ac80158d81f7282c370ea1d3b8fa",
+      "path": "validation/cg4/results/objective-continuous-uncertainty-group-v1/regression_bias/regression_bias-110025.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.987012987012987,
+          "false_negative": 33,
+          "false_positive": 0,
+          "planned": 19965,
+          "precision": 1.0,
+          "recall": 0.987012987012987,
+          "true_positive": 2508,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9873817034700315,
+          "false_negative": 16,
+          "false_positive": 0,
+          "planned": 9948,
+          "precision": 1.0,
+          "recall": 0.9873817034700315,
+          "true_positive": 1252,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9841930116472546,
+          "false_negative": 19,
+          "false_positive": 0,
+          "planned": 10087,
+          "precision": 1.0,
+          "recall": 0.9841930116472546,
+          "true_positive": 1183,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 393.12967945903074,
+      "seed": 110025,
+      "sha256": "5e63f45b41106ab9e2fc646723750ef5a84fa986c1be28f054353e6595d3b8d5",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.8927647195603512
+      ],
+      "assessment_states": [
+        "confirmed"
+      ],
+      "input_sha256": "4a816cab66f93c490ebec37c0a08b2740492d79555a5b75b407d287529b7d0cc",
+      "path": "validation/cg4/results/objective-continuous-uncertainty-group-v1/regression_bias/regression_bias-110026.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.9747474747474747,
+          "false_negative": 65,
+          "false_positive": 0,
+          "planned": 20140,
+          "precision": 1.0,
+          "recall": 0.9747474747474747,
+          "true_positive": 2509,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9798826487845766,
+          "false_negative": 24,
+          "false_positive": 0,
+          "planned": 9928,
+          "precision": 1.0,
+          "recall": 0.9798826487845766,
+          "true_positive": 1169,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9778142974527527,
+          "false_negative": 27,
+          "false_positive": 0,
+          "planned": 9932,
+          "precision": 1.0,
+          "recall": 0.9778142974527527,
+          "true_positive": 1190,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 390.93383616697975,
+      "seed": 110026,
+      "sha256": "b16120f875da22830c07db82a0aba8ecfbcd28b1a4398fabc739119c1178e67b",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.9175236460533897
+      ],
+      "assessment_states": [
+        "confirmed"
+      ],
+      "input_sha256": "49352849bd58580fcae6ffae1c8b7201a1c6973a23f740407b0434f1f0428c14",
+      "path": "validation/cg4/results/objective-continuous-uncertainty-group-v1/regression_bias/regression_bias-110027.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.9856459330143541,
+          "false_negative": 36,
+          "false_positive": 0,
+          "planned": 19970,
+          "precision": 1.0,
+          "recall": 0.9856459330143541,
+          "true_positive": 2472,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9802058590657166,
+          "false_negative": 25,
+          "false_positive": 0,
+          "planned": 10097,
+          "precision": 1.0,
+          "recall": 0.9802058590657166,
+          "true_positive": 1238,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9856687898089171,
+          "false_negative": 18,
+          "false_positive": 0,
+          "planned": 9933,
+          "precision": 1.0,
+          "recall": 0.9856687898089171,
+          "true_positive": 1238,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 395.5478647080017,
+      "seed": 110027,
+      "sha256": "3274a388767b9b204dee550eb91fdf7d71dd059befcaca09e8047786ba2aeb36",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.9004984930273316
+      ],
+      "assessment_states": [
+        "confirmed"
+      ],
+      "input_sha256": "ffc4b72c70330d5d88f04b24db5f1740248a58225b5572a8bfbb5122acc9f8bc",
+      "path": "validation/cg4/results/objective-continuous-uncertainty-group-v1/regression_bias/regression_bias-110028.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.9952774498229043,
+          "false_negative": 12,
+          "false_positive": 0,
+          "planned": 19814,
+          "precision": 1.0,
+          "recall": 0.9952774498229043,
+          "true_positive": 2529,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9967974379503602,
+          "false_negative": 4,
+          "false_positive": 0,
+          "planned": 9989,
+          "precision": 1.0,
+          "recall": 0.9967974379503602,
+          "true_positive": 1245,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9992325402916347,
+          "false_negative": 1,
+          "false_positive": 0,
+          "planned": 10197,
+          "precision": 1.0,
+          "recall": 0.9992325402916347,
+          "true_positive": 1302,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 389.9790672909585,
+      "seed": 110028,
+      "sha256": "6f0882e80f592ed30f4282efa703dd14f7880cae191b0cc02bd279c347961f67",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.8976364216443954
+      ],
+      "assessment_states": [
+        "confirmed"
+      ],
+      "input_sha256": "22fc44f9ff384693dd9366a46480c83a8c26fcf5ec363ecfa97657331c906e47",
+      "path": "validation/cg4/results/objective-continuous-uncertainty-group-v1/regression_bias/regression_bias-110029.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.9916067146282974,
+          "false_negative": 0,
+          "false_positive": 21,
+          "planned": 20092,
+          "precision": 0.9916067146282974,
+          "recall": 1.0,
+          "true_positive": 2481,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9936858721389108,
+          "false_negative": 0,
+          "false_positive": 8,
+          "planned": 10007,
+          "precision": 0.9936858721389108,
+          "recall": 1.0,
+          "true_positive": 1259,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9959579628132579,
+          "false_negative": 0,
+          "false_positive": 5,
+          "planned": 9901,
+          "precision": 0.9959579628132579,
+          "recall": 1.0,
+          "true_positive": 1232,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 459.0379001669935,
+      "seed": 110029,
+      "sha256": "f26599c0c3b98b668ad216686a122d05127e4b4c9d31c13b7702ca2409373e1f",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.8914143759629978
+      ],
+      "assessment_states": [
+        "confirmed"
+      ],
+      "input_sha256": "aea6081c2774384d55597ab6a401e58e9c17e6971e31ab8d14831dac05c6d07f",
+      "path": "validation/cg4/results/objective-continuous-uncertainty-group-v1/regression_bias/regression_bias-110030.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.9842233009708737,
+          "false_negative": 30,
+          "false_positive": 9,
+          "planned": 20083,
+          "precision": 0.9963144963144963,
+          "recall": 0.9878197320341048,
+          "true_positive": 2433,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9808333333333333,
+          "false_negative": 19,
+          "false_positive": 4,
+          "planned": 9903,
+          "precision": 0.9966130397967824,
+          "recall": 0.9841137123745819,
+          "true_positive": 1177,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9853395061728395,
+          "false_negative": 16,
+          "false_positive": 3,
+          "planned": 10014,
+          "precision": 0.99765625,
+          "recall": 0.9876256767208044,
+          "true_positive": 1277,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 556.2135318749934,
+      "seed": 110030,
+      "sha256": "d8488d1450bca02602e4e29f4fa60dfe1078bc1d510d8305d65fb1e6fd3a95c7",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.892216960742919
+      ],
+      "assessment_states": [
+        "confirmed"
+      ],
+      "input_sha256": "022dd2d62a2b45689a770e1fc81c0edd5d74b515d88365750685d2bd6fe28c7e",
+      "path": "validation/cg4/results/objective-continuous-uncertainty-group-v1/regression_bias/regression_bias-110031.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.9841269841269841,
+          "false_negative": 0,
+          "false_positive": 39,
+          "planned": 19924,
+          "precision": 0.9841269841269841,
+          "recall": 1.0,
+          "true_positive": 2418,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9857932123125493,
+          "false_negative": 0,
+          "false_positive": 18,
+          "planned": 9951,
+          "precision": 0.9857932123125493,
+          "recall": 1.0,
+          "true_positive": 1249,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9858156028368794,
+          "false_negative": 0,
+          "false_positive": 18,
+          "planned": 10125,
+          "precision": 0.9858156028368794,
+          "recall": 1.0,
+          "true_positive": 1251,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 545.4377930000192,
+      "seed": 110031,
+      "sha256": "2fb564bde368460a9ab0aafce8245ec877d7323303b357557f311b4903205407",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.8961421485939686
+      ],
+      "assessment_states": [
+        "confirmed"
+      ],
+      "input_sha256": "86b4bb1c48e594d31a68bf6ee84c2d8d0450502fdfedc49f8603fc6d80493800",
+      "path": "validation/cg4/results/objective-continuous-uncertainty-group-v1/regression_bias/regression_bias-110032.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.9943910256410257,
+          "false_negative": 14,
+          "false_positive": 0,
+          "planned": 19929,
+          "precision": 1.0,
+          "recall": 0.9943910256410257,
+          "true_positive": 2482,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9926829268292683,
+          "false_negative": 9,
+          "false_positive": 0,
+          "planned": 10203,
+          "precision": 1.0,
+          "recall": 0.9926829268292683,
+          "true_positive": 1221,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9949494949494949,
+          "false_negative": 6,
+          "false_positive": 0,
+          "planned": 9868,
+          "precision": 1.0,
+          "recall": 0.9949494949494949,
+          "true_positive": 1182,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 549.9990225410438,
+      "seed": 110032,
+      "sha256": "9da9a4a150cc896784732ecd44cb98fe1f081a25f7e168c3ba48fa24641c09f9",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.9013705033460461
+      ],
+      "assessment_states": [
+        "confirmed"
+      ],
+      "input_sha256": "06db87b1315d7fd7a9863d6af923ecfa308cf47a9c88ea87fbc20db3a64bee95",
+      "path": "validation/cg4/results/objective-continuous-uncertainty-group-v1/regression_bias/regression_bias-110033.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.9936658749010293,
+          "false_negative": 16,
+          "false_positive": 0,
+          "planned": 19993,
+          "precision": 1.0,
+          "recall": 0.9936658749010293,
+          "true_positive": 2510,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9984709480122325,
+          "false_negative": 2,
+          "false_positive": 0,
+          "planned": 10052,
+          "precision": 1.0,
+          "recall": 0.9984709480122325,
+          "true_positive": 1306,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9940978077571669,
+          "false_negative": 7,
+          "false_positive": 0,
+          "planned": 9955,
+          "precision": 1.0,
+          "recall": 0.9940978077571669,
+          "true_positive": 1179,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 553.0630502090207,
+      "seed": 110033,
+      "sha256": "3c02a6cd4d4d238fde93f98090b3db1b8263fb246b4a400877c20d0ec7e8d3de",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.8966758672760826
+      ],
+      "assessment_states": [
+        "confirmed"
+      ],
+      "input_sha256": "8b44a8db11ecc99bf041cc19730469b157d34a965c9596c0302b2d0718dfcb85",
+      "path": "validation/cg4/results/objective-continuous-uncertainty-group-v1/regression_bias/regression_bias-110034.json",
+      "recovery": {
+        "D": {
+          "IoU": 1.0,
+          "false_negative": 0,
+          "false_positive": 0,
+          "planned": 19911,
+          "precision": 1.0,
+          "recall": 1.0,
+          "true_positive": 2485,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 1.0,
+          "false_negative": 0,
+          "false_positive": 0,
+          "planned": 10007,
+          "precision": 1.0,
+          "recall": 1.0,
+          "true_positive": 1197,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 1.0,
+          "false_negative": 0,
+          "false_positive": 0,
+          "planned": 10082,
+          "precision": 1.0,
+          "recall": 1.0,
+          "true_positive": 1253,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 550.7610125000356,
+      "seed": 110034,
+      "sha256": "c1818b4629a4c04b967ba5735acb58623112a7e30c3e29a6f29de9f2140c3f15",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.9062936693463782
+      ],
+      "assessment_states": [
+        "confirmed"
+      ],
+      "input_sha256": "aca886900ab35be232c17abccba2dd92a640696a1e1d9c1abb69089033c0f7e1",
+      "path": "validation/cg4/results/objective-continuous-uncertainty-group-v1/regression_bias/regression_bias-110035.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.9823390894819466,
+          "false_negative": 45,
+          "false_positive": 0,
+          "planned": 19970,
+          "precision": 1.0,
+          "recall": 0.9823390894819466,
+          "true_positive": 2503,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9845320959010054,
+          "false_negative": 20,
+          "false_positive": 0,
+          "planned": 9914,
+          "precision": 1.0,
+          "recall": 0.9845320959010054,
+          "true_positive": 1273,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9852459016393442,
+          "false_negative": 18,
+          "false_positive": 0,
+          "planned": 10116,
+          "precision": 1.0,
+          "recall": 0.9852459016393442,
+          "true_positive": 1202,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 554.7780757090077,
+      "seed": 110035,
+      "sha256": "cac1fa9405dca3f39914f28dc73f7857915236a3bf344c0b23739fc26e1eeb47",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.9116575972421858
+      ],
+      "assessment_states": [
+        "confirmed"
+      ],
+      "input_sha256": "2123089433e3168074f0b3adfdbb09ee40665f2d3d6a315ee4e7acbdc7a1e1d6",
+      "path": "validation/cg4/results/objective-continuous-uncertainty-group-v1/regression_bias/regression_bias-110036.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.9839421918908069,
+          "false_negative": 30,
+          "false_positive": 10,
+          "planned": 20097,
+          "precision": 0.9959366111336855,
+          "recall": 0.9879081015719468,
+          "true_positive": 2451,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9801744647105471,
+          "false_negative": 18,
+          "false_positive": 7,
+          "planned": 10057,
+          "precision": 0.9943684633950121,
+          "recall": 0.9856459330143541,
+          "true_positive": 1236,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9833729216152018,
+          "false_negative": 11,
+          "false_positive": 10,
+          "planned": 9846,
+          "precision": 0.9920127795527156,
+          "recall": 0.99122106943336,
+          "true_positive": 1242,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 548.1245090829907,
+      "seed": 110036,
+      "sha256": "982dff20c051bc6b3110b4a84aecd79224b6f716a94ce32675f45716be492e82",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.8958793680121357
+      ],
+      "assessment_states": [
+        "confirmed"
+      ],
+      "input_sha256": "a9aa3cb52a0b6e0fd6159c5bf92c9c4a1758a079a3dd7f70ea79ddbec1918a70",
+      "path": "validation/cg4/results/objective-continuous-uncertainty-group-v1/regression_bias/regression_bias-110037.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.9980119284294234,
+          "false_negative": 0,
+          "false_positive": 5,
+          "planned": 20060,
+          "precision": 0.9980119284294234,
+          "recall": 1.0,
+          "true_positive": 2510,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9923136049192929,
+          "false_negative": 0,
+          "false_positive": 10,
+          "planned": 9941,
+          "precision": 0.9923136049192929,
+          "recall": 1.0,
+          "true_positive": 1291,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9967637540453075,
+          "false_negative": 0,
+          "false_positive": 4,
+          "planned": 9999,
+          "precision": 0.9967637540453075,
+          "recall": 1.0,
+          "true_positive": 1232,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 552.7421269159531,
+      "seed": 110037,
+      "sha256": "89fe55ae6ff584e4d9a3b90b1c33c054f710e39187f8afb0751f337efe14559b",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.8880642429881642
+      ],
+      "assessment_states": [
+        "confirmed"
+      ],
+      "input_sha256": "aa069c4e3faf81e84fb110c524367ab25861e583dea1d3c3924d080a0960c1ee",
+      "path": "validation/cg4/results/objective-continuous-uncertainty-group-v1/regression_bias/regression_bias-110038.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.9822580645161291,
+          "false_negative": 44,
+          "false_positive": 0,
+          "planned": 19771,
+          "precision": 1.0,
+          "recall": 0.9822580645161291,
+          "true_positive": 2436,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9745114698385726,
+          "false_negative": 30,
+          "false_positive": 0,
+          "planned": 10120,
+          "precision": 1.0,
+          "recall": 0.9745114698385726,
+          "true_positive": 1147,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9862280030604438,
+          "false_negative": 18,
+          "false_positive": 0,
+          "planned": 10109,
+          "precision": 1.0,
+          "recall": 0.9862280030604438,
+          "true_positive": 1289,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 569.3397212499985,
+      "seed": 110038,
+      "sha256": "b49129ae2f0c4a99887fa6176e2234e19246c43b535662b126c8220fd2df3da6",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.9133559938777885
+      ],
+      "assessment_states": [
+        "confirmed"
+      ],
+      "input_sha256": "c6c457f35dd440569dd3b4f5875331578fc86747a5c78ec2bde58b9c2e76723b",
+      "path": "validation/cg4/results/objective-continuous-uncertainty-group-v1/regression_bias/regression_bias-110039.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.9797665369649805,
+          "false_negative": 52,
+          "false_positive": 0,
+          "planned": 20238,
+          "precision": 1.0,
+          "recall": 0.9797665369649805,
+          "true_positive": 2518,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9828526890101325,
+          "false_negative": 22,
+          "false_positive": 0,
+          "planned": 9899,
+          "precision": 1.0,
+          "recall": 0.9828526890101325,
+          "true_positive": 1261,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9823717948717948,
+          "false_negative": 22,
+          "false_positive": 0,
+          "planned": 9863,
+          "precision": 1.0,
+          "recall": 0.9823717948717948,
+          "true_positive": 1226,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 635.3085979170282,
+      "seed": 110039,
+      "sha256": "c4c4af81d2b8a6955c47f0b4e8adb22a5aca1e780710878768b7bab6ac5d8339",
+      "success": true
+    }
+  ]
+}

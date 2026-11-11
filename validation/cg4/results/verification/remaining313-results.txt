@@ -1,0 +1,26 @@
+........................................................................ [ 14%]
+........................................................................ [ 29%]
+........................................................................ [ 44%]
+.................................................F
+=================================== FAILURES ===================================
+_______________ test_frozen_current_tree_m2_results_and_reports ________________
+
+    def test_frozen_current_tree_m2_results_and_reports():
+        cases=json.loads(Path('tests/fixtures/m2_baseline.json').read_text())
+        for name,c in cases.items():
+            r=DataTrust.from_spec(DatasetSpec(**c['dataset']),TaskSpec('regression',c['target']),AnalysisConfig(regression=RegressionOptions.from_dict(c['options']))).analyze_result()
+            r.generated_at='2026-10-09T00:00:00+00:00';r.execution['elapsed_seconds']=0
+>           assert r.to_dict()==c['result'],name
+E           AssertionError: bike_hour
+E           assert {'dataset': {...,', ...}, ...} == {'dataset': {...,', ...}, ...}
+E             
+E             Omitting 17 identical items, use -vv to show
+E             Differing items:
+E             {'execution': {'status': 'completed', 'backend': 'pandas_in_memory', 'materialization': 'in_memory', 'source_bytes': 1144308, ...}} != {'execution': {'status': 'completed', 'backend': 'pandas_in_memory', 'materialization': 'in_memory', 'source_bytes': 1144308, ...}}
+E             Use -v to get more diff
+
+tests/test_m2_parity.py:20: AssertionError
+=========================== short test summary info ============================
+FAILED tests/test_m2_parity.py::test_frozen_current_tree_m2_results_and_reports
+!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!!
+1 failed, 265 passed in 81.22s (0:01:21)

@@ -1,0 +1,45 @@
+--- prior/src/confidenceguard/evidence_use.py
++++ current/src/confidenceguard/evidence_use.py
+@@ -14,6 +14,42 @@
+ # are protected identifiers, not anonymization.
+ _SESSION_USES=[]
+ _SESSION_LOCK=threading.RLock()
++
++
++def source_aliases(info,event,entity=None):
++    """Known local file/key reuse survives namespace, label and path changes.
++
++    Paths/inodes are protected provenance anchors, not population identity or
++    proof of independence. Independent upstream populations need distinct source
++    snapshots. Unobservable copies/forks still require scoped declarations.
++    """
++    anchors=[]
++    if info.get('path'):anchors.append(['path',info['path']])
++    if isinstance(info.get('signature'),(list,tuple)) and len(info['signature'])>=2:anchors.append(['file',*info['signature'][:2]])
++    return ({digest(['local_source_event_v1',anchor,event]) for anchor in anchors},
++            {digest(['local_source_unit_v1',anchor,entity or event]) for anchor in anchors})
++
++
++def population_identifiers(prepared,indices):
++    """Canonical identifiers plus observable source aliases, never raw outcomes."""
++    events=set();units=set();namespace=prepared.spec.roles.namespace
++    for i in indices:
++        record=prepared.records[int(i)];event=record['event_key'];entity=record.get('entity_key')
++        events.add(digest([namespace,event]));units.add(digest([namespace,entity or event]))
++        retained=getattr(prepared.store,'cg4_source_identities',{}).get(event)
++        if retained is not None:
++            sources=retained
++        else:
++            sources=[]
++            for run in prepared.store.spec.runs:
++                row=prepared.run_records.get(run.id,{}).get(event)
++                if row:sources.append((prepared.files.get(run.source,{}),event,row.get('entity_key')))
++            outcomes=prepared.store.spec.outcomes
++            if outcomes:sources.append((prepared.files.get(outcomes.source,{}),event,entity))
++        for info,key,owner in sources:
++            ee,uu=source_aliases(info,key,owner);events.update(ee);units.update(uu)
++        if int(i)%512==0:prepared.work.check('protected evidence identity aliases')
++    return sorted(events),sorted(units)
+ 
+ 
+ def session_overlap(events,units,family=None,population=None):

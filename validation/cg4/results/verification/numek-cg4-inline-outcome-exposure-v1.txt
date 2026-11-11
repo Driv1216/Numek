@@ -1,0 +1,20 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+___ test_implicit_inline_outcomes_are_tracked_before_later_CG4_confirmation ____
+
+tmp_path = PosixPath('/private/var/folders/cs/c15xvw9d3t53tzcws5yxjxcr0000gn/T/pytest-of-drivyaanshyadav/pytest-465/test_implicit_inline_outcomes_0')
+
+    def test_implicit_inline_outcomes_are_tracked_before_later_CG4_confirmation(tmp_path):
+        spec=binary(tmp_path)
+        inline=replace(spec.evaluation,outcomes=None,runs=(replace(spec.evaluation.runs[0],inline_outcome='y'),))
+        ws=ReliabilityWorkspace.initialize(tmp_path/'workspace',WorkspaceConfig(saving=False,free_disk_bytes=1));ws.evidence_tracking(True)
+        ws._reserve_live_exposure(inline,EvaluationConfig(),(str(tmp_path),),operation='evaluate',request_id='inline-outcome-use')
+        uses=list(ws.catalog.iter_facts('evidence_use'))
+>       assert len(uses)==1 and uses[0]['payload']['kind']=='outcome_disclosure'
+E       assert (0 == 1)
+E        +  where 0 = len([])
+
+tests/cg4/test_live_browser_exposure.py:109: AssertionError
+=========================== short test summary info ============================
+FAILED tests/cg4/test_live_browser_exposure.py::test_implicit_inline_outcomes_are_tracked_before_later_CG4_confirmation
+1 failed in 1.28s

@@ -32,6 +32,7 @@ def schemas():
             props[f.name]=prop
             if f.default is MISSING and f.default_factory is MISSING:required.append(f.name)
         definitions[name]={'type':'object','additionalProperties':False,'properties':props,'required':required}
+    definitions['OutcomeSnapshotSpec']['properties']['status_values']['additionalProperties']={'enum':['final','observed','provisional','invalid','conflicting','pending','withdrawn']}
     definitions['SourceHandle']={'type':'object','additionalProperties':False,'required':['id','handle'],'properties':{'id':{'type':'string'},'handle':{'type':'string'}}}
     transport_spec={**definitions['EvaluationSpec'],'properties':{**definitions['EvaluationSpec']['properties'],'sources':{'type':'array','items':{'$ref':'#/$defs/SourceHandle'}}}}
     definitions['TransportEvaluationSpec']=transport_spec
@@ -56,6 +57,12 @@ def schemas():
     extend(definitions)
     from .history_schema import extend as extend_history
     extend_history(definitions)
+    from .investigation_schema import extend as extend_investigations
+    extend_investigations(definitions)
+    from .policy_schema import extend as extend_policies
+    extend_policies(definitions)
+    from .execution.schema import extend as extend_execution
+    extend_execution(definitions)
     return {'$schema':'https://json-schema.org/draft/2020-12/schema','$id':'confidenceguard.contracts/1.0','$defs':definitions,'$ref':'#/$defs/EvaluationSpec'}
 
 
@@ -103,13 +110,25 @@ def openapi():
         return value
     from .history_schema import paths as history_paths
     paths.update(history_paths())
+    from .investigation_schema import paths as investigation_paths
+    paths.update(investigation_paths())
+    from .policy_schema import paths as policy_paths
+    paths.update(policy_paths())
+    from .execution.schema import paths as execution_paths
+    paths.update(execution_paths())
     return {'openapi':'3.1.0','info':{'title':'ConfidenceGuard local API','version':'1.0.0','description':'Loopback, session-owned transport. No hosted/multi-user service. Response additions are compatible; request fields are strict. Summary and coverage sections return objects; measurements and findings return paginated lists.'},'servers':[{'url':'/api/confidenceguard/v1'}],'paths':paths,'components':{'schemas':references(schemas()['$defs'])}}
 
 
 def capabilities():
     config=c.EvaluationConfig().to_dict();config.pop('scratch_directory')
     from .method_schema import capabilities as method_capabilities
-    return {**method_capabilities(),'history':{'spec_schema':'confidenceguard.longitudinal_spec/1.0','result_schema':'confidenceguard.longitudinal_result/1.0','methodology_id':'longitudinal_reliability_v1','persistence':'opt_in_local','workspace_authorization':'single_use_launch_token','new_inference':['independent_periods','entity_clusters','moving_blocks','paired_rows','paired_clusters']},'api_version':'v1','spec_schema':c.SPEC_SCHEMA,'result_schema':c.RESULT_SCHEMA,'methodology_id':c.METHOD,'tasks':['binary_classification','multiclass_classification','regression'],'formats':['csv']+(['parquet'] if importlib.util.find_spec('pyarrow') else []),'representations':{'binary_classification':['probability','event_ranking_score','hard_decision'],'multiclass_classification':['complete_probabilities','comparable_class_scores','hard_decision'],'regression':['point','supplied_prediction_interval','selection_score']},'job_kinds':['inspect','evaluate','fit','apply','study','export','resolve_evidence'],'limits':config,'disclosure_policies':['conservative_aggregates_v1','exact_aggregates_v1'],'inference':['descriptive','qualified_independent_row_wilson','paired_bca','paired_percentile_ranking','independent_cluster_bootstrap'],'hosting':'local_single_user','decision_defaults':{'without_supplied_decision':'none','argmax_ties':'abstain'},'compatibility':'Strict requests; tolerate additive response fields.'}
+    from .investigation_schema import capabilities as investigation_capabilities
+    value={**method_capabilities(),'policy':__import__('confidenceguard.policy_schema',fromlist=['capabilities']).capabilities(),'investigation':investigation_capabilities(),'history':{'spec_schema':'confidenceguard.longitudinal_spec/1.0','result_schema':'confidenceguard.longitudinal_result/1.0','methodology_id':'longitudinal_reliability_v1','persistence':'opt_in_local','workspace_authorization':'single_use_launch_token','new_inference':['independent_periods','entity_clusters','moving_blocks','paired_rows','paired_clusters']},'api_version':'v1','spec_schema':c.SPEC_SCHEMA,'result_schema':c.RESULT_SCHEMA,'methodology_id':c.METHOD,'tasks':['binary_classification','multiclass_classification','regression'],'formats':['csv']+(['parquet'] if importlib.util.find_spec('pyarrow') else []),'representations':{'binary_classification':['probability','event_ranking_score','hard_decision'],'multiclass_classification':['complete_probabilities','comparable_class_scores','hard_decision'],'regression':['point','supplied_prediction_interval','selection_score']},'job_kinds':['inspect','evaluate','fit','apply','study','export','resolve_evidence','investigation_inspect','investigation_discover','confirmation_inspect','investigation_confirm','investigation_replay','policy_inspect','policy_optimize','policy_replay','policy_preview','policy_assessment_inspect','policy_assess','policy_history','policy_restate','policy_inspect_look','policy_assess_look'],'limits':config,'disclosure_policies':['conservative_aggregates_v1','exact_aggregates_v1'],'inference':['descriptive','qualified_independent_row_wilson','paired_bca','paired_percentile_ranking','independent_cluster_bootstrap'],'hosting':'local_single_user','decision_defaults':{'without_supplied_decision':'none','argmax_ties':'abstain'},'compatibility':'Strict requests; tolerate additive response fields.'}
+
+    from .execution.web import KINDS
+    value['execution']={'spec_schema':'confidenceguard.execution_spec/1.0','predictor_schema':'confidenceguard.predictor_spec/1.0','result_schema':'confidenceguard.execution_result/1.0','devices':['cpu','mps','cuda'],'qualification':'Separate implementation, current-host availability, actual runtime evidence and scientific standing','cuda_unavailable_blocks_completion':False,'storage_catalog_version':2}
+    value['job_kinds']=sorted(set(value['job_kinds'])|KINDS)
+    return value
 
 
 def examples():
@@ -122,4 +141,5 @@ def examples():
     response_examples={k:({'api_version':'v1','data':v} if k!='error' else v) for k,v in responses.items()}
     response_examples['measurement']={'id':'m1','run':'candidate','scope':'overall','family':'performance','metric':'accuracy','population_id':'SYNTHETIC_POPULATION','denominator':100,'value':.75,'value_state':'finite','applicability':'applicable','execution':'completed','basis':'measured','interpretation':'descriptive','method_standing':'established_method','method_version':'1','data':{},'evidence_refs':[]}
     from .method_schema import examples as method_examples
-    return {'label':'Synthetic contract examples, not measured results','evaluations':result,'studies':method_examples(result),'history':{'batch':{'namespace':'prediction-events','outcome_definition_version':'outcome-v1','evaluation':result['binary_classification']['spec'],'bindings':[{'run':'candidate'}]},'longitudinal':{'namespace':'prediction-events','windows':[{'id':'reference','start':'2026-01-01T00:00:00Z','end':'2026-02-01T00:00:00Z'},{'id':'current','start':'2026-02-01T00:00:00Z','end':'2026-03-01T00:00:00Z'}]}},'response_examples':response_examples,'jobs':{'inspect':{'kind':'inspect','evaluation_id':'EVALUATION_ID','revision':1,'client_request_id':'inspect-1'},'evaluate':{'kind':'evaluate','evaluation_id':'EVALUATION_ID','revision':1,'fingerprint':'CONFIRMATION_FINGERPRINT','client_request_id':'evaluate-1'}}}
+    from .investigation_schema import example as investigation_example
+    return {'execution':__import__('confidenceguard.execution.schema',fromlist=['examples']).examples(),'policies':__import__('confidenceguard.policy_schema',fromlist=['examples']).examples(result),'investigation':investigation_example(result['binary_classification']['spec']),'label':'Synthetic contract examples, not measured results','evaluations':result,'studies':method_examples(result),'history':{'batch':{'namespace':'prediction-events','outcome_definition_version':'outcome-v1','evaluation':result['binary_classification']['spec'],'bindings':[{'run':'candidate'}]},'longitudinal':{'namespace':'prediction-events','windows':[{'id':'reference','start':'2026-01-01T00:00:00Z','end':'2026-02-01T00:00:00Z'},{'id':'current','start':'2026-02-01T00:00:00Z','end':'2026-03-01T00:00:00Z'}]}},'response_examples':response_examples,'jobs':{'inspect':{'kind':'inspect','evaluation_id':'EVALUATION_ID','revision':1,'client_request_id':'inspect-1'},'evaluate':{'kind':'evaluate','evaluation_id':'EVALUATION_ID','revision':1,'fingerprint':'CONFIRMATION_FINGERPRINT','client_request_id':'evaluate-1'}}}

@@ -1,0 +1,2277 @@
+{
+  "H_selected_effect_summary": {
+    "count": 120,
+    "maximum": 0.5550678956297609,
+    "median": 0.47945108027294114,
+    "minimum": 0.35407594062419523
+  },
+  "H_unavailable": {
+    "oracle_members": 0,
+    "total": 0
+  },
+  "aggregation_source_sha256": "b0198af985f5ef3d4104b7d916feacc59527242a4b7f5bae3409a5212174d4c2",
+  "anchor_criterion_met": true,
+  "assessment_states": {
+    "confirmed": 118,
+    "inconclusive": 2
+  },
+  "assessment_strengths": {
+    "finite_sample": 120
+  },
+  "objective": "uncertainty_coverage",
+  "protocol": {
+    "assessments": "Authoritative frozen-region H effects measured separately from recovery; intervals remain finite or explicitly approximate and subject to qualification/refusal.",
+    "criterion": {
+      "H_precision": 0.7,
+      "H_recall": 0.7,
+      "minimum_successes_of_40": 32
+    },
+    "development_seed_range": [
+      0,
+      39
+    ],
+    "not_covered": [
+      "Historical-deterioration workspace panel",
+      "Natural-data recovery",
+      "Every registered metric from one representative objective"
+    ],
+    "panels": {
+      "calibration_bins": {
+        "contrast": "Frozen equal-width bin residual magnitude .30 versus zero",
+        "delta": 0.15,
+        "metric": "reliability_diagram"
+      },
+      "calibration_residual": {
+        "contrast": "Signed target residual +.30 versus zero at supplied p=.5",
+        "delta": 0.15,
+        "metric": "calibration_residual"
+      },
+      "false_negative": {
+        "contrast": ".40 versus .10 among actual positives",
+        "delta": 0.15,
+        "metric": "false_negative_rate"
+      },
+      "false_positive": {
+        "contrast": ".40 versus .10 among actual negatives",
+        "delta": 0.15,
+        "metric": "false_positive_rate"
+      },
+      "paired_degradation": {
+        "contrast": "Common-population candidate minus reference error .30 versus zero",
+        "delta": 0.15,
+        "metric": "error_rate"
+      },
+      "precision": {
+        "contrast": ".60 versus .90 among predicted positives",
+        "delta": 0.15,
+        "direction": "lower",
+        "metric": "precision"
+      },
+      "probability_quality": {
+        "contrast": "Brier .33 versus .09; high-confidence error mechanism",
+        "delta": 0.12,
+        "metric": "brier"
+      },
+      "ranking_ap": {
+        "contrast": "Reversed versus correctly ordered noisy scores at balanced label prevalence",
+        "delta": 0.2,
+        "direction": "lower",
+        "metric": "average_precision"
+      },
+      "ranking_auc": {
+        "contrast": "Reversed versus correctly ordered noisy score distributions",
+        "delta": 0.35,
+        "direction": "lower",
+        "metric": "roc_auc"
+      },
+      "regression_bias": {
+        "bounds": [
+          -1.0,
+          2.0
+        ],
+        "contrast": "Signed mean bias .90 versus zero with bounded independent noise",
+        "delta": 0.45,
+        "metric": "bias",
+        "units": "metres"
+      },
+      "regression_tail": {
+        "contrast": "Absolute error >1 metre: .60 versus .01",
+        "delta": 0.25,
+        "metric": "material_error_rate",
+        "units": "fraction"
+      },
+      "uncertainty_coverage": {
+        "contrast": "Prediction-interval miscoverage .60 versus .10",
+        "delta": 0.25,
+        "metric": "interval_miscoverage"
+      },
+      "uncertainty_efficiency": {
+        "bounds": [
+          1.0,
+          5.0
+        ],
+        "contrast": "Issued interval widths 4 versus 2 metres, with unchanged perfect coverage",
+        "delta": 1.0,
+        "metric": "interval_width",
+        "units": "metres"
+      }
+    },
+    "primary": "Positive-native-effect S-selected union evaluated on independent H; unavailable counts stay in planned recall.",
+    "qualification_seed_range": [
+      110000,
+      110039
+    ],
+    "region": "categorical a=1 AND continuous x>.5; expected prevalence .125",
+    "schema_version": "numek.cg4_objective_recovery_protocol/1.0",
+    "strategy_claims": "Unified runs do not qualify every strategy. Separate --strategies ablations retain the same profile and separate evidence.",
+    "units": 40000
+  },
+  "role_medians": {
+    "D": {
+      "IoU": 0.9840637020521315,
+      "precision": 0.998791279489291,
+      "recall": 0.9887070659159516
+    },
+    "H": {
+      "IoU": 0.9847507229456147,
+      "precision": 0.9988479262672811,
+      "recall": 0.9904612090083841
+    },
+    "S": {
+      "IoU": 0.9831999892479931,
+      "precision": 0.9995843724023274,
+      "recall": 0.9891304085741497
+    }
+  },
+  "schema_version": "numek.cg4_objective_anchor_summary/1.0",
+  "scope": "The declared synthetic objective and unified-strategy operating profile only. H measures independently selected frozen gates. Planned membership stays in recovery denominators. Candidate effects overlap and are not independent replicates. No claim for other objectives, individual strategy superiority, external independence verification or milestone completion.",
+  "source_binding_sha256": "0bd1f2032ade1fa5531e21624031a65e5d2d827943f445e244a0e85a852f9a38",
+  "source_identity": "4a9a0d10d38c8fb733e9923b257abb68a0783f775815a009f4cc10b213ab140c",
+  "success_fraction_MC95": [
+    0.9119026971211976,
+    1.0
+  ],
+  "successes": 40,
+  "trials": [
+    {
+      "H_selected_native_effects": [
+        0.4128346738023201,
+        0.47704062113199064,
+        0.48526252180286733
+      ],
+      "assessment_states": [
+        "confirmed",
+        "confirmed",
+        "confirmed"
+      ],
+      "input_sha256": "5abd833c6a8e4cd341ce840076e6e3968d4a3b6e841980be4a843ed0e0e555fc",
+      "path": "validation/cg4/results/objective-continuous-uncertainty-group-v1/uncertainty_coverage/uncertainty_coverage-110000.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.9959216965742251,
+          "false_negative": 0,
+          "false_positive": 10,
+          "planned": 20068,
+          "precision": 0.9959216965742251,
+          "recall": 1.0,
+          "true_positive": 2442,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9976359338061466,
+          "false_negative": 0,
+          "false_positive": 3,
+          "planned": 10087,
+          "precision": 0.9976359338061466,
+          "recall": 1.0,
+          "true_positive": 1266,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9982905982905983,
+          "false_negative": 0,
+          "false_positive": 2,
+          "planned": 9845,
+          "precision": 0.9982905982905983,
+          "recall": 1.0,
+          "true_positive": 1168,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 492.6526692500338,
+      "seed": 110000,
+      "sha256": "2a44b2ccdaa82895a41f721bf2e80ead7d795fe6d0d483b6c097ec11b3b506ba",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.447382354990285,
+        0.43667341796826575,
+        0.48830806578929686,
+        0.4832397850594542
+      ],
+      "assessment_states": [
+        "confirmed",
+        "confirmed",
+        "confirmed",
+        "confirmed"
+      ],
+      "input_sha256": "4365f273e30798f78264a43ff199e006473984c66d24da9c015e65e83b4f51fc",
+      "path": "validation/cg4/results/objective-continuous-uncertainty-group-v1/uncertainty_coverage/uncertainty_coverage-110001.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.981876761981474,
+          "false_negative": 28,
+          "false_positive": 17,
+          "planned": 19812,
+          "precision": 0.9930753564154786,
+          "recall": 0.9886455798864558,
+          "true_positive": 2438,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9851909586905689,
+          "false_negative": 9,
+          "false_positive": 10,
+          "planned": 10067,
+          "precision": 0.9921507064364207,
+          "recall": 0.992930086410055,
+          "true_positive": 1264,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9831865492393915,
+          "false_negative": 11,
+          "false_positive": 10,
+          "planned": 10121,
+          "precision": 0.9919224555735057,
+          "recall": 0.9911218724778047,
+          "true_positive": 1228,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 489.00137937499676,
+      "seed": 110001,
+      "sha256": "eac5e25858fb4b03a9aebf1d4906de023e84457753c192127695d416fbe57016",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.4755051343258284,
+        0.4739255642562499
+      ],
+      "assessment_states": [
+        "confirmed",
+        "confirmed"
+      ],
+      "input_sha256": "7b65e38d00951328dc58757d52adc43cdb4eec50777adc44a43f05d91f70f709",
+      "path": "validation/cg4/results/objective-continuous-uncertainty-group-v1/uncertainty_coverage/uncertainty_coverage-110002.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.984789391575663,
+          "false_negative": 39,
+          "false_positive": 0,
+          "planned": 20132,
+          "precision": 1.0,
+          "recall": 0.984789391575663,
+          "true_positive": 2525,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.986088379705401,
+          "false_negative": 17,
+          "false_positive": 0,
+          "planned": 9903,
+          "precision": 1.0,
+          "recall": 0.986088379705401,
+          "true_positive": 1205,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9824980111376292,
+          "false_negative": 22,
+          "false_positive": 0,
+          "planned": 9965,
+          "precision": 1.0,
+          "recall": 0.9824980111376292,
+          "true_positive": 1235,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 486.8859777500038,
+      "seed": 110002,
+      "sha256": "591562389aa82052ca5723e3f87079e86cd890586ae6bcb99deda1532a0f052e",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.4745015563861362,
+        0.48753070801502163,
+        0.48299064203052744
+      ],
+      "assessment_states": [
+        "confirmed",
+        "confirmed",
+        "confirmed"
+      ],
+      "input_sha256": "04d015bc6fb4b38435cc12f5eddcae15e9f85c5fa84f8c81b16b9e122e9250a9",
+      "path": "validation/cg4/results/objective-continuous-uncertainty-group-v1/uncertainty_coverage/uncertainty_coverage-110003.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.9888888888888889,
+          "false_negative": 0,
+          "false_positive": 28,
+          "planned": 20018,
+          "precision": 0.9888888888888889,
+          "recall": 1.0,
+          "true_positive": 2492,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9887550200803212,
+          "false_negative": 0,
+          "false_positive": 14,
+          "planned": 9856,
+          "precision": 0.9887550200803212,
+          "recall": 1.0,
+          "true_positive": 1231,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9854294478527608,
+          "false_negative": 0,
+          "false_positive": 19,
+          "planned": 10126,
+          "precision": 0.9854294478527608,
+          "recall": 1.0,
+          "true_positive": 1285,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 496.89442270901054,
+      "seed": 110003,
+      "sha256": "1e598a1d7efaf8d9cee8a5c35e2c2d7add7b15be7d56255b3c9c7d56db3cfeb7",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.42443274015213184,
+        0.47126309025335666,
+        0.4858720989766232,
+        0.49806878385177733,
+        0.4969130660379182
+      ],
+      "assessment_states": [
+        "confirmed",
+        "confirmed",
+        "confirmed",
+        "confirmed",
+        "confirmed"
+      ],
+      "input_sha256": "f9883a36b039261380e8edda1d7d4c9f9d302068650965dedda70d328c7b9ce2",
+      "path": "validation/cg4/results/objective-continuous-uncertainty-group-v1/uncertainty_coverage/uncertainty_coverage-110004.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.9968316831683168,
+          "false_negative": 8,
+          "false_positive": 0,
+          "planned": 20044,
+          "precision": 1.0,
+          "recall": 0.9968316831683168,
+          "true_positive": 2517,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9984313725490196,
+          "false_negative": 2,
+          "false_positive": 0,
+          "planned": 10010,
+          "precision": 1.0,
+          "recall": 0.9984313725490196,
+          "true_positive": 1273,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9992025518341308,
+          "false_negative": 1,
+          "false_positive": 0,
+          "planned": 9946,
+          "precision": 1.0,
+          "recall": 0.9992025518341308,
+          "true_positive": 1253,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 502.17949412495364,
+      "seed": 110004,
+      "sha256": "546e94f9bfdbb0da506e705f5209594fda2a22ff06f1732f10734608a2c3e61d",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.5139913742308228
+      ],
+      "assessment_states": [
+        "confirmed"
+      ],
+      "input_sha256": "64ed2188719d146e074651d4c7af4415060de8f57be87e063940cb509404090e",
+      "path": "validation/cg4/results/objective-continuous-uncertainty-group-v1/uncertainty_coverage/uncertainty_coverage-110005.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.9912871287128713,
+          "false_negative": 22,
+          "false_positive": 0,
+          "planned": 20039,
+          "precision": 1.0,
+          "recall": 0.9912871287128713,
+          "true_positive": 2503,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9958915365653246,
+          "false_negative": 5,
+          "false_positive": 0,
+          "planned": 10045,
+          "precision": 1.0,
+          "recall": 0.9958915365653246,
+          "true_positive": 1212,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9891472868217054,
+          "false_negative": 14,
+          "false_positive": 0,
+          "planned": 9916,
+          "precision": 1.0,
+          "recall": 0.9891472868217054,
+          "true_positive": 1276,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 475.04407170799095,
+      "seed": 110005,
+      "sha256": "0b46c6199b265f5dac8a89c47e9a9648f3bd7463b4d8167218b836c49f7c8402",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.4917616510348931,
+        0.4698897248552999
+      ],
+      "assessment_states": [
+        "confirmed",
+        "confirmed"
+      ],
+      "input_sha256": "1240f8c0a02714f96774499dcf8330c924627ca0a8b14f6d33f3cea9a543759e",
+      "path": "validation/cg4/results/objective-continuous-uncertainty-group-v1/uncertainty_coverage/uncertainty_coverage-110006.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.9988090512107979,
+          "false_negative": 0,
+          "false_positive": 3,
+          "planned": 19847,
+          "precision": 0.9988090512107979,
+          "recall": 1.0,
+          "true_positive": 2516,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9967105263157895,
+          "false_negative": 0,
+          "false_positive": 4,
+          "planned": 9985,
+          "precision": 0.9967105263157895,
+          "recall": 1.0,
+          "true_positive": 1212,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9967948717948718,
+          "false_negative": 0,
+          "false_positive": 4,
+          "planned": 10168,
+          "precision": 0.9967948717948718,
+          "recall": 1.0,
+          "true_positive": 1244,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 478.4725365000195,
+      "seed": 110006,
+      "sha256": "8614206676ecb6941e37198e1b017af85f45b8ea832452957583421ddb45e120",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.4395287393508034,
+        0.4349145205077408,
+        0.43529931023675383,
+        0.4567104843026645,
+        0.46095495274818277,
+        0.4643135612798891,
+        0.46464996850852447
+      ],
+      "assessment_states": [
+        "confirmed",
+        "confirmed",
+        "confirmed",
+        "confirmed",
+        "confirmed",
+        "confirmed",
+        "confirmed"
+      ],
+      "input_sha256": "a92935d84774543fe33afb04e742fbef5764cc34555f47539b27e312119e29a3",
+      "path": "validation/cg4/results/objective-continuous-uncertainty-group-v1/uncertainty_coverage/uncertainty_coverage-110007.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.9799679487179487,
+          "false_negative": 0,
+          "false_positive": 50,
+          "planned": 20117,
+          "precision": 0.9799679487179487,
+          "recall": 1.0,
+          "true_positive": 2446,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9618745035742653,
+          "false_negative": 0,
+          "false_positive": 48,
+          "planned": 9889,
+          "precision": 0.9618745035742653,
+          "recall": 1.0,
+          "true_positive": 1211,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9771112865035517,
+          "false_negative": 0,
+          "false_positive": 29,
+          "planned": 9994,
+          "precision": 0.9771112865035517,
+          "recall": 1.0,
+          "true_positive": 1238,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 478.07725762500195,
+      "seed": 110007,
+      "sha256": "e09c35e3fdd0a7257b8aaeb4e94a325178eb9fb7da9353bcfa2d15de19875d1d",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.35407594062419523,
+        0.4572939721820094,
+        0.4883679378249365,
+        0.4705513059501617,
+        0.47161953910295595,
+        0.47434324436769426
+      ],
+      "assessment_states": [
+        "inconclusive",
+        "confirmed",
+        "confirmed",
+        "confirmed",
+        "confirmed",
+        "confirmed"
+      ],
+      "input_sha256": "3200725a3a243699d582cef5e86658a7cbf7bcaebd36091db7a67469d17b2a62",
+      "path": "validation/cg4/results/objective-continuous-uncertainty-group-v1/uncertainty_coverage/uncertainty_coverage-110008.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.9734939759036144,
+          "false_negative": 37,
+          "false_positive": 29,
+          "planned": 19975,
+          "precision": 0.9881777415409703,
+          "recall": 0.9849654611946363,
+          "true_positive": 2424,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9760330578512396,
+          "false_negative": 19,
+          "false_positive": 10,
+          "planned": 9973,
+          "precision": 0.9916036943744753,
+          "recall": 0.9841666666666666,
+          "true_positive": 1181,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9746932515337423,
+          "false_negative": 23,
+          "false_positive": 10,
+          "planned": 10052,
+          "precision": 0.9921935987509758,
+          "recall": 0.982225656877898,
+          "true_positive": 1271,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 521.9075000829762,
+      "seed": 110008,
+      "sha256": "6b655d89d9258a4d0621c3398bcf10784ee548aa581237a962dce9374fce46fd",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.40311280201590993,
+        0.44968448261946325,
+        0.45735502342848866,
+        0.4753411200480352,
+        0.5006497929901195
+      ],
+      "assessment_states": [
+        "confirmed",
+        "confirmed",
+        "confirmed",
+        "confirmed",
+        "confirmed"
+      ],
+      "input_sha256": "7b6324dbcba29f5665837c2b5955ea494969f681b4efc08bc27f4167c9d5bd38",
+      "path": "validation/cg4/results/objective-continuous-uncertainty-group-v1/uncertainty_coverage/uncertainty_coverage-110009.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.9804957334416904,
+          "false_negative": 45,
+          "false_positive": 3,
+          "planned": 19893,
+          "precision": 0.9987582781456954,
+          "recall": 0.9816924328722538,
+          "true_positive": 2413,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9766917293233083,
+          "false_negative": 28,
+          "false_positive": 3,
+          "planned": 10031,
+          "precision": 0.9976958525345622,
+          "recall": 0.9788997739261492,
+          "true_positive": 1299,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9804241435562806,
+          "false_negative": 23,
+          "false_positive": 1,
+          "planned": 10076,
+          "precision": 0.999168744804655,
+          "recall": 0.9812244897959184,
+          "true_positive": 1202,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 461.05175479198806,
+      "seed": 110009,
+      "sha256": "adc8cc7a1555fc32d4d8610f931c449c1b57df288d293f4f03b9e77a05f05c03",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.46988315893596333,
+        0.4757450022923293
+      ],
+      "assessment_states": [
+        "confirmed",
+        "confirmed"
+      ],
+      "input_sha256": "f3691084203bbab631bfc30151008711fc85ab33e65a74b78659cc12aef16290",
+      "path": "validation/cg4/results/objective-continuous-uncertainty-group-v1/uncertainty_coverage/uncertainty_coverage-110010.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.9831663326653307,
+          "false_negative": 41,
+          "false_positive": 1,
+          "planned": 19853,
+          "precision": 0.9995925020374898,
+          "recall": 0.9835605453087409,
+          "true_positive": 2453,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9838579499596449,
+          "false_negative": 20,
+          "false_positive": 0,
+          "planned": 10144,
+          "precision": 1.0,
+          "recall": 0.9838579499596449,
+          "true_positive": 1219,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9832134292565947,
+          "false_negative": 21,
+          "false_positive": 0,
+          "planned": 10003,
+          "precision": 1.0,
+          "recall": 0.9832134292565947,
+          "true_positive": 1230,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 411.8397125409683,
+      "seed": 110010,
+      "sha256": "ff9a0775553bf43b515dd8065937eee2bf376abd26e9184ca8d85308c1ea5adf",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.45253428859303246,
+        0.493966506615939,
+        0.49740513670256825
+      ],
+      "assessment_states": [
+        "confirmed",
+        "confirmed",
+        "confirmed"
+      ],
+      "input_sha256": "339754d5be558898fc47f9bba72f6cbf56e5508d7043dd9fbf7004512b352fd2",
+      "path": "validation/cg4/results/objective-continuous-uncertainty-group-v1/uncertainty_coverage/uncertainty_coverage-110011.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.9811937857726901,
+          "false_negative": 8,
+          "false_positive": 38,
+          "planned": 19904,
+          "precision": 0.9844134536505332,
+          "recall": 0.9966777408637874,
+          "true_positive": 2400,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9863891112890312,
+          "false_negative": 0,
+          "false_positive": 17,
+          "planned": 10082,
+          "precision": 0.9863891112890312,
+          "recall": 1.0,
+          "true_positive": 1232,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9790322580645161,
+          "false_negative": 3,
+          "false_positive": 23,
+          "planned": 10014,
+          "precision": 0.9814066289409863,
+          "recall": 0.9975349219391948,
+          "true_positive": 1214,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 399.7048854579916,
+      "seed": 110011,
+      "sha256": "69588cf60ddbc8e3f3ac82725687eb231e3e50fdccaa0586a53c8fb778989c2a",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.5023919926304952,
+        0.4833505746294283
+      ],
+      "assessment_states": [
+        "confirmed",
+        "confirmed"
+      ],
+      "input_sha256": "71d0ff944d14a5202fab02fdbb050265162a33da8ab98bc57e20a346467d4ced",
+      "path": "validation/cg4/results/objective-continuous-uncertainty-group-v1/uncertainty_coverage/uncertainty_coverage-110012.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.9836132732486685,
+          "false_negative": 0,
+          "false_positive": 40,
+          "planned": 19814,
+          "precision": 0.9836132732486685,
+          "recall": 1.0,
+          "true_positive": 2401,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9828259172521467,
+          "false_negative": 0,
+          "false_positive": 22,
+          "planned": 10015,
+          "precision": 0.9828259172521467,
+          "recall": 1.0,
+          "true_positive": 1259,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9812938425565082,
+          "false_negative": 0,
+          "false_positive": 24,
+          "planned": 10171,
+          "precision": 0.9812938425565082,
+          "recall": 1.0,
+          "true_positive": 1259,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 381.96028749999823,
+      "seed": 110012,
+      "sha256": "16a2c0548b8ff5da3486b710a6a59f047c369c8b95f26e9be1d9b9c21f24150b",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.41313482644850696,
+        0.5099745489892207,
+        0.500791859614818,
+        0.5094894294194583
+      ],
+      "assessment_states": [
+        "confirmed",
+        "confirmed",
+        "confirmed",
+        "confirmed"
+      ],
+      "input_sha256": "f7cf1f740485eb60480ee74ff314d5ed973650c14bde2b9ab7d93d011aebd8ab",
+      "path": "validation/cg4/results/objective-continuous-uncertainty-group-v1/uncertainty_coverage/uncertainty_coverage-110013.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.9665032679738562,
+          "false_negative": 21,
+          "false_positive": 61,
+          "planned": 19845,
+          "precision": 0.9748660898228265,
+          "recall": 0.9912023460410557,
+          "true_positive": 2366,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9740853658536586,
+          "false_negative": 8,
+          "false_positive": 26,
+          "planned": 9997,
+          "precision": 0.9800613496932515,
+          "recall": 0.9937791601866252,
+          "true_positive": 1278,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9659810126582279,
+          "false_negative": 11,
+          "false_positive": 32,
+          "planned": 10158,
+          "precision": 0.9744612928970471,
+          "recall": 0.9910714285714286,
+          "true_positive": 1221,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 405.5798396250466,
+      "seed": 110013,
+      "sha256": "2e5eaa781ab045e466d75bc9d4729431ffa62a42e4a51db09f3cca497ab30f38",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.5154961106929061
+      ],
+      "assessment_states": [
+        "confirmed"
+      ],
+      "input_sha256": "9c2078e334595d3101d1ba2b6db67d3d730df697a5685783406e01c60ff85ed6",
+      "path": "validation/cg4/results/objective-continuous-uncertainty-group-v1/uncertainty_coverage/uncertainty_coverage-110014.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.9976,
+          "false_negative": 6,
+          "false_positive": 0,
+          "planned": 20001,
+          "precision": 1.0,
+          "recall": 0.9976,
+          "true_positive": 2494,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 1.0,
+          "false_negative": 0,
+          "false_positive": 0,
+          "planned": 10027,
+          "precision": 1.0,
+          "recall": 1.0,
+          "true_positive": 1275,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9968847352024922,
+          "false_negative": 4,
+          "false_positive": 0,
+          "planned": 9972,
+          "precision": 1.0,
+          "recall": 0.9968847352024922,
+          "true_positive": 1280,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 435.16218904196285,
+      "seed": 110014,
+      "sha256": "2c7a4dfc4394aaf7f894f9fb6ce9b7edee31df1bd4b1bcad19029f2d80bec5bc",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.4707431882252565,
+        0.4844446724309248,
+        0.5159100527978665
+      ],
+      "assessment_states": [
+        "confirmed",
+        "confirmed",
+        "confirmed"
+      ],
+      "input_sha256": "5dacfa6924f2f86fbfae5d0791b4c8f85b6f2abd9f57e2674b3bb50da843b67e",
+      "path": "validation/cg4/results/objective-continuous-uncertainty-group-v1/uncertainty_coverage/uncertainty_coverage-110015.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.9871294851794071,
+          "false_negative": 33,
+          "false_positive": 0,
+          "planned": 19798,
+          "precision": 1.0,
+          "recall": 0.9871294851794071,
+          "true_positive": 2531,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9809674861221253,
+          "false_negative": 24,
+          "false_positive": 0,
+          "planned": 9968,
+          "precision": 1.0,
+          "recall": 0.9809674861221253,
+          "true_positive": 1237,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9874312647289867,
+          "false_negative": 16,
+          "false_positive": 0,
+          "planned": 10234,
+          "precision": 1.0,
+          "recall": 0.9874312647289867,
+          "true_positive": 1257,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 625.9758342499845,
+      "seed": 110015,
+      "sha256": "8de14ce763feddcfb7e62ce267483d654ea645e1e913b557ee225b1a969ad749",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.4729194361384025,
+        0.47052583549866045,
+        0.46428378813950777,
+        0.4952438189838264
+      ],
+      "assessment_states": [
+        "confirmed",
+        "confirmed",
+        "confirmed",
+        "confirmed"
+      ],
+      "input_sha256": "fb8d5d56cf747966869c75c224c2efb5d587af7406fc2d25c25cde7ab47ee8b2",
+      "path": "validation/cg4/results/objective-continuous-uncertainty-group-v1/uncertainty_coverage/uncertainty_coverage-110016.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.986,
+          "false_negative": 28,
+          "false_positive": 7,
+          "planned": 20063,
+          "precision": 0.997168284789644,
+          "recall": 0.9887685519454472,
+          "true_positive": 2465,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9843104872006606,
+          "false_negative": 11,
+          "false_positive": 8,
+          "planned": 9989,
+          "precision": 0.9933333333333333,
+          "recall": 0.9908561928512053,
+          "true_positive": 1192,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9809069212410502,
+          "false_negative": 14,
+          "false_positive": 10,
+          "planned": 9948,
+          "precision": 0.9919549477071601,
+          "recall": 0.9887730553327987,
+          "true_positive": 1233,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 633.9116359999753,
+      "seed": 110016,
+      "sha256": "d170a687e08a18f21b74ac915eb1c48a1187a2642a7d86f336b24e59b4d31b40",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.4487592445196167,
+        0.3950017080645998,
+        0.4230253816594953,
+        0.4796829415954028
+      ],
+      "assessment_states": [
+        "confirmed",
+        "confirmed",
+        "confirmed",
+        "confirmed"
+      ],
+      "input_sha256": "b5ebf566ec18a4251b5d89108be9ab7e1321a4b1ecfc8fc6541e141aaf87eb7a",
+      "path": "validation/cg4/results/objective-continuous-uncertainty-group-v1/uncertainty_coverage/uncertainty_coverage-110017.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.9811472121941436,
+          "false_negative": 47,
+          "false_positive": 0,
+          "planned": 19994,
+          "precision": 1.0,
+          "recall": 0.9811472121941436,
+          "true_positive": 2446,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9856573705179282,
+          "false_negative": 18,
+          "false_positive": 0,
+          "planned": 10147,
+          "precision": 1.0,
+          "recall": 0.9856573705179282,
+          "true_positive": 1237,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9816053511705686,
+          "false_negative": 22,
+          "false_positive": 0,
+          "planned": 9859,
+          "precision": 1.0,
+          "recall": 0.9816053511705686,
+          "true_positive": 1174,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 669.0390498329652,
+      "seed": 110017,
+      "sha256": "a670e707e08c2f04927b4ffbd01b18be909e4dc191e730a2dc5edd6e08838643",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.40701935025741165,
+        0.4946189491311609
+      ],
+      "assessment_states": [
+        "confirmed",
+        "confirmed"
+      ],
+      "input_sha256": "f5ae83cb0121429ecc822799af22dc99c3e9e789d2173a1ff287572a812ab6e2",
+      "path": "validation/cg4/results/objective-continuous-uncertainty-group-v1/uncertainty_coverage/uncertainty_coverage-110018.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.9801823226317875,
+          "false_negative": 50,
+          "false_positive": 0,
+          "planned": 20097,
+          "precision": 1.0,
+          "recall": 0.9801823226317875,
+          "true_positive": 2473,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9834384858044164,
+          "false_negative": 21,
+          "false_positive": 0,
+          "planned": 9911,
+          "precision": 1.0,
+          "recall": 0.9834384858044164,
+          "true_positive": 1247,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9831865492393915,
+          "false_negative": 21,
+          "false_positive": 0,
+          "planned": 9992,
+          "precision": 1.0,
+          "recall": 0.9831865492393915,
+          "true_positive": 1228,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 627.0885424169828,
+      "seed": 110018,
+      "sha256": "ff8f150ea78a6341381df61b97ae5ffeaf6cf18fe40573f9890314efdfdfbf33",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.4356224638219248,
+        0.5164290474504151,
+        0.5130555326532886
+      ],
+      "assessment_states": [
+        "confirmed",
+        "confirmed",
+        "confirmed"
+      ],
+      "input_sha256": "1257012247039e0ec3c477ec5af0b62b1e5dbef517eb9460bc5a6a0084c26819",
+      "path": "validation/cg4/results/objective-continuous-uncertainty-group-v1/uncertainty_coverage/uncertainty_coverage-110019.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.9992094861660079,
+          "false_negative": 0,
+          "false_positive": 2,
+          "planned": 20045,
+          "precision": 0.9992094861660079,
+          "recall": 1.0,
+          "true_positive": 2528,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 1.0,
+          "false_negative": 0,
+          "false_positive": 0,
+          "planned": 9977,
+          "precision": 1.0,
+          "recall": 1.0,
+          "true_positive": 1267,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 1.0,
+          "false_negative": 0,
+          "false_positive": 0,
+          "planned": 9978,
+          "precision": 1.0,
+          "recall": 1.0,
+          "true_positive": 1197,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 387.2495632079663,
+      "seed": 110019,
+      "sha256": "85e9508fdcaf6df069d3ab447b370cd0626aea8fe68aa3add57b2cb9de5fd1e5",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.4161820826272784,
+        0.485463062373955
+      ],
+      "assessment_states": [
+        "confirmed",
+        "confirmed"
+      ],
+      "input_sha256": "fe7d14a0b512a0401cd3ceccaf5bb75bdf72b61bb53afb0c76802adc59f6167d",
+      "path": "validation/cg4/results/objective-continuous-uncertainty-group-v1/uncertainty_coverage/uncertainty_coverage-110020.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.9845141308555942,
+          "false_negative": 40,
+          "false_positive": 0,
+          "planned": 20169,
+          "precision": 1.0,
+          "recall": 0.9845141308555942,
+          "true_positive": 2543,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9788789601949635,
+          "false_negative": 26,
+          "false_positive": 0,
+          "planned": 9887,
+          "precision": 1.0,
+          "recall": 0.9788789601949635,
+          "true_positive": 1205,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9839615076182838,
+          "false_negative": 20,
+          "false_positive": 0,
+          "planned": 9944,
+          "precision": 1.0,
+          "recall": 0.9839615076182838,
+          "true_positive": 1227,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 395.31384733296,
+      "seed": 110020,
+      "sha256": "bbfe1dbd5e0dfab5fcbed990f3a38d2bf5b6b891b6024e7f037acd87f674554d",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.44189100730505193,
+        0.496319560688125,
+        0.4970806383656339
+      ],
+      "assessment_states": [
+        "confirmed",
+        "confirmed",
+        "confirmed"
+      ],
+      "input_sha256": "716df3fd4e8c51ea3aa17f35af41dfdd9dbf5b0871a020e2e3d02e3648d0e16d",
+      "path": "validation/cg4/results/objective-continuous-uncertainty-group-v1/uncertainty_coverage/uncertainty_coverage-110021.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.9995906672124437,
+          "false_negative": 1,
+          "false_positive": 0,
+          "planned": 20080,
+          "precision": 1.0,
+          "recall": 0.9995906672124437,
+          "true_positive": 2442,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9984214680347278,
+          "false_negative": 2,
+          "false_positive": 0,
+          "planned": 10027,
+          "precision": 1.0,
+          "recall": 0.9984214680347278,
+          "true_positive": 1265,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 1.0,
+          "false_negative": 0,
+          "false_positive": 0,
+          "planned": 9893,
+          "precision": 1.0,
+          "recall": 1.0,
+          "true_positive": 1220,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 405.8668857910088,
+      "seed": 110021,
+      "sha256": "c44975e88a81f7a5c7d78e410f6ee6bd4be1c577717bf30c01b872da3a1324ce",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.49883961326872817,
+        0.4853080098834087
+      ],
+      "assessment_states": [
+        "confirmed",
+        "confirmed"
+      ],
+      "input_sha256": "71198403e784f8ebaa11580bf4b88dcb3f6b662937e9fd90c706350156e6c515",
+      "path": "validation/cg4/results/objective-continuous-uncertainty-group-v1/uncertainty_coverage/uncertainty_coverage-110022.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.9801652892561984,
+          "false_negative": 30,
+          "false_positive": 18,
+          "planned": 19886,
+          "precision": 0.9924686192468619,
+          "recall": 0.9875104079933389,
+          "true_positive": 2372,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.975,
+          "false_negative": 20,
+          "false_positive": 11,
+          "planned": 10062,
+          "precision": 0.990983606557377,
+          "recall": 0.983726606997559,
+          "true_positive": 1209,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9825396825396825,
+          "false_negative": 18,
+          "false_positive": 4,
+          "planned": 10052,
+          "precision": 0.9967793880837359,
+          "recall": 0.9856687898089171,
+          "true_positive": 1238,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 425.66491345805116,
+      "seed": 110022,
+      "sha256": "de587bed1ef9d9ea65e9a29b040e960c0201be46137baedc3e8506b29928b343",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.4403491435106258,
+        0.4487866452859669,
+        0.4611862201606516,
+        0.46530990933498095,
+        0.46990420788211684,
+        0.4724217033132505
+      ],
+      "assessment_states": [
+        "confirmed",
+        "confirmed",
+        "confirmed",
+        "confirmed",
+        "confirmed",
+        "confirmed"
+      ],
+      "input_sha256": "6b1af3994cec114542937db6472733dbf4866b5576fe1a1329a6efb06b167ec3",
+      "path": "validation/cg4/results/objective-continuous-uncertainty-group-v1/uncertainty_coverage/uncertainty_coverage-110023.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.9794022617124394,
+          "false_negative": 42,
+          "false_positive": 9,
+          "planned": 20135,
+          "precision": 0.9963023829087921,
+          "recall": 0.9829752736116741,
+          "true_positive": 2425,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9798136645962733,
+          "false_negative": 21,
+          "false_positive": 5,
+          "planned": 9879,
+          "precision": 0.9960536700868192,
+          "recall": 0.9836321122369447,
+          "true_positive": 1262,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.975,
+          "false_negative": 27,
+          "false_positive": 3,
+          "planned": 9986,
+          "precision": 0.9974424552429667,
+          "recall": 0.9774436090225563,
+          "true_positive": 1170,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 427.26842054200824,
+      "seed": 110023,
+      "sha256": "4db650c18f29d29e63f1b003dd1dcd73f0230b30442e00f73ec7d21bdf22d963",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.4902528409544421
+      ],
+      "assessment_states": [
+        "confirmed"
+      ],
+      "input_sha256": "ad3ab6a1f29f53e04e35342bd13d045ad2e4a7426aa5810c4fe92cb83806080d",
+      "path": "validation/cg4/results/objective-continuous-uncertainty-group-v1/uncertainty_coverage/uncertainty_coverage-110024.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.971240755957272,
+          "false_negative": 41,
+          "false_positive": 29,
+          "planned": 20024,
+          "precision": 0.987881320518178,
+          "recall": 0.982952182952183,
+          "true_positive": 2364,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.970889063729347,
+          "false_negative": 16,
+          "false_positive": 21,
+          "planned": 9990,
+          "precision": 0.9832669322709163,
+          "recall": 0.9872,
+          "true_positive": 1234,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9727838258164853,
+          "false_negative": 18,
+          "false_positive": 17,
+          "planned": 9986,
+          "precision": 0.9865930599369085,
+          "recall": 0.9858156028368794,
+          "true_positive": 1251,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 390.10185208398616,
+      "seed": 110024,
+      "sha256": "0708f36e6f39f295bcf804e4e56fe61eb97e6a43553f4c54c53cd9e74562ec1f",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.4970198474423472
+      ],
+      "assessment_states": [
+        "confirmed"
+      ],
+      "input_sha256": "4ca0ada4487b4887adb903a7c8e9b59640ed864f27c694dee5b6f01be0b128bc",
+      "path": "validation/cg4/results/objective-continuous-uncertainty-group-v1/uncertainty_coverage/uncertainty_coverage-110025.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.9799438427597272,
+          "false_negative": 47,
+          "false_positive": 3,
+          "planned": 19905,
+          "precision": 0.9987735077677842,
+          "recall": 0.9811244979919679,
+          "true_positive": 2443,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9838056680161943,
+          "false_negative": 20,
+          "false_positive": 0,
+          "planned": 10025,
+          "precision": 1.0,
+          "recall": 0.9838056680161943,
+          "true_positive": 1215,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9891135303265941,
+          "false_negative": 14,
+          "false_positive": 0,
+          "planned": 10070,
+          "precision": 1.0,
+          "recall": 0.9891135303265941,
+          "true_positive": 1272,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 446.34748595795827,
+      "seed": 110025,
+      "sha256": "0aeb33ecc208ad6265b28ab0e86b4e3f64a4a8459a0e4136082fa3c20638c74f",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.5006516717325228,
+        0.5053842229332568
+      ],
+      "assessment_states": [
+        "confirmed",
+        "confirmed"
+      ],
+      "input_sha256": "d89c1ca9aa1a72fd9ebbf02c86323474c199f387c2451d0bbff57c2b1e319d61",
+      "path": "validation/cg4/results/objective-continuous-uncertainty-group-v1/uncertainty_coverage/uncertainty_coverage-110026.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.9896784438269154,
+          "false_negative": 26,
+          "false_positive": 0,
+          "planned": 20127,
+          "precision": 1.0,
+          "recall": 0.9896784438269154,
+          "true_positive": 2493,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9880668257756563,
+          "false_negative": 15,
+          "false_positive": 0,
+          "planned": 9925,
+          "precision": 1.0,
+          "recall": 0.9880668257756563,
+          "true_positive": 1242,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9884105960264901,
+          "false_negative": 14,
+          "false_positive": 0,
+          "planned": 9948,
+          "precision": 1.0,
+          "recall": 0.9884105960264901,
+          "true_positive": 1194,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 440.0401662499644,
+      "seed": 110026,
+      "sha256": "8a35d7390eb297b667892814dac9bb5bd21039f34f38123eecc04aa42dc38dd8",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.48266217823195745,
+        0.48402449200204656
+      ],
+      "assessment_states": [
+        "confirmed",
+        "confirmed"
+      ],
+      "input_sha256": "0d2f0c1a7dc25c0227f898eb9b3abbdfd33fcdddb2638973abe3da97e025c672",
+      "path": "validation/cg4/results/objective-continuous-uncertainty-group-v1/uncertainty_coverage/uncertainty_coverage-110027.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.9845910707230344,
+          "false_negative": 39,
+          "false_positive": 0,
+          "planned": 19936,
+          "precision": 1.0,
+          "recall": 0.9845910707230344,
+          "true_positive": 2492,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9826635145784082,
+          "false_negative": 22,
+          "false_positive": 0,
+          "planned": 10074,
+          "precision": 1.0,
+          "recall": 0.9826635145784082,
+          "true_positive": 1247,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9828850855745721,
+          "false_negative": 21,
+          "false_positive": 0,
+          "planned": 9990,
+          "precision": 1.0,
+          "recall": 0.9828850855745721,
+          "true_positive": 1206,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 492.8796047089854,
+      "seed": 110027,
+      "sha256": "507d88e14e41ab1ac807e49eda13cf4fab2a5fba6b2b72c21f8a52d5db0f5ce3",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.4978127368395012,
+        0.4990022513551259
+      ],
+      "assessment_states": [
+        "confirmed",
+        "confirmed"
+      ],
+      "input_sha256": "0b9039853bd49c6f20c2f6987cd837654c92ae3febc27eddbc1e4bc7bf159dd4",
+      "path": "validation/cg4/results/objective-continuous-uncertainty-group-v1/uncertainty_coverage/uncertainty_coverage-110028.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.9941905499612703,
+          "false_negative": 15,
+          "false_positive": 0,
+          "planned": 20103,
+          "precision": 1.0,
+          "recall": 0.9941905499612703,
+          "true_positive": 2567,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9945904173106646,
+          "false_negative": 7,
+          "false_positive": 0,
+          "planned": 10106,
+          "precision": 1.0,
+          "recall": 0.9945904173106646,
+          "true_positive": 1287,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9926047658175843,
+          "false_negative": 9,
+          "false_positive": 0,
+          "planned": 9791,
+          "precision": 1.0,
+          "recall": 0.9926047658175843,
+          "true_positive": 1208,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 471.729424707999,
+      "seed": 110028,
+      "sha256": "268901134deb468148b22ffce0949279ef9827b3585385709be707b303d73e44",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.4705668773486168,
+        0.4756727509020159
+      ],
+      "assessment_states": [
+        "confirmed",
+        "confirmed"
+      ],
+      "input_sha256": "a77be005ea498124edac4e3f48028db1117acfb345c199a110db484ab1cdcaba",
+      "path": "validation/cg4/results/objective-continuous-uncertainty-group-v1/uncertainty_coverage/uncertainty_coverage-110029.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.9924060751398881,
+          "false_negative": 0,
+          "false_positive": 19,
+          "planned": 20060,
+          "precision": 0.9924060751398881,
+          "recall": 1.0,
+          "true_positive": 2483,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9919678714859438,
+          "false_negative": 0,
+          "false_positive": 10,
+          "planned": 9930,
+          "precision": 0.9919678714859438,
+          "recall": 1.0,
+          "true_positive": 1235,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.993660855784469,
+          "false_negative": 0,
+          "false_positive": 8,
+          "planned": 10010,
+          "precision": 0.993660855784469,
+          "recall": 1.0,
+          "true_positive": 1254,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 490.4122182910214,
+      "seed": 110029,
+      "sha256": "7836fb7c3041b45792da177cd5e922441e79c14a17e89efdfdc6b4ee82615621",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.5550678956297609,
+        0.48714525480622517,
+        0.4364466519347666,
+        0.4554768139245059,
+        0.46674087154914545,
+        0.4685129631342744,
+        0.4792192189504795
+      ],
+      "assessment_states": [
+        "confirmed",
+        "confirmed",
+        "confirmed",
+        "confirmed",
+        "confirmed",
+        "confirmed",
+        "confirmed"
+      ],
+      "input_sha256": "80971a142ed2e90dfac2991aaab37b4548f997f7e959a8d0698f48a1e9e0bf49",
+      "path": "validation/cg4/results/objective-continuous-uncertainty-group-v1/uncertainty_coverage/uncertainty_coverage-110030.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.9896207584830339,
+          "false_negative": 0,
+          "false_positive": 26,
+          "planned": 19930,
+          "precision": 0.9896207584830339,
+          "recall": 1.0,
+          "true_positive": 2479,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9905660377358491,
+          "false_negative": 0,
+          "false_positive": 12,
+          "planned": 10063,
+          "precision": 0.9905660377358491,
+          "recall": 1.0,
+          "true_positive": 1260,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9918233851185609,
+          "false_negative": 0,
+          "false_positive": 10,
+          "planned": 10007,
+          "precision": 0.9918233851185609,
+          "recall": 1.0,
+          "true_positive": 1213,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 473.7736434160033,
+      "seed": 110030,
+      "sha256": "6c02c2833ae9487d7a61497394e7bcab819d15830f7f5c25ebb0e4978c395f2f",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.48326152374421405,
+        0.4943435901955249,
+        0.5033471617340073,
+        0.5141045000197175,
+        0.5187033982358578
+      ],
+      "assessment_states": [
+        "confirmed",
+        "confirmed",
+        "confirmed",
+        "confirmed",
+        "confirmed"
+      ],
+      "input_sha256": "294c8afbea75bb02affd883cfff0d047c35f06c37fb47c791608a9fd06aeb050",
+      "path": "validation/cg4/results/objective-continuous-uncertainty-group-v1/uncertainty_coverage/uncertainty_coverage-110031.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.9655309033280507,
+          "false_negative": 82,
+          "false_positive": 5,
+          "planned": 20068,
+          "precision": 0.997952497952498,
+          "recall": 0.9674473997618103,
+          "true_positive": 2437,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9678483099752679,
+          "false_negative": 36,
+          "false_positive": 3,
+          "planned": 10092,
+          "precision": 0.9974511469838573,
+          "recall": 0.9702479338842975,
+          "true_positive": 1174,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9756711409395973,
+          "false_negative": 26,
+          "false_positive": 3,
+          "planned": 9840,
+          "precision": 0.9974271012006861,
+          "recall": 0.9781328847771237,
+          "true_positive": 1163,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 524.6358136659837,
+      "seed": 110031,
+      "sha256": "81ab981ce029a5993816b6a3a2ee03f29460e51fb4a48d2aa9ad061bf1465f29",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.5037901830434386,
+        0.47304243557643755,
+        0.4789918485817575,
+        0.46912241073078387
+      ],
+      "assessment_states": [
+        "confirmed",
+        "confirmed",
+        "confirmed",
+        "confirmed"
+      ],
+      "input_sha256": "58b0ebd11b2fd8276c45b32ba23afcb2eaedeba401517b86826474524e02da24",
+      "path": "validation/cg4/results/objective-continuous-uncertainty-group-v1/uncertainty_coverage/uncertainty_coverage-110032.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.9616306954436451,
+          "false_negative": 46,
+          "false_positive": 50,
+          "planned": 19949,
+          "precision": 0.9796416938110749,
+          "recall": 0.9812398042414355,
+          "true_positive": 2406,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9697692919649961,
+          "false_negative": 11,
+          "false_positive": 27,
+          "planned": 10014,
+          "precision": 0.978330658105939,
+          "recall": 0.9910569105691057,
+          "true_positive": 1219,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9698173153296267,
+          "false_negative": 11,
+          "false_positive": 27,
+          "planned": 10037,
+          "precision": 0.9783653846153846,
+          "recall": 0.9910714285714286,
+          "true_positive": 1221,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 432.30390087503474,
+      "seed": 110032,
+      "sha256": "fe31083caf54e553184cd35702d42d5bc5ac1fca9fb14adc6b3d4cdd41d59a97",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.5171661698575044,
+        0.5232678539620671
+      ],
+      "assessment_states": [
+        "confirmed",
+        "confirmed"
+      ],
+      "input_sha256": "db1678aa012223f2685cb1549e309f4f6035e2cf711080d5fb87609612198d7d",
+      "path": "validation/cg4/results/objective-continuous-uncertainty-group-v1/uncertainty_coverage/uncertainty_coverage-110033.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.9940688018979834,
+          "false_negative": 0,
+          "false_positive": 15,
+          "planned": 20050,
+          "precision": 0.9940688018979834,
+          "recall": 1.0,
+          "true_positive": 2514,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9944444444444445,
+          "false_negative": 0,
+          "false_positive": 7,
+          "planned": 9994,
+          "precision": 0.9944444444444445,
+          "recall": 1.0,
+          "true_positive": 1253,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9936558287073751,
+          "false_negative": 0,
+          "false_positive": 8,
+          "planned": 9956,
+          "precision": 0.9936558287073751,
+          "recall": 1.0,
+          "true_positive": 1253,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 447.8737859170069,
+      "seed": 110033,
+      "sha256": "440a65ee3c1b49e88a178749582beaa32680dc8aaa1b520343a35bca5c05afc5",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.5121435767158687
+      ],
+      "assessment_states": [
+        "confirmed"
+      ],
+      "input_sha256": "7064340e6e30d8677bca3be400cf4235f29d2b705dd18e18dcfb1f0d879597fc",
+      "path": "validation/cg4/results/objective-continuous-uncertainty-group-v1/uncertainty_coverage/uncertainty_coverage-110034.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.9716399506781751,
+          "false_negative": 43,
+          "false_positive": 26,
+          "planned": 19964,
+          "precision": 0.9891213389121339,
+          "recall": 0.9821354383049439,
+          "true_positive": 2364,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9773260359655981,
+          "false_negative": 15,
+          "false_positive": 14,
+          "planned": 9934,
+          "precision": 0.9889240506329114,
+          "recall": 0.9881422924901185,
+          "true_positive": 1250,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9780564263322884,
+          "false_negative": 15,
+          "false_positive": 13,
+          "planned": 10102,
+          "precision": 0.9896907216494846,
+          "recall": 0.9881235154394299,
+          "true_positive": 1248,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 382.96170883398736,
+      "seed": 110034,
+      "sha256": "95cfb7d5c602ef1ff224a80cfa1319ca6d3946dce9b85b780ce840cfae6167b6",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.4977387782049063,
+        0.49278465584925035
+      ],
+      "assessment_states": [
+        "confirmed",
+        "confirmed"
+      ],
+      "input_sha256": "0630f2e0ede1597a9f4baf8b900b3b122b0581109273202baea98d4b2394dbd9",
+      "path": "validation/cg4/results/objective-continuous-uncertainty-group-v1/uncertainty_coverage/uncertainty_coverage-110035.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.9917127071823204,
+          "false_negative": 21,
+          "false_positive": 0,
+          "planned": 19997,
+          "precision": 1.0,
+          "recall": 0.9917127071823204,
+          "true_positive": 2513,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9900662251655629,
+          "false_negative": 12,
+          "false_positive": 0,
+          "planned": 9855,
+          "precision": 1.0,
+          "recall": 0.9900662251655629,
+          "true_positive": 1196,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9916603487490523,
+          "false_negative": 11,
+          "false_positive": 0,
+          "planned": 10148,
+          "precision": 1.0,
+          "recall": 0.9916603487490523,
+          "true_positive": 1308,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 401.8677978339838,
+      "seed": 110035,
+      "sha256": "9944b7689125a5ed93443b35a9a8295c4107661123ccfce2c821351b0d83ad41",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.3883478180898514,
+        0.46487289805458765,
+        0.47555494558878886
+      ],
+      "assessment_states": [
+        "inconclusive",
+        "confirmed",
+        "confirmed"
+      ],
+      "input_sha256": "1e289f18c37d0ca9200a4cd649c408cd3892c249664586d51711dc297149a702",
+      "path": "validation/cg4/results/objective-continuous-uncertainty-group-v1/uncertainty_coverage/uncertainty_coverage-110036.json",
+      "recovery": {
+        "D": {
+          "IoU": 1.0,
+          "false_negative": 0,
+          "false_positive": 0,
+          "planned": 20054,
+          "precision": 1.0,
+          "recall": 1.0,
+          "true_positive": 2544,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 1.0,
+          "false_negative": 0,
+          "false_positive": 0,
+          "planned": 9984,
+          "precision": 1.0,
+          "recall": 1.0,
+          "true_positive": 1257,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 1.0,
+          "false_negative": 0,
+          "false_positive": 0,
+          "planned": 9962,
+          "precision": 1.0,
+          "recall": 1.0,
+          "true_positive": 1187,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 419.967424249975,
+      "seed": 110036,
+      "sha256": "e35c385644b49ad3e74f94bb8e8a67b89bf19c0f7dd146d41e7c322d7dbfe735",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.49801839834089556
+      ],
+      "assessment_states": [
+        "confirmed"
+      ],
+      "input_sha256": "2645b19bb5653da62f4aba9f3ba301d48f49744731ae6b292f598fecc485fe97",
+      "path": "validation/cg4/results/objective-continuous-uncertainty-group-v1/uncertainty_coverage/uncertainty_coverage-110037.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.9826224328593997,
+          "false_negative": 44,
+          "false_positive": 0,
+          "planned": 19971,
+          "precision": 1.0,
+          "recall": 0.9826224328593997,
+          "true_positive": 2488,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9873116574147502,
+          "false_negative": 16,
+          "false_positive": 0,
+          "planned": 10058,
+          "precision": 1.0,
+          "recall": 0.9873116574147502,
+          "true_positive": 1245,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9741935483870968,
+          "false_negative": 32,
+          "false_positive": 0,
+          "planned": 9971,
+          "precision": 1.0,
+          "recall": 0.9741935483870968,
+          "true_positive": 1208,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 355.1819156249985,
+      "seed": 110037,
+      "sha256": "3b62b59ffbeadadb124243d47edbaa7a3c78af3d306e607e8b16dee2dc0251d5",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.4955482887017215,
+        0.49939923331760927,
+        0.5099393948321725,
+        0.5167847017266622
+      ],
+      "assessment_states": [
+        "confirmed",
+        "confirmed",
+        "confirmed",
+        "confirmed"
+      ],
+      "input_sha256": "b02a8bc02c276eed7066a9da360b07f4777036ca6dd5e1e8bbc3677c8145b325",
+      "path": "validation/cg4/results/objective-continuous-uncertainty-group-v1/uncertainty_coverage/uncertainty_coverage-110038.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.9796812749003984,
+          "false_negative": 51,
+          "false_positive": 0,
+          "planned": 19934,
+          "precision": 1.0,
+          "recall": 0.9796812749003984,
+          "true_positive": 2459,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9802143446001649,
+          "false_negative": 24,
+          "false_positive": 0,
+          "planned": 10043,
+          "precision": 1.0,
+          "recall": 0.9802143446001649,
+          "true_positive": 1189,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9774375503626108,
+          "false_negative": 28,
+          "false_positive": 0,
+          "planned": 10023,
+          "precision": 1.0,
+          "recall": 0.9774375503626108,
+          "true_positive": 1213,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 362.1256145000225,
+      "seed": 110038,
+      "sha256": "d6ad173a7f7954edade2d4654f21af65e643bebcf19453260343149cd5fc9d3f",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.5151289375500446,
+        0.5216405696505761
+      ],
+      "assessment_states": [
+        "confirmed",
+        "confirmed"
+      ],
+      "input_sha256": "9ff335e533f77444067c75b6a0dcd026ce7d6dc93f7a32d6b1771c42f77611fe",
+      "path": "validation/cg4/results/objective-continuous-uncertainty-group-v1/uncertainty_coverage/uncertainty_coverage-110039.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.9828660436137072,
+          "false_negative": 44,
+          "false_positive": 0,
+          "planned": 19983,
+          "precision": 1.0,
+          "recall": 0.9828660436137072,
+          "true_positive": 2524,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9839326702371843,
+          "false_negative": 21,
+          "false_positive": 0,
+          "planned": 9992,
+          "precision": 1.0,
+          "recall": 0.9839326702371843,
+          "true_positive": 1286,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9845024469820555,
+          "false_negative": 19,
+          "false_positive": 0,
+          "planned": 10025,
+          "precision": 1.0,
+          "recall": 0.9845024469820555,
+          "true_positive": 1207,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 523.6627384169842,
+      "seed": 110039,
+      "sha256": "b56dbdd8fa73ea2651c808f64f42d7bdeeee2b0a075933df4677afcf81dcfa1e",
+      "success": true
+    }
+  ]
+}

@@ -1,0 +1,68 @@
+.........................F.F                                             [100%]
+=================================== FAILURES ===================================
+_______ test_D4_complete_hybrid_optimization_is_not_a_complete_frontier ________
+
+tmp_path = PosixPath('/private/var/folders/cs/c15xvw9d3t53tzcws5yxjxcr0000gn/T/pytest-of-drivyaanshyadav/pytest-733/test_D4_complete_hybrid_optimi0')
+
+    def test_D4_complete_hybrid_optimization_is_not_a_complete_frontier(tmp_path):
+        s, f, _ = problem(tmp_path)
+        root = f.template['nodes']['root']; alternate = copy.deepcopy(root)
+        alternate['rules'][0]['when']['constant'] = .4
+        template = copy.deepcopy(f.template); template['nodes']['root'] = {'parameter': 'route'}
+        f = replace(f, template=template, kind='composition', backend='hybrid', routing_parameters=('route',),
+                    parameters=(PolicyParameter('route', 'node', (root, alternate)), *f.parameters))
+        s = replace(s, families=(f,), candidates=(), baselines=(),
+                    objectives=(PolicyMetricSpec('correct', 'correct_issue_rate', 'maximize'),
+                                PolicyMetricSpec('abstain', 'abstention_rate', 'maximize')))
+        actual = optimize_policies(s, CFG)
+        assert actual.data['policy']['searches'][0]['search_coverage'] == 'complete'
+        assert actual.data['policy']['frontier']['standing'] == 'sampled_tradeoff_set'
+        oracle = optimize_policies(replace(s, families=(replace(f, backend='enumerate'),)), CFG)
+        assert oracle.data['policy']['frontier']['standing'] == 'complete_empirical_frontier'
+        assert 'sampled_tradeoff_set' in render_report(actual.to_private_dict())
+>       public = actual.to_dict()['policy']['searches'][0]
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       KeyError: 'searches'
+
+tests/cg5/test_defect_corrections.py:208: KeyError
+__ test_D1_D5_owned_api_assessment_preserves_bounded_inference_and_semantics ___
+
+tmp_path = PosixPath('/private/var/folders/cs/c15xvw9d3t53tzcws5yxjxcr0000gn/T/pytest-of-drivyaanshyadav/pytest-733/test_D1_D5_owned_api_assessmen0')
+
+    def test_D1_D5_owned_api_assessment_preserves_bounded_inference_and_semantics(tmp_path):
+        from datatrust.web import create_app
+        from .test_interfaces_history import BASE, wait
+        spec = regression_study(tmp_path).to_dict()
+        app = create_app(tmp_path / 'host', data_roots=(tmp_path,)); app.testing = True; client = app.test_client()
+        try:
+            headers = {'X-CSRF-Token': client.get(BASE + '/session').json['data']['csrf_token']}
+            source = client.post(BASE + '/sources', headers=headers, json={'root_id': 'root_0', 'relative_path': 'predictions.csv'}).json['data']
+            spec['input']['evaluation']['sources'] = [{'id': 'data', 'handle': source['handle']}]
+            draft = client.post(BASE + '/policy-studies', headers=headers, json={'spec': spec, 'config': CFG.to_dict()}).json['data']
+            def run(kind, **extra):
+                posted = client.post(BASE + '/jobs', headers=headers, json={'kind': kind, 'client_request_id': kind,
+                    'policy_study_id': draft['id'], 'revision': 1, **extra})
+                assert posted.status_code == 202, posted.json
+                job = wait(client, posted.json['data']['id']); assert job['state'] == 'succeeded', job
+                return job['output']
+>           selected = run('policy_optimize'); rid = selected['result_id']
+                       ^^^^^^^^^^^^^^^^^^^^^^
+
+tests/cg5/test_defect_corrections.py:262: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+kind = 'policy_optimize', extra = {}
+
+    def run(kind, **extra):
+        posted = client.post(BASE + '/jobs', headers=headers, json={'kind': kind, 'client_request_id': kind,
+            'policy_study_id': draft['id'], 'revision': 1, **extra})
+>       assert posted.status_code == 202, posted.json
+E       AssertionError: {'api_version': 'v1', 'error': {'code': 'http_409', 'field_errors': [], 'message': 'Request could not be completed; review the declared fields or resource state.', 'request_id': 'd88c67685d81453f93c26b7f73e9d31d', ...}}
+E       assert 409 == 202
+E        +  where 409 = <WrapperTestResponse streamed [409 CONFLICT]>.status_code
+
+tests/cg5/test_defect_corrections.py:259: AssertionError
+=========================== short test summary info ============================
+FAILED tests/cg5/test_defect_corrections.py::test_D4_complete_hybrid_optimization_is_not_a_complete_frontier
+FAILED tests/cg5/test_defect_corrections.py::test_D1_D5_owned_api_assessment_preserves_bounded_inference_and_semantics
+2 failed, 26 passed in 56.33s

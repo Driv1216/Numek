@@ -11,6 +11,18 @@ REVISION='fd1525a9fd15316a2d503bf26ab031a61d056e98'
 RUNTIME={'torch':'2.8.0','transformers':'4.57.1','tokenizers':'0.22.1','safetensors':'0.6.2'}
 
 
+def pinned_runtime(extra):
+    """Admit the exact publisher CPU build while retaining its actual identity."""
+    observed={}
+    for package,version in RUNTIME.items():
+        try:actual=importlib.metadata.version(package)
+        except importlib.metadata.PackageNotFoundError as exc:raise ValueError(f'Install the pinned {extra} extra.') from exc
+        if actual!=version and not (package=='torch' and actual==version+'+cpu'):
+            raise ValueError(f'Install the pinned {extra} extra.')
+        observed[package]=actual
+    return observed
+
+
 class TokenizerBudget(Exception):
     pass
 
@@ -41,8 +53,7 @@ def preflight(options):
         provenance['language']={'package':'lingua-language-detector','version':'2.1.1','files':files,'artifact_hashes':{n:info['sha256'] for n,info in files.items()},'languages':list(options.languages),'calibrated_confidence':False}
     if options.embedding_directory:
         root=Path(options.embedding_directory).resolve()
-        for name,version in RUNTIME.items():
-            if importlib.metadata.version(name)!=version:raise ValueError('Install the pinned text-embeddings extra.')
+        runtime=pinned_runtime('text-embeddings')
         from datatrust.text_normalization import strict_json
         manifest_identity=capture(root/'datatrust-model.json')
         manifest=strict_json((root/'datatrust-model.json').read_text());verify(manifest_identity)
@@ -65,7 +76,7 @@ def preflight(options):
             identities[name]=identity;protected.append(str(path))
         config=strict_json((root/'config.json').read_text())
         if config.get('hidden_size')!=384 or config.get('max_position_embeddings')!=512 or config.get('model_type')!='bert':raise ValueError('Unsupported embedding architecture.')
-        provenance['embedding']={'model':manifest['model'],'revision':REVISION,'files':identities,'manifest':manifest_identity,'runtime':RUNTIME,'device':'cpu','dtype':'float32','pooling':'attention_mask_mean_then_l2','maximum_tokens':512,'window_method':options.long_documents}
+        provenance['embedding']={'model':manifest['model'],'revision':REVISION,'files':identities,'manifest':manifest_identity,'runtime':runtime,'device':'cpu','dtype':'float32','pooling':'attention_mask_mean_then_l2','maximum_tokens':512,'window_method':options.long_documents}
         protected.append(str(root/'datatrust-model.json'))
     return provenance,protected
 

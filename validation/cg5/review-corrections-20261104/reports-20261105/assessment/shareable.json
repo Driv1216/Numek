@@ -1,0 +1,149 @@
+{
+  "schema_version": "confidenceguard.policy_result/1.0",
+  "methodology_id": "policy_selection_v1",
+  "analysis_id": "af4bec35f5364ddba70f6495a326d42e",
+  "generated_at": "2026-11-05T05:10:19.727172+00:00",
+  "name": "ConfidenceGuard decision policies",
+  "audience": "shareable",
+  "task": {
+    "kind": "binary_classification"
+  },
+  "runs": [
+    {
+      "id": "policy_1",
+      "display_name": "Policy 1",
+      "role": "hypothetical"
+    }
+  ],
+  "outcomes": {
+    "scope": "observed_labels",
+    "interpretation": "Supplied authoritative outcomes; observation and causal limitations apply."
+  },
+  "comparison": null,
+  "measurements": [
+    {
+      "value": 1.0,
+      "value_state": "finite",
+      "denominator": 40,
+      "denominator_kind": "eligible_records",
+      "basis": "simulated",
+      "interpretation": "descriptive",
+      "applicability": "applicable",
+      "execution": "completed",
+      "evidence_basis": "observed_outcome",
+      "id": "measurement_1",
+      "run": "policy_1",
+      "scope": "scope_1",
+      "family": "policy",
+      "metric": "issued_accuracy",
+      "population_id": "pop_46a7930fa2be4d573f9cba2d39dcba45",
+      "data": {}
+    },
+    {
+      "value": 1.0,
+      "value_state": "finite",
+      "denominator": 20,
+      "denominator_kind": "eligible_records",
+      "basis": "simulated",
+      "interpretation": "descriptive",
+      "applicability": "applicable",
+      "execution": "completed",
+      "evidence_basis": "observed_outcome",
+      "id": "measurement_2",
+      "run": "policy_1",
+      "scope": "scope_2",
+      "family": "policy",
+      "metric": "issued_accuracy",
+      "population_id": "pop_7e8041b96c75094b25fc477fc6e76580",
+      "data": {}
+    }
+  ],
+  "checks": [],
+  "findings": [
+    {
+      "code": "policy_qualification",
+      "priority": "Information",
+      "message": "Policy conclusions retain the displayed evidence and population qualifications."
+    }
+  ],
+  "coverage": {
+    "populations": [
+      {
+        "id": "pop_46a7930fa2be4d573f9cba2d39dcba45",
+        "run": "policy_1",
+        "scope": "scope_1",
+        "denominator": 40,
+        "denominator_kind": "eligible_records"
+      },
+      {
+        "id": "pop_7e8041b96c75094b25fc477fc6e76580",
+        "run": "policy_1",
+        "scope": "scope_2",
+        "denominator": 20,
+        "denominator_kind": "eligible_records"
+      }
+    ],
+    "analytical_scope": "Frozen admitted policy populations; exact definitions and lineage retained locally.",
+    "limitations": [
+      "Policy decisions are hypothetical offline replay; no deployment approval or causal business-value guarantee.",
+      "Observed-outcome, model-implied, operational and missing-label bounds are different estimands.",
+      "Conditional selective risk, full-opportunity behavior and deferral workload have different denominators.",
+      "Independent support conditions on frozen policies and declared sampling, observation, bounds and exposure assumptions.",
+      "Historical stability does not establish future effectiveness. Conformal marginal coverage is not conditional policy coverage.",
+      "Sampled resource controls can overshoot; admission defaults are not capacity guarantees."
+    ],
+    "joint_policy_withholding": false,
+    "not_anonymity_guarantee": true
+  },
+  "policy": {
+    "stage": "assessment",
+    "interpretation": "Offline policy evidence; no deployment recommendation.",
+    "executable_definitions_exported": false,
+    "joint_withholding": false,
+    "assessments": [
+      {
+        "metric": "issued_accuracy",
+        "operator": "ge",
+        "bound": 0.8,
+        "basis": "observed_outcome",
+        "scope": "overall",
+        "direction": "maximize",
+        "estimate": 1.0,
+        "estimate_state": "finite",
+        "support": 40,
+        "minimum_support": 1,
+        "state": "supported",
+        "method": "registered_finite_component_composition",
+        "strength": "finite_sample_under_declared_assumptions",
+        "lower": 0.8962367545996842,
+        "upper": 1.0,
+        "reason": null,
+        "family_size": 2,
+        "allocated_alpha": 0.025,
+        "required": true,
+        "id": "claim_1",
+        "policy_digest": "policy_1",
+        "comparator": null
+      }
+    ],
+    "withheld_assessments": 1,
+    "assessment_disclosure": "Only identified overall claims are shown; protected scoped/economic claims are withheld with their intervals.",
+    "searches": []
+  },
+  "disclosure": {
+    "policy": "conservative_aggregates_v1",
+    "minimum_denominator": 10,
+    "minimum_component": 10,
+    "display_labels": {},
+    "schema_version": "confidenceguard.disclosure/1.0"
+  },
+  "origin_binding": {
+    "analysis_digest": "32c79d559708e1497a0e7737bd327144a8ad207e1a17baaaebb9e0eb311231a0",
+    "private_manifest_digest": "c8dd603a35b60201ce27f578f97b8a4a45a68e293d03092f763a65c5cdac97f2"
+  },
+  "execution": {
+    "status": "completed",
+    "backend": "duckdb_local"
+  },
+  "projection_digest": "6701b76589f18017893378a92c21f74d6a320fe65cd215221e82d96d8bf7ba40"
+}

@@ -1,0 +1,108 @@
+{
+  "evaluation": {
+    "name": "ConfidenceGuard evaluation",
+    "outcomes": {
+      "column": "y",
+      "key_columns": [
+        "id"
+      ],
+      "source": "source1"
+    },
+    "runs": [
+      {
+        "decision": {
+          "rule": "none",
+          "tie_policy": "abstain"
+        },
+        "entity_columns": [
+          "entity"
+        ],
+        "id": "run1",
+        "key_columns": [
+          "id"
+        ],
+        "model": {
+          "display_name": "Model 1",
+          "id": "model1",
+          "version": "v1"
+        },
+        "prediction": "decision",
+        "probabilities": {
+          "positive_column": "p"
+        },
+        "role": "unknown",
+        "source": "source1"
+      }
+    ],
+    "sources": [
+      {
+        "handle": "78e65dd0f145450f95786042deac58f2",
+        "id": "source1"
+      }
+    ],
+    "task": {
+      "classes": [
+        "0",
+        "1"
+      ],
+      "kind": "binary_classification",
+      "outcome_definition": "Known-exposed synthetic paired events",
+      "positive_class": "1"
+    }
+  },
+  "feature_time_view": "available_at_decision",
+  "features": [
+    {
+      "availability": "at_decision",
+      "fields": [
+        {
+          "column": "x",
+          "id": "x",
+          "kind": "categorical",
+          "role": "context"
+        },
+        {
+          "column": "z",
+          "id": "z",
+          "kind": "categorical",
+          "role": "context"
+        }
+      ],
+      "id": "context"
+    }
+  ],
+  "name": "Known-exposed entity design verification",
+  "objectives": [
+    {
+      "bounds": [],
+      "ceiling": null,
+      "comparator": "complement",
+      "current_period": null,
+      "direction": "higher",
+      "id": "objective",
+      "interval": null,
+      "material_error": null,
+      "metric": "error_rate",
+      "metric_identity": {},
+      "nominal": null,
+      "practical_threshold": 0.1,
+      "reference_period": null,
+      "reference_run": null,
+      "run": "run1",
+      "target": null,
+      "training_clip": 30,
+      "units": "fraction"
+    }
+  ],
+  "representations": [],
+  "roles": {
+    "column": "role",
+    "namespace": "known-exposed-entity-arm-browser-v94",
+    "seed": 0,
+    "unit": "entity"
+  },
+  "schema_version": "confidenceguard.investigation_spec/1.0",
+  "strategies": [
+    "structured"
+  ]
+}

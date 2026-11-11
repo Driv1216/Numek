@@ -45,6 +45,11 @@ def register(bp, app, sessions, *, workspace_path=None, launch_token=None):
         if state.get('workspace_grant') != (workspace.instance_id, authorization['generation']): abort(403)
         return workspace
     app.extensions['confidenceguard_authorize_workspace'] = authorized
+    def attached():
+        state=sessions.current()
+        if workspace is None or state.get('workspace_grant')!=(workspace.instance_id,authorization['generation']):return None
+        return authorized()
+    app.extensions['confidenceguard_attached_workspace'] = attached
 
     def response(data, status=200): return {'api_version': 'v1', 'data': data}, status
     def body(allowed):
@@ -81,6 +86,8 @@ def register(bp, app, sessions, *, workspace_path=None, launch_token=None):
             if method.get('schema_version') == 'confidenceguard.application_spec/1.0':
                 directory = compat.protected_directory(state['directory']/'applications'/uuid.uuid4().hex)
                 method['output_path'] = str(directory/'predictions.jsonl')
+            if value.get('discovery_representations'):
+                value['discovery_representations']=app.extensions['confidenceguard_resolve_discovery_representations'](value['discovery_representations'],workspace)
         return value
 
     @bp.get('/workspace/access')
@@ -130,16 +137,17 @@ def register(bp, app, sessions, *, workspace_path=None, launch_token=None):
     @bp.post('/workspace/jobs')
     def workspace_submit():
         ws = authorized(); state = sessions.current()
-        value = body({'kind', 'client_request_id', 'spec', 'config', 'fingerprint', 'assessment_id', 'as_of', 'reason', 'plan', 'format', 'audience', 'reference', 'reveal_values'})
+        value = body({'kind', 'client_request_id', 'spec', 'config', 'fingerprint', 'assessment_id', 'as_of', 'reason', 'plan', 'format', 'audience', 'reference', 'reveal_values','text','references','replicates','look_id'})
         kind = value.get('kind'); request_id = value.get('client_request_id')
-        if kind not in {'ingest', 'outcomes', 'analyze', 'restate', 'correct', 'recover', 'backup', 'delete', 'export', 'resolve_evidence'} or not isinstance(request_id, str) or not request_id or len(request_id) > 512:
+        if kind not in {'ingest', 'outcomes', 'analyze', 'restate', 'correct', 'recover', 'backup', 'delete', 'export', 'resolve_evidence','enrich_features','prepare_representations','annotate_investigation','retry_confirmation','inspect_restatement_confirmation','restate_confirmation'} or not isinstance(request_id, str) or not request_id or len(request_id) > 512:
             raise EvaluationError('Invalid workspace job.')
         config = EvaluationConfig.from_dict(value.get('config', {}))
         if config.scratch_directory is not None: raise EvaluationError('Scratch paths are host controlled.')
         specification = value.get('spec')
-        if kind in {'ingest', 'outcomes'}:
+        if kind in {'ingest', 'outcomes','enrich_features','prepare_representations'}:
             specification = source_spec(specification)
-            specification = PredictionBatchSpec.from_dict(specification) if kind == 'ingest' else OutcomeRevisionSpec.from_dict(specification)
+            from .feature_contracts import FeatureEnrichmentSpec
+            specification = PredictionBatchSpec.from_dict(specification) if kind in {'ingest','prepare_representations'} else FeatureEnrichmentSpec.from_dict(specification) if kind=='enrich_features' else OutcomeRevisionSpec.from_dict(specification)
         if kind == 'analyze':
             specification = LongitudinalSpec.from_dict(specification)
             effective = ws.inspect(specification,populations=False)
@@ -166,8 +174,17 @@ def register(bp, app, sessions, *, workspace_path=None, launch_token=None):
                 kwargs = {'progress': progress, 'cancel': job['cancel']}
                 if kind == 'ingest': output = ws.ingest(specification, config, request_id=request_id, allowed_roots=roots, **kwargs)
                 elif kind == 'outcomes': output = ws.update_outcomes(specification, config, request_id=request_id, allowed_roots=roots, **kwargs)
-                elif kind in {'analyze', 'restate'}:
-                    result = ws.analyze(specification, request_id=request_id, expected_fingerprint=value.get('fingerprint'), **kwargs) if kind == 'analyze' else ws.restate(value['assessment_id'], as_of=value.get('as_of'), reason=value['reason'], request_id=request_id, **kwargs)
+                elif kind == 'enrich_features':output=ws.enrich_features(specification,config,request_id=request_id,allowed_roots=roots,**kwargs)
+                elif kind == 'prepare_representations':output=ws.prepare_representations(specification,config,request_id=request_id,allowed_roots=roots,**kwargs)
+                elif kind == 'inspect_restatement_confirmation':output=ws.inspect_restatement_confirmation(value['assessment_id'],value['look_id'],config,allowed_roots=roots+(str(ws.path),),**kwargs)
+                elif kind in {'analyze', 'restate','annotate_investigation','retry_confirmation','restate_confirmation'}:
+                    if kind=='analyze':result=ws.analyze(specification,request_id=request_id,expected_fingerprint=value.get('fingerprint'),**kwargs)
+                    elif kind=='restate':result=ws.restate(value['assessment_id'],as_of=value.get('as_of'),reason=value['reason'],request_id=request_id,**kwargs)
+                    elif kind=='retry_confirmation':result=ws.retry_confirmation(value['assessment_id'],replicates=value['replicates'],config=config,allowed_roots=roots+(str(ws.path),),request_id=request_id,**kwargs)
+                    elif kind=='restate_confirmation':
+                        if not value.get('fingerprint'):raise EvaluationError('Inspect this predeclared look before execution.','stale_confirmation')
+                        result=ws.restate_confirmation(value['assessment_id'],value['look_id'],config,allowed_roots=roots+(str(ws.path),),expected_fingerprint=value['fingerprint'],request_id=request_id,**kwargs)
+                    else:result=ws.annotate_investigation(value['assessment_id'],value['text'],references=value.get('references',()),request_id=request_id)
                     rid = result.data['analysis_id']; state['results'][rid] = {'result': result, 'evaluation_id': None, 'revision': 0, 'workspace_instance': ws.instance_id}
                     output = {'assessment_id': rid, 'result_id': rid, 'committed': True}
                 elif kind == 'correct': output = ws.correct(value['spec'], request_id=request_id)
@@ -204,7 +221,7 @@ def register(bp, app, sessions, *, workspace_path=None, launch_token=None):
                     output = {'artifact_ids': ids}
                 if kind=='ingest' and output.get('assessment_id'):
                     captured=ws.open(output['assessment_id']);rid=captured.data['analysis_id']
-                    state['results'][rid]={'result':captured,'evaluation_id':None,'revision':0,'workspace_instance':ws.instance_id}
+                    state['results'][rid]={'result':captured,'evaluation_id':None,'revision':0,'workspace_instance':ws.instance_id,'retained':True}
                     method_handles=[]
                     for method in captured.private.get('fitted_methods',[]):
                         handle=uuid.uuid4().hex

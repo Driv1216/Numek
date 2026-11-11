@@ -1,6 +1,59 @@
 # DataTrust
 
-Last updated: 2026-10-19
+## CG6 completion and founder acceptance — 2026-11-08
+
+The founder has confirmed CG6 is done and accepted. CG1–CG6 are complete within
+their approved scopes. This decision supersedes earlier pending-review,
+pending-understanding and pending-founder-acceptance language. CG6 adds trusted
+local predictor execution, fitted auxiliaries and a bounded robustness laboratory
+through the existing ConfidenceGuard workbench and catalog v2.
+
+The [final implementation explainer](validation/cg6/CG6_FINAL_IMPLEMENTATION_EXPLAINER.md)
+covers all 16 requested areas, six architecture/data-flow diagrams, source files,
+algorithms, statistical methods, execution walkthroughs, R1–R6, limitations and
+15 technical questions. See also [the CG6 guide](docs/CG6_CONFIDENCEGUARD.md),
+[completion status](validation/cg6/IMPLEMENTATION_STATUS.md) and
+[correction evidence](validation/cg6/review-corrections-r1-r6/REVIEW_CORRECTIONS.md).
+The accepted 230-file runtime identity is
+`aa72f09caa5bc5b174db5b4253add54a9fba8b3ecec3309c99f0beb0608fbf6a`.
+Real CPU/MPS qualification and all 21 admitted Mac performance observations retain
+their recorded source/host scope. Actual NVIDIA CUDA qualification remains pending
+compatible hardware and is nonblocking. Scientific limits and historical evidence
+are unchanged; acceptance does not authorize CG7 work.
+
+## CG5 completion — 2026-11-06
+
+The founder has confirmed CG5 is fully completed, including implementation,
+independent review, R01–R09 and D1–D5 corrections, engineering verification and
+the implementation understanding gate. This decision supersedes pending-review,
+pending-understanding and pending-founder-acceptance language retained below.
+CG1–CG5 are complete within their approved scopes; scientific limitations and
+source-specific historical evidence remain unchanged. No CG6 work is implied.
+
+The [final implementation explainer](validation/cg5/CG5_FINAL_IMPLEMENTATION_EXPLAINER.md) covers architecture, source files,
+policy semantics, optimization, statistical assessment, four execution scenarios,
+corrections, limitations, glossary and 15 technical questions. Its quick
+requirements review found all 13 requested areas present and no material issues
+in the technical spot-checks; no test suite was rerun for that document review.
+The explained 190-file runtime identity is
+`7d3f64affcbc9491223e23294482149848f3bd945a7aaefce33af4af7b3fc3b9`.
+
+Last updated: 2026-11-08
+
+**ConfidenceGuard CG5 decision policies.** Typed compositional policies support
+binary/multiclass classification and regression, development-only selection,
+finite/discrete optimization, frozen independent assessment and historical stress
+replay. Python, CLI, the local API, browser and canonical reports share the same
+services. See [CG5 usage and scientific boundaries](docs/CG5_CONFIDENCEGUARD.md) and
+[engineering verification](validation/cg5/README.md).
+CG5 is not founder-accepted. The independent-review findings and authorized targeted
+corrections have a separate [correction record](validation/cg5/review-corrections-20261104/REVIEW_CORRECTIONS.md);
+earlier verification receipts describe their original source.
+
+CG1–CG4 are complete under the project's approved scope and corrections. CG4
+qualification limits and negative evidence remain intact; general unequal-cluster,
+ranking-percentile and temporal formal confirmation are not newly supported.
+[CG4 usage and retained limitations](docs/CG4_CONFIDENCEGUARD.md).
 
 NUMEK now also includes **ConfidenceGuard CG1**, a distinct prediction reliability
 workbench for binary/multiclass classification and regression. It has independent
@@ -32,7 +85,10 @@ artifacts through Python, CLI, and browser UI. PDF derives from canonical HTML.
 ## Quick Start
 
 Using a virtual environment is recommended so Numek's dependencies stay
-isolated from other Python projects:
+isolated from other Python projects. Use Python **3.12+**, with **3.13** the primary
+development runtime. Python 3.14 support is capability-specific; the pinned language
+detector is unavailable there, and CG4 encoders use a separate runtime profile.
+Exact hashed qualification locks are in `constraints/`:
 
 ```bash
 python3 -m venv .venv

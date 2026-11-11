@@ -1,0 +1,99 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Failure investigation — ConfidenceGuard</title><style>
+@page{size:A4;margin:17mm 14mm}*{box-sizing:border-box}body{font:11px/1.5 Arial,sans-serif;color:#182432;margin:0}main{max-width:1050px;margin:auto;padding:24px}h1{font-size:28px;line-height:1.15}h2{font-size:18px;margin-top:28px}h3{font-size:13px}p,td,th{overflow-wrap:anywhere}small,.note{color:#536375}header{border-bottom:3px solid #196d70;padding-bottom:16px}section{break-before:page}section:first-of-type{break-before:auto}table{width:100%;border-collapse:collapse;table-layout:fixed}th,td{padding:7px;text-align:left;vertical-align:top;border-bottom:1px solid #d7e1e5}th{background:#edf4f4}tr{break-inside:avoid}thead{display:table-header-group}pre{white-space:pre-wrap;overflow-wrap:anywhere;font:9px/1.4 monospace;border-left:2px solid #c4d8d8;padding-left:8px}figure{break-inside:avoid;margin:18px 0}svg{width:380px;max-width:100%;height:210px}details{margin:12px 0}.banner{padding:12px;background:#edf4f4}.value{font-variant-numeric:tabular-nums}@media print{main{padding:0}details{display:block}details>summary{font-weight:bold}details pre{display:block}a{color:inherit}}
+ .cg2 section{break-before:auto}.cg2 h2{break-after:avoid}</style></head><body class=""><main><header><p>NUMEK / ConfidenceGuard · Model Reliability Intelligence</p><h1>Failure investigation</h1><p>Binary Classification · 2026-10-23T18:09:20.417840+00:00</p><p>Method failure_investigation_v1 · confidenceguard.investigation_result/1.0</p><div class="banner">Exact protected local report — contains confidential aggregate evidence. No overall reliability score or production approval is defined.</div></header>
+<section><h2>Evaluation summary and priority investigations</h2><p><strong>fixture</strong> · unknown · v1</p><p><strong>Review · exploratory discovery</strong> — D/S selection evidence is exploratory. Freeze hypotheses before independent assessment.</p></section>
+<section class="cg4"><h2>Failure discovery and investigation</h2>
+<p>Prepare evidence → discover on D → select on S → freeze claims → assess independently on H. These roles are separate from CG2 fitting, selection, calibration and evaluation.</p>
+<p>Stage: <strong>discovery</strong>. Discovery and selection evidence is exploratory. Learned models propose regions; shared ConfidenceGuard reducers define the reported metrics. A finding does not establish a cause or authorize a model change.</p>
+<h3>Search and method standing</h3><table><thead><tr><th>Strategy / objective</th><th>Execution and coverage</th><th>Qualification</th></tr></thead><tbody><tr><td>structured · errors</td><td>completed · predicate search complete within admitted class · </td><td>Recovery is limited to the recorded qualification envelope.</td></tr></tbody></table><h3>Candidates and selection evidence</h3><p>3 retained candidates; up to 50 shown here. Matching JSON retains every disclosed candidate. Effects use their objective-specific conditional denominator and units.</p>
+<article><h3>2c0284b34de43b9bedc2cc0699822a5b · structured · exploratory</h3>
+<p>error_rate · adverse direction higher · fraction · comparator complement. Practical threshold: 0.1.</p><table><thead><tr><th>Population</th><th>Planned / applicable</th><th>Members / comparison / unavailable</th><th>Adverse effect</th></tr></thead><tbody><tr><td>D</td><td>240 / 240</td><td>120 / 120 / 0<br>Conditional support 120 / 120</td><td>1.0</td></tr><tr><td>S</td><td>240 / 240</td><td>120 / 120 / 0<br>Conditional support 120 / 120</td><td>1.0</td></tr></tbody></table>
+<pre>{
+  "any_of": [
+    [
+      {
+        "field": "context.x",
+        "kind": "categorical",
+        "op": "eq",
+        "value": "1"
+      },
+      {
+        "field": "context.z",
+        "kind": "categorical",
+        "op": "eq",
+        "value": "0"
+      }
+    ],
+    [
+      {
+        "field": "context.x",
+        "kind": "categorical",
+        "op": "eq",
+        "value": "0"
+      },
+      {
+        "field": "context.z",
+        "kind": "categorical",
+        "op": "eq",
+        "value": "1"
+      }
+    ]
+  ]
+}</pre><p>Explanation: exact_predicate. Held-out S precision 1.0, recall 1.0. The simplified explanation does not define learned membership.</p><pre>{
+  "coverage_guarantee": false,
+  "diagnostic_references": "Original D-only diagnostic targets fixed; refits resample whole admitted D units before the disclosed D cap.",
+  "matching": "Largest frozen membership IoU on S features, within strategy and diagnostic head; no S outcome selection.",
+  "median_membership_IoU": 1.0,
+  "method": "bounded_D_unit_bootstrap_refits_v1",
+  "profile": {
+    "D_row_limit": 20000,
+    "maximum_nodes": 10000,
+    "retained_candidates": 16
+  },
+  "replicates": 1,
+  "results": [
+    {
+      "applicable_fraction": 1.0,
+      "membership_IoU": 1.0,
+      "refit_D_records": 240,
+      "replicate": 0
+    }
+  ],
+  "scope": "Product perturbation diagnostic; full-method qualification is separate.",
+  "seed": 0
+}</pre><p>Protected evidence references: cg4_ref_faed19d8f5099f86ade0144c (higher_diagnostic_loss_member); cg4_ref_943e6e65a610ec18fa238b58 (lower_diagnostic_loss_member); cg4_ref_5992f81d018328b075a9ed1c (outside_comparison); cg4_ref_13c3593e4cd812e416ef9b69 (representative_member); cg4_ref_245106b15f2ea5bd7f7e9319 (representative_member). Resolve only with current authorized source access.</p></article><article><h3>55922ab8f824409bb0d9ad68167bd436 · structured · exploratory</h3>
+<p>error_rate · adverse direction higher · fraction · comparator complement. Practical threshold: 0.1.</p><table><thead><tr><th>Population</th><th>Planned / applicable</th><th>Members / comparison / unavailable</th><th>Adverse effect</th></tr></thead><tbody><tr><td>D</td><td>240 / 240</td><td>60 / 180 / 0<br>Conditional support 60 / 180</td><td>0.6666666666666666</td></tr><tr><td>S</td><td>240 / 240</td><td>60 / 180 / 0<br>Conditional support 60 / 180</td><td>0.6666666666666666</td></tr></tbody></table>
+<pre>{
+  "clauses": [
+    {
+      "field": "context.x",
+      "kind": "categorical",
+      "op": "eq",
+      "value": "1"
+    },
+    {
+      "field": "context.z",
+      "kind": "categorical",
+      "op": "eq",
+      "value": "0"
+    }
+  ]
+}</pre><p>Explanation: exact_predicate. Held-out S precision 1.0, recall 1.0. The simplified explanation does not define learned membership.</p><p>Protected evidence references: cg4_ref_6fb3f8c2a6801891d9803f3f (higher_diagnostic_loss_member); cg4_ref_8a837596942047b315c70250 (lower_diagnostic_loss_member); cg4_ref_b4c33d0916749bb8dbd2a4c4 (outside_comparison); cg4_ref_4ca97d5749a32f1447411ae5 (representative_member); cg4_ref_cec8c5d6cfcb056d3f88476f (representative_member). Resolve only with current authorized source access.</p></article><article><h3>ff9f27cff97c657186e905a3446dda69 · structured · exploratory</h3>
+<p>error_rate · adverse direction higher · fraction · comparator complement. Practical threshold: 0.1.</p><table><thead><tr><th>Population</th><th>Planned / applicable</th><th>Members / comparison / unavailable</th><th>Adverse effect</th></tr></thead><tbody><tr><td>D</td><td>240 / 240</td><td>60 / 180 / 0<br>Conditional support 60 / 180</td><td>0.6666666666666666</td></tr><tr><td>S</td><td>240 / 240</td><td>60 / 180 / 0<br>Conditional support 60 / 180</td><td>0.6666666666666666</td></tr></tbody></table>
+<pre>{
+  "clauses": [
+    {
+      "field": "context.x",
+      "kind": "categorical",
+      "op": "eq",
+      "value": "0"
+    },
+    {
+      "field": "context.z",
+      "kind": "categorical",
+      "op": "eq",
+      "value": "1"
+    }
+  ]
+}</pre><p>Explanation: exact_predicate. Held-out S precision 1.0, recall 1.0. The simplified explanation does not define learned membership.</p><p>Protected evidence references: cg4_ref_82792b557645fda1fa20d07e (higher_diagnostic_loss_member); cg4_ref_c5236249be3aa2313e329286 (lower_diagnostic_loss_member); cg4_ref_ca5e1de0851bdb8b4cd8dd17 (outside_comparison); cg4_ref_143890c49348b5eca0bc5d3e (representative_member); cg4_ref_cbafd14e7f3cc697548145be (representative_member). Resolve only with current authorized source access.</p></article><h3>Overlap</h3><p>Shortlist union support: 120 distinct opportunities. Overlapping supports are not summed.</p><table><thead><tr><th>Regions</th><th>Intersection / union</th><th>Jaccard</th></tr></thead><tbody><tr><td>2c0284b34de43b9bedc2cc0699822a5b / 55922ab8f824409bb0d9ad68167bd436</td><td>60 / 120</td><td>0.5</td></tr><tr><td>2c0284b34de43b9bedc2cc0699822a5b / ff9f27cff97c657186e905a3446dda69</td><td>60 / 120</td><td>0.5</td></tr></tbody></table><h3>Private investigation notes</h3><p>Notes are recorded interpretations, not new statistical or causal findings.</p><pre>CG4_PRIVATE_SENTINEL_27E39F Synthetic private interpretation; no causal inference.</pre><p>2026-10-23T18:09:20.417840+00:00 · </p><h3>Scope and limitations</h3><p>Unavailable membership remains visible against the planned population. Conditional results cannot be read as full-population findings. Observed labels do not establish unobserved outcomes. Local overlap checks do not verify external independence; missing exposure history never proves freshness. Error control is study scoped, with no automatic guarantee across overlapping workspace studies.</p>
+<p>Finite-sample procedures require their declared independence and observation assumptions. Approximate procedures have a recorded qualification envelope. Temporal common shocks, arbitrary adaptive reuse, and CG3 moving-block bootstrap are not admitted CG4 confirmation routes. Historical restatements preserve original evidence and are descriptive unless an inferential schedule was frozen in advance.</p></section><section><h2>Methodology, coverage and limitations</h2><p>Metrics describe supplied outcomes and declared populations; ground truth and representativeness are not independently established.</p><p>Calibration bins and high-confidence settings are investigation definitions, not universal safety thresholds.</p><p>Policy replay is retrospective; different actions may change outcomes or their observation.</p><p>Statistical intervals, when enabled, are assumption-qualified; the recorded adjustment distinguishes pointwise and family confidence.</p><p>Sampled resource safeguards are not hard quotas or capacity guarantees.</p><p>No composite score, certification or production approval is defined.</p><p></p><p>Analytical bounds, retained-detail omissions, presentation omissions and privacy withholding are distinct. An unavailable metric is not zero. The protected local workbench contains exact retained evidence where supplied and eligible.</p><p>Analysis identity: fa3e1a1d23194331a06622993be66830</p></section></main></body></html>

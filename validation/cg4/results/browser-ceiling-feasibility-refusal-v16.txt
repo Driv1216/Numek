@@ -1,0 +1,477 @@
+Browser tab: 6, Title: "ConfidenceGuard — local workbench", URL: "http://127.0.0.1:8049/confidenceguard".
+0 AXWebArea ConfidenceGuard — local workbench, URL: 127.0.0.1:8049/confidenceguard
+	1 container
+		2 text NUMEK / local analytical workbench
+		3 heading ConfidenceGuard, Value: 1
+			4 text ConfidenceGuard
+		5 text Evaluate supplied predictions. No model execution or overall trust score.
+		6 link Description: DataTrust, Value: 127.0.0.1:8049/
+		7 text  · 
+		8 link Description: API contract, Value: 127.0.0.1:8049/api/confidenceguard/v1/openapi.json
+		9 container ConfidenceGuard workspace
+			10 button Evaluations & methods, ID: nav-evaluate
+			11 button Models & reliability history, ID: nav-history
+			12 button Failure investigations, ID: nav-investigations
+		13 container cg4-workspace
+			14 heading Failure investigations, Value: 2
+				15 text Failure investigations
+			16 text Discover on D, select on S, freeze claims, then assess independently on H. Candidate regions are diagnostic hypotheses. They do not establish causes or change a model.
+			17 button Use current evaluation, ID: cg4-use-evaluation
+			18 button Use current historical selection, ID: cg4-use-history
+			19 container
+				20 text Name
+				21 text field (settable) Name, Value: CG4 guided whole-population ceiling, ID: cg4-name
+			22 heading 1 · Evidence and objective, Value: 3
+				23 text 1 · Evidence and objective
+			24 text Register prediction sources in Evaluations & methods. Historical selections use the authorized local workspace. Every objective has its own eligible denominator, adverse direction and units.
+			25 container
+				26 text Event/entity namespace
+				27 text field (settable) Event/entity namespace, Value: cg4-browser-ceiling-workflow-v1, ID: cg4-namespace
+			28 container
+				29 text Entity columns for copied evaluation
+				30 text field (settable) Entity columns for copied evaluation, ID: cg4-entities
+			31 container
+				32 text Partition unit
+				33 pop up button (collapsed, settable) Partition unit, Value: Declared independent rows, ID: cg4-role-unit, Secondary Actions: Expand
+					34 menu
+						35 Whole entities
+						36 (selected) Declared independent rows
+			37 container
+				38 text Explicit D/S/H column (optional)
+				39 text field (settable) Explicit D/S/H column (optional), Value: role, ID: cg4-role-column
+			40 container
+				41 text Partition seed
+				42 stepper (settable, integer) Partition seed, Value: 0, ID: cg4-seed
+			43 container
+				44 text Failure objective
+				45 pop up button (collapsed, settable) Failure objective, Value: error_rate, ID: cg4-objective, Secondary Actions: Expand
+					46 menu
+						47 (selected) error_rate
+						48 false_negative_rate
+						49 false_positive_rate
+						50 precision
+						51 recall
+						52 brier
+						53 log_loss
+						54 reliability_diagram
+						55 calibration_residual
+						56 bias
+						57 mae
+						58 mse
+						59 rmse
+						60 material_error_rate
+						61 roc_auc
+						62 average_precision
+						63 interval_miscoverage
+						64 interval_coverage
+						65 interval_width
+						66 central_interval_score
+			67 container
+				68 text Adverse direction
+				69 pop up button (collapsed, settable) Adverse direction, Value: Metric default (resolved at inspection), ID: cg4-direction, Secondary Actions: Expand
+					70 menu
+						71 (selected) Metric default (resolved at inspection)
+						72 Higher is worse
+						73 Lower is worse
+						74 Larger absolute bias/residual
+						75 Nominal coverage shortfall
+			76 container
+				77 text Units (blank: authoritative metric units)
+				78 text field (settable) Units (blank: authoritative metric units), ID: cg4-units
+			79 container
+				80 text Material effect δ
+				81 stepper (settable, float) Material effect δ, Value: 0.10000000149011612, Details: 0.1, ID: cg4-delta
+			82 container
+				83 text Comparator
+				84 pop up button (collapsed, settable) Comparator, Value: Declared ceiling, ID: cg4-comparator, Secondary Actions: Expand
+					85 menu
+						86 Complement within eligible scope
+						87 Whole eligible scope (overlapping)
+						88 (selected) Declared ceiling
+						89 Paired reference model
+			90 container
+				91 text Ceiling
+				92 stepper (settable, float) Ceiling, Value: 0.10000000149011612, Details: 0.1, ID: cg4-ceiling
+			93 container
+				94 text Reference run ID
+				95 text field (settable) Reference run ID, ID: cg4-reference-run
+			96 container
+				97 text Target class
+				98 text field (settable) Target class, ID: cg4-target
+			99 container
+				100 text Interval ID
+				101 text field (settable) Interval ID, ID: cg4-interval
+			102 container
+				103 text Nominal coverage
+				104 stepper (settable, float) Nominal coverage, Value: 0.8999999761581421, Details: 0.9, ID: cg4-nominal
+			105 button (collapsed) Typed features and temporal provenance, Secondary Actions: Expand
+				106 text Typed features and temporal provenance
+			107 button (collapsed) Supplied vectors and pinned offline encoders, Secondary Actions: Expand
+				108 text Supplied vectors and pinned offline encoders
+			109 heading 2 · Search and resources, Value: 3
+				110 text 2 · Search and resources
+			111 container cg4-strategies
+				112 checkbox (settable, integer) Description: Structured interactions, Value: 1
+				113 checkbox (settable, integer) Description: CatBoost objective-specific diagnostics, Value: 1
+				114 checkbox (settable, integer) Description: Geometric nonlinear fallback, Value: 1
+				115 checkbox (settable, integer) Description: Experimental NUMEK landmark method; promotion failed in the locked curved-region profile, Value: 0
+			116 button Compose complete specification, ID: cg4-compose
+			117 container
+				118 text Complete investigation specification
+				119 text entry area (settable) Complete investigation specification, ID: cg4-spec, Value: {
+  "evaluation": {
+    "name": "ConfidenceGuard evaluation",
+    "outcomes": {
+      "column": "y",
+      "key_columns": [
+        "id"
+      ],
+      "source": "source1"
+    },
+    "runs": [
+      {
+        "decision": {
+          "rule": "none",
+          "tie_policy": "abstain"
+        },
+        "id": "run1",
+        "key_columns": [
+          "id"
+        ],
+        "model": {
+          "display_name": "Model 1",
+          "id": "model1",
+          "version": "v1"
+        },
+        "prediction": "decision",
+        "role": "unknown",
+        "source": "source1"
+      }
+    ],
+    "sources": [
+      {
+        "handle": "68b8623da1e141cab9f57c744271016e",
+        "id": "source1"
+      }
+    ],
+    "task": {
+      "classes": [
+        "0",
+        "1"
+      ],
+      "kind": "binary_classification",
+      "outcome_definition": "Supplied reference outcome",
+      "positive_class": "1"
+    }
+  },
+  "feature_time_view": "available_at_decision",
+  "features": [],
+  "name": "CG4 guided whole-population ceiling",
+  "objectives": [
+    {
+      "bounds": [],
+      "ceiling": 0.1,
+      "comparator": "ceiling",
+      "current_period": null,
+      "direction": "higher",
+      "id": "objective",
+      "interval": null,
+      "material_error": null,
+      "metric": "error_rate",
+      "metric_identity": {},
+      "nominal": null,
+      "practical_threshold": 0.1,
+      "reference_period": null,
+      "reference_run": null,
+      "run": "run1",
+      "target": null,
+      "training_clip": 30,
+      "units": "fraction"
+    }
+  ],
+  "representations": [],
+  "roles": {
+    "column": "role",
+    "namespace": "cg4-browser-ceiling-workflow-v1",
+    "seed": 0,
+    "unit": "independent_rows"
+  },
+  "schema_version": "confidenceguard.investigation_spec/1.0",
+  "strategies": [
+    "structured",
+    "catboost",
+    "geometric"
+  ]
+}
+			120 button (collapsed) Execution configuration and limits, Secondary Actions: Expand
+				121 text Execution configuration and limits
+			122 checkbox (disabled, settable, integer) Description: Retain this immutable investigation/assessment in the authorized workspace, Value: 0, ID: cg4-retain
+			123 button Inspect evidence and admitted search, ID: cg4-inspect
+			124 button Run discovery on D and selection on S, ID: cg4-discover
+			125 button Cancel active job, ID: cg4-cancel
+			227 text Planned 720: D 240, S 240, H 240. 0 typed fields, 0 representations. 2 threads, 6.0 GiB RSS, 30.0 minutes, 256 MiB result budget. H outcome metrics remain sealed.
+			126 button (collapsed) Complete inspection and admitted specification, Secondary Actions: Expand
+				127 text Complete inspection and admitted specification
+			228 container cg4-result
+				229 heading CG4 guided whole-population ceiling, Value: 3, ID: cg4-result-title
+					230 text CG4 guided whole-population ceiling
+				231 container cg4-assessment
+					232 text Exploratory evidence. D 240, S 240, sealed H 240. 1 proposed hypotheses are shortlisted; every retained candidate remains available below.
+					233 button (collapsed) Complete assessment, population and provenance evidence, Secondary Actions: Expand
+						234 text Complete assessment, population and provenance evidence
+				235 container Scrollable investigation evidence table
+					236 table Scroll horizontally to see all evidence when the table is wider than the view.
+						237 text Scroll horizontally to see all evidence when the table is wider than the view.
+						238 row
+							239 cell
+								240 text Freeze
+							241 cell
+								242 text Candidate
+							243 cell
+								244 text Strategy
+							245 cell
+								246 text Objective
+							247 cell
+								248 text Material effect δ
+							249 cell
+								250 text S adverse effect
+							251 cell
+								252 text Members / applicable / planned
+							253 cell
+								254 text Evidence
+						255 row
+							256 cell
+								257 checkbox (settable, integer) Description: Select hypothesis e0360fc4e2a19d944ebd30320505c8d1, Value: 1
+							258 cell
+								259 text e0360fc4e2a19d944ebd30320505c8d1
+							260 cell
+								261 text Whole population (ceiling baseline)
+							262 cell
+								263 text error_rate
+							264 cell
+								265 stepper (settable, float) Description: Material effect threshold for e0360fc4e2a19d944ebd30320505c8d1, Value: 0.10000000149011612, Details: 0.1
+							266 cell
+								267 text 0.9
+							268 cell
+								269 text 240 / 240 / 240; unavailable 0
+							270 cell
+								281 button (collapsed) Gate, denominators, fidelity, stability and evidence, Secondary Actions: Expand
+									282 text Gate, denominators, fidelity, stability and evidence
+				273 button (disabled) More candidates, ID: cg4-more
+				274 checkbox (settable, integer) Description: Reveal a bounded private evidence excerpt, Value: 0, ID: cg4-reveal
+				275 button (collapsed) Strategy execution, qualification and negative evidence, Secondary Actions: Expand
+					276 text Strategy execution, qualification and negative evidence
+				277 button (collapsed) Overlap and unique union support, Secondary Actions: Expand
+					278 text Overlap and unique union support
+			128 heading 3 · Freeze the complete family, Value: 3
+				129 text 3 · Freeze the complete family
+			130 text Select up to 32 hypotheses. Set each candidate’s material effect threshold in its metric units; there is no universal default. Freeze thresholds, comparator, membership scope and assumptions before H. A score threshold chosen on S cannot be revised after seeing H.
+			131 container
+				132 text Inference method
+				133 pop up button (collapsed, settable) Inference method, Value: Finite sample where registered, ID: cg4-method, Secondary Actions: Expand
+					134 menu
+						135 (selected) Finite sample where registered
+						136 Joint BCa (formal confirmation currently refused)
+						137 Ranking percentile approximation (qualification scoped)
+			138 container
+				139 text Independent sampling unit
+				140 pop up button (collapsed, settable) Independent sampling unit, Value: Independent rows, ID: cg4-sampling, Secondary Actions: Expand
+					141 menu
+						142 (selected) Independent rows
+						143 Independent complete entities
+						144 Unsupported temporal dependence
+						145 Descriptive only
+			146 container
+				147 text Membership scope
+				148 pop up button (collapsed, settable) Membership scope, Value: Full planned population, ID: cg4-membership-scope, Secondary Actions: Expand
+					149 menu
+						150 (selected) Full planned population
+						151 Frozen supported population
+			152 container
+				153 text Minimum applicable fraction
+				154 stepper (settable, integer) Minimum applicable fraction, Value: 1, ID: cg4-coverage
+			155 container
+				156 text Upstream independence
+				157 pop up button (collapsed, settable) Upstream independence, Value: Unknown, ID: cg4-upstream, Secondary Actions: Expand
+					158 menu
+						159 (selected) Unknown
+						160 Scoped upstream declaration
+						161 Known prohibited overlap
+			162 container
+				163 text External prior exposure
+				164 pop up button (collapsed, settable) External prior exposure, Value: Unknown, ID: cg4-external, Secondary Actions: Expand
+					165 menu
+						166 (selected) Unknown
+						167 Scoped declaration of no exposure
+						168 Known prior exposure
+			169 container
+				170 text Declaration author
+				171 text field (settable) Declaration author, ID: cg4-declaration-author
+			172 container
+				173 text Scoped reason / external provenance
+				174 text field (settable) Scoped reason / external provenance, ID: cg4-declaration-reason
+			175 container
+				176 text Bootstrap baseline B
+				177 stepper (settable, integer) Bootstrap baseline B, Value: 20000, ID: cg4-replicates
+			178 container
+				179 text Maximum B
+				180 stepper (settable, integer) Maximum B, Value: 200000, ID: cg4-maximum-replicates
+			181 container
+				182 text Replication policy
+				183 pop up button (collapsed, settable) Replication policy, Value: Admit nominal minimum within maximum, ID: cg4-replicate-policy, Secondary Actions: Expand
+					184 menu
+						185 (selected) Admit nominal minimum within maximum
+						186 Fixed caller budget; refuse if inadequate
+			187 checkbox (settable, integer) Description: Explicitly declare prior exposure history for the current workspace gap and this study, Value: 0, ID: cg4-history-gap-declaration
+			188 text This declaration requires the author and scoped reason above. It does not establish intact system history or override known prior use.
+			189 button Compose confirmation protocol, ID: cg4-compose-confirmation
+			190 container
+				191 text Complete ConfirmationSpec
+				192 text entry area (settable) Complete ConfirmationSpec, ID: cg4-confirmation, Value: {
+  "confidence": 0.95,
+  "method": "finite",
+  "sampling": "independent_rows",
+  "upstream_independence": "unknown",
+  "external_exposure": "unknown",
+  "membership_scope": "full_population",
+  "minimum_membership_coverage": 1,
+  "replicates": 20000,
+  "max_replicates": 200000,
+  "replicate_policy": "nominal_admission"
+}
+			193 button Freeze selected hypotheses, ID: cg4-freeze
+			194 container
+				195 text Import protected frozen hypotheses
+				196 button Import protected frozen hypotheses, ID: cg4-import-family
+			283 text {
+  "confirmation": {
+    "batch_alpha": 0.05,
+    "confidence": 0.95,
+    "declaration_author": null,
+    "declaration_reason": null,
+    "exposure_history_token": null,
+    "external_exposure": "unknown",
+    "known_common_shocks": false,
+    "max_replicates": 200000,
+    "membership_scope": "full_population",
+    "method": "finite",
+    "minimum_membership_coverage": 1,
+    "minimum_tail": 20,
+    "minimum_units": 30,
+    "outcome_scope": "observed_labels",
+    "replicate_policy": "nominal_admission",
+    "replicates": 20000,
+    "request_id": null,
+    "restatement_schedule": [],
+    "sampling": "independent_rows",
+    "schema_version": "confidenceguard.confirmation_spec/1.0",
+    "seed": 0,
+    "study_alpha": 0.05,
+    "study_id": null,
+    "upstream_independence": "unknown"
+  },
+  "content_digest": "94efb0c13f42dbf28134b0fc5e9dfb7410bf74a50d352195482d3aba993ca49b",
+  "family_digest": "e83c402425981ec244f1e774a754fb018944964d4ad659880f7d6fd78bfbb491",
+  "handle": "01f37496484746c6aca5b0080fd9e96e",
+  "hypotheses": [
+    {
+      "candidate_id": "e0360fc4e2a19d944ebd30320505c8d1",
+      "id": "6a855e096874031cbcfa52954c4ebce2e32b994b7b4ff6b1ced62c989b84d223",
+      "membership_scope": "full_population",
+      "objective": {
+        "bounds": [],
+        "ceiling": 0.1,
+        "comparator": "ceiling",
+        "current_period": null,
+        "direction": "higher",
+        "id": "objective",
+        "interval": null,
+        "material_error": null,
+        "metric": "error_rate",
+        "metric_identity": {
+          "dimensions": {},
+          "family": "performance",
+          "method_version": "1",
+          "metric": "accuracy",
+          "units": null
+        },
+        "nominal": null,
+        "practical_threshold": 0.1,
+        "reference_period": null,
+        "reference_run": null,
+        "run": "run1",
+        "target": null,
+        "training_clip": 30,
+        "units": "fraction"
+      }
+    }
+  ]
+}
+			284 link Description: Download protected frozen hypotheses, Value: 127.0.0.1:8049/api/confidenceguard/v1/hypothesis-sets/01f37496484746c6aca5b0080fd9e96e/content
+			197 heading 4 · Independent confirmation, Value: 3
+				198 text 4 · Independent confirmation
+			199 text The current inspected draft supplies H, including an explicitly configured future population when appropriate. Previously exposed H cannot become fresh through renaming or splitting. Missing provenance and unsupported dependence refuse formal claims.
+			200 button Inspect confirmation feasibility without H metrics, ID: cg4-inspect-confirmation
+			285 text 1 frozen hypotheses; 1 elementary intervals. Finite procedure; bootstrap is not used. 240 declared sampling units. Numerical admission: nominally admitted. Claim admission: refused. external exposure unknown; upstream independence unknown
+			286 container Scrollable investigation evidence table
+				287 table Scroll horizontally to see all evidence when the table is wider than the view.
+					288 text Scroll horizontally to see all evidence when the table is wider than the view.
+					289 row
+						290 cell
+							291 text Hypothesis
+						292 cell
+							293 text Planned H
+						294 cell
+							295 text Applicable
+						296 cell
+							297 text Members
+						298 cell
+							299 text Nonmembers
+						300 cell
+							301 text Unavailable
+						302 cell
+							303 text Membership admission
+					304 row
+						305 cell
+							306 text 6a855e096874031cbcfa52954c4ebce2e32b994b7b4ff6b1ced62c989b84d223
+						307 cell
+							308 text 240
+						309 cell
+							310 text 240
+						311 cell
+							312 text 240
+						313 cell
+							314 text 0
+						315 cell
+							316 text 0
+						317 cell
+							318 text No membership refusal
+			201 button (collapsed) Complete feasibility, assumptions and refusal reasons, Secondary Actions: Expand
+				202 text Complete feasibility, assumptions and refusal reasons
+			203 button Assess frozen claims independently on H, ID: cg4-confirm
+			204 heading 5 · Revisit and communicate immutable evidence, Value: 3
+				205 text 5 · Revisit and communicate immutable evidence
+			206 button (collapsed) Historical replay, outcome restatement and private notes, Secondary Actions: Expand
+				207 text Historical replay, outcome restatement and private notes
+			208 button (collapsed) Retain typed enrichment and representations, Secondary Actions: Expand
+				209 text Retain typed enrichment and representations
+			210 button (collapsed) Resolve recorded bootstrap numerical insufficiency, Secondary Actions: Expand
+				211 text Resolve recorded bootstrap numerical insufficiency
+			212 button (collapsed) Predeclared inferential outcome restatements, Secondary Actions: Expand
+				213 text Predeclared inferential outcome restatements
+			214 container
+				215 text Audience
+				216 pop up button (collapsed, settable) Audience, Value: Conservative shareable, ID: cg4-audience, Secondary Actions: Expand
+					217 menu
+						218 (selected) Conservative shareable
+						219 Exact protected local
+			220 container
+				221 text Format
+				222 pop up button (collapsed, settable) Format, Value: html, ID: cg4-format, Secondary Actions: Expand
+					223 menu
+						224 (selected) html
+						225 pdf
+			226 button Export canonical report and JSON, ID: cg4-export
+			319 text Feasibility inspected without H outcome metrics. Known contamination, unavailable membership and unsupported dependence remain explicit.
+
+The focused UI element is 200 button Inspect confirmation feasibility without H metrics, ID: cg4-inspect-confirmation

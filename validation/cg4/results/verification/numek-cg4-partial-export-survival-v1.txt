@@ -1,0 +1,38 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_____ test_partial_export_keeps_failed_job_and_surviving_public_artifacts ______
+
+tmp_path = PosixPath('/private/var/folders/cs/c15xvw9d3t53tzcws5yxjxcr0000gn/T/pytest-of-drivyaanshyadav/pytest-433/test_partial_export_keeps_fail0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x10eb316e0>
+
+    def test_partial_export_keeps_failed_job_and_surviving_public_artifacts(tmp_path,monkeypatch):
+        import io,json
+        from confidenceguard import investigate
+        from confidenceguard import transport
+        result=investigate(binary(tmp_path));before=result.to_private_dict()
+        app=create_app(tmp_path/'host',data_roots=(tmp_path,));app.testing=True;client=app.test_client()
+        original_supervise=transport.compat.supervise
+        def supervised(function,args,config,**options):
+            if function is transport._export:
+                # Exercise the real export coordinator and job serialization while
+                # deterministically faulting only its native PDF converter.
+                def failed_renderer(*args):raise RuntimeError('PRIVATE_RENDERER_FAILURE_SENTINEL')
+                with monkeypatch.context() as patch:
+                    patch.setattr(transport.compat,'pdf',failed_renderer)
+                    return function(*args)
+            return original_supervise(function,args,config,**options)
+        monkeypatch.setattr(transport.compat,'supervise',supervised)
+        try:
+            headers={'X-CSRF-Token':client.get(BASE+'/session').json['data']['csrf_token']}
+            imported=client.post(BASE+'/results/import',headers=headers,data={
+                'result':(io.BytesIO(json.dumps(before).encode()),'result.json'),
+                'manifest':(io.BytesIO(json.dumps(result.private).encode()),'manifest.json')})
+            assert imported.status_code==201,imported.json
+>           rid=imported.json['data']['result_id']
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           KeyError: 'id'
+
+tests/cg4/test_interfaces.py:74: KeyError
+=========================== short test summary info ============================
+FAILED tests/cg4/test_interfaces.py::test_partial_export_keeps_failed_job_and_surviving_public_artifacts
+1 failed in 17.25s

@@ -1,0 +1,24 @@
+F......                                                                  [100%]
+=================================== FAILURES ===================================
+________ test_r2_anchor_is_regression_with_fresh_seeds_and_native_units ________
+
+tmp_path = PosixPath('/private/var/folders/cs/c15xvw9d3t53tzcws5yxjxcr0000gn/T/pytest-of-drivyaanshyadav/pytest-561/test_r2_anchor_is_regression_w0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x10b85eb10>
+
+    def test_r2_anchor_is_regression_with_fresh_seeds_and_native_units(tmp_path, monkeypatch):
+        directory = Path(__file__).resolve().parents[2]/'validation/cg4'
+        monkeypatch.syspath_prepend(str(directory))
+        import qualify_objectives as benchmarks
+        spec, truth = benchmarks.generate(tmp_path, 7, 2000, 'regression_r2')
+        assert spec.evaluation.task.kind == 'regression'
+        assert spec.objectives[0].metric == 'r2'
+        assert spec.objectives[0].units == 'dimensionless'
+        assert benchmarks.PROTOCOL['panel_specific_seed_ranges']['regression_r2'] == [480000, 480039]
+>       assert spec.objectives[0].bounds is None
+E       AssertionError: assert () is None
+E        +  where () = FailureObjectiveSpec(id='failure', metric='r2', run='candidate', comparator='complement', direction='lower', units='di...cal_threshold=0.75, ceiling=None, nominal=None, material_error=None, bounds=(), training_clip=30.0, metric_identity={}).bounds
+
+tests/cg4/test_r2_qualification_inputs.py:21: AssertionError
+=========================== short test summary info ============================
+FAILED tests/cg4/test_r2_qualification_inputs.py::test_r2_anchor_is_regression_with_fresh_seeds_and_native_units
+1 failed, 6 passed in 5.32s

@@ -1,0 +1,38 @@
+F.                                                                       [100%]
+=================================== FAILURES ===================================
+_ test_free_space_poll_falls_back_when_scratch_disappears_between_exists_and_stat _
+
+tmp_path = PosixPath('/private/var/folders/cs/c15xvw9d3t53tzcws5yxjxcr0000gn/T/pytest-of-drivyaanshyadav/pytest-491/test_free_space_poll_falls_bac0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x107586520>
+
+    def test_free_space_poll_falls_back_when_scratch_disappears_between_exists_and_stat(tmp_path,monkeypatch):
+        scratch=tmp_path/'scratch';scratch.mkdir();actual=scalable.os.statvfs;calls=[]
+        expected=actual(tmp_path)
+        def raced(path):
+            calls.append(path)
+            if path==scratch:scratch.rmdir()
+            return actual(path)
+        monkeypatch.setattr(scalable.os,'statvfs',raced)
+>       assert scalable.available(scratch)==expected.f_bavail*expected.f_frsize
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests/cg4/test_supervisor_cleanup.py:15: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/datatrust/scalable.py:38: in available
+    stat = os.statvfs(p)
+           ^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+path = PosixPath('/private/var/folders/cs/c15xvw9d3t53tzcws5yxjxcr0000gn/T/pytest-of-drivyaanshyadav/pytest-491/test_free_space_poll_falls_bac0/scratch')
+
+    def raced(path):
+        calls.append(path)
+        if path==scratch:scratch.rmdir()
+>       return actual(path)
+               ^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: '/private/var/folders/cs/c15xvw9d3t53tzcws5yxjxcr0000gn/T/pytest-of-drivyaanshyadav/pytest-491/test_free_space_poll_falls_bac0/scratch'
+
+tests/cg4/test_supervisor_cleanup.py:13: FileNotFoundError
+=========================== short test summary info ============================
+FAILED tests/cg4/test_supervisor_cleanup.py::test_free_space_poll_falls_back_when_scratch_disappears_between_exists_and_stat
+1 failed, 1 passed in 0.51s

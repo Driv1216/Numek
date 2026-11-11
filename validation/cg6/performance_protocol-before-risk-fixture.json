@@ -1,0 +1,220 @@
+{
+  "schema": "cg6.named_host_performance/1.0",
+  "hardware": "CG6-MAC-01",
+  "frozen_before_acceptance": true,
+  "calibration_sha256": "b14a34c4a9761844dc7a41c4f58e2fee0de6fe426f240796fa28d13030f15baf",
+  "calibration_policy": "one bounded pass; setup-only failure was corrected before any workload measurement",
+  "config": {
+    "free_disk_bytes": 1073741824,
+    "threads": 2,
+    "max_rss_bytes": 6442450944,
+    "workspace_bytes": 17179869184,
+    "max_seconds": 1800,
+    "private_bytes": 134217728,
+    "result_bytes": 33554432,
+    "max_details": 2
+  },
+  "profiles": {
+    "tabular-25k": {
+      "kind": "tabular",
+      "rows": 25000,
+      "fields": 50,
+      "scenarios": 8,
+      "elapsed_seconds": 1800
+    },
+    "streaming-100k": {
+      "kind": "streaming",
+      "rows": 100000,
+      "fields": 32,
+      "scenarios": 1,
+      "elapsed_seconds": 1800
+    },
+    "device-cpu": {
+      "kind": "device",
+      "rows": 100000,
+      "fields": 128,
+      "hidden": [
+        512,
+        512
+      ],
+      "device": "cpu",
+      "elapsed_seconds": 900
+    },
+    "device-mps": {
+      "kind": "device",
+      "rows": 100000,
+      "fields": 128,
+      "hidden": [
+        512,
+        512
+      ],
+      "device": "mps",
+      "elapsed_seconds": 900
+    },
+    "text-cpu": {
+      "kind": "text",
+      "rows": 2000,
+      "device": "cpu",
+      "elapsed_seconds": 600
+    },
+    "text-mps": {
+      "kind": "text",
+      "rows": 2000,
+      "device": "mps",
+      "elapsed_seconds": 600
+    },
+    "image-cpu": {
+      "kind": "image",
+      "rows": 1000,
+      "device": "cpu",
+      "elapsed_seconds": 900
+    },
+    "image-mps": {
+      "kind": "image",
+      "rows": 1000,
+      "device": "mps",
+      "elapsed_seconds": 900
+    },
+    "attacks-cpu": {
+      "kind": "attacks",
+      "rows": 200,
+      "fields": 50,
+      "device": "cpu",
+      "elapsed_seconds": 900
+    },
+    "attacks-mps": {
+      "kind": "attacks",
+      "rows": 200,
+      "fields": 50,
+      "device": "mps",
+      "elapsed_seconds": 1200
+    },
+    "capacity": {
+      "kind": "capacity",
+      "rows": 10000,
+      "fields": 50,
+      "device": "cpu",
+      "elapsed_seconds": 1200
+    },
+    "scale-histogram": {
+      "kind": "auxiliary",
+      "target": "scale",
+      "family": "histogram",
+      "rows": 100000,
+      "fields": 50,
+      "device": "cpu",
+      "elapsed_seconds": 1800
+    },
+    "scale-mlp": {
+      "kind": "auxiliary",
+      "target": "scale",
+      "family": "mlp",
+      "rows": 100000,
+      "fields": 50,
+      "device": "cpu",
+      "elapsed_seconds": 1800
+    },
+    "quantiles-histogram": {
+      "kind": "auxiliary",
+      "target": "quantiles",
+      "family": "histogram",
+      "rows": 100000,
+      "fields": 50,
+      "device": "cpu",
+      "elapsed_seconds": 1800,
+      "quantile_rearrange": true
+    },
+    "quantiles-mlp": {
+      "kind": "auxiliary",
+      "target": "quantiles",
+      "family": "mlp",
+      "rows": 100000,
+      "fields": 50,
+      "device": "cpu",
+      "elapsed_seconds": 1800,
+      "quantile_rearrange": true
+    },
+    "failure_risk-logistic": {
+      "kind": "auxiliary",
+      "target": "failure_risk",
+      "family": "logistic",
+      "rows": 100000,
+      "fields": 50,
+      "device": "cpu",
+      "elapsed_seconds": 1800
+    },
+    "failure_risk-histogram": {
+      "kind": "auxiliary",
+      "target": "failure_risk",
+      "family": "histogram",
+      "rows": 100000,
+      "fields": 50,
+      "device": "cpu",
+      "elapsed_seconds": 1800
+    },
+    "failure_risk-mlp": {
+      "kind": "auxiliary",
+      "target": "failure_risk",
+      "family": "mlp",
+      "rows": 100000,
+      "fields": 50,
+      "device": "cpu",
+      "elapsed_seconds": 1800
+    },
+    "scale-mlp-mps": {
+      "kind": "auxiliary",
+      "target": "scale",
+      "family": "mlp",
+      "rows": 100000,
+      "fields": 50,
+      "device": "mps",
+      "elapsed_seconds": 1800
+    },
+    "quantiles-mlp-mps": {
+      "kind": "auxiliary",
+      "target": "quantiles",
+      "family": "mlp",
+      "rows": 100000,
+      "fields": 50,
+      "device": "mps",
+      "elapsed_seconds": 1800,
+      "quantile_rearrange": true
+    },
+    "failure_risk-mlp-mps": {
+      "kind": "auxiliary",
+      "target": "failure_risk",
+      "family": "mlp",
+      "rows": 100000,
+      "fields": 50,
+      "device": "mps",
+      "elapsed_seconds": 1800
+    }
+  },
+  "not_admitted_reference_profiles": [
+    {
+      "name": "tabular-100k",
+      "rows": 100000,
+      "fields": 50,
+      "models": 2,
+      "scenarios": 8,
+      "reason": "Calibration staged 25.4 MB per 2000 output rows, implying roughly 22.9 GB for 1.8 million output rows, above the frozen 16 GiB workspace envelope. Admitted 25k profile remains separately named."
+    },
+    {
+      "name": "streaming-1m",
+      "rows": 1000000,
+      "fields": 32,
+      "scenarios": 1,
+      "reason": "Canonical and original-source exposure aliases are returned to the parent before execution; one million identities exceed the admitted 128 MiB protected packet. The 100k profile qualifies bounded streaming tensor execution, not million-row capacity."
+    }
+  ],
+  "structural_requirements": [
+    "one model load per operation except recorded restart/fallback",
+    "batch-bounded tensors",
+    "no event-by-scenario-by-model-by-class tensor",
+    "cache_bytes=0 for measurements",
+    "charged retries and searches",
+    "synchronized GPU execution timing including transfers"
+  ],
+  "interpretation": "Host/model/workload-specific completion and resource observations; no universal throughput, GPU speedup, or CUDA runtime qualification. RSS and MPS allocation overlap in unified memory.",
+  "pre_measurement_clarification": "Quantile benchmark fits declare monotone rearrangement explicitly before any measured auxiliary workload; default-crossing refusal remains unchanged. Sizes, thresholds and resource envelopes are unchanged."
+}

@@ -1,0 +1,43 @@
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+___ test_paired_native_precision_preserves_each_models_positive_denominator ____
+
+tmp_path = PosixPath('/private/var/folders/cs/c15xvw9d3t53tzcws5yxjxcr0000gn/T/pytest-of-drivyaanshyadav/pytest-488/test_paired_native_precision_p0')
+
+    def test_paired_native_precision_preserves_each_models_positive_denominator(tmp_path):
+        spec=fixture_spec(tmp_path);s,c,roots=arguments(spec,None,None)
+        with prepared(s,c,roots) as p:
+            objective=bind(s.objectives[0],p.store);indices,features,_=p.role_data('D')
+            member=np.array([cell['canonical']=='1' for cell in features['context.x']])
+            artifact=seal('structured',{'clauses':[{'field':'context.x','kind':'categorical','op':'eq','value':'1'}]},
+                          features=['context.x'],objective=objective.identity)
+            measurement=p.evaluate(objective,'D',indices,{'member':member,'available':np.ones(len(indices),bool),
+                                                        'reason':np.full(len(indices),'available')},artifact)
+            # Direct fixture calculation: 60 true positives among current's 120
+            # positive decisions; reference has only the 60 true positive decisions.
+>           assert measurement['member_metric']['value']==pytest.approx(.5)
+E           assert 1.0 == 0.5 ± 5.0e-07
+E             
+E             comparison failed
+E             Obtained: 1.0
+E             Expected: 0.5 ± 5.0e-07
+
+tests/cg4/test_paired_precision.py:42: AssertionError
+___ test_paired_precision_diagnostic_can_learn_differing_positive_decisions ____
+
+tmp_path = PosixPath('/private/var/folders/cs/c15xvw9d3t53tzcws5yxjxcr0000gn/T/pytest-of-drivyaanshyadav/pytest-488/test_paired_precision_diagnost0')
+
+    def test_paired_precision_diagnostic_can_learn_differing_positive_decisions(tmp_path):
+        spec=fixture_spec(tmp_path);s,c,roots=arguments(spec,None,None)
+        with prepared(s,c,roots) as p:
+            objective=bind(s.objectives[0],p.store);keys,eligible,loss=objective.training('D')
+>           assert eligible.sum()==240
+E           assert np.int64(120) == 240
+E            +  where np.int64(120) = <built-in method sum of numpy.ndarray object at 0x110341050>()
+E            +    where <built-in method sum of numpy.ndarray object at 0x110341050> = array([False,  True,  True, False, False,  True,  True, False, False,\n       False,  True,  True, False, False,  True,...       False, False,  True,  True, False, False,  True,  True, False,\n       False,  True,  True,  True, False, False]).sum
+
+tests/cg4/test_paired_precision.py:53: AssertionError
+=========================== short test summary info ============================
+FAILED tests/cg4/test_paired_precision.py::test_paired_native_precision_preserves_each_models_positive_denominator
+FAILED tests/cg4/test_paired_precision.py::test_paired_precision_diagnostic_can_learn_differing_positive_decisions
+2 failed in 1.51s

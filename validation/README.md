@@ -1,6 +1,18 @@
 # DataTrust Validation Corpus
 
-Last updated: 2026-10-09
+Last updated: 2026-11-08
+
+## ConfidenceGuard CG6 — founder-accepted
+
+The founder confirmed CG6 is done and accepted on 2026-11-08. CG1–CG6 are complete
+within their approved scopes. See [CG6 completion status](cg6/IMPLEMENTATION_STATUS.md),
+[verification and evidence reuse](cg6/VERIFICATION.md),
+[R1–R6 correction record](cg6/review-corrections-r1-r6/REVIEW_CORRECTIONS.md), and
+[the final implementation explainer](cg6/CG6_FINAL_IMPLEMENTATION_EXPLAINER.md).
+Actual NVIDIA CUDA runtime qualification remains pending hardware and nonblocking.
+Scientific limits and source-bound measurements remain unchanged. The earlier
+DataTrust validation corpus instructions below retain their historical scope;
+this documentation update does not regenerate evidence or rerun campaigns.
 
 This workspace is separate from `src/datatrust/`. It prepares public validation
 data, creates deterministic controlled mutations, generates DataTrust reports,

@@ -1,0 +1,21 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+___ test_shortlist_reserves_broad_material_impact_alongside_narrow_severity ____
+
+    def test_shortlist_reserves_broad_material_impact_alongside_narrow_severity():
+        rows=[]
+        for identifier,effect,start,support in [('severe',.6,0,70),('another_severe',.59,70,90),('broad',.3,0,500)]:
+            row=candidate(identifier,effect,support,2 if identifier=='broad' else 1)
+            row['objective']['practical_threshold']=.15
+            row['_S_mask']=(((1<<support)-1)<<start).to_bytes(125,'little').hex();rows.append(row)
+        _,overlap,selected=reconcile(rows,2,1000)
+>       assert selected==['severe','broad']
+E       AssertionError: assert ['severe', 'another_severe'] == ['severe', 'broad']
+E         
+E         At index 1 diff: 'another_severe' != 'broad'
+E         Use -v to get more diff
+
+tests/cg4/test_reconciliation.py:27: AssertionError
+=========================== short test summary info ============================
+FAILED tests/cg4/test_reconciliation.py::test_shortlist_reserves_broad_material_impact_alongside_narrow_severity
+1 failed in 0.24s

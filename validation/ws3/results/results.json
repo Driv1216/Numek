@@ -1,0 +1,769 @@
+{
+  "benchmark": "ws3_context_v1",
+  "definition_sha256": "c4bed25f91e83e47a778dfe6a169398261e0e1428662a837573d87b096abf6f7",
+  "summary": {
+    "cases": 29,
+    "passed": 29,
+    "failed": [],
+    "dependency": {
+      "positives": 4,
+      "detected": [
+        "dep_copy_renamed",
+        "dep_numeric_reencoding",
+        "dep_categorical_proxy",
+        "dep_quantitative_separator"
+      ],
+      "missed": [],
+      "negatives": 5,
+      "false_flags": [],
+      "clean": [
+        "dep_outcome_like_name",
+        "dep_identifier",
+        "dep_raw_bank",
+        "dep_raw_adult",
+        "dep_raw_german"
+      ],
+      "expected_misses": {
+        "dep_noisy_copy": "missed"
+      },
+      "abstained": [
+        "dep_small_sample",
+        "cand_999_rare"
+      ],
+      "unsearched_features_total": 21
+    },
+    "families": [
+      "adult",
+      "bank",
+      "german"
+    ],
+    "note": "Families are mutations of three base datasets; they are not independent samples. Results establish behaviour on these constructed cases only, not external validity."
+  },
+  "cases": [
+    {
+      "id": "dep_copy_renamed",
+      "family": "german",
+      "kind": "dependency",
+      "class": "positive",
+      "expected": {
+        "flagged": [
+          "col_17"
+        ]
+      },
+      "observed": {
+        "flagged": [
+          "col_17"
+        ],
+        "status": "completed",
+        "unsearched": 0,
+        "codes": [
+          "dependency_availability_unknown"
+        ]
+      },
+      "outcome": "detected",
+      "passed": true
+    },
+    {
+      "id": "dep_numeric_reencoding",
+      "family": "german",
+      "kind": "dependency",
+      "class": "positive",
+      "expected": {
+        "flagged": [
+          "flag"
+        ]
+      },
+      "observed": {
+        "flagged": [
+          "flag"
+        ],
+        "status": "completed",
+        "unsearched": 0,
+        "codes": [
+          "dependency_availability_unknown"
+        ]
+      },
+      "outcome": "detected",
+      "passed": true
+    },
+    {
+      "id": "dep_categorical_proxy",
+      "family": "adult",
+      "kind": "dependency",
+      "class": "positive",
+      "expected": {
+        "flagged": [
+          "segment_code"
+        ]
+      },
+      "observed": {
+        "flagged": [
+          "segment_code"
+        ],
+        "status": "completed",
+        "unsearched": 0,
+        "codes": [
+          "dependency_availability_unknown"
+        ]
+      },
+      "outcome": "detected",
+      "passed": true
+    },
+    {
+      "id": "dep_quantitative_separator",
+      "family": "bank",
+      "kind": "dependency",
+      "class": "positive",
+      "expected": {
+        "flagged": [
+          "x_score"
+        ]
+      },
+      "observed": {
+        "flagged": [
+          "x_score"
+        ],
+        "status": "completed",
+        "unsearched": 0,
+        "codes": [
+          "dependency_availability_unknown"
+        ]
+      },
+      "outcome": "detected",
+      "passed": true
+    },
+    {
+      "id": "dep_noisy_copy",
+      "family": "german",
+      "kind": "dependency",
+      "class": "expected_miss",
+      "expected": {
+        "flagged": []
+      },
+      "observed": {
+        "flagged": [],
+        "status": "completed",
+        "unsearched": 0,
+        "codes": []
+      },
+      "outcome": "missed",
+      "passed": true
+    },
+    {
+      "id": "dep_outcome_like_name",
+      "family": "german",
+      "kind": "dependency",
+      "class": "negative",
+      "expected": {
+        "flagged": []
+      },
+      "observed": {
+        "flagged": [],
+        "status": "completed",
+        "unsearched": 0,
+        "codes": []
+      },
+      "outcome": "clean",
+      "passed": true
+    },
+    {
+      "id": "dep_identifier",
+      "family": "adult",
+      "kind": "dependency",
+      "class": "negative",
+      "expected": {
+        "flagged": []
+      },
+      "observed": {
+        "flagged": [],
+        "status": "completed",
+        "unsearched": 0,
+        "codes": []
+      },
+      "outcome": "clean",
+      "passed": true
+    },
+    {
+      "id": "dep_raw_bank",
+      "family": "bank",
+      "kind": "dependency",
+      "class": "negative",
+      "expected": {
+        "flagged": []
+      },
+      "observed": {
+        "flagged": [],
+        "status": "completed",
+        "unsearched": 0,
+        "codes": []
+      },
+      "outcome": "clean",
+      "passed": true
+    },
+    {
+      "id": "dep_raw_adult",
+      "family": "adult",
+      "kind": "dependency",
+      "class": "negative",
+      "expected": {
+        "flagged": []
+      },
+      "observed": {
+        "flagged": [],
+        "status": "completed",
+        "unsearched": 0,
+        "codes": []
+      },
+      "outcome": "clean",
+      "passed": true
+    },
+    {
+      "id": "dep_raw_german",
+      "family": "german",
+      "kind": "dependency",
+      "class": "negative",
+      "expected": {
+        "flagged": []
+      },
+      "observed": {
+        "flagged": [],
+        "status": "completed",
+        "unsearched": 0,
+        "codes": []
+      },
+      "outcome": "clean",
+      "passed": true
+    },
+    {
+      "id": "dep_small_sample",
+      "family": "german",
+      "kind": "dependency",
+      "class": "abstention",
+      "expected": {
+        "status": "not_assessable"
+      },
+      "observed": {
+        "flagged": [],
+        "status": "not_assessable",
+        "unsearched": 21,
+        "codes": []
+      },
+      "outcome": "abstained",
+      "passed": true
+    },
+    {
+      "id": "dep_declared_available",
+      "family": "german",
+      "kind": "availability",
+      "class": "negative",
+      "expected": {
+        "codes": [
+          "deterministic_predictor_declared_available"
+        ],
+        "absent_codes": [
+          "target_dependency_unavailable",
+          "dependency_availability_unknown"
+        ]
+      },
+      "observed": {
+        "flagged": [
+          "risk_band"
+        ],
+        "status": "completed",
+        "unsearched": 0,
+        "codes": [
+          "deterministic_predictor_declared_available"
+        ]
+      },
+      "outcome": "agrees",
+      "passed": true
+    },
+    {
+      "id": "dep_declared_unavailable",
+      "family": "german",
+      "kind": "availability",
+      "class": "positive",
+      "expected": {
+        "codes": [
+          "target_dependency_unavailable"
+        ]
+      },
+      "observed": {
+        "flagged": [
+          "decision_flag"
+        ],
+        "status": "completed",
+        "unsearched": 0,
+        "codes": [
+          "declared_unavailable_feature",
+          "target_dependency_unavailable"
+        ]
+      },
+      "outcome": "agrees",
+      "passed": true
+    },
+    {
+      "id": "avail_duration_declared",
+      "family": "bank",
+      "kind": "availability",
+      "class": "positive",
+      "expected": {
+        "codes": [
+          "declared_unavailable_feature"
+        ],
+        "columns": [
+          "duration"
+        ]
+      },
+      "observed": {
+        "flagged": [],
+        "status": "completed",
+        "unsearched": 0,
+        "codes": [
+          "declared_unavailable_feature"
+        ]
+      },
+      "outcome": "agrees",
+      "passed": true
+    },
+    {
+      "id": "avail_duration_undeclared",
+      "family": "bank",
+      "kind": "availability",
+      "class": "negative",
+      "expected": {
+        "absent_codes": [
+          "declared_unavailable_feature",
+          "target_dependency_unavailable"
+        ]
+      },
+      "observed": {
+        "flagged": [],
+        "status": "completed",
+        "unsearched": 0,
+        "codes": []
+      },
+      "outcome": "agrees",
+      "passed": true
+    },
+    {
+      "id": "cand_bank",
+      "family": "bank",
+      "kind": "candidates",
+      "class": "positive",
+      "expected": {
+        "candidates": [
+          [
+            "pdays",
+            -1
+          ],
+          [
+            "previous_campaign_outcome",
+            "unknown"
+          ],
+          [
+            "contact",
+            "unknown"
+          ],
+          [
+            "education",
+            "unknown"
+          ],
+          [
+            "job",
+            "unknown"
+          ]
+        ],
+        "no_candidate_columns": [
+          "balance",
+          "day",
+          "campaign",
+          "previous",
+          "age",
+          "duration"
+        ]
+      },
+      "observed": {
+        "flagged": [],
+        "status": "completed",
+        "unsearched": 0,
+        "codes": [],
+        "candidates": [
+          [
+            "contact",
+            "unknown"
+          ],
+          [
+            "education",
+            "unknown"
+          ],
+          [
+            "job",
+            "unknown"
+          ],
+          [
+            "pdays",
+            -1
+          ],
+          [
+            "previous_campaign_outcome",
+            "unknown"
+          ]
+        ]
+      },
+      "outcome": "agrees",
+      "passed": true
+    },
+    {
+      "id": "cand_real_minus_one",
+      "family": "german",
+      "kind": "candidates",
+      "class": "negative",
+      "expected": {
+        "no_candidate_columns": [
+          "delta"
+        ]
+      },
+      "observed": {
+        "flagged": [],
+        "status": "completed",
+        "unsearched": 0,
+        "codes": [],
+        "candidates": []
+      },
+      "outcome": "agrees",
+      "passed": true
+    },
+    {
+      "id": "cand_999_outside",
+      "family": "german",
+      "kind": "candidates",
+      "class": "positive",
+      "expected": {
+        "candidates": [
+          [
+            "months_open",
+            999
+          ]
+        ]
+      },
+      "observed": {
+        "flagged": [],
+        "status": "completed",
+        "unsearched": 0,
+        "codes": [],
+        "candidates": [
+          [
+            "months_open",
+            999
+          ]
+        ]
+      },
+      "outcome": "agrees",
+      "passed": true
+    },
+    {
+      "id": "cand_999_rare",
+      "family": "german",
+      "kind": "candidates",
+      "class": "abstention",
+      "expected": {
+        "no_candidate_columns": [
+          "months_open"
+        ]
+      },
+      "observed": {
+        "flagged": [],
+        "status": "completed",
+        "unsearched": 0,
+        "codes": [],
+        "candidates": []
+      },
+      "outcome": "abstained",
+      "passed": true
+    },
+    {
+      "id": "decl_pdays",
+      "family": "bank",
+      "kind": "declaration",
+      "class": "positive",
+      "expected": {
+        "oracle": "pdays_applicable"
+      },
+      "observed": {
+        "flagged": [],
+        "status": "completed",
+        "unsearched": 0,
+        "codes": []
+      },
+      "oracle": {
+        "expected": {
+          "applicable_rows": 8257,
+          "outside": 49,
+          "present": 0,
+          "absent": 0
+        },
+        "observed": {
+          "applicable_rows": 8257,
+          "outside": 49,
+          "present": 0,
+          "absent": 0
+        }
+      },
+      "outcome": "agrees",
+      "passed": true
+    },
+    {
+      "id": "decl_poutcome",
+      "family": "bank",
+      "kind": "declaration",
+      "class": "positive",
+      "expected": {
+        "oracle": "poutcome_exceptions",
+        "codes": [
+          "declared_condition_exceptions"
+        ]
+      },
+      "observed": {
+        "flagged": [],
+        "status": "completed",
+        "unsearched": 0,
+        "codes": [
+          "declared_condition_exceptions"
+        ]
+      },
+      "oracle": {
+        "expected": {
+          "absent": 5,
+          "present": 0
+        },
+        "observed": {
+          "absent": 5,
+          "present": 0
+        }
+      },
+      "outcome": "agrees",
+      "passed": true
+    },
+    {
+      "id": "decl_typo",
+      "family": "bank",
+      "kind": "declaration",
+      "class": "positive",
+      "expected": {
+        "codes": [
+          "declared_value_not_observed"
+        ]
+      },
+      "observed": {
+        "flagged": [],
+        "status": "completed",
+        "unsearched": 0,
+        "codes": [
+          "declared_value_not_observed"
+        ]
+      },
+      "outcome": "agrees",
+      "passed": true
+    },
+    {
+      "id": "ba_filter_keys",
+      "family": "german",
+      "kind": "before_after",
+      "class": "positive",
+      "expected": {
+        "oracle": "lineage",
+        "titles_absent": [
+          "Changes between before and after were not declared",
+          "Declared transformations are not reflected in the data"
+        ]
+      },
+      "oracle": {
+        "expected": {
+          "difference": -40,
+          "by_class": {
+            "bad": -24,
+            "good": -16
+          },
+          "dropped": 40,
+          "added": 0,
+          "dropped_by_class": {
+            "bad": 24,
+            "good": 16
+          },
+          "explained": true
+        },
+        "observed": {
+          "difference": -40,
+          "by_class": {
+            "good": -16,
+            "bad": -24
+          },
+          "dropped": 40,
+          "added": 0,
+          "dropped_by_class": {
+            "bad": 24,
+            "good": 16
+          },
+          "explained": true
+        }
+      },
+      "observed": {
+        "titles": [
+          "Selected schema or representation changed"
+        ]
+      },
+      "passed": true,
+      "outcome": "agrees"
+    },
+    {
+      "id": "ba_filter_no_keys",
+      "family": "german",
+      "kind": "before_after",
+      "class": "positive",
+      "expected": {
+        "oracle": "aggregate",
+        "titles": [
+          "Row changes are not explained by identity evidence"
+        ]
+      },
+      "oracle": {
+        "expected": {
+          "difference": -40,
+          "by_class": {
+            "bad": -24,
+            "good": -16
+          },
+          "explained": null
+        },
+        "observed": {
+          "difference": -40,
+          "by_class": {
+            "good": -16,
+            "bad": -24
+          },
+          "explained": null
+        }
+      },
+      "observed": {
+        "titles": [
+          "Row changes are not explained by identity evidence",
+          "Selected schema or representation changed"
+        ]
+      },
+      "passed": true,
+      "outcome": "agrees"
+    },
+    {
+      "id": "ba_dedup",
+      "family": "bank",
+      "kind": "before_after",
+      "class": "positive",
+      "expected": {
+        "oracle": "aggregate"
+      },
+      "oracle": {
+        "expected": {
+          "difference": -200,
+          "by_class": {
+            "no": -191,
+            "yes": -9
+          },
+          "explained": null
+        },
+        "observed": {
+          "difference": -200,
+          "by_class": {
+            "no": -191,
+            "yes": -9
+          },
+          "explained": null
+        }
+      },
+      "observed": {
+        "titles": [
+          "Row changes are not explained by identity evidence"
+        ]
+      },
+      "passed": true,
+      "outcome": "agrees"
+    },
+    {
+      "id": "ba_undeclared_drop",
+      "family": "german",
+      "kind": "before_after",
+      "class": "positive",
+      "expected": {
+        "titles": [
+          "Changes between before and after were not declared"
+        ]
+      },
+      "observed": {
+        "titles": [
+          "Changes between before and after were not declared",
+          "Selected schema or representation changed"
+        ]
+      },
+      "passed": true,
+      "outcome": "agrees"
+    },
+    {
+      "id": "ba_incomplete_impute",
+      "family": "german",
+      "kind": "before_after",
+      "class": "positive",
+      "expected": {
+        "titles": [
+          "Declared imputation left missing values"
+        ]
+      },
+      "observed": {
+        "titles": [
+          "Declared imputation left missing values"
+        ]
+      },
+      "passed": true,
+      "outcome": "agrees"
+    },
+    {
+      "id": "ba_undeclared_encoding",
+      "family": "bank",
+      "kind": "before_after",
+      "class": "positive",
+      "expected": {
+        "encodings": [
+          "housing"
+        ],
+        "titles": [
+          "Changes between before and after were not declared"
+        ]
+      },
+      "observed": {
+        "titles": [
+          "Changes between before and after were not declared",
+          "Selected schema or representation changed"
+        ]
+      },
+      "passed": true,
+      "outcome": "agrees"
+    },
+    {
+      "id": "ba_declared_not_done",
+      "family": "german",
+      "kind": "before_after",
+      "class": "positive",
+      "expected": {
+        "titles": [
+          "Declared transformations are not reflected in the data"
+        ]
+      },
+      "observed": {
+        "titles": [
+          "Declared transformations are not reflected in the data"
+        ]
+      },
+      "passed": true,
+      "outcome": "agrees"
+    }
+  ]
+}

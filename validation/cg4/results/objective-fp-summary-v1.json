@@ -1,0 +1,2371 @@
+{
+  "H_selected_effect_summary": {
+    "count": 167,
+    "maximum": 0.3847590081070257,
+    "median": 0.2839633225458468,
+    "minimum": 0.15503246753246747
+  },
+  "H_unavailable": {
+    "oracle_members": 0,
+    "total": 0
+  },
+  "aggregation_source_sha256": "b0198af985f5ef3d4104b7d916feacc59527242a4b7f5bae3409a5212174d4c2",
+  "anchor_criterion_met": true,
+  "assessment_states": {
+    "confirmed": 140,
+    "inconclusive": 27
+  },
+  "assessment_strengths": {
+    "finite_sample": 167
+  },
+  "objective": "false_positive",
+  "protocol": {
+    "assessments": "Authoritative frozen-region H effects measured separately from recovery; intervals remain finite or explicitly approximate and subject to qualification/refusal.",
+    "criterion": {
+      "H_precision": 0.7,
+      "H_recall": 0.7,
+      "minimum_successes_of_40": 32
+    },
+    "development_seed_range": [
+      0,
+      39
+    ],
+    "not_covered": [
+      "Historical-deterioration workspace panel",
+      "Natural-data recovery",
+      "Every registered metric from one representative objective"
+    ],
+    "panels": {
+      "calibration_bins": {
+        "contrast": "Frozen equal-width bin residual magnitude .30 versus zero",
+        "delta": 0.15,
+        "metric": "reliability_diagram"
+      },
+      "calibration_residual": {
+        "contrast": "Signed target residual +.30 versus zero at supplied p=.5",
+        "delta": 0.15,
+        "metric": "calibration_residual"
+      },
+      "false_negative": {
+        "contrast": ".40 versus .10 among actual positives",
+        "delta": 0.15,
+        "metric": "false_negative_rate"
+      },
+      "false_positive": {
+        "contrast": ".40 versus .10 among actual negatives",
+        "delta": 0.15,
+        "metric": "false_positive_rate"
+      },
+      "paired_degradation": {
+        "contrast": "Common-population candidate minus reference error .30 versus zero",
+        "delta": 0.15,
+        "metric": "error_rate"
+      },
+      "precision": {
+        "contrast": ".60 versus .90 among predicted positives",
+        "delta": 0.15,
+        "direction": "lower",
+        "metric": "precision"
+      },
+      "probability_quality": {
+        "contrast": "Brier .33 versus .09; high-confidence error mechanism",
+        "delta": 0.12,
+        "metric": "brier"
+      },
+      "ranking_ap": {
+        "contrast": "Reversed versus correctly ordered noisy scores at balanced label prevalence",
+        "delta": 0.2,
+        "direction": "lower",
+        "metric": "average_precision"
+      },
+      "ranking_auc": {
+        "contrast": "Reversed versus correctly ordered noisy score distributions",
+        "delta": 0.35,
+        "direction": "lower",
+        "metric": "roc_auc"
+      },
+      "regression_bias": {
+        "bounds": [
+          -1.0,
+          2.0
+        ],
+        "contrast": "Signed mean bias .90 versus zero with bounded independent noise",
+        "delta": 0.45,
+        "metric": "bias",
+        "units": "metres"
+      },
+      "regression_tail": {
+        "contrast": "Absolute error >1 metre: .60 versus .01",
+        "delta": 0.25,
+        "metric": "material_error_rate",
+        "units": "fraction"
+      },
+      "uncertainty_coverage": {
+        "contrast": "Prediction-interval miscoverage .60 versus .10",
+        "delta": 0.25,
+        "metric": "interval_miscoverage"
+      },
+      "uncertainty_efficiency": {
+        "bounds": [
+          1.0,
+          5.0
+        ],
+        "contrast": "Issued interval widths 4 versus 2 metres, with unchanged perfect coverage",
+        "delta": 1.0,
+        "metric": "interval_width",
+        "units": "metres"
+      }
+    },
+    "primary": "Positive-native-effect S-selected union evaluated on independent H; unavailable counts stay in planned recall.",
+    "qualification_seed_range": [
+      110000,
+      110039
+    ],
+    "region": "categorical a=1 AND continuous x>.5; expected prevalence .125",
+    "schema_version": "numek.cg4_objective_recovery_protocol/1.0",
+    "strategy_claims": "Unified runs do not qualify every strategy. Separate --strategies ablations retain the same profile and separate evidence.",
+    "units": 40000
+  },
+  "role_medians": {
+    "D": {
+      "IoU": 0.9699341624948064,
+      "precision": 0.9951678352408935,
+      "recall": 0.9813138940501738
+    },
+    "H": {
+      "IoU": 0.969113652811145,
+      "precision": 0.9974304063809557,
+      "recall": 0.9813673731989454
+    },
+    "S": {
+      "IoU": 0.9703283765787107,
+      "precision": 0.997210104849396,
+      "recall": 0.9807536065313887
+    }
+  },
+  "schema_version": "numek.cg4_objective_anchor_summary/1.0",
+  "scope": "The declared synthetic objective and unified-strategy operating profile only. H measures independently selected frozen gates. Planned membership stays in recovery denominators. Candidate effects overlap and are not independent replicates. No claim for other objectives, individual strategy superiority, external independence verification or milestone completion.",
+  "source_binding_sha256": "3dcb8e7b1f72f0fd74594d627da28d632e56b5feda1c0ea8b889d65190127489",
+  "source_identity": "4a9a0d10d38c8fb733e9923b257abb68a0783f775815a009f4cc10b213ab140c",
+  "success_fraction_MC95": [
+    0.9119026971211976,
+    1.0
+  ],
+  "successes": 40,
+  "trials": [
+    {
+      "H_selected_native_effects": [
+        0.3501785780036084,
+        0.3203271262047659,
+        0.30611584319190654
+      ],
+      "assessment_states": [
+        "confirmed",
+        "confirmed",
+        "confirmed"
+      ],
+      "input_sha256": "1b8961ff5a386932cf18db4defd4c5d54b8752abe52374d4b6c95cc86afb7240",
+      "path": "validation/cg4/results/objective-fp-qualification-v1/false_positive-110000.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.9409300377042312,
+          "false_negative": 98,
+          "false_positive": 43,
+          "planned": 19890,
+          "precision": 0.981214504150284,
+          "recall": 0.9581911262798635,
+          "true_positive": 2246,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9322555812163202,
+          "false_negative": 63,
+          "false_positive": 25,
+          "planned": 10045,
+          "precision": 0.9797734627831716,
+          "recall": 0.9505494505494505,
+          "true_positive": 1211,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9386169386169386,
+          "false_negative": 50,
+          "false_positive": 29,
+          "planned": 10065,
+          "precision": 0.9765561843168957,
+          "recall": 0.9602543720190779,
+          "true_positive": 1208,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 512.3561837919988,
+      "seed": 110000,
+      "sha256": "8e15731c01f968a6f8da92f0ca5c20bea0913387d6c91b4e35e99029f5f5db4e",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.16430315529952821,
+        0.2854251196845563,
+        0.2769624095186819,
+        0.2728552210423695,
+        0.27912520258705564,
+        0.27398584924894764
+      ],
+      "assessment_states": [
+        "inconclusive",
+        "confirmed",
+        "confirmed",
+        "confirmed",
+        "confirmed",
+        "confirmed"
+      ],
+      "input_sha256": "fd2ec45d3d02926fb50fb41137aecedbecd59a3218511b52a25f612e7d4818af",
+      "path": "validation/cg4/results/objective-fp-qualification-v1/false_positive-110001.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.992879746835443,
+          "false_negative": 10,
+          "false_positive": 8,
+          "planned": 20128,
+          "precision": 0.9968228752978554,
+          "recall": 0.996031746031746,
+          "true_positive": 2510,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9958711808422791,
+          "false_negative": 3,
+          "false_positive": 2,
+          "planned": 9844,
+          "precision": 0.9983443708609272,
+          "recall": 0.9975186104218362,
+          "true_positive": 1206,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9927942353883107,
+          "false_negative": 9,
+          "false_positive": 0,
+          "planned": 10028,
+          "precision": 1.0,
+          "recall": 0.9927942353883107,
+          "true_positive": 1240,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 510.5827133330167,
+      "seed": 110001,
+      "sha256": "b1b7f86872553d821159637a61c2df37339f86d100a6f870b1667534daeae4f8",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.15503246753246747,
+        0.21712286478699316,
+        0.2903844543513687,
+        0.2780593458956032,
+        0.281075329566855,
+        0.2828657568333912
+      ],
+      "assessment_states": [
+        "inconclusive",
+        "inconclusive",
+        "confirmed",
+        "confirmed",
+        "confirmed",
+        "confirmed"
+      ],
+      "input_sha256": "9d3e18300b117642c9cc2be25ae4772a34164775bf69ac68dd8a396505fe1e85",
+      "path": "validation/cg4/results/objective-fp-qualification-v1/false_positive-110002.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.9515246286161063,
+          "false_negative": 122,
+          "false_positive": 2,
+          "planned": 19988,
+          "precision": 0.9991789819376026,
+          "recall": 0.9522691705790297,
+          "true_positive": 2434,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9463696369636964,
+          "false_negative": 64,
+          "false_positive": 1,
+          "planned": 10043,
+          "precision": 0.9991289198606271,
+          "recall": 0.9471511147811725,
+          "true_positive": 1147,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9428347689898199,
+          "false_negative": 72,
+          "false_positive": 1,
+          "planned": 9969,
+          "precision": 0.9991701244813278,
+          "recall": 0.9435736677115988,
+          "true_positive": 1204,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 534.410625458986,
+      "seed": 110002,
+      "sha256": "c9a1e35ff880f66f55f6c88f0a97a09be927312b4989434e014d3f5b885bfc36",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.20282424896564133,
+        0.23501227345031295,
+        0.22593585407250472,
+        0.24003548196333524,
+        0.24908339314227845
+      ],
+      "assessment_states": [
+        "inconclusive",
+        "inconclusive",
+        "inconclusive",
+        "confirmed",
+        "confirmed"
+      ],
+      "input_sha256": "5187d9b3b613abc19ae3839b54e15558ac0d10094c14415bc1d8981b2c99de96",
+      "path": "validation/cg4/results/objective-fp-qualification-v1/false_positive-110003.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.9436017113963439,
+          "false_negative": 143,
+          "false_positive": 2,
+          "planned": 19980,
+          "precision": 0.999176276771005,
+          "recall": 0.9443363176333204,
+          "true_positive": 2426,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9494614747307374,
+          "false_negative": 61,
+          "false_positive": 0,
+          "planned": 9919,
+          "precision": 1.0,
+          "recall": 0.9494614747307374,
+          "true_positive": 1146,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9415584415584416,
+          "false_negative": 72,
+          "false_positive": 0,
+          "planned": 10101,
+          "precision": 1.0,
+          "recall": 0.9415584415584416,
+          "true_positive": 1160,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 543.3173419999948,
+      "seed": 110003,
+      "sha256": "69ca0142f078961c537f48e41a8e5246116e762847e9a59e22a4afe98be84d3e",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.27455026455026454,
+        0.24997106621015575,
+        0.2110513096519555,
+        0.2575882944603647,
+        0.26754732735788755,
+        0.2592578695860067,
+        0.2789771482582766
+      ],
+      "assessment_states": [
+        "inconclusive",
+        "confirmed",
+        "inconclusive",
+        "confirmed",
+        "confirmed",
+        "confirmed",
+        "confirmed"
+      ],
+      "input_sha256": "944759a2422c07c044b256d8332a216c9963a514c0d90fdcf30591bd5b73469e",
+      "path": "validation/cg4/results/objective-fp-qualification-v1/false_positive-110004.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.94750656167979,
+          "false_negative": 21,
+          "false_positive": 119,
+          "planned": 20133,
+          "precision": 0.955026455026455,
+          "recall": 0.9917582417582418,
+          "true_positive": 2527,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9625,
+          "false_negative": 7,
+          "false_positive": 41,
+          "planned": 9967,
+          "precision": 0.9677926158680282,
+          "recall": 0.9943502824858758,
+          "true_positive": 1232,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9700230591852421,
+          "false_negative": 5,
+          "false_positive": 34,
+          "planned": 9900,
+          "precision": 0.9737654320987654,
+          "recall": 0.9960536700868192,
+          "true_positive": 1262,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 543.2808410839934,
+      "seed": 110004,
+      "sha256": "a2d2a4b8d34e5def3123c09b2525152494081c30178e07aafaedf03d97726ce1",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.2930311430228033,
+        0.2787126864726164
+      ],
+      "assessment_states": [
+        "confirmed",
+        "confirmed"
+      ],
+      "input_sha256": "4e5ff65d05219ae19443abd485c6d8a8017c17d101663a22c5eeaaab99ceff05",
+      "path": "validation/cg4/results/objective-fp-qualification-v1/false_positive-110005.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.9281789638932496,
+          "false_negative": 183,
+          "false_positive": 0,
+          "planned": 20066,
+          "precision": 1.0,
+          "recall": 0.9281789638932496,
+          "true_positive": 2365,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9119086460032626,
+          "false_negative": 108,
+          "false_positive": 0,
+          "planned": 9903,
+          "precision": 1.0,
+          "recall": 0.9119086460032626,
+          "true_positive": 1118,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9379968203497615,
+          "false_negative": 78,
+          "false_positive": 0,
+          "planned": 10031,
+          "precision": 1.0,
+          "recall": 0.9379968203497615,
+          "true_positive": 1180,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 513.4361665830074,
+      "seed": 110005,
+      "sha256": "b047abde61974a4072b52c0dbb6712286c28dd1d2f47a19216ac2ebd4c7b7a95",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.2966829800278883,
+        0.27522343851123054,
+        0.28844401516622276,
+        0.29987560490905507
+      ],
+      "assessment_states": [
+        "confirmed",
+        "confirmed",
+        "confirmed",
+        "confirmed"
+      ],
+      "input_sha256": "773f143d1f5d729afa5c220f11bbc9364787e99054fea10fae7c8360b8bf6154",
+      "path": "validation/cg4/results/objective-fp-qualification-v1/false_positive-110006.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.9927913496195434,
+          "false_negative": 18,
+          "false_positive": 0,
+          "planned": 20113,
+          "precision": 1.0,
+          "recall": 0.9927913496195434,
+          "true_positive": 2479,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9903225806451613,
+          "false_negative": 12,
+          "false_positive": 0,
+          "planned": 10049,
+          "precision": 1.0,
+          "recall": 0.9903225806451613,
+          "true_positive": 1228,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.994331983805668,
+          "false_negative": 7,
+          "false_positive": 0,
+          "planned": 9838,
+          "precision": 1.0,
+          "recall": 0.994331983805668,
+          "true_positive": 1228,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 446.29123804101255,
+      "seed": 110006,
+      "sha256": "5534f06aff2745193b2b735a819254181a733807b9b8c7a178b936cf59c77a4c",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.24867744854995477,
+        0.28262214672935493,
+        0.3117836624248228,
+        0.2786271644793037,
+        0.2802535286863126,
+        0.2974963969752743
+      ],
+      "assessment_states": [
+        "inconclusive",
+        "confirmed",
+        "confirmed",
+        "confirmed",
+        "confirmed",
+        "confirmed"
+      ],
+      "input_sha256": "a3ce35e0d20e3d58919c8eb553b6b5f8f4e8c10a28db622dadbfbff56320d5d9",
+      "path": "validation/cg4/results/objective-fp-qualification-v1/false_positive-110007.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.9744897959183674,
+          "false_negative": 10,
+          "false_positive": 55,
+          "planned": 20098,
+          "precision": 0.9783293932230103,
+          "recall": 0.9959887685519454,
+          "true_positive": 2483,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9790322580645161,
+          "false_negative": 3,
+          "false_positive": 23,
+          "planned": 10008,
+          "precision": 0.9814066289409863,
+          "recall": 0.9975349219391948,
+          "true_positive": 1214,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9760132340777502,
+          "false_negative": 5,
+          "false_positive": 24,
+          "planned": 9894,
+          "precision": 0.9800664451827242,
+          "recall": 0.9957805907172996,
+          "true_positive": 1180,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 433.11840962499264,
+      "seed": 110007,
+      "sha256": "5b1ccccdbf6f8dbded3576dbaa9df30ab4768be0bdbe8c6198eaf1b7c459c7aa",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.29523972228679296,
+        0.3019095477386934,
+        0.3294117647058823,
+        0.35637971969058746,
+        0.3466517857142857
+      ],
+      "assessment_states": [
+        "inconclusive",
+        "confirmed",
+        "confirmed",
+        "confirmed",
+        "confirmed"
+      ],
+      "input_sha256": "e48a0d52d9ad0b517ba868fbc12609a1ec17b2506e9d42b1c7d28352d3718a76",
+      "path": "validation/cg4/results/objective-fp-qualification-v1/false_positive-110008.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.9809220985691574,
+          "false_negative": 31,
+          "false_positive": 17,
+          "planned": 19982,
+          "precision": 0.993158953722334,
+          "recall": 0.9875950380152061,
+          "true_positive": 2468,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9847878302642114,
+          "false_negative": 17,
+          "false_positive": 2,
+          "planned": 10064,
+          "precision": 0.9983766233766234,
+          "recall": 0.9863672814755413,
+          "true_positive": 1230,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9892650701899257,
+          "false_negative": 11,
+          "false_positive": 2,
+          "planned": 9954,
+          "precision": 0.9983333333333333,
+          "recall": 0.9909015715467329,
+          "true_positive": 1198,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 425.11686937499326,
+      "seed": 110008,
+      "sha256": "ef209de72058dd96b3bf8062259862c0896d1cbb6e33afc200b7ccd674446877",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.3549080463233595,
+        0.3215246833029207,
+        0.33327984545880185,
+        0.3251784463382228
+      ],
+      "assessment_states": [
+        "confirmed",
+        "confirmed",
+        "confirmed",
+        "confirmed"
+      ],
+      "input_sha256": "fae3cde55cc5d8e7560fafc7314e8d5703e6ddd00ca4e519b7d6ac43d70fc14d",
+      "path": "validation/cg4/results/objective-fp-qualification-v1/false_positive-110009.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.984036021285305,
+          "false_negative": 37,
+          "false_positive": 2,
+          "planned": 19968,
+          "precision": 0.999168744804655,
+          "recall": 0.9848422777550184,
+          "true_positive": 2404,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9831546707503829,
+          "false_negative": 19,
+          "false_positive": 3,
+          "planned": 9988,
+          "precision": 0.9976689976689976,
+          "recall": 0.985418265541059,
+          "true_positive": 1284,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9850157728706624,
+          "false_negative": 17,
+          "false_positive": 2,
+          "planned": 10044,
+          "precision": 0.9984012789768185,
+          "recall": 0.9865718799368088,
+          "true_positive": 1249,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 405.6477714999928,
+      "seed": 110009,
+      "sha256": "e553766f138963e1e3e4377b2ad40d8a9bdf0781190280dd3a66c3441246e692",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.294990567308988,
+        0.2940147652843299,
+        0.2816685314136994
+      ],
+      "assessment_states": [
+        "confirmed",
+        "confirmed",
+        "confirmed"
+      ],
+      "input_sha256": "b75e3a4fabe9c8abe9370f3bb243e951201f89636ab1c397a02822545dbf06f2",
+      "path": "validation/cg4/results/objective-fp-qualification-v1/false_positive-110010.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.9558011049723757,
+          "false_negative": 77,
+          "false_positive": 35,
+          "planned": 20122,
+          "precision": 0.9857549857549858,
+          "recall": 0.969187675070028,
+          "true_positive": 2422,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9588709677419355,
+          "false_negative": 38,
+          "false_positive": 13,
+          "planned": 9987,
+          "precision": 0.9891846921797005,
+          "recall": 0.9690301548492257,
+          "true_positive": 1189,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9528301886792453,
+          "false_negative": 46,
+          "false_positive": 14,
+          "planned": 9891,
+          "precision": 0.9885807504078303,
+          "recall": 0.9634340222575517,
+          "true_positive": 1212,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 415.38240074997884,
+      "seed": 110010,
+      "sha256": "132ea92b9538f351360a4742a02fef497b4001a19c4d4f69c4d23c5ce1489bb9",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.23903288813809853,
+        0.25673586204693544,
+        0.28364909049920983,
+        0.271396902520498
+      ],
+      "assessment_states": [
+        "inconclusive",
+        "confirmed",
+        "confirmed",
+        "confirmed"
+      ],
+      "input_sha256": "f295bfc02755e772aa3c6069f2ac20fd3f8f84e78be89cee5ed0c9caaffdffc5",
+      "path": "validation/cg4/results/objective-fp-qualification-v1/false_positive-110011.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.975229724330803,
+          "false_negative": 55,
+          "false_positive": 7,
+          "planned": 20068,
+          "precision": 0.997140522875817,
+          "recall": 0.9779647435897436,
+          "true_positive": 2441,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9765100671140939,
+          "false_negative": 25,
+          "false_positive": 3,
+          "planned": 9978,
+          "precision": 0.9974293059125964,
+          "recall": 0.9789739276703112,
+          "true_positive": 1164,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.96845694799659,
+          "false_negative": 36,
+          "false_positive": 1,
+          "planned": 9954,
+          "precision": 0.9991204925241864,
+          "recall": 0.9692832764505119,
+          "true_positive": 1136,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 395.9053208339901,
+      "seed": 110011,
+      "sha256": "dd8ea44d9f49ae582db6e718414ccbe445691858e1e95714e20dd4ba584ec4d5",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.24503149597526108,
+        0.23928335328485406,
+        0.2614677390527257
+      ],
+      "assessment_states": [
+        "confirmed",
+        "confirmed",
+        "confirmed"
+      ],
+      "input_sha256": "030953d1f5e56b122fe8b3072f83c489c0e8e2fadcc8fa64ad619d3210e32866",
+      "path": "validation/cg4/results/objective-fp-qualification-v1/false_positive-110012.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.9968316831683168,
+          "false_negative": 8,
+          "false_positive": 0,
+          "planned": 19979,
+          "precision": 1.0,
+          "recall": 0.9968316831683168,
+          "true_positive": 2517,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9991863303498779,
+          "false_negative": 1,
+          "false_positive": 0,
+          "planned": 10108,
+          "precision": 1.0,
+          "recall": 0.9991863303498779,
+          "true_positive": 1228,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9974248927038627,
+          "false_negative": 3,
+          "false_positive": 0,
+          "planned": 9913,
+          "precision": 1.0,
+          "recall": 0.9974248927038627,
+          "true_positive": 1162,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 411.1921092910052,
+      "seed": 110012,
+      "sha256": "9c6fa6386c7a6ddf17556519aea47ba60e67fbaeca9ef33340196aa9ad8729bd",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.27362813456747037,
+        0.29827911791873185,
+        0.2956564442272408
+      ],
+      "assessment_states": [
+        "confirmed",
+        "confirmed",
+        "confirmed"
+      ],
+      "input_sha256": "1c7352903b99bd0f62e9eec0cb6f49414d4ffad22484c8bd845c0bba204c4460",
+      "path": "validation/cg4/results/objective-fp-qualification-v1/false_positive-110013.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.9519306540583137,
+          "false_negative": 21,
+          "false_positive": 101,
+          "planned": 20145,
+          "precision": 0.9598728645212554,
+          "recall": 0.9913828477636438,
+          "true_positive": 2416,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9625498007968127,
+          "false_negative": 8,
+          "false_positive": 39,
+          "planned": 9936,
+          "precision": 0.9687249398556536,
+          "recall": 0.993421052631579,
+          "true_positive": 1208,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9621036349574633,
+          "false_negative": 8,
+          "false_positive": 41,
+          "planned": 9919,
+          "precision": 0.9680933852140078,
+          "recall": 0.9936102236421726,
+          "true_positive": 1244,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 409.0566708749975,
+      "seed": 110013,
+      "sha256": "e1b4a4e0556b69fc8273c2ada26a2ab36c17fdb854bdf4c25864ba9c0970d8e6",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.30629236847577457,
+        0.3216155771990352,
+        0.29051450505647003,
+        0.2874737990967253
+      ],
+      "assessment_states": [
+        "confirmed",
+        "confirmed",
+        "confirmed",
+        "confirmed"
+      ],
+      "input_sha256": "368c1e6ed9b41a901dc7afe00ece428abc87f64bdb97532a48e0c8e8ad102488",
+      "path": "validation/cg4/results/objective-fp-qualification-v1/false_positive-110014.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.9826976012583563,
+          "false_negative": 43,
+          "false_positive": 1,
+          "planned": 20123,
+          "precision": 0.9996,
+          "recall": 0.9830841856805664,
+          "true_positive": 2499,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.983159582999198,
+          "false_negative": 21,
+          "false_positive": 0,
+          "planned": 9931,
+          "precision": 1.0,
+          "recall": 0.983159582999198,
+          "true_positive": 1226,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9850393700787402,
+          "false_negative": 19,
+          "false_positive": 0,
+          "planned": 9946,
+          "precision": 1.0,
+          "recall": 0.9850393700787402,
+          "true_positive": 1251,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 412.58649412498926,
+      "seed": 110014,
+      "sha256": "a7df24e986a05f8193d3715ff55b8550e4ed9be02541e711c3f2f82f8b5fb407",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.26713693979881026,
+        0.2649964939121566,
+        0.27456817376172205
+      ],
+      "assessment_states": [
+        "confirmed",
+        "confirmed",
+        "confirmed"
+      ],
+      "input_sha256": "e85b330d9e91d4859bdd207cd4b92318d4da2a0922b5ddb89ac1937fed12169d",
+      "path": "validation/cg4/results/objective-fp-qualification-v1/false_positive-110015.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.968812475009996,
+          "false_negative": 50,
+          "false_positive": 28,
+          "planned": 19824,
+          "precision": 0.9885760913912689,
+          "recall": 0.9797816417306915,
+          "true_positive": 2423,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9755351681957186,
+          "false_negative": 21,
+          "false_positive": 11,
+          "planned": 10127,
+          "precision": 0.9914529914529915,
+          "recall": 0.9838087895142636,
+          "true_positive": 1276,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9694713328369322,
+          "false_negative": 26,
+          "false_positive": 15,
+          "planned": 10049,
+          "precision": 0.9886104783599089,
+          "recall": 0.9804216867469879,
+          "true_positive": 1302,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 402.84811583400005,
+      "seed": 110015,
+      "sha256": "a10acd7052536dc5ee20f0b181b9d6db6b1dde1975e713f65dd5951bcf8bed6c",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.3847590081070257,
+        0.34364636687399763,
+        0.2982553528945281,
+        0.32514721133776814
+      ],
+      "assessment_states": [
+        "confirmed",
+        "confirmed",
+        "confirmed",
+        "confirmed"
+      ],
+      "input_sha256": "7c3cb97c2778299b5a50c9020587c60b38f8ee37896e9b30e391c2903e990ecd",
+      "path": "validation/cg4/results/objective-fp-qualification-v1/false_positive-110016.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.98661800486618,
+          "false_negative": 22,
+          "false_positive": 11,
+          "planned": 19933,
+          "precision": 0.9954991816693944,
+          "recall": 0.9910386965376782,
+          "true_positive": 2433,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9832268370607029,
+          "false_negative": 13,
+          "false_positive": 8,
+          "planned": 10076,
+          "precision": 0.993543179983858,
+          "recall": 0.9895498392282959,
+          "true_positive": 1231,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9815852682145717,
+          "false_negative": 18,
+          "false_positive": 5,
+          "planned": 9991,
+          "precision": 0.9959382615759546,
+          "recall": 0.9855305466237942,
+          "true_positive": 1226,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 409.17711279101786,
+      "seed": 110016,
+      "sha256": "c496355e8c29b5a264f0ae3db1284f3ee8d099e9e0100aefbafae751194edd51",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.16866823024103528,
+        0.18772951040204777,
+        0.29901155580377303,
+        0.2645606713015288,
+        0.2716640046287855
+      ],
+      "assessment_states": [
+        "inconclusive",
+        "inconclusive",
+        "confirmed",
+        "confirmed",
+        "confirmed"
+      ],
+      "input_sha256": "a138844f4fc18964f4e84ab3027ef03f535dbd72c61ed763f3e4411ae3e974db",
+      "path": "validation/cg4/results/objective-fp-qualification-v1/false_positive-110017.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.9687880016214026,
+          "false_negative": 49,
+          "false_positive": 28,
+          "planned": 19973,
+          "precision": 0.9884201819685691,
+          "recall": 0.979909799097991,
+          "true_positive": 2390,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9609494640122511,
+          "false_negative": 34,
+          "false_positive": 17,
+          "planned": 10081,
+          "precision": 0.9866352201257862,
+          "recall": 0.9736229635376261,
+          "true_positive": 1255,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9707078925956062,
+          "false_negative": 23,
+          "false_positive": 13,
+          "planned": 9946,
+          "precision": 0.9892205638474295,
+          "recall": 0.9810855263157895,
+          "true_positive": 1193,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 386.3162632500171,
+      "seed": 110017,
+      "sha256": "a692f9043f254e04dee36d29a84f92e7b0b5dfed948a0ff543a866e20f427ffd",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.2775987107171636,
+        0.2486533074768369,
+        0.257372867465815,
+        0.25692469425888875,
+        0.2639078887368901
+      ],
+      "assessment_states": [
+        "inconclusive",
+        "confirmed",
+        "confirmed",
+        "confirmed",
+        "confirmed"
+      ],
+      "input_sha256": "20e677cfa8f34cb0494013347ef5f4b9371be07f9efa2a79ce94d4b759f9fe4a",
+      "path": "validation/cg4/results/objective-fp-qualification-v1/false_positive-110018.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.9512686266612969,
+          "false_negative": 100,
+          "false_positive": 21,
+          "planned": 20118,
+          "precision": 0.9911875786823332,
+          "recall": 0.9593826157595451,
+          "true_positive": 2362,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9561200923787528,
+          "false_negative": 44,
+          "false_positive": 13,
+          "planned": 9955,
+          "precision": 0.9896414342629483,
+          "recall": 0.9657853810264385,
+          "true_positive": 1242,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9532567049808429,
+          "false_negative": 48,
+          "false_positive": 13,
+          "planned": 9927,
+          "precision": 0.9896579156722355,
+          "recall": 0.9628482972136223,
+          "true_positive": 1244,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 383.942358374974,
+      "seed": 110018,
+      "sha256": "7067cee9e80c1d44e4dc5a136f3267f13d09535da35b66cfcbcae4a112348da3",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.24969499950745266,
+        0.27376814569206165,
+        0.2717039960424511
+      ],
+      "assessment_states": [
+        "confirmed",
+        "confirmed",
+        "confirmed"
+      ],
+      "input_sha256": "1d4f4b24d339b063e4de238048a99eac9d66045267885a379a0178e09677deab",
+      "path": "validation/cg4/results/objective-fp-qualification-v1/false_positive-110019.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.958498023715415,
+          "false_negative": 79,
+          "false_positive": 26,
+          "planned": 20023,
+          "precision": 0.9893920848633211,
+          "recall": 0.9684504792332268,
+          "true_positive": 2425,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9548335974643423,
+          "false_negative": 41,
+          "false_positive": 16,
+          "planned": 9952,
+          "precision": 0.9868959868959869,
+          "recall": 0.9670947030497592,
+          "true_positive": 1205,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9609250398724083,
+          "false_negative": 37,
+          "false_positive": 12,
+          "planned": 10025,
+          "precision": 0.990139687756779,
+          "recall": 0.9702093397745571,
+          "true_positive": 1205,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 377.77053599999635,
+      "seed": 110019,
+      "sha256": "bc97177febac3e2fcdfeea9ea239decf02ac916fb6f7c3740f4b3046d6db3f64",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.3021087274500244,
+        0.33361808321735376
+      ],
+      "assessment_states": [
+        "confirmed",
+        "confirmed"
+      ],
+      "input_sha256": "42f10bca517498031458c6c0e267f703260e4bf4ced54517aa54877a60efe5c4",
+      "path": "validation/cg4/results/objective-fp-qualification-v1/false_positive-110020.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.9940143655227454,
+          "false_negative": 0,
+          "false_positive": 15,
+          "planned": 19987,
+          "precision": 0.9940143655227454,
+          "recall": 1.0,
+          "true_positive": 2491,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.996141975308642,
+          "false_negative": 0,
+          "false_positive": 5,
+          "planned": 9974,
+          "precision": 0.996141975308642,
+          "recall": 1.0,
+          "true_positive": 1291,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9937839937839937,
+          "false_negative": 0,
+          "false_positive": 8,
+          "planned": 10039,
+          "precision": 0.9937839937839937,
+          "recall": 1.0,
+          "true_positive": 1279,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 365.92800695900223,
+      "seed": 110020,
+      "sha256": "c52a0a8bfda24d8ee5a181fc4057b744fab02e74816697834340ddb6b37024c1",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.31795543372055146,
+        0.3218207442843296,
+        0.324818619874534,
+        0.33747443361339513,
+        0.3180710062259271
+      ],
+      "assessment_states": [
+        "confirmed",
+        "confirmed",
+        "confirmed",
+        "confirmed",
+        "confirmed"
+      ],
+      "input_sha256": "7891678fd4d665fecdb10c08fa0b137c6dcb876d4364085f602d779e873fd736",
+      "path": "validation/cg4/results/objective-fp-qualification-v1/false_positive-110021.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.9503602882305845,
+          "false_negative": 61,
+          "false_positive": 63,
+          "planned": 19979,
+          "precision": 0.9741485432909315,
+          "recall": 0.9749486652977413,
+          "true_positive": 2374,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9565560821484992,
+          "false_negative": 33,
+          "false_positive": 22,
+          "planned": 9959,
+          "precision": 0.9821573398215734,
+          "recall": 0.9734726688102894,
+          "true_positive": 1211,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.950626959247649,
+          "false_negative": 38,
+          "false_positive": 25,
+          "planned": 10062,
+          "precision": 0.9798061389337641,
+          "recall": 0.9696243005595524,
+          "true_positive": 1213,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 359.4501675830106,
+      "seed": 110021,
+      "sha256": "37818f184d097ff2008d689d1d3e3fc4d8d2fad37964a20fe91541163f25a94b",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.29801525873507295,
+        0.28826248170192525,
+        0.3142244053119976,
+        0.29719673322786166,
+        0.2984470059663986
+      ],
+      "assessment_states": [
+        "confirmed",
+        "confirmed",
+        "confirmed",
+        "confirmed",
+        "confirmed"
+      ],
+      "input_sha256": "f7d949277917248e4163c462739421f45cd35126dc6273c722a9c75b14d4be89",
+      "path": "validation/cg4/results/objective-fp-qualification-v1/false_positive-110022.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.9839679358717435,
+          "false_negative": 40,
+          "false_positive": 0,
+          "planned": 20005,
+          "precision": 1.0,
+          "recall": 0.9839679358717435,
+          "true_positive": 2455,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9758333333333333,
+          "false_negative": 29,
+          "false_positive": 0,
+          "planned": 10026,
+          "precision": 1.0,
+          "recall": 0.9758333333333333,
+          "true_positive": 1171,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9773489932885906,
+          "false_negative": 27,
+          "false_positive": 0,
+          "planned": 9969,
+          "precision": 1.0,
+          "recall": 0.9773489932885906,
+          "true_positive": 1165,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 384.7110232920095,
+      "seed": 110022,
+      "sha256": "7df0fa10969f4e82542ff32a560e920a103a3da0504573279a6d01aa60efe309",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.27554602364943204,
+        0.27476877543470213,
+        0.2839633225458468,
+        0.2881376157736757
+      ],
+      "assessment_states": [
+        "confirmed",
+        "confirmed",
+        "confirmed",
+        "confirmed"
+      ],
+      "input_sha256": "dec2c835a4e752555afe0d927b48964029c139bc05f2af7444921761237c0018",
+      "path": "validation/cg4/results/objective-fp-qualification-v1/false_positive-110023.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.9995982322217758,
+          "false_negative": 1,
+          "false_positive": 0,
+          "planned": 19915,
+          "precision": 1.0,
+          "recall": 0.9995982322217758,
+          "true_positive": 2488,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9983539094650206,
+          "false_negative": 2,
+          "false_positive": 0,
+          "planned": 10023,
+          "precision": 1.0,
+          "recall": 0.9983539094650206,
+          "true_positive": 1213,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.998390989541432,
+          "false_negative": 2,
+          "false_positive": 0,
+          "planned": 10062,
+          "precision": 1.0,
+          "recall": 0.998390989541432,
+          "true_positive": 1241,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 422.48631833298714,
+      "seed": 110023,
+      "sha256": "7fcae75ae05fd42d0dd50d228a8cae11deffdba818ff4fa0498da67f63b47238",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.270397059870744,
+        0.2762028507892589
+      ],
+      "assessment_states": [
+        "confirmed",
+        "confirmed"
+      ],
+      "input_sha256": "e1219c747770edb59e81dcb052421a4976d11393902d18b13e47a5790597f5e5",
+      "path": "validation/cg4/results/objective-fp-qualification-v1/false_positive-110024.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.973404255319149,
+          "false_negative": 65,
+          "false_positive": 0,
+          "planned": 20018,
+          "precision": 1.0,
+          "recall": 0.973404255319149,
+          "true_positive": 2379,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9794576828266228,
+          "false_negative": 25,
+          "false_positive": 0,
+          "planned": 9936,
+          "precision": 1.0,
+          "recall": 0.9794576828266228,
+          "true_positive": 1192,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9762470308788599,
+          "false_negative": 30,
+          "false_positive": 0,
+          "planned": 10046,
+          "precision": 1.0,
+          "recall": 0.9762470308788599,
+          "true_positive": 1233,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 392.7185308749904,
+      "seed": 110024,
+      "sha256": "f09ad2dd897a4cf81e70d881811bca5d45821ca08cd98f45cd69155f9e653177",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.2676272225628449,
+        0.25026232368323187,
+        0.27145648250363597,
+        0.260023118905228
+      ],
+      "assessment_states": [
+        "inconclusive",
+        "confirmed",
+        "confirmed",
+        "confirmed"
+      ],
+      "input_sha256": "abb24b3158711ea137c6f35dde2539b4d5aeb4b7daf5d91cf4439005a6850145",
+      "path": "validation/cg4/results/objective-fp-qualification-v1/false_positive-110025.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.9857425742574257,
+          "false_negative": 31,
+          "false_positive": 5,
+          "planned": 20096,
+          "precision": 0.9979951884522855,
+          "recall": 0.9876984126984127,
+          "true_positive": 2489,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.994299674267101,
+          "false_negative": 7,
+          "false_positive": 0,
+          "planned": 9963,
+          "precision": 1.0,
+          "recall": 0.994299674267101,
+          "true_positive": 1221,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9818325434439179,
+          "false_negative": 20,
+          "false_positive": 3,
+          "planned": 9941,
+          "precision": 0.9975922953451043,
+          "recall": 0.9841646872525732,
+          "true_positive": 1243,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 425.6412267090054,
+      "seed": 110025,
+      "sha256": "4a211b5bfee0301b206ad1edd2cc812326c11f429d207f515731e47b787bc796",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.22197568057486494,
+        0.31311686550976137,
+        0.31152797534376486,
+        0.30186984781526793,
+        0.3059075071270193
+      ],
+      "assessment_states": [
+        "inconclusive",
+        "confirmed",
+        "confirmed",
+        "confirmed",
+        "confirmed"
+      ],
+      "input_sha256": "f78ff6c934fbd5e8c45d01187a59693665e912288ec8f4552452a8ee572e313e",
+      "path": "validation/cg4/results/objective-fp-qualification-v1/false_positive-110026.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.9939589206604913,
+          "false_negative": 11,
+          "false_positive": 4,
+          "planned": 19978,
+          "precision": 0.9983818770226537,
+          "recall": 0.9955627269060104,
+          "true_positive": 2468,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9903381642512077,
+          "false_negative": 11,
+          "false_positive": 1,
+          "planned": 9916,
+          "precision": 0.9991876523151909,
+          "recall": 0.9911361804995971,
+          "true_positive": 1230,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9944664031620554,
+          "false_negative": 6,
+          "false_positive": 1,
+          "planned": 10106,
+          "precision": 0.9992057188244639,
+          "recall": 0.995253164556962,
+          "true_positive": 1258,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 391.67742729198653,
+      "seed": 110026,
+      "sha256": "61b2ed53f7e54658aa56bf88fb163aebe61c48495845d50bb5736f89ff0a4619",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.2794630587003468,
+        0.30408832946751385,
+        0.30979048512205953,
+        0.30991713445602787,
+        0.31173553667025977,
+        0.31442240633804786
+      ],
+      "assessment_states": [
+        "confirmed",
+        "confirmed",
+        "confirmed",
+        "confirmed",
+        "confirmed",
+        "confirmed"
+      ],
+      "input_sha256": "e33af755548bdf13b3b70755371fb6e6329120da10f8f8f4d8b418b915671fb4",
+      "path": "validation/cg4/results/objective-fp-qualification-v1/false_positive-110027.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.9933176100628931,
+          "false_negative": 0,
+          "false_positive": 17,
+          "planned": 20082,
+          "precision": 0.9933176100628931,
+          "recall": 1.0,
+          "true_positive": 2527,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9959935897435898,
+          "false_negative": 0,
+          "false_positive": 5,
+          "planned": 9984,
+          "precision": 0.9959935897435898,
+          "recall": 1.0,
+          "true_positive": 1243,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9968279143536876,
+          "false_negative": 0,
+          "false_positive": 4,
+          "planned": 9934,
+          "precision": 0.9968279143536876,
+          "recall": 1.0,
+          "true_positive": 1257,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 348.9245954590151,
+      "seed": 110027,
+      "sha256": "be4c704c6b652ca063228d99de6e5715cf0072a7aedbd39c81aaf6641ea8f2ce",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.3480589064768672,
+        0.3424360797003698,
+        0.3399782897025154,
+        0.34622447873541073
+      ],
+      "assessment_states": [
+        "confirmed",
+        "confirmed",
+        "confirmed",
+        "confirmed"
+      ],
+      "input_sha256": "eddd5d1ca86961be5fe1f169991e80ffd48a1df48e28081e28fd1445fd958226",
+      "path": "validation/cg4/results/objective-fp-qualification-v1/false_positive-110028.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.9218500797448166,
+          "false_negative": 184,
+          "false_positive": 12,
+          "planned": 19929,
+          "precision": 0.9948364888123924,
+          "recall": 0.9262820512820513,
+          "true_positive": 2312,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9304610733182161,
+          "false_negative": 90,
+          "false_positive": 2,
+          "planned": 10150,
+          "precision": 0.9983779399837794,
+          "recall": 0.9318697956093869,
+          "true_positive": 1231,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9055425448868072,
+          "false_negative": 116,
+          "false_positive": 5,
+          "planned": 9921,
+          "precision": 0.9957081545064378,
+          "recall": 0.9090909090909091,
+          "true_positive": 1160,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 320.3287048749917,
+      "seed": 110028,
+      "sha256": "f9d64f3d3daa71c2f1f3d4abf9f078ec42a53e37fe76d841eb1fdfc8853819cc",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.27137382397538923,
+        0.2507047635246621,
+        0.2576467258205447,
+        0.2763667970447631
+      ],
+      "assessment_states": [
+        "inconclusive",
+        "confirmed",
+        "confirmed",
+        "confirmed"
+      ],
+      "input_sha256": "91b9dd341f97442041dc1ae5669dd59cc3add147304150e0848f0e0ba6628411",
+      "path": "validation/cg4/results/objective-fp-qualification-v1/false_positive-110029.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.9671026555687673,
+          "false_negative": 58,
+          "false_positive": 25,
+          "planned": 20157,
+          "precision": 0.9898580121703854,
+          "recall": 0.9767814251401121,
+          "true_positive": 2440,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.967453213995118,
+          "false_negative": 32,
+          "false_positive": 8,
+          "planned": 9863,
+          "precision": 0.9933166248955723,
+          "recall": 0.9737919737919738,
+          "true_positive": 1189,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9651623119556612,
+          "false_negative": 34,
+          "false_positive": 10,
+          "planned": 9980,
+          "precision": 0.9918633034987795,
+          "recall": 0.9728651237031125,
+          "true_positive": 1219,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 327.7168631670065,
+      "seed": 110029,
+      "sha256": "1ffcff7a7fb073906c9f784d8ce068dec52ed5ffb48bbed813e42dbe1f2dfff9",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.2772188256473054,
+        0.28339228238955894,
+        0.2506800013268319
+      ],
+      "assessment_states": [
+        "confirmed",
+        "confirmed",
+        "confirmed"
+      ],
+      "input_sha256": "0f8927f649e3ec8bd6724dadbcc59c2f96c208c7338ffb92ec31b917073a1a36",
+      "path": "validation/cg4/results/objective-fp-qualification-v1/false_positive-110030.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.947746310331073,
+          "false_negative": 116,
+          "false_positive": 15,
+          "planned": 20119,
+          "precision": 0.9937264742785445,
+          "recall": 0.9534510433386838,
+          "true_positive": 2376,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9502762430939227,
+          "false_negative": 56,
+          "false_positive": 7,
+          "planned": 10064,
+          "precision": 0.9942196531791907,
+          "recall": 0.9555555555555556,
+          "true_positive": 1204,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9455445544554455,
+          "false_negative": 54,
+          "false_positive": 12,
+          "planned": 9817,
+          "precision": 0.9896373056994818,
+          "recall": 0.955,
+          "true_positive": 1146,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 321.37662991700927,
+      "seed": 110030,
+      "sha256": "20a1be5a6c69a64071306d6ce5d4645b9b1c9b4dd9177a4a2278abbea048a91f",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.35771261934687226,
+        0.20743164522446145,
+        0.300747021163149,
+        0.3001914025479635
+      ],
+      "assessment_states": [
+        "confirmed",
+        "inconclusive",
+        "confirmed",
+        "confirmed"
+      ],
+      "input_sha256": "aa6ad86703e0803641327acae5247b004058d41ee1bc44279bcb2a7af467102a",
+      "path": "validation/cg4/results/objective-fp-qualification-v1/false_positive-110031.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.9162244124336618,
+          "false_negative": 36,
+          "false_positive": 185,
+          "planned": 19999,
+          "precision": 0.9289008455034589,
+          "recall": 0.9853240929474113,
+          "true_positive": 2417,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9352627570449352,
+          "false_negative": 14,
+          "false_positive": 71,
+          "planned": 10112,
+          "precision": 0.945342571208622,
+          "recall": 0.9887278582930756,
+          "true_positive": 1228,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9380325329202169,
+          "false_negative": 12,
+          "false_positive": 68,
+          "planned": 9889,
+          "precision": 0.9468334636434714,
+          "recall": 0.9901880621422731,
+          "true_positive": 1211,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 344.11119212498306,
+      "seed": 110031,
+      "sha256": "e590e1204bb35e95604ea29577b0d5186c417bc6e435a4ff186cbe8b76a2378a",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.2538666666666667,
+        0.28769204533122494,
+        0.29388950480188036,
+        0.29697564813874255
+      ],
+      "assessment_states": [
+        "inconclusive",
+        "confirmed",
+        "confirmed",
+        "confirmed"
+      ],
+      "input_sha256": "71b77b4449ab983e5067f1560529dc38541f697003e91eb5ed99a0ac5119600d",
+      "path": "validation/cg4/results/objective-fp-qualification-v1/false_positive-110032.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.8862251117431938,
+          "false_negative": 248,
+          "false_positive": 32,
+          "planned": 19988,
+          "precision": 0.9855399909624943,
+          "recall": 0.8979003705228489,
+          "true_positive": 2181,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.891388673390225,
+          "false_negative": 120,
+          "false_positive": 20,
+          "planned": 9995,
+          "precision": 0.9828913601368692,
+          "recall": 0.9054373522458629,
+          "true_positive": 1149,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9104234527687296,
+          "false_negative": 98,
+          "false_positive": 12,
+          "planned": 10017,
+          "precision": 0.9893805309734514,
+          "recall": 0.9194078947368421,
+          "true_positive": 1118,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 338.1189550830168,
+      "seed": 110032,
+      "sha256": "913533758be9e76728589a0c8c1a56cf3ee833c7567b182992b4a769c93dffb1",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.27555307678007057,
+        0.24628835487160206,
+        0.2841149281660108,
+        0.2765697187966095
+      ],
+      "assessment_states": [
+        "inconclusive",
+        "inconclusive",
+        "confirmed",
+        "confirmed"
+      ],
+      "input_sha256": "c6ac7e5f8dea3c2253987fc4e2a5eec58ba5803d652a32808ada196785ddf388",
+      "path": "validation/cg4/results/objective-fp-qualification-v1/false_positive-110033.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.9353140278300113,
+          "false_negative": 57,
+          "false_positive": 115,
+          "planned": 20032,
+          "precision": 0.9558032282859339,
+          "recall": 0.9775943396226415,
+          "true_positive": 2487,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9538583929992045,
+          "false_negative": 25,
+          "false_positive": 33,
+          "planned": 9858,
+          "precision": 0.9732142857142857,
+          "recall": 0.9795751633986928,
+          "true_positive": 1199,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9501945525291828,
+          "false_negative": 31,
+          "false_positive": 33,
+          "planned": 10110,
+          "precision": 0.9736842105263158,
+          "recall": 0.9752396166134185,
+          "true_positive": 1221,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 346.0126792920055,
+      "seed": 110033,
+      "sha256": "908d49b95626c27474e701d5e93cffd7fb6088756b8ab9610143c1466876894e",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.2864488636363637,
+        0.25387794451161205,
+        0.300022416498543
+      ],
+      "assessment_states": [
+        "confirmed",
+        "confirmed",
+        "confirmed"
+      ],
+      "input_sha256": "940793d03e9dc160278ac16af941f0206e7ab735c4b52280b519d009e5652b2c",
+      "path": "validation/cg4/results/objective-fp-qualification-v1/false_positive-110034.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.9710558499796168,
+          "false_negative": 71,
+          "false_positive": 0,
+          "planned": 19856,
+          "precision": 1.0,
+          "recall": 0.9710558499796168,
+          "true_positive": 2382,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9653751030502885,
+          "false_negative": 42,
+          "false_positive": 0,
+          "planned": 9969,
+          "precision": 1.0,
+          "recall": 0.9653751030502885,
+          "true_positive": 1171,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.970843183609141,
+          "false_negative": 37,
+          "false_positive": 0,
+          "planned": 10175,
+          "precision": 1.0,
+          "recall": 0.970843183609141,
+          "true_positive": 1232,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 343.0880490419804,
+      "seed": 110034,
+      "sha256": "63f26500d355a4a09384f822bdac9ab3eaad11946e2d7ddaff858f458d62c756",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.31635210178546325,
+        0.2954296844542048,
+        0.31325193050008693
+      ],
+      "assessment_states": [
+        "confirmed",
+        "confirmed",
+        "confirmed"
+      ],
+      "input_sha256": "38591039a6c73e5b363848272d7e23787558c807addafd3592b87c0ebba5c8ca",
+      "path": "validation/cg4/results/objective-fp-qualification-v1/false_positive-110035.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.9827179890023566,
+          "false_negative": 44,
+          "false_positive": 0,
+          "planned": 19901,
+          "precision": 1.0,
+          "recall": 0.9827179890023566,
+          "true_positive": 2502,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9872712808273667,
+          "false_negative": 16,
+          "false_positive": 0,
+          "planned": 10094,
+          "precision": 1.0,
+          "recall": 0.9872712808273667,
+          "true_positive": 1241,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9825119236883942,
+          "false_negative": 22,
+          "false_positive": 0,
+          "planned": 10005,
+          "precision": 1.0,
+          "recall": 0.9825119236883942,
+          "true_positive": 1236,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 482.67924820800545,
+      "seed": 110035,
+      "sha256": "bd3d07226a2609c6de43035c079ae6a6bdbd6b7edd7627bd12fa3b58b09f7922",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.2997408293460925,
+        0.25833930965669927,
+        0.23046672840913474,
+        0.25448553730290824,
+        0.3114236599468667,
+        0.2991525299069929
+      ],
+      "assessment_states": [
+        "inconclusive",
+        "inconclusive",
+        "inconclusive",
+        "confirmed",
+        "confirmed",
+        "confirmed"
+      ],
+      "input_sha256": "15a71f0ec4965cbf0f5007ba61c32f91e92f53922252252728f07815a070a19d",
+      "path": "validation/cg4/results/objective-fp-qualification-v1/false_positive-110036.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.9757165605095541,
+          "false_negative": 25,
+          "false_positive": 36,
+          "planned": 20004,
+          "precision": 0.985524728588661,
+          "recall": 0.9899030694668821,
+          "true_positive": 2451,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9707740916271722,
+          "false_negative": 12,
+          "false_positive": 25,
+          "planned": 10119,
+          "precision": 0.9800637958532695,
+          "recall": 0.9903303787268332,
+          "true_positive": 1229,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9706336939721792,
+          "false_negative": 15,
+          "false_positive": 23,
+          "planned": 9877,
+          "precision": 0.982017200938233,
+          "recall": 0.988198269079465,
+          "true_positive": 1256,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 607.0214111249952,
+      "seed": 110036,
+      "sha256": "328f894203a2a88b5a7ccf6c8ea0616abafbb8a1198630c42759f9510640f8d2",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.2304112124818194,
+        0.21530446055659624,
+        0.22555889709675225,
+        0.23968081153709897,
+        0.24481459855840781
+      ],
+      "assessment_states": [
+        "inconclusive",
+        "inconclusive",
+        "inconclusive",
+        "confirmed",
+        "confirmed"
+      ],
+      "input_sha256": "265ffcd013c325bae0608b8b6284d4a02049fab2665bfa625b1a0f8852dd946d",
+      "path": "validation/cg4/results/objective-fp-qualification-v1/false_positive-110037.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.9888623707239459,
+          "false_negative": 24,
+          "false_positive": 4,
+          "planned": 19994,
+          "precision": 0.9983935742971888,
+          "recall": 0.9904382470119522,
+          "true_positive": 2486,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9871279163314561,
+          "false_negative": 16,
+          "false_positive": 0,
+          "planned": 10080,
+          "precision": 1.0,
+          "recall": 0.9871279163314561,
+          "true_positive": 1227,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.98984375,
+          "false_negative": 13,
+          "false_positive": 0,
+          "planned": 9926,
+          "precision": 1.0,
+          "recall": 0.98984375,
+          "true_positive": 1267,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 713.0224037499866,
+      "seed": 110037,
+      "sha256": "e0534f0c0bcdcf8fff3207ab7d3f10b8094811836e61ca386c22c0fb744d3050",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.31496783484479485,
+        0.3203172737407236
+      ],
+      "assessment_states": [
+        "confirmed",
+        "confirmed"
+      ],
+      "input_sha256": "c50b53ad9b536dd64cf403bc8f5c412079fcf4d2015280f736a9da5943e05b75",
+      "path": "validation/cg4/results/objective-fp-qualification-v1/false_positive-110038.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.9539078156312625,
+          "false_negative": 115,
+          "false_positive": 0,
+          "planned": 20091,
+          "precision": 1.0,
+          "recall": 0.9539078156312625,
+          "true_positive": 2380,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9603559870550162,
+          "false_negative": 49,
+          "false_positive": 0,
+          "planned": 9909,
+          "precision": 1.0,
+          "recall": 0.9603559870550162,
+          "true_positive": 1187,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9505271695052717,
+          "false_negative": 61,
+          "false_positive": 0,
+          "planned": 10000,
+          "precision": 1.0,
+          "recall": 0.9505271695052717,
+          "true_positive": 1172,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 595.2588185000059,
+      "seed": 110038,
+      "sha256": "faf2cd52ec562c12861661157d3e5d2e23d60ce0eebeccaee63ca966b1642491",
+      "success": true
+    },
+    {
+      "H_selected_native_effects": [
+        0.3030389349386615,
+        0.31586801525451835,
+        0.32941836603821983,
+        0.3156371700697367,
+        0.33738793317070626,
+        0.31054530504487365,
+        0.29764259411130944
+      ],
+      "assessment_states": [
+        "confirmed",
+        "confirmed",
+        "confirmed",
+        "confirmed",
+        "confirmed",
+        "confirmed",
+        "confirmed"
+      ],
+      "input_sha256": "9c29cce3969fa7f2e173579ba1b0c0fad689ee9ff96057faa5fa0b11665b1848",
+      "path": "validation/cg4/results/objective-fp-qualification-v1/false_positive-110039.json",
+      "recovery": {
+        "D": {
+          "IoU": 0.931924882629108,
+          "false_negative": 164,
+          "false_positive": 10,
+          "planned": 19972,
+          "precision": 0.995819397993311,
+          "recall": 0.9355852317360566,
+          "true_positive": 2382,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "H": {
+          "IoU": 0.9334935897435898,
+          "false_negative": 80,
+          "false_positive": 3,
+          "planned": 9953,
+          "precision": 0.997431506849315,
+          "recall": 0.9357429718875502,
+          "true_positive": 1165,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        },
+        "S": {
+          "IoU": 0.9405034324942791,
+          "false_negative": 77,
+          "false_positive": 1,
+          "planned": 10075,
+          "precision": 0.9991896272285251,
+          "recall": 0.9412213740458015,
+          "true_positive": 1233,
+          "unavailable": 0,
+          "unavailable_oracle_members": 0
+        }
+      },
+      "seconds": 455.0735383340216,
+      "seed": 110039,
+      "sha256": "04cd06f5055b441cd2a5732f697f7b0420683da73e8569308e1005240ca85bca",
+      "success": true
+    }
+  ]
+}

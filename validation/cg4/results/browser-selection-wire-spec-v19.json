@@ -1,0 +1,117 @@
+{
+  "name": "Previously exposed synthetic paired-precision selector check",
+  "evaluation": {
+    "task": {
+      "kind": "binary_classification",
+      "classes": [
+        "0",
+        "1"
+      ],
+      "positive_class": "1",
+      "outcome_definition": "Deterministic synthetic review fixture"
+    },
+    "sources": [
+      {
+        "id": "data",
+        "handle": "d60fc99acfaa4d93a9278c75e12444da"
+      }
+    ],
+    "runs": [
+      {
+        "id": "model",
+        "source": "data",
+        "model": {
+          "id": "synthetic-review",
+          "version": "v1"
+        },
+        "key_columns": [
+          "id"
+        ],
+        "entity_columns": [
+          "entity"
+        ],
+        "prediction": "decision",
+        "probabilities": {
+          "positive_column": "p"
+        },
+        "prediction_at": {
+          "column": "when"
+        }
+      },
+      {
+        "id": "reference",
+        "source": "data",
+        "model": {
+          "id": "synthetic-review-reference",
+          "version": "v1"
+        },
+        "key_columns": [
+          "id"
+        ],
+        "entity_columns": [
+          "entity"
+        ],
+        "prediction": "reference",
+        "prediction_at": {
+          "column": "when"
+        }
+      }
+    ],
+    "outcomes": {
+      "source": "data",
+      "column": "y",
+      "key_columns": [
+        "id"
+      ],
+      "available_at": {
+        "column": "available"
+      }
+    },
+    "as_of": "2026-02-01T00:00:00Z"
+  },
+  "roles": {
+    "namespace": "cg4-exposed-review-fixture-v1",
+    "unit": "entity",
+    "column": "role"
+  },
+  "features": [
+    {
+      "id": "context",
+      "availability": "at_decision",
+      "fields": [
+        {
+          "id": "x",
+          "column": "x",
+          "kind": "categorical"
+        },
+        {
+          "id": "z",
+          "column": "z",
+          "kind": "categorical"
+        }
+      ]
+    }
+  ],
+  "objectives": [
+    {
+      "id": "precision",
+      "metric": "precision",
+      "run": "model",
+      "reference_run": "reference",
+      "comparator": "paired",
+      "direction": "lower",
+      "practical_threshold": 0.1
+    }
+  ],
+  "strategies": [
+    "structured",
+    "catboost"
+  ],
+  "limits": {
+    "max_nodes": 10000,
+    "max_depth": 3,
+    "candidates_per_strategy": 8,
+    "shortlist": 3,
+    "stability_replicates": 1
+  }
+}

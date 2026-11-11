@@ -1,0 +1,67 @@
+{
+  "development": [
+    {
+      "H_recovery": {
+        "IoU": 0.9813953488372092,
+        "false_negative": 4,
+        "false_positive": 0,
+        "planned": 1516,
+        "precision": 1.0,
+        "recall": 0.9813953488372092,
+        "true_positive": 211,
+        "unavailable": 0,
+        "unavailable_oracle_members": 0
+      },
+      "objective": "ranking_auc",
+      "path": "validation/cg4/results/objective-ranking-AUC-development-v1/ranking_auc-0.json",
+      "seconds": 49.54532716597896,
+      "sha256": "c74183abf2acf4a68f1dcd0a8bc4473f433914cf75c38492c065ff8c7efc1dc4",
+      "states": [
+        "confirmed"
+      ],
+      "strengths": [
+        "approximate"
+      ]
+    },
+    {
+      "H_recovery": {
+        "IoU": 0.9585492227979274,
+        "false_negative": 8,
+        "false_positive": 0,
+        "planned": 1478,
+        "precision": 1.0,
+        "recall": 0.9585492227979274,
+        "true_positive": 185,
+        "unavailable": 0,
+        "unavailable_oracle_members": 0
+      },
+      "objective": "ranking_ap",
+      "path": "validation/cg4/results/objective-ranking-AP-development-v1/ranking_ap-0.json",
+      "seconds": 50.56420200003777,
+      "sha256": "29f492bf5bd206d3c93c8a59b86d77522666af09fd1218db97caa2db5a7efbfe",
+      "states": [
+        "confirmed"
+      ],
+      "strengths": [
+        "approximate"
+      ]
+    }
+  ],
+  "qualification": {
+    "capacity_dependency": "Complete and audit existing 200-trial default null before ranking, one serial child at a time.",
+    "criteria": "H precision and recall >=.70 in >=32/40; original objective-specific thresholds/default budgets. No H/oracle selection.",
+    "group": "ranking",
+    "objectives": [
+      "ranking_auc",
+      "ranking_ap"
+    ],
+    "population": 40000,
+    "seeds": [
+      110000,
+      110039
+    ]
+  },
+  "schema_version": "numek.cg4_ranking_recovery_admission/1.0",
+  "scope": "Two small development workflows only, with native exact AUC/AP evaluation and qualified scoped approximate intervals. Not completed recovery qualification, general ranking coverage or individual-learner claims.",
+  "source_identity": "d8f73aaacf3d835d4323561e94336fccef453cdc6db5c985af2357b4084dcc46"
+}

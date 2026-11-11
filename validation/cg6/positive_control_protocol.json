@@ -1,0 +1,53 @@
+{
+  "schema": "cg6.cpu_positive_controls/1.0",
+  "seeds": [
+    11,
+    29,
+    47,
+    71,
+    97
+  ],
+  "profiles": {
+    "scale": [
+      "histogram",
+      "mlp"
+    ],
+    "quantiles": [
+      "histogram",
+      "mlp"
+    ],
+    "failure_risk": [
+      "logistic",
+      "histogram",
+      "mlp"
+    ]
+  },
+  "rows": 5000,
+  "roles": {
+    "F": 2000,
+    "S": 1000,
+    "C": 500,
+    "E": 1500
+  },
+  "candidate_parameters": "approved bounded defaults",
+  "criteria": {
+    "improved_seeds": 4,
+    "median_relative_improvement": 0.05
+  },
+  "comparison": "constant baseline on the same E roots",
+  "primary_losses": {
+    "scale": "scale_squared_error",
+    "quantiles": "pinball_loss",
+    "failure_risk": "brier"
+  },
+  "standing": "Designed learnable CPU method-integration controls; no dataset-wide or device-wide improvement promise",
+  "scale_envelope": "y=Rademacher*(0.1+1.5*(x+1)^2)*abs(N(0,1)); primary point=0",
+  "quantile_envelope": "y=4*x+(0.1+0.5*abs(x))*N(0,1); primary point=0",
+  "risk_envelope": "P(y=no|x)=sigmoid(5*x); frozen primary always predicts yes",
+  "resource_envelope": {
+    "device": "cpu",
+    "max_seconds_per_service": 180,
+    "threads": 2,
+    "max_rss_bytes": 6442450944
+  }
+}

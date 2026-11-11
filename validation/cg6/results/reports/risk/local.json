@@ -1,0 +1,296 @@
+{
+  "schema_version": "confidenceguard.execution_result/1.0",
+  "methodology_id": "predictor_robustness_v1",
+  "analysis_id": "5124f2e039114ff6bf904b2ef5c524ec",
+  "generated_at": "2026-11-07T04:57:28.971738+00:00",
+  "name": "ConfidenceGuard predictor execution",
+  "task": {
+    "kind": "binary_classification",
+    "outcome_definition": "observed",
+    "classes": [
+      "no",
+      "yes"
+    ],
+    "positive_class": "yes",
+    "units": null,
+    "horizon": null,
+    "material_error": null
+  },
+  "runs": [
+    {
+      "id": "baseline@auxiliary_application",
+      "display_name": "baseline@auxiliary_application",
+      "model": {
+        "id": "baseline",
+        "version": "cg6",
+        "display_name": "",
+        "artifact_sha256": "5fb8f42971ca76743cdbdb9d19e10ea613cb16fd50b4824f07318f842b228292",
+        "preprocessing": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+        "calibration": null
+      },
+      "role": "experiment",
+      "scope": "auxiliary_application"
+    }
+  ],
+  "outcomes": {
+    "authority": "input",
+    "timing": "supplied_snapshot_maturity_unestablished",
+    "duplicate_rows": 0,
+    "invalid_keys": 0,
+    "canonical_content_digest": "5f79b5f14d1177b84ed20837e3fc0b75f0a45de334dbdbe7c25d88caeeca5e17",
+    "snapshot_digest": "8a576b07edc0942da4e4020ee0d90cf256439930b9a46c46a18f59ae2bec698d",
+    "effective_cutoff_ns": "1794027447799769000",
+    "scope": "observed_labels"
+  },
+  "comparison": null,
+  "measurements": [
+    {
+      "id": "cg6_m1",
+      "run": "baseline@auxiliary_application",
+      "scope": "overall",
+      "family": "auxiliary_diagnostics",
+      "metric": "brier",
+      "value": 1.0,
+      "value_state": "finite",
+      "denominator": 30,
+      "denominator_kind": "eligible_records",
+      "population_id": "pop_09c4d64ac0c8a937f37b7ddeacba5591",
+      "data": {},
+      "reason": null,
+      "basis": "measured",
+      "interpretation": "descriptive",
+      "applicability": "applicable",
+      "execution": "completed",
+      "sensitive_counts": [],
+      "evidence_refs": []
+    },
+    {
+      "id": "cg6_m2",
+      "run": "baseline@auxiliary_application",
+      "scope": "overall",
+      "family": "auxiliary_diagnostics",
+      "metric": "failure_prevalence",
+      "value": 0.0,
+      "value_state": "finite",
+      "denominator": 30,
+      "denominator_kind": "eligible_records",
+      "population_id": "pop_bc792ef577f6e347d8d24968f83fd68d",
+      "data": {},
+      "reason": null,
+      "basis": "measured",
+      "interpretation": "descriptive",
+      "applicability": "applicable",
+      "execution": "completed",
+      "sensitive_counts": [],
+      "evidence_refs": []
+    },
+    {
+      "id": "cg6_m3",
+      "run": "baseline@auxiliary_application",
+      "scope": "overall",
+      "family": "auxiliary_diagnostics",
+      "metric": "failure_log_loss",
+      "value": null,
+      "value_state": "positive_infinity",
+      "denominator": 30,
+      "denominator_kind": "eligible_records",
+      "population_id": "pop_ef25188763a34b16326a02e8558bbbd6",
+      "data": {
+        "zero_probability_is_infinite_loss": true
+      },
+      "reason": null,
+      "basis": "measured",
+      "interpretation": "descriptive",
+      "applicability": "applicable",
+      "execution": "completed",
+      "sensitive_counts": [],
+      "evidence_refs": []
+    }
+  ],
+  "checks": [],
+  "findings": [],
+  "coverage": {
+    "population_provenance_version": "1.1",
+    "populations": [
+      {
+        "id": "pop_09c4d64ac0c8a937f37b7ddeacba5591",
+        "run": "baseline@auxiliary_application",
+        "scope": "overall",
+        "definition": "brier",
+        "lineage": {
+          "execution_fingerprint": "439c4dcaa3bc929988948387439d8761d07f10e1071334092aae62ad49e88c6e"
+        },
+        "denominator": 30,
+        "denominator_kind": "eligible_records"
+      },
+      {
+        "id": "pop_bc792ef577f6e347d8d24968f83fd68d",
+        "run": "baseline@auxiliary_application",
+        "scope": "overall",
+        "definition": "failure_prevalence",
+        "lineage": {
+          "execution_fingerprint": "439c4dcaa3bc929988948387439d8761d07f10e1071334092aae62ad49e88c6e"
+        },
+        "denominator": 30,
+        "denominator_kind": "eligible_records"
+      },
+      {
+        "id": "pop_ef25188763a34b16326a02e8558bbbd6",
+        "run": "baseline@auxiliary_application",
+        "scope": "overall",
+        "definition": "failure_log_loss",
+        "lineage": {
+          "execution_fingerprint": "439c4dcaa3bc929988948387439d8761d07f10e1071334092aae62ad49e88c6e"
+        },
+        "denominator": 30,
+        "denominator_kind": "eligible_records"
+      }
+    ],
+    "planned_roots": 120,
+    "output_cells": 150,
+    "retained_output_rows": 30,
+    "complete_output_records": 30,
+    "limitations": [
+      "Experimental behavior concerns only identified scenarios, inputs and execution budgets; bounded search is not a robustness guarantee.",
+      "Variants of an original event are dependent observations. Unknown transformed outcomes cannot establish transformed accuracy.",
+      "Statistical claims require frozen populations, valid outcome relations, sampling, bounds and independent evidence.",
+      "Availability and contract tests do not establish device runtime qualification. NVIDIA qualification may remain pending hardware.",
+      "Trusted execution is not a security sandbox. Sampled resource limits can overshoot.",
+      "No universal robustness score, causal policy value, certification or production approval is established."
+    ]
+  },
+  "cg6": {
+    "stage": "auxiliary_assessment",
+    "evidence_level": "verified_experimental_behavior",
+    "qualification": {
+      "cpu": "not_established_by_this_result",
+      "mps": "not_established_by_this_result",
+      "cuda": "not_run_hardware_unavailable",
+      "cuda_pending_is_nonblocking": true,
+      "scientific_qualification": "separate_from_device_execution"
+    },
+    "artifact_digest": "11026991889bbeb77662c297fc96980c9fd5046f1fe4863a64db6577033c6d1f",
+    "application_state": "applied_unvalidated",
+    "membership_check": "passed",
+    "planned_role": "E",
+    "independent_assessment": "observed_nonoverlap_only",
+    "retention": {
+      "inputs": "materialized_inputs",
+      "models": {
+        "model": "copy"
+      },
+      "exact_input_reopening": true,
+      "reopening_executes_models": false
+    },
+    "calibration_bins": [
+      {
+        "lower": 0.0,
+        "support": 0,
+        "predicted": null,
+        "observed": null
+      },
+      {
+        "lower": 0.1,
+        "support": 0,
+        "predicted": null,
+        "observed": null
+      },
+      {
+        "lower": 0.2,
+        "support": 0,
+        "predicted": null,
+        "observed": null
+      },
+      {
+        "lower": 0.30000000000000004,
+        "support": 0,
+        "predicted": null,
+        "observed": null
+      },
+      {
+        "lower": 0.4,
+        "support": 0,
+        "predicted": null,
+        "observed": null
+      },
+      {
+        "lower": 0.5,
+        "support": 0,
+        "predicted": null,
+        "observed": null
+      },
+      {
+        "lower": 0.6000000000000001,
+        "support": 0,
+        "predicted": null,
+        "observed": null
+      },
+      {
+        "lower": 0.7000000000000001,
+        "support": 0,
+        "predicted": null,
+        "observed": null
+      },
+      {
+        "lower": 0.8,
+        "support": 0,
+        "predicted": null,
+        "observed": null
+      },
+      {
+        "lower": 0.9,
+        "support": 30,
+        "predicted": 1.0,
+        "observed": 0.0
+      }
+    ],
+    "risk_diagnostics": {
+      "support": 30,
+      "failures": 0,
+      "nonfailures": 30,
+      "prevalence": 0.0,
+      "auroc": null,
+      "average_precision": null,
+      "undefined_reason": "both_outcome_classes_required",
+      "risk_coverage": [
+        {
+          "threshold": 1.0,
+          "accepted": 30,
+          "coverage": 1.0,
+          "failures": 0,
+          "risk": 0.0
+        }
+      ],
+      "tie_policy": "whole_equal_score_groups",
+      "standing": "descriptive on eligible observed targets; no population or future-risk guarantee"
+    },
+    "assessment_qualifications": {
+      "upstream_independence": "unknown",
+      "observable_upstream_contradictions": {},
+      "membership_checks_establish_only_supplied_nonoverlap": true,
+      "no_future_coverage_guarantee": true
+    },
+    "exposure_checks": {
+      "overlap": false,
+      "scope": "process_scoped",
+      "external_history_verified": false,
+      "reasons": []
+    }
+  },
+  "execution": {
+    "status": "completed",
+    "backend": "supervised_local",
+    "duration_seconds": 1.1853125829948112,
+    "peak_workspace_bytes": 315392,
+    "whole_evaluation_atomic": true,
+    "resource_limits_are_hard_quotas": false,
+    "peak_worker_rss_bytes": 338821120,
+    "whole_job_seconds": 1.9181023329729214,
+    "peak_spill_bytes": 0,
+    "serialized_bytes": 48468
+  },
+  "binding": {
+    "analysis_digest": "2e4d57187d0a810f37d7cdcc7726169111e79f0ed37602a62282e20896cb31f2",
+    "private_manifest_digest": "705a6f36de12eb0bcd483bf98082a6e1effad4f527bc3cdcd62db554b1c99647"
+  }
+}

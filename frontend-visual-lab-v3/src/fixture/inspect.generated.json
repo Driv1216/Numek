@@ -1,0 +1,994 @@
+{
+ "file": "adult.csv",
+ "file_size": 5271081,
+ "row_count": 48842,
+ "column_count": 15,
+ "columns": [
+  "age",
+  "workclass",
+  "final_weight",
+  "education",
+  "education_years",
+  "marital_status",
+  "occupation",
+  "relationship",
+  "race",
+  "sex",
+  "capital_gain",
+  "capital_loss",
+  "hours_per_week",
+  "native_country",
+  "annual_income_over_50k"
+ ],
+ "preview": [
+  [
+   "39",
+   "State-gov",
+   "77516",
+   "Bachelors",
+   "13",
+   "Never-married",
+   "Adm-clerical",
+   "Not-in-family",
+   "White",
+   "Male",
+   "2174",
+   "0",
+   "40",
+   "United-States",
+   "<=50K"
+  ],
+  [
+   "50",
+   "Self-emp-not-inc",
+   "83311",
+   "Bachelors",
+   "13",
+   "Married-civ-spouse",
+   "Exec-managerial",
+   "Husband",
+   "White",
+   "Male",
+   "0",
+   "0",
+   "13",
+   "United-States",
+   "<=50K"
+  ],
+  [
+   "38",
+   "Private",
+   "215646",
+   "HS-grad",
+   "9",
+   "Divorced",
+   "Handlers-cleaners",
+   "Not-in-family",
+   "White",
+   "Male",
+   "0",
+   "0",
+   "40",
+   "United-States",
+   "<=50K"
+  ],
+  [
+   "53",
+   "Private",
+   "234721",
+   "11th",
+   "7",
+   "Married-civ-spouse",
+   "Handlers-cleaners",
+   "Husband",
+   "Black",
+   "Male",
+   "0",
+   "0",
+   "40",
+   "United-States",
+   "<=50K"
+  ],
+  [
+   "28",
+   "Private",
+   "338409",
+   "Bachelors",
+   "13",
+   "Married-civ-spouse",
+   "Prof-specialty",
+   "Wife",
+   "Black",
+   "Female",
+   "0",
+   "0",
+   "40",
+   "Cuba",
+   "<=50K"
+  ],
+  [
+   "37",
+   "Private",
+   "284582",
+   "Masters",
+   "14",
+   "Married-civ-spouse",
+   "Exec-managerial",
+   "Wife",
+   "White",
+   "Female",
+   "0",
+   "0",
+   "40",
+   "United-States",
+   "<=50K"
+  ],
+  [
+   "49",
+   "Private",
+   "160187",
+   "9th",
+   "5",
+   "Married-spouse-absent",
+   "Other-service",
+   "Not-in-family",
+   "Black",
+   "Female",
+   "0",
+   "0",
+   "16",
+   "Jamaica",
+   "<=50K"
+  ],
+  [
+   "52",
+   "Self-emp-not-inc",
+   "209642",
+   "HS-grad",
+   "9",
+   "Married-civ-spouse",
+   "Exec-managerial",
+   "Husband",
+   "White",
+   "Male",
+   "0",
+   "0",
+   "45",
+   "United-States",
+   ">50K"
+  ],
+  [
+   "31",
+   "Private",
+   "45781",
+   "Masters",
+   "14",
+   "Never-married",
+   "Prof-specialty",
+   "Not-in-family",
+   "White",
+   "Female",
+   "14084",
+   "0",
+   "50",
+   "United-States",
+   ">50K"
+  ],
+  [
+   "42",
+   "Private",
+   "159449",
+   "Bachelors",
+   "13",
+   "Married-civ-spouse",
+   "Exec-managerial",
+   "Husband",
+   "White",
+   "Male",
+   "5178",
+   "0",
+   "40",
+   "United-States",
+   ">50K"
+  ]
+ ],
+ "target_options": [
+  {
+   "name": "workclass",
+   "group": "small_class_set",
+   "observed_distinct_count": 8,
+   "missing_count": 2799,
+   "selector_explanation": "Could be used as a classification outcome."
+  },
+  {
+   "name": "education",
+   "group": "small_class_set",
+   "observed_distinct_count": 16,
+   "missing_count": 0,
+   "selector_explanation": "Could be used as a classification outcome."
+  },
+  {
+   "name": "education_years",
+   "group": "small_class_set",
+   "observed_distinct_count": 16,
+   "missing_count": 0,
+   "selector_explanation": "Could be used as a classification outcome."
+  },
+  {
+   "name": "marital_status",
+   "group": "small_class_set",
+   "observed_distinct_count": 7,
+   "missing_count": 0,
+   "selector_explanation": "Could be used as a classification outcome."
+  },
+  {
+   "name": "occupation",
+   "group": "small_class_set",
+   "observed_distinct_count": 14,
+   "missing_count": 2809,
+   "selector_explanation": "Could be used as a classification outcome."
+  },
+  {
+   "name": "relationship",
+   "group": "small_class_set",
+   "observed_distinct_count": 6,
+   "missing_count": 0,
+   "selector_explanation": "Could be used as a classification outcome."
+  },
+  {
+   "name": "race",
+   "group": "small_class_set",
+   "observed_distinct_count": 5,
+   "missing_count": 0,
+   "selector_explanation": "Could be used as a classification outcome."
+  },
+  {
+   "name": "sex",
+   "group": "small_class_set",
+   "observed_distinct_count": 2,
+   "missing_count": 0,
+   "selector_explanation": "Could be used as a classification outcome."
+  },
+  {
+   "name": "annual_income_over_50k",
+   "group": "small_class_set",
+   "observed_distinct_count": 2,
+   "missing_count": 0,
+   "selector_explanation": "Could be used as a classification outcome."
+  },
+  {
+   "name": "age",
+   "group": "advanced",
+   "observed_distinct_count": 74,
+   "missing_count": 0,
+   "selector_explanation": "This looks more like a continuous measurement than a classification outcome."
+  },
+  {
+   "name": "final_weight",
+   "group": "advanced",
+   "observed_distinct_count": 28523,
+   "missing_count": 0,
+   "selector_explanation": "This looks more like a continuous measurement than a classification outcome."
+  },
+  {
+   "name": "capital_gain",
+   "group": "advanced",
+   "observed_distinct_count": 123,
+   "missing_count": 0,
+   "selector_explanation": "This looks more like a continuous measurement than a classification outcome."
+  },
+  {
+   "name": "capital_loss",
+   "group": "advanced",
+   "observed_distinct_count": 99,
+   "missing_count": 0,
+   "selector_explanation": "This looks more like a continuous measurement than a classification outcome."
+  },
+  {
+   "name": "hours_per_week",
+   "group": "advanced",
+   "observed_distinct_count": 96,
+   "missing_count": 0,
+   "selector_explanation": "This looks more like a continuous measurement than a classification outcome."
+  },
+  {
+   "name": "native_country",
+   "group": "advanced",
+   "observed_distinct_count": 41,
+   "missing_count": 857,
+   "selector_explanation": "This has too many categories for an ordinary classification outcome."
+  }
+ ],
+ "targets": {
+  "workclass": {
+   "subtype": "multiclass",
+   "class_count": 8,
+   "labeled": 46043,
+   "missing": 2799,
+   "distribution": [
+    {
+     "label": "Private",
+     "count": 33906,
+     "percentage": 73.64
+    },
+    {
+     "label": "Self-emp-not-inc",
+     "count": 3862,
+     "percentage": 8.39
+    },
+    {
+     "label": "Local-gov",
+     "count": 3136,
+     "percentage": 6.81
+    },
+    {
+     "label": "State-gov",
+     "count": 1981,
+     "percentage": 4.3
+    },
+    {
+     "label": "Self-emp-inc",
+     "count": 1695,
+     "percentage": 3.68
+    },
+    {
+     "label": "Federal-gov",
+     "count": 1432,
+     "percentage": 3.11
+    },
+    {
+     "label": "Without-pay",
+     "count": 21,
+     "percentage": 0.05
+    },
+    {
+     "label": "Never-worked",
+     "count": 10,
+     "percentage": 0.02
+    }
+   ],
+   "more_classes": 0,
+   "explanation": "It has 8 observed values, which is structurally compatible with a small-set classification target.",
+   "requires_override": false,
+   "disabled": false
+  },
+  "education": {
+   "subtype": "multiclass",
+   "class_count": 16,
+   "labeled": 48842,
+   "missing": 0,
+   "distribution": [
+    {
+     "label": "HS-grad",
+     "count": 15784,
+     "percentage": 32.32
+    },
+    {
+     "label": "Some-college",
+     "count": 10878,
+     "percentage": 22.27
+    },
+    {
+     "label": "Bachelors",
+     "count": 8025,
+     "percentage": 16.43
+    },
+    {
+     "label": "Masters",
+     "count": 2657,
+     "percentage": 5.44
+    },
+    {
+     "label": "Assoc-voc",
+     "count": 2061,
+     "percentage": 4.22
+    },
+    {
+     "label": "11th",
+     "count": 1812,
+     "percentage": 3.71
+    },
+    {
+     "label": "Assoc-acdm",
+     "count": 1601,
+     "percentage": 3.28
+    },
+    {
+     "label": "10th",
+     "count": 1389,
+     "percentage": 2.84
+    }
+   ],
+   "more_classes": 8,
+   "explanation": "It has 16 observed values, which is structurally compatible with a small-set classification target.",
+   "requires_override": false,
+   "disabled": false
+  },
+  "education_years": {
+   "subtype": "multiclass",
+   "class_count": 16,
+   "labeled": 48842,
+   "missing": 0,
+   "distribution": [
+    {
+     "label": "9",
+     "count": 15784,
+     "percentage": 32.32
+    },
+    {
+     "label": "10",
+     "count": 10878,
+     "percentage": 22.27
+    },
+    {
+     "label": "13",
+     "count": 8025,
+     "percentage": 16.43
+    },
+    {
+     "label": "14",
+     "count": 2657,
+     "percentage": 5.44
+    },
+    {
+     "label": "11",
+     "count": 2061,
+     "percentage": 4.22
+    },
+    {
+     "label": "7",
+     "count": 1812,
+     "percentage": 3.71
+    },
+    {
+     "label": "12",
+     "count": 1601,
+     "percentage": 3.28
+    },
+    {
+     "label": "6",
+     "count": 1389,
+     "percentage": 2.84
+    }
+   ],
+   "more_classes": 8,
+   "explanation": "It has 16 observed values, which is structurally compatible with a small-set classification target.",
+   "requires_override": false,
+   "disabled": false
+  },
+  "marital_status": {
+   "subtype": "multiclass",
+   "class_count": 7,
+   "labeled": 48842,
+   "missing": 0,
+   "distribution": [
+    {
+     "label": "Married-civ-spouse",
+     "count": 22379,
+     "percentage": 45.82
+    },
+    {
+     "label": "Never-married",
+     "count": 16117,
+     "percentage": 33.0
+    },
+    {
+     "label": "Divorced",
+     "count": 6633,
+     "percentage": 13.58
+    },
+    {
+     "label": "Separated",
+     "count": 1530,
+     "percentage": 3.13
+    },
+    {
+     "label": "Widowed",
+     "count": 1518,
+     "percentage": 3.11
+    },
+    {
+     "label": "Married-spouse-absent",
+     "count": 628,
+     "percentage": 1.29
+    },
+    {
+     "label": "Married-AF-spouse",
+     "count": 37,
+     "percentage": 0.08
+    }
+   ],
+   "more_classes": 0,
+   "explanation": "It has 7 observed values, which is structurally compatible with a small-set classification target.",
+   "requires_override": false,
+   "disabled": false
+  },
+  "occupation": {
+   "subtype": "multiclass",
+   "class_count": 14,
+   "labeled": 46033,
+   "missing": 2809,
+   "distribution": [
+    {
+     "label": "Prof-specialty",
+     "count": 6172,
+     "percentage": 13.41
+    },
+    {
+     "label": "Craft-repair",
+     "count": 6112,
+     "percentage": 13.28
+    },
+    {
+     "label": "Exec-managerial",
+     "count": 6086,
+     "percentage": 13.22
+    },
+    {
+     "label": "Adm-clerical",
+     "count": 5611,
+     "percentage": 12.19
+    },
+    {
+     "label": "Sales",
+     "count": 5504,
+     "percentage": 11.96
+    },
+    {
+     "label": "Other-service",
+     "count": 4923,
+     "percentage": 10.69
+    },
+    {
+     "label": "Machine-op-inspct",
+     "count": 3022,
+     "percentage": 6.56
+    },
+    {
+     "label": "Transport-moving",
+     "count": 2355,
+     "percentage": 5.12
+    }
+   ],
+   "more_classes": 6,
+   "explanation": "It has 14 observed values, which is structurally compatible with a small-set classification target.",
+   "requires_override": false,
+   "disabled": false
+  },
+  "relationship": {
+   "subtype": "multiclass",
+   "class_count": 6,
+   "labeled": 48842,
+   "missing": 0,
+   "distribution": [
+    {
+     "label": "Husband",
+     "count": 19716,
+     "percentage": 40.37
+    },
+    {
+     "label": "Not-in-family",
+     "count": 12583,
+     "percentage": 25.76
+    },
+    {
+     "label": "Own-child",
+     "count": 7581,
+     "percentage": 15.52
+    },
+    {
+     "label": "Unmarried",
+     "count": 5125,
+     "percentage": 10.49
+    },
+    {
+     "label": "Wife",
+     "count": 2331,
+     "percentage": 4.77
+    },
+    {
+     "label": "Other-relative",
+     "count": 1506,
+     "percentage": 3.08
+    }
+   ],
+   "more_classes": 0,
+   "explanation": "It has 6 observed values, which is structurally compatible with a small-set classification target.",
+   "requires_override": false,
+   "disabled": false
+  },
+  "race": {
+   "subtype": "multiclass",
+   "class_count": 5,
+   "labeled": 48842,
+   "missing": 0,
+   "distribution": [
+    {
+     "label": "White",
+     "count": 41762,
+     "percentage": 85.5
+    },
+    {
+     "label": "Black",
+     "count": 4685,
+     "percentage": 9.59
+    },
+    {
+     "label": "Asian-Pac-Islander",
+     "count": 1519,
+     "percentage": 3.11
+    },
+    {
+     "label": "Amer-Indian-Eskimo",
+     "count": 470,
+     "percentage": 0.96
+    },
+    {
+     "label": "Other",
+     "count": 406,
+     "percentage": 0.83
+    }
+   ],
+   "more_classes": 0,
+   "explanation": "It has 5 observed values, which is structurally compatible with a small-set classification target.",
+   "requires_override": false,
+   "disabled": false
+  },
+  "sex": {
+   "subtype": "binary",
+   "class_count": 2,
+   "labeled": 48842,
+   "missing": 0,
+   "distribution": [
+    {
+     "label": "Male",
+     "count": 32650,
+     "percentage": 66.85
+    },
+    {
+     "label": "Female",
+     "count": 16192,
+     "percentage": 33.15
+    }
+   ],
+   "more_classes": 0,
+   "explanation": "It has 2 observed values, which is structurally compatible with a small-set classification target.",
+   "requires_override": false,
+   "disabled": false
+  },
+  "annual_income_over_50k": {
+   "subtype": "binary",
+   "class_count": 2,
+   "labeled": 48842,
+   "missing": 0,
+   "distribution": [
+    {
+     "label": "<=50K",
+     "count": 37155,
+     "percentage": 76.07
+    },
+    {
+     "label": ">50K",
+     "count": 11687,
+     "percentage": 23.93
+    }
+   ],
+   "more_classes": 0,
+   "explanation": "It has 2 observed values, which is structurally compatible with a small-set classification target.",
+   "requires_override": false,
+   "disabled": false
+  },
+  "age": {
+   "subtype": "multiclass",
+   "class_count": 74,
+   "labeled": 48842,
+   "missing": 0,
+   "distribution": [
+    {
+     "label": "36",
+     "count": 1348,
+     "percentage": 2.76
+    },
+    {
+     "label": "35",
+     "count": 1337,
+     "percentage": 2.74
+    },
+    {
+     "label": "33",
+     "count": 1335,
+     "percentage": 2.73
+    },
+    {
+     "label": "23",
+     "count": 1329,
+     "percentage": 2.72
+    },
+    {
+     "label": "31",
+     "count": 1325,
+     "percentage": 2.71
+    },
+    {
+     "label": "34",
+     "count": 1303,
+     "percentage": 2.67
+    },
+    {
+     "label": "28",
+     "count": 1280,
+     "percentage": 2.62
+    },
+    {
+     "label": "37",
+     "count": 1280,
+     "percentage": 2.62
+    }
+   ],
+   "more_classes": 66,
+   "explanation": "age has 74 distinct numeric values across 48842 labeled rows (0.15% distinct), above the small-outcome guidance limit of 20. It may represent a continuous measure rather than a classification outcome.",
+   "requires_override": true,
+   "disabled": false
+  },
+  "final_weight": {
+   "subtype": "multiclass",
+   "class_count": 28523,
+   "labeled": 48842,
+   "missing": 0,
+   "distribution": [
+    {
+     "label": "203488",
+     "count": 21,
+     "percentage": 0.04
+    },
+    {
+     "label": "190290",
+     "count": 19,
+     "percentage": 0.04
+    },
+    {
+     "label": "120277",
+     "count": 19,
+     "percentage": 0.04
+    },
+    {
+     "label": "125892",
+     "count": 18,
+     "percentage": 0.04
+    },
+    {
+     "label": "126569",
+     "count": 18,
+     "percentage": 0.04
+    },
+    {
+     "label": "99185",
+     "count": 17,
+     "percentage": 0.03
+    },
+    {
+     "label": "126675",
+     "count": 17,
+     "percentage": 0.03
+    },
+    {
+     "label": "113364",
+     "count": 17,
+     "percentage": 0.03
+    }
+   ],
+   "more_classes": 28515,
+   "explanation": "final_weight has 28523 distinct numeric values across 48842 labeled rows (58.4% distinct), above the small-outcome guidance limit of 20. It may represent a continuous measure rather than a classification outcome.",
+   "requires_override": true,
+   "disabled": false
+  },
+  "capital_gain": {
+   "subtype": "multiclass",
+   "class_count": 123,
+   "labeled": 48842,
+   "missing": 0,
+   "distribution": [
+    {
+     "label": "0",
+     "count": 44807,
+     "percentage": 91.74
+    },
+    {
+     "label": "15024",
+     "count": 513,
+     "percentage": 1.05
+    },
+    {
+     "label": "7688",
+     "count": 410,
+     "percentage": 0.84
+    },
+    {
+     "label": "7298",
+     "count": 364,
+     "percentage": 0.75
+    },
+    {
+     "label": "99999",
+     "count": 244,
+     "percentage": 0.5
+    },
+    {
+     "label": "3103",
+     "count": 152,
+     "percentage": 0.31
+    },
+    {
+     "label": "5178",
+     "count": 146,
+     "percentage": 0.3
+    },
+    {
+     "label": "5013",
+     "count": 117,
+     "percentage": 0.24
+    }
+   ],
+   "more_classes": 115,
+   "explanation": "capital_gain has 123 distinct numeric values across 48842 labeled rows (0.25% distinct), above the small-outcome guidance limit of 20. It may represent a continuous measure rather than a classification outcome.",
+   "requires_override": true,
+   "disabled": false
+  },
+  "capital_loss": {
+   "subtype": "multiclass",
+   "class_count": 99,
+   "labeled": 48842,
+   "missing": 0,
+   "distribution": [
+    {
+     "label": "0",
+     "count": 46560,
+     "percentage": 95.33
+    },
+    {
+     "label": "1902",
+     "count": 304,
+     "percentage": 0.62
+    },
+    {
+     "label": "1977",
+     "count": 253,
+     "percentage": 0.52
+    },
+    {
+     "label": "1887",
+     "count": 233,
+     "percentage": 0.48
+    },
+    {
+     "label": "2415",
+     "count": 72,
+     "percentage": 0.15
+    },
+    {
+     "label": "1485",
+     "count": 71,
+     "percentage": 0.15
+    },
+    {
+     "label": "1848",
+     "count": 67,
+     "percentage": 0.14
+    },
+    {
+     "label": "1590",
+     "count": 62,
+     "percentage": 0.13
+    }
+   ],
+   "more_classes": 91,
+   "explanation": "capital_loss has 99 distinct numeric values across 48842 labeled rows (0.2% distinct), above the small-outcome guidance limit of 20. It may represent a continuous measure rather than a classification outcome.",
+   "requires_override": true,
+   "disabled": false
+  },
+  "hours_per_week": {
+   "subtype": "multiclass",
+   "class_count": 96,
+   "labeled": 48842,
+   "missing": 0,
+   "distribution": [
+    {
+     "label": "40",
+     "count": 22803,
+     "percentage": 46.69
+    },
+    {
+     "label": "50",
+     "count": 4246,
+     "percentage": 8.69
+    },
+    {
+     "label": "45",
+     "count": 2717,
+     "percentage": 5.56
+    },
+    {
+     "label": "60",
+     "count": 2177,
+     "percentage": 4.46
+    },
+    {
+     "label": "35",
+     "count": 1937,
+     "percentage": 3.97
+    },
+    {
+     "label": "20",
+     "count": 1862,
+     "percentage": 3.81
+    },
+    {
+     "label": "30",
+     "count": 1700,
+     "percentage": 3.48
+    },
+    {
+     "label": "55",
+     "count": 1051,
+     "percentage": 2.15
+    }
+   ],
+   "more_classes": 88,
+   "explanation": "hours_per_week has 96 distinct numeric values across 48842 labeled rows (0.2% distinct), above the small-outcome guidance limit of 20. It may represent a continuous measure rather than a classification outcome.",
+   "requires_override": true,
+   "disabled": false
+  },
+  "native_country": {
+   "subtype": "multiclass",
+   "class_count": 41,
+   "labeled": 47985,
+   "missing": 857,
+   "distribution": [
+    {
+     "label": "United-States",
+     "count": 43832,
+     "percentage": 91.35
+    },
+    {
+     "label": "Mexico",
+     "count": 951,
+     "percentage": 1.98
+    },
+    {
+     "label": "Philippines",
+     "count": 295,
+     "percentage": 0.61
+    },
+    {
+     "label": "Germany",
+     "count": 206,
+     "percentage": 0.43
+    },
+    {
+     "label": "Puerto-Rico",
+     "count": 184,
+     "percentage": 0.38
+    },
+    {
+     "label": "Canada",
+     "count": 182,
+     "percentage": 0.38
+    },
+    {
+     "label": "El-Salvador",
+     "count": 155,
+     "percentage": 0.32
+    },
+    {
+     "label": "India",
+     "count": 151,
+     "percentage": 0.31
+    }
+   ],
+   "more_classes": 33,
+   "explanation": "native_country has 41 distinct categories across 47985 labeled rows (0.09% distinct), above the small-outcome guidance limit of 20. Using it would create many classification outcomes.",
+   "requires_override": true,
+   "disabled": false
+  }
+ }
+}

@@ -1,0 +1,25 @@
+Traceback (most recent call last):
+  File "/Users/drivyaanshyadav/Desktop/Numek/src/confidenceguard/compat.py", line 22, in supervise
+    try:return run_supervised(operation,arguments,limits,progress=progress,cancel=cancel)
+               ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/drivyaanshyadav/Desktop/Numek/src/datatrust/worker.py", line 49, in run_supervised
+    elif kind=='error':raise AnalysisError(value['message'],code=value['code'],stage=value['stage'])
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+datatrust.contracts.AnalysisError: 'types.SimpleNamespace' object has no attribute 'outcomes'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/drivyaanshyadav/Desktop/Numek/validation/cg4/check_legacy_status_capture.py", line 99, in <module>
+    if __name__=='__main__':main()
+                            ~~~~^^
+  File "/Users/drivyaanshyadav/Desktop/Numek/validation/cg4/check_legacy_status_capture.py", line 77, in main
+    result=ws.investigate(spec)
+  File "/Users/drivyaanshyadav/Desktop/Numek/src/confidenceguard/workspace.py", line 327, in investigate
+    result=investigate(spec,config,workspace=self,request_id=('discovery:'+request_id) if request_id else None,**kwargs)
+  File "/Users/drivyaanshyadav/Desktop/Numek/src/confidenceguard/investigation.py", line 529, in investigate
+    population=compat.supervise(_discovery_population,(spec,config,roots),config,progress=progress,cancel=cancel,deadline=deadline).data
+               ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/drivyaanshyadav/Desktop/Numek/src/confidenceguard/compat.py", line 26, in supervise
+    raise error from exc
+confidenceguard.contracts.EvaluationError: Evaluation stopped; inspect the execution code and configured limits.

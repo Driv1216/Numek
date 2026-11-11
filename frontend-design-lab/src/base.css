@@ -1,0 +1,285 @@
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+}
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+button,
+a,
+input,
+select,
+textarea {
+  touch-action: manipulation;
+}
+button {
+  cursor: pointer;
+}
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+a {
+  color: inherit;
+}
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+summary:focus-visible {
+  outline: 3px solid #4986ce;
+  outline-offset: 3px;
+}
+svg {
+  flex-shrink: 0;
+}
+button svg {
+  vertical-align: middle;
+}
+p {
+  line-height: 1.55;
+}
+h1,
+h2,
+h3,
+p {
+  margin-top: 0;
+}
+table {
+  border-collapse: collapse;
+}
+th,
+td {
+  text-align: left;
+}
+pre {
+  overflow: auto;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+input,
+select,
+textarea {
+  max-width: 100%;
+}
+.lab-return {
+  position: fixed;
+  bottom: 13px;
+  right: 15px;
+  z-index: 60;
+  font: 11px system-ui;
+  text-decoration: none;
+  background: #fff;
+  color: #232830;
+  border: 1px solid #ccd0d3;
+  padding: 8px 12px;
+  border-radius: 4px;
+  box-shadow: 0 2px 8px #0001;
+}
+.launcher {
+  font: 15px/1.5 system-ui;
+  color: #26313a;
+  background: #f3f4f2;
+  min-height: 100vh;
+  padding: 44px max(24px, calc((100vw - 1180px) / 2));
+}
+.launcher header {
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px solid #ced3cf;
+  padding-bottom: 22px;
+}
+.launcher h1 {
+  font-size: clamp(32px, 4vw, 52px);
+  font-weight: 500;
+  letter-spacing: -2px;
+  margin: 34px 0 16px;
+}
+.launcher .intro {
+  max-width: 750px;
+  color: #5a6867;
+}
+.launcher-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 18px;
+  margin-top: 35px;
+}
+.concept-entry {
+  background: #fff;
+  border: 1px solid #d2d8d4;
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+}
+.concept-entry h2 {
+  font-size: 20px;
+  font-weight: 500;
+  line-height: 1.15;
+  margin: 22px 0 14px;
+}
+.concept-entry p {
+  font-size: 13px;
+  color: #67706d;
+  flex: 1;
+}
+.concept-entry a {
+  font-size: 13px;
+  margin-top: 13px;
+  text-decoration: none;
+  border-bottom: 1px solid #ccd0cc;
+  padding-bottom: 8px;
+}
+.mini-layout {
+  height: 145px;
+  background: var(--mini);
+  position: relative;
+  padding: 16px;
+  overflow: hidden;
+}
+.mini-layout i,
+.mini-layout b,
+.mini-layout em {
+  display: block;
+  background: currentColor;
+  opacity: 0.2;
+  position: absolute;
+}
+.mini-layout i {
+  width: 75%;
+  height: 5px;
+  top: 20px;
+}
+.mini-layout b {
+  width: 28%;
+  height: 80px;
+  top: 38px;
+}
+.mini-layout em {
+  width: 43%;
+  height: 55px;
+  top: 50px;
+  left: 48%;
+}
+.mini-02 b {
+  width: 80%;
+  height: 60px;
+}
+.mini-02 em {
+  height: 2px;
+  left: 16px;
+  top: 110px;
+  width: 80%;
+}
+.mini-03 b {
+  width: 15%;
+  height: 90px;
+}
+.mini-03 em {
+  height: 80px;
+  width: 65%;
+  left: 28%;
+  top: 38px;
+}
+.mini-04 b {
+  height: 8px;
+  width: 65%;
+  top: 46px;
+}
+.mini-04 em {
+  height: 54px;
+  left: 16px;
+  width: 80%;
+  top: 69px;
+}
+.mini-05 b {
+  height: 65px;
+  width: 12%;
+  top: 50px;
+  left: 23%;
+  transform: rotate(-25deg);
+}
+.mini-05 em {
+  height: 80px;
+  width: 12%;
+  top: 40px;
+  left: 50%;
+  transform: rotate(25deg);
+}
+.launcher details {
+  margin-top: 30px;
+  padding: 18px 0;
+  border-block: 1px solid #d2d8d4;
+}
+.launcher summary {
+  cursor: pointer;
+}
+.compare-controls {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin: 20px 0;
+}
+.compare-controls select {
+  padding: 8px;
+}
+.comparison {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.comparison iframe {
+  width: 100%;
+  height: 780px;
+  border: 1px solid #ccc;
+  background: white;
+}
+.compare-title {
+  font-size: 16px;
+}
+.launcher footer {
+  margin-top: 28px;
+  font-size: 12px;
+  color: #67706d;
+}
+@media (max-width: 1000px) {
+  .launcher-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+@media (max-width: 650px) {
+  .launcher-grid {
+    grid-template-columns: 1fr;
+  }
+  .concept-entry {
+    display: grid;
+    grid-template-columns: 120px 1fr;
+    gap: 0 20px;
+  }
+  .mini-layout {
+    grid-row: 1/5;
+    height: 180px;
+  }
+  .concept-entry h2 {
+    margin: 12px 0;
+  }
+  .comparison {
+    grid-template-columns: 1fr;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}

@@ -1,0 +1,230 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Previously exposed synthetic CG4 review reproduction — ConfidenceGuard</title><style>
+@page{size:A4;margin:17mm 14mm}*{box-sizing:border-box}body{font:11px/1.5 Arial,sans-serif;color:#182432;margin:0}main{max-width:1050px;margin:auto;padding:24px}h1{font-size:28px;line-height:1.15}h2{font-size:18px;margin-top:28px}h3{font-size:13px}p,td,th{overflow-wrap:anywhere}small,.note{color:#536375}header{border-bottom:3px solid #196d70;padding-bottom:16px}section{break-before:page}section:first-of-type{break-before:auto}table{width:100%;border-collapse:collapse;table-layout:fixed}th,td{padding:7px;text-align:left;vertical-align:top;border-bottom:1px solid #d7e1e5}th{background:#edf4f4}tr{break-inside:avoid}thead{display:table-header-group}pre{white-space:pre-wrap;overflow-wrap:anywhere;font:9px/1.4 monospace;border-left:2px solid #c4d8d8;padding-left:8px}figure{break-inside:avoid;margin:18px 0}svg{width:380px;max-width:100%;height:210px}details{margin:12px 0}.banner{padding:12px;background:#edf4f4}.value{font-variant-numeric:tabular-nums}@media print{main{padding:0}details{display:block}details>summary{font-weight:bold}details pre{display:block}a{color:inherit}}
+ .cg2 section,.cg4 section{break-before:auto}.cg2 h2,.cg4 h2,.cg4 h3{break-after:avoid}.cg4 article{break-inside:avoid}.cg4 .candidate-intro,.cg4 .overlap-intro{break-after:avoid}</style></head><body class="cg4"><main><header><p>NUMEK / ConfidenceGuard · Model Reliability Intelligence</p><h1>Previously exposed synthetic CG4 review reproduction</h1><p>Binary Classification · 2026-10-28T02:21:04.167685+00:00</p><p>Method failure_investigation_v1 · confidenceguard.investigation_result/1.0</p><div class="banner">Exact protected local report — contains confidential aggregate evidence. No overall reliability score or production approval is defined.</div></header>
+<section><h2>Evaluation summary and priority investigations</h2><p><strong>synthetic-review</strong> · unknown · v1</p><p><strong>synthetic-review-reference</strong> · unknown · v1</p><p><strong>Review · exploratory discovery</strong> — D/S selection evidence is exploratory. Freeze hypotheses before independent assessment.</p></section>
+<section class="cg4"><h2>Failure discovery and investigation</h2>
+<p>Prepare evidence → discover on D → select on S → freeze claims → assess independently on H. These roles are separate from CG2 fitting, selection, calibration and evaluation.</p>
+<p>Stage: <strong>discovery</strong>. Discovery and selection evidence is exploratory. Learned models propose regions; shared ConfidenceGuard reducers define the reported metrics. A finding does not establish a cause or authorize a model change.</p>
+<p>Selection uses S only. Within each objective, preserve the severity extreme, then prioritize (adverse effect minus the declared practical threshold) × conditional support when another slot is available. Remaining gates follow the effect/support/complexity frontier and marginal-coverage checks. This is an investigation heuristic, not a statistical or causal guarantee.</p><h3>Search and method standing</h3><table><thead><tr><th>Strategy / objective</th><th>Execution and coverage</th><th>Qualification</th></tr></thead><tbody><tr><td>structured · precision</td><td>completed · predicate search complete within admitted class · </td><td>Consult recorded recovery qualification; this search is not a recovery guarantee.</td></tr><tr><td>catboost · precision</td><td>completed · </td><td>requires_objective_family_qualification</td></tr><tr><td>geometric · precision</td><td>completed · </td><td>requires_qualification</td></tr></tbody></table><h3>Candidates and selection evidence</h3><p class="candidate-intro">20 retained candidates; up to 50 shown here. Matching JSON retains every disclosed candidate. Effects use their objective-specific conditional denominator and units.</p>
+<article><h3>09b81b1aadb7409553d780c850799c0f · structured · exploratory</h3>
+<p>precision · adverse direction lower · fraction · comparator paired. Practical threshold: 0.1.</p><table><thead><tr><th>Population</th><th>Planned / applicable</th><th>Members / comparison / unavailable</th><th>Adverse effect</th></tr></thead><tbody><tr><td>D</td><td>240 / 240</td><td>120 / 120 / 0<br>Conditional support 120 / 60</td><td>0.5</td></tr><tr><td>S</td><td>240 / 240</td><td>120 / 120 / 0<br>Conditional support 120 / 60</td><td>0.5</td></tr></tbody></table>
+<pre>{
+  "clauses": [
+    {
+      "field": "context.x",
+      "kind": "categorical",
+      "op": "eq",
+      "value": "1"
+    }
+  ]
+}</pre><p>Explanation: exact_predicate. The exact predicate defines membership, subject to the frozen availability rules.</p><p>Explanation applicability: 240 jointly applicable of 240 planned S observations; 0 unavailable. 0 gate members lack an applicable explanation. Fidelity uses joint applicability.</p><pre>{
+  "coverage_guarantee": false,
+  "diagnostic_references": "Original D-only diagnostic targets fixed; refits resample whole admitted D units before the disclosed D cap.",
+  "matching": "Largest frozen membership IoU on S features, within strategy, representation and diagnostic head; no S outcome selection.",
+  "median_membership_IoU": 1.0,
+  "method": "bounded_D_unit_bootstrap_refits_v2",
+  "profile": {
+    "D_row_limit": 20000,
+    "maximum_nodes": 10000,
+    "retained_candidates": 8
+  },
+  "replicates": 1,
+  "results": [
+    {
+      "applicable_fraction": 1.0,
+      "membership_IoU": 1.0,
+      "refit_D_records": 240,
+      "replicate": 0
+    }
+  ],
+  "scope": "Product perturbation diagnostic; full-method qualification is separate.",
+  "seed": 0
+}</pre><p>Protected evidence references: cg4_ref_24212be318f23f45fb88be21 (higher_diagnostic_loss_member); cg4_ref_16909b5824fc81261641b4dc (lower_diagnostic_loss_member); cg4_ref_a01ff64437e3035779576344 (outside_comparison); cg4_ref_b8f8510d093c896c263d05ff (representative_member); cg4_ref_21f828c0a1f87b603ca8368a (representative_member). Resolve only with current authorized source access.</p></article><article><h3>3c6d2274180c31752c2c442a364f40df · geometric · exploratory</h3>
+<p>precision · adverse direction lower · fraction · comparator paired. Practical threshold: 0.1.</p><table><thead><tr><th>Population</th><th>Planned / applicable</th><th>Members / comparison / unavailable</th><th>Adverse effect</th></tr></thead><tbody><tr><td>D</td><td>240 / 240</td><td>120 / 120 / 0<br>Conditional support 120 / 60</td><td>0.5</td></tr><tr><td>S</td><td>240 / 240</td><td>120 / 120 / 0<br>Conditional support 120 / 60</td><td>0.5</td></tr></tbody></table>
+<pre>"Frozen geometric membership"</pre><p>Explanation: approximate. Held-out S precision 1.0, recall 1.0. The simplified explanation does not define learned membership.</p><p>Explanation applicability: 240 jointly applicable of 240 planned S observations; 0 unavailable. 0 gate members lack an applicable explanation. Fidelity uses joint applicability.</p><p>Protected evidence references: cg4_ref_671af134f09ddeee538ba1ca (higher_diagnostic_loss_member); cg4_ref_9dc814377c189a8a73e9ce6b (lower_diagnostic_loss_member); cg4_ref_da8bb707a70bd99ec11db261 (boundary_case); cg4_ref_5358a3fe0518fb08bcd33bf2 (outside_comparison); cg4_ref_6ecac243dfa041d32875cf50 (representative_member). Resolve only with current authorized source access.</p></article><article><h3>460da5a159f6ef55b11529116514ade4 · geometric · exploratory</h3>
+<p>precision · adverse direction lower · fraction · comparator paired. Practical threshold: 0.1.</p><table><thead><tr><th>Population</th><th>Planned / applicable</th><th>Members / comparison / unavailable</th><th>Adverse effect</th></tr></thead><tbody><tr><td>D</td><td>240 / 240</td><td>120 / 120 / 0<br>Conditional support 120 / 60</td><td>0.5</td></tr><tr><td>S</td><td>240 / 240</td><td>120 / 120 / 0<br>Conditional support 120 / 60</td><td>0.5</td></tr></tbody></table>
+<pre>"Frozen geometric membership"</pre><p>Explanation: approximate. Held-out S precision 1.0, recall 1.0. The simplified explanation does not define learned membership.</p><p>Explanation applicability: 240 jointly applicable of 240 planned S observations; 0 unavailable. 0 gate members lack an applicable explanation. Fidelity uses joint applicability.</p><p>Protected evidence references: cg4_ref_380fcbf133c9b99d98391cb8 (higher_diagnostic_loss_member); cg4_ref_9b17b6f671af9ddcba91af8e (lower_diagnostic_loss_member); cg4_ref_dae88276f937f8374f682ba9 (boundary_case); cg4_ref_a103d8a9d5ebb1fe4071a04c (representative_member); cg4_ref_3194d44433cb31e99fd21f56 (representative_member). Resolve only with current authorized source access.</p></article><article><h3>88cf1551c6b8ad9071d600479940e9e8 · geometric · exploratory</h3>
+<p>precision · adverse direction lower · fraction · comparator paired. Practical threshold: 0.1.</p><table><thead><tr><th>Population</th><th>Planned / applicable</th><th>Members / comparison / unavailable</th><th>Adverse effect</th></tr></thead><tbody><tr><td>D</td><td>240 / 240</td><td>120 / 120 / 0<br>Conditional support 120 / 60</td><td>0.5</td></tr><tr><td>S</td><td>240 / 240</td><td>120 / 120 / 0<br>Conditional support 120 / 60</td><td>0.5</td></tr></tbody></table>
+<pre>"Frozen geometric membership"</pre><p>Explanation: approximate. Held-out S precision 1.0, recall 1.0. The simplified explanation does not define learned membership.</p><p>Explanation applicability: 240 jointly applicable of 240 planned S observations; 0 unavailable. 0 gate members lack an applicable explanation. Fidelity uses joint applicability.</p><p>Protected evidence references: cg4_ref_b0928191ecaf28e5652cf7d3 (higher_diagnostic_loss_member); cg4_ref_ba88d00ee61c074f095f23c5 (lower_diagnostic_loss_member); cg4_ref_6fdc9df2458ec1888bc0cf0a (boundary_case); cg4_ref_899753af4354c3aea24bec0e (outside_comparison); cg4_ref_228c193e2dfcbbb38036ab90 (representative_member). Resolve only with current authorized source access.</p></article><article><h3>da6bb9712532d7f7e9d7a66c7cac1947 · geometric · exploratory</h3>
+<p>precision · adverse direction lower · fraction · comparator paired. Practical threshold: 0.1.</p><table><thead><tr><th>Population</th><th>Planned / applicable</th><th>Members / comparison / unavailable</th><th>Adverse effect</th></tr></thead><tbody><tr><td>D</td><td>240 / 240</td><td>120 / 120 / 0<br>Conditional support 120 / 60</td><td>0.5</td></tr><tr><td>S</td><td>240 / 240</td><td>120 / 120 / 0<br>Conditional support 120 / 60</td><td>0.5</td></tr></tbody></table>
+<pre>"Frozen geometric membership"</pre><p>Explanation: approximate. Held-out S precision 1.0, recall 1.0. The simplified explanation does not define learned membership.</p><p>Explanation applicability: 240 jointly applicable of 240 planned S observations; 0 unavailable. 0 gate members lack an applicable explanation. Fidelity uses joint applicability.</p><p>Protected evidence references: cg4_ref_997f424729f1525e92170227 (higher_diagnostic_loss_member); cg4_ref_4fc9bc890a82f61d912a8706 (lower_diagnostic_loss_member); cg4_ref_fd87798b127bc505585fa5c0 (boundary_case); cg4_ref_24eff651b20f288d97996fa6 (outside_comparison); cg4_ref_d560dfc5646b48b79fe773bf (representative_member). Resolve only with current authorized source access.</p></article><article><h3>4cc8bf5730c2b56baa01d038bbb2a510 · structured · exploratory</h3>
+<p>precision · adverse direction lower · fraction · comparator paired. Practical threshold: 0.1.</p><table><thead><tr><th>Population</th><th>Planned / applicable</th><th>Members / comparison / unavailable</th><th>Adverse effect</th></tr></thead><tbody><tr><td>D</td><td>240 / 240</td><td>180 / 60 / 0<br>Conditional support 150 / 90</td><td>0.4</td></tr><tr><td>S</td><td>240 / 240</td><td>180 / 60 / 0<br>Conditional support 150 / 90</td><td>0.4</td></tr></tbody></table>
+<pre>{
+  "any_of": [
+    [
+      {
+        "field": "context.x",
+        "kind": "categorical",
+        "op": "eq",
+        "value": "1"
+      }
+    ],
+    [
+      {
+        "field": "context.z",
+        "kind": "categorical",
+        "op": "eq",
+        "value": "0"
+      }
+    ]
+  ]
+}</pre><p>Explanation: exact_predicate. The exact predicate defines membership, subject to the frozen availability rules.</p><p>Explanation applicability: 240 jointly applicable of 240 planned S observations; 0 unavailable. 0 gate members lack an applicable explanation. Fidelity uses joint applicability.</p><p>Protected evidence references: cg4_ref_a5d77a521ed154dcca259598 (higher_diagnostic_loss_member); cg4_ref_0b25e5dc568be3799d8e18f0 (lower_diagnostic_loss_member); cg4_ref_4182bf3ad7d1d9a7ce0a296a (outside_comparison); cg4_ref_891d2f6a2376d8d60817f961 (representative_member); cg4_ref_f75ee9e1175c9f841d2e1a94 (representative_member). Resolve only with current authorized source access.</p></article><article><h3>cd2107cd03fe1b1618fe07459ed60775 · structured · exploratory</h3>
+<p>precision · adverse direction lower · fraction · comparator paired. Practical threshold: 0.1.</p><table><thead><tr><th>Population</th><th>Planned / applicable</th><th>Members / comparison / unavailable</th><th>Adverse effect</th></tr></thead><tbody><tr><td>D</td><td>240 / 240</td><td>180 / 60 / 0<br>Conditional support 150 / 90</td><td>0.4</td></tr><tr><td>S</td><td>240 / 240</td><td>180 / 60 / 0<br>Conditional support 150 / 90</td><td>0.4</td></tr></tbody></table>
+<pre>{
+  "any_of": [
+    [
+      {
+        "field": "context.x",
+        "kind": "categorical",
+        "op": "eq",
+        "value": "1"
+      }
+    ],
+    [
+      {
+        "field": "context.z",
+        "kind": "categorical",
+        "op": "eq",
+        "value": "1"
+      }
+    ]
+  ]
+}</pre><p>Explanation: exact_predicate. The exact predicate defines membership, subject to the frozen availability rules.</p><p>Explanation applicability: 240 jointly applicable of 240 planned S observations; 0 unavailable. 0 gate members lack an applicable explanation. Fidelity uses joint applicability.</p><p>Protected evidence references: cg4_ref_dc64931108eda7ea0f063401 (higher_diagnostic_loss_member); cg4_ref_783513275bd6cd16c668c7cd (lower_diagnostic_loss_member); cg4_ref_b9a383a8cc15d3d86b15a013 (outside_comparison); cg4_ref_e91341c85eba87246a676e28 (representative_member); cg4_ref_7d1292cf821041024d96aa88 (representative_member). Resolve only with current authorized source access.</p></article><article><h3>d86fcb9d188c1e27456b58542e01c372 · catboost · exploratory</h3>
+<p>precision · adverse direction lower · fraction · comparator paired. Practical threshold: 0.1.</p><table><thead><tr><th>Population</th><th>Planned / applicable</th><th>Members / comparison / unavailable</th><th>Adverse effect</th></tr></thead><tbody><tr><td>D</td><td>240 / 240</td><td>240 / 0 / 0<br>Conditional support 180 / 120</td><td>0.33333333333333337</td></tr><tr><td>S</td><td>240 / 240</td><td>240 / 0 / 0<br>Conditional support 180 / 120</td><td>0.33333333333333337</td></tr></tbody></table>
+<pre>"Frozen catboost membership"</pre><p>Explanation: approximate. no_supported_surrogate_rule</p><p>Protected evidence references: cg4_ref_7a7b410dac4cf3f258b02564 (higher_diagnostic_loss_member); cg4_ref_a2378cc8947377ffb56758b0 (lower_diagnostic_loss_member); cg4_ref_c10f8ef56a97f74df70f91ec (boundary_case); cg4_ref_bf9212140d9cb7276453baba (representative_member); cg4_ref_54f7ef85017f28d29545dbba (representative_member). Resolve only with current authorized source access.</p></article><article><h3>e97e49103ecbb8c288f10c7ff86310e9 · structured · exploratory</h3>
+<p>precision · adverse direction lower · fraction · comparator paired. Practical threshold: 0.1.</p><table><thead><tr><th>Population</th><th>Planned / applicable</th><th>Members / comparison / unavailable</th><th>Adverse effect</th></tr></thead><tbody><tr><td>D</td><td>240 / 240</td><td>120 / 120 / 0<br>Conditional support 120 / 60</td><td>0.5</td></tr><tr><td>S</td><td>240 / 240</td><td>120 / 120 / 0<br>Conditional support 120 / 60</td><td>0.5</td></tr></tbody></table>
+<pre>{
+  "any_of": [
+    [
+      {
+        "field": "context.x",
+        "kind": "categorical",
+        "op": "eq",
+        "value": "1"
+      }
+    ],
+    [
+      {
+        "field": "context.x",
+        "kind": "categorical",
+        "op": "eq",
+        "value": "1"
+      },
+      {
+        "field": "context.z",
+        "kind": "categorical",
+        "op": "eq",
+        "value": "1"
+      }
+    ]
+  ]
+}</pre><p>Explanation: exact_predicate. The exact predicate defines membership, subject to the frozen availability rules.</p><p>Explanation applicability: 240 jointly applicable of 240 planned S observations; 0 unavailable. 0 gate members lack an applicable explanation. Fidelity uses joint applicability.</p><p>Protected evidence references: cg4_ref_ee1f61029063b904f86b0a71 (higher_diagnostic_loss_member); cg4_ref_39504bb1e3b0fb7ec813a219 (lower_diagnostic_loss_member); cg4_ref_cd8e2b2bb8b248015ccf3c1f (outside_comparison); cg4_ref_434d594a4241e00bf6689fe1 (representative_member); cg4_ref_dea2387fce41d51f382ab089 (representative_member). Resolve only with current authorized source access.</p></article><article><h3>efb35d88842cf8728e82682339744c9d · structured · exploratory</h3>
+<p>precision · adverse direction lower · fraction · comparator paired. Practical threshold: 0.1.</p><table><thead><tr><th>Population</th><th>Planned / applicable</th><th>Members / comparison / unavailable</th><th>Adverse effect</th></tr></thead><tbody><tr><td>D</td><td>240 / 240</td><td>120 / 120 / 0<br>Conditional support 120 / 60</td><td>0.5</td></tr><tr><td>S</td><td>240 / 240</td><td>120 / 120 / 0<br>Conditional support 120 / 60</td><td>0.5</td></tr></tbody></table>
+<pre>{
+  "any_of": [
+    [
+      {
+        "field": "context.x",
+        "kind": "categorical",
+        "op": "eq",
+        "value": "1"
+      }
+    ],
+    [
+      {
+        "field": "context.x",
+        "kind": "categorical",
+        "op": "eq",
+        "value": "1"
+      },
+      {
+        "field": "context.z",
+        "kind": "categorical",
+        "op": "eq",
+        "value": "0"
+      }
+    ]
+  ]
+}</pre><p>Explanation: exact_predicate. The exact predicate defines membership, subject to the frozen availability rules.</p><p>Explanation applicability: 240 jointly applicable of 240 planned S observations; 0 unavailable. 0 gate members lack an applicable explanation. Fidelity uses joint applicability.</p><p>Protected evidence references: cg4_ref_b0af0b51922a079c479949b3 (higher_diagnostic_loss_member); cg4_ref_79c6a6666dfd521c7ae1e050 (lower_diagnostic_loss_member); cg4_ref_db208ea0fecdf4ac5fd4f4be (outside_comparison); cg4_ref_b3b4f7c61e79502f235efdf1 (representative_member); cg4_ref_04e9224015c657bcb184f8c8 (representative_member). Resolve only with current authorized source access.</p></article><article><h3>4fad0e1b3788de5482418cf341a77739 · structured · exploratory</h3>
+<p>precision · adverse direction lower · fraction · comparator paired. Practical threshold: 0.1.</p><table><thead><tr><th>Population</th><th>Planned / applicable</th><th>Members / comparison / unavailable</th><th>Adverse effect</th></tr></thead><tbody><tr><td>D</td><td>240 / 240</td><td>60 / 180 / 0<br>Conditional support 60 / 30</td><td>0.5</td></tr><tr><td>S</td><td>240 / 240</td><td>60 / 180 / 0<br>Conditional support 60 / 30</td><td>0.5</td></tr></tbody></table>
+<pre>{
+  "clauses": [
+    {
+      "field": "context.x",
+      "kind": "categorical",
+      "op": "eq",
+      "value": "1"
+    },
+    {
+      "field": "context.z",
+      "kind": "categorical",
+      "op": "eq",
+      "value": "0"
+    }
+  ]
+}</pre><p>Explanation: exact_predicate. The exact predicate defines membership, subject to the frozen availability rules.</p><p>Explanation applicability: 240 jointly applicable of 240 planned S observations; 0 unavailable. 0 gate members lack an applicable explanation. Fidelity uses joint applicability.</p><p>Protected evidence references: cg4_ref_de1740ef808cb95022eb8e93 (higher_diagnostic_loss_member); cg4_ref_b0541519afa6b40190cb679e (lower_diagnostic_loss_member); cg4_ref_afc50b3afa2c53b7133fe5d3 (outside_comparison); cg4_ref_6704d5c776af9f1f297af4c5 (representative_member); cg4_ref_0bfc79053de396f8ac34977a (representative_member). Resolve only with current authorized source access.</p></article><article><h3>c1cf785b51a58780e7f6724ff80ea78a · structured · exploratory</h3>
+<p>precision · adverse direction lower · fraction · comparator paired. Practical threshold: 0.1.</p><table><thead><tr><th>Population</th><th>Planned / applicable</th><th>Members / comparison / unavailable</th><th>Adverse effect</th></tr></thead><tbody><tr><td>D</td><td>240 / 240</td><td>60 / 180 / 0<br>Conditional support 60 / 30</td><td>0.5</td></tr><tr><td>S</td><td>240 / 240</td><td>60 / 180 / 0<br>Conditional support 60 / 30</td><td>0.5</td></tr></tbody></table>
+<pre>{
+  "clauses": [
+    {
+      "field": "context.x",
+      "kind": "categorical",
+      "op": "eq",
+      "value": "1"
+    },
+    {
+      "field": "context.z",
+      "kind": "categorical",
+      "op": "eq",
+      "value": "1"
+    }
+  ]
+}</pre><p>Explanation: exact_predicate. The exact predicate defines membership, subject to the frozen availability rules.</p><p>Explanation applicability: 240 jointly applicable of 240 planned S observations; 0 unavailable. 0 gate members lack an applicable explanation. Fidelity uses joint applicability.</p><p>Protected evidence references: cg4_ref_d20c6b3f719f1f4e0da16249 (higher_diagnostic_loss_member); cg4_ref_5262e839913bcb8e91d0a1ed (lower_diagnostic_loss_member); cg4_ref_ecf8666640a37af568d575d3 (outside_comparison); cg4_ref_543b0bf07e9456e89a7ab0d9 (representative_member); cg4_ref_ccaf268711dc170452083eed (representative_member). Resolve only with current authorized source access.</p></article><article><h3>39954de95f882060398487c67e75baef · catboost · exploratory</h3>
+<p>precision · adverse direction lower · fraction · comparator paired. Practical threshold: 0.1.</p><table><thead><tr><th>Population</th><th>Planned / applicable</th><th>Members / comparison / unavailable</th><th>Adverse effect</th></tr></thead><tbody><tr><td>D</td><td>240 / 240</td><td>240 / 0 / 0<br>Conditional support 180 / 120</td><td>0.33333333333333337</td></tr><tr><td>S</td><td>240 / 240</td><td>240 / 0 / 0<br>Conditional support 180 / 120</td><td>0.33333333333333337</td></tr></tbody></table>
+<pre>"Frozen catboost membership"</pre><p>Explanation: approximate. no_supported_surrogate_rule</p><p>Protected evidence references: cg4_ref_87cc607fe1143d41a700ad69 (higher_diagnostic_loss_member); cg4_ref_2990fa93e03107101e08a336 (lower_diagnostic_loss_member); cg4_ref_9d5eb361343b79ce0b77024b (boundary_case); cg4_ref_1e4894c17a69225efce1d665 (representative_member); cg4_ref_8a1baec63379389c42568828 (representative_member). Resolve only with current authorized source access.</p></article><article><h3>eb49658007549416fd5ba98defdafb63 · structured · exploratory</h3>
+<p>precision · adverse direction lower · fraction · comparator paired. Practical threshold: 0.1.</p><table><thead><tr><th>Population</th><th>Planned / applicable</th><th>Members / comparison / unavailable</th><th>Adverse effect</th></tr></thead><tbody><tr><td>D</td><td>240 / 240</td><td>120 / 120 / 0<br>Conditional support 120 / 60</td><td>0.5</td></tr><tr><td>S</td><td>240 / 240</td><td>120 / 120 / 0<br>Conditional support 120 / 60</td><td>0.5</td></tr></tbody></table>
+<pre>{
+  "any_of": [
+    [
+      {
+        "field": "context.x",
+        "kind": "categorical",
+        "op": "eq",
+        "value": "1"
+      },
+      {
+        "field": "context.z",
+        "kind": "categorical",
+        "op": "eq",
+        "value": "1"
+      }
+    ],
+    [
+      {
+        "field": "context.x",
+        "kind": "categorical",
+        "op": "eq",
+        "value": "1"
+      },
+      {
+        "field": "context.z",
+        "kind": "categorical",
+        "op": "eq",
+        "value": "0"
+      }
+    ]
+  ]
+}</pre><p>Explanation: exact_predicate. The exact predicate defines membership, subject to the frozen availability rules.</p><p>Explanation applicability: 240 jointly applicable of 240 planned S observations; 0 unavailable. 0 gate members lack an applicable explanation. Fidelity uses joint applicability.</p><p>Protected evidence references: cg4_ref_b512dbc938fef0c34ddbd106 (higher_diagnostic_loss_member); cg4_ref_c4911f89c50ce3ca5b94c663 (lower_diagnostic_loss_member); cg4_ref_33568742bbac321aef175dcb (outside_comparison); cg4_ref_97ebe9cacc18254af30dc270 (representative_member); cg4_ref_8b8d7e84a227c2bb24d24202 (representative_member). Resolve only with current authorized source access.</p></article><article><h3>90fa64a82c53abf8d19391de17d20059 · catboost · exploratory</h3>
+<p>precision · adverse direction lower · fraction · comparator paired. Practical threshold: 0.1.</p><table><thead><tr><th>Population</th><th>Planned / applicable</th><th>Members / comparison / unavailable</th><th>Adverse effect</th></tr></thead><tbody><tr><td>D</td><td>240 / 240</td><td>120 / 120 / 0<br>Conditional support 120 / 60</td><td>0.5</td></tr><tr><td>S</td><td>240 / 240</td><td>120 / 120 / 0<br>Conditional support 120 / 60</td><td>0.5</td></tr></tbody></table>
+<pre>"Frozen catboost membership"</pre><p>Explanation: approximate. Held-out S precision 1.0, recall 1.0. The simplified explanation does not define learned membership.</p><p>Explanation applicability: 240 jointly applicable of 240 planned S observations; 0 unavailable. 0 gate members lack an applicable explanation. Fidelity uses joint applicability.</p><p>Protected evidence references: cg4_ref_a54f7fe323fd56b71ee929e7 (higher_diagnostic_loss_member); cg4_ref_6786f9ab7701a239522db51d (lower_diagnostic_loss_member); cg4_ref_f1780c3c35d6502d6ebae238 (boundary_case); cg4_ref_a16198ff85c821130ea013e5 (outside_comparison); cg4_ref_932dd0e04fa952f351e61fd3 (representative_member). Resolve only with current authorized source access.</p></article><article><h3>9ec312c18a71723152f408977f908a97 · catboost · exploratory</h3>
+<p>precision · adverse direction lower · fraction · comparator paired. Practical threshold: 0.1.</p><table><thead><tr><th>Population</th><th>Planned / applicable</th><th>Members / comparison / unavailable</th><th>Adverse effect</th></tr></thead><tbody><tr><td>D</td><td>240 / 240</td><td>120 / 120 / 0<br>Conditional support 120 / 60</td><td>0.5</td></tr><tr><td>S</td><td>240 / 240</td><td>120 / 120 / 0<br>Conditional support 120 / 60</td><td>0.5</td></tr></tbody></table>
+<pre>"Frozen catboost membership"</pre><p>Explanation: approximate. Held-out S precision 1.0, recall 1.0. The simplified explanation does not define learned membership.</p><p>Explanation applicability: 240 jointly applicable of 240 planned S observations; 0 unavailable. 0 gate members lack an applicable explanation. Fidelity uses joint applicability.</p><p>Protected evidence references: cg4_ref_c3a4c7e789c049e784b6b250 (higher_diagnostic_loss_member); cg4_ref_91d7ed4288a1d49405a0c986 (lower_diagnostic_loss_member); cg4_ref_73ccc492d34482e153e8472f (boundary_case); cg4_ref_c2269ab5eda34d9fac7b300a (outside_comparison); cg4_ref_dace3e992ffaa8eaf40f9bc7 (representative_member). Resolve only with current authorized source access.</p></article><article><h3>4364a5a8f1d8b47e56f1a4004ae52b0e · catboost · exploratory</h3>
+<p>precision · adverse direction lower · fraction · comparator paired. Practical threshold: 0.1.</p><table><thead><tr><th>Population</th><th>Planned / applicable</th><th>Members / comparison / unavailable</th><th>Adverse effect</th></tr></thead><tbody><tr><td>D</td><td>240 / 240</td><td>60 / 180 / 0<br>Conditional support 60 / 30</td><td>0.5</td></tr><tr><td>S</td><td>240 / 240</td><td>60 / 180 / 0<br>Conditional support 60 / 30</td><td>0.5</td></tr></tbody></table>
+<pre>"Frozen catboost membership"</pre><p>Explanation: approximate. Held-out S precision 1.0, recall 1.0. The simplified explanation does not define learned membership.</p><p>Explanation applicability: 240 jointly applicable of 240 planned S observations; 0 unavailable. 0 gate members lack an applicable explanation. Fidelity uses joint applicability.</p><p>Protected evidence references: cg4_ref_3c68f470b8f23461b8963a44 (higher_diagnostic_loss_member); cg4_ref_2b43988fef668a0f79ca81a9 (lower_diagnostic_loss_member); cg4_ref_9e76485c71cf4224b67b697f (boundary_case); cg4_ref_67b52846a077b334cf181774 (outside_comparison); cg4_ref_27383944fb31170f7f7e1898 (representative_member). Resolve only with current authorized source access.</p></article><article><h3>b969db59331524d0004a7c72f9a0f3ac · catboost · exploratory</h3>
+<p>precision · adverse direction lower · fraction · comparator paired. Practical threshold: 0.1.</p><table><thead><tr><th>Population</th><th>Planned / applicable</th><th>Members / comparison / unavailable</th><th>Adverse effect</th></tr></thead><tbody><tr><td>D</td><td>240 / 240</td><td>60 / 180 / 0<br>Conditional support 60 / 30</td><td>0.5</td></tr><tr><td>S</td><td>240 / 240</td><td>60 / 180 / 0<br>Conditional support 60 / 30</td><td>0.5</td></tr></tbody></table>
+<pre>"Frozen catboost membership"</pre><p>Explanation: approximate. Held-out S precision 1.0, recall 1.0. The simplified explanation does not define learned membership.</p><p>Explanation applicability: 240 jointly applicable of 240 planned S observations; 0 unavailable. 0 gate members lack an applicable explanation. Fidelity uses joint applicability.</p><p>Protected evidence references: cg4_ref_b173071531f8f603f37d83c1 (higher_diagnostic_loss_member); cg4_ref_4481d59f676e1f72edccec84 (lower_diagnostic_loss_member); cg4_ref_b8bb66f40e053b77e421cc5c (boundary_case); cg4_ref_d17552f0e930c610b9c23e41 (outside_comparison); cg4_ref_7cc372af93fc2c97850a824c (representative_member). Resolve only with current authorized source access.</p></article><article><h3>51ef968757ac0519ef289f6ba85b02a6 · catboost · exploratory</h3>
+<p>precision · adverse direction lower · fraction · comparator paired. Practical threshold: 0.1.</p><table><thead><tr><th>Population</th><th>Planned / applicable</th><th>Members / comparison / unavailable</th><th>Adverse effect</th></tr></thead><tbody><tr><td>D</td><td>240 / 240</td><td>120 / 120 / 0<br>Conditional support 60 / 60</td><td>0.0</td></tr><tr><td>S</td><td>240 / 240</td><td>120 / 120 / 0<br>Conditional support 60 / 60</td><td>0.0</td></tr></tbody></table>
+<pre>"Frozen catboost membership"</pre><p>Explanation: approximate. Held-out S precision 1.0, recall 1.0. The simplified explanation does not define learned membership.</p><p>Explanation applicability: 240 jointly applicable of 240 planned S observations; 0 unavailable. 0 gate members lack an applicable explanation. Fidelity uses joint applicability.</p><p>Protected evidence references: cg4_ref_2a7b4d53843c107f8e60d8f2 (higher_diagnostic_loss_member); cg4_ref_7dd3b81e0720b7dc626e2358 (lower_diagnostic_loss_member); cg4_ref_93e15c948d8fddfa1482181a (boundary_case); cg4_ref_7b05dc71c9a9efa7f9083a23 (outside_comparison); cg4_ref_fcddf634c372c03436fb7153 (representative_member). Resolve only with current authorized source access.</p></article><article><h3>b08f24cb1972115353e6484f37b1d8ac · catboost · exploratory</h3>
+<p>precision · adverse direction lower · fraction · comparator paired. Practical threshold: 0.1.</p><table><thead><tr><th>Population</th><th>Planned / applicable</th><th>Members / comparison / unavailable</th><th>Adverse effect</th></tr></thead><tbody><tr><td>D</td><td>240 / 240</td><td>120 / 120 / 0<br>Conditional support 60 / 60</td><td>0.0</td></tr><tr><td>S</td><td>240 / 240</td><td>120 / 120 / 0<br>Conditional support 60 / 60</td><td>0.0</td></tr></tbody></table>
+<pre>"Frozen catboost membership"</pre><p>Explanation: approximate. Held-out S precision 1.0, recall 1.0. The simplified explanation does not define learned membership.</p><p>Explanation applicability: 240 jointly applicable of 240 planned S observations; 0 unavailable. 0 gate members lack an applicable explanation. Fidelity uses joint applicability.</p><p>Protected evidence references: cg4_ref_98832e80515bfd378ea3abe2 (higher_diagnostic_loss_member); cg4_ref_31728dc82219d37acb9d86c2 (lower_diagnostic_loss_member); cg4_ref_86c54d8e6dd13182e32b9cdc (boundary_case); cg4_ref_18475d30273c116ab626070f (outside_comparison); cg4_ref_749c67bd2faab8beb822f6a7 (representative_member). Resolve only with current authorized source access.</p></article><h3>Overlap</h3><p class="overlap-intro">Shortlist union support: 120 distinct opportunities. Overlapping supports are not summed.</p><p>Showing 40 of 158 retained overlapping pairs. There are 158 overlapping pairs in total; 0 were omitted from retained pair detail. Absence from this table does not establish disjointness.</p><table><thead><tr><th>Regions</th><th>Intersection / union</th><th>Jaccard</th></tr></thead><tbody><tr><td>09b81b1aadb7409553d780c850799c0f / 3c6d2274180c31752c2c442a364f40df</td><td>120 / 120</td><td>1.0</td></tr><tr><td>09b81b1aadb7409553d780c850799c0f / 460da5a159f6ef55b11529116514ade4</td><td>120 / 120</td><td>1.0</td></tr><tr><td>09b81b1aadb7409553d780c850799c0f / 88cf1551c6b8ad9071d600479940e9e8</td><td>120 / 120</td><td>1.0</td></tr><tr><td>09b81b1aadb7409553d780c850799c0f / da6bb9712532d7f7e9d7a66c7cac1947</td><td>120 / 120</td><td>1.0</td></tr><tr><td>09b81b1aadb7409553d780c850799c0f / 4cc8bf5730c2b56baa01d038bbb2a510</td><td>120 / 180</td><td>0.6666666666666666</td></tr><tr><td>09b81b1aadb7409553d780c850799c0f / cd2107cd03fe1b1618fe07459ed60775</td><td>120 / 180</td><td>0.6666666666666666</td></tr><tr><td>09b81b1aadb7409553d780c850799c0f / d86fcb9d188c1e27456b58542e01c372</td><td>120 / 240</td><td>0.5</td></tr><tr><td>09b81b1aadb7409553d780c850799c0f / e97e49103ecbb8c288f10c7ff86310e9</td><td>120 / 120</td><td>1.0</td></tr><tr><td>09b81b1aadb7409553d780c850799c0f / efb35d88842cf8728e82682339744c9d</td><td>120 / 120</td><td>1.0</td></tr><tr><td>09b81b1aadb7409553d780c850799c0f / 4fad0e1b3788de5482418cf341a77739</td><td>60 / 120</td><td>0.5</td></tr><tr><td>09b81b1aadb7409553d780c850799c0f / c1cf785b51a58780e7f6724ff80ea78a</td><td>60 / 120</td><td>0.5</td></tr><tr><td>09b81b1aadb7409553d780c850799c0f / 39954de95f882060398487c67e75baef</td><td>120 / 240</td><td>0.5</td></tr><tr><td>09b81b1aadb7409553d780c850799c0f / eb49658007549416fd5ba98defdafb63</td><td>120 / 120</td><td>1.0</td></tr><tr><td>09b81b1aadb7409553d780c850799c0f / 90fa64a82c53abf8d19391de17d20059</td><td>120 / 120</td><td>1.0</td></tr><tr><td>09b81b1aadb7409553d780c850799c0f / 9ec312c18a71723152f408977f908a97</td><td>120 / 120</td><td>1.0</td></tr><tr><td>09b81b1aadb7409553d780c850799c0f / 4364a5a8f1d8b47e56f1a4004ae52b0e</td><td>60 / 120</td><td>0.5</td></tr><tr><td>09b81b1aadb7409553d780c850799c0f / b969db59331524d0004a7c72f9a0f3ac</td><td>60 / 120</td><td>0.5</td></tr><tr><td>3c6d2274180c31752c2c442a364f40df / 460da5a159f6ef55b11529116514ade4</td><td>120 / 120</td><td>1.0</td></tr><tr><td>3c6d2274180c31752c2c442a364f40df / 88cf1551c6b8ad9071d600479940e9e8</td><td>120 / 120</td><td>1.0</td></tr><tr><td>3c6d2274180c31752c2c442a364f40df / da6bb9712532d7f7e9d7a66c7cac1947</td><td>120 / 120</td><td>1.0</td></tr><tr><td>3c6d2274180c31752c2c442a364f40df / 4cc8bf5730c2b56baa01d038bbb2a510</td><td>120 / 180</td><td>0.6666666666666666</td></tr><tr><td>3c6d2274180c31752c2c442a364f40df / cd2107cd03fe1b1618fe07459ed60775</td><td>120 / 180</td><td>0.6666666666666666</td></tr><tr><td>3c6d2274180c31752c2c442a364f40df / d86fcb9d188c1e27456b58542e01c372</td><td>120 / 240</td><td>0.5</td></tr><tr><td>3c6d2274180c31752c2c442a364f40df / e97e49103ecbb8c288f10c7ff86310e9</td><td>120 / 120</td><td>1.0</td></tr><tr><td>3c6d2274180c31752c2c442a364f40df / efb35d88842cf8728e82682339744c9d</td><td>120 / 120</td><td>1.0</td></tr><tr><td>3c6d2274180c31752c2c442a364f40df / 4fad0e1b3788de5482418cf341a77739</td><td>60 / 120</td><td>0.5</td></tr><tr><td>3c6d2274180c31752c2c442a364f40df / c1cf785b51a58780e7f6724ff80ea78a</td><td>60 / 120</td><td>0.5</td></tr><tr><td>3c6d2274180c31752c2c442a364f40df / 39954de95f882060398487c67e75baef</td><td>120 / 240</td><td>0.5</td></tr><tr><td>3c6d2274180c31752c2c442a364f40df / eb49658007549416fd5ba98defdafb63</td><td>120 / 120</td><td>1.0</td></tr><tr><td>3c6d2274180c31752c2c442a364f40df / 90fa64a82c53abf8d19391de17d20059</td><td>120 / 120</td><td>1.0</td></tr><tr><td>3c6d2274180c31752c2c442a364f40df / 9ec312c18a71723152f408977f908a97</td><td>120 / 120</td><td>1.0</td></tr><tr><td>3c6d2274180c31752c2c442a364f40df / 4364a5a8f1d8b47e56f1a4004ae52b0e</td><td>60 / 120</td><td>0.5</td></tr><tr><td>3c6d2274180c31752c2c442a364f40df / b969db59331524d0004a7c72f9a0f3ac</td><td>60 / 120</td><td>0.5</td></tr><tr><td>460da5a159f6ef55b11529116514ade4 / 88cf1551c6b8ad9071d600479940e9e8</td><td>120 / 120</td><td>1.0</td></tr><tr><td>460da5a159f6ef55b11529116514ade4 / da6bb9712532d7f7e9d7a66c7cac1947</td><td>120 / 120</td><td>1.0</td></tr><tr><td>460da5a159f6ef55b11529116514ade4 / 4cc8bf5730c2b56baa01d038bbb2a510</td><td>120 / 180</td><td>0.6666666666666666</td></tr><tr><td>460da5a159f6ef55b11529116514ade4 / cd2107cd03fe1b1618fe07459ed60775</td><td>120 / 180</td><td>0.6666666666666666</td></tr><tr><td>460da5a159f6ef55b11529116514ade4 / d86fcb9d188c1e27456b58542e01c372</td><td>120 / 240</td><td>0.5</td></tr><tr><td>460da5a159f6ef55b11529116514ade4 / e97e49103ecbb8c288f10c7ff86310e9</td><td>120 / 120</td><td>1.0</td></tr><tr><td>460da5a159f6ef55b11529116514ade4 / efb35d88842cf8728e82682339744c9d</td><td>120 / 120</td><td>1.0</td></tr></tbody></table><h3>Scope and limitations</h3><p>Unavailable membership remains visible against the planned population. Conditional results cannot be read as full-population findings. Observed labels do not establish unobserved outcomes. Local overlap checks do not verify external independence; missing exposure history never proves freshness. Error control is study scoped, with no automatic guarantee across overlapping workspace studies.</p>
+<p>Finite-sample procedures require their declared independence and observation assumptions. Under the founder-approved closure revision, inadequately qualified general BCa/cluster and ranking-percentile approximations refuse new formal confirmation; their research and historical evidence is retained. Temporal common shocks, arbitrary adaptive reuse, and CG3 moving-block bootstrap are not admitted CG4 confirmation routes. Historical restatements preserve original evidence and are descriptive unless an inferential schedule was frozen in advance.</p></section><section><h2>Methodology, coverage and limitations</h2><p>Metrics describe supplied outcomes and declared populations; ground truth and representativeness are not independently established.</p><p>Calibration bins and high-confidence settings are investigation definitions, not universal safety thresholds.</p><p>Policy replay is retrospective; different actions may change outcomes or their observation.</p><p>Statistical intervals, when enabled, are assumption-qualified; the recorded adjustment distinguishes pointwise and family confidence.</p><p>Sampled resource safeguards are not hard quotas or capacity guarantees.</p><p>No composite score, certification or production approval is defined.</p><p></p><p>Analytical bounds, retained-detail omissions, presentation omissions and privacy withholding are distinct. An unavailable metric is not zero. The protected local workbench contains exact retained evidence where supplied and eligible.</p><p>Analysis identity: 40e00354caa14e1fb3d70b12b5721d76</p></section></main></body></html>

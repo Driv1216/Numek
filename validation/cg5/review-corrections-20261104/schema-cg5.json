@@ -1,0 +1,448 @@
+{
+  "documents": {
+    "examples.json": "f6e2f026f4b0503e259100307539e0e1dc4d840bb8109ccf5bf2e647df13c18a",
+    "contracts.json": "1e8ce22010925cfb219b38847704c09ddd1de9799f8f996313eb902fbac979e4",
+    "openapi.json": "69b2da1c1e5d8ea60416d544ccca4f2d9524dee75b535be3d3abf0a9ebbc7234"
+  },
+  "cases": [
+    {
+      "case": "binary_classification transport",
+      "expected": true,
+      "accepted": true,
+      "passed": true,
+      "errors": []
+    },
+    {
+      "case": "binary_classification unknown top level",
+      "expected": false,
+      "accepted": false,
+      "passed": true,
+      "errors": [
+        {
+          "pointer": "/",
+          "message": "Additional properties are not allowed ('unregistered_execution' was unexpected)"
+        }
+      ]
+    },
+    {
+      "case": "binary_classification executable action",
+      "expected": false,
+      "accepted": false,
+      "passed": true,
+      "errors": [
+        {
+          "pointer": "/candidates/0/nodes/root",
+          "message": "{'action': {'kind': 'supplied', 'python': 'print(1)'}, 'kind': 'action'} is not valid under any of the given schemas"
+        }
+      ]
+    },
+    {
+      "case": "binary_classification path instead of owned handle",
+      "expected": false,
+      "accepted": false,
+      "passed": true,
+      "errors": [
+        {
+          "pointer": "/input/evaluation",
+          "message": "{'outcomes': {'column': 'outcome', 'key_columns': ['id'], 'source': 'predictions'}, 'runs': [{'id': 'candidate', 'key_columns': ['id'], 'model': {'id': 'model', 'version': 'v1'}, 'prediction': 'prediction', 'source': 'predictions'}], 'sources': [{'id': 'data', 'path': '/private.csv'}], 'task': {'classes': ['0', '1'], 'kind': 'binary_classification', 'outcome_definition': 'Supplied reference outcome', 'positive_class': '1'}} is not valid under any of the given schemas"
+        }
+      ]
+    },
+    {
+      "case": "multiclass_classification transport",
+      "expected": true,
+      "accepted": true,
+      "passed": true,
+      "errors": []
+    },
+    {
+      "case": "multiclass_classification unknown top level",
+      "expected": false,
+      "accepted": false,
+      "passed": true,
+      "errors": [
+        {
+          "pointer": "/",
+          "message": "Additional properties are not allowed ('unregistered_execution' was unexpected)"
+        }
+      ]
+    },
+    {
+      "case": "multiclass_classification executable action",
+      "expected": false,
+      "accepted": false,
+      "passed": true,
+      "errors": [
+        {
+          "pointer": "/candidates/0/nodes/root",
+          "message": "{'action': {'kind': 'supplied', 'python': 'print(1)'}, 'kind': 'action'} is not valid under any of the given schemas"
+        }
+      ]
+    },
+    {
+      "case": "multiclass_classification path instead of owned handle",
+      "expected": false,
+      "accepted": false,
+      "passed": true,
+      "errors": [
+        {
+          "pointer": "/input/evaluation",
+          "message": "{'outcomes': {'column': 'outcome', 'key_columns': ['id'], 'source': 'predictions'}, 'runs': [{'id': 'candidate', 'key_columns': ['id'], 'model': {'id': 'model', 'version': 'v1'}, 'prediction': 'prediction', 'source': 'predictions'}], 'sources': [{'id': 'data', 'path': '/private.csv'}], 'task': {'classes': ['a', 'b', 'c'], 'kind': 'multiclass_classification', 'outcome_definition': 'Supplied reference outcome', 'positive_class': None}} is not valid under any of the given schemas"
+        }
+      ]
+    },
+    {
+      "case": "regression transport",
+      "expected": true,
+      "accepted": true,
+      "passed": true,
+      "errors": []
+    },
+    {
+      "case": "regression unknown top level",
+      "expected": false,
+      "accepted": false,
+      "passed": true,
+      "errors": [
+        {
+          "pointer": "/",
+          "message": "Additional properties are not allowed ('unregistered_execution' was unexpected)"
+        }
+      ]
+    },
+    {
+      "case": "regression executable action",
+      "expected": false,
+      "accepted": false,
+      "passed": true,
+      "errors": [
+        {
+          "pointer": "/candidates/0/nodes/root",
+          "message": "{'action': {'kind': 'numeric', 'source': {'kind': 'point'}, 'python': 'print(1)'}, 'kind': 'action'} is not valid under any of the given schemas"
+        }
+      ]
+    },
+    {
+      "case": "regression path instead of owned handle",
+      "expected": false,
+      "accepted": false,
+      "passed": true,
+      "errors": [
+        {
+          "pointer": "/input/evaluation",
+          "message": "{'outcomes': {'column': 'outcome', 'key_columns': ['id'], 'source': 'predictions'}, 'runs': [{'id': 'candidate', 'key_columns': ['id'], 'model': {'id': 'model', 'version': 'v1'}, 'prediction': 'prediction', 'source': 'predictions'}], 'sources': [{'id': 'data', 'path': '/private.csv'}], 'task': {'classes': [], 'kind': 'regression', 'outcome_definition': 'Supplied reference outcome', 'positive_class': None}} is not valid under any of the given schemas"
+        }
+      ]
+    },
+    {
+      "case": "policy_inspect",
+      "expected": true,
+      "accepted": true,
+      "passed": true,
+      "errors": []
+    },
+    {
+      "case": "policy_inspect solver injection",
+      "expected": false,
+      "accepted": false,
+      "passed": true,
+      "errors": [
+        {
+          "pointer": "/",
+          "message": "Additional properties are not allowed ('solver_options' was unexpected)"
+        }
+      ]
+    },
+    {
+      "case": "policy_optimize",
+      "expected": true,
+      "accepted": true,
+      "passed": true,
+      "errors": []
+    },
+    {
+      "case": "policy_optimize solver injection",
+      "expected": false,
+      "accepted": false,
+      "passed": true,
+      "errors": [
+        {
+          "pointer": "/",
+          "message": "Additional properties are not allowed ('solver_options' was unexpected)"
+        }
+      ]
+    },
+    {
+      "case": "policy_replay",
+      "expected": true,
+      "accepted": true,
+      "passed": true,
+      "errors": []
+    },
+    {
+      "case": "policy_replay solver injection",
+      "expected": false,
+      "accepted": false,
+      "passed": true,
+      "errors": [
+        {
+          "pointer": "/",
+          "message": "Additional properties are not allowed ('solver_options' was unexpected)"
+        }
+      ]
+    },
+    {
+      "case": "policy_preview",
+      "expected": true,
+      "accepted": true,
+      "passed": true,
+      "errors": []
+    },
+    {
+      "case": "policy_preview solver injection",
+      "expected": false,
+      "accepted": false,
+      "passed": true,
+      "errors": [
+        {
+          "pointer": "/",
+          "message": "Additional properties are not allowed ('solver_options' was unexpected)"
+        }
+      ]
+    },
+    {
+      "case": "policy_assessment_inspect",
+      "expected": true,
+      "accepted": true,
+      "passed": true,
+      "errors": []
+    },
+    {
+      "case": "policy_assessment_inspect solver injection",
+      "expected": false,
+      "accepted": false,
+      "passed": true,
+      "errors": [
+        {
+          "pointer": "/",
+          "message": "Additional properties are not allowed ('solver_options' was unexpected)"
+        }
+      ]
+    },
+    {
+      "case": "policy_assess",
+      "expected": true,
+      "accepted": true,
+      "passed": true,
+      "errors": []
+    },
+    {
+      "case": "policy_assess solver injection",
+      "expected": false,
+      "accepted": false,
+      "passed": true,
+      "errors": [
+        {
+          "pointer": "/",
+          "message": "Additional properties are not allowed ('solver_options' was unexpected)"
+        }
+      ]
+    },
+    {
+      "case": "policy_history",
+      "expected": true,
+      "accepted": true,
+      "passed": true,
+      "errors": []
+    },
+    {
+      "case": "policy_history solver injection",
+      "expected": false,
+      "accepted": false,
+      "passed": true,
+      "errors": [
+        {
+          "pointer": "/",
+          "message": "Additional properties are not allowed ('solver_options' was unexpected)"
+        }
+      ]
+    },
+    {
+      "case": "policy_restate",
+      "expected": true,
+      "accepted": true,
+      "passed": true,
+      "errors": []
+    },
+    {
+      "case": "policy_restate solver injection",
+      "expected": false,
+      "accepted": false,
+      "passed": true,
+      "errors": [
+        {
+          "pointer": "/",
+          "message": "Additional properties are not allowed ('solver_options' was unexpected)"
+        }
+      ]
+    },
+    {
+      "case": "policy_inspect_look",
+      "expected": true,
+      "accepted": true,
+      "passed": true,
+      "errors": []
+    },
+    {
+      "case": "policy_inspect_look solver injection",
+      "expected": false,
+      "accepted": false,
+      "passed": true,
+      "errors": [
+        {
+          "pointer": "/",
+          "message": "Additional properties are not allowed ('solver_options' was unexpected)"
+        }
+      ]
+    },
+    {
+      "case": "policy_assess_look",
+      "expected": true,
+      "accepted": true,
+      "passed": true,
+      "errors": []
+    },
+    {
+      "case": "policy_assess_look solver injection",
+      "expected": false,
+      "accepted": false,
+      "passed": true,
+      "errors": [
+        {
+          "pointer": "/",
+          "message": "Additional properties are not allowed ('solver_options' was unexpected)"
+        }
+      ]
+    },
+    {
+      "case": "label",
+      "expected": true,
+      "accepted": true,
+      "passed": true,
+      "errors": []
+    },
+    {
+      "case": "label inapplicable field",
+      "expected": false,
+      "accepted": false,
+      "passed": true,
+      "errors": [
+        {
+          "pointer": "/",
+          "message": "{'kind': 'label', 'label': 'a', 'threshold': 0.1} is not valid under any of the given schemas"
+        }
+      ]
+    },
+    {
+      "case": "numeric",
+      "expected": true,
+      "accepted": true,
+      "passed": true,
+      "errors": []
+    },
+    {
+      "case": "numeric inapplicable field",
+      "expected": false,
+      "accepted": false,
+      "passed": true,
+      "errors": [
+        {
+          "pointer": "/",
+          "message": "{'kind': 'numeric', 'value': 2, 'threshold': 0.1} is not valid under any of the given schemas"
+        }
+      ]
+    },
+    {
+      "case": "expected_cost",
+      "expected": true,
+      "accepted": true,
+      "passed": true,
+      "errors": []
+    },
+    {
+      "case": "expected_cost inapplicable field",
+      "expected": false,
+      "accepted": false,
+      "passed": true,
+      "errors": [
+        {
+          "pointer": "/",
+          "message": "{'kind': 'expected_cost', 'costs': 'c', 'actions': [{'kind': 'abstain'}], 'threshold': 0.1} is not valid under any of the given schemas"
+        }
+      ]
+    },
+    {
+      "case": "application historical constraints",
+      "expected": true,
+      "accepted": true,
+      "passed": true,
+      "errors": []
+    },
+    {
+      "case": "application constraint injection",
+      "expected": false,
+      "accepted": false,
+      "passed": true,
+      "errors": [
+        {
+          "pointer": "/constraints/0/metric",
+          "message": "Additional properties are not allowed ('python' was unexpected)"
+        }
+      ]
+    },
+    {
+      "case": "hybrid finite route and leaf declarations",
+      "expected": true,
+      "accepted": true,
+      "passed": true,
+      "errors": []
+    },
+    {
+      "case": "hybrid unregistered backend",
+      "expected": false,
+      "accepted": false,
+      "passed": true,
+      "errors": [
+        {
+          "pointer": "/families/0/backend",
+          "message": "'unregistered' is not one of ['auto', 'sweep', 'enumerate', 'milp', 'hybrid', 'bounded']"
+        }
+      ]
+    },
+    {
+      "case": "hybrid duplicate routing identities",
+      "expected": false,
+      "accepted": false,
+      "passed": true,
+      "errors": [
+        {
+          "pointer": "/families/0/routing_parameters",
+          "message": "['route', 'route'] has non-unique elements"
+        }
+      ]
+    },
+    {
+      "case": "hybrid malformed routing identities",
+      "expected": false,
+      "accepted": false,
+      "passed": true,
+      "errors": [
+        {
+          "pointer": "/families/0/routing_parameters",
+          "message": "True is not of type 'array'"
+        }
+      ]
+    }
+  ],
+  "passed": true
+}

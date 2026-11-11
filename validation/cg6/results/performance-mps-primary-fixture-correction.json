@@ -1,0 +1,16 @@
+{
+  "reason": "Explicit MPS device correctly refuses CPU-only constant primary adapter; fixture admission failed before fitting",
+  "failure_log": "performance-risk-complete-mps-fixture-refusal.log",
+  "product_source_change": false,
+  "targeted_profiles": [
+    "scale-mlp-mps",
+    "quantiles-mlp-mps",
+    "failure_risk-mlp-mps"
+  ],
+  "correction": "Equivalent frozen zero-weight Torch primary (point=0, or softmax(log(.1),log(.9))); actual requested MPS execution, no CPU fallback",
+  "sizes_learner_defaults_thresholds_budgets_changed": false,
+  "passing_profiles_reused": 18,
+  "prior_fixture_sha256": "b60a5ccad3b9077f2c02a6c3978c4664acf3efbbd19c0105fedfce9e987aa8db",
+  "corrected_fixture_sha256": "1c7926b7c32373dcff0cd1c937e3dc3a7c0f75975ece138f036064eaa005e897",
+  "comparison_qualification": "CPU fitting benchmark uses CPU constant primary, MPS uses equivalent Torch primary. End-to-end comparison includes that adapter difference; it is not isolated training-kernel speedup."
+}

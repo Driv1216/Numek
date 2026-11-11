@@ -1,0 +1,92 @@
+{
+  "schema_version": "confidenceguard.confirmation_assessment/1.0",
+  "methodology_id": "failure_investigation_v1",
+  "analysis_id": "4e1ad651a4ac4946bc6aefb5fc88e9ef",
+  "generated_at": "2026-10-27T08:15:19.307674+00:00",
+  "execution": {
+    "status": "completed",
+    "peak_workspace_bytes": 1077248,
+    "duration_seconds": 0.2127814160194248,
+    "peak_worker_rss_bytes": 160612352,
+    "whole_job_seconds": 1.231306208006572,
+    "peak_spill_bytes": 0,
+    "serialized_bytes": 381680,
+    "end_to_end_seconds": 2.5503896250156686,
+    "requested_operation_deadline_seconds": 1800
+  },
+  "name": "Failure discovery and investigation",
+  "audience": "shareable",
+  "task": {
+    "kind": "binary_classification",
+    "classes": []
+  },
+  "runs": [],
+  "outcomes": {
+    "scope": "observed_labels"
+  },
+  "comparison": null,
+  "measurements": [],
+  "checks": [],
+  "findings": [
+    {
+      "code": "investigation_scope",
+      "priority": "Information",
+      "message": "Findings apply only to their recorded populations, assumptions and qualification envelope."
+    }
+  ],
+  "coverage": {
+    "qualification": "Conditional membership, observation and independence scopes apply.",
+    "withheld_related_family": false,
+    "populations": []
+  },
+  "investigation": {
+    "stage": "confirmation",
+    "candidates": [],
+    "assessments": [
+      {
+        "hypothesis": "region_1",
+        "state": "statistically_inadmissible",
+        "strength": "descriptive",
+        "membership_scope": "full_population",
+        "independence_qualification": {
+          "local_separation": "system_checked",
+          "local_identity_scope": "live_source_keys_and_available_local_aliases",
+          "upstream": "declared_independent",
+          "external_exposure": "known_exposed",
+          "exposure_continuity": "unknown"
+        },
+        "objective": {
+          "metric": "error_rate",
+          "direction": "higher",
+          "comparator": "ceiling",
+          "units": "fraction"
+        },
+        "practical_threshold": 0.15,
+        "support": {
+          "planned": 240,
+          "available": 240,
+          "members": 240,
+          "nonmembers": 0,
+          "unavailable": 0
+        },
+        "reason": "known_external_exposure"
+      }
+    ],
+    "strategies": [],
+    "overlap": [],
+    "overlap_disclosure": {
+      "state": "withheld",
+      "reason": "Conservative shareable overlap and unique union counts are retained locally; omission does not establish disjointness. Pair-cell checks alone do not qualify release of all higher-order overlap combinations."
+    },
+    "history": [],
+    "notes": [],
+    "method_status": "Qualification is limited to recorded benchmark evidence."
+  },
+  "disclosure": {
+    "policy": "conservative_aggregates_v1",
+    "minimum_denominator": 10,
+    "minimum_component": 10,
+    "learned_artifacts_exported": false
+  },
+  "projection_digest": "cfdc7442484373354ae70dd1eb35045f5c8e2126e02b3defd376a7c052329f99"
+}

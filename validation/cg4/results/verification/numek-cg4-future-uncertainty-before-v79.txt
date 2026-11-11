@@ -1,0 +1,115 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_____ test_future_H_only_uncertainty_inspection_does_not_need_D_S_outcomes _____
+
+operation = <function _discover at 0x109e1e2a0>
+arguments = (InvestigationSpec(objectives=(FailureObjectiveSpec(id='coverage', metric='interval_coverage@0.9', run='model', compar...ytest-525/test_future_H_only_uncertainty0',), None, 'b09448bbbd2d6a08302e4478efd5f78ee287e090b96caf0c56eaa6f1e8be39cb')
+config = EvaluationConfig(max_source_bytes=5368709120, max_combined_source_bytes=8589934592, max_rows=10000000, max_combined_ro...v1', minimum_denominator=10, minimum_component=10, display_labels={}, schema_version='confidenceguard.disclosure/1.0'))
+progress = None, cancel = None, deadline = 375495.77192275
+
+    def supervise(operation,arguments,config,*,progress=None,cancel=None,deadline=None):
+        from datatrust.worker import run_supervised
+        from datatrust.contracts import AnalysisError
+        limits=options(config)
+        if deadline is not None:
+            import time
+            from dataclasses import replace
+            remaining=deadline-time.monotonic()
+            if remaining<=0:raise EvaluationError('Operation deadline exhausted before the next phase.','deadline_exceeded')
+            limits=replace(limits,max_seconds=min(limits.max_seconds,remaining))
+>       try:return run_supervised(operation,arguments,limits,progress=progress,cancel=cancel)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+src/confidenceguard/compat.py:22: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+operation = <function _discover at 0x109e1e2a0>
+arguments = (InvestigationSpec(objectives=(FailureObjectiveSpec(id='coverage', metric='interval_coverage@0.9', run='model', compar...ytest-525/test_future_H_only_uncertainty0',), None, 'b09448bbbd2d6a08302e4478efd5f78ee287e090b96caf0c56eaa6f1e8be39cb')
+options = ExecutionOptions(backend='duckdb_local', max_source_bytes=5368709120, max_combined_source_bytes=8589934592, max_rows=1...8719476736, free_disk_bytes=2147483648, max_seconds=1797.9362923749723, result_bytes=268435456, scratch_directory=None)
+progress = None, cancel = None, owned_snapshots = ()
+
+    def run_supervised(operation, arguments, options, *, progress=None, cancel=None, owned_snapshots=()):
+        context=multiprocessing.get_context('spawn');receiver,sender=context.Pipe(duplex=False)
+        process=context.Process(target=_entry,args=(sender,operation,arguments),daemon=True)
+        started=time.monotonic();process.start();sender.close();root=None;peak_rss=0;peak_workspace=0;peak_spill=0;result=None
+        try:
+            monitor=psutil.Process(process.pid)
+            while True:
+                if cancel is not None and cancel.is_set():fail('Analysis cancelled; no completed result was published.','cancelled')
+                if time.monotonic()-started>options.max_seconds:fail('Whole-job deadline exceeded; worker terminated.','deadline')
+                try:rss=monitor.memory_info().rss;peak_rss=max(peak_rss,rss)
+                except psutil.NoSuchProcess:rss=0
+                if rss>options.max_rss_bytes:fail(f'Worker RSS {rss} bytes exceeded configured termination threshold {options.max_rss_bytes}.','rss_limit')
+                if root and root.exists():
+                    owned,files=owned_inventory(root,owned_snapshots)
+                    peak_workspace=max(peak_workspace,owned)
+                    peak_spill=max(peak_spill,sum(f['bytes'] for f in files if f['file'].startswith('spill/')))
+                    if owned>options.workspace_bytes:fail(f'Workspace {owned} bytes exceeds budget {options.workspace_bytes}.')
+                    if available(root)<options.free_disk_bytes:fail('Scratch free-space reserve was breached during execution.','disk_exhausted')
+                    if any(available(path)<options.free_disk_bytes for path in owned_snapshots):fail('Owned-upload free-space reserve was breached.','disk_exhausted')
+                if receiver.poll(.1):
+                    try:kind,value=receiver.recv()
+                    except EOFError:break
+                    if kind=='progress':
+                        if 'owned_workspace' in value:root=Path(value.pop('owned_workspace'))
+                        if progress:progress(value)
+>                   elif kind=='error':raise AnalysisError(value['message'],code=value['code'],stage=value['stage'])
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E                   datatrust.contracts.AnalysisError: Catalog Error: Table with name cg4_extra_input_18fb9fa0b971 does not exist!
+E                   Did you mean "pg_attribute"?
+E                   
+E                   LINE 1: SELECT ordinal,event_key,y_num,l0,u0,w0,outcome_valid FROM cg4_extra_input_18fb9fa0b971
+E                                                                                      ^
+
+src/datatrust/worker.py:49: AnalysisError
+
+The above exception was the direct cause of the following exception:
+
+tmp_path = PosixPath('/private/var/folders/cs/c15xvw9d3t53tzcws5yxjxcr0000gn/T/pytest-of-drivyaanshyadav/pytest-525/test_future_H_only_uncertainty0')
+
+    def test_future_H_only_uncertainty_inspection_does_not_need_D_S_outcomes(tmp_path):
+        packet = binary(tmp_path).to_dict()
+        packet['evaluation']['task'] = {'kind': 'regression', 'outcome_definition': 'Synthetic numeric target'}
+        run = packet['evaluation']['runs'][0]
+        run.pop('probabilities')
+        run['intervals'] = [{'id': 'band', 'lower': 'decision', 'upper': 'decision',
+            'meaning': 'prediction', 'coverage': .9, 'central': True}]
+        packet['objectives'] = [{'id': 'coverage', 'metric': 'interval_coverage@0.9', 'run': 'model',
+            'direction': 'lower', 'practical_threshold': .1}]
+        spec = InvestigationSpec.from_dict(packet)
+>       result = investigate(spec)
+                 ^^^^^^^^^^^^^^^^^
+
+tests/cg4/test_confirmation_method_admission.py:81: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/confidenceguard/investigation.py:529: in investigate
+    result=compat.supervise(_discover,(spec,config,roots,expected_fingerprint,population['fingerprint']),config,progress=progress,cancel=cancel,deadline=deadline)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+operation = <function _discover at 0x109e1e2a0>
+arguments = (InvestigationSpec(objectives=(FailureObjectiveSpec(id='coverage', metric='interval_coverage@0.9', run='model', compar...ytest-525/test_future_H_only_uncertainty0',), None, 'b09448bbbd2d6a08302e4478efd5f78ee287e090b96caf0c56eaa6f1e8be39cb')
+config = EvaluationConfig(max_source_bytes=5368709120, max_combined_source_bytes=8589934592, max_rows=10000000, max_combined_ro...v1', minimum_denominator=10, minimum_component=10, display_labels={}, schema_version='confidenceguard.disclosure/1.0'))
+progress = None, cancel = None, deadline = 375495.77192275
+
+    def supervise(operation,arguments,config,*,progress=None,cancel=None,deadline=None):
+        from datatrust.worker import run_supervised
+        from datatrust.contracts import AnalysisError
+        limits=options(config)
+        if deadline is not None:
+            import time
+            from dataclasses import replace
+            remaining=deadline-time.monotonic()
+            if remaining<=0:raise EvaluationError('Operation deadline exhausted before the next phase.','deadline_exceeded')
+            limits=replace(limits,max_seconds=min(limits.max_seconds,remaining))
+        try:return run_supervised(operation,arguments,limits,progress=progress,cancel=cancel)
+        except AnalysisError as exc:
+            error=EvaluationError('Evaluation stopped; inspect the execution code and configured limits.',exc.code,exc.stage)
+            error.execution=getattr(exc,'execution',{})
+>           raise error from exc
+E           confidenceguard.contracts.EvaluationError: Evaluation stopped; inspect the execution code and configured limits.
+
+src/confidenceguard/compat.py:26: EvaluationError
+=========================== short test summary info ============================
+FAILED tests/cg4/test_confirmation_method_admission.py::test_future_H_only_uncertainty_inspection_does_not_need_D_S_outcomes
+1 failed, 6 deselected in 3.73s

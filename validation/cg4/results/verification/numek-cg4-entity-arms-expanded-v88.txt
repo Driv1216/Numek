@@ -1,0 +1,17 @@
+......F........................                                          [100%]
+=================================== FAILURES ===================================
+_________ test_inadmissible_region_remains_in_the_confirmation_family __________
+
+tmp_path = PosixPath('/private/var/folders/cs/c15xvw9d3t53tzcws5yxjxcr0000gn/T/pytest-of-drivyaanshyadav/pytest-535/test_inadmissible_region_remai0')
+
+    def test_inadmissible_region_remains_in_the_confirmation_family(tmp_path):
+        result = investigate(paired_events(tmp_path))
+        broad = broad_failure(result)
+>       narrow = next(c for c in result.data['investigation']['candidates']
+            if c['S']['effect'] == 1 and c['S']['conditional_members'] == 60)
+E       StopIteration
+
+tests/cg4/test_entity_arm_confirmation.py:116: StopIteration
+=========================== short test summary info ============================
+FAILED tests/cg4/test_entity_arm_confirmation.py::test_inadmissible_region_remains_in_the_confirmation_family
+1 failed, 30 passed in 180.05s (0:03:00)

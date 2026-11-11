@@ -1,0 +1,35 @@
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+______________ test_r2_proxy_direction_and_authoritative_reducer _______________
+
+tmp_path = PosixPath('/private/var/folders/cs/c15xvw9d3t53tzcws5yxjxcr0000gn/T/pytest-of-drivyaanshyadav/pytest-520/test_r2_proxy_direction_and_au0')
+
+    def test_r2_proxy_direction_and_authoritative_reducer(tmp_path):
+        spec = regression_fixture(tmp_path)
+        s, c, roots = arguments(spec, None, None)
+        with prepared(s, c, roots) as p:
+            objective = bind(s.objectives[0], p.store)
+            keys, eligible, target = objective.training('D')
+            records = [p.run_records['model'][key] for key in keys]
+            squared_error = np.array([(row['point'] - row['y_num']) ** 2 for row in records])
+>           assert np.array_equal(target[eligible], -squared_error[eligible])
+E           assert False
+E            +  where False = <function array_equal at 0x108e3b1b0>(array([0., 1., 0., 0., 1., 1., 0., 0., 0., 1., 1., 0., 0., 1., 1., 0., 0.,\n       1., 1., 1., 0., 0., 1., 1., 0., 0., ... 1., 0., 0., 1., 0., 1., 0.,\n       0., 1., 1., 0., 0., 1., 1., 0., 0., 1., 1., 0., 0., 1., 0., 1., 0.,\n       0., 1.]), -array([0., 1., 0., 0., 1., 1., 0., 0., 0., 1., 1., 0., 0., 1., 1., 0., 0.,\n       1., 1., 1., 0., 0., 1., 1., 0., 0., ... 1., 0., 0., 1., 0., 1., 0.,\n       0., 1., 1., 0., 0., 1., 1., 0., 0., 1., 1., 0., 0., 1., 0., 1., 0.,\n       0., 1.]))
+E            +    where <function array_equal at 0x108e3b1b0> = np.array_equal
+
+tests/cg4/test_r2_proposal_target.py:30: AssertionError
+_____________ test_default_lower_r2_discovers_worse_native_regions _____________
+
+tmp_path = PosixPath('/private/var/folders/cs/c15xvw9d3t53tzcws5yxjxcr0000gn/T/pytest-of-drivyaanshyadav/pytest-520/test_default_lower_r2_discover0')
+
+    def test_default_lower_r2_discovers_worse_native_regions(tmp_path):
+        result = investigate(regression_fixture(tmp_path))
+        selected = set(result.data['investigation']['shortlist'])
+>       assert selected
+E       assert set()
+
+tests/cg4/test_r2_proposal_target.py:45: AssertionError
+=========================== short test summary info ============================
+FAILED tests/cg4/test_r2_proposal_target.py::test_r2_proxy_direction_and_authoritative_reducer
+FAILED tests/cg4/test_r2_proposal_target.py::test_default_lower_r2_discovers_worse_native_regions
+2 failed in 5.19s

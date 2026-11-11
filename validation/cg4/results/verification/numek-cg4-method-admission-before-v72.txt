@@ -1,0 +1,163 @@
+FFF                                                                      [100%]
+=================================== FAILURES ===================================
+_ test_unregistered_finite_route_refuses_before_H[error_rate-independent_entities-finite_row_methods_do_not_correct_entity_dependence] _
+
+tmp_path = PosixPath('/private/var/folders/cs/c15xvw9d3t53tzcws5yxjxcr0000gn/T/pytest-of-drivyaanshyadav/pytest-515/test_unregistered_finite_route0')
+metric = 'error_rate', sampling = 'independent_entities'
+reason = 'finite_row_methods_do_not_correct_entity_dependence'
+
+    @pytest.mark.parametrize(('metric', 'sampling', 'reason'), [
+        ('error_rate', 'independent_entities', 'finite_row_methods_do_not_correct_entity_dependence'),
+        ('roc_auc', 'independent_rows', 'ranking_finite_method_not_registered'),
+        ('log_loss', 'independent_rows', 'finite_inference_requires_registered_bounded_contributions'),
+    ])
+    def test_unregistered_finite_route_refuses_before_H(tmp_path, metric, sampling, reason):
+        spec = binary(tmp_path)
+        spec = replace(spec, objectives=(replace(spec.objectives[0], metric=metric, direction='auto'),))
+        result = investigate(spec)
+        protocol = ConfirmationSpec(sampling=sampling, upstream_independence='declared_independent',
+            external_exposure='declared_unexposed', declaration_author='synthetic fixture',
+            declaration_reason='Isolated independent synthetic entities for method-admission checks.')
+        frozen = freeze_hypotheses(result, [result.data['investigation']['shortlist'][0]], confirmation=protocol)
+        preview = inspect_confirmation(frozen)
+        assert not preview['H_outcomes_disclosed']
+>       assert reason in preview['membership'][0]['admissibility_reasons']
+E       AssertionError: assert 'finite_row_methods_do_not_correct_entity_dependence' in []
+
+tests/cg4/test_confirmation_method_admission.py:26: AssertionError
+_ test_unregistered_finite_route_refuses_before_H[roc_auc-independent_rows-ranking_finite_method_not_registered] _
+
+tmp_path = PosixPath('/private/var/folders/cs/c15xvw9d3t53tzcws5yxjxcr0000gn/T/pytest-of-drivyaanshyadav/pytest-515/test_unregistered_finite_route1')
+metric = 'roc_auc', sampling = 'independent_rows'
+reason = 'ranking_finite_method_not_registered'
+
+    @pytest.mark.parametrize(('metric', 'sampling', 'reason'), [
+        ('error_rate', 'independent_entities', 'finite_row_methods_do_not_correct_entity_dependence'),
+        ('roc_auc', 'independent_rows', 'ranking_finite_method_not_registered'),
+        ('log_loss', 'independent_rows', 'finite_inference_requires_registered_bounded_contributions'),
+    ])
+    def test_unregistered_finite_route_refuses_before_H(tmp_path, metric, sampling, reason):
+        spec = binary(tmp_path)
+        spec = replace(spec, objectives=(replace(spec.objectives[0], metric=metric, direction='auto'),))
+        result = investigate(spec)
+        protocol = ConfirmationSpec(sampling=sampling, upstream_independence='declared_independent',
+            external_exposure='declared_unexposed', declaration_author='synthetic fixture',
+            declaration_reason='Isolated independent synthetic entities for method-admission checks.')
+        frozen = freeze_hypotheses(result, [result.data['investigation']['shortlist'][0]], confirmation=protocol)
+        preview = inspect_confirmation(frozen)
+        assert not preview['H_outcomes_disclosed']
+>       assert reason in preview['membership'][0]['admissibility_reasons']
+E       AssertionError: assert 'ranking_finite_method_not_registered' in []
+
+tests/cg4/test_confirmation_method_admission.py:26: AssertionError
+_ test_unregistered_finite_route_refuses_before_H[log_loss-independent_rows-finite_inference_requires_registered_bounded_contributions] _
+
+operation = <function _discovery_population at 0x107e71120>
+arguments = (InvestigationSpec(objectives=(FailureObjectiveSpec(id='errors', metric='log_loss', run='model', comparator='complemen...ar/folders/cs/c15xvw9d3t53tzcws5yxjxcr0000gn/T/pytest-of-drivyaanshyadav/pytest-515/test_unregistered_finite_route2',))
+config = EvaluationConfig(max_source_bytes=5368709120, max_combined_source_bytes=8589934592, max_rows=10000000, max_combined_ro...v1', minimum_denominator=10, minimum_component=10, display_labels={}, schema_version='confidenceguard.disclosure/1.0'))
+progress = None, cancel = None, deadline = 374659.273893166
+
+    def supervise(operation,arguments,config,*,progress=None,cancel=None,deadline=None):
+        from datatrust.worker import run_supervised
+        from datatrust.contracts import AnalysisError
+        limits=options(config)
+        if deadline is not None:
+            import time
+            from dataclasses import replace
+            remaining=deadline-time.monotonic()
+            if remaining<=0:raise EvaluationError('Operation deadline exhausted before the next phase.','deadline_exceeded')
+            limits=replace(limits,max_seconds=min(limits.max_seconds,remaining))
+>       try:return run_supervised(operation,arguments,limits,progress=progress,cancel=cancel)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+src/confidenceguard/compat.py:22: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+operation = <function _discovery_population at 0x107e71120>
+arguments = (InvestigationSpec(objectives=(FailureObjectiveSpec(id='errors', metric='log_loss', run='model', comparator='complemen...ar/folders/cs/c15xvw9d3t53tzcws5yxjxcr0000gn/T/pytest-of-drivyaanshyadav/pytest-515/test_unregistered_finite_route2',))
+options = ExecutionOptions(backend='duckdb_local', max_source_bytes=5368709120, max_combined_source_bytes=8589934592, max_rows=1...8719476736, free_disk_bytes=2147483648, max_seconds=1799.9999494999647, result_bytes=268435456, scratch_directory=None)
+progress = None, cancel = None, owned_snapshots = ()
+
+    def run_supervised(operation, arguments, options, *, progress=None, cancel=None, owned_snapshots=()):
+        context=multiprocessing.get_context('spawn');receiver,sender=context.Pipe(duplex=False)
+        process=context.Process(target=_entry,args=(sender,operation,arguments),daemon=True)
+        started=time.monotonic();process.start();sender.close();root=None;peak_rss=0;peak_workspace=0;peak_spill=0;result=None
+        try:
+            monitor=psutil.Process(process.pid)
+            while True:
+                if cancel is not None and cancel.is_set():fail('Analysis cancelled; no completed result was published.','cancelled')
+                if time.monotonic()-started>options.max_seconds:fail('Whole-job deadline exceeded; worker terminated.','deadline')
+                try:rss=monitor.memory_info().rss;peak_rss=max(peak_rss,rss)
+                except psutil.NoSuchProcess:rss=0
+                if rss>options.max_rss_bytes:fail(f'Worker RSS {rss} bytes exceeded configured termination threshold {options.max_rss_bytes}.','rss_limit')
+                if root and root.exists():
+                    owned,files=owned_inventory(root,owned_snapshots)
+                    peak_workspace=max(peak_workspace,owned)
+                    peak_spill=max(peak_spill,sum(f['bytes'] for f in files if f['file'].startswith('spill/')))
+                    if owned>options.workspace_bytes:fail(f'Workspace {owned} bytes exceeds budget {options.workspace_bytes}.')
+                    if available(root)<options.free_disk_bytes:fail('Scratch free-space reserve was breached during execution.','disk_exhausted')
+                    if any(available(path)<options.free_disk_bytes for path in owned_snapshots):fail('Owned-upload free-space reserve was breached.','disk_exhausted')
+                if receiver.poll(.1):
+                    try:kind,value=receiver.recv()
+                    except EOFError:break
+                    if kind=='progress':
+                        if 'owned_workspace' in value:root=Path(value.pop('owned_workspace'))
+                        if progress:progress(value)
+>                   elif kind=='error':raise AnalysisError(value['message'],code=value['code'],stage=value['stage'])
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E                   datatrust.contracts.AnalysisError: Failure-objective units differ from the authoritative metric/task units.
+
+src/datatrust/worker.py:49: AnalysisError
+
+The above exception was the direct cause of the following exception:
+
+tmp_path = PosixPath('/private/var/folders/cs/c15xvw9d3t53tzcws5yxjxcr0000gn/T/pytest-of-drivyaanshyadav/pytest-515/test_unregistered_finite_route2')
+metric = 'log_loss', sampling = 'independent_rows'
+reason = 'finite_inference_requires_registered_bounded_contributions'
+
+    @pytest.mark.parametrize(('metric', 'sampling', 'reason'), [
+        ('error_rate', 'independent_entities', 'finite_row_methods_do_not_correct_entity_dependence'),
+        ('roc_auc', 'independent_rows', 'ranking_finite_method_not_registered'),
+        ('log_loss', 'independent_rows', 'finite_inference_requires_registered_bounded_contributions'),
+    ])
+    def test_unregistered_finite_route_refuses_before_H(tmp_path, metric, sampling, reason):
+        spec = binary(tmp_path)
+        spec = replace(spec, objectives=(replace(spec.objectives[0], metric=metric, direction='auto'),))
+>       result = investigate(spec)
+                 ^^^^^^^^^^^^^^^^^
+
+tests/cg4/test_confirmation_method_admission.py:19: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+src/confidenceguard/investigation.py:518: in investigate
+    population=compat.supervise(_discovery_population,(spec,config,roots),config,progress=progress,cancel=cancel,deadline=deadline).data
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+operation = <function _discovery_population at 0x107e71120>
+arguments = (InvestigationSpec(objectives=(FailureObjectiveSpec(id='errors', metric='log_loss', run='model', comparator='complemen...ar/folders/cs/c15xvw9d3t53tzcws5yxjxcr0000gn/T/pytest-of-drivyaanshyadav/pytest-515/test_unregistered_finite_route2',))
+config = EvaluationConfig(max_source_bytes=5368709120, max_combined_source_bytes=8589934592, max_rows=10000000, max_combined_ro...v1', minimum_denominator=10, minimum_component=10, display_labels={}, schema_version='confidenceguard.disclosure/1.0'))
+progress = None, cancel = None, deadline = 374659.273893166
+
+    def supervise(operation,arguments,config,*,progress=None,cancel=None,deadline=None):
+        from datatrust.worker import run_supervised
+        from datatrust.contracts import AnalysisError
+        limits=options(config)
+        if deadline is not None:
+            import time
+            from dataclasses import replace
+            remaining=deadline-time.monotonic()
+            if remaining<=0:raise EvaluationError('Operation deadline exhausted before the next phase.','deadline_exceeded')
+            limits=replace(limits,max_seconds=min(limits.max_seconds,remaining))
+        try:return run_supervised(operation,arguments,limits,progress=progress,cancel=cancel)
+        except AnalysisError as exc:
+            error=EvaluationError('Evaluation stopped; inspect the execution code and configured limits.',exc.code,exc.stage)
+            error.execution=getattr(exc,'execution',{})
+>           raise error from exc
+E           confidenceguard.contracts.EvaluationError: Evaluation stopped; inspect the execution code and configured limits.
+
+src/confidenceguard/compat.py:26: EvaluationError
+=========================== short test summary info ============================
+FAILED tests/cg4/test_confirmation_method_admission.py::test_unregistered_finite_route_refuses_before_H[error_rate-independent_entities-finite_row_methods_do_not_correct_entity_dependence]
+FAILED tests/cg4/test_confirmation_method_admission.py::test_unregistered_finite_route_refuses_before_H[roc_auc-independent_rows-ranking_finite_method_not_registered]
+FAILED tests/cg4/test_confirmation_method_admission.py::test_unregistered_finite_route_refuses_before_H[log_loss-independent_rows-finite_inference_requires_registered_bounded_contributions]
+3 failed in 7.26s

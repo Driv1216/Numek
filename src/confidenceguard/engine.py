@@ -27,7 +27,7 @@ def preflight(spec,config):
     if spec.context and set(spec.context.assertions)-{r.id for r in spec.runs}:raise EvaluationError('Unknown context assertion run.')
 
 
-def open_store(spec,config,roots,progress=None,extension=None,capture=None):
+def open_store(spec,config,roots,progress=None,extension=None,capture=None,projection=None):
     """Shared CG1/CG2 snapshot admission and normalization boundary."""
     work=None
     try:
@@ -50,6 +50,7 @@ def open_store(spec,config,roots,progress=None,extension=None,capture=None):
         else:
             from .method_sources import MethodStore
             store=MethodStore(work,spec,config,roots,extension)
+        if projection is not None:store.add_projection(projection)
         if capture is not None:
             from .history_capture import Capture
             store.history_capture=Capture(capture,store)
@@ -140,16 +141,16 @@ def _arguments(spec,config,allowed_roots):
     return spec,config,roots
 
 
-def evaluate(spec,config=None,*,progress=None,cancel=None,allowed_roots=None,expected_fingerprint=None,_capture=None):
+def evaluate(spec,config=None,*,progress=None,cancel=None,allowed_roots=None,expected_fingerprint=None,_capture=None,_deadline=None):
     from .method_contracts import ReliabilitySpec, parse_spec
     if isinstance(spec,dict):spec=parse_spec(spec)
     if isinstance(spec,ReliabilitySpec):
         from .methods import evaluate_methods
-        return evaluate_methods(spec,config,progress=progress,cancel=cancel,allowed_roots=allowed_roots,expected_fingerprint=expected_fingerprint,_capture=_capture)
+        return evaluate_methods(spec,config,progress=progress,cancel=cancel,allowed_roots=allowed_roots,expected_fingerprint=expected_fingerprint,_capture=_capture,_deadline=_deadline)
     spec,config,roots=_arguments(spec,config,allowed_roots)
     # The legacy worker protocol must budget the full protected return value.
     worker_config=replace(config,result_bytes=config.private_bytes+config.result_bytes)
-    result=compat.supervise(_execute,(spec,config,roots,False,expected_fingerprint,_capture),worker_config,progress=progress,cancel=cancel)
+    result=compat.supervise(_execute,(spec,config,roots,False,expected_fingerprint,_capture),worker_config,progress=progress,cancel=cancel,deadline=_deadline)
     if cancel is not None and cancel.is_set():raise EvaluationError('Evaluation cancelled before commit.','cancelled')
     result.seal()
     if len(result.json_text().encode())>config.private_bytes:raise EvaluationError('Final protected result exceeds budget.','private_result_limit')

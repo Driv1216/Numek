@@ -1,0 +1,48 @@
+MEASURING quantiles-histogram
+{"name": "quantiles-histogram", "elapsed_seconds": 92.76825991703663, "passed": true}
+MEASURING quantiles-mlp
+{"name": "quantiles-mlp", "elapsed_seconds": 91.70698979194276, "passed": true}
+MEASURING failure_risk-logistic
+{"name": "failure_risk-logistic", "elapsed_seconds": 91.12480962497648, "passed": true}
+MEASURING failure_risk-histogram
+{"name": "failure_risk-histogram", "elapsed_seconds": 91.13981987501029, "passed": true}
+MEASURING failure_risk-mlp
+{"name": "failure_risk-mlp", "elapsed_seconds": 91.09174137504306, "passed": true}
+MEASURING scale-mlp-mps
+Traceback (most recent call last):
+  File "/Users/drivyaanshyadav/Desktop/Numek/src/confidenceguard/compat.py", line 22, in supervise
+    try:return run_supervised(operation,arguments,limits,progress=progress,cancel=cancel)
+               ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/drivyaanshyadav/Desktop/Numek/src/datatrust/worker.py", line 49, in run_supervised
+    elif kind=='error':raise AnalysisError(value['message'],code=value['code'],stage=value['stage'])
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+datatrust.contracts.AnalysisError: Requested execution device is unavailable or incompatible.
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/drivyaanshyadav/Desktop/Numek/validation/cg6/performance.py", line 164, in <module>
+    if __name__=='__main__':main()
+                            ~~~~^^
+  File "/Users/drivyaanshyadav/Desktop/Numek/validation/cg6/performance.py", line 160, in main
+    record=run_one(name,p,directory,protocol['config']);record['protocol_sha256']=hashlib.sha256((ROOT/'performance_protocol.json').read_bytes()).hexdigest();write(directory/'receipt.json',record);records.append(record)
+  File "/Users/drivyaanshyadav/Desktop/Numek/validation/cg6/performance.py", line 103, in run_one
+    result=fit_auxiliary(AuxiliaryStudySpec(s,profile['target'],'torch',candidates=(candidate,),quantile_rearrange=profile.get('quantile_rearrange',False)),config)
+  File "/Users/drivyaanshyadav/Desktop/Numek/src/confidenceguard/auxiliary/services.py", line 250, in fit_auxiliary
+    return service(execution,config,operation='auxiliary_fit',options={'study':study.to_dict()},**kwargs)
+  File "/Users/drivyaanshyadav/Desktop/Numek/src/confidenceguard/execution/services.py", line 402, in service
+    result=compat.supervise(_worker,(spec,config,roots,operation,expected_fingerprint,str(staging),host_bindings(),options),budget,progress=progress,cancel=cancel,deadline=deadline)
+  File "/Users/drivyaanshyadav/Desktop/Numek/src/confidenceguard/compat.py", line 26, in supervise
+    raise error from exc
+confidenceguard.contracts.EvaluationError: Evaluation stopped; inspect the execution code and configured limits.
+Traceback (most recent call last):
+  File "/Users/drivyaanshyadav/Desktop/Numek/validation/cg6/finish_performance.py", line 32, in <module>
+    if __name__=='__main__':main()
+                            ~~~~^^
+  File "/Users/drivyaanshyadav/Desktop/Numek/validation/cg6/finish_performance.py", line 30, in main
+    subprocess.run([sys.executable,'-B',str(ROOT/'performance.py'),'measure','--name',name],check=True)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/drivyaanshyadav/Desktop/Numek/validation/cg4/runtime.nosync/cpython-3.13.17-macos-aarch64-none/lib/python3.13/subprocess.py", line 578, in run
+    raise CalledProcessError(retcode, process.args,
+                             output=stdout, stderr=stderr)
+subprocess.CalledProcessError: Command '['/Users/drivyaanshyadav/Desktop/Numek/validation/cg6/py313.nosync/bin/python', '-B', '/Users/drivyaanshyadav/Desktop/Numek/validation/cg6/performance.py', 'measure', '--name', 'scale-mlp-mps']' returned non-zero exit status 1.

@@ -281,6 +281,15 @@ def evaluate_scope(e,r,table,where,scope):
         if r.probabilities:calibration(e,r,table,where,scope)
 
 
+def diagnostic_mean(e,r,table,where,scope,metric,expression,eligibility,*,units='fraction'):
+    """Registered additive diagnostics; expressions never come from user SQL."""
+    e.use_relation(table);valid=f'({where}) AND ({eligibility})'
+    n,value,unsafe=e.con.execute(f'SELECT count(*),avg({expression}),count(*) FILTER(WHERE NOT isfinite({expression})) FROM {table} WHERE {valid}').fetchone()
+    return e.add(r,scope,'diagnostic',metric,value if not unsafe else None,n,units=units,where=valid,
+                 reason='nonfinite_diagnostic_contribution' if unsafe else 'empty_conditional_population' if not n else None,
+                 data={'definition':'registered_additive_diagnostic_v1','conditional_eligibility':eligibility})
+
+
 def policies(e,r,table):
     e.use_relation(table)
     for pi,policy in enumerate(p for p in e.s.spec.policies if p.run==r.id):

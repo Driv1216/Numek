@@ -1,0 +1,24 @@
+...F............                                                         [100%]
+=================================== FAILURES ===================================
+___ test_nonadditive_regression_refuses_even_with_declared_point_loss_bounds ___
+
+tmp_path = PosixPath('/private/var/folders/cs/c15xvw9d3t53tzcws5yxjxcr0000gn/T/pytest-of-drivyaanshyadav/pytest-518/test_nonadditive_regression_re0')
+
+    def test_nonadditive_regression_refuses_even_with_declared_point_loss_bounds(tmp_path):
+        packet = binary(tmp_path).to_dict()
+        packet['evaluation']['task'] = {'kind': 'regression', 'outcome_definition': 'Synthetic numeric target'}
+        packet['evaluation']['runs'][0].pop('probabilities')
+        packet['objectives'] = [{'id': 'r2_failure', 'metric': 'r2', 'run': 'model',
+            'practical_threshold': .1, 'bounds': [0., 1.]}]
+        result = investigate(InvestigationSpec.from_dict(packet))
+        protocol = ConfirmationSpec(upstream_independence='declared_independent',
+            external_exposure='declared_unexposed', declaration_author='synthetic fixture',
+            declaration_reason='Isolated independent synthetic numeric rows.')
+>       frozen = freeze_hypotheses(result, [result.data['investigation']['shortlist'][0]], confirmation=protocol)
+                                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       IndexError: list index out of range
+
+tests/cg4/test_confirmation_method_admission.py:45: IndexError
+=========================== short test summary info ============================
+FAILED tests/cg4/test_confirmation_method_admission.py::test_nonadditive_regression_refuses_even_with_declared_point_loss_bounds
+1 failed, 15 passed in 99.22s (0:01:39)

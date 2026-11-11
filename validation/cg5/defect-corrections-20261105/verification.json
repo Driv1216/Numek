@@ -1,0 +1,147 @@
+{
+  "schema_version": "numek.cg5_d1_d5_verification/1.0",
+  "date": "2026-11-05",
+  "status": "ready_for_focused_independent_re_review_not_accepted",
+  "baseline_runtime_digest": "cecde695823502f5744268d7bb5c62edfe223eb07c2cd819de2fe2e601ed1ef2",
+  "runtime_digest": "7d3f64affcbc9491223e23294482149848f3bd945a7aaefce33af4af7b3fc3b9",
+  "final_affected_gate": {
+    "command": "DYLD_FALLBACK_LIBRARY_PATH=/opt/homebrew/lib PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=src:. validation/cg4/py313q.nosync/bin/python -m pytest --import-mode=importlib -p no:cacheprovider tests/cg5 tests/cg1/test_interfaces.py tests/cg2/test_interfaces.py tests/cg3/test_interfaces.py tests/cg4/test_interfaces.py -q",
+    "passed": 121,
+    "skipped": 1,
+    "seconds": 265.94,
+    "skip_reason": "CG2 optional development jsonschema import unavailable in analytical environment; separate retained schema environment passed 63 CG1\u2013CG4 and 44 CG5 checks",
+    "log": "final-affected-tests.log",
+    "runtime_and_test_hashes_unchanged": true
+  },
+  "new_regressions": {
+    "module": "tests/cg5/test_defect_corrections.py",
+    "test_functions": 13,
+    "executed_cases": 32,
+    "included_in_final_gate": true,
+    "owned_api_and_public_supervised_paths": true
+  },
+  "prior_R01_R09_regressions": {
+    "cases": 27,
+    "included_in_final_gate": true
+  },
+  "counterexamples": {
+    "D1": {
+      "original_supported": true,
+      "original_upper": 0.08809730287880237,
+      "corrected_claim": {
+        "metric": "selective_risk",
+        "operator": "le",
+        "bound": 0.1,
+        "basis": "observed_outcome",
+        "scope": "overall",
+        "direction": "minimize",
+        "estimate": 0.0,
+        "estimate_state": "finite",
+        "support": 40,
+        "minimum_support": 1,
+        "state": "inconclusive",
+        "method": "bounded_mean_hoeffding",
+        "strength": "finite_sample_under_declared_assumptions",
+        "lower": 0,
+        "upper": 2.147347041733688,
+        "reason": null,
+        "family_size": 1,
+        "allocated_alpha": 0.05,
+        "required": true,
+        "units": "items",
+        "outcome_units": "items",
+        "loss": "absolute",
+        "id": "claim_1",
+        "policy_digest": "policy_1",
+        "comparator": null
+      }
+    },
+    "D2": {
+      "exhaustive_match": true,
+      "nominated_objective": [
+        -0.6
+      ],
+      "empirical_optimum": [
+        -1.0
+      ]
+    },
+    "D3": {
+      "exhaustive_match": true,
+      "nominated_rmse": 3.2171415884290826,
+      "standing": {
+        "solution_standing": "solver_optimal_encoded_model",
+        "search_coverage": "complete",
+        "objective_certificate_transferred": true,
+        "tie_refinement": {
+          "complete": true,
+          "evaluated": 3,
+          "termination": "tied_space_exhausted",
+          "reference_objective": [
+            2.4186773244895647
+          ],
+          "order": "structural_complexity_then_policy_digest",
+          "scope": "local_tolerance_band"
+        }
+      }
+    },
+    "D4": {
+      "corrected_frontier_standing": "sampled_tradeoff_set"
+    },
+    "D5": {
+      "pinball_levels": [
+        0.1,
+        0.9
+      ],
+      "regression_loss": "squared",
+      "material_error": 0.5,
+      "private_units_joint_withholding_and_approved_labels": "passed in final regression gate"
+    }
+  },
+  "schemas": {
+    "cg1_cg4": 63,
+    "cg5": 44,
+    "passed": 107,
+    "dependency_installation": false
+  },
+  "reports": {
+    "sets": 2,
+    "pages": 12,
+    "text_and_privacy_checks": "passed",
+    "changed_table_pages_visually_inspected": 3,
+    "receipt": "reports/visual-qa.json",
+    "evidence_reuse": "Report fixture was generated before the final direct-hybrid-helper memory lifetime refinement. The assessment, projection and template code used by this fixture is byte-identical in the final runtime; its layout/text evidence remains applicable."
+  },
+  "environment": {
+    "analytical_interpreter": "validation/cg4/py313q.nosync/bin/python",
+    "python": "3.13.17",
+    "numpy": "2.4.6",
+    "scipy": "1.18.1",
+    "highs": "1.12.0",
+    "schema_interpreter": "validation/cg4/schemaq.nosync/bin/python",
+    "dependency_replacement_or_installation": false
+  },
+  "preservation": {
+    "runtime_paths_retained": true,
+    "unchanged_runtime_files": 184,
+    "datatrust_runtime_unchanged": true,
+    "cg1_cg4_kernels_and_shared_infrastructure_unchanged": true,
+    "generated_schemas_unchanged": true,
+    "no_runtime_change_during_completed_final_gate": true
+  },
+  "scope": {
+    "full_576_test_suite_repeated": false,
+    "research_campaign": false,
+    "cg6": false,
+    "zip": false,
+    "educational_report": false,
+    "founder_acceptance_declared": false
+  },
+  "remaining_limits": [
+    "Global nomination remains bounded; large relative tolerances can require whole-family enumeration",
+    "Registered finite encoding and solver tolerances only; mixed nonlinear weighted RMSE sums refuse",
+    "Hybrid optimization does not establish a complete Pareto frontier",
+    "Private unit definitions without approved public labels withhold the entire claim",
+    "True bounds, independence, observation/exposure and immutable population assumptions remain necessary",
+    "Historical assessments are not silently recomputed or rewritten"
+  ]
+}

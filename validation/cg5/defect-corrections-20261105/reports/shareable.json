@@ -1,0 +1,283 @@
+{
+  "schema_version": "confidenceguard.policy_result/1.0",
+  "methodology_id": "policy_selection_v1",
+  "analysis_id": "8ca1a66e7fd042a1b6659d6ad24cbc8c",
+  "generated_at": "2026-11-05T13:22:55.067428+00:00",
+  "name": "ConfidenceGuard decision policies",
+  "audience": "shareable",
+  "task": {
+    "kind": "regression"
+  },
+  "runs": [
+    {
+      "id": "policy_1",
+      "display_name": "Policy 1",
+      "role": "hypothetical"
+    }
+  ],
+  "outcomes": {
+    "scope": "observed_labels",
+    "interpretation": "Supplied authoritative outcomes; observation and causal limitations apply."
+  },
+  "comparison": null,
+  "measurements": [
+    {
+      "value": 0.1,
+      "value_state": "finite",
+      "denominator": 40,
+      "denominator_kind": "eligible_records",
+      "basis": "simulated",
+      "interpretation": "descriptive",
+      "applicability": "applicable",
+      "execution": "completed",
+      "evidence_basis": "observed_outcome",
+      "id": "measurement_1",
+      "run": "policy_1",
+      "scope": "scope_1",
+      "family": "policy",
+      "metric": "pinball",
+      "population_id": "pop_b5c993a2e6153a4acc5a07051b104913",
+      "data": {}
+    },
+    {
+      "value": 0.9,
+      "value_state": "finite",
+      "denominator": 40,
+      "denominator_kind": "eligible_records",
+      "basis": "simulated",
+      "interpretation": "descriptive",
+      "applicability": "applicable",
+      "execution": "completed",
+      "evidence_basis": "observed_outcome",
+      "id": "measurement_2",
+      "run": "policy_1",
+      "scope": "scope_2",
+      "family": "policy",
+      "metric": "pinball",
+      "population_id": "pop_1b2ebf8b84befb44b0df3782050b66f3",
+      "data": {}
+    },
+    {
+      "value": 1.0,
+      "value_state": "finite",
+      "denominator": 40,
+      "denominator_kind": "eligible_records",
+      "basis": "simulated",
+      "interpretation": "descriptive",
+      "applicability": "applicable",
+      "execution": "completed",
+      "evidence_basis": "observed_outcome",
+      "id": "measurement_3",
+      "run": "policy_1",
+      "scope": "scope_3",
+      "family": "policy",
+      "metric": "selective_risk",
+      "population_id": "pop_000535338a6f8a854defef0f91096624",
+      "data": {}
+    },
+    {
+      "value": 1.0,
+      "value_state": "finite",
+      "denominator": 40,
+      "denominator_kind": "eligible_records",
+      "basis": "simulated",
+      "interpretation": "descriptive",
+      "applicability": "applicable",
+      "execution": "completed",
+      "evidence_basis": "observed_outcome",
+      "id": "measurement_4",
+      "run": "policy_1",
+      "scope": "scope_4",
+      "family": "policy",
+      "metric": "material_error_rate",
+      "population_id": "pop_e8d6406a78d0d250cebec474eeffbfdf",
+      "data": {}
+    }
+  ],
+  "checks": [],
+  "findings": [
+    {
+      "code": "policy_qualification",
+      "priority": "Information",
+      "message": "Policy conclusions retain the displayed evidence and population qualifications."
+    }
+  ],
+  "coverage": {
+    "populations": [
+      {
+        "id": "pop_b5c993a2e6153a4acc5a07051b104913",
+        "run": "policy_1",
+        "scope": "scope_1",
+        "denominator": 40,
+        "denominator_kind": "eligible_records"
+      },
+      {
+        "id": "pop_1b2ebf8b84befb44b0df3782050b66f3",
+        "run": "policy_1",
+        "scope": "scope_2",
+        "denominator": 40,
+        "denominator_kind": "eligible_records"
+      },
+      {
+        "id": "pop_000535338a6f8a854defef0f91096624",
+        "run": "policy_1",
+        "scope": "scope_3",
+        "denominator": 40,
+        "denominator_kind": "eligible_records"
+      },
+      {
+        "id": "pop_e8d6406a78d0d250cebec474eeffbfdf",
+        "run": "policy_1",
+        "scope": "scope_4",
+        "denominator": 40,
+        "denominator_kind": "eligible_records"
+      }
+    ],
+    "analytical_scope": "Frozen admitted policy populations; exact definitions and lineage retained locally.",
+    "limitations": [
+      "Policy decisions are hypothetical offline replay; no deployment approval or causal business-value guarantee.",
+      "Observed-outcome, model-implied, operational and missing-label bounds are different estimands.",
+      "Conditional selective risk, full-opportunity behavior and deferral workload have different denominators.",
+      "Independent support conditions on frozen policies and declared sampling, observation, bounds and exposure assumptions.",
+      "Historical stability does not establish future effectiveness. Conformal marginal coverage is not conditional policy coverage.",
+      "Sampled resource controls can overshoot; admission defaults are not capacity guarantees."
+    ],
+    "joint_policy_withholding": false,
+    "not_anonymity_guarantee": true
+  },
+  "policy": {
+    "stage": "assessment",
+    "interpretation": "Offline policy evidence; no deployment recommendation.",
+    "executable_definitions_exported": false,
+    "joint_withholding": false,
+    "assessments": [
+      {
+        "metric": "pinball",
+        "operator": "le",
+        "bound": 2,
+        "basis": "observed_outcome",
+        "scope": "overall",
+        "direction": "minimize",
+        "estimate": 0.1,
+        "estimate_state": "finite",
+        "support": 40,
+        "minimum_support": 1,
+        "state": "inconclusive",
+        "method": "bounded_mean_hoeffding",
+        "strength": "finite_sample_under_declared_assumptions",
+        "lower": 0,
+        "upper": 2.6187233411080073,
+        "reason": null,
+        "family_size": 4,
+        "allocated_alpha": 0.0125,
+        "required": true,
+        "units": "items",
+        "outcome_units": "items",
+        "level": 0.1,
+        "id": "claim_1",
+        "policy_digest": "policy_1",
+        "comparator": null
+      },
+      {
+        "metric": "pinball",
+        "operator": "le",
+        "bound": 2,
+        "basis": "observed_outcome",
+        "scope": "overall",
+        "direction": "minimize",
+        "estimate": 0.9,
+        "estimate_state": "finite",
+        "support": 40,
+        "minimum_support": 1,
+        "state": "inconclusive",
+        "method": "bounded_mean_hoeffding",
+        "strength": "finite_sample_under_declared_assumptions",
+        "lower": 0,
+        "upper": 3.418723341108007,
+        "reason": null,
+        "family_size": 4,
+        "allocated_alpha": 0.0125,
+        "required": true,
+        "units": "items",
+        "outcome_units": "items",
+        "level": 0.9,
+        "id": "claim_2",
+        "policy_digest": "policy_1",
+        "comparator": null
+      },
+      {
+        "metric": "selective_risk",
+        "operator": "le",
+        "bound": 2,
+        "basis": "observed_outcome",
+        "scope": "overall",
+        "direction": "minimize",
+        "estimate": 1.0,
+        "estimate_state": "finite",
+        "support": 40,
+        "minimum_support": 1,
+        "state": "inconclusive",
+        "method": "bounded_mean_hoeffding",
+        "strength": "finite_sample_under_declared_assumptions",
+        "lower": 0,
+        "upper": 3.518723341108007,
+        "reason": null,
+        "family_size": 4,
+        "allocated_alpha": 0.0125,
+        "required": true,
+        "units": "squared_items",
+        "outcome_units": "items",
+        "loss": "squared",
+        "id": "claim_3",
+        "policy_digest": "policy_1",
+        "comparator": null
+      },
+      {
+        "metric": "material_error_rate",
+        "operator": "le",
+        "bound": 2,
+        "basis": "observed_outcome",
+        "scope": "overall",
+        "direction": "minimize",
+        "estimate": 1.0,
+        "estimate_state": "finite",
+        "support": 40,
+        "minimum_support": 1,
+        "state": "supported",
+        "method": "bernoulli_clopper_pearson",
+        "strength": "finite_sample_under_declared_assumptions",
+        "lower": 0.8808399435939148,
+        "upper": 1.0,
+        "reason": null,
+        "family_size": 4,
+        "allocated_alpha": 0.0125,
+        "required": true,
+        "units": "fraction",
+        "outcome_units": "items",
+        "material_error": 0.5,
+        "id": "claim_4",
+        "policy_digest": "policy_1",
+        "comparator": null
+      }
+    ],
+    "withheld_assessments": 0,
+    "assessment_disclosure": "Only identified overall claims are shown; protected scopes, economics and uninterpretable unit definitions are withheld with their intervals.",
+    "searches": []
+  },
+  "disclosure": {
+    "policy": "conservative_aggregates_v1",
+    "minimum_denominator": 10,
+    "minimum_component": 10,
+    "display_labels": {},
+    "schema_version": "confidenceguard.disclosure/1.0"
+  },
+  "origin_binding": {
+    "analysis_digest": "99ed3ecc1d54577a0c7e71c7b9acc50b505d84ced40af9e4d24ba6bffe34bca3",
+    "private_manifest_digest": "fdc52902b5ab374fa4cf358f9f54f9c47a26932dd28e2f53813f13f9f70cd96c"
+  },
+  "execution": {
+    "status": "completed",
+    "backend": "duckdb_local"
+  },
+  "projection_digest": "28ceec4e961bedc037fd876bfcb581442bf38be0c96eef0d15a8d0985a83072d"
+}

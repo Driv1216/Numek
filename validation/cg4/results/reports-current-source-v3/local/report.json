@@ -1,0 +1,605 @@
+{
+  "analysis_id": "5b87f47a03714e0f842586ac210e8966",
+  "checks": [],
+  "comparison": null,
+  "coverage": {
+    "planned": 720,
+    "populations": [],
+    "roles": {
+      "D": 240,
+      "H": 240,
+      "S": 240
+    }
+  },
+  "findings": [
+    {
+      "code": "exploratory_discovery",
+      "message": "D/S selection evidence is exploratory. Freeze hypotheses before independent assessment.",
+      "priority": "Review"
+    }
+  ],
+  "generated_at": "2026-10-25T14:12:02.664385+00:00",
+  "investigation": {
+    "assessments": [],
+    "candidates": [
+      {
+        "D": {
+          "available": 240,
+          "comparator_metric": {
+            "measurement": {
+              "applicability": "applicable",
+              "basis": "measured",
+              "data": {},
+              "denominator": 120,
+              "denominator_kind": "eligible_records",
+              "disclosure_group": "D",
+              "evidence_refs": [],
+              "execution": "completed",
+              "family": "performance",
+              "id": "m1",
+              "interpretation": "descriptive",
+              "method_standing": "established_method",
+              "method_version": "1",
+              "metric": "accuracy",
+              "population_id": "pop_9e80c128820509ee1b7453a3627dd396",
+              "reason": null,
+              "run": "model",
+              "scope": "D/comparator",
+              "sensitive_counts": [
+                120,
+                0
+              ],
+              "support_warning": false,
+              "units": null,
+              "value": 1.0,
+              "value_state": "finite"
+            },
+            "metric_identity": {
+              "dimensions": {},
+              "family": "performance",
+              "method_version": "1",
+              "metric": "accuracy",
+              "units": null
+            },
+            "objective_identity": {
+              "authoritative_metric": "accuracy",
+              "authoritative_transform": "one_minus",
+              "bounds": [],
+              "ceiling": null,
+              "comparator": "complement",
+              "conditional_denominator": "eligible_records",
+              "current_period": null,
+              "definition_version": "failure_objective_v1",
+              "direction": "higher",
+              "eligible_population": "outcome_valid AND decision IS NOT NULL AND state IN ('issued','hypothetical')",
+              "id": "errors",
+              "interval": null,
+              "learning_target": "(decision<>y)::DOUBLE",
+              "material_error": null,
+              "metric": "error_rate",
+              "metric_identity": {},
+              "nominal": null,
+              "paired_reference": null,
+              "practical_threshold": 0.1,
+              "proxy": "exact_additive_loss",
+              "reference_period": null,
+              "reference_run": null,
+              "run": "model",
+              "target": null,
+              "task": {
+                "classes": [
+                  "0",
+                  "1"
+                ],
+                "horizon": null,
+                "kind": "binary_classification",
+                "material_error": null,
+                "outcome_definition": "fixture",
+                "positive_class": "1",
+                "units": null
+              },
+              "training_clip": 30,
+              "units": "fraction"
+            },
+            "population_id": "pop_9e80c128820509ee1b7453a3627dd396",
+            "reason": null,
+            "support": 120,
+            "value": 0.0,
+            "value_state": "finite"
+          },
+          "conditional_members": 120,
+          "conditional_nonmembers": 120,
+          "effect": 1.0,
+          "effect_state": "finite",
+          "member_metric": {
+            "measurement": {
+              "applicability": "applicable",
+              "basis": "measured",
+              "data": {},
+              "denominator": 120,
+              "denominator_kind": "eligible_records",
+              "disclosure_group": "D",
+              "evidence_refs": [],
+              "execution": "completed",
+              "family": "performance",
+              "id": "m1",
+              "interpretation": "descriptive",
+              "method_standing": "established_method",
+              "method_version": "1",
+              "metric": "accuracy",
+              "population_id": "pop_c80a9aac1e81a2b996c3ecc15b88e9da",
+              "reason": null,
+              "run": "model",
+              "scope": "D/members",
+              "sensitive_counts": [
+                0,
+                120
+              ],
+              "support_warning": false,
+              "units": null,
+              "value": 0.0,
+              "value_state": "finite"
+            },
+            "metric_identity": {
+              "dimensions": {},
+              "family": "performance",
+              "method_version": "1",
+              "metric": "accuracy",
+              "units": null
+            },
+            "objective_identity": {
+              "authoritative_metric": "accuracy",
+              "authoritative_transform": "one_minus",
+              "bounds": [],
+              "ceiling": null,
+              "comparator": "complement",
+              "conditional_denominator": "eligible_records",
+              "current_period": null,
+              "definition_version": "failure_objective_v1",
+              "direction": "higher",
+              "eligible_population": "outcome_valid AND decision IS NOT NULL AND state IN ('issued','hypothetical')",
+              "id": "errors",
+              "interval": null,
+              "learning_target": "(decision<>y)::DOUBLE",
+              "material_error": null,
+              "metric": "error_rate",
+              "metric_identity": {},
+              "nominal": null,
+              "paired_reference": null,
+              "practical_threshold": 0.1,
+              "proxy": "exact_additive_loss",
+              "reference_period": null,
+              "reference_run": null,
+              "run": "model",
+              "target": null,
+              "task": {
+                "classes": [
+                  "0",
+                  "1"
+                ],
+                "horizon": null,
+                "kind": "binary_classification",
+                "material_error": null,
+                "outcome_definition": "fixture",
+                "positive_class": "1",
+                "units": null
+              },
+              "training_clip": 30,
+              "units": "fraction"
+            },
+            "population_id": "pop_c80a9aac1e81a2b996c3ecc15b88e9da",
+            "reason": null,
+            "support": 120,
+            "value": 1.0,
+            "value_state": "finite"
+          },
+          "members": 120,
+          "membership_unavailable_reasons": {},
+          "nonmembers": 120,
+          "outcome_observation_states": {
+            "observed_eligible": 240
+          },
+          "planned": 240,
+          "sensitive_counts": [
+            0,
+            120,
+            120,
+            0,
+            240
+          ],
+          "unavailable": 0
+        },
+        "H_assessed": false,
+        "S": {
+          "available": 240,
+          "comparator_metric": {
+            "measurement": {
+              "applicability": "applicable",
+              "basis": "measured",
+              "data": {},
+              "denominator": 120,
+              "denominator_kind": "eligible_records",
+              "disclosure_group": "S",
+              "evidence_refs": [],
+              "execution": "completed",
+              "family": "performance",
+              "id": "m1",
+              "interpretation": "descriptive",
+              "method_standing": "established_method",
+              "method_version": "1",
+              "metric": "accuracy",
+              "population_id": "pop_6776cdac8a3f02a88fe015525e2ad695",
+              "reason": null,
+              "run": "model",
+              "scope": "S/comparator",
+              "sensitive_counts": [
+                120,
+                0
+              ],
+              "support_warning": false,
+              "units": null,
+              "value": 1.0,
+              "value_state": "finite"
+            },
+            "metric_identity": {
+              "dimensions": {},
+              "family": "performance",
+              "method_version": "1",
+              "metric": "accuracy",
+              "units": null
+            },
+            "objective_identity": {
+              "authoritative_metric": "accuracy",
+              "authoritative_transform": "one_minus",
+              "bounds": [],
+              "ceiling": null,
+              "comparator": "complement",
+              "conditional_denominator": "eligible_records",
+              "current_period": null,
+              "definition_version": "failure_objective_v1",
+              "direction": "higher",
+              "eligible_population": "outcome_valid AND decision IS NOT NULL AND state IN ('issued','hypothetical')",
+              "id": "errors",
+              "interval": null,
+              "learning_target": "(decision<>y)::DOUBLE",
+              "material_error": null,
+              "metric": "error_rate",
+              "metric_identity": {},
+              "nominal": null,
+              "paired_reference": null,
+              "practical_threshold": 0.1,
+              "proxy": "exact_additive_loss",
+              "reference_period": null,
+              "reference_run": null,
+              "run": "model",
+              "target": null,
+              "task": {
+                "classes": [
+                  "0",
+                  "1"
+                ],
+                "horizon": null,
+                "kind": "binary_classification",
+                "material_error": null,
+                "outcome_definition": "fixture",
+                "positive_class": "1",
+                "units": null
+              },
+              "training_clip": 30,
+              "units": "fraction"
+            },
+            "population_id": "pop_6776cdac8a3f02a88fe015525e2ad695",
+            "reason": null,
+            "support": 120,
+            "value": 0.0,
+            "value_state": "finite"
+          },
+          "conditional_members": 120,
+          "conditional_nonmembers": 120,
+          "effect": 1.0,
+          "effect_state": "finite",
+          "member_metric": {
+            "measurement": {
+              "applicability": "applicable",
+              "basis": "measured",
+              "data": {},
+              "denominator": 120,
+              "denominator_kind": "eligible_records",
+              "disclosure_group": "S",
+              "evidence_refs": [],
+              "execution": "completed",
+              "family": "performance",
+              "id": "m1",
+              "interpretation": "descriptive",
+              "method_standing": "established_method",
+              "method_version": "1",
+              "metric": "accuracy",
+              "population_id": "pop_08ce46725128047da40691b214e0584c",
+              "reason": null,
+              "run": "model",
+              "scope": "S/members",
+              "sensitive_counts": [
+                0,
+                120
+              ],
+              "support_warning": false,
+              "units": null,
+              "value": 0.0,
+              "value_state": "finite"
+            },
+            "metric_identity": {
+              "dimensions": {},
+              "family": "performance",
+              "method_version": "1",
+              "metric": "accuracy",
+              "units": null
+            },
+            "objective_identity": {
+              "authoritative_metric": "accuracy",
+              "authoritative_transform": "one_minus",
+              "bounds": [],
+              "ceiling": null,
+              "comparator": "complement",
+              "conditional_denominator": "eligible_records",
+              "current_period": null,
+              "definition_version": "failure_objective_v1",
+              "direction": "higher",
+              "eligible_population": "outcome_valid AND decision IS NOT NULL AND state IN ('issued','hypothetical')",
+              "id": "errors",
+              "interval": null,
+              "learning_target": "(decision<>y)::DOUBLE",
+              "material_error": null,
+              "metric": "error_rate",
+              "metric_identity": {},
+              "nominal": null,
+              "paired_reference": null,
+              "practical_threshold": 0.1,
+              "proxy": "exact_additive_loss",
+              "reference_period": null,
+              "reference_run": null,
+              "run": "model",
+              "target": null,
+              "task": {
+                "classes": [
+                  "0",
+                  "1"
+                ],
+                "horizon": null,
+                "kind": "binary_classification",
+                "material_error": null,
+                "outcome_definition": "fixture",
+                "positive_class": "1",
+                "units": null
+              },
+              "training_clip": 30,
+              "units": "fraction"
+            },
+            "population_id": "pop_08ce46725128047da40691b214e0584c",
+            "reason": null,
+            "support": 120,
+            "value": 1.0,
+            "value_state": "finite"
+          },
+          "members": 120,
+          "membership_unavailable_reasons": {},
+          "nonmembers": 120,
+          "outcome_observation_states": {
+            "observed_eligible": 240
+          },
+          "planned": 240,
+          "sensitive_counts": [
+            0,
+            120,
+            120,
+            0,
+            240
+          ],
+          "unavailable": 0
+        },
+        "complexity": 1,
+        "definition": {
+          "clauses": [
+            {
+              "field": "context.hot",
+              "kind": "boolean",
+              "op": "eq",
+              "value": "true"
+            }
+          ]
+        },
+        "examples": [
+          {
+            "outcome_values_disclosed": false,
+            "reference": "cg4_ref_38ecc4bce272f335af433cef",
+            "selection": "higher_diagnostic_loss_member"
+          },
+          {
+            "outcome_values_disclosed": false,
+            "reference": "cg4_ref_1498bb11c908cf0db24730cb",
+            "selection": "lower_diagnostic_loss_member"
+          },
+          {
+            "outcome_values_disclosed": false,
+            "reference": "cg4_ref_1abe8e7f6b4d4f379651bcbb",
+            "selection": "outside_comparison"
+          },
+          {
+            "outcome_values_disclosed": false,
+            "reference": "cg4_ref_ce11705ce76748e4241ac5cc",
+            "selection": "representative_member"
+          },
+          {
+            "outcome_values_disclosed": false,
+            "reference": "cg4_ref_22c3400550a32b7aa653cd48",
+            "selection": "representative_member"
+          }
+        ],
+        "explanation": {
+          "causal_interpretation": false,
+          "defines_membership": true,
+          "evaluation_population": "S",
+          "fidelity": {
+            "available": 240,
+            "basis": "exact_definition_identity",
+            "false_negative": 0,
+            "false_positive": 0,
+            "precision": 1.0,
+            "recall": 1.0,
+            "true_negative": 120,
+            "true_positive": 120,
+            "unavailable": 0
+          },
+          "kind": "exact_predicate",
+          "scope": "The predicate is the gate itself; these identity counts are not an empirical surrogate accuracy estimate."
+        },
+        "frontier": 0,
+        "head": "positive",
+        "id": "9648d327d9c9ddbb65bb8ddbc255a172",
+        "membership_artifact": "21eb5247c629c0c11b34f128ecc41cb12d9d15a2187db1537e17996c762e0304",
+        "objective": {
+          "bounds": [],
+          "ceiling": null,
+          "comparator": "complement",
+          "current_period": null,
+          "direction": "higher",
+          "id": "errors",
+          "interval": null,
+          "material_error": null,
+          "metric": "error_rate",
+          "metric_identity": {},
+          "nominal": null,
+          "practical_threshold": 0.1,
+          "reference_period": null,
+          "reference_run": null,
+          "run": "model",
+          "target": null,
+          "training_clip": 30,
+          "units": "fraction"
+        },
+        "selection_population": "S",
+        "shortlisted": true,
+        "stability": {
+          "coverage_guarantee": false,
+          "diagnostic_references": "Original D-only diagnostic targets fixed; refits resample whole admitted D units before the disclosed D cap.",
+          "matching": "Largest frozen membership IoU on S features, within strategy and diagnostic head; no S outcome selection.",
+          "median_membership_IoU": 1.0,
+          "method": "bounded_D_unit_bootstrap_refits_v1",
+          "profile": {
+            "D_row_limit": 20000,
+            "maximum_nodes": 10000,
+            "retained_candidates": 16
+          },
+          "replicates": 1,
+          "results": [
+            {
+              "applicable_fraction": 1.0,
+              "membership_IoU": 1.0,
+              "refit_D_records": 240,
+              "replicate": 0
+            }
+          ],
+          "scope": "Product perturbation diagnostic; full-method qualification is separate.",
+          "seed": 0
+        },
+        "state": "exploratory",
+        "strategy": "structured"
+      }
+    ],
+    "fingerprint": "2aa98d1ee7056ca4ba3584381443c39707ee3b53b2cf1e943413a3f8431f3760",
+    "history": [],
+    "notes": [],
+    "overlap": {
+      "counts_are_not_summed": true,
+      "omitted_pairs": 0,
+      "pair_coverage_complete": true,
+      "pair_limit": 1000,
+      "pairs": [],
+      "retained_pairs": 0,
+      "selection_population": 240,
+      "shortlist_pairs_complete": true,
+      "shortlist_pairs_prioritized": true,
+      "shortlist_union_support": 120,
+      "total_overlapping_pairs": 0
+    },
+    "qualification": "No discovery recovery guarantee is inferred from predictive accuracy.",
+    "shortlist": [
+      "9648d327d9c9ddbb65bb8ddbc255a172"
+    ],
+    "stage": "discovery",
+    "strategies": [
+      {
+        "atoms": 2,
+        "diagnostic_target_support": {
+          "admitted_D_records": 240,
+          "admitted_defined_targets": 240,
+          "assigned_records": 240,
+          "bounds_scope": "Predeclared pointwise contributions before any root/absolute interval transform; never H extrema.",
+          "diagnostic_contribution_units": "fraction",
+          "excluded_after_proxy_pair_and_period_requirements": 0,
+          "inference_bounds": [
+            0.0,
+            1.0
+          ],
+          "interpretation": "Diagnostic proposal support only. Final metric denominators are recomputed by the authoritative reducers.",
+          "learning_target_defined_records": 240,
+          "log_loss_training_clip": null,
+          "native_eligible_before_proxy_and_pair_requirements": 240
+        },
+        "global_authoritative_optimum_claimed": false,
+        "marginal_effect_pruning": false,
+        "max_depth": 1,
+        "nodes": 2,
+        "objective": "errors",
+        "proposal_vocabulary": "D_observation_order_statistic_quantiles_v2",
+        "search_class": "Conjunctions across distinct fields; top-16 D-only disjunction proposals are additional heuristics.",
+        "search_complete": true,
+        "search_objective": "D diagnostic proxy excess times sqrt conditional support",
+        "strategy": "structured"
+      }
+    ]
+  },
+  "measurements": [],
+  "methodology_id": "failure_investigation_v1",
+  "name": "CG4 zero-pair overlap and exact-gate evidence",
+  "outcomes": {
+    "H_outcomes_disclosed": false,
+    "definition": "Authoritative supplied/historical snapshot"
+  },
+  "runs": [
+    {
+      "display_name": "fixture",
+      "id": "model",
+      "role": "unknown",
+      "version_alias": "v1"
+    }
+  ],
+  "schema_version": "confidenceguard.investigation_result/1.0",
+  "task": {
+    "classes": [
+      "0",
+      "1"
+    ],
+    "horizon": null,
+    "kind": "binary_classification",
+    "material_error": null,
+    "outcome_definition": "fixture",
+    "positive_class": "1",
+    "units": null
+  },
+  "execution": {
+    "diagnostic_fits": 0,
+    "duration_seconds": 0.392834166996181,
+    "end_to_end_seconds": 6.3979817499930505,
+    "peak_spill_bytes": 0,
+    "peak_worker_rss_bytes": 162643968,
+    "peak_workspace_bytes": 1097728,
+    "requested_operation_deadline_seconds": 1800,
+    "serialized_bytes": 253518,
+    "status": "completed",
+    "whole_job_seconds": 3.1855591670027934
+  },
+  "binding": {
+    "analysis_digest": "8ed59723abef23f872ae510d28a8bfcc1c28c3eaf766dbf54406b1001ac46474",
+    "private_manifest_digest": "39efd8a521178f452fa987207bc899d955c0900f5dad8d68881408a9e0924fb9"
+  }
+}

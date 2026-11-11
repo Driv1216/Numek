@@ -1,0 +1,946 @@
+{
+  "classification_subtype": "binary",
+  "column_count": 15,
+  "conflicting_label_group_count": 5,
+  "dataset_path": "data/prepared/adult.csv",
+  "duplicate_group_count": 49,
+  "finding_codes": [
+    "conflicting_target_labels",
+    "target_imbalance",
+    "numeric_outlier_concentration",
+    "leakage_review_prompts"
+  ],
+  "guardrails": [
+    {
+      "cap": 69.0,
+      "code": "critical_sub_score",
+      "explanation": "The target balance sub-score is 47.86, indicating a critical weakness."
+    }
+  ],
+  "leakage_details": [
+    {
+      "classification": "review_only",
+      "column": "marital_status",
+      "reason": "generic status-like name; verify when the value becomes available"
+    }
+  ],
+  "missing_feature_row_rate": 7.41,
+  "name": "adult",
+  "overall": 69.0,
+  "report_path": "reports/adult.html",
+  "risk_level": "Elevated",
+  "risks": [
+    {
+      "code": "conflicting_target_labels",
+      "evidence": "10 labeled rows are included in these groups.",
+      "finding": "5 feature-identical groups contain more than one non-missing target label.",
+      "modeling_impact": "Inconsistent labels for identical recorded features can introduce irreducible ambiguity or reveal missing time/entity context.",
+      "recommendation": "Review whether these are label errors, repeated entities over time, target updates, or omitted distinguishing features.",
+      "score_effect": "Evidence only; this finding does not change any score or guardrail.",
+      "severity": "Moderate",
+      "title": "Potentially conflicting target labels"
+    },
+    {
+      "code": "target_imbalance",
+      "evidence": "The majority-class baseline is 76.07%; majority-to-minority ratio: 3.18:1.",
+      "finding": "The target is dominated by one class, so headline accuracy may hide poor minority-class performance.",
+      "modeling_impact": "A model may favor the majority class and underperform on less common outcomes.",
+      "recommendation": "Use class-sensitive metrics and consider resampling, weighting, or collecting more minority examples.",
+      "score_effect": "Reduces the target-balance score and may trigger the critical-sub-score guardrail.",
+      "severity": "Moderate",
+      "title": "Target imbalance"
+    },
+    {
+      "code": "numeric_outlier_concentration",
+      "evidence": "Affected fields: hours_per_week.",
+      "finding": "1 numeric feature has notable IQR-based outlier rates.",
+      "modeling_impact": "Extreme values can dominate some model families or indicate collection and unit inconsistencies.",
+      "recommendation": "Inspect the outlier rows and confirm whether they are real edge cases or data entry errors.",
+      "score_effect": "Reduces the feature-usability score at the current outlier thresholds.",
+      "severity": "Moderate",
+      "title": "Numeric outlier concentration"
+    },
+    {
+      "code": "leakage_review_prompts",
+      "title": "Prediction-time availability needs review",
+      "severity": "Low",
+      "finding": "The marital_status field has a generic status-like name.",
+      "evidence": "Name-based review prompt only; no strong leakage candidate.",
+      "modeling_impact": "Availability cannot be established from a column name.",
+      "recommendation": "Confirm collection timing with the source owner.",
+      "score_effect": "Review only; does not affect scoring."
+    }
+  ],
+  "row_count": 48842,
+  "runtime_seconds": 0.18444,
+  "sub_scores": {
+    "completeness": 99.12,
+    "feature_usability": 98.86,
+    "leakage_risk": 100.0,
+    "target_balance": 47.86,
+    "uniqueness": 99.89
+  },
+  "target_missing_count": 0,
+  "class_counts": {
+    "<=50K": 37155,
+    ">50K": 11687
+  },
+  "missingness": [
+    {
+      "field": "occupation",
+      "count": 2809
+    },
+    {
+      "field": "workclass",
+      "count": 2799
+    },
+    {
+      "field": "native_country",
+      "count": 857
+    },
+    {
+      "field": "age",
+      "count": 0
+    },
+    {
+      "field": "final_weight",
+      "count": 0
+    },
+    {
+      "field": "education",
+      "count": 0
+    },
+    {
+      "field": "education_years",
+      "count": 0
+    },
+    {
+      "field": "marital_status",
+      "count": 0
+    },
+    {
+      "field": "relationship",
+      "count": 0
+    },
+    {
+      "field": "race",
+      "count": 0
+    },
+    {
+      "field": "sex",
+      "count": 0
+    },
+    {
+      "field": "capital_gain",
+      "count": 0
+    },
+    {
+      "field": "capital_loss",
+      "count": 0
+    },
+    {
+      "field": "hours_per_week",
+      "count": 0
+    }
+  ],
+  "preview": [
+    {
+      "age": "39",
+      "education": "Bachelors",
+      "hours_per_week": "40",
+      "annual_income_over_50k": "<=50K"
+    },
+    {
+      "age": "50",
+      "education": "Bachelors",
+      "hours_per_week": "13",
+      "annual_income_over_50k": "<=50K"
+    },
+    {
+      "age": "38",
+      "education": "HS-grad",
+      "hours_per_week": "40",
+      "annual_income_over_50k": "<=50K"
+    },
+    {
+      "age": "53",
+      "education": "11th",
+      "hours_per_week": "40",
+      "annual_income_over_50k": "<=50K"
+    },
+    {
+      "age": "28",
+      "education": "Bachelors",
+      "hours_per_week": "40",
+      "annual_income_over_50k": "<=50K"
+    }
+  ],
+  "conflict_example": [
+    {
+      "row": 850,
+      "age": "39",
+      "education": "Bachelors",
+      "hours_per_week": "40",
+      "annual_income_over_50k": "<=50K"
+    },
+    {
+      "row": 22763,
+      "age": "39",
+      "education": "Bachelors",
+      "hours_per_week": "40",
+      "annual_income_over_50k": ">50K"
+    }
+  ],
+  "hour_bins": [
+    {
+      "label": "0\u20139",
+      "lower": 0,
+      "upper": 9,
+      "counts": {
+        "<=50K": 628,
+        ">50K": 72
+      },
+      "examples": {
+        "<=50K": [
+          {
+            "age": "67",
+            "education": "10th",
+            "hours_per_week": "2",
+            "annual_income_over_50k": "<=50K"
+          },
+          {
+            "age": "71",
+            "education": "Some-college",
+            "hours_per_week": "2",
+            "annual_income_over_50k": "<=50K"
+          },
+          {
+            "age": "67",
+            "education": "11th",
+            "hours_per_week": "8",
+            "annual_income_over_50k": "<=50K"
+          },
+          {
+            "age": "17",
+            "education": "11th",
+            "hours_per_week": "5",
+            "annual_income_over_50k": "<=50K"
+          },
+          {
+            "age": "17",
+            "education": "9th",
+            "hours_per_week": "6",
+            "annual_income_over_50k": "<=50K"
+          }
+        ],
+        ">50K": [
+          {
+            "age": "58",
+            "education": "Doctorate",
+            "hours_per_week": "1",
+            "annual_income_over_50k": ">50K"
+          },
+          {
+            "age": "44",
+            "education": "Some-college",
+            "hours_per_week": "6",
+            "annual_income_over_50k": ">50K"
+          },
+          {
+            "age": "67",
+            "education": "Bachelors",
+            "hours_per_week": "7",
+            "annual_income_over_50k": ">50K"
+          },
+          {
+            "age": "61",
+            "education": "Prof-school",
+            "hours_per_week": "5",
+            "annual_income_over_50k": ">50K"
+          },
+          {
+            "age": "47",
+            "education": "HS-grad",
+            "hours_per_week": "8",
+            "annual_income_over_50k": ">50K"
+          }
+        ]
+      }
+    },
+    {
+      "label": "10\u201319",
+      "lower": 10,
+      "upper": 19,
+      "counts": {
+        "<=50K": 1774,
+        ">50K": 117
+      },
+      "examples": {
+        "<=50K": [
+          {
+            "age": "50",
+            "education": "Bachelors",
+            "hours_per_week": "13",
+            "annual_income_over_50k": "<=50K"
+          },
+          {
+            "age": "49",
+            "education": "9th",
+            "hours_per_week": "16",
+            "annual_income_over_50k": "<=50K"
+          },
+          {
+            "age": "22",
+            "education": "Some-college",
+            "hours_per_week": "15",
+            "annual_income_over_50k": "<=50K"
+          },
+          {
+            "age": "18",
+            "education": "11th",
+            "hours_per_week": "16",
+            "annual_income_over_50k": "<=50K"
+          },
+          {
+            "age": "18",
+            "education": "HS-grad",
+            "hours_per_week": "12",
+            "annual_income_over_50k": "<=50K"
+          }
+        ],
+        ">50K": [
+          {
+            "age": "30",
+            "education": "Bachelors",
+            "hours_per_week": "16",
+            "annual_income_over_50k": ">50K"
+          },
+          {
+            "age": "75",
+            "education": "Bachelors",
+            "hours_per_week": "16",
+            "annual_income_over_50k": ">50K"
+          },
+          {
+            "age": "44",
+            "education": "Some-college",
+            "hours_per_week": "18",
+            "annual_income_over_50k": ">50K"
+          },
+          {
+            "age": "63",
+            "education": "Some-college",
+            "hours_per_week": "10",
+            "annual_income_over_50k": ">50K"
+          },
+          {
+            "age": "55",
+            "education": "Bachelors",
+            "hours_per_week": "18",
+            "annual_income_over_50k": ">50K"
+          }
+        ]
+      }
+    },
+    {
+      "label": "20\u201329",
+      "lower": 20,
+      "upper": 29,
+      "counts": {
+        "<=50K": 3339,
+        ">50K": 221
+      },
+      "examples": {
+        "<=50K": [
+          {
+            "age": "54",
+            "education": "HS-grad",
+            "hours_per_week": "20",
+            "annual_income_over_50k": "<=50K"
+          },
+          {
+            "age": "19",
+            "education": "HS-grad",
+            "hours_per_week": "25",
+            "annual_income_over_50k": "<=50K"
+          },
+          {
+            "age": "79",
+            "education": "Some-college",
+            "hours_per_week": "20",
+            "annual_income_over_50k": "<=50K"
+          },
+          {
+            "age": "18",
+            "education": "11th",
+            "hours_per_week": "22",
+            "annual_income_over_50k": "<=50K"
+          },
+          {
+            "age": "28",
+            "education": "Some-college",
+            "hours_per_week": "25",
+            "annual_income_over_50k": "<=50K"
+          }
+        ],
+        ">50K": [
+          {
+            "age": "30",
+            "education": "Assoc-acdm",
+            "hours_per_week": "25",
+            "annual_income_over_50k": ">50K"
+          },
+          {
+            "age": "49",
+            "education": "Bachelors",
+            "hours_per_week": "26",
+            "annual_income_over_50k": ">50K"
+          },
+          {
+            "age": "37",
+            "education": "Assoc-voc",
+            "hours_per_week": "24",
+            "annual_income_over_50k": ">50K"
+          },
+          {
+            "age": "29",
+            "education": "HS-grad",
+            "hours_per_week": "25",
+            "annual_income_over_50k": ">50K"
+          },
+          {
+            "age": "34",
+            "education": "Assoc-acdm",
+            "hours_per_week": "25",
+            "annual_income_over_50k": ">50K"
+          }
+        ]
+      }
+    },
+    {
+      "label": "30\u201339",
+      "lower": 30,
+      "upper": 39,
+      "counts": {
+        "<=50K": 4851,
+        ">50K": 685
+      },
+      "examples": {
+        "<=50K": [
+          {
+            "age": "23",
+            "education": "Bachelors",
+            "hours_per_week": "30",
+            "annual_income_over_50k": "<=50K"
+          },
+          {
+            "age": "25",
+            "education": "HS-grad",
+            "hours_per_week": "35",
+            "annual_income_over_50k": "<=50K"
+          },
+          {
+            "age": "25",
+            "education": "HS-grad",
+            "hours_per_week": "35",
+            "annual_income_over_50k": "<=50K"
+          },
+          {
+            "age": "53",
+            "education": "HS-grad",
+            "hours_per_week": "38",
+            "annual_income_over_50k": "<=50K"
+          },
+          {
+            "age": "18",
+            "education": "HS-grad",
+            "hours_per_week": "30",
+            "annual_income_over_50k": "<=50K"
+          }
+        ],
+        ">50K": [
+          {
+            "age": "31",
+            "education": "Some-college",
+            "hours_per_week": "38",
+            "annual_income_over_50k": ">50K"
+          },
+          {
+            "age": "44",
+            "education": "Some-college",
+            "hours_per_week": "38",
+            "annual_income_over_50k": ">50K"
+          },
+          {
+            "age": "36",
+            "education": "Bachelors",
+            "hours_per_week": "36",
+            "annual_income_over_50k": ">50K"
+          },
+          {
+            "age": "58",
+            "education": "HS-grad",
+            "hours_per_week": "35",
+            "annual_income_over_50k": ">50K"
+          },
+          {
+            "age": "34",
+            "education": "Masters",
+            "hours_per_week": "35",
+            "annual_income_over_50k": ">50K"
+          }
+        ]
+      }
+    },
+    {
+      "label": "40\u201349",
+      "lower": 40,
+      "upper": 49,
+      "counts": {
+        "<=50K": 21006,
+        ">50K": 6468
+      },
+      "examples": {
+        "<=50K": [
+          {
+            "age": "39",
+            "education": "Bachelors",
+            "hours_per_week": "40",
+            "annual_income_over_50k": "<=50K"
+          },
+          {
+            "age": "38",
+            "education": "HS-grad",
+            "hours_per_week": "40",
+            "annual_income_over_50k": "<=50K"
+          },
+          {
+            "age": "53",
+            "education": "11th",
+            "hours_per_week": "40",
+            "annual_income_over_50k": "<=50K"
+          },
+          {
+            "age": "28",
+            "education": "Bachelors",
+            "hours_per_week": "40",
+            "annual_income_over_50k": "<=50K"
+          },
+          {
+            "age": "37",
+            "education": "Masters",
+            "hours_per_week": "40",
+            "annual_income_over_50k": "<=50K"
+          }
+        ],
+        ">50K": [
+          {
+            "age": "52",
+            "education": "HS-grad",
+            "hours_per_week": "45",
+            "annual_income_over_50k": ">50K"
+          },
+          {
+            "age": "42",
+            "education": "Bachelors",
+            "hours_per_week": "40",
+            "annual_income_over_50k": ">50K"
+          },
+          {
+            "age": "30",
+            "education": "Bachelors",
+            "hours_per_week": "40",
+            "annual_income_over_50k": ">50K"
+          },
+          {
+            "age": "40",
+            "education": "Assoc-voc",
+            "hours_per_week": "40",
+            "annual_income_over_50k": ">50K"
+          },
+          {
+            "age": "43",
+            "education": "Masters",
+            "hours_per_week": "45",
+            "annual_income_over_50k": ">50K"
+          }
+        ]
+      }
+    },
+    {
+      "label": "50\u201359",
+      "lower": 50,
+      "upper": 59,
+      "counts": {
+        "<=50K": 3257,
+        ">50K": 2571
+      },
+      "examples": {
+        "<=50K": [
+          {
+            "age": "32",
+            "education": "Assoc-acdm",
+            "hours_per_week": "50",
+            "annual_income_over_50k": "<=50K"
+          },
+          {
+            "age": "38",
+            "education": "11th",
+            "hours_per_week": "50",
+            "annual_income_over_50k": "<=50K"
+          },
+          {
+            "age": "23",
+            "education": "Assoc-acdm",
+            "hours_per_week": "52",
+            "annual_income_over_50k": "<=50K"
+          },
+          {
+            "age": "24",
+            "education": "Bachelors",
+            "hours_per_week": "50",
+            "annual_income_over_50k": "<=50K"
+          },
+          {
+            "age": "29",
+            "education": "Some-college",
+            "hours_per_week": "58",
+            "annual_income_over_50k": "<=50K"
+          }
+        ],
+        ">50K": [
+          {
+            "age": "31",
+            "education": "Masters",
+            "hours_per_week": "50",
+            "annual_income_over_50k": ">50K"
+          },
+          {
+            "age": "50",
+            "education": "Bachelors",
+            "hours_per_week": "55",
+            "annual_income_over_50k": ">50K"
+          },
+          {
+            "age": "49",
+            "education": "Some-college",
+            "hours_per_week": "50",
+            "annual_income_over_50k": ">50K"
+          },
+          {
+            "age": "43",
+            "education": "Doctorate",
+            "hours_per_week": "50",
+            "annual_income_over_50k": ">50K"
+          },
+          {
+            "age": "56",
+            "education": "HS-grad",
+            "hours_per_week": "50",
+            "annual_income_over_50k": ">50K"
+          }
+        ]
+      }
+    },
+    {
+      "label": "60\u201369",
+      "lower": 60,
+      "upper": 69,
+      "counts": {
+        "<=50K": 1511,
+        ">50K": 1131
+      },
+      "examples": {
+        "<=50K": [
+          {
+            "age": "47",
+            "education": "HS-grad",
+            "hours_per_week": "60",
+            "annual_income_over_50k": "<=50K"
+          },
+          {
+            "age": "40",
+            "education": "Bachelors",
+            "hours_per_week": "60",
+            "annual_income_over_50k": "<=50K"
+          },
+          {
+            "age": "28",
+            "education": "Assoc-acdm",
+            "hours_per_week": "60",
+            "annual_income_over_50k": "<=50K"
+          },
+          {
+            "age": "43",
+            "education": "HS-grad",
+            "hours_per_week": "60",
+            "annual_income_over_50k": "<=50K"
+          },
+          {
+            "age": "29",
+            "education": "HS-grad",
+            "hours_per_week": "60",
+            "annual_income_over_50k": "<=50K"
+          }
+        ],
+        ">50K": [
+          {
+            "age": "40",
+            "education": "Doctorate",
+            "hours_per_week": "60",
+            "annual_income_over_50k": ">50K"
+          },
+          {
+            "age": "54",
+            "education": "Some-college",
+            "hours_per_week": "60",
+            "annual_income_over_50k": ">50K"
+          },
+          {
+            "age": "47",
+            "education": "Prof-school",
+            "hours_per_week": "60",
+            "annual_income_over_50k": ">50K"
+          },
+          {
+            "age": "48",
+            "education": "Doctorate",
+            "hours_per_week": "60",
+            "annual_income_over_50k": ">50K"
+          },
+          {
+            "age": "44",
+            "education": "Bachelors",
+            "hours_per_week": "60",
+            "annual_income_over_50k": ">50K"
+          }
+        ]
+      }
+    },
+    {
+      "label": "70\u201379",
+      "lower": 70,
+      "upper": 79,
+      "counts": {
+        "<=50K": 444,
+        ">50K": 239
+      },
+      "examples": {
+        "<=50K": [
+          {
+            "age": "23",
+            "education": "HS-grad",
+            "hours_per_week": "72",
+            "annual_income_over_50k": "<=50K"
+          },
+          {
+            "age": "27",
+            "education": "Doctorate",
+            "hours_per_week": "70",
+            "annual_income_over_50k": "<=50K"
+          },
+          {
+            "age": "55",
+            "education": "HS-grad",
+            "hours_per_week": "72",
+            "annual_income_over_50k": "<=50K"
+          },
+          {
+            "age": "47",
+            "education": "HS-grad",
+            "hours_per_week": "75",
+            "annual_income_over_50k": "<=50K"
+          },
+          {
+            "age": "28",
+            "education": "Some-college",
+            "hours_per_week": "70",
+            "annual_income_over_50k": "<=50K"
+          }
+        ],
+        ">50K": [
+          {
+            "age": "29",
+            "education": "Bachelors",
+            "hours_per_week": "70",
+            "annual_income_over_50k": ">50K"
+          },
+          {
+            "age": "38",
+            "education": "Masters",
+            "hours_per_week": "70",
+            "annual_income_over_50k": ">50K"
+          },
+          {
+            "age": "37",
+            "education": "Some-college",
+            "hours_per_week": "75",
+            "annual_income_over_50k": ">50K"
+          },
+          {
+            "age": "53",
+            "education": "Doctorate",
+            "hours_per_week": "70",
+            "annual_income_over_50k": ">50K"
+          },
+          {
+            "age": "44",
+            "education": "Some-college",
+            "hours_per_week": "70",
+            "annual_income_over_50k": ">50K"
+          }
+        ]
+      }
+    },
+    {
+      "label": "80\u201389",
+      "lower": 80,
+      "upper": 89,
+      "counts": {
+        "<=50K": 197,
+        ">50K": 118
+      },
+      "examples": {
+        "<=50K": [
+          {
+            "age": "39",
+            "education": "HS-grad",
+            "hours_per_week": "80",
+            "annual_income_over_50k": "<=50K"
+          },
+          {
+            "age": "38",
+            "education": "HS-grad",
+            "hours_per_week": "80",
+            "annual_income_over_50k": "<=50K"
+          },
+          {
+            "age": "57",
+            "education": "Bachelors",
+            "hours_per_week": "80",
+            "annual_income_over_50k": "<=50K"
+          },
+          {
+            "age": "28",
+            "education": "Assoc-acdm",
+            "hours_per_week": "80",
+            "annual_income_over_50k": "<=50K"
+          },
+          {
+            "age": "20",
+            "education": "HS-grad",
+            "hours_per_week": "80",
+            "annual_income_over_50k": "<=50K"
+          }
+        ],
+        ">50K": [
+          {
+            "age": "37",
+            "education": "Some-college",
+            "hours_per_week": "80",
+            "annual_income_over_50k": ">50K"
+          },
+          {
+            "age": "38",
+            "education": "Bachelors",
+            "hours_per_week": "80",
+            "annual_income_over_50k": ">50K"
+          },
+          {
+            "age": "49",
+            "education": "Some-college",
+            "hours_per_week": "80",
+            "annual_income_over_50k": ">50K"
+          },
+          {
+            "age": "35",
+            "education": "Prof-school",
+            "hours_per_week": "80",
+            "annual_income_over_50k": ">50K"
+          },
+          {
+            "age": "45",
+            "education": "HS-grad",
+            "hours_per_week": "80",
+            "annual_income_over_50k": ">50K"
+          }
+        ]
+      }
+    },
+    {
+      "label": "90\u201399",
+      "lower": 90,
+      "upper": 99,
+      "counts": {
+        "<=50K": 148,
+        ">50K": 65
+      },
+      "examples": {
+        "<=50K": [
+          {
+            "age": "50",
+            "education": "Masters",
+            "hours_per_week": "98",
+            "annual_income_over_50k": "<=50K"
+          },
+          {
+            "age": "24",
+            "education": "Masters",
+            "hours_per_week": "90",
+            "annual_income_over_50k": "<=50K"
+          },
+          {
+            "age": "35",
+            "education": "11th",
+            "hours_per_week": "90",
+            "annual_income_over_50k": "<=50K"
+          },
+          {
+            "age": "63",
+            "education": "HS-grad",
+            "hours_per_week": "98",
+            "annual_income_over_50k": "<=50K"
+          },
+          {
+            "age": "50",
+            "education": "10th",
+            "hours_per_week": "99",
+            "annual_income_over_50k": "<=50K"
+          }
+        ],
+        ">50K": [
+          {
+            "age": "37",
+            "education": "HS-grad",
+            "hours_per_week": "99",
+            "annual_income_over_50k": ">50K"
+          },
+          {
+            "age": "25",
+            "education": "Masters",
+            "hours_per_week": "99",
+            "annual_income_over_50k": ">50K"
+          },
+          {
+            "age": "31",
+            "education": "Bachelors",
+            "hours_per_week": "90",
+            "annual_income_over_50k": ">50K"
+          },
+          {
+            "age": "55",
+            "education": "Some-college",
+            "hours_per_week": "99",
+            "annual_income_over_50k": ">50K"
+          },
+          {
+            "age": "37",
+            "education": "Doctorate",
+            "hours_per_week": "99",
+            "annual_income_over_50k": ">50K"
+          }
+        ]
+      }
+    }
+  ]
+}
