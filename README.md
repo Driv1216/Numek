@@ -238,6 +238,51 @@ ordered `findings` list, sanitized `context`, and deterministic `narrative`.
 Fallback report titles are humanized from the original filename; an explicit
 `dataset_name` is retained exactly as supplied.
 
+### Reading reports, explanations and print profiles
+
+Every current report has an **Understand this report** guide: plain-language
+explanations of the terms that report uses, worded for its methodology, with
+examples quoted only from recorded values. The terms are linked where they
+appear. The guide opens as a searchable side panel on screen (Escape closes it;
+linking to `#understand` opens it) and prints as the Reading guide. The DataTrust
+app's report viewer has an **Understand this report** button for reports that
+include the guide; saved reports from earlier versions keep their original bytes.
+
+Reports load nothing external and work offline. Their one script is pinned by a
+content security policy, so an injected script cannot run.
+
+The PDF is always derived from the canonical HTML. Choose what it prints with a
+print profile:
+
+- `focused` (default) prints every finding, flagged rows and disclosed summaries.
+- `complete` also prints every row the HTML report lists in full.
+
+```bash
+datatrust audit data.csv --task unlabeled --format pdf --out review.pdf --print-profile complete
+datatrust text --spec text.json --format pdf --out text-review.pdf --print-profile complete
+```
+
+```python
+result.generate_artifacts("review.pdf", format="pdf", print_profile="complete")
+```
+
+`--print-profile` is accepted by `audit`, `compare`, `temporal`, `text`, `images`
+and `cross-representation`. `print_profile=` is accepted by every result's
+`generate_artifacts`, and by `generate_report` where it exists.
+
+The HTML report itself always lists every row. Summary views name their bound,
+for example "Summary view: 20 of 412 rows shown (historical display limit)" or
+"(summary selection)", and say where the rest is: the complete section in the
+same file, the JSON pointer and, for text, image and cross-representation
+evidence, the protected local resolution. The app's PDF uses `focused`.
+
+**Classification reports.** A plain `datatrust audit … --out report.html`, and
+`DataTrust(path, target=…).generate_report("report.html")`, keep the frozen
+legacy classification report. To opt in to the current report, use
+`--report-style current` or `generate_report(path, presentation="current")`.
+PDFs, specification- or JSON-driven analyses and the app always use the
+current report.
+
 ## Advanced Tabular Tasks (M3)
 
 M3 adds annotation-aware classification/regression, binary-indicator multilabel

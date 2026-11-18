@@ -188,6 +188,13 @@ All runtime modules below live in `src/datatrust/`.
 | `cli.py` | Expose `audit`, manifest-relative `compare`, and `ui` commands; wrap analysis failures in CLI errors. |
 | `web.py`, `templates/ui.html` | Guided browser workflow, session/form protection, temporary job ownership, compact result, report viewing/downloads, and PDF caching. |
 | `pdf.py` | Restricted local HTML conversion, source identity checks, unique staging/no-replace publication, actionable failure with surviving artifacts. |
+| `report_format.py` | Report display filters, the shared Jinja environment, the classification section insertions and the one hashed report script with its CSP. Moved from `renderer.py` (still re-exported there) so presentation identity does not depend on artifact publication. |
+| `report_identity.py` | Per-workflow presentation identity: a digest over each family's resolved template closure, its presentation modules and the print-policy version. Pinned per family in `tests/fixtures/presentation_identities.json`. |
+| `report_layout.py`, `templates/_report_shell.html`, `_evidence.html`, `_report_script.js.html`, `_report_base.css.html` | Shared evidence-presentation contract (`report_print_v1`): signal groups, focused/complete print profiles, evidence-appropriate summaries from stored values, coverage/treatment/location accounting and disclosures; shared shell, evidence table and paged data-island script. Adopted by report templates from Report Experience Stage 2. |
+| `tabular_presentation.py`, `templates/classification_report.html`, `_tabular_layers.html` | Report Experience Stage 2 projection for classification, regression and unlabeled reports. Column signals come only from recorded structures (classification contributor rules, flags, severe-missingness list and leakage details; otherwise findings → evidence → `affected_columns`). Signal tables by family, summaries of columns without signals, complete "All columns" and "Numeric summaries" tables on screen (printed in the `complete` profile), grouped check ledger, and per-column guidance lines kept on screen when their facts are already printed. `classification_report.html` is the current classification report (app, canonical path, every PDF); `report.html` stays frozen for `DataTrust(path, target).generate_report()` and the plain `audit` HTML, with `presentation="current"` / `--report-style current` as the opt-in. `print_profile` / `--print-profile` select `focused` (default) or `complete`. |
+| `report_concepts.py`, `report_context.py`, `templates/_concepts.html` | "Understand this report": versioned concept catalogue with methodology variants, deterministic examples from recorded values (JSON-pointer keyed) and a per-report manifest built before rendering. It decides the term placements under section headings, the "How to read" box and the guide entries. Anchor links work without script; the hashed report script adds one shared popover and a searchable guide drawer. Print renders a Reading guide with `target-counter` page references. Catalogue entries are part of each family's presentation identity. |
+| `report_catalogue.py`, `report_structured.py` | The concept catalogue as data, outside identity module dependencies: each family's identity covers only the entries it uses, so one workflow's concept edits never move another's identity. `report_structured.py` serves M3, M4, M5 temporal, M6 text, M7 image and M9 cross (M6–M9 disclose their summary selections, mark opaque references protected, and list retained entries under “Complete retained evidence”): a V1 disclosure for every table capped by a historical display limit, a matching V2 complete table in the appendix (printed in the `complete` profile) and a finding index without display limits. |
+| App report viewer and report responses (Stage 7) | Reports reach the app through `framed()` in `api_web.py`: `X-Frame-Options: SAMEORIGIN`, `Referrer-Policy: no-referrer` and `REPORT_CSP` (load nothing external; `frame-ancestors 'self'`). Header and per-report meta policies both apply, so current reports keep their hash-pinned script; saved reports from earlier versions still render. The viewer (`frontend/src/app/parts.tsx`) is a modal (outside content inert, focus on Back, focus restored) and offers “Understand this report” when the loaded report has a guide; it sets the report's `#understand` fragment, which the report script turns into its guide drawer. |
 
 `validation/` is separate engineering/evidence tooling, not a runtime package
 dependency. `tests/` exercises implemented contracts and failures. Packaging is
@@ -416,6 +423,57 @@ user-supplied, while fallback titles are humanized from the source filename.
 These local controls do not provide enterprise authentication or multi-user
 isolation. Upload size is not a pandas memory bound, and abrupt process failure
 is not a guaranteed cleanup path.
+
+### Report experience (`report_print_v1`, Report Experience Stages 0–8)
+
+Every current report, classification to M9, is rendered in the same order, and every step is presentation only:
+1. The workflow projection (`tabular_presentation`, `presentation`, `m4_presentation`, `temporal_presentation`,
+   `text_presentation`, `image_presentation` or `cross_presentation`) builds a view from the completed result. It never
+   re-runs analysis.
+2. `report_layout` / `report_structured` turn its tables into units: signal groups, print profiles, accounting and
+   disclosures.
+3. `report_concepts.build_manifest` decides, before rendering, which concepts the report uses and where.
+4. The workflow template renders the view inside `_report_shell.html`, and the PDF is derived from that same HTML.
+
+**Print policy.**
+- The print profile is a render-time input (`focused` by default, or `complete`). It is recorded in the HTML and in
+  `qa_metadata`, never in the analysis JSON.
+- Historical `PresentationLimits` keep their meaning for the M3, M4 and M5 summary views.
+- M6, M7 and M9 keep their existing summary selections, named as such.
+
+**Evidence behind findings.**
+- `report_structured.capped_tables(..., referenced=)` prints, in the focused profile, the rows past a summary view's
+  limit that a recorded finding refers to (M3 and M4 columns, M5 evidence records). Each finding forms its own signal
+  group, so distinct findings never merge.
+- Row anchors are the record's position in its unit, and a unit that points to another unit keeps its own element id
+  (`render_unit(own_anchor=)`).
+- `report_format.long_list` prints the first 12 names of a very long recorded list, with a disclosed count.
+- The shared shell sets running section headers with `string-set`.
+
+**Screen-only rows.** Rows that the focused profile does not print are held in JSON data islands and drawn by the
+report script in pages of 500. CSS-hidden rows were measured at +440% to +1,400% WeasyPrint cost; data islands cost
+nothing.
+
+**Identity.**
+- `report_identity` hashes each workflow's resolved template closure, its explicit presentation modules, the concept
+  entries it uses (`report_catalogue.catalogue_bytes`) and the policy version.
+- A change to one workflow's presentation moves only that workflow's identity. A change to a shared module moves every
+  identity that depends on it.
+- Pins live in `tests/fixtures/presentation_identities.json`.
+- `validation/report_experience/repin.py` re-asserts every analytical value before it re-pins golden HTML hashes.
+
+**Security.**
+- Reports load nothing external.
+- One inline script is pinned by a `sha256` meta content security policy; autoescaping applies throughout, and anchors
+  are index-based, never built from column names.
+- The app serves reports with `REPORT_CSP`, which also applies to immutable saved reports.
+
+**Compatibility.**
+- `report.html` stays the frozen legacy classification report for `DataTrust(path, target).generate_report()` and a
+  plain `datatrust audit` HTML. `presentation="current"` / `--report-style current` opt in to the current report.
+- Every PDF, every specification-based path and the app use the current report.
+- M6, M7 and M9 exports add `presentation_identity` and `print_profile` to `export_identity`.
+- `text_presentation.executive_summary` stays frozen, because export JSON fields depend on it.
 
 ## Dependencies And Validation Architecture
 

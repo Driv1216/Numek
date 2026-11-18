@@ -100,3 +100,31 @@ The post-hoc case was added after the frozen run, because M4's row limit refused
 - **M4 on 5,000 columns.** M4's 1,000-column limit refuses it.
 - **M5, M6, M7 and M9 at scale.** Their earlier benchmark evidence in `validation/m5` to `m9` is reused. Workstreams 2 and 3 changed only their report layers, whose cost was measured above as negligible next to analysis.
 - **Classification beyond 10M rows.** This was deliberately not pushed toward this machine's memory limit (see the safeguard gaps in `docs/proposals/WS4_SCALABILITY_AND_FORMATS.md`).
+
+## Report Experience redesign: wide-data export (2026-11-18)
+
+The WS4 tables above are preserved unchanged. These measurements replace the wide-data export picture for current
+reports.
+
+They come from the Report Experience matrix: the median of three runs on the same Mac, with analysis JSON identical to
+the Stage 0 baseline. See `validation/report_experience/results/after_stage8_rule/COMPARISON.md`.
+
+| Dataset shape (classification) | PDF pages before → focused / complete | PDF time before → focused | Peak PDF RSS before → focused |
+|---|---|---|---|
+| 5,000 × 200 | 27 → 14 / 33 | 2.32 → 0.70 s | 221 → 104 MiB |
+| 5,000 × 1,000 | 92 → 14 / 122 | 10.72 → 0.68 s | 734 → 104 MiB |
+| 5,000 × 5,000 | 417 → 14 / 564 | 50.64 → 0.74 s | 2,362 → 107 MiB |
+| 5,000 × 1,000, 600 flagged columns | 128 → 29 / 146 | 11.00 → 1.58 s | 837 → 147 MiB |
+| 1,000,000 × 10 | 12 → 15 / 15 | 0.50 → 0.69 s | 101 → 105 MiB |
+
+**What changed.**
+- The focused print profile (the default) prints every finding and every flagged column. It summarises repetitive and
+  signal-free columns from stored values.
+- The HTML report still lists every column. Rows shown only on screen are held in data islands, which cost WeasyPrint
+  nothing.
+- Focused length now follows the number of distinct problems, not the number of columns.
+- The complete profile prints every row by explicit choice, so its length, time and memory still grow with columns.
+  At 5,000 columns it measured 564 pages, 48.8 s and about 2.9 GiB peak, more memory than the old default. Exports
+  warn (`CompletePrintWarning`) when a complete-profile PDF would print more than 5,000 table rows.
+- Tall data gains about three pages: the Reading guide and the finding index.
+

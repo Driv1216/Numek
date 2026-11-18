@@ -1,5 +1,5 @@
 // Pieces shared by live and saved results.
-import { useEffect, type ReactNode } from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 
 /** Four fixed-size corner brackets (Markup's mark). Fixed px, so every corner is identical at any size. */
 export function Corners({ tone = 'hot' }: { tone?: 'hot' | 'ghost' }) {
@@ -8,15 +8,43 @@ export function Corners({ tone = 'hot' }: { tone?: 'hot' | 'ghost' }) {
 
 /** DataTrust's canonical HTML report, full screen inside the app. */
 export function Viewer({ name, src, note, downloads, onClose }: { name: string; src: string; note: string; downloads: ReactNode; onClose: () => void }) {
+  const frame = useRef<HTMLIFrameElement>(null);
+  const dialog = useRef<HTMLDivElement>(null);
+  const back = useRef<HTMLButtonElement>(null);
+  // A modal dialog: everything outside it is inert while it is open, focus starts on Back and returns to the opener.
+  useEffect(() => {
+    const opener = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    const made: HTMLElement[] = [];
+    for (let node: HTMLElement | null = dialog.current; node && node.parentElement; node = node.parentElement) {
+      for (const sibling of Array.from(node.parentElement.children)) {
+        if (sibling !== node && sibling instanceof HTMLElement && !sibling.inert) { sibling.inert = true; made.push(sibling); }
+      }
+      if (node.parentElement === document.body) break;
+    }
+    back.current?.focus();
+    return () => { made.forEach((el) => { el.inert = false; }); opener?.focus(); };
+  }, []);
+  // Reports from before "Understand this report" (saved analyses keep their original bytes) have no guide to open.
+  const [guide, setGuide] = useState(false);
   useEffect(() => { const esc = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); }; addEventListener('keydown', esc); return () => removeEventListener('keydown', esc); }, [onClose]);
+  const loaded = () => { try { setGuide(!!frame.current?.contentDocument?.getElementById('understand')); } catch { setGuide(false); } };
+  const understand = () => {
+    const win = frame.current?.contentWindow;
+    if (!win) return;
+    win.location.hash = 'understand';   // the report's own script opens its guide drawer and moves focus into it
+    win.focus();
+  };
   return (
-    <div className="ap-view" role="dialog" aria-modal="true" aria-label={`${name}: full DataTrust report`}>
+    <div ref={dialog} className="ap-view" role="dialog" aria-modal="true" aria-label={`${name}: full DataTrust report`}>
       <header className="ap-view__h">
-        <button type="button" className="ap-sheet__x" onClick={onClose}>← Back</button>
+        <button ref={back} type="button" className="ap-sheet__x" onClick={onClose}>← Back</button>
         <b>{name}</b><span>{note}</span>
-        <div className="ap-view__dl">{downloads}</div>
+        <div className="ap-view__dl">
+          {guide && <button type="button" className="ap-sheet__x" onClick={understand}>Understand this report</button>}
+          {downloads}
+        </div>
       </header>
-      <iframe title={`${name} report`} src={src} />
+      <iframe ref={frame} title={`${name} report`} src={src} onLoad={loaded} />
     </div>
   );
 }

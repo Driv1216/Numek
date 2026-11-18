@@ -6,10 +6,12 @@ import time
 from types import SimpleNamespace
 from datatrust import *
 from validation.m5.download import digest
-ROOT=Path(__file__).parent
+from validation.outputs import output_root
+ROOT=Path(__file__).parent.resolve()
 
 
 def run(refresh=(),render_directory=None):
+    OUT=output_root(ROOT)   # committed results only with --refresh; a temporary mirror otherwise
     catalog=json.loads((ROOT/'data/prepared/manifest.json').read_text());records=[]
     for dataset in catalog['datasets']:
         for filename,pin in dataset['prepared'].items():assert digest(ROOT/'data/prepared'/filename)==pin['sha256']
@@ -19,7 +21,7 @@ def run(refresh=(),render_directory=None):
         cfg=TemporalAnalysisConfig(limits=TemporalWorkLimits(behavior_measurements=8,detailed_series=16))
         started=time.monotonic();refined=ROOT/'reports/refined'/name;base=refined if refined.with_suffix('.json').exists() else ROOT/'reports'/name
         reused=base.with_suffix('.json').exists() and name not in refresh
-        if name in refresh:base=ROOT/'reports/refined'/name;base.parent.mkdir(exist_ok=True)
+        if name in refresh:base=OUT/'reports/refined'/name;base.parent.mkdir(parents=True,exist_ok=True)
         if reused:
             saved=json.loads(base.with_suffix('.json').read_text())
             assert TemporalAnalysisConfig.from_dict(saved['declarations']['configuration']).to_dict()==cfg.to_dict()
@@ -28,7 +30,8 @@ def run(refresh=(),render_directory=None):
         else:
             try:result=DataTrust.audit_temporal(spec,cfg)
             except AnalysisError as exc:
-                (ROOT/'results'/(name+'_failure.json')).write_text(json.dumps({'status':'failed','stage':exc.stage,'code':exc.code,'error':str(exc),'execution':getattr(exc,'execution',{}),'configuration':cfg.to_dict()},indent=2)+'\n')
+                (OUT/'results').mkdir(parents=True,exist_ok=True)
+                (OUT/'results'/(name+'_failure.json')).write_text(json.dumps({'status':'failed','stage':exc.stage,'code':exc.code,'error':str(exc),'execution':getattr(exc,'execution',{}),'configuration':cfg.to_dict()},indent=2)+'\n')
                 raise
         main=next(x for x in spec.inputs if x.temporal)
         assert result.profile['sources'][main.id]['rows']==dataset['rows']
@@ -47,15 +50,17 @@ def run(refresh=(),render_directory=None):
         if not reused:result.write_json(base.with_suffix('.json'))
         presented=refined if base==refined else ROOT/'reports/compact'/name;
         if render_directory:presented=ROOT/'reports'/render_directory/name
-        presented.parent.mkdir(exist_ok=True)
-        if not presented.with_suffix('.pdf').exists():result.generate_artifacts(presented.with_suffix('.pdf'),format='pdf')
+        if not presented.with_suffix('.pdf').exists():   # never add files beside committed evidence unless refreshing
+            presented=OUT/presented.relative_to(ROOT);presented.parent.mkdir(parents=True,exist_ok=True)
+            result.generate_artifacts(presented.with_suffix('.pdf'),format='pdf')
         artifacts=SimpleNamespace(html_path=presented.with_suffix('.html'),pdf_path=presented.with_suffix('.pdf'),json_path=base.with_suffix('.json'))
         from pypdf import PdfReader
         pages=len(PdfReader(artifacts.pdf_path).pages)
         records.append({'reused_completed_evidence':reused,'name':name,'status':result.execution['status'],'rows':dataset['rows'],'normalized_cells':chronology['cells'],'verification_seconds':time.monotonic()-started,'analysis_seconds':result.execution['whole_job_seconds'],'execution':result.execution,'pdf_pages':pages,'artifacts':{k:str(v.relative_to(ROOT)) for k,v in vars(artifacts).items()},'manifest_sha256':digest(manifest),'html_sha256':digest(artifacts.html_path),'json_sha256':digest(artifacts.json_path),'pdf_sha256':digest(artifacts.pdf_path),'methodology':result.methodology_id,'limitations':dataset['notes']})
         assert pages<=12
         print(name,result.execution['status'],records[-1]['verification_seconds'],'seconds',pages,'pages',flush=True)
-    (ROOT/'results/public_corpus.json').write_text(json.dumps({'transform':catalog['transform'],'natural_data_validates_universal_thresholds':False,'datasets':records},indent=2)+'\n')
+    (OUT/'results').mkdir(parents=True,exist_ok=True)
+    (OUT/'results/public_corpus.json').write_text(json.dumps({'transform':catalog['transform'],'natural_data_validates_universal_thresholds':False,'datasets':records},indent=2)+'\n')
 if __name__=='__main__':
     import argparse
     parser=argparse.ArgumentParser();parser.add_argument('--refresh',nargs='*',choices=['bike','beijing','electricity','retail','alfred'],default=[]);parser.add_argument('--render-directory');a=parser.parse_args();run(a.refresh,a.render_directory)

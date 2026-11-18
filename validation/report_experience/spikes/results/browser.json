@@ -1,0 +1,45 @@
+{
+ "recorded": "2026-11-17, Stage 0 browser session",
+ "fixtures": ["spikes/browser/term_popover.html", "spikes/browser/iframe_parent.html", "work.nosync/spikes/term_popover_noscript.html (CSP hash deliberately wrong)"],
+ "server": "python -m http.server on 127.0.0.1:5421 serving validation/report_experience (.claude/launch.json 'report-spikes')",
+ "browser": "Claude desktop built-in browser: Chrome/156.0.8078.75 (Chromium). Safari, Firefox and file:// were not exercised; see limits.",
+ "a_info_links_and_popover": {
+  "popover_api_supported": true,
+  "enhancement_ran_under_hashed_csp": true,
+  "links_upgraded": "role=button, aria-expanded=false, aria-controls=dt-pop on both links",
+  "tab_reaches_first_info_link": true,
+  "enter_opens_popover": true,
+  "space_opens_popover": true,
+  "focus_moves_to_popover_heading_on_open": true,
+  "popover_content_cloned_from_guide_entry": "title and both layers plus a 'More in Understand this report' link",
+  "escape_closes": true,
+  "focus_returns_to_trigger_on_close": true,
+  "aria_expanded_reset_on_close": "true, but only after the asynchronous toggle event (read 300 ms later); an immediate synchronous read still showed 'true'",
+  "outside_click_light_dismiss": true,
+  "url_hash_unchanged_while_enhanced": true,
+  "default_position": "centred in the viewport by the user-agent popover style; placing it next to its trigger needs a few lines of script or CSS anchor positioning",
+  "inside_same_origin_iframe": "enhanced, both links upgraded, data image loaded (the app viewer shape)"
+ },
+ "a_fallback_without_script": {
+  "how": "same page with a wrong script hash, so the CSP blocks the enhancement",
+  "links_remain_plain_anchors": true,
+  "activating_link_navigates_to_guide_entry": "#concept-iqr, entry in view",
+  "popover_element_hidden": "display:none from the user-agent popover style, so the empty shell never shows"
+ },
+ "e_meta_csp": {
+  "policy": "default-src 'none'; img-src data:; style-src 'unsafe-inline'; script-src 'sha256-<hash of the one inline script>'",
+  "hashed_report_script_ran": true,
+  "simulated_injected_inline_script_blocked": true,
+  "simulated_injected_inline_event_handler_blocked": true,
+  "data_uri_image_loaded": true,
+  "inline_style_attributes_honoured": true,
+  "json_data_island": "not executed and not subject to script-src (WeasyPrint spike: not printed)",
+  "console": "the browser logs one CSP violation per blocked injection; these are the expected evidence of blocking, not page errors",
+  "weasyprint": "meta CSP is ignored by WeasyPrint without error (weasyprint_features.json)"
+ },
+ "limits": [
+  "file:// could not be exercised: the desktop app opens local files as a static preview, not in the browser tab. Meta CSP is defined to apply to file:// documents, but that is not verified here.",
+  "Safari and Firefox were not exercised: only Safari is installed and driving it needs Remote Automation, a system setting that was not changed.",
+  "The design does not depend on these: info links are plain anchors first, and the popover enhancement only runs where HTMLElement.prototype.showPopover exists."
+ ]
+}

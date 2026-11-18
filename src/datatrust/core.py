@@ -126,19 +126,27 @@ class DataTrust:
         result = self.analyze_result()
         return result.to_legacy_dict() if result.methodology_id == "classification_legacy_2026_08_13" else result.to_dict()
 
-    def generate_report(self, output_path: str, *, format="html", html_path=None) -> str:
-        if format == "html" and self.task == "classification" and not self._specification_based:
+    def generate_report(self, output_path: str, *, format="html", html_path=None, presentation=None,
+                        print_profile="focused") -> str:
+        """Write a report. A classification HTML report from this constructor keeps the frozen legacy presentation
+        unless presentation="current" asks for the current report; every PDF and every other path is current."""
+        if presentation not in (None, "legacy", "current"):
+            raise ValueError("presentation must be 'legacy' or 'current'.")
+        legacy = format == "html" and self.task == "classification" and not self._specification_based
+        if presentation == "legacy" and not legacy:
+            raise ValueError("The legacy presentation exists only for a classification HTML report from DataTrust(path, target).")
+        if legacy and presentation != "current":
             if html_path is not None:
                 raise ValueError("html_path is only supported for PDF output.")
             from datatrust.renderer import protect_source
             protect_source(self.dataset_path, [output_path])
             return write_html_report(self.analyze(), output_path)
         result = self.analyze_result()
-        return result.generate_report(output_path, format=format, html_path=html_path)
+        return result.generate_report(output_path, format=format, html_path=html_path, print_profile=print_profile)
 
-    def generate_artifacts(self, output_path, *, format="html", html_path=None, json_path=None):
-        return self.analyze_result().generate_artifacts(output_path, format=format,
-                                                       html_path=html_path, json_path=json_path)
+    def generate_artifacts(self, output_path, *, format="html", html_path=None, json_path=None, print_profile="focused"):
+        return self.analyze_result().generate_artifacts(output_path, format=format, html_path=html_path,
+                                                       json_path=json_path, print_profile=print_profile)
 
 
 def run_analysis(dataset: DatasetSpec, task: TaskSpec, config=None) -> AnalysisResult:

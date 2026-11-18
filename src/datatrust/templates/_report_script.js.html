@@ -1,0 +1,166 @@
+(function () {
+  'use strict';
+  var root = document.documentElement;
+  root.classList.add('dt-enhanced');
+  var PAGE = 500;
+
+  function text(value) { return value === null || value === undefined ? '' : String(value); }
+
+  function islandTable(table) {
+    var island = document.getElementById(table.getAttribute('data-dt-island'));
+    var body = table.querySelector('tbody[data-dt-screen-body]');
+    var status = document.getElementById(table.id + '-status');
+    var more = document.getElementById(table.id + '-more');
+    var search = document.getElementById(table.id + '-search');
+    if (!island || !body) return;
+    var data = JSON.parse(island.textContent);
+    var rows = data.rows, matches = rows, shown = 0;
+    var numeric = data.numeric || [];
+    function cell(tr, value, isNumber) {
+      var td = document.createElement('td'); td.textContent = text(value);
+      if (isNumber) td.className = 'num';
+      tr.appendChild(td);
+    }
+    function render(reset) {
+      if (reset) { body.replaceChildren(); shown = 0; }
+      var frag = document.createDocumentFragment(), end = Math.min(matches.length, shown + PAGE);
+      for (var i = shown; i < end; i++) {
+        var row = matches[i], tr = document.createElement('tr');
+        tr.id = row.anchor || '';
+        if (!tr.id) tr.removeAttribute('id');
+        cell(tr, row.entity);
+        row.cells.forEach(function (value, index) { cell(tr, value, numeric[index]); });
+        frag.appendChild(tr);
+      }
+      body.appendChild(frag);
+      shown = end;
+      if (status) status.textContent = 'Showing ' + shown.toLocaleString('en-US') + ' of ' + matches.length.toLocaleString('en-US') +
+        (matches.length === rows.length ? '' : ' matching') + ' ' + data.noun + '.';
+      if (more) more.hidden = shown >= matches.length;
+    }
+    function filter() {
+      var q = search ? search.value.trim().toLowerCase() : '';
+      matches = q ? rows.filter(function (row) { return text(row.entity).toLowerCase().indexOf(q) >= 0; }) : rows;
+      render(true);
+    }
+    if (search) search.addEventListener('input', filter);
+    if (more) more.addEventListener('click', function () { render(false); });
+    table.querySelectorAll('[data-dt-static]').forEach(function (part) {
+      part.hidden = true;
+      part.querySelectorAll('[id]').forEach(function (element) { element.removeAttribute('id'); });
+    });
+    render(true);
+  }
+
+  function staticTable(table) {
+    var search = document.getElementById(table.id + '-search');
+    var status = document.getElementById(table.id + '-status');
+    if (!search) return;
+    var rows = Array.prototype.slice.call(table.querySelectorAll('tbody tr[data-dt-entity]'));
+    search.addEventListener('input', function () {
+      var q = search.value.trim().toLowerCase(), count = 0;
+      rows.forEach(function (tr) {
+        var hit = !q || tr.getAttribute('data-dt-entity').toLowerCase().indexOf(q) >= 0;
+        tr.hidden = !hit;
+        if (hit) count++;
+      });
+      if (status) status.textContent = q ? count.toLocaleString('en-US') + ' of ' + rows.length.toLocaleString('en-US') + ' match.' : '';
+    });
+  }
+
+  function explanations() {
+    var pop = document.getElementById('dt-pop');
+    if (!pop || typeof HTMLElement.prototype.showPopover !== 'function') return;
+    var title = pop.querySelector('h3'), body = pop.querySelector('.dt-pop__body'), trigger = null;
+    function place() {
+      if (!trigger) return;
+      var r = trigger.getBoundingClientRect(), w = pop.offsetWidth, h = pop.offsetHeight;
+      var left = Math.max(8, Math.min(r.left, window.innerWidth - w - 8));
+      var top = r.bottom + 6 + h > window.innerHeight ? Math.max(8, r.top - h - 6) : r.bottom + 6;
+      pop.style.right = 'auto'; pop.style.bottom = 'auto';
+      pop.style.left = left + 'px'; pop.style.top = top + 'px'; pop.style.position = 'fixed';
+    }
+    document.querySelectorAll('a.dt-term').forEach(function (link) {
+      link.setAttribute('role', 'button');
+      link.setAttribute('aria-expanded', 'false');
+      link.setAttribute('aria-controls', 'dt-pop');
+      function open(event) {
+        var entry = document.getElementById(link.getAttribute('href').slice(1));
+        if (!entry) return;
+        event.preventDefault();
+        title.textContent = entry.querySelector('h3').textContent;
+        body.replaceChildren();
+        entry.querySelectorAll('.dt-layer').forEach(function (layer) { body.appendChild(layer.cloneNode(true)); });
+        var more = document.createElement('p'), a = document.createElement('a');
+        a.href = '#' + entry.id; a.textContent = 'More in Understand this report';
+        a.addEventListener('click', function () { pop.hidePopover(); });
+        more.appendChild(a); body.appendChild(more);
+        if (pop.matches(':popover-open')) pop.hidePopover();
+        trigger = link;
+        pop.showPopover();
+        place();
+        link.setAttribute('aria-expanded', 'true');
+        title.focus();
+      }
+      link.addEventListener('click', open);
+      link.addEventListener('keydown', function (event) { if (event.key === ' ') open(event); });
+    });
+    pop.querySelector('.dt-pop__close').addEventListener('click', function () { pop.hidePopover(); });
+    pop.addEventListener('toggle', function (event) {
+      if (event.newState === 'closed' && trigger) { trigger.setAttribute('aria-expanded', 'false'); trigger.focus(); }
+    });
+    window.addEventListener('resize', place);
+  }
+
+  function guide() {
+    var section = document.getElementById('understand');
+    if (!section) return;
+    var tools = section.querySelector('.dt-guide-tools'), search = document.getElementById('dt-guide-search');
+    var select = document.getElementById('dt-guide-section'), status = document.getElementById('dt-guide-status');
+    var entries = Array.prototype.slice.call(section.querySelectorAll('.dt-entry'));
+    var groups = Array.prototype.slice.call(section.querySelectorAll('[data-dt-group]'));
+    if (tools) tools.hidden = false;
+    function filter() {
+      var q = search ? search.value.trim().toLowerCase() : '', s = select ? select.value : '', shown = 0;
+      entries.forEach(function (entry) {
+        var hit = (!q || entry.getAttribute('data-dt-term').indexOf(q) >= 0 || entry.textContent.toLowerCase().indexOf(q) >= 0)
+          && (!s || entry.getAttribute('data-dt-section') === s);
+        entry.hidden = !hit; if (hit) shown++;
+      });
+      groups.forEach(function (g) {
+        g.hidden = !entries.some(function (e) { return !e.hidden && e.getAttribute('data-dt-section') === g.getAttribute('data-dt-group'); });
+      });
+      if (status) status.textContent = (q || s) ? shown + ' of ' + entries.length + ' terms' : '';
+    }
+    if (search) search.addEventListener('input', filter);
+    if (select) select.addEventListener('change', filter);
+    var close = section.querySelector('.dt-drawer-close'), opener = null;
+    function setOpen(open) {
+      root.classList.toggle('dt-drawer-open', open);
+      if (close) close.hidden = !open;
+      if (open) { section.setAttribute('tabindex', '-1'); section.focus(); }
+      else {
+        if (location.hash === '#understand' && history.replaceState) history.replaceState(null, '', location.pathname + location.search);
+        if (opener) opener.focus();
+      }
+    }
+    function fromHash() {   // a link to #understand (the app viewer's button, or a shared URL) opens the guide drawer
+      if (location.hash === '#understand' && !root.classList.contains('dt-drawer-open')) { opener = null; setOpen(true); }
+    }
+    window.addEventListener('hashchange', fromHash);
+    document.querySelectorAll('a[data-dt-drawer]').forEach(function (link) {
+      link.addEventListener('click', function (event) { event.preventDefault(); opener = link; setOpen(true); });
+    });
+    if (close) close.addEventListener('click', function () { setOpen(false); });
+    fromHash();
+    document.addEventListener('keydown', function (event) {
+      if (event.key === 'Escape' && root.classList.contains('dt-drawer-open') && !document.querySelector('#dt-pop:popover-open')) setOpen(false);
+    });
+  }
+
+  explanations();
+  guide();
+  document.querySelectorAll('table[data-dt-island]').forEach(islandTable);
+  document.querySelectorAll('table[data-dt-filterable]').forEach(staticTable);
+  document.querySelectorAll('.dt-tools').forEach(function (tools) { tools.hidden = false; });
+})();

@@ -197,7 +197,11 @@ def test_reports_render_exactly_the_recorded_guidance(tmp_path, legacy):
     c = BASELINE['mutation_duplicates']
     result = run(ROOT / c['path'], TaskSpec('classification', target=c['target']))
     artifacts = write_report_artifacts(result, tmp_path / 'r.html', legacy_html=legacy)
-    report = text_of(Path(artifacts.html_path).read_text())
+    markup = Path(artifacts.html_path).read_text()
+    report = text_of(markup)
+    for island in re.findall(r'<script type="application/json" id="[^"]+">(.*?)</script>', markup, re.S):
+        data = json.loads(island)   # per-column observations shown on screen from the report's data islands
+        report += ' ' + ' '.join(' '.join(map(str, row['cells'])) for row in data.get('rows', []))
     g = result.to_dict()['guidance']
     for heading in ('Completed scope and open questions', 'Preprocessing guidance', 'How the score was reached', 'Thresholds and policy', 'Provenance'):
         assert heading in report, heading

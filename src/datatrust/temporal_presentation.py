@@ -10,8 +10,11 @@ def display(v):
     if v is None:return 'Unavailable / unknown'
     if isinstance(v,bool):return 'Yes' if v else 'No'
     if isinstance(v,float):return format(v,'.7g')
-    if isinstance(v,(list,dict)):return json.dumps(v,ensure_ascii=False,separators=(',',':'))
+    if isinstance(v,(list,dict)):return _labelled(v)
     return str(v)
+
+
+from datatrust.report_structured import labelled as _labelled  # noqa: E402  (shared since Stage 6)
 
 
 def flattened(data,prefix=''):
@@ -34,7 +37,7 @@ def bars(labels,counts,title):
     return Markup(f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {width+10} {height}" role="img" aria-label="{escape(title)}"><title>{escape(title)}</title>'+''.join(items)+'</svg>')
 
 
-def report_view(result,*,family=None,measurement=None):
+def report_view(result,*,family=None,measurement=None,profile_name='focused'):
     value=result.to_dict() if hasattr(result,'to_dict') else result
     limits=value['context']['presentation'];records=value['evidence'];topics=[];omissions={};totalrows=0
     for ident,title,families in TOPICS:
@@ -86,13 +89,14 @@ def report_view(result,*,family=None,measurement=None):
                 if record['check_id']=='continuity' and data.get('timeline') and len(charts)<2:
                     charts.append({'title':base+' · missing values and absent slots remain separate', 'svg':timeline(data['timeline'],base)})
                 if record['check_id']=='continuity' and 'occupied_distinct_slots' in data and len(charts)<2:charts.append({'title':base+' · expected population', 'svg':bars(['Occupied','Absent'],[data['occupied_distinct_slots'],data['absent_expected_records_or_opportunities']],base+' observation coverage')})
-        limit=limits['table_rows'];visible=rows[:limit];omissions[ident]=len(rows)-len(visible);totalrows+=len(visible)
+        limit=limits['table_rows'];full=[[row['ref'],row['field'],row['value']] for row in rows]
+        visible=rows[:limit];omissions[ident]=len(rows)-len(visible);totalrows+=len(visible)
         for row in visible:
             if len(row['value'])>350:row['value']=row['value'][:347]+'… [retained JSON contains full detail]'
         for row in visible:
             for key,size in (('ref',48),('field',64),('value',180)):
                 text=row[key];row['print_'+key]=text if len(text)<=size else text[:size-7]+'… [JSON]'
-        topics.append({'id':ident,'title':title,'rows':visible,'charts':charts,'omitted_rows':omissions[ident],'total_rows':len(rows)})
+        topics.append({'id':ident,'title':title,'rows':visible,'charts':charts,'omitted_rows':omissions[ident],'total_rows':len(rows),'all_rows':full})
     appendix=[]
     for record in records:
         if family and record['check_id']!=family or measurement and record['measurement'] is not None and record['measurement']!=measurement:continue
@@ -100,11 +104,34 @@ def report_view(result,*,family=None,measurement=None):
             appendix.append({'ref':record['id'],'field':'Witness','value':display(item)})
         for key in ('retained_histories','details'):
             for item in record['data'].get(key,[]):appendix.append({'ref':record['id'],'field':key.replace('_',' '),'value':display(item)})
-    appendix_total=len(appendix);appendix=appendix[:limits['appendix_rows']]
+    appendix_total=len(appendix);appendix_full=[[row['ref'],row['field'],row['value']] for row in appendix];appendix=appendix[:limits['appendix_rows']]
     for row in appendix:
         if len(row['value'])>500:row['value']=row['value'][:497]+'… [full detail in JSON]'
         row['print_value']=row['value'] if len(row['value'])<=180 else row['value'][:177]+'… [JSON]'
-    return {'appendix':appendix,'appendix_total':appendix_total,'appendix_print_rows':limits['table_rows'],'topics':topics,'actions':value['findings'][:limits['executive_actions']],'omissions':omissions,'qa':{'pdf_abbreviated_metric_cells':sum(row[key]!=row['print_'+key] for topic in topics for row in topic['rows'] for key in ('ref','field','value')),'pdf_omitted_additional_charts':{x['id']:max(0,len(x['charts'])-1) for x in topics},'pdf_appendix_omitted_rows':max(0,appendix_total-min(len(appendix),limits['table_rows'])),'html_appendix_omitted_rows':max(0,appendix_total-len(appendix)),'presentation_omitted_rows':omissions,'retained_evidence_records':len(records),'displayed_metric_rows':totalrows,'page_budget':'One executive page; ordinary target eight pages; wide/long-header target twelve. No PDF pages are removed.'}}
+    from datatrust.report_structured import capped_tables, finding_index
+    columns=['Evidence / source','Measurement or rule','Retained result']
+    described=[{'title':t['title'],'columns':columns,'rows':t['all_rows'][:len(t['rows'])],'all_rows':t['all_rows'],'topic':t['id'],'pointer':'/evidence'} for t in topics]
+    described.append({'title':'Retained witnesses and selected detail','columns':['Evidence','Detail','Witness / selected population'],
+                      'rows':appendix_full[:len(appendix)],'print_rows':min(len(appendix),limits['table_rows']),'all_rows':appendix_full,'topic':'appendix','pointer':'/evidence'})
+    # Rows of the evidence records findings refer to are printed in the focused profile even beyond the per-topic
+    # limit (plan R1/R2, gate 2): each finding is its own group; triggering comparisons and blocked rows come first.
+    from dataclasses import replace as _replace
+    from datatrust.report_structured import finding_signal
+    rank={'High':0,'Moderate':1,'Low':2};evidence_of={}
+    for finding in sorted(value['findings'],key=lambda f:rank.get(f.get('priority'),3)):
+        for ref in finding.get('evidence_refs') or []:evidence_of.setdefault(ref,finding)
+    def signal(row):
+        finding=evidence_of.get(str(row[0]).split(' ')[0])
+        if not finding:return None
+        text=str(row[2]);trigger=1.0 if ('investigation candidate' in text or 'blocked' in text) else 0.0
+        return _replace(finding_signal(finding,finding.get('measurement') or ''),measure=trigger)
+    for t in described:t['signals']=[signal(row) for row in t['all_rows']]
+    referenced={}
+    disclosures,complete=capped_tables(described,profile_name,referenced=referenced)
+    findings=value['findings'];cards=limits['executive_actions']
+    return {'disclosures':disclosures,'complete_tables':complete,'referenced':referenced,'findings':finding_index(findings),
+            'omitted_actions':max(0,len(findings)-cards),'profile':profile_name,
+            'appendix':appendix,'appendix_total':appendix_total,'appendix_print_rows':limits['table_rows'],'topics':topics,'actions':value['findings'][:limits['executive_actions']],'omissions':omissions,'qa':{'pdf_abbreviated_metric_cells':sum(row[key]!=row['print_'+key] for topic in topics for row in topic['rows'] for key in ('ref','field','value')),'pdf_omitted_additional_charts':{x['id']:max(0,len(x['charts'])-1) for x in topics},'pdf_appendix_omitted_rows':max(0,appendix_total-min(len(appendix),limits['table_rows'])),'html_appendix_omitted_rows':max(0,appendix_total-len(appendix)),'presentation_omitted_rows':omissions,'retained_evidence_records':len(records),'displayed_metric_rows':totalrows,'page_budget':'One executive page; ordinary target eight pages; wide/long-header target twelve. No PDF pages are removed.','print_profile':profile_name}}
 
 
 def timeline(rows,title):

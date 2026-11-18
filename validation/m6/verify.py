@@ -4,17 +4,19 @@ import csv,hashlib,importlib.metadata,json,platform,time
 from pathlib import Path
 from datatrust import *
 from datatrust.text_normalization import strict_json
+from validation.outputs import output_root
 
-ROOT=Path(__file__).parent
+ROOT=Path(__file__).parent.resolve()
 
 def sha(path):
     with Path(path).open('rb') as f:return hashlib.file_digest(f,'sha256').hexdigest()
 
 def run(selected=None):
-    manifest=json.loads((ROOT/'data/prepared_manifest.json').read_text());out=ROOT/'results';out.mkdir(exist_ok=True)
+    manifest=json.loads((ROOT/'data/prepared_manifest.json').read_text())
+    OUT=output_root(ROOT);out=OUT/'results';out.mkdir(parents=True,exist_ok=True)   # committed only with --refresh
     for item in manifest['prepared'].values():assert sha(ROOT/item['path'])==item['sha256']
     ledger={'status':'running','python':platform.python_version(),'platform':platform.platform(),'new_evidence':{},'reused_evidence':['Pinned LSH grid calibration; 1 GiB full-population supervised workload (structural methods unchanged)','Historical M1–M5 artifacts are verified by the repository suite, never regenerated.']}
-    if selected and (out/'verification.json').exists():ledger['new_evidence']=json.loads((out/'verification.json').read_text())['new_evidence']
+    if selected and (ROOT/'results/verification.json').exists():ledger['new_evidence']=json.loads((ROOT/'results/verification.json').read_text())['new_evidence']
     def data(r,family):return next(x['data'] for x in r.evidence if x['family']==family)
     def rows(name):return [json.loads(x) for x in (ROOT/manifest['prepared'][name]['path']).read_text().splitlines()]
     for name,case in manifest['cases'].items():
@@ -44,7 +46,7 @@ def run(selected=None):
         public=(run_dir/f'{name}.json').read_text();assert str(ROOT.resolve()) not in public
         strict_json(public)
         for reference in list(r.private['locators'])[:10]:assert r.resolve_evidence(reference,allowed_roots=spec.allowed_roots)['status']=='resolved'
-        entry={'records':population,'seconds':time.monotonic()-tick,'execution':r.execution,'coverage':r.coverage,'source_hashes':r.execution['provenance'],'artifact_directory':str(run_dir.relative_to(ROOT)),'artifact_hashes':{'html':sha(artifacts.html_path),'json':sha(artifacts.json_path)},'transformation':case['transformation']}
+        entry={'records':population,'seconds':time.monotonic()-tick,'execution':r.execution,'coverage':r.coverage,'source_hashes':r.execution['provenance'],'artifact_directory':str(run_dir.relative_to(OUT)),'artifact_hashes':{'html':sha(artifacts.html_path),'json':sha(artifacts.json_path)},'transformation':case['transformation']}
         if name in {'squad','ud_hindi','scifact'}:
             pdf=r.generate_artifacts(run_dir/f'{name}.pdf',format='pdf');from pypdf import PdfReader
             reader=PdfReader(pdf.pdf_path);text='\n'.join(p.extract_text() for p in reader.pages)
@@ -55,4 +57,4 @@ def run(selected=None):
 
 if __name__=='__main__':
     import argparse
-    p=argparse.ArgumentParser();p.add_argument('--cases');a=p.parse_args();run(a.cases.split(',') if a.cases else None)
+    p=argparse.ArgumentParser();p.add_argument('--cases');p.add_argument('--refresh',action='store_true');a=p.parse_args();run(a.cases.split(',') if a.cases else None)

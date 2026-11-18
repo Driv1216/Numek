@@ -105,7 +105,7 @@ def core_pdf(job):
     pdf_path = job["directory"] / "report.pdf"
     if not (artifact_owned(job, "pdf") and job.get("pdf_html_digest") == job["artifacts"]["html"]["sha256"]):
         artifacts = write_report_artifacts(job["analysis_result"], pdf_path, format="pdf",
-            html_path=job["report_path"], pdf_converter=render_pdf_report, legacy_html=job["analysis_result"].methodology_id == "classification_legacy_2026_08_13")
+            html_path=job["report_path"], pdf_converter=render_pdf_report)
         remember_artifacts(job, artifacts)
         job["pdf_html_digest"] = job["artifacts"]["html"]["sha256"]
     job["pdf_path"] = pdf_path
@@ -429,7 +429,7 @@ def generate_report(job, form, analysis_config):
             if typed.parsing['source_sha256']!=job['target_info']['source_sha256'] or typed.parsing['fingerprint']!=job['target_info']['parsing_fingerprint']:
                 job.pop('target_info',None)
                 raise ValueError('Source/parsing changed since confirmation; no report was published.')
-        artifacts = write_report_artifacts(typed, report_path, json_path=job["directory"] / "analysis.json", legacy_html=typed.methodology_id == "classification_legacy_2026_08_13")
+        artifacts = write_report_artifacts(typed, report_path, json_path=job["directory"] / "analysis.json")
         remember_artifacts(job, artifacts)
         summary.update(parsing_warnings=typed.parsing_warnings, execution=typed.execution, coverage=typed.coverage, scoring=typed.scoring)
         job.update(

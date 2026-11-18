@@ -140,7 +140,7 @@ def test_issue_rich_report_keeps_important_decisions_and_full_json(tmp_path):
     assert any('compatible annotation changes' in f for a in view['actions'] for f in a['facts'])
     blocks=[b for s in view['sections'] for b in s['blocks']]
     assert len(blocks)==len(result.evidence)+1  # coverage is an additional block
-    assert any(b['title']=='near duplicates' for b in blocks)
+    assert any(b['title']=='Perceptual near-duplicate candidates' for b in blocks)   # reader-facing name (Report Experience Stage 6)
     from datatrust.renderer import render_analysis_result
     html=render_analysis_result(result)
     for title in titles: assert title in html

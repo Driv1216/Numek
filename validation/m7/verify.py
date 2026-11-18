@@ -14,8 +14,9 @@ import numpy as np
 from PIL import Image
 from datatrust import *
 from datatrust.image_models import registry
+from validation.outputs import output_root
 
-ROOT=Path(__file__).parent
+ROOT=Path(__file__).parent.resolve()
 
 
 def sha(path):
@@ -23,7 +24,9 @@ def sha(path):
 
 
 def run():
-    data=ROOT/'data'; out=ROOT/os.environ.get('M7_RESULT_DIR','results'); reports=out/'reports'; reports.mkdir(parents=True,exist_ok=True)
+    data=ROOT/'data'; committed=ROOT/os.environ.get('M7_RESULT_DIR','results')
+    # Committed results are read for reuse; new artifacts and the ledger go to a temporary mirror unless --refresh.
+    out=output_root(ROOT)/committed.relative_to(ROOT); reports=out/'reports'; reports.mkdir(parents=True,exist_ok=True)
     natural=json.loads((data/'natural_manifest.json').read_text())
     for item in natural['images']: assert sha(data/item['path'])==item['sha256']
     selected={x['id'] for x in natural['images']}
@@ -42,24 +45,24 @@ def run():
         'segmentation':ImageInputSpec('data',ImageSourceSpec(str(coco),'coco',str(data)),ImageTaskSpec('segmentation')),
     }
     ledger={'status':'running','platform':platform.platform(),'python':platform.python_version(),'cases':{},'historical_reuse':'M1–M6 source/data/artifacts preserved; classification and archive verifiers and repository tests cover shared seams.'}
-    completed={}
+    completed={};specs={};reused=set()
     for name,item in cases.items():
-        spec=ImageAuditSpec((item,),allowed_roots=(str(ROOT.absolute()),),dataset_name=f'{name.title()} image evidence')
+        spec=ImageAuditSpec((item,),allowed_roots=(str(ROOT.absolute()),),dataset_name=f'{name.title()} image evidence');specs[name]=spec
         tick=time.monotonic()
-        existing=reports/name/'analysis.json'
+        existing=committed/'reports'/name/'analysis.json'
         if existing.exists():
-            payload=json.loads(existing.read_text()); private_path=next((reports/name/'.datatrust-private').glob('*/manifest.json'))
+            payload=json.loads(existing.read_text()); private_path=next((committed/'reports'/name/'.datatrust-private').glob('*/manifest.json'))
             private=json.loads(private_path.read_text()); profile=dict(payload['profile'])
             for key in ['examples','disclosure','export_identity']: profile.pop(key,None)
-            result=ImageAuditResult(profile,payload['checks'],payload['evidence'],payload['findings'],payload['coverage'],payload['execution'],payload['generated_at'],private)
+            result=ImageAuditResult(profile,payload['checks'],payload['evidence'],payload['findings'],payload['coverage'],payload['execution'],payload['generated_at'],private);reused.add(name)
         else: result=DataTrust.audit_images(spec)
         assert result.profile['occurrences']==len(natural['images'])
         assert str(data.absolute()) not in result.json_text()
         if name in {'detection','segmentation'}:
             annotation=next(x['data'] for x in result.evidence if x['family']=='annotations')
             assert annotation['object_visits']==len(prepared['annotations'])
-        directory=reports/name; directory.mkdir(mode=0o700,exist_ok=True)
-        artifacts=ImageReportArtifacts(html_path=str(directory/'review.html'),pdf_path=str(directory/'review.pdf'),json_path=str(existing),qa_metadata={}) if existing.exists() else result.generate_artifacts(directory/'review.pdf',format='pdf',json_path=directory/'analysis.json')
+        directory=reports/name; directory.mkdir(mode=0o700,parents=True,exist_ok=True)
+        artifacts=ImageReportArtifacts(html_path=str(existing.parent/'review.html'),pdf_path=str(existing.parent/'review.pdf'),json_path=str(existing),qa_metadata={}) if existing.exists() else result.generate_artifacts(directory/'review.pdf',format='pdf',json_path=directory/'analysis.json')
         ledger['cases'][name]={'seconds':time.monotonic()-tick,'occurrences':len(natural['images']),'execution':result.execution,'coverage':result.coverage,'html_sha256':sha(artifacts.html_path),'pdf_sha256':sha(artifacts.pdf_path),'json_sha256':sha(artifacts.json_path),'qa':artifacts.qa_metadata}
         completed[name]=result
         print(name,'verified',flush=True)
@@ -82,7 +85,10 @@ def run():
         directory=reports/'comparison'; directory.mkdir(mode=0o700,exist_ok=True); a=result.generate_artifacts(directory/'final.pdf',format='pdf',json_path=directory/'final.json')
         ledger['cases']['comparison']={'pdf_sha256':sha(a.pdf_path),'evidence':evidence,'source_deleted_after_validation':True}
     # Explicit local examples are a separate variant of completed evidence.
-    result=completed['segmentation']; refs=tuple(ref for ref,loc in result.private['locators'].items() if loc.get('normalized',{}).get('comparable') and loc.get('normalized',{}).get('task')=='segmentation')[:2]
+    # A stored private manifest binds each source's filesystem identity (device, inode, times) when it was audited, so
+    # after a restart or a move it no longer resolves, by design. Disclosure therefore needs a fresh audit whenever the
+    # segmentation case was reused from stored evidence.
+    result=DataTrust.audit_images(specs['segmentation']) if 'segmentation' in reused else completed['segmentation']; refs=tuple(ref for ref,loc in result.private['locators'].items() if loc.get('normalized',{}).get('comparable') and loc.get('normalized',{}).get('task')=='segmentation')[:2]
     directory=reports/'disclosed'; directory.mkdir(mode=0o700,exist_ok=True)
     a=result.generate_artifacts(directory/'review.pdf',format='pdf',json_path=directory/'analysis.json',disclosure=ImageDisclosureOptions(refs,True),allowed_roots=(str(ROOT.absolute()),))
     ledger['cases']['disclosed']={'pdf_sha256':sha(a.pdf_path),'examples':len(refs)}

@@ -12,8 +12,9 @@ import numpy as np
 import pandas as pd
 from datatrust import *
 from datatrust.m4_worker import execute
+from validation.outputs import output_root
 
-ROOT=Path(__file__).parent
+ROOT=Path(__file__).parent.resolve()
 
 
 def digest(path):return hashlib.sha256(Path(path).read_bytes()).hexdigest()
@@ -55,8 +56,9 @@ def pinned():
 
 
 def run():
-    records=[];artifacts=[];destination=ROOT/'results/reports';destination.mkdir(parents=True,exist_ok=True)
-    previous=ROOT/'results/verification.json'
+    OUT=output_root(ROOT)   # committed results only with --refresh; a temporary mirror otherwise
+    records=[];artifacts=[];destination=OUT/'results/reports';destination.mkdir(parents=True,exist_ok=True)
+    previous=OUT/'results/verification.json'
     owned={path:sha for case in json.loads(previous.read_text()).get('artifacts',[]) for path,sha in case['files'].items()} if previous.exists() else {}
     with tempfile.TemporaryDirectory(prefix='numek-m4-validator-') as tmp:
         temp=Path(tmp)
@@ -94,15 +96,15 @@ def run():
             outputs=[folder/filename for filename in ('report.html','report.pdf','analysis.json')]
             for output in outputs:
                 if output.exists():
-                    relative=str(output.relative_to(ROOT))
+                    relative=str(output.relative_to(OUT))
                     if output.is_symlink() or owned.get(relative)!=digest(output):raise ValueError('Verification output ownership changed: '+relative)
             for output in outputs:output.unlink(missing_ok=True)
             bundle=result.generate_artifacts(folder/'report.pdf',format='pdf',json_path=folder/'analysis.json')
             pages=PdfReader(bundle.pdf_path).pages;text=[p.extract_text() for p in pages]
             assert len(pages)<=(16 if name=='wide' else 12),(name,len(pages))
             executive=next(i for i,t in enumerate(text) if '3. Sources and declarations' in t);assert executive<=2,(name,executive)
-            artifacts.append({'name':name,'pages':len(pages),'executive_pages':executive,'files':{str(Path(location).relative_to(ROOT)):digest(location) for location in [bundle.html_path,bundle.pdf_path,bundle.json_path]}})
+            artifacts.append({'name':name,'pages':len(pages),'executive_pages':executive,'files':{str(Path(location).relative_to(OUT)):digest(location) for location in [bundle.html_path,bundle.pdf_path,bundle.json_path]}})
     record={'status':'passed','verification':'independent mathematics over compatible canonical interpretations; deterministic mutations are not natural drift or evaluation ground truth','python':platform.python_version(),'duckdb':__import__('duckdb').__version__,'cases':records,'artifacts':artifacts}
-    (ROOT/'results/verification.json').write_text(json.dumps(record,indent=2)+'\n');print(json.dumps(record,indent=2))
+    (OUT/'results/verification.json').write_text(json.dumps(record,indent=2)+'\n');print(json.dumps(record,indent=2))
 
 if __name__=='__main__':run()

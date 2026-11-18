@@ -140,7 +140,7 @@ def write_manifest(result,path):
 
 
 class ExportView:
-    def __init__(self,result,disclosure,roots):
+    def __init__(self,result,disclosure,roots,print_profile='focused'):
         self.result=result; self.data=copy.deepcopy(result.to_dict()); self.data['profile']['examples']=[]
         total=0
         for ref in disclosure.references:
@@ -153,7 +153,9 @@ class ExportView:
         self.data['profile']['disclosure']={'policy':'explicit_examples' if disclosure.references else 'references_only',**asdict(disclosure),'encoded_bytes':total}
         self.data['profile']['export_identity']={'completed_evidence_sha256':hashlib.sha256(result.json_text().encode()).hexdigest(),'disclosure_sha256':digest(self.data['profile']['disclosure']),'example_sha256':digest(self.data['profile']['examples']), 'template_sha256':hashlib.sha256(Path(__file__).with_name('templates').joinpath('image_report.html').read_bytes()).hexdigest(),'projection_sha256':hashlib.sha256(Path(__file__).with_name('image_presentation.py').read_bytes()).hexdigest()}
         from datatrust.renderer import render_analysis_result
-        self.data['profile']['export_identity']['canonical_html_sha256']=hashlib.sha256(render_analysis_result(self).encode()).hexdigest()
+        self.data['profile']['export_identity']['canonical_html_sha256']=hashlib.sha256(render_analysis_result(self,print_profile=print_profile).encode()).hexdigest()
+        from datatrust.report_identity import identity  # additive (Report Experience I.3)
+        self.data['profile']['export_identity'].update(presentation_identity=identity('image')['presentation_id'],print_profile=print_profile)
     def __getattr__(self,key): return getattr(self.result,key)
     def to_dict(self): return self.data
     def json_text(self): return json.dumps(self.data,ensure_ascii=False,indent=2,allow_nan=False)
@@ -164,15 +166,15 @@ def write_image_json(result,path,*,private_out=None):
     return write_analysis_json(ExportView(result,ImageDisclosureOptions(),()),path)
 
 
-def generate_artifacts(result,path,*,format='html',html_path=None,json_path=None,private_out=None,disclosure=None,allowed_roots=(),pdf_converter=None):
+def generate_artifacts(result,path,*,format='html',html_path=None,json_path=None,private_out=None,disclosure=None,allowed_roots=(),pdf_converter=None,print_profile='focused'):
     disclosure=disclosure or ImageDisclosureOptions()
     if not isinstance(disclosure,ImageDisclosureOptions): raise ValueError('Use ImageDisclosureOptions.')
     private=manifest_path(result,path,private_out); protect_source(result.source_paths,[path,html_path,json_path,private])
-    view=ExportView(result,disclosure,allowed_roots)
+    view=ExportView(result,disclosure,allowed_roots,print_profile)
     canonical=Path(html_path) if html_path else Path(path).with_suffix('.html') if format=='pdf' else Path(path)
     if canonical.exists() and (canonical.is_symlink() or os.name=='posix' and canonical.stat().st_mode&0o077): raise ArtifactCollisionError('Existing canonical HTML is unprotected.')
     write_manifest(result,private)
-    try: artifacts=write_report_artifacts(view,path,format=format,html_path=html_path,json_path=json_path,pdf_converter=pdf_converter)
+    try: artifacts=write_report_artifacts(view,path,format=format,html_path=html_path,json_path=json_path,pdf_converter=pdf_converter,print_profile=print_profile)
     except Exception as exc:
         if getattr(exc,'artifacts',None): exc.artifacts=ImageReportArtifacts(**asdict(exc.artifacts),private_manifest_path=str(private))
         raise

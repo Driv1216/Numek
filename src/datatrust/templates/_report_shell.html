@@ -1,0 +1,64 @@
+{# The shared report shell (Report Experience plan, F and Stage 0 decisions). Templates adopt it from Stage 2 on.
+   Everything here is presentation: no value is computed. The one executable script is hashed into the CSP, so any
+   injected script or inline handler is refused by the browser; WeasyPrint ignores both. #}
+
+{% macro head(title) -%}
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="{{ report_csp }}">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{ title }}</title>
+{%- endmacro %}
+
+{% macro page_rules(label, appendix_label=None) -%}
+@page { size: A4 portrait; margin: 14mm 12mm 18mm;
+  @bottom-left { content: "{{ label | replace('"', '') }}"; color: #5d6877; font-size: 8pt; }
+  @bottom-right { content: "Page " counter(page) " of " counter(pages); color: #5d6877; font-size: 8pt; } }
+@page appendix { size: A4 landscape; margin: 12mm 12mm 16mm;
+  @bottom-left { content: "{{ (appendix_label or label) | replace('"', '') }}"; color: #5d6877; font-size: 8pt; }
+  @bottom-right { content: "Page " counter(page) " of " counter(pages); color: #5d6877; font-size: 8pt; } }
+{%- endmacro %}
+
+{% macro styles() -%}
+/* Running section header (plan F.3): every page after the first names the section it is in. */
+h2 { string-set: dt-section content(text); }
+#understand h2 { string-set: dt-section "Reading guide"; }
+@page { @top-right { content: string(dt-section, start); color: #5d6877; font-size: 7.5pt; } }
+@page :first { @top-right { content: none; } }
+.dt-appendix { page: appendix; break-before: page; }
+.dt-unit { margin: 18px 0 8px; }
+.dt-unit h3 { margin: 0 0 6px; }
+table.dt-evidence { width: 100%; border-collapse: collapse; table-layout: fixed; font-size: 12.5px; }
+table.dt-evidence th, table.dt-evidence td { border-bottom: 1px solid #d8e0e9; padding: 5px 6px; text-align: left; vertical-align: top; overflow-wrap: anywhere; }
+table.dt-evidence th { color: #5d6877; background: #f5f7fa; font-weight: 650; }
+table.dt-evidence thead th:first-child { width: 26%; }
+table.dt-evidence td.num, table.dt-evidence th.num { text-align: right; font-variant-numeric: tabular-nums; }
+table.dt-evidence tr.dt-group th { background: #e7f3f7; color: #17202d; }
+table.dt-evidence tr.dt-summary td { background: #fbfaf7; color: #3d4756; }
+.dt-disclosure { color: #5d6877; font-size: 12px; margin: 6px 0 0; }
+.dt-coverage { color: #5d6877; font-size: 12px; margin: 2px 0 0; }
+.dt-tools { display: flex; gap: 10px; align-items: center; margin: 6px 0; font-size: 13px; }
+.dt-tools input { font: inherit; padding: 4px 6px; border: 1px solid #c9d5df; border-radius: 4px; min-width: 16em; }
+.dt-tools button { font: inherit; padding: 3px 10px; }
+.dt-noscript { color: #5d6877; font-size: 12px; }
+[hidden] { display: none !important; }
+:focus-visible { outline: 3px solid #176b87; outline-offset: 2px; }
+@media screen { .dt-enhanced .dt-print-summary, .dt-enhanced .dt-noscript { display: none; } .dt-print-only { display: none; } }
+@media print {
+  [popover], .dt-tools, .dt-screen-only, .dt-noscript { display: none !important; }
+  tbody[data-dt-static][hidden] { display: table-row-group !important; }
+  tbody[data-dt-screen-body] { display: none !important; }
+  table.dt-evidence { font-size: 7.6pt; }
+  table.dt-evidence th, table.dt-evidence td { padding: 3px 4px; }
+  thead { display: table-header-group; }
+  tr { break-inside: avoid; }
+  h2, h3 { break-after: avoid; }
+}
+{%- endmacro %}
+
+{% macro script() -%}
+<script>{{ report_script }}</script>
+{%- endmacro %}
+
+{% macro data_island(id, value) -%}
+<script type="application/json" id="{{ id }}">{{ value | tojson }}</script>
+{%- endmacro %}

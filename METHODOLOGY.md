@@ -367,6 +367,88 @@ enforced server-side after full safeguarded confirmation. Explicit API/CLI task
 selection suffices. Parsing/configuration changes invalidate confirmations and owned
 artifacts; generation verifies source hash and parsing fingerprint.
 
+## Reading Reports: Presentation, Explanations, and Context Layers
+
+These rules govern presentation only. They never change a finding, a score or any recorded evidence.
+
+**Guidance layer.** The guidance layer (`finding_guidance_v1`) is recorded with the analysis. It states, for each finding:
+- what was observed;
+- its possible impact;
+- what to investigate first;
+- conditional options, with their prerequisites;
+- what was not assessed.
+
+None of the options is applied.
+
+**Context layer.** The context layer (`context_v1`) keeps your declarations separate from parsed values. Declarations
+include prediction point, availability, missing or special codes, and applicability conditions.
+- It lists suggested codes, found by a fixed, versioned rule set, as suggestions only.
+- Its dependency search is bounded, and it states its unsearched scope.
+
+**Review thresholds.** Priorities (High, Moderate, Low) and review thresholds order the work. They are heuristic review
+settings, not validated cut-offs or measured harm.
+
+**Print profiles** (`report_print_v1`). Reports print in one of two profiles.
+- **Focused** (the default) prints:
+  - every finding;
+  - every column a finding or analysis flag refers to, grouped only when severity, scope, trigger and interpretation
+    all match, most significant first, about one page of repetitive rows per group (rows that differ in meaning always
+    print);
+  - summaries of the remaining rows. A summary gives the count plus the smallest and largest stored values with the
+    column that has each, or counts per value. No derived statistics.
+- **Complete** prints every row once.
+
+**HTML report.** The HTML report always lists every row. Each grouped or unprinted table carries a disclosure naming
+where every row is: a section of the HTML file, a JSON pointer, or protected local resolution.
+
+**Understand this report.** Explanations of terms come from a versioned concept catalogue (`report_concepts_v1`):
+- a definition;
+- where the report's evidence allows, an "In this report" example quoting recorded values only;
+- for interpretive terms, what the term does and does not establish.
+
+The printed Reading guide contains every term the report uses. The first use of each term names its page.
+
+### Reading reports: coverage, treatment, location
+
+Every report states, for each piece of evidence, three separate things. They never stand in for one another.
+
+| Dimension | Values | Comes from |
+|---|---|---|
+| **Coverage** (analysis) | completed, completed within a bound, not applicable, not requested, blocked, failed, partial | the recorded checks and coverage |
+| **Treatment** (presentation, per table and medium) | shown individually, summarised (a count with stored values), or referenced (counted, with where it is) | the print policy |
+| **Location** | HTML summary view, HTML complete view, PDF, analysis JSON, protected local evidence | the print policy and export |
+
+A bounded search is a coverage statement ("examined 12,400 of 18,000 pairs"). It is never mixed into a table's counts.
+A table that leaves rows out says so in one line, naming which of four views it is and where the rest is.
+
+| View | Holds | Bound |
+|---|---|---|
+| **Summary view** | readable selections: executive cards, topic tables, charts | M3, M4 and M5 keep their historical display limits (“historical display limit”); M6, M7 and M9 keep their existing selections (“summary selection”) |
+| **Complete view** (HTML) | every retained record of the kinds the report lays out | none from presentation |
+| **Analysis JSON** | every computed record the analysis retained | the analysis's own retention bounds, stated as coverage |
+| **Protected evidence** | source text, images, values and file locations for M6, M7 and M9 | resolved only locally, through the private manifest and the unchanged sources |
+
+Rules:
+- **Findings.** Every finding is listed in each report's finding index, whatever its action-card limit.
+- **Distinct findings stay distinct.** Records are grouped only when severity, scope, trigger and interpretation all
+  match.
+- **Summaries.** Summaries use stored values only: a range with the column that has each end, a tally per recorded
+  value, the scopes affected, or the first and last members. They never use means, medians or other derived numbers.
+- **No duplication.** No field is printed twice for the same column in either print profile.
+- **Privacy.** Explanations, examples and disclosures read only what the report already discloses. Opaque references
+  in M6, M7 and M9 reports are labelled protected; nothing in a report resolves them.
+- **Report identity.** Each report records the print policy (`report_print_v1`) and a per-workflow presentation
+  identity covering exactly the templates, modules and concept entries that produced it.
+- **Evidence behind findings always prints.** When a summary view stops at its display limit, the rows beyond it that
+  a recorded finding refers to are printed in the focused profile, grouped per finding. That applies to M3 and M4
+  columns and to M5 evidence records. Each finding's rows print individually up to about a page, the rest as a
+  disclosed summary. The complete profile prints them once, in the complete table.
+- **Disclosures name their view.** For example: "Summary view: 20 of 412 rows shown (historical display limit)",
+  "Summary view: counts only …", "Detailed view, print: …" and "Detailed view, not printed in this profile: …".
+- **Long recorded lists.** A recorded sentence listing more than 20 names (for example, a guardrail naming 400 columns)
+  keeps every name on screen. Print shows the first 12 and "… and N more", disclosed.
+- **Running headers.** Every printed page after the first names the section it opens in.
+
 ## Internal and External Validation
 
 The classification corpus, frozen result/report regression fixtures, deterministic

@@ -24,6 +24,7 @@ from werkzeug.exceptions import HTTPException, RequestEntityTooLarge, default_ex
 from datatrust.history import HistoryError
 from datatrust.profiler import inspect_classification_target
 from datatrust.renderer import _regression_inspection_notice, presentation_identity
+from datatrust.report_identity import family_of
 from datatrust.ingestion import source_digest, source_signature
 from datatrust.m4_web import add_m4_source, configure_m4, discard_m4, m4_artifact, run_m4, start_m4
 from datatrust.temporal_web import add_m5_source, configure_m5, m5_artifact, m5_investigation, run_m5, start_m5
@@ -41,6 +42,12 @@ M4_LIMITS = {'splits': 3, 'versions': 2, 'advanced': 1, 'before_after': 2}
 APP_BUNDLE = Path(__file__).resolve().parent / 'static' / 'app'
 CLIENT_CSP = ("default-src 'self'; img-src 'self' data:; frame-src 'self'; object-src 'none'; "
               "frame-ancestors 'none'; base-uri 'none'; form-action 'self'")
+# Canonical reports load nothing: no external host, stylesheet, font, form target or connection. Current reports also
+# carry their own meta policy pinning their one script by hash; header and meta policies both apply, so an injected
+# script stays blocked there. Inline script is allowed at the header level only so immutable saved reports from earlier
+# presentation versions keep working; they never relied on anything this policy blocks.
+REPORT_CSP = ("default-src 'none'; img-src data:; style-src 'unsafe-inline'; script-src 'unsafe-inline'; "
+              "base-uri 'none'; form-action 'none'; frame-ancestors 'self'")
 SAFE_METHODS = {'GET', 'HEAD'}
 
 
@@ -135,7 +142,7 @@ def _history_meta(analysis_path):
     names = [((i.get('dataset') or i.get('source') or {}).get('source_filename') or PurePath(str((i.get('dataset') or i.get('source') or {}).get('path', ''))).name) for i in inputs]
     single = (a.get('dataset') or {}).get('source_filename') or PurePath(str((a.get('dataset') or {}).get('path', ''))).name or None
     return {
-        'presentation': {**presentation_identity(), 'app_build': _app_build()},
+        'presentation': {**presentation_identity(family_of(a)), 'app_build': _app_build()},
         'dataset_name': context.get('dataset_name') or (a.get('comparison') or {}).get('dataset_name') or profile.get('dataset_name'),
         'source_filename': context.get('source_filename') or (' ↔ '.join(names) if names else single),
         'roles': [{'id': i.get('id'), 'role': i.get('role'), 'file': n} for i, n in zip(inputs, names)],
@@ -547,10 +554,7 @@ def register(app, analysis_config, max_upload_mib, history=None, launch_token=No
 
     @bp.get('/m4/report')
     def m4_report():
-        response = send_file(m4_artifact(m4_job(), 'html'), mimetype='text/html')
-        response.headers['X-Frame-Options'] = 'SAMEORIGIN'
-        response.headers['Content-Security-Policy'] = "frame-ancestors 'self'"
-        return response
+        return framed(send_file(m4_artifact(m4_job(), 'html'), mimetype='text/html'))
 
     @bp.post('/m4/new')
     def m4_new():
@@ -628,8 +632,10 @@ def register(app, analysis_config, max_upload_mib, history=None, launch_token=No
         return send_file(m5_artifact(m5_job(), 'json'), mimetype='application/json')
 
     def framed(response):
+        """A canonical report shown in the app's same-origin viewer (Report Experience Stage 7 header review)."""
         response.headers['X-Frame-Options'] = 'SAMEORIGIN'
-        response.headers['Content-Security-Policy'] = "frame-ancestors 'self'"
+        response.headers['Content-Security-Policy'] = REPORT_CSP
+        response.headers['Referrer-Policy'] = 'no-referrer'
         return response
 
     @bp.get('/temporal/download/<kind>')
@@ -1154,10 +1160,7 @@ def register(app, analysis_config, max_upload_mib, history=None, launch_token=No
 
     @bp.get('/history/<eid>/report')
     def history_report(eid):
-        response = send_file(saved_file(eid, 'html'), mimetype='text/html')
-        response.headers['X-Frame-Options'] = 'SAMEORIGIN'
-        response.headers['Content-Security-Policy'] = "frame-ancestors 'self'"
-        return response
+        return framed(send_file(saved_file(eid, 'html'), mimetype='text/html'))
 
     @bp.get('/history/<eid>/download/<kind>')
     def history_download(eid, kind):

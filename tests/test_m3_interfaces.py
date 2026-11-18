@@ -109,12 +109,10 @@ def test_annotation_browser_expected_semantics_preserve_legacy_reports(tmp_path)
     assert r.schema_version=='1.0' and r.methodology_id=='classification_legacy_2026_08_13'
     old=DataTrust(job['dataset_path'],'y').analyze_result()
     assert r.scoring==old.scoring and r.profile==old.profile
-    from datatrust.renderer import render_html_report
-    legacy=r.to_legacy_dict()
-    # The legacy body is preserved exactly; WS1 adds the UTC qualifier and the provenance table, WS2 the guidance layers.
-    from datatrust.renderer import _with_layers, _with_provenance
-    stamp=__import__("datetime").datetime.fromisoformat(r.generated_at).strftime("%Y-%m-%d %H:%M:%S")
-    assert client.get('/report').text==_with_provenance(_with_layers(render_html_report(**legacy,generated_at=stamp).replace(stamp,stamp+' UTC'),r),r)
+    # The app serves the current classification report (Report Experience Stage 2), rendered from the same result;
+    # the frozen legacy body remains available through DataTrust.generate_report and legacy_html.
+    from datatrust.renderer import render_analysis_result
+    assert client.get('/report').text==render_analysis_result(r)
 
 
 def test_presentation_ranks_affected_fields_before_source_order(tmp_path):

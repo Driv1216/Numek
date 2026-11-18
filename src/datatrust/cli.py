@@ -13,6 +13,13 @@ def main():
     """Generate local DataTrust reliability reports."""
 
 
+PRINT_PROFILE_HELP = ("What the PDF prints of detailed evidence. focused: every finding, flagged rows and disclosed "
+                      "summaries; complete: also every row the HTML report lists in full, so PDF time and memory grow with the "
+                      "data (5,000 columns: about 560 pages, 49 s, 2.9 GiB). The HTML report always lists every row.")
+PRINT_PROFILE = click.option('--print-profile', type=click.Choice(['focused', 'complete']), default='focused', show_default=True,
+                             help=PRINT_PROFILE_HELP)
+
+
 @main.command()
 @click.argument("dataset_path")
 @click.option("--target", multiple=True, help="Required classification/regression target; omitted for unlabeled profiling.")
@@ -26,6 +33,10 @@ def main():
 @click.option("--name", "dataset_name", help="Optional dataset/report display name.")
 @click.option("--purpose", help="Optional description of the prediction purpose.")
 @click.option("--delimiter", help="CSV separator: comma, semicolon, tab, pipe, a single character, or auto to detect it. Default: the --config value, else comma.")
+@click.option("--report-style", type=click.Choice(["legacy", "current"]), default=None,
+              help="Classification HTML only: a plain audit keeps the frozen legacy report unless 'current' is chosen.")
+@click.option("--print-profile", type=click.Choice(["focused", "complete"]), default="focused", show_default=True,
+              help=PRINT_PROFILE_HELP)
 def audit(
     dataset_path: str,
     target: str,
@@ -39,6 +50,8 @@ def audit(
     config_path: str,
     task_spec_path: str,
     delimiter: str = None,
+    report_style: str = None,
+    print_profile: str = "focused",
 ):
     """Audit a CSV dataset and write a discoverable report bundle."""
     try:
@@ -60,12 +73,17 @@ def audit(
             task_spec = TaskSpec("dataset_profile" if task == "unlabeled" else task, targets=target)
         audit = DataTrust.from_spec(spec, task_spec, config)
         result = audit.analyze_result()
-        if result.methodology_id == "classification_legacy_2026_08_13" and not task_spec_path and report_format == "html" and not config_path and not json_out and not html_out and delimiter is None:
-            # Established explicit HTML behavior remains available through the CLI.
+        plain = (result.methodology_id == "classification_legacy_2026_08_13" and not task_spec_path and report_format == "html"
+                 and not config_path and not json_out and not html_out and delimiter is None)
+        if report_style == "legacy" and not plain:
+            raise ValueError("--report-style legacy applies only to a plain classification HTML audit.")
+        if plain and report_style != "current":
+            # Established explicit HTML behavior remains available through the CLI (frozen legacy presentation).
             report_path = write_html_report(result.to_legacy_dict(), output_path)
             click.echo(f"DataTrust report written to {report_path}")
         else:
-            _print_artifacts(result.generate_artifacts(output_path, format=report_format, html_path=html_out, json_path=json_out))
+            _print_artifacts(result.generate_artifacts(output_path, format=report_format, html_path=html_out, json_path=json_out,
+                                                       print_profile=print_profile))
     except MemoryError as exc:
         raise click.ClickException("The dataset could not be analyzed with available memory. Try a smaller input or tighter limits.") from exc
     except Exception as exc:
@@ -94,7 +112,8 @@ def _load_config(path):
 @click.option('--format', 'report_format', type=click.Choice(['html','pdf']), default='html')
 @click.option('--html-out')
 @click.option('--json-out')
-def compare(spec_path, config_path, output_path, report_format, html_out, json_out):
+@PRINT_PROFILE
+def compare(spec_path, config_path, output_path, report_format, html_out, json_out,print_profile):
     """Compare declared split or version CSV sources from a local manifest."""
     from datatrust import ComparisonSpec, ComparisonConfig
     try:
@@ -102,7 +121,7 @@ def compare(spec_path, config_path, output_path, report_format, html_out, json_o
         spec = ComparisonSpec.from_dict(json.loads(path.read_text(encoding='utf-8')), base_directory=path.parent)
         config = ComparisonConfig.from_dict(json.loads(Path(config_path).read_text(encoding='utf-8'))) if config_path else ComparisonConfig()
         result = DataTrust.compare(spec, config)
-        _print_artifacts(result.generate_artifacts(output_path, format=report_format, html_path=html_out, json_path=json_out))
+        _print_artifacts(result.generate_artifacts(output_path, format=report_format, html_path=html_out, json_path=json_out, print_profile=print_profile))
     except Exception as exc:
         if getattr(exc, 'artifacts', None): _print_artifacts(exc.artifacts)
         raise click.ClickException(str(exc)) from exc
@@ -116,7 +135,8 @@ def compare(spec_path, config_path, output_path, report_format, html_out, json_o
 @click.option('--format','report_format',type=click.Choice(['html','pdf']),default='html')
 @click.option('--html-out')
 @click.option('--json-out')
-def temporal(spec_path,config_path,output_path,report_format,html_out,json_out):
+@PRINT_PROFILE
+def temporal(spec_path,config_path,output_path,report_format,html_out,json_out,print_profile):
     """Audit local CSV/Parquet temporal sources from an explicit manifest."""
     from datatrust import TemporalAuditSpec,TemporalAnalysisConfig
     try:
@@ -124,7 +144,7 @@ def temporal(spec_path,config_path,output_path,report_format,html_out,json_out):
         spec=TemporalAuditSpec.from_dict(json.loads(path.read_text(encoding='utf-8')),base_directory=path.parent)
         config=TemporalAnalysisConfig.from_dict(json.loads(Path(config_path).read_text(encoding='utf-8'))) if config_path else TemporalAnalysisConfig()
         result=DataTrust.audit_temporal(spec,config)
-        _print_artifacts(result.generate_artifacts(output_path,format=report_format,html_path=html_out,json_path=json_out))
+        _print_artifacts(result.generate_artifacts(output_path,format=report_format,html_path=html_out,json_path=json_out,print_profile=print_profile))
     except Exception as exc:
         if getattr(exc,'artifacts',None):_print_artifacts(exc.artifacts)
         raise click.ClickException(str(exc)) from exc
@@ -151,7 +171,8 @@ def _print_artifacts(artifacts):
 @click.option('--private-out')
 @click.option('--excerpt-ref',multiple=True)
 @click.option('--data-root',multiple=True,type=click.Path(exists=True,file_okay=False))
-def text_audit(spec_path,config_path,output_path,report_format,html_out,json_out,private_out,excerpt_ref,data_root):
+@PRINT_PROFILE
+def text_audit(spec_path,config_path,output_path,report_format,html_out,json_out,private_out,excerpt_ref,data_root,print_profile):
     """Audit text, annotation, conversation or RAG data locally."""
     from datatrust import TextAuditSpec,TextAnalysisConfig
     from datatrust.text_normalization import strict_json
@@ -163,7 +184,7 @@ def text_audit(spec_path,config_path,output_path,report_format,html_out,json_out
             from dataclasses import replace
             spec=replace(spec,allowed_roots=data_root)
         result=DataTrust.audit_text(spec,config)
-        _print_artifacts(result.generate_artifacts(output_path,format=report_format,html_path=html_out,json_path=json_out,private_out=private_out,excerpt_refs=excerpt_ref,allowed_roots=data_root))
+        _print_artifacts(result.generate_artifacts(output_path,format=report_format,html_path=html_out,json_path=json_out,private_out=private_out,excerpt_refs=excerpt_ref,allowed_roots=data_root,print_profile=print_profile))
     except Exception as exc:
         if getattr(exc,'artifacts',None):_print_artifacts(exc.artifacts)
         raise click.ClickException(f'Text operation failed: {getattr(exc,"code",type(exc).__name__)}; stage {getattr(exc,"stage","configuration/export")}. {str(exc) if isinstance(exc,ValueError) and not isinstance(exc,OSError) else "Review the declarations and local source integrity."}') from exc
@@ -235,7 +256,8 @@ if __name__ == "__main__":
 @click.option('--overlays',is_flag=True)
 @click.option('--disclose-labels',is_flag=True)
 @click.option('--data-root',multiple=True,type=click.Path(exists=True,file_okay=False))
-def images_audit(spec_path,config_path,output_path,report_format,html_out,json_out,private_out,example_ref,overlays,disclose_labels,data_root):
+@PRINT_PROFILE
+def images_audit(spec_path,config_path,output_path,report_format,html_out,json_out,private_out,example_ref,overlays,disclose_labels,data_root,print_profile):
     """Audit local images, supplied annotations, splits and versions."""
     from datatrust import ImageAuditSpec,ImageAnalysisConfig,ImageDisclosureOptions
     from datatrust.text_normalization import strict_json
@@ -246,7 +268,7 @@ def images_audit(spec_path,config_path,output_path,report_format,html_out,json_o
             from dataclasses import replace
             spec=replace(spec,allowed_roots=data_root)
         result=DataTrust.audit_images(spec,config)
-        _print_artifacts(result.generate_artifacts(output_path,format=report_format,html_path=html_out,json_path=json_out,private_out=private_out,disclosure=ImageDisclosureOptions(example_ref,overlays,disclose_labels),allowed_roots=data_root or spec.allowed_roots))
+        _print_artifacts(result.generate_artifacts(output_path,format=report_format,html_path=html_out,json_path=json_out,private_out=private_out,disclosure=ImageDisclosureOptions(example_ref,overlays,disclose_labels),allowed_roots=data_root or spec.allowed_roots,print_profile=print_profile))
     except Exception as exc:
         if getattr(exc,'artifacts',None): _print_artifacts(exc.artifacts)
         raise click.ClickException(f'Image operation failed: {getattr(exc,"code",type(exc).__name__)}; stage {getattr(exc,"stage","configuration/export")}.') from exc
@@ -280,7 +302,8 @@ def image_evidence(manifest,report,reference,data_root,show_image,overlays,discl
 @click.option('--data-root',multiple=True,type=click.Path(exists=True,file_okay=False))
 @click.option('--excerpt-ref',multiple=True)
 @click.option('--image-ref',multiple=True)
-def cross_representation(spec_path,config_path,output_path,report_format,html_out,json_out,private_out,data_root,excerpt_ref,image_ref):
+@PRINT_PROFILE
+def cross_representation(spec_path,config_path,output_path,report_format,html_out,json_out,private_out,data_root,excerpt_ref,image_ref,print_profile):
     """Audit explicitly connected records and representations locally."""
     from datatrust import CrossRepresentationAuditSpec,CrossRepresentationAnalysisConfig,CrossDisclosureOptions
     from datatrust.text_normalization import strict_json
@@ -291,7 +314,7 @@ def cross_representation(spec_path,config_path,output_path,report_format,html_ou
             spec=replace(spec,allowed_roots=data_root)
         config=CrossRepresentationAnalysisConfig.from_dict(strict_json(Path(config_path).read_text())) if config_path else CrossRepresentationAnalysisConfig()
         result=DataTrust.audit_cross_representation(spec,config)
-        artifacts=result.generate_artifacts(output_path,format=report_format,html_path=html_out,json_path=json_out,private_out=private_out,disclosure=CrossDisclosureOptions(excerpt_ref,image_ref),allowed_roots=data_root or spec.allowed_roots)
+        artifacts=result.generate_artifacts(output_path,format=report_format,html_path=html_out,json_path=json_out,private_out=private_out,disclosure=CrossDisclosureOptions(excerpt_ref,image_ref),allowed_roots=data_root or spec.allowed_roots,print_profile=print_profile)
         _print_artifacts(artifacts);click.echo(f'Private manifest: {artifacts.private_manifest_path}')
     except Exception as exc:
         if getattr(exc,'artifacts',None): _print_artifacts(exc.artifacts)

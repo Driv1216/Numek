@@ -167,7 +167,9 @@ def m5_artifact(j,kind):
 
 def m5_investigation(j,family=None,measurement=None):
     if 'result' not in j:abort(400,description='Completed evidence is required.')
-    return render_template('temporal_report.html',result=j['result'].to_dict(),view=report_view(j['result'],family=family,measurement=measurement))
+    from datatrust.report_concepts import build_manifest
+    view=report_view(j['result'],family=family,measurement=measurement); value=j['result'].to_dict()
+    return render_template('temporal_report.html',result=value,view=view,M=build_manifest('temporal',value,view))
 
 
 def register(app,workspace,roots):

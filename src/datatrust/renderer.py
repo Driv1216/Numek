@@ -1,5 +1,4 @@
 from datetime import datetime, timezone
-from functools import lru_cache
 from pathlib import Path
 import re
 import os
@@ -9,17 +8,13 @@ import hashlib
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 from markupsafe import Markup, escape
 from datatrust.wording import count_phrase
-
-
-def _report_time(value):
-    """A report timestamp with its time zone stated: UTC when the canonical value carries an offset."""
-    try:
-        moment = datetime.fromisoformat(str(value))
-    except ValueError:
-        return str(value)
-    if moment.tzinfo is None:
-        return moment.strftime("%Y-%m-%d %H:%M:%S") + " (time zone not recorded)"
-    return moment.astimezone(timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC")
+# Display formatting lives in report_format; these names stay importable from here for existing callers.
+from datatrust.report_format import (  # noqa: F401
+    _analysis_env, _delimiter_label, _regression_inspection_notice, _regression_population, _report_evidence_text,
+    _report_label, _report_sentence, _report_time, _report_value, _separator_note, _soft_wrap_name, _with_layers,
+    _with_provenance, _with_separator_note, register_filters,
+)
+from datatrust.report_identity import family_of
 
 
 def _legacy_time(value):
@@ -34,37 +29,22 @@ def _legacy_time(value):
     return _report_time(value) if aware else value
 
 
-def _delimiter_label(value):
-    from datatrust.ingestion import delimiter_name
-    name = delimiter_name(value or ",")
-    return name[:1].upper() + name[1:]
-
-
-@lru_cache(maxsize=1)
-def presentation_identity():
-    """The DataTrust package version and a digest of the report templates: how a report was rendered.
-    Recorded separately from the analytical methodology, so a presentation change never reads as a method change."""
-    from importlib.metadata import PackageNotFoundError, version
-    try:
-        package = version("datatrust")
-    except PackageNotFoundError:
-        package = "not recorded"
-    digest = hashlib.sha256()
-    for path in sorted((Path(__file__).parent / "templates").glob("*.html")):
-        digest.update(path.name.encode() + b"\0" + path.read_bytes())
-    return {"package_version": package, "report_templates": digest.hexdigest()[:12]}
-
-
-def _presentation_line():
-    identity = presentation_identity()
-    return f"DataTrust {identity['package_version']}, report templates {identity['report_templates']}"
+def presentation_identity(family=None):
+    """How a report was rendered, recorded separately from the analytical methodology so a presentation change never
+    reads as a method change. With a family (see report_identity.family_of) the value is that workflow's
+    dependency-aware identity; `report_templates` then carries its presentation id. Without one it is the digest of
+    every report template, the meaning this key had before per-workflow identity."""
+    from datatrust.report_identity import all_templates_identity, identity
+    if family is None:
+        return all_templates_identity()
+    value = identity(family)
+    return {"package_version": value["package_version"], "report_templates": value["presentation_id"],
+            "presentation_family": family, "print_policy": value["print_policy"]}
 
 
 def _report_filters(env):
-    env.filters["report_time"] = _report_time
-    env.filters.setdefault("report_label", _report_label)
-    env.filters["delimiter_label"] = _delimiter_label
-    env.globals["presentation"] = _presentation_line()
+    """Report filters for page templates outside a report (the classic temporal investigate view)."""
+    register_filters(env)
 
 
 def render_html_report(
@@ -206,210 +186,56 @@ def _validate_parent(path):
             break
 
 
-def _report_label(value):
-    """Display internal labels without changing their serialized identifiers."""
-    labels = {
-        "pandas_default": "Pandas default missing tokens",
-        "empty_only": "Empty strings only",
-        "custom": "Explicit custom tokens",
-        "eof": "End of source",
-        "pandas_in_memory": "Pandas in memory",
-        "insufficient_finite_observations": "Fewer than four finite observations",
-        "zero_iqr": "The interquartile range is zero",
-        "finite_1.5_iqr": "Finite-value 1.5-IQR fences",
-        "finite_descriptive": "Finite-value descriptive statistics",
-        "max_source_bytes": "Maximum source size",
-        "max_frame_bytes": "Maximum loaded frame size",
-        "max_rows": "Maximum rows",
-        "max_columns": "Maximum columns",
-        "max_seconds": "Cooperative elapsed-time limit",
-    }
-    return labels.get(str(value), str(value).replace("_", " "))
-
-
-def _report_value(value, *, empty="None configured"):
-    """Readable nested metadata; escaping remains the template's responsibility."""
-    if value is None:
-        return "Not set"
-    if isinstance(value, bool):
-        return "Yes" if value else "No"
-    if isinstance(value, dict):
-        return "; ".join(f"{_report_label(k).capitalize()}: {_report_value(v)}" for k, v in value.items()) or empty
-    if isinstance(value, (tuple, list)):
-        return "; ".join(_report_value(v) for v in value) or empty
-    return str(value)
-
-
-def _report_evidence_text(value):
-    # Findings remain unchanged in API/JSON; correct count wording only at display.
-    value = re.sub(r"(?<![\d.])1 rows repeat\b", "1 row repeats", value)
-    return re.sub(
-        r"(?<![\d.])1 (observed values|values|repeated rows|participating rows|missing cells|groups)\b",
-        lambda m: "1 " + m[1][:-1], value,
-    )
-
-
-def _report_sentence(value):
-    """Join display prose with exactly one terminal period, leaving JSON untouched."""
-    text = str(value or "").strip().rstrip(". ")
-    return text + "." if text else ""
-
-
-def _regression_population(value):
-    """Describe finding populations without exposing internal metadata field names."""
-    name = value.get("name", "")
-    denominator = value.get("denominator")
-    count = f"{denominator:,}" if denominator is not None else None
-    descriptions = {
-        "all parsed rows": f"Based on all {count} parsed {'row' if denominator == 1 else 'rows'}",
-        "all complete parsed rows, including the target and nulls":
-            f"Based on all {count} parsed {'row' if denominator == 1 else 'rows'}, including target and missing values",
-        "finite targets": f"Based on {count} finite target {'value' if denominator == 1 else 'values'}",
-        "feature columns": f"Based on {count} feature {'column' if denominator == 1 else 'columns'}",
-        "parsed feature cells": f"Based on {count} parsed feature {'cell' if denominator == 1 else 'cells'}",
-        "finite values by affected feature": "Each affected feature is assessed on its finite values",
-        "fully verified relationship overlap scopes": "Based on fully verified row overlaps",
-    }
-    # Known counted scopes always have a denominator. Do not manufacture one if absent.
-    description = descriptions.get(name) if count is not None or name in {
-        "finite values by affected feature", "fully verified relationship overlap scopes"
-    } else None
-    description = description or ("Based on " + _report_label(name) if name else "")
-    detail = value.get("detail", "")
-    if name == "finite values by affected feature":
-        detail = "Counts of infinite values use all parsed rows"
-    elif name == "fully verified relationship overlap scopes":
-        detail = "Each relationship reports its own overlap and coverage of finite targets"
-    return " ".join(_report_sentence(part) for part in (description, detail) if part)
-
-
-def _regression_inspection_notice(warning):
-    """Humanize planned source-token bounds only; unexpected failures stay warnings."""
-    reason = warning.get("inspected_population", {}).get("stopping_reason")
-    limits = {
-        "record_limit": "record limit",
-        "cell_limit": "comparable-cell limit",
-        "byte_limit": "byte limit",
-        "byte_limit_incomplete_record": "byte limit before the next complete record",
-    }
-    if warning.get("code") != "inspection_incomplete" or reason not in limits:
-        return None
-    return {
-        "title": "Source-token inspection coverage",
-        "text": f"Source-token inspection stopped at its configured {limits[reason]}. "
-                "This is expected coverage disclosure, not an analysis failure. "
-                "Parsing review covers only the inspected source tokens; "
-                "absence of warnings within that scope does not establish losslessness.",
-    }
-
-
-def render_analysis_result(result):
+def render_analysis_result(result, *, print_profile="focused"):
     """Render only completed evidence; exports never trigger a new analysis. A source read with a separator other
-    than a comma is named under the title; comma reports are unchanged, byte for byte."""
-    return _with_separator_note(_render_analysis_result(result), result)
+    than a comma is named under the title; comma reports are unchanged, byte for byte. The print profile
+    (report_print_v1: focused or complete) decides what the PDF prints of the tabular reports' per-column evidence."""
+    return _with_separator_note(_render_analysis_result(result, print_profile), result)
 
 
-def _with_separator_note(html, result):
-    note = _separator_note(result.to_dict())
-    position = html.find("</h1>")
-    if not note or position < 0:
-        return html
-    position += len("</h1>")
-    return html[:position] + f'<p class="separator-note">CSV separator: {escape(note)}.</p>' + html[position:]
-
-
-def _separator_note(value):
-    from datatrust.contracts import _PARSE_OPTION_KEYS
-    from datatrust.ingestion import delimiter_name
-    found = set()
-    def walk(item):
-        if isinstance(item, dict):
-            if _PARSE_OPTION_KEYS <= item.keys() and item.get("delimiter", ",") != ",":
-                found.add(item["delimiter"])
-            for child in item.values():
-                walk(child)
-        elif isinstance(item, list):
-            for child in item:
-                walk(child)
-    walk(value)
-    return ", ".join(sorted(delimiter_name(d) for d in found))
-
-
-def _analysis_env():
-    template_dir = Path(__file__).parent / "templates"
-    env = Environment(loader=FileSystemLoader(str(template_dir)),
-                      autoescape=select_autoescape(["html", "xml"]), trim_blocks=True, lstrip_blocks=True)
-    env.filters["soft_wrap_name"] = _soft_wrap_name
-    env.filters["report_label"] = _report_label
-    env.filters["report_value"] = _report_value
-    env.filters["report_evidence_text"] = _report_evidence_text
-    env.filters["report_sentence"] = _report_sentence
-    env.filters["regression_population"] = _regression_population
-    env.filters["regression_inspection_notice"] = _regression_inspection_notice
-    env.filters["count_phrase"] = count_phrase
-    _report_filters(env)
-    env.filters["regression_number"] = lambda value: "Unavailable" if value is None else (format(value, ".8g") if isinstance(value, float) else str(value))
-    return env
-
-
-def _with_provenance(html, result):
-    """The legacy classification report keeps its established body; the provenance table is added before its
-    last section closes, as the analysis disclosure is in the library report."""
-    section = _analysis_env().from_string("<div class=\"analysis-disclosure\">{% include 'provenance.html' %}</div>").render(result=result.to_dict())
-    position = html.rfind("</section>")
-    return html[:position] + section + html[position:]
-
-
-def _with_layers(html, result):
-    """The legacy classification report keeps its established body; the guidance layers are inserted at its section
-    boundaries: scope and open questions after the decision summary, preprocessing guidance before methodology, and
-    the score explanation and thresholds before the appendix."""
-    env, value = _analysis_env(), result.to_dict()
-    part = lambda body: env.from_string("{% import 'guidance_layers.html' as L %}" + body).render(result=value)
-    inserts = (('<section class="action-section">', '<section class="dt-scope">{{ L.style() }}{{ L.scope_box(result.guidance) }}</section>\n'),
-               ('<section class="methodology-section">', '<section class="dt-context">{{ L.context_section(result.contextual) }}</section>\n'
-                                                         '<section class="dt-guidance">{{ L.guidance_section(result.guidance) }}</section>\n'),
-               ('<section class="appendix-section">', '<section class="dt-scoring"><h2>Score explanation and thresholds</h2>{{ L.scoring_section(result.guidance) }}'
-                                                      '{{ L.policy_table(result.guidance, result.methodology_id) }}</section>\n'))
-    for anchor, body in inserts:
-        position = html.find(anchor)
-        if position >= 0:
-            html = html[:position] + part(body) + html[position:]
-    return html
-
-
-def _render_analysis_result(result):
-    template_dir = Path(__file__).parent / "templates"
-    env = _analysis_env()
+def _render_analysis_result(result, print_profile="focused"):
+    from datatrust.report_layout import PROFILES
+    if print_profile not in PROFILES:
+        raise ValueError(f"print_profile must be one of {', '.join(PROFILES)}.")
+    env = _analysis_env(family_of(result))
     value = result.to_dict()
     if result.schema_version == '1.7':
         from datatrust.cross_presentation import report_view
-        return env.get_template('cross_report.html').render(result=value, view=report_view(result))
+        from datatrust.report_concepts import build_manifest
+        view = report_view(result, print_profile)
+        return env.get_template('cross_report.html').render(result=value, view=view, M=build_manifest('cross', value, view))
     if result.schema_version == '1.6':
         from datatrust.image_presentation import report_view
-        return env.get_template('image_report.html').render(result=value, view=report_view(result))
+        from datatrust.report_concepts import build_manifest
+        view = report_view(result, print_profile)
+        return env.get_template('image_report.html').render(result=value, view=view, M=build_manifest('image', value, view))
     if result.schema_version == '1.5':
         from datatrust.text_presentation import report_view
-        return env.get_template('text_report.html').render(result=value, view=report_view(result))
+        from datatrust.report_concepts import build_manifest
+        view = report_view(result, print_profile)
+        return env.get_template('text_report.html').render(result=value, view=view, M=build_manifest('text', value, view))
     if result.schema_version == '1.4':
         from datatrust.temporal_presentation import report_view
-        return env.get_template('temporal_report.html').render(result=value,view=report_view(result))
-    if result.schema_version == '1.3':
-        from datatrust.m4_presentation import report_view
-        return env.get_template('m4_report.html').render(result=value, view=report_view(result))
-    if result.schema_version == "1.2":
-        from datatrust.presentation import report_view
-        return env.get_template("m3_report.html").render(result=value, view=report_view(result))
+        from datatrust.report_concepts import build_manifest
+        view = report_view(result, profile_name=print_profile)
+        return env.get_template('temporal_report.html').render(result=value, view=view, M=build_manifest('temporal', value, view))
+    if result.schema_version in ('1.3', '1.2'):
+        from datatrust.report_concepts import build_manifest
+        if result.schema_version == '1.3':
+            from datatrust.m4_presentation import report_view
+        else:
+            from datatrust.presentation import report_view
+        view = report_view(result, print_profile)
+        manifest = build_manifest(family_of(result), value, view)
+        return env.get_template('m4_report.html' if result.schema_version == '1.3' else 'm3_report.html').render(result=value, view=view, M=manifest)
+    from datatrust.tabular_presentation import report_view as tabular_view
+    from datatrust.report_concepts import build_manifest
+    view = tabular_view(value, print_profile)
+    manifest = build_manifest(family_of(result), value, view)
     if result.methodology_id == "classification_legacy_2026_08_13":
-        legacy = result.to_legacy_dict(); legacy.pop("parsing", None)  # recorded in the JSON; the legacy HTML takes its fixed fields
-        html = _with_layers(render_html_report(**legacy, generated_at=result.generated_at), result)
-        disclosure = env.get_template("analysis_disclosure.html").render(result=value)
-        # Keep the established eight topics and analytical body intact.
-        position = html.rfind("</section>")
-        return html[:position] + disclosure + html[position:]
-    # Reuse the existing report's presentation rules without changing its legacy bytes.
-    style = re.search(r"<style>(.*?)</style>", (template_dir / "report.html").read_text(), re.S).group(1)
-    return env.get_template("regression_report.html" if result.task.kind == "regression" else "unlabeled_report.html").render(result=value, style=Markup(style))
+        # The current classification report; the frozen legacy report.html stays with render_html_report.
+        return env.get_template("classification_report.html").render(result=value, view=view, M=manifest)
+    return env.get_template("regression_report.html" if result.task.kind == "regression" else "unlabeled_report.html").render(result=value, view=view, M=manifest)
 
 
 def write_analysis_json(result, path):
@@ -422,8 +248,26 @@ def write_analysis_json(result, path):
     return publish_bytes(path, result.json_text().encode("utf-8"))
 
 
+COMPLETE_PRINT_WARNING_ROWS = 5000
+
+
+class CompletePrintWarning(UserWarning):
+    """The complete print profile is about to print a very large number of table rows."""
+
+
+def _warn_complete_cost(content):
+    """The complete profile prints every row, so PDF time and memory grow with the evidence (measured on 5,000
+    columns: 564 pages, about 49 s and 2.9 GiB peak). Say so before converting; the focused profile is unaffected."""
+    import warnings
+    rows = content.count(b"<tr")
+    if rows > COMPLETE_PRINT_WARNING_ROWS:
+        warnings.warn(f"The complete print profile will print about {rows:,} table rows. PDF time and memory grow with "
+                      "the rows printed (5,000 columns measured about 49 s and 2.9 GiB). The focused profile prints every "
+                      "finding and flagged row, and the HTML report lists every row.", CompletePrintWarning, stacklevel=3)
+
+
 def write_report_artifacts(result, path, *, format="html", html_path=None, json_path=None,
-                           pdf_converter=None, legacy_html=False):
+                           pdf_converter=None, legacy_html=False, print_profile="focused"):
     """Create a discoverable report bundle without implicit overwrite permission."""
     from datatrust.contracts import ReportArtifacts
     from datatrust.pdf import PDFRenderError, render_pdf_report
@@ -450,7 +294,9 @@ def write_report_artifacts(result, path, *, format="html", html_path=None, json_
         legacy = result.to_legacy_dict(); legacy.pop("parsing", None)
         content = _with_separator_note(_with_provenance(_with_layers(render_html_report(**legacy, generated_at=result.generated_at), result), result), result).encode("utf-8")
     else:
-        content = render_analysis_result(result).encode("utf-8")
+        content = render_analysis_result(result, print_profile=print_profile).encode("utf-8")
+    if pdf_path is not None and print_profile == "complete":
+        _warn_complete_cost(content)
     reused = _html_state(canonical, content)
     for output in (pdf_path, json_path):
         if output is not None:
@@ -476,22 +322,34 @@ def write_report_artifacts(result, path, *, format="html", html_path=None, json_
         if isinstance(exc, PDFRenderError):
             exc.args = (f"{exc} HTML report retained at {canonical}.",)
         raise
+    if result.schema_version in {"1.0", "1.1"} and not legacy_html:
+        from dataclasses import replace
+        from datatrust.tabular_presentation import report_view as tabular_view
+        artifacts = replace(artifacts, qa_metadata=tabular_view(result.to_dict(), print_profile)["qa"])
     if result.schema_version == "1.2":
         from dataclasses import replace
         from datatrust.presentation import report_view
-        artifacts = replace(artifacts, qa_metadata=report_view(result)["qa"])
+        artifacts = replace(artifacts, qa_metadata=report_view(result, print_profile)["qa"])
+    if result.schema_version == "1.3":
+        from dataclasses import replace
+        from datatrust.m4_presentation import report_view
+        artifacts = replace(artifacts, qa_metadata=report_view(result, print_profile)["qa"])
     if result.schema_version == "1.4":
         from dataclasses import replace
         from datatrust.temporal_presentation import report_view
-        artifacts = replace(artifacts,qa_metadata=report_view(result)["qa"])
+        artifacts = replace(artifacts,qa_metadata=report_view(result, profile_name=print_profile)["qa"])
     if result.schema_version == '1.5':
         from dataclasses import replace
         from datatrust.text_presentation import report_view
-        artifacts = replace(artifacts,qa_metadata=report_view(result)['qa'])
+        artifacts = replace(artifacts,qa_metadata=report_view(result, print_profile)['qa'])
+    if result.schema_version == '1.7':
+        from dataclasses import replace
+        from datatrust.cross_presentation import report_view
+        artifacts = replace(artifacts, qa_metadata=report_view(result, print_profile)['qa'])
     if result.schema_version == '1.6':
         from dataclasses import replace
         from datatrust.image_presentation import report_view
-        artifacts = replace(artifacts, qa_metadata=report_view(result)['qa'])
+        artifacts = replace(artifacts, qa_metadata=report_view(result, print_profile)['qa'])
     return artifacts
 
 
@@ -517,9 +375,3 @@ def _missingness_chart(columns: list) -> list:
     ]
     affected.sort(key=lambda column: (-column["missing_rate"], column["name"]))
     return affected[:15]
-
-
-def _soft_wrap_name(value: str) -> Markup:
-    """Add safe wrap opportunities at semantic name boundaries."""
-    parts = re.split(r"(?<=[a-z0-9])(?=[A-Z])|(?<=[_-])", str(value))
-    return Markup("<wbr>".join(str(escape(part)) for part in parts))

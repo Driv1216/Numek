@@ -1,0 +1,32 @@
+{# Shared evidence macros. Each takes a unit already rendered by report_layout.render_unit: the template only lays it
+   out. Printed rows are ordinary HTML; rows shown only on screen live in a JSON data island and are drawn by the report
+   script in pages (Stage 0 spikes c and d), with a notice that stays visible until the script has run. #}
+{% import '_report_shell.html' as shell %}
+
+{% macro unit_table(u) -%}
+<div class="dt-unit{% if u.print_hidden %} dt-print-collapsed{% endif %}" id="{{ u.anchor }}">
+  {% if u.title %}<h3 id="{{ u.table_id }}-title">{{ u.title }}</h3>{% endif %}
+  {% for line in u.coverage %}<p class="dt-coverage">{{ line }}</p>{% endfor %}
+  {% if u.filterable or u.island %}
+  <div class="dt-tools" hidden><label>Find <input type="search" id="{{ u.table_id }}-search" aria-controls="{{ u.table_id }}" placeholder="Name or identifier"{% if u.name %} aria-label="Find in {{ u.name }}"{% endif %}></label>
+    <span id="{{ u.table_id }}-status" role="status" aria-live="polite"></span></div>
+  {% endif %}
+  <table class="dt-evidence{% if u.print_hidden %} dt-screen-only{% endif %}" id="{{ u.table_id }}"{% if u.title %} aria-labelledby="{{ u.table_id }}-title"{% endif %}{% if u.island %} data-dt-island="{{ u.table_id }}-rows"{% elif u.filterable %} data-dt-filterable{% endif %}>
+    <thead><tr><th>{{ u.entity_label }}</th>{% for f in u.fields %}<th{% if f.numeric %} class="num"{% endif %}>{{ f.label }}</th>{% endfor %}</tr></thead>
+    <tbody{% if u.island %} data-dt-static{% endif %}>
+    {% for row in u.rows %}
+      {% if row.type == 'group' %}<tr class="dt-group"><th colspan="{{ u.fields | length + 1 }}">{{ row.label }}</th></tr>
+      {% elif row.type == 'summary' %}<tr class="dt-summary"><td>{{ row.label }}</td>{% for c in row.cells %}<td>{{ c }}</td>{% endfor %}</tr>
+      {% else %}<tr data-dt-entity="{{ row.entity }}"{% if row.anchor %} id="{{ row.anchor }}"{% endif %}><td>{{ row.entity | soft_wrap_name }}</td>{% for c in row.cells %}<td{% if u.fields[loop.index0].numeric %} class="num"{% endif %}>{{ c }}</td>{% endfor %}</tr>{% endif %}
+    {% endfor %}
+    </tbody>
+    {% if u.island %}<tbody data-dt-screen-body></tbody>{% endif %}
+  </table>
+  {% if u.island %}
+  <p class="dt-tools" hidden><button type="button" id="{{ u.table_id }}-more"{% if u.name %} aria-label="Show more {{ u.noun }} in {{ u.name }}"{% endif %}>Show more</button></p>
+  <p class="dt-noscript">This view shows the printed rows. All {{ u.screen_total }} {{ u.noun }} are listed when the page's script can run, and in {{ u.json_hint }}.</p>
+  {{ shell.data_island(u.table_id ~ '-rows', u.island) }}
+  {% endif %}
+  {% if u.disclosure %}<p class="dt-disclosure">{{ u.disclosure }}</p>{% endif %}
+</div>
+{%- endmacro %}

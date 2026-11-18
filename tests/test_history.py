@@ -78,6 +78,8 @@ def test_saved_analysis_survives_a_restart_with_verified_artifacts(tmp_path, roo
     assert analysis.status_code == 200 and analysis.json['scoring']['status'] == 'computed'
     report = second.get(f'/history/{eid}/report')
     assert report.status_code == 200 and report.headers['X-Frame-Options'] == 'SAMEORIGIN'
+    from datatrust.api_web import REPORT_CSP
+    assert report.headers['Content-Security-Policy'] == REPORT_CSP and report.headers['Referrer-Policy'] == 'no-referrer'
     assert second.get(f'/history/{eid}/download/json').headers['Content-Disposition'].startswith('attachment')
     second.close()
 

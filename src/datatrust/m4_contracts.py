@@ -337,11 +337,11 @@ class ComparisonResult:
     def write_json(self,path):
         from datatrust.renderer import write_analysis_json
         return write_analysis_json(self,path)
-    def generate_artifacts(self,path,*,format='html',html_path=None,json_path=None):
+    def generate_artifacts(self,path,*,format='html',html_path=None,json_path=None,print_profile='focused'):
         from datatrust.renderer import write_report_artifacts
-        return write_report_artifacts(self,path,format=format,html_path=html_path,json_path=json_path)
-    def generate_report(self,path,*,format='html',html_path=None):
-        a=self.generate_artifacts(path,format=format,html_path=html_path)
+        return write_report_artifacts(self,path,format=format,html_path=html_path,json_path=json_path,print_profile=print_profile)
+    def generate_report(self,path,*,format='html',html_path=None,print_profile='focused'):
+        a=self.generate_artifacts(path,format=format,html_path=html_path,print_profile=print_profile)
         return a.pdf_path if format=='pdf' else a.html_path
 
 

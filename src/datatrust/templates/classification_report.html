@@ -1,0 +1,199 @@
+{% import '_report_shell.html' as shell %}{% import '_evidence.html' as ev %}{% import '_tabular_layers.html' as T %}{% import '_concepts.html' as C %}{% import 'guidance_layers.html' as L %}
+{% set profile = result.profile %}{% set scores = result.scoring['values'] %}{% set findings = result.findings %}{% set narrative = result.narrative %}{% set context = result.context %}
+<!doctype html>
+<html lang="en">
+<head>
+  {{ shell.head(context.dataset_name ~ ' - DataTrust Reliability Report') }}
+  <style>{% include '_report_base.css.html' +%}
+{{ shell.styles() }}
+{{ C.styles() }}
+{{ T.styles() }}
+    .finding-anchor { scroll-margin-top: 12px; }
+    table.dt-index { margin-bottom: 14px; }
+    @media print {
+      /* Long cards may split rather than leave blank pages (a card taller than a page cannot be kept whole). */
+      .decision-layout .card, .action-card, .dt-guardrails .card { break-inside: auto; }
+      .decision-card h3, .action-heading, .action-details h4 { break-after: avoid; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <p class="label">DataTrust Reliability Report</p>
+      <h1>{{ context.dataset_name | soft_wrap_name }}</h1>
+      <p class="meta">Source: {{ context.source_filename | soft_wrap_name }} · Target: {{ profile.target | soft_wrap_name }} · Classification: {{ profile.classification_subtype }} · Generated: {{ result.generated_at | report_time }}</p>
+      {% if context.purpose %}<p class="purpose"><strong>Purpose:</strong> {{ context.purpose }}</p>{% endif %}
+      {{ C.understand_link() }}
+    </header>
+
+    <section>
+      <h2>1. Decision Summary</h2>{{ C.strip(M, 'summary') }}
+      <div class="decision-layout">
+        <div class="card">
+          <span class="risk-badge {{ scores.risk_level }}">{{ scores.risk_level }} Risk</span>
+          <div class="score">{{ scores.overall }}</div>
+          <p class="label">Final reliability score</p>
+          <p class="small">Evidence score before guardrails: {{ scores.evidence_score }}</p>
+        </div>
+        <div class="card decision-card">
+          <h3>Assessment</h3>
+          <p>{{ narrative.overall_assessment }}</p>
+          <h3 style="margin-top: 14px;">Why this score</h3>
+          <p>{{ narrative.score_explanation | long_list }}</p>
+          <h3 style="margin-top: 14px;">Principal evidence</h3>
+          <p>{{ narrative.principal_evidence_summary | long_list }}</p>
+          <h3 style="margin-top: 14px;">Recommended next action</h3>
+          <p>{{ scores.recommended_action }}</p>
+        </div>
+      </div>
+      {% set risks = findings[:3] %}
+      <div class="risk-list summary-risks count-{{ risks | length }}">
+        {% for risk in risks %}
+        <article class="card risk-card {{ risk.severity }}">
+          <h3>{{ risk.title }} <span class="small">({{ risk.severity }})</span></h3>
+          <p>{{ risk.finding }}</p>
+          <p><strong>Next review:</strong> {{ risk.recommendation }}</p>
+        </article>
+        {% endfor %}
+      </div>
+    </section>
+
+    {{ C.how_to_read(M) }}
+    <section class="dt-scope">{{ L.style() }}{{ L.scope_box(result.guidance) }}</section>
+
+    <section>
+      <h2>2. Priority Actions</h2>{{ C.strip(M, 'actions') }}
+      <p class="section-note">Priority actions are ordered by severity. Some review items are informational and do not affect the reliability score.</p>
+      {% set clean_report = findings | length == 1 and findings[0].code == "no_major_issues" %}
+      {% if clean_report %}
+      <article class="card clean-state">
+        <h3>No priority actions were generated</h3>
+        <p>{{ findings[0].finding }}</p>
+        <p><strong>Important boundary:</strong> {{ findings[0].modeling_impact }}</p>
+        <p><strong>Recommended review:</strong> {{ findings[0].recommendation }}</p>
+      </article>
+      {% else %}
+      {{ T.finding_index(view) }}
+      <div class="action-list">
+        {% for finding in findings %}
+        <article class="card action-card finding-anchor {{ finding.severity }}" id="finding-{{ loop.index0 }}">
+          <div class="action-heading"><div><h3>{{ finding.title }}</h3><p>{{ finding.finding }}</p></div><span class="risk-badge {{ finding.severity }}">{{ finding.severity }}</span></div>
+          <div class="action-details">
+            <div><h4>Evidence</h4><p>{{ finding.evidence }}</p></div>
+            <div><h4>Possible modeling impact</h4><p>{{ finding.modeling_impact }}</p></div>
+            <div><h4>Recommended review</h4><p>{{ finding.recommendation }}</p></div>
+            <div><h4>Score effect</h4><p>{{ finding.score_effect }}</p></div>
+          </div>
+        </article>
+        {% endfor %}
+      </div>
+      {% endif %}
+    </section>
+
+    <section>
+      <h2>3. Dataset Overview</h2>
+      <div class="grid">
+        <div class="card"><div class="label">Rows</div><div class="metric">{{ profile.row_count }}</div></div>
+        <div class="card"><div class="label">Columns</div><div class="metric">{{ profile.column_count }}</div></div>
+        <div class="card"><div class="label">Feature columns</div><div class="metric">{{ profile.feature_count }}</div></div>
+        <div class="card target-card"><div class="label">Target</div><div class="metric name">{{ profile.target | soft_wrap_name }}</div></div>
+        <div class="card"><div class="label">Numeric features</div><div class="metric">{{ profile.numeric_feature_count }}</div></div>
+        <div class="card"><div class="label">Non-numeric features</div><div class="metric">{{ profile.non_numeric_feature_count }}</div></div>
+        <div class="card"><div class="label">Missing cells</div><div class="metric">{{ profile.missing_rate }}%</div></div>
+        <div class="card"><div class="label">Repeated rows</div><div class="metric">{{ profile.duplicate_rate }}%</div></div>
+      </div>
+    </section>
+
+    <section>
+      <h2>4. Target and Label Evidence</h2>{{ C.strip(M, 'target') }}
+      <div class="callout interpretation"><strong>Interpretation:</strong> {{ narrative.target_interpretation }}</div>
+      <div class="grid">
+        <div class="card"><div class="label">Classification subtype</div><div class="metric">{{ profile.classification_subtype }}</div></div>
+        <div class="card"><div class="label">Observed classes</div><div class="metric">{{ profile.class_balance.class_count }}</div></div>
+        <div class="card"><div class="label">Majority baseline</div><div class="metric">{{ profile.majority_class_baseline }}%</div></div>
+        <div class="card"><div class="label">Majority : minority</div><div class="metric">{% if profile.majority_to_minority_ratio is not none %}{{ profile.majority_to_minority_ratio }} : 1{% else %}N/A{% endif %}</div></div>
+      </div>
+      <h3 style="margin-top: 20px;">Target distribution</h3>
+      <div class="chart" role="img" aria-label="Horizontal bars showing target class distribution">
+        {% for item in view.target_chart %}
+        <div class="bar-row"><div class="bar-label">{{ item.label }}</div><div class="bar-track"><div class="bar" style="width: {{ item.percentage }}%"></div></div><div class="bar-value">{{ item.count }} · {{ item.percentage }}%</div></div>
+        {% endfor %}
+      </div>
+      <div class="table-wrap"><table{% if profile.target_distribution | length <= 15 %} class="compact-table"{% endif %}><thead><tr><th>Class</th><th>Rows</th><th>Percentage of labeled rows</th></tr></thead><tbody>{% for item in profile.target_distribution %}<tr><td>{{ item.label }}</td><td>{{ item.count }}</td><td>{{ item.percentage }}%</td></tr>{% endfor %}</tbody></table></div>
+      <p class="section-note">Class calculations exclude {{ profile.target_missing_count }} {{ "row" if profile.target_missing_count == 1 else "rows" }} without target labels. The majority baseline is the accuracy obtained by always predicting the largest class; it is context, not a model-quality result.</p>
+    </section>
+
+    <section>
+      <h2>5. Missingness Evidence</h2>{{ C.strip(M, 'missingness') }}
+      <div class="callout interpretation"><strong>Interpretation:</strong> {{ narrative.missingness_interpretation }}</div>
+      <div class="grid">
+        <div class="card"><div class="label">Missing cells</div><div class="metric">{{ profile.missing_cells }}</div></div>
+        <div class="card"><div class="label">Rows with missing features</div><div class="metric">{{ profile.missing_feature_row_rate }}%</div></div>
+        <div class="card"><div class="label">Missing target labels</div><div class="metric">{{ profile.target_missing_count }}</div></div>
+        <div class="card"><div class="label">Severe feature columns</div><div class="metric">{{ profile.severe_missing_columns | length }}</div></div>
+      </div>
+      <div class="grid three" style="margin-top: 12px;">
+        <div class="card"><div class="label">Rows missing 1 feature</div><div class="metric">{{ profile.rows_with_1_missing_feature }}</div></div>
+        <div class="card"><div class="label">Rows missing 2 features</div><div class="metric">{{ profile.rows_with_2_missing_features }}</div></div>
+        <div class="card"><div class="label">Rows missing 3+ features</div><div class="metric">{{ profile.rows_with_3_plus_missing_features }}</div></div>
+      </div>
+      {% if view.missingness_chart.bars %}<h3 style="margin-top: 20px;">Missingness by feature</h3>{{ T.missingness_bars(view) }}{% endif %}
+    </section>
+
+    <section>
+      <h2>6. Duplicate and Feature Evidence</h2>{{ C.strip(M, 'features') }}
+      <div class="callout interpretation"><p><strong>Duplicate interpretation:</strong> {{ narrative.duplicate_interpretation }}</p><p><strong>Leakage interpretation:</strong> {{ narrative.leakage_interpretation }}</p></div>
+      <div class="grid">
+        <div class="card"><div class="label">Repeated rows</div><div class="metric">{{ profile.duplicate_rows }}</div></div>
+        <div class="card"><div class="label">Duplicate groups</div><div class="metric">{{ profile.duplicate_group_count }}</div></div>
+        <div class="card"><div class="label">Largest group</div><div class="metric">{{ profile.largest_duplicate_group_size }}</div></div>
+        <div class="card"><div class="label">Conflicting-label groups</div><div class="metric">{{ profile.conflicting_label_group_count }}</div></div>
+      </div>
+      <p class="section-note">A conflicting-label group contains identical recorded feature values but more than one non-missing target label. It requires context review and is not automatically treated as a labeling error.</p>
+      <h3 style="margin-top: 20px;">Leakage-name review</h3>
+      {% if profile.leakage_details %}
+      <div class="table-wrap"><table class="leakage-table"><thead><tr><th>Column</th><th>Classification</th><th>Reason</th><th>Scoring effect</th></tr></thead><tbody>{% for item in profile.leakage_details %}<tr><td>{{ item.column }}</td><td>{{ "Strong candidate" if item.classification == "strong" else "Review only" }}</td><td>{{ item.reason }}</td><td>{{ "Affects score and guardrails" if item.classification == "strong" else "No automatic penalty" }}</td></tr>{% endfor %}</tbody></table></div>
+      {% else %}<p class="section-note">No name-based leakage candidates were detected.</p>{% endif %}
+      <h3 style="margin-top: 20px;">Review-worthy feature findings</h3>
+      <div class="risk-list">
+        {% set feature_codes = ["conflicting_target_labels", "constant_fields", "high_cardinality_categoricals", "numeric_outlier_concentration", "leakage_review_prompts", "possible_target_leakage"] %}
+        {% for finding in findings if finding.code in feature_codes %}
+        <article class="card risk-card {{ finding.severity }}"><h3>{{ finding.title }} <span class="small">({{ finding.severity }})</span></h3><p>{{ finding.evidence }}</p><p><strong>Review:</strong> {{ finding.recommendation }}</p></article>
+        {% else %}<p class="section-note">The current feature checks did not produce a separate review-worthy feature finding.</p>{% endfor %}
+      </div>
+      <p class="section-note">Per-column evidence for every finding and flag is in the technical appendix (“Column evidence”).</p>
+    </section>
+
+    <section class="dt-context">{{ T.context_section(result.contextual, view, M) }}</section>
+    <section class="dt-guidance">{{ T.guidance_section(result.guidance, view) }}</section>
+
+    <section>
+      <h2>7. Scoring, Methodology, and Limitations</h2>{{ C.strip(M, 'methodology') }}
+      <div class="callout interpretation"><strong>Score path:</strong> {{ narrative.score_explanation }}</div>
+      <div class="score-grid">{% for name, score in scores.sub_scores.items() %}<div class="card"><div class="label">{{ name.replace("_", " ").title() }}</div><div class="metric">{{ score }}</div></div>{% endfor %}</div>
+      {% if scores.guardrails %}
+      <h3 style="margin-top: 18px;">Applied guardrails</h3>
+      <div class="risk-list dt-guardrails">{% for guardrail in scores.guardrails %}<div class="card"><p><strong>Overall score cap: {{ guardrail.cap }}</strong></p><p>{{ guardrail.explanation | long_list }}</p></div>{% endfor %}</div>
+      {% endif %}
+      <div class="callout" style="margin-top: 16px;">
+        <p>Sub-scores cover completeness, uniqueness, target balance, feature usability, and name-based leakage risk. Row-impact and conflicting-label evidence remain visible without changing a score.</p>
+        <p>Findings support human review; they do not prove causation or prescribe automatic cleaning. Leakage findings require confirmation of when a value becomes available.</p>
+        <p>Not included: label-noise estimation, drift, fairness, calibration, semantic date validation, fuzzy category normalization, feature correlation, compliance, or certification.</p>
+      </div>
+    </section>
+
+    <section class="dt-scoring"><h2>Score explanation and thresholds</h2>{{ C.strip(M, 'scoring') }}{{ T.scoring_section(result.guidance, view) }}{{ L.policy_table(result.guidance, result.methodology_id) }}</section>
+
+    {{ C.understand(M) }}
+    <section class="appendix-section">
+      <h2>8. Technical Appendix</h2>{{ C.strip(M, 'appendix') }}
+      <p class="section-note">Percentages use total dataset rows unless stated otherwise. Print profile: {{ view.profile }} ({{ print_policy }}).</p>
+      {{ T.column_evidence(view) }}
+      {{ T.disclosure(result, view) }}
+    </section>
+  </main>
+  {{ C.popover() }}
+  {{ shell.script() }}
+</body>
+</html>

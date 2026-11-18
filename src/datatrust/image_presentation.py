@@ -28,6 +28,35 @@ def detail_lines(value,limit=10,*,scalars_first=False):
     return retained,max(0,len(lines)-limit)+sum(len(v)>240 for k,v in lines[:limit])
 
 
+FAMILY_TITLES={'inventory':'Inventory','decode':'Decode states','representations':'Representations','logical_identity':'Logical identities',
+ 'visual_quality':'Visual quality distributions','visual_extremes':'Visual extremes','quality_expectations':'Visual-quality rule violations',
+ 'annotations':'Annotation validity','annotation_disagreement':'Annotation differences on identical images','composition':'Dataset composition',
+ 'multilabel_composition':'Multilabel composition','exact_duplicates_bytes':'Exact byte duplicates','exact_duplicates_native':'Exact raster duplicates',
+ 'exact_duplicates_oriented':'Exact oriented-pixel duplicates','near_duplicates':'Perceptual near-duplicate candidates',
+ 'embeddings':'Model similarity candidates','split_requirements':'Declared split separation','versions':'Version changes'}
+MEANINGS={'deterministic_fact':'Deterministic fact','deterministic_violation':'Deterministic violation','contextual_observation':'Contextual observation',
+ 'heuristic_candidate':'Heuristic candidate','model_assisted_candidate':'Model-assisted candidate'}
+
+
+def family_title(family):
+    return FAMILY_TITLES.get(family,str(family).replace('_',' ').capitalize())
+
+
+def all_lines(value):
+    """Every leaf of a recorded value as a labelled line, unabbreviated (the complete view of detail_lines)."""
+    lines=[]
+    def visit(item,prefix=''):
+        if isinstance(item,dict):
+            if not item: lines.append((prefix,'None observed'))
+            for k,v in item.items(): visit(v,(prefix+' / ' if prefix else '')+str(k).replace('_',' '))
+        elif isinstance(item,list):
+            if not item: lines.append((prefix,'None retained'))
+            for n,v in enumerate(item): visit(v,(prefix+' / ' if prefix else '')+str(n+1))
+        else: lines.append((prefix,display(item)))
+    visit(value)
+    return [[k or 'value',v] for k,v in lines]
+
+
 def executive_actions(data):
     """Group decisions by consequence, without scoring dataset reliability.
 
@@ -93,9 +122,10 @@ def executive_actions(data):
     return actions
 
 
-def report_view(result):
-    data=result.to_dict(); sections=[]; omitted=0
-    checks={c['id']:c for c in data['checks']}
+def report_view(result,profile_name='focused'):
+    from datatrust.report_structured import capped_tables,has_references
+    data=result.to_dict(); sections=[]; omitted=0; described=[]
+    checks={c['id']:c for c in data['checks']}; index={r['id']:i for i,r in enumerate(data['evidence'])}
     for key,title in TOPICS:
         def matches(family):
             if key=='duplicates': return family.startswith(('exact_duplicates','near_duplicates','embeddings','annotation_disagreement'))
@@ -116,7 +146,15 @@ def report_view(result):
             hidden+=max(0,len(rows)-20); omitted+=hidden
             c=checks.get(record['id'],{}); d=record['data']
             state='Blocked' if c.get('applicability')=='blocked' or d.get('group_separation_applicability')=='blocked' or d.get('blocked_geometric_checks') else 'Review' if c.get('violations') else 'Bounded' if record.get('scope')=='bounded' else 'Examined'
-            blocks.append({'title':record['family'].replace('_',' '),'meaning':record['meaning'].replace('_',' '),'state':state,'rows':rows[:20],'omitted':hidden})
+            block={'title':family_title(record['family']),'meaning':record['meaning'].replace('_',' '),'state':state,'rows':rows[:20],'omitted':hidden,
+                   'anchor':f"ev-{index[record['id']]}",'id':record['id'],'disclosures':[]}
+            complete=all_lines({k:v for k,v in record['data'].items() if k!='quality_score'})
+            shown=sum(len(row['lines']) for row in rows[:20])
+            if hidden or shown<len(complete):
+                described.append({'title':family_title(record['family']),'columns':['Field','Recorded value'],'rows':complete[:min(shown,len(complete))],
+                                  'all_rows':complete,'topic':record['id'],'noun':'details','pointer':f"/evidence/{index[record['id']]}/data",
+                                  'protected':has_references(record['data']),'block':block})
+            blocks.append(block)
         if key=='coverage':
             rows=[]
             boundaries={'execution':data['execution']['status'],'source integrity':'Verified per-file bytes and membership; no atomic filesystem snapshot.','search interpretation':'Bounded candidates do not establish global absence, leakage or annotation correctness.'}
@@ -125,6 +163,11 @@ def report_view(result):
                 # witnesses; a presentation cap must not hide search semantics.
                 lines,n=detail_lines(cov,24,scalars_first=True); omitted+=n
                 rows.append({'label':family.replace('_',' '),'lines':lines,'omitted':n})
+                if n and family in data['coverage']['families']:
+                    complete=all_lines(cov)
+                    described.append({'title':'Coverage · '+family.replace('_',' '),'columns':['Field','Recorded value'],'rows':complete[:len(lines)],
+                                      'all_rows':complete,'topic':'coverage-'+family,'noun':'details','pointer':'/coverage/families/'+family,
+                                      'protected':has_references(cov),'block':rows[-1]})
             blocks=[{'title':'Population and search coverage','meaning':'method and execution boundaries','state':'Partial' if data['execution']['status']=='partial' else 'Bounded','rows':rows,'omitted':0}]
             for record in data['evidence']:
                 if record['family']=='embeddings':
@@ -140,5 +183,14 @@ def report_view(result):
                             benchmark=pinned.get('review_evidence',{})
                     if benchmark:
                         blocks.append({'title':'Model benchmark interpretation','meaning':'fixed-fixture evidence, not universal matching quality','state':'Review','rows':[{'label':'Encoder versus pipeline','lines':[{'label':'Encoder calibration precision','value':format(benchmark['encoder_calibration']['precision'],'.2%')},{'label':'Encoder held-out precision','value':format(benchmark['encoder_held_out']['precision'],'.2%')},{'label':'Combined pipeline held-out precision','value':format(benchmark['combined_pipeline_held_out']['precision'],'.2%')},{'label':'90% combined precision target','value':'Not met'},{'label':'Scope','value':benchmark['scope']}]}],'omitted':0})
-        sections.append({'title':title,'blocks':blocks})
-    return {'sections':sections,'actions':executive_actions(data),'examples':data['profile'].get('examples',[]),'qa':{'presentation_rows_omitted':omitted,'presentation_rows_or_details_omitted':omitted,'topics':8,'maximum_actions':5,'retained_evidence_not_recomputed':True}}
+        sections.append({'id':key,'title':title,'blocks':blocks})
+    disclosures,complete=capped_tables(described,profile_name,limit_label='summary selection',section_label='Complete retained evidence')
+    for table in described:
+        if table['topic'] in disclosures: table['block'].setdefault('disclosures',[]).append(disclosures[table['topic']])
+    rendered={b.get('id') for s in sections for b in s['blocks']}
+    findings=[{'anchor':f"ev-{index[f['id']]}" if f['id'] in rendered else None,'index':n,'title':family_title(f['family']),
+               'severity':MEANINGS.get(f['meaning'],str(f['meaning']).replace('_',' ')),
+               'effect':f"Count {f['count']:,}"+(f" · {str(data['evidence'][index[f['id']]].get('scope','')).replace('_',' ')}" if f['id'] in index else '')}
+              for n,f in enumerate(data['findings'])]
+    return {'sections':sections,'actions':executive_actions(data),'examples':data['profile'].get('examples',[]),'findings':findings,
+            'disclosures':disclosures,'complete_tables':complete,'profile':profile_name,'qa':{'presentation_rows_omitted':omitted,'presentation_rows_or_details_omitted':omitted,'topics':8,'maximum_actions':5,'retained_evidence_not_recomputed':True,'print_profile':profile_name}}

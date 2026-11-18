@@ -8,8 +8,9 @@ import socket
 from datatrust import *
 from datatrust.cross_models import algorithm_identity
 from validation.m9.fixtures import financial
+from validation.outputs import output_root
 
-ROOT=Path(__file__).parent.absolute()
+ROOT=Path(__file__).parent.resolve()
 
 
 def offline_model(*args,**kwargs):
@@ -30,13 +31,16 @@ def run():
     cfg=CrossRepresentationAnalysisConfig(models=CrossModelOptions(str(ROOT/'models/nli'),str(ROOT.parent/'m6/models/multilingual-e5-small')))
     label=os.environ.get('M9_RUN_LABEL','closure')
     if not label or len(label)>64 or any(c not in 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_-' for c in label): raise ValueError('Use a simple isolated verification label.')
-    reports=ROOT/'results/reports'/label;reports.mkdir(parents=True,exist_ok=True);cases={}
-    private=ROOT/'results/private'/label;data=ROOT/'data'/label
+    OUT=output_root(ROOT)   # committed results only with --refresh; a temporary mirror otherwise
+    reports=OUT/'results/reports'/label;reports.mkdir(parents=True,exist_ok=True);cases={}
+    private=OUT/'results/private'/label;data=ROOT/'data'/label
     try:
         for fmt in ('pdf','docx'):
             spec=financial(data/('api_'+fmt),format=fmt)
             result=DataTrust.audit_cross_representation(spec,cfg)
-            assert result.profile['summary'].startswith(str(len(result.findings))+' review findings.')
+            from datatrust.cross_presentation import summary
+            assert result.profile['summary']==summary(result)
+            assert result.profile['summary'].startswith(f'This review identified {len(result.findings):,} topics')
             revenue=next(e['data'] for e in result.evidence if e['population']=='rule_1')
             assert [revenue[k] for k in ('satisfied','violated','conflicting_evidence')]==[18,1,1]
             models=next(e['data'] for e in result.evidence if e['family']=='models')
@@ -77,8 +81,8 @@ def run():
         assert next(e['data']['abstained'] for e in abstained.evidence if e['family']=='models')==20
         cases['non_english']={'status':'passed','coverage':abstained.coverage}
     finally: cross.run_supervised=original
-    ledger=ROOT/'results'/('end_to_end.json' if label=='closure' else label+'_end_to_end.json')
-    if ledger.exists(): (ROOT/'results/initial_end_to_end.json').write_bytes(ledger.read_bytes())
+    ledger=OUT/'results'/('end_to_end.json' if label=='closure' else label+'_end_to_end.json')
+    if ledger.exists(): (OUT/'results/initial_end_to_end.json').write_bytes(ledger.read_bytes())
     ledger.write_text(json.dumps({'status':'passed','algorithm_identity':algorithm_identity(),'cases':cases,'network':'Socket connect/connect_ex/create_connection blocked inside actual optional audit worker.','privacy':'Default public artifacts have no fixture values, claims, paths or review notes; private locators resolve exact native evidence.'},indent=2,allow_nan=False)+'\n')
     print('M9 native PDF/DOCX, mixed evidence, reviews, privacy, bounded and English eligibility: passed',flush=True)
 

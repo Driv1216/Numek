@@ -1,5 +1,421 @@
 # Numek Current State
 
+## DataTrust Report Experience — review fixes (2026-11-18)
+
+Fixes for every finding of the technical review of the redesign, plus the validator problems. All presentation only,
+except the validator scripts. Analysis JSON is identical in all 25 matrix cases
+(`validation/report_experience/results/after_review_fixes/COMPARISON.md`).
+
+**H1: evidence behind every finding now prints.** The focused PDF prints the rows a recorded finding refers to beyond
+a summary view's limit, as a table under each capped one (`report_structured.capped_tables(..., referenced=)`):
+- M3 and M4 columns, and M5 evidence records;
+- grouped per finding, never merged, and budgeted by `report_print_v1`.
+
+| Case | Before (finding evidence in the default PDF) | Now | Pages |
+|---|---|---|---|
+| M5 Beijing | 2 of 15 findings | 15 of 15 | 11 → 23 |
+| M5 retail | 1 of 2 | 2 of 2 | 10 → 11 |
+| M4 wide | 20 of 80 columns | all 80 (individually or in a disclosed summary) | 6 → 7 |
+
+**Moderate fixes:**
+- **M1:** every opaque reference kind the analyses define (including `split_`, `field_`, `category_`) is labelled
+  protected.
+- **M2:** an export that discloses examples gets "Protected evidence" wording that says so.
+- **M3:** no duplicate element ids. Units that point elsewhere keep their own id, and row anchors are positional.
+- **M4:** complete-profile PDFs above 5,000 rows raise `CompletePrintWarning`. The CLI help and `docs/SCALABILITY.md`
+  state the cost (5,000 columns: 564 pages, 49 s, about 2.9 GiB).
+
+**Low fixes:**
+- **L1:** "In this report" examples for window effects, Jaccard, shared passages, Hamming distance, duplicate
+  candidates, reconciliation outcomes and logical identity.
+- **L2:** the M5 appendix disclosure states its print count as well as its screen count.
+- **L3:** disclosures name their view ("Detailed view, …"; "Summary view: counts only …").
+- **L4:** running section headers on every page after the first.
+- **L5:** a test for the `legacy_html=True` path.
+- **L6:** recorded lists of more than 20 names print the first 12 plus a disclosed count; the screen text is
+  unchanged.
+- **L7:** M6 and M7 "No score" wording no longer mentions priorities.
+- **L8:** M4 disclosures point to `/profile/columns` or `/profile/sources`.
+
+**Validators.**
+- The M4, M5, M6, M7 and M9 validators write into a temporary mirror unless `--refresh` is given (`validation/outputs.py`).
+  A full run left `validation/` unchanged.
+- M7 passes again. Its disclosure step audits afresh, because a stored private manifest is bound to the disk's device
+  number, which changed since 14 October.
+- M9 checks the real summary wording and then stops at the model step. See the open decision below.
+
+**Measured** (median of three runs; Beijing re-timed over five):
+- Every sparse page sits before an intended boundary or is the last page, and no stranded headings remain.
+- Timing is within tolerance except M5 Beijing: 0.54 → 1.37 s against a 1.04 s allowance. Its default PDF now prints
+  the evidence for all 15 findings, about a page each, which the discoverability gate requires.
+
+**Open decision: M9 model qualification.**
+- Since commit `ba3cf1606` (2026-10-23), M9's packaged model qualification no longer matches the code, so every model
+  judgment abstains (`model_not_enabled_or_unqualified`), with or without this redesign.
+- Verified: that commit changed only the post-analysis guidance attachment (4 inserted lines and 1 changed line in
+  `cross.py` and `cross_contracts.py`).
+- The methodology allows a qualification-reuse record for changes outside the semantic pipeline. Recording one, or
+  re-qualifying, is left to the founder.
+
+**Tests:** the DataTrust suite passed 801; M9 and CG1 together passed 80.
+
+## DataTrust Report Experience Redesign — Stage 8 closure (2026-11-18)
+
+The redesign (Stages 0–8) is complete. It covers classification, regression, unlabeled, M3, M4, M5, M6, M7 and M9
+reports; ConfidenceGuard is excluded and audio is deferred. The work is presentation only.
+
+**Outcome on the full 25-case matrix** (`validation/report_experience/results/after_stage8_rule/` and `after_stage8/`,
+against Stage 0):
+- **Analysis JSON:** identical in all 25 cases.
+- **Findings:** every finding title or reader-facing name appears in every PDF.
+- **Wide data:** 5,000 columns went from 417 pages, 50.6 s and 2.4 GiB to 14 pages, 0.74 s and 107 MiB. The `complete`
+  profile prints all 564 pages by choice (`docs/SCALABILITY.md`).
+- **Timing:** every ordinary report is within its timing tolerance. Every wide case is faster and smaller than before.
+- **Sparse pages:** every page under 40% fill sits immediately before an intended part boundary (Reading guide or
+  Technical Appendix) or is the last page.
+- **Stranded headings:** a PDF scan finds none.
+- **Visual check:** all 353 focused pages were inspected as contact sheets (`work.nosync/stage8/`).
+
+**Closure changes:**
+- **Shared keep-with-next rule.** Each section's "Explained terms" line now stays with its content and in one piece, in
+  every report. This removed 7 stranded headings in tabular reports. It adds one page to the three plain-wide cases (a
+  short tail before the Reading guide).
+- **Accessibility.**
+  - Every table's search box and "Show more" button has its own accessible name ("Find in All columns", "Show more
+    columns in All columns"). Before, seven boxes in one report were all named "Find".
+  - Tables are labelled by their headings.
+  - Keyboard pass: term buttons open and close by Enter, Space and Escape, focus returns to the term, and
+    `aria-expanded` resets. Table filters report their results through a polite live region.
+  - VoiceOver itself was not run; that needs a person at the Mac.
+- **Docs.**
+  - ARCHITECTURE: "Report experience (`report_print_v1`)".
+  - METHODOLOGY: "Reading reports: coverage, treatment, location".
+  - SCALABILITY: the appended wide-data export table.
+
+**Re-pins over the redesign** (all presentation-only, re-asserted by `validation/report_experience/repin.py`):
+- every family identity in `tests/fixtures/presentation_identities.json`;
+- the 18 `html_sha256` values in `tests/fixtures/m2_baseline.json`;
+- the 3 `html_sha256` values in `tests/fixtures/m1_unlabeled_baseline.json`.
+
+The legacy classification hash (`tests/fixtures/m1_classification_baseline.json`) is unchanged.
+
+**Validators.**
+- `validation.verify`, `unlabeled`, `regression`, `dry_runs`, `m3`, `m4`, `m5` and `m6` pass.
+- `m7` and `m9` fail, and fail identically on the code before this redesign (`git archive HEAD`):
+  - **M9:** the validator expects summaries beginning "N review findings.", while `cross_presentation.summary()` has
+    said "This review identified N topics…" since an earlier milestone.
+  - **M7:** the validator regenerates `validation/m7/results/reports/classification/final.html` in place, and the
+    no-overwrite safeguard refuses because the stored file came from an older template.
+- The `m4`, `m5` and `m6` validators rewrite their committed results (21 files, plus new M6 report folders) when run.
+  Those writes were restored to the committed state, and the new folders were moved out of the repository.
+- These validator issues are left for a separate decision.
+
+**Tests:** the DataTrust suite passed 787; M9 and CG1 together passed 80.
+
+**Founder decisions still open:**
+- **L1:** whether the plain `DataTrust(path, target).generate_report()` and plain `datatrust audit` HTML should default
+  to the current classification report. They stay frozen legacy; `--report-style current` opts in.
+- **L4:** reader-facing branding. The per-template wording is kept (for example "NUMEK M5", "DataTrust image evidence").
+
+## DataTrust Report Experience Redesign — Stage 7 (2026-11-18)
+
+The app and the command line now reach the report experience directly.
+
+**App report viewer:**
+- An **Understand this report** button opens the report's guide drawer. It appears only when the loaded report has a
+  guide; saved reports keep their original bytes.
+- The report script opens the guide whenever its URL fragment is `#understand`, so the app never reaches into the report
+  page. Closing the guide clears the fragment so the button works again.
+- The viewer is now a real modal:
+  - content behind it is inert;
+  - focus starts on Back;
+  - focus returns to the control that opened it.
+  Before, keyboard focus stayed on the page behind it.
+
+**Report responses:**
+- Every report the app serves (live, M4–M9 and saved) goes through one helper.
+- The header policy is `default-src 'none'; img-src data:; style-src 'unsafe-inline'; script-src 'unsafe-inline';
+  base-uri 'none'; form-action 'none'; frame-ancestors 'self'`, with `Referrer-Policy: no-referrer`. Before, the header
+  carried only `frame-ancestors 'self'`.
+- Current reports also keep their own hash-pinned meta policy, so injected script stays blocked.
+- Inline script is allowed at header level only so saved reports from earlier versions keep rendering.
+
+**Print profile everywhere:**
+- `--print-profile focused|complete` is now accepted by `compare`, `temporal`, `text`, `images` and
+  `cross-representation`, as well as `audit`.
+- M4 `ComparisonResult.generate_artifacts` and `generate_report` gain `print_profile=` (previously only the renderer
+  could print M4's complete tables).
+- README "Reading reports, explanations and print profiles" documents the guide, the profiles, the summary-view
+  wording and the classification `presentation="current"` / `--report-style current` opt-in.
+
+**Checked in the browser pane:** a saved classification analysis, served by `datatrust ui`.
+- **Keyboard:** Tab from Back reaches the button, Enter opens the drawer with focus on the guide, and Escape closes only
+  the drawer. Pressing the button again reopens it.
+- **Phone width (375 px):** the button and full-width drawer work by tap, and Back returns focus to “Open report” with
+  nothing left inert.
+- **Console:** no errors or policy violations.
+- **Fixed during the pass:** the button's tooltip had replaced its accessible name, so it was removed.
+
+**Tests:** `tests/test_app_api.py` (report headers and the deep-link target), `tests/test_history.py` (saved-report
+headers) and `tests/test_modality_reports.py` (print profile on every command and result). The DataTrust suite passed
+786; M9 and CG1 together passed 80. The app bundle was rebuilt (`npm run build:app`; the bundle check passed).
+
+## DataTrust Report Experience Redesign — Stage 6 (2026-11-18)
+
+The M6 text, M7 image and M9 cross-representation reports now use the shared shell (CSP, script and print rules),
+evidence contract and "Understand this report". Branding and footers are unchanged (founder decision L4 still open).
+
+**Findings:**
+- Each report lists every finding in an index.
+- M6 and M7 findings record a family code, not a title, so the index gives each a reader-facing name, for example
+  "Shared literal passages" or "Perceptual near-duplicate candidates".
+- M7 evidence blocks use the same names.
+- The M9 action-card limit is now disclosed in the shared wording.
+
+**Summary selections:**
+- These workflows have no `PresentationLimits`. Their existing summary selections are disclosed as "Summary view: N of M
+  … shown (summary selection)", never as a historical display limit.
+- Each disclosure names the HTML section, the JSON pointer and, where opaque references appear, "source content:
+  protected, local resolution only".
+- Every abbreviated collection is listed in full under "Complete retained evidence", printed in the `complete` profile.
+  This covers M6 nested collections, witnesses, coverage strata and phase timings; M7 examples, details and candidates,
+  which the summary tables previously left out without saying so; and M9 retained examples, nested measurements and
+  coverage.
+- All of these are opaque references and counts, already in the export JSON, so the HTML discloses nothing new.
+
+**Concepts:** 19 new concepts:
+- shared: protected evidence;
+- text: framed records, five-grapheme Jaccard, candidate versus verified pair, shared passages, semantic neighbours,
+  language identification;
+- images: exact representations, perceptual signature, Hamming distance, duplicate candidate, coordinate frames;
+- cross: logical identity, association cardinality, reconciliation outcomes, conflicting supplied evidence, separation,
+  model candidates, abstention.
+
+The shared report terms (no score, findings are review evidence, coverage, bounded search, print profile, listed on
+screen) now cover these workflows, with methodology variants.
+
+**Exports:**
+- `generate_artifacts(..., print_profile=)` is accepted by all three workflows.
+- `profile.export_identity` gains `presentation_identity` and `print_profile` (additive), and `canonical_html_sha256`
+  binds the profile actually written.
+- `text_presentation.display` and `executive_summary` are frozen and pinned by a test.
+- Gate 1b: fresh M6, M7 and M9 exports from this code and from the previous commit are deep-equal once export metadata,
+  volatile timings and per-audit opaque ids are removed.
+
+**Measured** (`results/after_stage6/COMPARISON.md`, against Stage 0):
+
+| Case | Pages before → focused / complete | PDF time |
+|---|---|---|
+| SciFact | 7 → 10 / 12 | 0.32 → 0.53 s |
+| M7 classification | 7 → 10 / 13 | 0.27 → 0.43 s |
+| M7 overlay | 13 → 18 / 28 | 0.53 → 0.61 s |
+| M9 PDF / DOCX financial | 5 → 9 / 19–20 | 0.18–0.21 → 0.37 s |
+
+- Every finding name is in each PDF. Timing is within tolerance; analysis JSON is identical.
+- The only sparse pages are before the Reading guide (SciFact p8) and last pages.
+- HTML grows to 61–129 KB, mostly the Reading guide and complete-evidence data.
+
+**Re-pins and tests:**
+- Every presentation identity was re-pinned (shared `report_layout`/`report_structured` changes), along with the M2 and
+  unlabeled golden hashes, through `repin.py`.
+- `tests/test_modality_reports.py` (25 tests) was added.
+- One M7 assertion now uses the reader-facing block name.
+- The DataTrust suite passed 784; M9 and CG1 together passed 80.
+
+## DataTrust Report Experience Redesign — Stage 5 (2026-11-17)
+
+The M5 temporal report now uses the shared evidence contract and has "Understand this report".
+
+**Findings and display limits:**
+- A finding index lists every finding. This closes the verified Stage 0 gap where findings beyond the five action
+  cards were silently omitted (Beijing: 15 findings, 5 cards).
+- The cards keep their historical limit, now with a disclosure.
+- Every capped topic table carries a "Summary view: N of M rows shown (historical display limit)" disclosure.
+- Each capped topic is listed in full in a new "Complete tables and print profile" section, printed in the `complete`
+  profile.
+
+**Readability:**
+- Recorded nested values read as labelled text ("format: csv · role: dataset") instead of raw JSON or dictionary dumps.
+- Per-topic forced page breaks are gone; section labels and term lines stay with their content.
+
+**Concepts:** 11 temporal concepts were added: clock, schedule continuity, windows, window effects, runs, volatility,
+seasonality, availability timing, revisions, maturity and folds. Total variation, CDF distance and Wasserstein-1 now
+also apply to M5.
+
+**Measured** (`results/after_stage5/COMPARISON.md`, against Stage 0):
+
+| Case | Pages before → focused / complete | PDF time |
+|---|---|---|
+| Retail | 10 → 10 / 85 | 0.56 → 0.80 s |
+| Beijing | 10 → 11 / 160 | 0.54 → 0.83 s |
+| Long headers | 10 → 10 / 806 | 0.58 → 0.92 s |
+
+- Every finding is in the PDF. Timing is within tolerance.
+- The only sparse pages are the short tail before the Reading guide and each document's last page.
+- **HTML size:** canonical HTML grows from 0.12–0.14 MB to 0.6–3.9 MB, because the complete tables are held as screen-only
+  data islands. This is above the +120 KB review trigger: a review item, not a failure.
+- The analysis JSON is identical, and M6–M9 renders are byte-identical to the previous commit.
+
+**Re-pins and tests:**
+- Re-pinned: every presentation identity that includes the shared concept modules. The M2 and unlabeled golden HTML hashes
+  were re-pinned through `repin.py`.
+- `tests/test_temporal_reports.py` (16 tests) was added.
+- The DataTrust suite passed 759; M9 and CG1 together passed 80.
+
+## DataTrust Report Experience Redesign — Stage 4 (2026-11-17)
+
+The M3 (annotation, multilabel, multi-output, readiness) and M4 (comparison and advanced) reports now use the shared
+shell and evidence contract and have "Understand this report".
+
+**Display limits:**
+- The historical display limits recorded with each result (`PresentationLimits`) keep their meaning.
+- Every capped summary table now carries a disclosure, for example "Summary view: 20 of 80 rows shown (historical display
+  limit)", with the HTML section and JSON pointer.
+- Each capped table is also listed in full in an appendix "Complete tables" section, printed in the `complete` profile.
+
+**Other changes:**
+- M4 summary tables put rows referenced by a finding's recorded column list first, ordered by priority. Only the order
+  changes, not the limit.
+- A finding index lists every finding beyond the action-card limit.
+- The forced executive page break is gone.
+- 19 concepts were added: annotation axes and coverage, label cardinality and Jaccard, output correlation, central span and
+  Bowley skewness, readiness, cohort contrast, overlap, schema change, total variation, CDF distance, Wasserstein-1,
+  significance with BH adjustment, and affected-row union.
+
+**Catalogue isolation.** The catalogue data moved to `report_catalogue.py`, which is not an identity module dependency.
+Each family's identity covers only the concept entries it uses, so rewording one workflow's concept no longer changes
+another's identity; a test proves it.
+
+**Measured** (`results/after_stage4/COMPARISON.md`, against Stage 0):
+
+| Case | Pages | PDF time |
+|---|---|---|
+| Scene | 11 → 14 | 0.43 → 0.60 s |
+| M4 cases | 4–5 → 6 | 0.21–0.25 → 0.31–0.37 s |
+
+Timing is within tolerance. The analysis JSON is identical; M5–M9 reports are byte-identical to Stage 0.
+
+**Re-pins and tests:**
+- Presentation-only re-pins (`repin.py`): the 18 M2 and 3 unlabeled golden hashes, and every family identity (a one-off
+  change to the catalogue fingerprint format).
+- The DataTrust suite passed 743 (7 new). M9 and CG1 together passed 80.
+
+## DataTrust Report Experience Redesign — Stage 3 (2026-11-17)
+
+"Understand this report" is live in the classification, regression and unlabeled reports.
+
+**What was added:**
+- `report_concepts.py`: catalogue `report_concepts_v1`, with 32 tabular and evidence-vocabulary concepts and
+  methodology-specific variants. For example, the classification IQR rule counts against all rows with non-finite values
+  outside the fences; the finite-only rule applies elsewhere.
+- `report_context.py`: deterministic "In this report" examples that quote only recorded values, each keyed by its JSON
+  pointer, or state why no example is available.
+- A per-report concept manifest, built before rendering, that decides every term placement and guide entry.
+
+**On screen:**
+- Section headings carry "Explained terms" links. Each opens one shared popover next to the link; it is keyboard
+  operable, Escape closes it and focus returns to the link.
+- A "How to read this report" box follows the summary.
+- The "Understand this report" section opens as a searchable drawer.
+- Without script, the links still lead to the guide entries.
+
+**In print:**
+- A Reading guide of about two pages comes before the technical appendix.
+- The first use of each term names its guide page, and every page reference resolves.
+
+**Methodology:** the new section "Reading Reports: Presentation, Explanations, and Context Layers" documents the
+presentation rules.
+
+**Measured** (`validation/report_experience/results/after_stage3/COMPARISON.md`, compared with Stage 2):
+- Reports gain 2–4 pages for the guide; Bank Full goes from 15 to 18.
+- PDF time stays within the plan's tolerance in every case. A two-column guide was measured at +0.6 s and dropped.
+- Long narrative, guidance and guardrail blocks may now split, so every page under 40% filled sits just before the
+  Reading guide or the technical appendix.
+- The analysis JSON is identical in all 13 cases; M4–M9 reports are unchanged.
+
+**Re-pins and tests:**
+- Presentation-only re-pins via `validation/report_experience/repin.py`, which re-asserts each analytical result first:
+  the 18 M2 and 3 unlabeled golden HTML hashes, and the identities of the three tabular families. The digest now also
+  covers each family's catalogue entries.
+- The DataTrust suite passed 736 (16 new). M9 and CG1 together passed 80.
+
+## DataTrust Report Experience Redesign — Stage 2 (2026-11-17)
+
+The classification, regression and unlabeled reports now use the shared evidence contract (`report_print_v1`).
+
+**Which classification report each path produces:**
+- `classification_report.html` is the current classification report. The app, the canonical path and every PDF use it.
+- The frozen legacy `report.html` stays the default for `DataTrust(path, target).generate_report()` and for a plain
+  `datatrust audit` HTML report. `presentation="current"` or `--report-style current` opts in to the current report.
+
+**Print profiles:** `print_profile` / `--print-profile` choose `focused` (the default) or `complete`.
+
+**How the focused PDF handles per-column evidence:**
+- Columns that a finding or an analysis flag refers to are printed in signal tables, one per family, most significant
+  first, about one page of repetitive rows per group.
+- The other columns are summarised using stored values only.
+- "All columns" and "Numeric summaries" are complete on screen, drawn in pages from a JSON data island.
+- Check ledgers are grouped.
+- Per-column guidance lines whose facts are already printed stay on screen, with a disclosure.
+- Checks that could not be assessed for a column are printed with their recorded reason.
+- The body has no forced page breaks.
+
+**Measured** (`validation/report_experience/results/after_stage2/COMPARISON.md`; one machine, not guarantees):
+
+| Case | Before | After |
+|---|---|---|
+| 5,000 columns | 416 pages, 48 s, 2.4–3.0 GiB peak PDF memory | 10 pages, 0.50 s, 97 MiB (complete profile: 560 pages, by choice) |
+| 1,000 columns | 91 pages | 10 pages |
+| Many flagged columns | 126 pages | 26 pages |
+| Bike regression | 27 pages | 18 pages |
+| Bank Full | 15 pages | 15 pages, no sparse decision page |
+
+The normalised analysis JSON is identical before and after in all 14 measured cases. M4–M9 reports are byte-identical to
+Stage 0.
+
+**Presentation-only re-pins** (deliberate content change; every analytical fixture field re-asserted unchanged):
+- `html_sha256` for the 18 cases in `m2_baseline.json` and the 3 cases in `m1_unlabeled_baseline.json`.
+- Every family in `presentation_identities.json`, because the shared `report_layout.py` changed.
+
+**Updated tests:** four existing tests changed to follow deliberate presentation changes:
+- evidence IDs print in the complete profile;
+- guidance lines may be held in a data island;
+- the app serves the current report;
+- the identity checks follow the new template.
+
+**Test results:** the DataTrust suite passed 720. M9 and CG1 together passed 80.
+
+## DataTrust Report Experience Redesign — Stages 0 and 1 (2026-11-17)
+
+The founder-approved Report Experience plan (Revision 2) is in progress.
+
+**Stage 0** (`validation/report_experience/`) measured 25 report cases and settled six technical spikes.
+- It reproduced the 416-page report: 5,000 rows × 5,000 columns, with 97% of the pages in the appendix. The cause is
+  column count, not row count.
+- It confirmed that the M5 report omits findings beyond its action limit without saying so.
+- It chose a JSON data island with paged rendering for screen-only evidence. CSS-hidden content still costs WeasyPrint
+  +440% time at 5,000 rows.
+
+**Stage 1** adds the shared presentation foundation. No report's content changes yet. New modules:
+- `report_identity.py`: per-workflow, dependency-aware presentation identity.
+- `report_format.py`: display filters moved from `renderer.py`, still importable from there.
+- `report_layout.py`: the `report_print_v1` evidence contract.
+
+There are also four shared template partials.
+
+The provenance "Presentation" line now names each report's workflow identity. Saved-history entries record that same
+identity.
+
+**Presentation-only re-pins:**
+- `html_sha256` for the 18 cases in `tests/fixtures/m2_baseline.json` and the 3 cases in
+  `tests/fixtures/m1_unlabeled_baseline.json`. Every one reproduces its previous hash exactly when the previous provenance
+  line is restored.
+- New per-workflow pins in `tests/fixtures/presentation_identities.json`.
+- Analytical fixture fields are unchanged.
+
+**Tests:** the DataTrust suite passed 703 (the 647-test baseline on the committed source, plus 56 new). The separately
+run M9 suite passed 42. M4–M9 reports re-rendered byte-identical to Stage 0.
+
 ## CG6 completion and founder acceptance — 2026-11-08
 
 The founder has confirmed CG6 is done and accepted. CG1–CG6 are complete within

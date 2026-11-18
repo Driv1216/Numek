@@ -1,0 +1,146 @@
+{# Report layers for the tabular reports (classification, regression, unlabeled), on the shared evidence contract.
+   Same recorded content as guidance_layers.html and analysis_disclosure.html, which M3 to M9 keep using unchanged;
+   per-entity lists are laid out as evidence units (report_layout) so repetition is grouped and disclosed. #}
+{% import '_evidence.html' as ev %}
+
+{% import '_concepts.html' as C %}
+{% macro styles() -%}
+@media print {
+  /* A long guidance item may split rather than leave a sparse page; its headings stay with their text. */
+  .dt-guidance .dt-item, .dt-context .dt-item, .callout.interpretation { break-inside: auto; }
+  .dt-guidance .dt-item h3, .dt-guidance .dt-item h4 { break-after: avoid; }
+}
+{%- endmacro %}
+
+{% macro context_section(c, view, M=None) %}
+<div class="dt-layer">
+  <h2>Context and declarations</h2>{% if M %}{{ C.strip(M, 'context') }}{% endif %}
+  {% if not c %}<p>Contextual evidence was not recorded by the version that produced this analysis.</p>
+  {% elif c.status != 'completed' %}<p>Contextual evidence did not complete: {{ c.reason }}. Nothing contextual was concluded.</p>
+  {% else %}
+  <p class="section-note">Declarations never change parsed values, findings or scores. Candidates are suggestions only. Pipeline or model use is never inferred. Version {{ c.version }}.</p>
+  <h3>Prediction</h3>
+  <p>{% if c.prediction.declared %}Objective: {{ c.prediction.objective or 'not stated' }}. Prediction point: {{ c.prediction.point or 'not stated' }}.{% else %}No prediction objective or point was declared, so availability at prediction time was not concluded on.{% endif %}</p>
+  {% if c.availability %}<table><thead><tr><th>Column</th><th>Declared availability</th></tr></thead><tbody>{% for col, v in c.availability.items() %}<tr><td>{{ col }}</td><td>{{ v | report_label }}</td></tr>{% endfor %}</tbody></table>{% endif %}
+  <h3>Suggested codes (not applied)</h3>
+  {% if view.candidates %}{{ ev.unit_table(view.candidates) }}
+  {% else %}<p>No value matched the candidate rules ({{ c.candidate_rules.version }}).</p>{% endif %}
+  {% if c.interpreted %}<h3>Your declarations and the applicable populations</h3>
+  {% for name, r in c.interpreted.items() %}<div class="dt-item"><h4>{{ name }}{% if r.unit %} ({{ r.unit }}){% endif %}</h4><ul>
+    {% for code in r.declared_codes %}<li>{{ code.value }} declared {{ code.meaning | report_label }}: {{ code.rows }} rows{% if not code.observed %} (not found in the data){% endif %}</li>{% endfor %}
+    <li>Applicable population: {{ r.applicable_rows }} of {{ r.rows }} rows; declared missing {{ r.declared_missing_rows }}; declared not applicable {{ r.structural_absence_rows }}; parser missing {{ r.parser_missing_rows }}.</li>
+    {% if r.condition %}<li>Condition {{ r.condition.column }} {{ r.condition.op }} {{ r.condition.value }}: holds in {{ r.condition.rows_true }} rows, not in {{ r.condition.rows_false }}, unevaluable in {{ r.condition.rows_unevaluable }}. Exceptions: {{ r.condition.exceptions.value_present_where_declared_not_to_apply }} rows hold a value where it should not apply; {{ r.condition.exceptions.not_applicable_code_where_condition_holds }} carry a not-applicable code where it should apply.</li>{% endif %}
+    {% if r.applicable_numeric %}{% set q = r.applicable_numeric %}<li>Applicable finite values {{ q.finite_count }}{% if q.summary %}: min {{ q.summary.min }}, q1 {{ q.summary.q1 }}, median {{ q.summary.median }}, q3 {{ q.summary.q3 }}, max {{ q.summary.max }}{% endif %}; {% if q.outlier_rate is not none %}{{ q.outlier_count }} outside the 1.5 × IQR fences ({{ q.outlier_rate }}%){% else %}IQR evidence not assessable: {{ q.outlier_unavailable_reason | report_label }}{% endif %}.</li>{% endif %}
+  </ul></div>{% endfor %}{% endif %}
+  <h3>Observed co-occurrence of codes</h3>
+  {% if c.observed_dependencies.pairs %}<ul>{% for d in c.observed_dependencies.pairs %}<li>{{ d.a.column }} = {{ d.a.value }} ({{ d.a.rows }} rows) and {{ d.b.column }} = {{ d.b.value }} ({{ d.b.rows }} rows): {{ d.both }} rows together; {{ d.a_only }} only in {{ d.a.column }}, {{ d.b_only }} only in {{ d.b.column }}.{% if d.a_only_row_refs or d.b_only_row_refs %} Parsed rows {{ (d.a_only_row_refs + d.b_only_row_refs) | join(', ') }}.{% endif %}</li>{% endfor %}</ul>
+  {% else %}<p>No pair of codes met the rule: {{ c.observed_dependencies.rule }}.</p>{% endif %}
+  <h3>Target-dependency search</h3>
+  {% set s = c.dependency_search %}
+  {% if s.status == 'not_applicable' %}<p>Not applicable: {{ s.reason }}</p>
+  {% elif s.status == 'not_assessable' %}<p>Not assessable: {{ s.reason }}</p>
+  {% else %}<p>{{ s.method }}. {{ s.checks | length }} features checked{% if view.unsearched %}; {{ view.unsearched.count }} unsearched within the limits{% if view.unsearched.names %} ({{ view.unsearched.names | join(', ') }}){% endif %}{% endif %}. Gates: at least {{ s.gates.min_category_support }} rows per category or class, {{ s.gates.min_matched_rows }} matched rows and {{ s.gates.min_coverage * 100 }}% coverage, with no exceptions. {% if s.flagged %}Flagged: {{ s.flagged | join(', ') }}.{% else %}No feature determined the target within this scope; noisy or multi-feature dependence was not searched.{% endif %}</p>
+  {% if view.unsearched and view.unsearched.unit %}{{ ev.unit_table(view.unsearched.unit) }}{% endif %}{% endif %}
+  <p class="section-note">{{ c.demonstrated_use }}</p>
+  {% endif %}
+</div>
+{% endmacro %}
+
+{% macro guidance_section(g, view, heading='Preprocessing guidance') %}
+<div class="dt-layer">
+  <h2>{{ heading }}</h2>
+  {% if not g %}<p>Guidance was not recorded by the version that produced this analysis.</p>
+  {% elif not g['items'] %}<p class="section-note">No finding called for guidance. The scope and open questions above still apply.</p>
+  {% else %}
+  <p class="section-note">For each finding: what was observed, its possible impact, what to investigate first, options with their prerequisites, when to avoid them and how to verify the result, and what this analysis did not assess. Options are conditional; none is prescribed and none was applied. Guidance version {{ g.version }}.</p>
+  {% for ref, item in g['items'].items() %}{% set o = view.observed.get(ref) %}
+  <div class="dt-item">
+    <h3>{{ item.title }}</h3>
+    <h4>Observed</h4>{% if o %}{% if o.lines %}<ul>{% for line in o.lines %}<li>{{ line }}</li>{% endfor %}</ul>{% endif %}{% if o.moved %}{{ ev.unit_table(o.moved) }}{% endif %}{% else %}<ul>{% for line in item.observed %}<li>{{ line }}</li>{% endfor %}</ul>{% endif %}
+    <h4>Possible impact</h4><ul>{% for line in item.impact %}<li>{{ line }}</li>{% endfor %}</ul>
+    <h4>Investigate first</h4><ul>{% for line in item.investigate %}<li>{{ line }}</li>{% endfor %}</ul>
+    <h4>Options</h4>
+    <table><thead><tr><th>Option</th><th>Prerequisites</th><th>Avoid when</th><th>How to verify</th></tr></thead><tbody>
+    {% for option in item.options %}<tr><td>{{ option.option }}</td><td>{{ option.prerequisites }}</td><td>{{ option.avoid_when }}</td><td>{{ option.verify }}</td></tr>{% endfor %}
+    </tbody></table>
+    {% if item.unknowns %}<h4>Not assessed</h4><ul>{% for line in item.unknowns %}<li>{{ line }}</li>{% endfor %}</ul>{% endif %}
+  </div>
+  {% endfor %}
+  {% endif %}
+</div>
+{% endmacro %}
+
+{% macro scoring_section(g, view) %}
+{% if g and g.scoring %}{% set s = g.scoring %}
+<div class="dt-layer">
+  <h3>How the score was reached</h3>
+  <p>{{ s.evidence_score.method }} Evidence score {{ s.evidence_score.mean }}. {{ s.overall_method }} Final score {{ s.overall }}.</p>
+  <table><thead><tr><th>Sub-score</th><th>Value</th></tr></thead><tbody>{% for name, v in s.evidence_score.sub_scores.items() %}<tr><td>{{ name | report_label }}</td><td>{{ v }}</td></tr>{% endfor %}</tbody></table>
+  {% if s.guardrails %}<h4>Guardrails</h4><ul>{% for gr in s.guardrails %}<li>Cap {{ gr.cap }}{% if gr.governing %} (governing){% else %} (also triggered){% endif %}: {{ gr.explanation | long_list }}</li>{% endfor %}</ul>{% endif %}
+  <h4>Feature-usability contributors</h4>
+  <p>{{ s.feature_usability.method }} {{ s.feature_usability.raw_points }} raw points across {{ s.feature_usability.feature_count }} feature columns give a sub-score of {{ s.feature_usability.sub_score }}.</p>
+  {% if view.contributors %}{{ ev.unit_table(view.contributors) }}
+  {% else %}<p class="section-note">No feature column triggered a penalty rule.</p>{% endif %}
+</div>
+{% endif %}
+{% endmacro %}
+
+{% macro disclosure(result, view) %}
+<div class="analysis-disclosure">
+  <h3>Parsing, execution, and coverage disclosure</h3>
+  {% if result.execution.status == 'partial' %}<div class="callout"><strong>Analysis incomplete</strong> — review unavailable checks below.</div>{% endif %}
+  <p>Parser: {{ result.parsing.parser }} / pandas {{ result.parsing.pandas_version }}. {{ result.parsing.options.delimiter | delimiter_label }} delimiter, inferred header, blank lines skipped. Encoding: {{ result.parsing.options.encoding }}. Missing policy: {{ result.parsing.options.missing_policy | report_label }}. Source values were not rewritten.</p>
+  <p>Custom missing tokens: {% for token in result.parsing.options.na_values %}{{ token | tojson }}{{ ", " if not loop.last }}{% else %}None configured{% endfor %}; explicit column types: {% for column, kind in result.parsing.options.column_types.items() %}{{ column | soft_wrap_name }}: {{ kind }}{{ "; " if not loop.last }}{% else %}None configured{% endfor %}.</p>
+  <p>Source SHA-256: <span class="digest">{{ result.parsing.source_sha256 }}</span>. Method: {{ result.methodology_id }}.</p>
+  <p>Token inspection: {{ result.parsing.fidelity_inspection.bytes_inspected }} bytes, {{ result.parsing.fidelity_inspection.records_inspected }} data records, {{ result.parsing.fidelity_inspection.comparable_cells }} comparable cells; stopping reason: {{ result.parsing.fidelity_inspection.stopping_reason | report_label }}. Alignment confirmed: {{ result.parsing.fidelity_inspection.alignment_confirmed | report_value }}.</p>
+  <p class="section-note">Interpretation review warnings are separate from data findings and scoring. Counts describe only inspected source tokens and are never extrapolated to the dataset. No warnings observed does not establish losslessness.</p>
+  {% for warning in result.parsing_warnings %}
+  {% set notice = warning | regression_inspection_notice if result.task.kind == 'regression' else none %}
+  {% if notice %}<div class="callout"><strong>{{ notice.title }}</strong><p>{{ notice.text }}</p></div>{% else %}
+  <div class="callout"><strong>{{ warning.code }}{% if warning.column %} · {{ warning.column }}{% endif %}</strong><p>{{ warning.interpretation }}</p><p class="small">Observed occurrences: {{ warning.observed_count }}; setting: {{ warning.setting }}. {{ warning.recommendation }}</p></div>
+  {% endif %}
+  {% else %}<p>No parsing warnings observed within the inspected scope.</p>{% endfor %}
+  {% include 'provenance.html' %}
+  <h4>Operational safeguards</h4>
+  <p>{{ result.execution.enforcement }}</p>
+  <p>Backend: {{ result.execution.backend | report_label }}; frame: {{ result.execution.frame_bytes }} bytes; elapsed: {{ result.execution.elapsed_seconds }} seconds.</p>
+  <table class="limit-table"><thead><tr><th>Configured safeguard</th><th>Limit</th></tr></thead><tbody>
+  {% for name, value in result.execution.limits.items() %}<tr><td>{{ name | report_label }}</td><td>{% if value is none %}Not set{% else %}{{ value }}{% if name.endswith('_bytes') %} bytes{% elif name == 'max_seconds' %} seconds{% endif %}{% endif %}</td></tr>{% endfor %}
+  </tbody></table>
+  <h4>Check applicability and execution</h4>
+  {% if view.checks.detail %}
+  <table class="check-table"><thead><tr><th>Check</th><th>Count and scope examples</th><th>Applicable</th><th>Execution</th><th>Reason</th></tr></thead><tbody>
+  {% for row in view.checks.grouped %}<tr><td>{{ row[0] }}</td><td>{{ row[1] }}</td><td>{{ row[2] | report_label }}</td><td>{{ row[3] | report_label }}</td><td>{{ row[4] | report_label }}</td></tr>{% endfor %}
+  </tbody></table>
+  <p class="section-note">Repeated checks are grouped above: {{ view.checks.total }} check records in {{ view.checks.grouped | length }} groups.</p>{{ ev.unit_table(view.checks.detail) }}
+  {% else %}
+  <table class="check-table"><thead><tr><th>Check / scope</th><th>Applicable</th><th>Execution</th><th>Reason / exclusions</th></tr></thead><tbody>
+  {% for check in result.checks %}<tr><td>{{ check.check_id | report_label }} · {{ check.scope }}</td><td>{{ check.applicability | report_label }}</td><td>{{ check.execution | report_label }}</td><td>{% if check.reason %}{{ check.reason | report_label }}{% endif %}{% if check.exclusions %}{% if check.reason %}; {% endif %}Exclusions: {{ check.exclusions | report_value }}{% elif not check.reason %}No exclusions{% endif %}</td></tr>{% endfor %}
+  </tbody></table>
+  {% endif %}
+  <p>{{ result.coverage.meaning }}</p>
+  <p>Unsupported: {{ result.coverage.unsupported_capabilities | join('; ') }}.</p>
+  <p class="section-note">Deterministic fixtures and corpus regression checks provide internal methodology validation. They do not establish external method validity or customer usefulness. Prediction and model-performance analysis belong to ConfidenceGuard.</p>
+</div>
+{% endmacro %}
+
+{% macro column_evidence(view, heading='Column evidence') %}
+<h3 id="ev-column-evidence">{{ heading }}</h3>
+<p class="section-note">{% if view.profile == 'focused' %}Columns that a finding or an analysis flag refers to are listed by family, most significant first; the remaining columns are summarised. Every column is listed in “All columns” on screen and in analysis.json.{% else %}Complete print profile: every column is printed once in “All columns” and, for numeric columns, in “Numeric summaries”.{% endif %} Percentages use the denominators stated in the methodology.</p>
+{% for uid in view.column_order %}{{ ev.unit_table(view.columns[uid]) }}{% endfor %}
+{% endmacro %}
+
+{% macro finding_index(view) %}
+{% if view.findings %}<table class="dt-evidence dt-index"><thead><tr><th>Finding</th><th>Priority</th><th>Effect</th></tr></thead><tbody>
+{% for f in view.findings %}<tr><td><a href="#{{ f.anchor }}">{{ f.title }}</a></td><td>{{ f.severity }}</td><td>{{ f.effect }}</td></tr>{% endfor %}
+</tbody></table>{% endif %}
+{% endmacro %}
+
+{% macro missingness_bars(view) %}{% set m = view.missingness_chart %}
+{% if m.bars %}
+<div class="chart" role="img" aria-label="Horizontal bars showing missing percentage by column">
+  {% for c in m.bars %}<div class="bar-row"><div class="bar-label">{{ c.name | soft_wrap_name }}</div><div class="bar-track"><div class="bar missing" style="width: {{ c.missing_rate }}%"></div></div><div class="bar-value">{{ c.missing_count }} · {{ c.missing_rate }}%</div></div>{% endfor %}
+</div>
+<p class="section-note">{% if m.more %}{{ m.bars | length }} of {{ m.total }} columns with missing values, most missing first; all {{ m.total }} are in “All columns” (technical appendix) and analysis.json → /profile/columns.{% else %}Every column with missing values is shown.{% endif %}</p>
+{% else %}<p class="section-note">No column has missing values.</p>{% endif %}
+{% endmacro %}

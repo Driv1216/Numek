@@ -116,7 +116,7 @@ def resolve_text_evidence(manifest,reference,report,*,allowed_roots,reveal_conte
 
 
 class ExportView:
-    def __init__(self,result,references,allowed_roots):
+    def __init__(self,result,references,allowed_roots,print_profile='focused'):
         self.result=result;self.data=copy.deepcopy(result.to_dict());self.data['profile']['excerpts']=[]
         from datatrust.text_presentation import executive_summary
         executive=executive_summary(self.data)
@@ -131,7 +131,9 @@ class ExportView:
         self.data['profile'].pop('export_fingerprint',None)
         self.data['profile'].pop('export_identity',None)
         package=Path(__file__).parent
-        identity={'completed_evidence_sha256':hashlib.sha256(result.json_text().encode()).hexdigest(),'disclosure':self.data['profile']['disclosure'],'excerpt_sha256':hashlib.sha256(json.dumps(self.data['profile']['excerpts'],sort_keys=True,ensure_ascii=True).encode()).hexdigest(),'template_sha256':hashlib.sha256((package/'templates/text_report.html').read_bytes()).hexdigest(),'projection_sha256':hashlib.sha256((package/'text_presentation.py').read_bytes()).hexdigest(),'canonical_html_sha256':hashlib.sha256(render_analysis_result(self).encode()).hexdigest()}
+        identity={'completed_evidence_sha256':hashlib.sha256(result.json_text().encode()).hexdigest(),'disclosure':self.data['profile']['disclosure'],'excerpt_sha256':hashlib.sha256(json.dumps(self.data['profile']['excerpts'],sort_keys=True,ensure_ascii=True).encode()).hexdigest(),'template_sha256':hashlib.sha256((package/'templates/text_report.html').read_bytes()).hexdigest(),'projection_sha256':hashlib.sha256((package/'text_presentation.py').read_bytes()).hexdigest(),'canonical_html_sha256':hashlib.sha256(render_analysis_result(self,print_profile=print_profile).encode()).hexdigest()}
+        from datatrust.report_identity import identity as _presentation  # additive (Report Experience I.3)
+        identity.update(presentation_identity=_presentation('text')['presentation_id'],print_profile=print_profile)
         self.data['profile']['export_identity']=identity
         self.data['profile']['export_fingerprint']=hashlib.sha256(json.dumps(identity,sort_keys=True,ensure_ascii=True).encode()).hexdigest()
     def __getattr__(self,key):return getattr(self.result,key)
@@ -149,16 +151,16 @@ def write_text_json(result,path,*,private_out=None):
     return write_analysis_json(ExportView(result,(),()),path)
 
 
-def generate_artifacts(result,path,*,format='html',html_path=None,json_path=None,private_out=None,excerpt_refs=(),allowed_roots=(),pdf_converter=None):
+def generate_artifacts(result,path,*,format='html',html_path=None,json_path=None,private_out=None,excerpt_refs=(),allowed_roots=(),pdf_converter=None,print_profile='focused'):
     private=manifest_path(result,path,private_out)
     protect_source(result.source_paths,[private,path,html_path,json_path])
-    view=ExportView(result,tuple(excerpt_refs),allowed_roots)
+    view=ExportView(result,tuple(excerpt_refs),allowed_roots,print_profile)
     canonical=Path(html_path) if html_path else Path(path).with_suffix('.html') if format=='pdf' else Path(path)
     if canonical.exists() and os.name=='posix' and canonical.stat().st_mode&0o077:raise ArtifactCollisionError('Existing canonical HTML is not owner-only.')
     # Reject a disclosure collision before creating any public artifacts.
     write_manifest(result,private)
     try:
-        artifacts=write_report_artifacts(view,path,format=format,html_path=html_path,json_path=json_path,pdf_converter=pdf_converter)
+        artifacts=write_report_artifacts(view,path,format=format,html_path=html_path,json_path=json_path,pdf_converter=pdf_converter,print_profile=print_profile)
     except Exception as exc:
         if getattr(exc,'artifacts',None):exc.artifacts=TextReportArtifacts(**asdict(exc.artifacts),private_manifest_path=str(private))
         raise

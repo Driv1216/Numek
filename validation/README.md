@@ -72,6 +72,21 @@ python -m validation.prepare
 - `results/leakage_review.csv`: every leakage flag, reason, and reviewed classification
 - `results/validation_summary.json`: machine-readable run summary
 
+## Milestone validators never rewrite committed evidence
+
+The M4, M5, M6, M7 and M9 validators (`python -m validation.<milestone>.verify`) regenerate reports and ledgers as part
+of verifying. Since 2026-11-18 they write everything into a temporary mirror of their folder that is removed at exit
+(`validation/outputs.py`). Committed evidence is only read: to compare, or to reuse a recorded result.
+
+- `--refresh` (or `DATATRUST_VALIDATION_REFRESH=1`) writes to the committed locations. That is the deliberate
+  re-baselining step, to be reviewed and committed like any other change.
+- `DATATRUST_VALIDATION_KEEP=1` keeps the temporary mirror and prints where it is.
+
+Two milestone-specific notes:
+- **M7:** when a case reuses a stored result, its "disclosed examples" step runs a fresh audit. A stored private manifest
+  binds each source's filesystem identity (device, inode, times) and no longer resolves after a restart or a move.
+- **M9:** the validator checks the summary sentence against `cross_presentation.summary()`.
+
 ## Isolated Evidently Comparison
 
 The project and validation environments use Python 3.10 or newer. Evidently is pinned in

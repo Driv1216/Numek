@@ -1,0 +1,1781 @@
+{
+  "dataset": {
+    "path": "german_credit.csv",
+    "format": "csv",
+    "sample_unit": "row",
+    "dataset_name": null,
+    "purpose": null,
+    "source_filename": null
+  },
+  "task": {
+    "kind": "dataset_profile",
+    "target": null
+  },
+  "profile": {
+    "row_count": 1000,
+    "column_count": 21,
+    "feature_count": 21,
+    "numeric_feature_count": 7,
+    "non_numeric_feature_count": 14,
+    "missing_cells": 0,
+    "missing_rate": 0.0,
+    "missing_feature_row_count": 0,
+    "missing_feature_row_rate": 0.0,
+    "rows_with_1_missing_feature": 0,
+    "rows_with_2_missing_features": 0,
+    "rows_with_3_plus_missing_features": 0,
+    "columns": [
+      {
+        "name": "checking_account_status",
+        "dtype": "str",
+        "role": "feature",
+        "is_numeric": false,
+        "missing_count": 0,
+        "missing_rate": 0.0,
+        "non_null_count": 1000,
+        "unique_count": 4,
+        "unique_rate": 0.4,
+        "constant": false,
+        "near_constant": false,
+        "high_cardinality": false,
+        "top_value": "A14",
+        "top_value_count": 394,
+        "top_value_rate": 39.4,
+        "top_value_hidden": false,
+        "top_value_is_missing": false,
+        "outlier_count": 0,
+        "outlier_rate": 0.0,
+        "numeric_summary": null
+      },
+      {
+        "name": "duration_months",
+        "dtype": "int64",
+        "role": "feature",
+        "is_numeric": true,
+        "missing_count": 0,
+        "missing_rate": 0.0,
+        "non_null_count": 1000,
+        "unique_count": 33,
+        "unique_rate": 3.3,
+        "constant": false,
+        "near_constant": false,
+        "high_cardinality": false,
+        "top_value": "24",
+        "top_value_count": 184,
+        "top_value_rate": 18.4,
+        "top_value_hidden": false,
+        "top_value_is_missing": false,
+        "outlier_count": 70,
+        "outlier_rate": 7.0,
+        "numeric_summary": {
+          "min": 4,
+          "q1": 12.0,
+          "median": 18.0,
+          "q3": 24.0,
+          "max": 72,
+          "zero_count": 0,
+          "zero_rate": 0.0,
+          "negative_count": 0,
+          "negative_rate": 0.0,
+          "non_finite_count": 0,
+          "non_finite_rate": 0.0
+        },
+        "finite_count": 1000,
+        "outlier_denominator": 1000,
+        "outlier_method": "finite_1.5_iqr",
+        "outlier_unavailable_reason": null
+      },
+      {
+        "name": "credit_history",
+        "dtype": "str",
+        "role": "feature",
+        "is_numeric": false,
+        "missing_count": 0,
+        "missing_rate": 0.0,
+        "non_null_count": 1000,
+        "unique_count": 5,
+        "unique_rate": 0.5,
+        "constant": false,
+        "near_constant": false,
+        "high_cardinality": false,
+        "top_value": "A32",
+        "top_value_count": 530,
+        "top_value_rate": 53.0,
+        "top_value_hidden": false,
+        "top_value_is_missing": false,
+        "outlier_count": 0,
+        "outlier_rate": 0.0,
+        "numeric_summary": null
+      },
+      {
+        "name": "purpose",
+        "dtype": "str",
+        "role": "feature",
+        "is_numeric": false,
+        "missing_count": 0,
+        "missing_rate": 0.0,
+        "non_null_count": 1000,
+        "unique_count": 10,
+        "unique_rate": 1.0,
+        "constant": false,
+        "near_constant": false,
+        "high_cardinality": false,
+        "top_value": "A43",
+        "top_value_count": 280,
+        "top_value_rate": 28.0,
+        "top_value_hidden": false,
+        "top_value_is_missing": false,
+        "outlier_count": 0,
+        "outlier_rate": 0.0,
+        "numeric_summary": null
+      },
+      {
+        "name": "credit_amount",
+        "dtype": "int64",
+        "role": "feature",
+        "is_numeric": true,
+        "missing_count": 0,
+        "missing_rate": 0.0,
+        "non_null_count": 1000,
+        "unique_count": 921,
+        "unique_rate": 92.1,
+        "constant": false,
+        "near_constant": false,
+        "high_cardinality": false,
+        "top_value": "1393",
+        "top_value_count": 3,
+        "top_value_rate": 0.3,
+        "top_value_hidden": false,
+        "top_value_is_missing": false,
+        "outlier_count": 72,
+        "outlier_rate": 7.2,
+        "numeric_summary": {
+          "min": 250,
+          "q1": 1365.5,
+          "median": 2319.5,
+          "q3": 3972.25,
+          "max": 18424,
+          "zero_count": 0,
+          "zero_rate": 0.0,
+          "negative_count": 0,
+          "negative_rate": 0.0,
+          "non_finite_count": 0,
+          "non_finite_rate": 0.0
+        },
+        "finite_count": 1000,
+        "outlier_denominator": 1000,
+        "outlier_method": "finite_1.5_iqr",
+        "outlier_unavailable_reason": null
+      },
+      {
+        "name": "savings_status",
+        "dtype": "str",
+        "role": "feature",
+        "is_numeric": false,
+        "missing_count": 0,
+        "missing_rate": 0.0,
+        "non_null_count": 1000,
+        "unique_count": 5,
+        "unique_rate": 0.5,
+        "constant": false,
+        "near_constant": false,
+        "high_cardinality": false,
+        "top_value": "A61",
+        "top_value_count": 603,
+        "top_value_rate": 60.3,
+        "top_value_hidden": false,
+        "top_value_is_missing": false,
+        "outlier_count": 0,
+        "outlier_rate": 0.0,
+        "numeric_summary": null
+      },
+      {
+        "name": "employment_duration",
+        "dtype": "str",
+        "role": "feature",
+        "is_numeric": false,
+        "missing_count": 0,
+        "missing_rate": 0.0,
+        "non_null_count": 1000,
+        "unique_count": 5,
+        "unique_rate": 0.5,
+        "constant": false,
+        "near_constant": false,
+        "high_cardinality": false,
+        "top_value": "A73",
+        "top_value_count": 339,
+        "top_value_rate": 33.9,
+        "top_value_hidden": false,
+        "top_value_is_missing": false,
+        "outlier_count": 0,
+        "outlier_rate": 0.0,
+        "numeric_summary": null
+      },
+      {
+        "name": "installment_rate",
+        "dtype": "int64",
+        "role": "feature",
+        "is_numeric": true,
+        "missing_count": 0,
+        "missing_rate": 0.0,
+        "non_null_count": 1000,
+        "unique_count": 4,
+        "unique_rate": 0.4,
+        "constant": false,
+        "near_constant": false,
+        "high_cardinality": false,
+        "top_value": "4",
+        "top_value_count": 476,
+        "top_value_rate": 47.6,
+        "top_value_hidden": false,
+        "top_value_is_missing": false,
+        "outlier_count": 0,
+        "outlier_rate": 0.0,
+        "numeric_summary": {
+          "min": 1,
+          "q1": 2.0,
+          "median": 3.0,
+          "q3": 4.0,
+          "max": 4,
+          "zero_count": 0,
+          "zero_rate": 0.0,
+          "negative_count": 0,
+          "negative_rate": 0.0,
+          "non_finite_count": 0,
+          "non_finite_rate": 0.0
+        },
+        "finite_count": 1000,
+        "outlier_denominator": 1000,
+        "outlier_method": "finite_1.5_iqr",
+        "outlier_unavailable_reason": null
+      },
+      {
+        "name": "personal_status_sex",
+        "dtype": "str",
+        "role": "feature",
+        "is_numeric": false,
+        "missing_count": 0,
+        "missing_rate": 0.0,
+        "non_null_count": 1000,
+        "unique_count": 4,
+        "unique_rate": 0.4,
+        "constant": false,
+        "near_constant": false,
+        "high_cardinality": false,
+        "top_value": "A93",
+        "top_value_count": 548,
+        "top_value_rate": 54.8,
+        "top_value_hidden": false,
+        "top_value_is_missing": false,
+        "outlier_count": 0,
+        "outlier_rate": 0.0,
+        "numeric_summary": null
+      },
+      {
+        "name": "other_debtors",
+        "dtype": "str",
+        "role": "feature",
+        "is_numeric": false,
+        "missing_count": 0,
+        "missing_rate": 0.0,
+        "non_null_count": 1000,
+        "unique_count": 3,
+        "unique_rate": 0.3,
+        "constant": false,
+        "near_constant": false,
+        "high_cardinality": false,
+        "top_value": "A101",
+        "top_value_count": 907,
+        "top_value_rate": 90.7,
+        "top_value_hidden": false,
+        "top_value_is_missing": false,
+        "outlier_count": 0,
+        "outlier_rate": 0.0,
+        "numeric_summary": null
+      },
+      {
+        "name": "residence_duration",
+        "dtype": "int64",
+        "role": "feature",
+        "is_numeric": true,
+        "missing_count": 0,
+        "missing_rate": 0.0,
+        "non_null_count": 1000,
+        "unique_count": 4,
+        "unique_rate": 0.4,
+        "constant": false,
+        "near_constant": false,
+        "high_cardinality": false,
+        "top_value": "4",
+        "top_value_count": 413,
+        "top_value_rate": 41.3,
+        "top_value_hidden": false,
+        "top_value_is_missing": false,
+        "outlier_count": 0,
+        "outlier_rate": 0.0,
+        "numeric_summary": {
+          "min": 1,
+          "q1": 2.0,
+          "median": 3.0,
+          "q3": 4.0,
+          "max": 4,
+          "zero_count": 0,
+          "zero_rate": 0.0,
+          "negative_count": 0,
+          "negative_rate": 0.0,
+          "non_finite_count": 0,
+          "non_finite_rate": 0.0
+        },
+        "finite_count": 1000,
+        "outlier_denominator": 1000,
+        "outlier_method": "finite_1.5_iqr",
+        "outlier_unavailable_reason": null
+      },
+      {
+        "name": "property",
+        "dtype": "str",
+        "role": "feature",
+        "is_numeric": false,
+        "missing_count": 0,
+        "missing_rate": 0.0,
+        "non_null_count": 1000,
+        "unique_count": 4,
+        "unique_rate": 0.4,
+        "constant": false,
+        "near_constant": false,
+        "high_cardinality": false,
+        "top_value": "A123",
+        "top_value_count": 332,
+        "top_value_rate": 33.2,
+        "top_value_hidden": false,
+        "top_value_is_missing": false,
+        "outlier_count": 0,
+        "outlier_rate": 0.0,
+        "numeric_summary": null
+      },
+      {
+        "name": "age",
+        "dtype": "int64",
+        "role": "feature",
+        "is_numeric": true,
+        "missing_count": 0,
+        "missing_rate": 0.0,
+        "non_null_count": 1000,
+        "unique_count": 53,
+        "unique_rate": 5.3,
+        "constant": false,
+        "near_constant": false,
+        "high_cardinality": false,
+        "top_value": "27",
+        "top_value_count": 51,
+        "top_value_rate": 5.1,
+        "top_value_hidden": false,
+        "top_value_is_missing": false,
+        "outlier_count": 23,
+        "outlier_rate": 2.3,
+        "numeric_summary": {
+          "min": 19,
+          "q1": 27.0,
+          "median": 33.0,
+          "q3": 42.0,
+          "max": 75,
+          "zero_count": 0,
+          "zero_rate": 0.0,
+          "negative_count": 0,
+          "negative_rate": 0.0,
+          "non_finite_count": 0,
+          "non_finite_rate": 0.0
+        },
+        "finite_count": 1000,
+        "outlier_denominator": 1000,
+        "outlier_method": "finite_1.5_iqr",
+        "outlier_unavailable_reason": null
+      },
+      {
+        "name": "other_installment_plans",
+        "dtype": "str",
+        "role": "feature",
+        "is_numeric": false,
+        "missing_count": 0,
+        "missing_rate": 0.0,
+        "non_null_count": 1000,
+        "unique_count": 3,
+        "unique_rate": 0.3,
+        "constant": false,
+        "near_constant": false,
+        "high_cardinality": false,
+        "top_value": "A143",
+        "top_value_count": 814,
+        "top_value_rate": 81.4,
+        "top_value_hidden": false,
+        "top_value_is_missing": false,
+        "outlier_count": 0,
+        "outlier_rate": 0.0,
+        "numeric_summary": null
+      },
+      {
+        "name": "housing",
+        "dtype": "str",
+        "role": "feature",
+        "is_numeric": false,
+        "missing_count": 0,
+        "missing_rate": 0.0,
+        "non_null_count": 1000,
+        "unique_count": 3,
+        "unique_rate": 0.3,
+        "constant": false,
+        "near_constant": false,
+        "high_cardinality": false,
+        "top_value": "A152",
+        "top_value_count": 713,
+        "top_value_rate": 71.3,
+        "top_value_hidden": false,
+        "top_value_is_missing": false,
+        "outlier_count": 0,
+        "outlier_rate": 0.0,
+        "numeric_summary": null
+      },
+      {
+        "name": "existing_credits",
+        "dtype": "int64",
+        "role": "feature",
+        "is_numeric": true,
+        "missing_count": 0,
+        "missing_rate": 0.0,
+        "non_null_count": 1000,
+        "unique_count": 4,
+        "unique_rate": 0.4,
+        "constant": false,
+        "near_constant": false,
+        "high_cardinality": false,
+        "top_value": "1",
+        "top_value_count": 633,
+        "top_value_rate": 63.3,
+        "top_value_hidden": false,
+        "top_value_is_missing": false,
+        "outlier_count": 6,
+        "outlier_rate": 0.6,
+        "numeric_summary": {
+          "min": 1,
+          "q1": 1.0,
+          "median": 1.0,
+          "q3": 2.0,
+          "max": 4,
+          "zero_count": 0,
+          "zero_rate": 0.0,
+          "negative_count": 0,
+          "negative_rate": 0.0,
+          "non_finite_count": 0,
+          "non_finite_rate": 0.0
+        },
+        "finite_count": 1000,
+        "outlier_denominator": 1000,
+        "outlier_method": "finite_1.5_iqr",
+        "outlier_unavailable_reason": null
+      },
+      {
+        "name": "job",
+        "dtype": "str",
+        "role": "feature",
+        "is_numeric": false,
+        "missing_count": 0,
+        "missing_rate": 0.0,
+        "non_null_count": 1000,
+        "unique_count": 4,
+        "unique_rate": 0.4,
+        "constant": false,
+        "near_constant": false,
+        "high_cardinality": false,
+        "top_value": "A173",
+        "top_value_count": 630,
+        "top_value_rate": 63.0,
+        "top_value_hidden": false,
+        "top_value_is_missing": false,
+        "outlier_count": 0,
+        "outlier_rate": 0.0,
+        "numeric_summary": null
+      },
+      {
+        "name": "dependents",
+        "dtype": "int64",
+        "role": "feature",
+        "is_numeric": true,
+        "missing_count": 0,
+        "missing_rate": 0.0,
+        "non_null_count": 1000,
+        "unique_count": 2,
+        "unique_rate": 0.2,
+        "constant": false,
+        "near_constant": false,
+        "high_cardinality": false,
+        "top_value": "1",
+        "top_value_count": 845,
+        "top_value_rate": 84.5,
+        "top_value_hidden": false,
+        "top_value_is_missing": false,
+        "outlier_count": null,
+        "outlier_rate": null,
+        "numeric_summary": {
+          "min": 1,
+          "q1": 1.0,
+          "median": 1.0,
+          "q3": 1.0,
+          "max": 2,
+          "zero_count": 0,
+          "zero_rate": 0.0,
+          "negative_count": 0,
+          "negative_rate": 0.0,
+          "non_finite_count": 0,
+          "non_finite_rate": 0.0
+        },
+        "finite_count": 1000,
+        "outlier_denominator": 1000,
+        "outlier_method": "finite_1.5_iqr",
+        "outlier_unavailable_reason": "zero_iqr"
+      },
+      {
+        "name": "telephone",
+        "dtype": "str",
+        "role": "feature",
+        "is_numeric": false,
+        "missing_count": 0,
+        "missing_rate": 0.0,
+        "non_null_count": 1000,
+        "unique_count": 2,
+        "unique_rate": 0.2,
+        "constant": false,
+        "near_constant": false,
+        "high_cardinality": false,
+        "top_value": "A191",
+        "top_value_count": 596,
+        "top_value_rate": 59.6,
+        "top_value_hidden": false,
+        "top_value_is_missing": false,
+        "outlier_count": 0,
+        "outlier_rate": 0.0,
+        "numeric_summary": null
+      },
+      {
+        "name": "foreign_worker",
+        "dtype": "str",
+        "role": "feature",
+        "is_numeric": false,
+        "missing_count": 0,
+        "missing_rate": 0.0,
+        "non_null_count": 1000,
+        "unique_count": 2,
+        "unique_rate": 0.2,
+        "constant": false,
+        "near_constant": true,
+        "high_cardinality": false,
+        "top_value": "A201",
+        "top_value_count": 963,
+        "top_value_rate": 96.3,
+        "top_value_hidden": false,
+        "top_value_is_missing": false,
+        "outlier_count": 0,
+        "outlier_rate": 0.0,
+        "numeric_summary": null
+      },
+      {
+        "name": "credit_risk",
+        "dtype": "str",
+        "role": "feature",
+        "is_numeric": false,
+        "missing_count": 0,
+        "missing_rate": 0.0,
+        "non_null_count": 1000,
+        "unique_count": 2,
+        "unique_rate": 0.2,
+        "constant": false,
+        "near_constant": false,
+        "high_cardinality": false,
+        "top_value": "good",
+        "top_value_count": 700,
+        "top_value_rate": 70.0,
+        "top_value_hidden": false,
+        "top_value_is_missing": false,
+        "outlier_count": 0,
+        "outlier_rate": 0.0,
+        "numeric_summary": null
+      }
+    ],
+    "severe_missing_columns": [],
+    "duplicate_rows": 0,
+    "duplicate_rate": 0.0,
+    "duplicate_group_count": 0,
+    "largest_duplicate_group_size": 0,
+    "rows_in_duplicate_groups": 0,
+    "duplicate_row_examples": []
+  },
+  "parsing": {
+    "options": {
+      "encoding": "utf-8",
+      "missing_policy": "pandas_default",
+      "na_values": [],
+      "column_types": {}
+    },
+    "pandas_version": "3.0.3",
+    "parser": "pandas.read_csv",
+    "delimiter": ",",
+    "header": "infer",
+    "skip_blank_lines": true,
+    "dtypes": {
+      "checking_account_status": "str",
+      "duration_months": "int64",
+      "credit_history": "str",
+      "purpose": "str",
+      "credit_amount": "int64",
+      "savings_status": "str",
+      "employment_duration": "str",
+      "installment_rate": "int64",
+      "personal_status_sex": "str",
+      "other_debtors": "str",
+      "residence_duration": "int64",
+      "property": "str",
+      "age": "int64",
+      "other_installment_plans": "str",
+      "housing": "str",
+      "existing_credits": "int64",
+      "job": "str",
+      "dependents": "int64",
+      "telephone": "str",
+      "foreign_worker": "str",
+      "credit_risk": "str"
+    },
+    "provisional_types": false,
+    "structure_validation": "complete_source_width_v1",
+    "header_mapping": [
+      {
+        "position": 1,
+        "original": "checking_account_status",
+        "resolved": "checking_account_status"
+      },
+      {
+        "position": 2,
+        "original": "duration_months",
+        "resolved": "duration_months"
+      },
+      {
+        "position": 3,
+        "original": "credit_history",
+        "resolved": "credit_history"
+      },
+      {
+        "position": 4,
+        "original": "purpose",
+        "resolved": "purpose"
+      },
+      {
+        "position": 5,
+        "original": "credit_amount",
+        "resolved": "credit_amount"
+      },
+      {
+        "position": 6,
+        "original": "savings_status",
+        "resolved": "savings_status"
+      },
+      {
+        "position": 7,
+        "original": "employment_duration",
+        "resolved": "employment_duration"
+      },
+      {
+        "position": 8,
+        "original": "installment_rate",
+        "resolved": "installment_rate"
+      },
+      {
+        "position": 9,
+        "original": "personal_status_sex",
+        "resolved": "personal_status_sex"
+      },
+      {
+        "position": 10,
+        "original": "other_debtors",
+        "resolved": "other_debtors"
+      },
+      {
+        "position": 11,
+        "original": "residence_duration",
+        "resolved": "residence_duration"
+      },
+      {
+        "position": 12,
+        "original": "property",
+        "resolved": "property"
+      },
+      {
+        "position": 13,
+        "original": "age",
+        "resolved": "age"
+      },
+      {
+        "position": 14,
+        "original": "other_installment_plans",
+        "resolved": "other_installment_plans"
+      },
+      {
+        "position": 15,
+        "original": "housing",
+        "resolved": "housing"
+      },
+      {
+        "position": 16,
+        "original": "existing_credits",
+        "resolved": "existing_credits"
+      },
+      {
+        "position": 17,
+        "original": "job",
+        "resolved": "job"
+      },
+      {
+        "position": 18,
+        "original": "dependents",
+        "resolved": "dependents"
+      },
+      {
+        "position": 19,
+        "original": "telephone",
+        "resolved": "telephone"
+      },
+      {
+        "position": 20,
+        "original": "foreign_worker",
+        "resolved": "foreign_worker"
+      },
+      {
+        "position": 21,
+        "original": "credit_risk",
+        "resolved": "credit_risk"
+      }
+    ],
+    "fidelity_inspection": {
+      "bytes_inspected": 82789,
+      "records_inspected": 200,
+      "cells_retained": 4200,
+      "complete": false,
+      "stopping_reason": "record_limit",
+      "comparable_cells": 4200,
+      "alignment_confirmed": true,
+      "counts_are_dataset_incidence": false
+    },
+    "inspection_limits": {
+      "max_bytes": 1048576,
+      "max_records": 200,
+      "max_cells": 20000
+    },
+    "fingerprint": "446293f2ef2c1c84c78ae3052649065aa9cbe30138b955f1d397c3a676ddc7d0",
+    "inference_caution": "NA-like tokens may become missing; numeric-looking codes may lose leading zeros. No source values were rewritten.",
+    "source_sha256": "ceb623db48e2c6acadbdc1ddd57a4644c5c9d72184f7926797258591c4a79e2e"
+  },
+  "parsing_warnings": [
+    {
+      "code": "inspection_incomplete",
+      "column": null,
+      "header_position": null,
+      "interpretation": "Inspection stopped at record_limit; absence of warnings does not establish losslessness.",
+      "observed_count": 0,
+      "row_refs": [],
+      "setting": "inference",
+      "evidence_type": "interpretation_review_warning",
+      "recommendation": "Confirm this interpretation matches the source meaning; use an explicit parsing override where appropriate.",
+      "scope": "bounded source inspection; counts are not dataset-wide incidence",
+      "inspected_population": {
+        "bytes_inspected": 82789,
+        "records_inspected": 200,
+        "cells_retained": 4200,
+        "complete": false,
+        "stopping_reason": "record_limit",
+        "comparable_cells": 4200,
+        "alignment_confirmed": true,
+        "counts_are_dataset_incidence": false
+      }
+    }
+  ],
+  "checks": [
+    {
+      "check_id": "schema",
+      "applicability": "applicable",
+      "execution": "completed",
+      "scope": "dataset",
+      "reason": null,
+      "evidence_refs": [
+        "schema.0"
+      ],
+      "exclusions": [],
+      "version": "1"
+    },
+    {
+      "check_id": "missingness",
+      "applicability": "applicable",
+      "execution": "completed",
+      "scope": "dataset",
+      "reason": null,
+      "evidence_refs": [
+        "missingness.1"
+      ],
+      "exclusions": [],
+      "version": "1"
+    },
+    {
+      "check_id": "column_variation",
+      "applicability": "applicable",
+      "execution": "completed",
+      "scope": "dataset",
+      "reason": null,
+      "evidence_refs": [
+        "column_variation.2"
+      ],
+      "exclusions": [],
+      "version": "1"
+    },
+    {
+      "check_id": "categorical_cardinality",
+      "applicability": "applicable",
+      "execution": "completed",
+      "scope": "dataset",
+      "reason": null,
+      "evidence_refs": [
+        "categorical_cardinality.3"
+      ],
+      "exclusions": [],
+      "version": "1"
+    },
+    {
+      "check_id": "exact_duplicates",
+      "applicability": "applicable",
+      "execution": "completed",
+      "scope": "dataset",
+      "reason": null,
+      "evidence_refs": [
+        "exact_duplicates.4"
+      ],
+      "exclusions": [],
+      "version": "1"
+    },
+    {
+      "check_id": "numeric_summary",
+      "applicability": "applicable",
+      "execution": "completed",
+      "scope": "duration_months",
+      "reason": null,
+      "evidence_refs": [
+        "numeric_summary.5"
+      ],
+      "exclusions": [],
+      "version": "1"
+    },
+    {
+      "check_id": "numeric_outliers",
+      "applicability": "applicable",
+      "execution": "completed",
+      "scope": "duration_months",
+      "reason": null,
+      "evidence_refs": [
+        "numeric_outliers.6"
+      ],
+      "exclusions": [
+        {
+          "missing_values": 0,
+          "non_finite_values": 0
+        }
+      ],
+      "version": "1"
+    },
+    {
+      "check_id": "numeric_summary",
+      "applicability": "applicable",
+      "execution": "completed",
+      "scope": "credit_amount",
+      "reason": null,
+      "evidence_refs": [
+        "numeric_summary.7"
+      ],
+      "exclusions": [],
+      "version": "1"
+    },
+    {
+      "check_id": "numeric_outliers",
+      "applicability": "applicable",
+      "execution": "completed",
+      "scope": "credit_amount",
+      "reason": null,
+      "evidence_refs": [
+        "numeric_outliers.8"
+      ],
+      "exclusions": [
+        {
+          "missing_values": 0,
+          "non_finite_values": 0
+        }
+      ],
+      "version": "1"
+    },
+    {
+      "check_id": "numeric_summary",
+      "applicability": "applicable",
+      "execution": "completed",
+      "scope": "installment_rate",
+      "reason": null,
+      "evidence_refs": [
+        "numeric_summary.9"
+      ],
+      "exclusions": [],
+      "version": "1"
+    },
+    {
+      "check_id": "numeric_outliers",
+      "applicability": "applicable",
+      "execution": "completed",
+      "scope": "installment_rate",
+      "reason": null,
+      "evidence_refs": [
+        "numeric_outliers.10"
+      ],
+      "exclusions": [
+        {
+          "missing_values": 0,
+          "non_finite_values": 0
+        }
+      ],
+      "version": "1"
+    },
+    {
+      "check_id": "numeric_summary",
+      "applicability": "applicable",
+      "execution": "completed",
+      "scope": "residence_duration",
+      "reason": null,
+      "evidence_refs": [
+        "numeric_summary.11"
+      ],
+      "exclusions": [],
+      "version": "1"
+    },
+    {
+      "check_id": "numeric_outliers",
+      "applicability": "applicable",
+      "execution": "completed",
+      "scope": "residence_duration",
+      "reason": null,
+      "evidence_refs": [
+        "numeric_outliers.12"
+      ],
+      "exclusions": [
+        {
+          "missing_values": 0,
+          "non_finite_values": 0
+        }
+      ],
+      "version": "1"
+    },
+    {
+      "check_id": "numeric_summary",
+      "applicability": "applicable",
+      "execution": "completed",
+      "scope": "age",
+      "reason": null,
+      "evidence_refs": [
+        "numeric_summary.13"
+      ],
+      "exclusions": [],
+      "version": "1"
+    },
+    {
+      "check_id": "numeric_outliers",
+      "applicability": "applicable",
+      "execution": "completed",
+      "scope": "age",
+      "reason": null,
+      "evidence_refs": [
+        "numeric_outliers.14"
+      ],
+      "exclusions": [
+        {
+          "missing_values": 0,
+          "non_finite_values": 0
+        }
+      ],
+      "version": "1"
+    },
+    {
+      "check_id": "numeric_summary",
+      "applicability": "applicable",
+      "execution": "completed",
+      "scope": "existing_credits",
+      "reason": null,
+      "evidence_refs": [
+        "numeric_summary.15"
+      ],
+      "exclusions": [],
+      "version": "1"
+    },
+    {
+      "check_id": "numeric_outliers",
+      "applicability": "applicable",
+      "execution": "completed",
+      "scope": "existing_credits",
+      "reason": null,
+      "evidence_refs": [
+        "numeric_outliers.16"
+      ],
+      "exclusions": [
+        {
+          "missing_values": 0,
+          "non_finite_values": 0
+        }
+      ],
+      "version": "1"
+    },
+    {
+      "check_id": "numeric_summary",
+      "applicability": "applicable",
+      "execution": "completed",
+      "scope": "dependents",
+      "reason": null,
+      "evidence_refs": [
+        "numeric_summary.17"
+      ],
+      "exclusions": [],
+      "version": "1"
+    },
+    {
+      "check_id": "numeric_outliers",
+      "applicability": "blocked",
+      "execution": "not_run",
+      "scope": "dependents",
+      "reason": "zero_iqr",
+      "evidence_refs": [],
+      "exclusions": [],
+      "version": "1"
+    },
+    {
+      "check_id": "classification_target",
+      "applicability": "not_applicable",
+      "execution": "not_run",
+      "scope": "dataset",
+      "reason": "No target selected; general dataset profiling.",
+      "evidence_refs": [],
+      "exclusions": [],
+      "version": "1"
+    },
+    {
+      "check_id": "label_conflicts",
+      "applicability": "not_applicable",
+      "execution": "not_run",
+      "scope": "dataset",
+      "reason": "No target selected; general dataset profiling.",
+      "evidence_refs": [],
+      "exclusions": [],
+      "version": "1"
+    },
+    {
+      "check_id": "target_leakage",
+      "applicability": "not_applicable",
+      "execution": "not_run",
+      "scope": "dataset",
+      "reason": "No target selected; general dataset profiling.",
+      "evidence_refs": [],
+      "exclusions": [],
+      "version": "1"
+    },
+    {
+      "check_id": "classification_scoring",
+      "applicability": "not_applicable",
+      "execution": "not_run",
+      "scope": "dataset",
+      "reason": "No target selected; general dataset profiling.",
+      "evidence_refs": [],
+      "exclusions": [],
+      "version": "1"
+    },
+    {
+      "check_id": "parsing_fidelity",
+      "applicability": "applicable",
+      "execution": "completed",
+      "scope": "dataset",
+      "reason": null,
+      "evidence_refs": [
+        "parsing_fidelity.18"
+      ],
+      "exclusions": [],
+      "version": "1"
+    }
+  ],
+  "evidence": [
+    {
+      "id": "schema.0",
+      "check_id": "schema",
+      "measurement_refs": [
+        "/parsing/header_mapping",
+        "/profile/row_count",
+        "/profile/column_count"
+      ],
+      "population": "parsed records",
+      "denominator": 1000,
+      "affected_count": null,
+      "affected_columns": [],
+      "row_refs": [],
+      "method": "deterministic",
+      "thresholds": {}
+    },
+    {
+      "id": "missingness.1",
+      "check_id": "missingness",
+      "measurement_refs": [
+        "/profile/missing_cells",
+        "/profile/missing_rate",
+        "/profile/missing_feature_row_rate"
+      ],
+      "population": "all parsed cells",
+      "denominator": 21000,
+      "affected_count": 0,
+      "affected_columns": [],
+      "row_refs": [],
+      "method": "deterministic",
+      "thresholds": {}
+    },
+    {
+      "id": "column_variation.2",
+      "check_id": "column_variation",
+      "measurement_refs": [
+        "/profile/columns"
+      ],
+      "population": "all parsed columns",
+      "denominator": 21,
+      "affected_count": null,
+      "affected_columns": [],
+      "row_refs": [],
+      "method": "deterministic",
+      "thresholds": {}
+    },
+    {
+      "id": "categorical_cardinality.3",
+      "check_id": "categorical_cardinality",
+      "measurement_refs": [
+        "/profile/columns"
+      ],
+      "population": "nonnumeric parsed columns",
+      "denominator": 14,
+      "affected_count": null,
+      "affected_columns": [],
+      "row_refs": [],
+      "method": "deterministic",
+      "thresholds": {}
+    },
+    {
+      "id": "exact_duplicates.4",
+      "check_id": "exact_duplicates",
+      "measurement_refs": [
+        "/profile/duplicate_rows",
+        "/profile/duplicate_group_count",
+        "/profile/rows_in_duplicate_groups"
+      ],
+      "population": "all parsed rows",
+      "denominator": 1000,
+      "affected_count": 0,
+      "affected_columns": [],
+      "row_refs": [],
+      "method": "deterministic",
+      "thresholds": {}
+    },
+    {
+      "id": "numeric_summary.5",
+      "check_id": "numeric_summary",
+      "measurement_refs": [
+        "/profile/columns/1/numeric_summary",
+        "/profile/columns/1/finite_count"
+      ],
+      "population": "finite values; zero/negative/non-finite rates use total rows",
+      "denominator": 1000,
+      "affected_count": null,
+      "affected_columns": [
+        "duration_months"
+      ],
+      "row_refs": [],
+      "method": "finite_descriptive",
+      "thresholds": {}
+    },
+    {
+      "id": "numeric_outliers.6",
+      "check_id": "numeric_outliers",
+      "measurement_refs": [
+        "/profile/columns/1/outlier_count",
+        "/profile/columns/1/outlier_rate"
+      ],
+      "population": "finite numeric observations",
+      "denominator": 1000,
+      "affected_count": 70,
+      "affected_columns": [
+        "duration_months"
+      ],
+      "row_refs": [],
+      "method": "finite_1.5_iqr",
+      "thresholds": {
+        "review_rate": 5
+      }
+    },
+    {
+      "id": "numeric_summary.7",
+      "check_id": "numeric_summary",
+      "measurement_refs": [
+        "/profile/columns/4/numeric_summary",
+        "/profile/columns/4/finite_count"
+      ],
+      "population": "finite values; zero/negative/non-finite rates use total rows",
+      "denominator": 1000,
+      "affected_count": null,
+      "affected_columns": [
+        "credit_amount"
+      ],
+      "row_refs": [],
+      "method": "finite_descriptive",
+      "thresholds": {}
+    },
+    {
+      "id": "numeric_outliers.8",
+      "check_id": "numeric_outliers",
+      "measurement_refs": [
+        "/profile/columns/4/outlier_count",
+        "/profile/columns/4/outlier_rate"
+      ],
+      "population": "finite numeric observations",
+      "denominator": 1000,
+      "affected_count": 72,
+      "affected_columns": [
+        "credit_amount"
+      ],
+      "row_refs": [],
+      "method": "finite_1.5_iqr",
+      "thresholds": {
+        "review_rate": 5
+      }
+    },
+    {
+      "id": "numeric_summary.9",
+      "check_id": "numeric_summary",
+      "measurement_refs": [
+        "/profile/columns/7/numeric_summary",
+        "/profile/columns/7/finite_count"
+      ],
+      "population": "finite values; zero/negative/non-finite rates use total rows",
+      "denominator": 1000,
+      "affected_count": null,
+      "affected_columns": [
+        "installment_rate"
+      ],
+      "row_refs": [],
+      "method": "finite_descriptive",
+      "thresholds": {}
+    },
+    {
+      "id": "numeric_outliers.10",
+      "check_id": "numeric_outliers",
+      "measurement_refs": [
+        "/profile/columns/7/outlier_count",
+        "/profile/columns/7/outlier_rate"
+      ],
+      "population": "finite numeric observations",
+      "denominator": 1000,
+      "affected_count": 0,
+      "affected_columns": [
+        "installment_rate"
+      ],
+      "row_refs": [],
+      "method": "finite_1.5_iqr",
+      "thresholds": {
+        "review_rate": 5
+      }
+    },
+    {
+      "id": "numeric_summary.11",
+      "check_id": "numeric_summary",
+      "measurement_refs": [
+        "/profile/columns/10/numeric_summary",
+        "/profile/columns/10/finite_count"
+      ],
+      "population": "finite values; zero/negative/non-finite rates use total rows",
+      "denominator": 1000,
+      "affected_count": null,
+      "affected_columns": [
+        "residence_duration"
+      ],
+      "row_refs": [],
+      "method": "finite_descriptive",
+      "thresholds": {}
+    },
+    {
+      "id": "numeric_outliers.12",
+      "check_id": "numeric_outliers",
+      "measurement_refs": [
+        "/profile/columns/10/outlier_count",
+        "/profile/columns/10/outlier_rate"
+      ],
+      "population": "finite numeric observations",
+      "denominator": 1000,
+      "affected_count": 0,
+      "affected_columns": [
+        "residence_duration"
+      ],
+      "row_refs": [],
+      "method": "finite_1.5_iqr",
+      "thresholds": {
+        "review_rate": 5
+      }
+    },
+    {
+      "id": "numeric_summary.13",
+      "check_id": "numeric_summary",
+      "measurement_refs": [
+        "/profile/columns/12/numeric_summary",
+        "/profile/columns/12/finite_count"
+      ],
+      "population": "finite values; zero/negative/non-finite rates use total rows",
+      "denominator": 1000,
+      "affected_count": null,
+      "affected_columns": [
+        "age"
+      ],
+      "row_refs": [],
+      "method": "finite_descriptive",
+      "thresholds": {}
+    },
+    {
+      "id": "numeric_outliers.14",
+      "check_id": "numeric_outliers",
+      "measurement_refs": [
+        "/profile/columns/12/outlier_count",
+        "/profile/columns/12/outlier_rate"
+      ],
+      "population": "finite numeric observations",
+      "denominator": 1000,
+      "affected_count": 23,
+      "affected_columns": [
+        "age"
+      ],
+      "row_refs": [],
+      "method": "finite_1.5_iqr",
+      "thresholds": {
+        "review_rate": 5
+      }
+    },
+    {
+      "id": "numeric_summary.15",
+      "check_id": "numeric_summary",
+      "measurement_refs": [
+        "/profile/columns/15/numeric_summary",
+        "/profile/columns/15/finite_count"
+      ],
+      "population": "finite values; zero/negative/non-finite rates use total rows",
+      "denominator": 1000,
+      "affected_count": null,
+      "affected_columns": [
+        "existing_credits"
+      ],
+      "row_refs": [],
+      "method": "finite_descriptive",
+      "thresholds": {}
+    },
+    {
+      "id": "numeric_outliers.16",
+      "check_id": "numeric_outliers",
+      "measurement_refs": [
+        "/profile/columns/15/outlier_count",
+        "/profile/columns/15/outlier_rate"
+      ],
+      "population": "finite numeric observations",
+      "denominator": 1000,
+      "affected_count": 6,
+      "affected_columns": [
+        "existing_credits"
+      ],
+      "row_refs": [],
+      "method": "finite_1.5_iqr",
+      "thresholds": {
+        "review_rate": 5
+      }
+    },
+    {
+      "id": "numeric_summary.17",
+      "check_id": "numeric_summary",
+      "measurement_refs": [
+        "/profile/columns/17/numeric_summary",
+        "/profile/columns/17/finite_count"
+      ],
+      "population": "finite values; zero/negative/non-finite rates use total rows",
+      "denominator": 1000,
+      "affected_count": null,
+      "affected_columns": [
+        "dependents"
+      ],
+      "row_refs": [],
+      "method": "finite_descriptive",
+      "thresholds": {}
+    },
+    {
+      "id": "parsing_fidelity.18",
+      "check_id": "parsing_fidelity",
+      "measurement_refs": [
+        "/parsing/fidelity_inspection",
+        "/parsing_warnings"
+      ],
+      "population": "bounded source prefix",
+      "denominator": 4200,
+      "affected_count": null,
+      "affected_columns": [],
+      "row_refs": [],
+      "method": "bounded_source_token_comparison",
+      "thresholds": {}
+    }
+  ],
+  "findings": [
+    {
+      "code": "numeric_outlier_concentration",
+      "title": "IQR review candidates",
+      "finding": "Some fields have at least 5% of finite values outside the 1.5-IQR fences.",
+      "evidence": "duration_months: 70 of 1000 finite values (7.0%); credit_amount: 72 of 1000 finite values (7.2%)",
+      "recommendation": "Review distributions, units, and legitimate rare observations. Skew or an IQR flag does not prove a data error.",
+      "severity": "Moderate",
+      "modeling_impact": "Extreme observations can influence some analyses; this check does not establish task suitability.",
+      "evidence_type": "review_observation",
+      "evidence_refs": [
+        "numeric_outliers.6",
+        "numeric_outliers.8",
+        "numeric_outliers.10",
+        "numeric_outliers.12",
+        "numeric_outliers.14",
+        "numeric_outliers.16"
+      ]
+    },
+    {
+      "code": "near_constant_fields",
+      "title": "Near-constant fields",
+      "finding": "1 column meets the near-constant fields review rule.",
+      "evidence": "foreign_worker: 2 observed values, 96.3% top share",
+      "recommendation": "Review whether rare values are legitimate and important before changing these fields.",
+      "severity": "Low",
+      "modeling_impact": "Observed distributions need interpretation against the intended data use; rarity or cardinality alone is not a defect.",
+      "evidence_type": "review_observation",
+      "evidence_refs": [
+        "column_variation.2"
+      ]
+    }
+  ],
+  "narrative": {
+    "overall_assessment": "General dataset profiling summarizes observed input evidence. No overall scoring policy is defined for unlabeled profiling.",
+    "principal_evidence_summary": "Some fields have at least 5% of finite values outside the 1.5-IQR fences.",
+    "recommended_action": "Review distributions, units, and legitimate rare observations. Skew or an IQR flag does not prove a data error.",
+    "missingness_interpretation": "No missing feature values were detected by the current null-value checks.",
+    "duplicate_interpretation": "0 repeated rows beyond each group's first occurrence; legitimate repetition is possible.",
+    "finding_count": 2
+  },
+  "context": {
+    "dataset_name": "German Credit",
+    "purpose": null,
+    "source_filename": "german_credit.csv"
+  },
+  "coverage": {
+    "completed_applicable_groups": [
+      "schema",
+      "missingness",
+      "column_variation",
+      "categorical_cardinality",
+      "exact_duplicates",
+      "numeric_summary",
+      "numeric_outliers",
+      "parsing_fidelity"
+    ],
+    "completed_applicable_checks": 19,
+    "unavailable_checks": [
+      {
+        "check_id": "numeric_outliers",
+        "applicability": "blocked",
+        "execution": "not_run",
+        "scope": "dependents",
+        "reason": "zero_iqr",
+        "evidence_refs": [],
+        "exclusions": [],
+        "version": "1"
+      },
+      {
+        "check_id": "classification_target",
+        "applicability": "not_applicable",
+        "execution": "not_run",
+        "scope": "dataset",
+        "reason": "No target selected; general dataset profiling.",
+        "evidence_refs": [],
+        "exclusions": [],
+        "version": "1"
+      },
+      {
+        "check_id": "label_conflicts",
+        "applicability": "not_applicable",
+        "execution": "not_run",
+        "scope": "dataset",
+        "reason": "No target selected; general dataset profiling.",
+        "evidence_refs": [],
+        "exclusions": [],
+        "version": "1"
+      },
+      {
+        "check_id": "target_leakage",
+        "applicability": "not_applicable",
+        "execution": "not_run",
+        "scope": "dataset",
+        "reason": "No target selected; general dataset profiling.",
+        "evidence_refs": [],
+        "exclusions": [],
+        "version": "1"
+      },
+      {
+        "check_id": "classification_scoring",
+        "applicability": "not_applicable",
+        "execution": "not_run",
+        "scope": "dataset",
+        "reason": "No target selected; general dataset profiling.",
+        "evidence_refs": [],
+        "exclusions": [],
+        "version": "1"
+      }
+    ],
+    "unsupported_capabilities": [
+      "semantic typing",
+      "missingness patterns",
+      "split/reference comparisons",
+      "model performance",
+      "non-tabular modalities"
+    ],
+    "meaning": "Coverage describes these checks, not a percentage of universal reliability."
+  },
+  "scoring": {
+    "status": "not_defined",
+    "values": null,
+    "reason": "No validated scoring policy is defined for unlabeled profiling."
+  },
+  "execution": {
+    "status": "completed",
+    "backend": "pandas_in_memory",
+    "materialization": "in_memory",
+    "source_bytes": 82789,
+    "analyzed_rows": 1000,
+    "analyzed_columns": 21,
+    "frame_bytes": 217844,
+    "elapsed_seconds": 0.06817,
+    "limits": {
+      "max_source_bytes": 104857600,
+      "max_rows": 1000000,
+      "max_columns": 1000,
+      "max_frame_bytes": 536870912,
+      "max_seconds": null
+    },
+    "enforcement": "Source/header preflight, bounded row read, post-load frame measurement, cooperative stage deadlines; no hard memory or execution guarantee."
+  },
+  "generated_at": "2026-11-17T02:10:04.187409+00:00",
+  "methodology_id": "unlabeled_csv_profile_v1",
+  "schema_version": "1.0",
+  "guidance": {
+    "version": "finding_guidance_v1",
+    "items": {
+      "numeric_outlier_concentration": {
+        "catalogue": "outliers",
+        "title": "IQR review candidates",
+        "observed": [
+          "duration_months: 70 of 1,000 finite values (7.0%) outside the 1.5 × IQR fences; q1 12, q3 24, min 4, max 72; 0 negative, 0 zero.",
+          "credit_amount: 72 of 1,000 finite values (7.2%) outside the 1.5 × IQR fences; q1 1365.5, q3 3972.25, min 250, max 18,424; 0 negative, 0 zero.",
+          "IQR is zero for dependents (q1 equals q3), so the fences cannot separate values; no rate was computed for them."
+        ],
+        "impact": [
+          "Values outside the 1.5 × IQR fences can dominate scale-sensitive methods and summary statistics.",
+          "They may be legitimate tails, unit or entry errors, or sentinel codes."
+        ],
+        "investigate": [
+          "The extreme values themselves: are they plausible for the field's meaning and unit?",
+          "Whether a single code (for example −1 or 999) accounts for many of them."
+        ],
+        "options": [
+          {
+            "option": "Keep the values and use robust methods or transforms",
+            "prerequisites": "The values are legitimate.",
+            "avoid_when": "They are confirmed errors or sentinel codes.",
+            "verify": "Compare model behaviour with and without the transform on the same split."
+          },
+          {
+            "option": "Cap (winsorise) the values",
+            "prerequisites": "Extremes are legitimate but over-influential, and the cap is chosen from training rows only.",
+            "avoid_when": "Tails carry the signal you care about (for example, fraud amounts); or the cap uses evaluation data.",
+            "verify": "Report how many values change and compare metrics on tail cases specifically."
+          },
+          {
+            "option": "Correct or remove values",
+            "prerequisites": "They are confirmed errors from source records.",
+            "avoid_when": "They are legitimate rare observations.",
+            "verify": "Re-run this analysis and record which rows changed."
+          }
+        ],
+        "unknowns": [
+          "Whether extreme values are legitimate was not assessed; an IQR flag does not establish an error."
+        ]
+      },
+      "near_constant_fields": {
+        "catalogue": "constant_features",
+        "title": "Near-constant fields",
+        "observed": [
+          "foreign_worker: 2 distinct values; most common 'A201' in 96.3% of rows."
+        ],
+        "impact": [
+          "A column with one value (or nearly one) carries little or no information for most methods, and rare values may be noise or important exceptions."
+        ],
+        "investigate": [
+          "Whether the rare values are meaningful exceptions, errors, or a coding of missing values."
+        ],
+        "options": [
+          {
+            "option": "Exclude constant columns",
+            "prerequisites": "The column has exactly one value in every population that matters.",
+            "avoid_when": "The data is a subset and other subsets vary.",
+            "verify": "Confirm the column is constant in every split."
+          },
+          {
+            "option": "Keep near-constant columns",
+            "prerequisites": "The rare values carry meaning for the outcome.",
+            "avoid_when": "The rare values are errors or placeholders.",
+            "verify": "Check how the rare values relate to the target before deciding."
+          }
+        ],
+        "unknowns": [
+          "Whether rare values are meaningful was not assessed."
+        ]
+      }
+    },
+    "scope": {
+      "execution": "completed",
+      "not_completed": [
+        {
+          "check": "numeric_outliers",
+          "scope": "dependents",
+          "state": "excluded",
+          "reason": "zero_iqr"
+        }
+      ],
+      "not_completed_total": 1,
+      "unknowns": [
+        "0 possible placeholder or sentinel codes were suggested but none was declared, so none was interpreted.",
+        "Whether extreme values are legitimate was not assessed; an IQR flag does not establish an error.",
+        "Whether rare values are meaningful was not assessed."
+      ],
+      "conclusion": "Within the completed checks, 2 findings call for review (1 moderate, 1 low). Some scopes were excluded by a method's preconditions and are listed. This is review evidence for the stated scope; it does not establish model performance, semantic correctness or prediction-time availability."
+    },
+    "policy": [
+      {
+        "rule": "IQR review candidates",
+        "threshold": "≥ 5% of finite values outside 1.5 × IQR fences",
+        "effect": "Finding (evidence only)."
+      },
+      {
+        "rule": "Column missingness",
+        "threshold": "≥ 25% missing (High from 50%); cells ≥ 10%; rows with a gap ≥ 25%",
+        "effect": "Findings (evidence only)."
+      },
+      {
+        "rule": "Duplicates",
+        "threshold": "Any repeated row (Moderate from 2%, High from 10%)",
+        "effect": "Finding (evidence only)."
+      },
+      {
+        "rule": "Near-constant / high cardinality",
+        "threshold": "Top value ≥ 95% / ≥ 80% unique and ≥ 20 values",
+        "effect": "Findings (evidence only)."
+      },
+      {
+        "rule": "Score",
+        "threshold": "None",
+        "effect": "No validated score is defined for unlabeled profiling."
+      }
+    ]
+  },
+  "contextual": {
+    "version": "context_v1",
+    "status": "completed",
+    "prediction": {
+      "objective": null,
+      "point": null,
+      "declared": false
+    },
+    "declarations": {},
+    "availability": {},
+    "features": [
+      "checking_account_status",
+      "duration_months",
+      "credit_history",
+      "purpose",
+      "credit_amount",
+      "savings_status",
+      "employment_duration",
+      "installment_rate",
+      "personal_status_sex",
+      "other_debtors",
+      "residence_duration",
+      "property",
+      "age",
+      "other_installment_plans",
+      "housing",
+      "existing_credits",
+      "job",
+      "dependents",
+      "telephone",
+      "foreign_worker",
+      "credit_risk"
+    ],
+    "candidates": [],
+    "candidate_rules": {
+      "version": "candidate_rules_v1",
+      "placeholder_tokens": [
+        "unknown",
+        "unk",
+        "n/a",
+        "na",
+        "none",
+        "null",
+        "missing",
+        "?",
+        "-",
+        "--",
+        "not known",
+        "not available",
+        "undefined",
+        "unspecified",
+        "nan",
+        "blank"
+      ],
+      "sentinel_codes": [
+        -1,
+        -9,
+        -99,
+        -999,
+        -9999,
+        9,
+        99,
+        999,
+        9999,
+        99999
+      ],
+      "meaning": "Candidates are suggestions only; nothing is interpreted until you declare it."
+    },
+    "interpreted": {},
+    "observed_dependencies": {
+      "pairs": [],
+      "indicators_examined": 0,
+      "indicators_unexamined": 0,
+      "rule": "cross-column code pairs sharing at least 95% of their rows and at least 5 rows"
+    },
+    "demonstrated_use": "Not observed: DataTrust does not see your pipeline. A before/after comparison can show which columns survive preprocessing.",
+    "dependency_search": {
+      "status": "not_applicable",
+      "reason": "No single classification target."
+    },
+    "findings": []
+  }
+}

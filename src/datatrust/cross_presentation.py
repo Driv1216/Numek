@@ -43,9 +43,13 @@ def explanation(family,c):
     return text
 
 
-def report_view(result):
+SECTION_IDS={'identities':'identities','relationships':'associations','context':'cross_context','reconciliation':'reconciliation','separation':'separation','models':'models'}
+
+
+def report_view(result,profile_name='focused'):
     import copy
-    r=copy.deepcopy(result.to_dict());sections=[]
+    from datatrust.report_structured import capped_tables,has_references,labelled
+    r=copy.deepcopy(result.to_dict());sections=[];described=[];index={e['id']:i for i,e in enumerate(r['evidence'])}
     for family,title in [('identities','Source logical identities'),('relationships','Identity and association integrity'),('context','Declared entity, version and timing context'),('reconciliation','Reconciliation and conflicting evidence'),('separation','Cross-source contamination'),('models','Optional semantic investigations')]:
         blocks=[]
         for e in r['evidence']:
@@ -53,10 +57,26 @@ def report_view(result):
             counts={k:v for k,v in e['data'].items() if k not in {'details','candidates'} and not isinstance(v,(dict,list))}
             details=e['data'].get('details',[])[:5]
             for d in details: d['description']=label(d.get('reason') or d.get('status','Retained source example'))
-            blocks.append({'population':e['population'],'title':population_label(e['population']),'explanation':explanation(family,e['data']),'counts':{label(k):v for k,v in counts.items()},'details':details,'omitted':max(0,len(e['data'].get('details',[]))-len(details))})
-        sections.append({'title':title,'blocks':blocks})
-    ordered=sorted(r['findings'],key=lambda f:{'High':0,'Moderate':1}.get(f['priority'],2))
-    actions=[{**f,'explanation':explanation(f['family'],f['counts']),'population_title':population_label(f['population'])} for f in ordered[:5]]
+            i=index[e['id']]
+            block={'population':e['population'],'title':population_label(e['population']),'explanation':explanation(family,e['data']),'counts':{label(k):v for k,v in counts.items()},'details':details,'omitted':max(0,len(e['data'].get('details',[]))-len(details)),
+                   'anchor':f'ev-{i}','disclosures':[]}
+            for key in ('details','candidates'):
+                items=e['data'].get(key) or []
+                if len(items)>(5 if key=='details' else 0):
+                    rows=[[str(d.get('target_id') or d.get('reference') or n+1),label(d.get('reason') or d.get('status') or 'retained example'),labelled({k:v for k,v in d.items() if k not in {'target_id','description'}})] for n,d in enumerate(items)]
+                    described.append({'title':f"{block['title']} · {title} · retained {key}",'columns':['Review reference','Outcome','Recorded detail'],'rows':rows[:5 if key=='details' else 0],'all_rows':rows,
+                                      'topic':f"{e['id']}-{key}",'noun':'retained examples','pointer':f'/evidence/{i}/data/{key}','protected':True,'block':block})
+            nested=[[k.replace('_',' '),labelled(v)] for k,v in e['data'].items() if k not in {'details','candidates'} and isinstance(v,(dict,list))]
+            if nested:
+                described.append({'title':f"{block['title']} · {title} · nested measurements",'columns':['Field','Recorded value'],'rows':[],'all_rows':nested,
+                                  'topic':f"{e['id']}-nested",'noun':'fields','pointer':f'/evidence/{i}/data','protected':has_references(nested),'block':block})
+            blocks.append(block)
+        sections.append({'id':SECTION_IDS[family],'title':title,'blocks':blocks})
+    ordered=sorted(enumerate(r['findings']),key=lambda x:{'High':0,'Moderate':1}.get(x[1]['priority'],2))
+    actions=[{**f,'anchor':f'finding-{n}','explanation':explanation(f['family'],f['counts']),'population_title':population_label(f['population'])} for n,f in ordered[:5]]
+    carded={a['anchor'] for a in actions}
+    findings=[{'anchor':f'finding-{n}' if f'finding-{n}' in carded else None,'index':n,'title':f['title'],'severity':f['priority'],
+               'effect':population_label(f['population'])+' · '+str(f['family']).replace('_',' ')} for n,f in enumerate(r['findings'])]
     coverage={k:v for k,v in r['coverage'].items() if k!='document_extraction'}
     docs=r['coverage'].get('document_extraction',[])
     from collections import Counter
@@ -67,5 +87,19 @@ def report_view(result):
         if state!='processed': scope.append(f"{count:,} extraction entries require attention ({label(state).lower()}).")
     model_state=r['coverage'].get('models',{}).get('status')
     if model_state in {'bounded','failed'}: scope.append('Optional model work stopped at its allocation.' if model_state=='bounded' else 'Optional model work failed; only the verified deterministic evidence was retained.')
+    limitations={'disclosures':[]}
+    rest=[[k.replace('_',' '),labelled(v)] for k,v in r['coverage'].items() if k!='document_extraction']
+    if rest:
+        described.append({'title':'Coverage','columns':['Coverage family','Recorded coverage'],'rows':[],'all_rows':rest,'topic':'coverage','noun':'coverage families',
+                          'pointer':'/coverage','protected':has_references(rest),'block':limitations})
+    if docs:
+        rows=[[str(n+1),label(x.get('state','')),labelled({k:v for k,v in x.items() if k!='state'})] for n,x in enumerate(docs)]
+        described.append({'title':'Document extraction coverage','columns':['Entry','State','Recorded coverage'],'rows':[],'all_rows':rows,'topic':'document-extraction',
+                          'noun':'document entries','pointer':'/coverage/document_extraction','protected':True,'block':limitations})
+    disclosures,complete=capped_tables(described,profile_name,limit_label='summary selection',section_label='Complete retained evidence')
+    for table in described:
+        if table['topic'] in disclosures:table['block']['disclosures'].append(disclosures[table['topic']])
     execution=[('Completion',label(r['execution']['status'])),('Elapsed time',f"{r['execution'].get('whole_job_seconds',r['execution'].get('duration_seconds',0)):.1f} seconds"),('Peak sampled worker memory',f"{r['execution'].get('peak_worker_rss_bytes',0)/1024**2:.1f} MiB"),('Peak temporary workspace',f"{r['execution'].get('peak_workspace_bytes',0)/1024**2:.1f} MiB")]
-    return {'summary':summary(result),'actions':actions,'omitted_actions':max(0,len(r['findings'])-5),'sections':sections,'scope':scope,'execution':execution,'coverage':coverage,'examples':r['profile'].get('examples',[]),'target_labels':{id:label(t.get('semantic',{}).get('status') or t.get('detail',{}).get('reason') or t.get('detail',{}).get('status') or t['kind']) for id,t in r['profile']['review_targets'].items()}}
+    return {'findings':findings,'disclosures':disclosures,'complete_tables':complete,'profile':profile_name,'limitation_disclosures':limitations['disclosures'],
+            'qa':{'schema_version':'1.7','print_profile':profile_name,'retained_evidence_not_recomputed':True},
+            'summary':summary(result),'actions':actions,'omitted_actions':max(0,len(r['findings'])-5),'sections':sections,'scope':scope,'execution':execution,'coverage':coverage,'examples':r['profile'].get('examples',[]),'target_labels':{id:label(t.get('semantic',{}).get('status') or t.get('detail',{}).get('reason') or t.get('detail',{}).get('status') or t['kind']) for id,t in r['profile']['review_targets'].items()}}

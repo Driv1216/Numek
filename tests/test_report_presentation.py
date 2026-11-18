@@ -1,6 +1,7 @@
 """Report display regressions; analytical result and legacy HTML stay untouched."""
 
 import copy
+from pathlib import Path
 import re
 
 import pytest
@@ -73,8 +74,14 @@ def test_real_pdf_readable_disclosure_and_all_evidence_preserved(tmp_path, kind,
     if kind == "dataset_profile":
         assert "Summary unavailable: no finite observations" in text
         assert not re.search(r"Bounded parsed-row references:\s*\.", text)
+        # Focused print (report_print_v1) discloses the evidence records instead of printing every ID; the HTML holds
+        # them all, and the complete profile prints them all.
+        html = Path(bundle.html_path).read_text()
+        assert f"all {len(result.evidence)} evidence records are listed in analysis.json → /evidence" in " ".join(text.split())
+        complete = result.generate_artifacts(tmp_path / "complete.pdf", format="pdf", print_profile="complete")
+        complete_text = "\n".join(page.extract_text() for page in PdfReader(complete.pdf_path).pages)
         for evidence in result.evidence:
-            assert evidence.id in text
+            assert evidence.id in html and evidence.id in complete_text
         assert "1 observed value," in text
     else:
         assert "1. Decision Summary" in text and "8. Technical Appendix" in text

@@ -1,0 +1,27 @@
+{
+ "recorded": "2026-11-17, Stage 0 browser session, Chromium 156 (Claude built-in browser), pane displayed and tab in front",
+ "fixtures": "work.nosync/spikes/{container,json}_{5000,15000}.html from spikes/hidden_cost.py; the real 5,000-column report work.nosync/before/wide_5000/canonical.html",
+ "method": "Navigation Timing for load; filter latency = performance.now() around the filter plus a forced layout (getBoundingClientRect). Single session; times in ms; not guarantees.",
+ "load": {
+  "container_5000": {"dom_content_loaded": 79, "load": 115},
+  "json_5000": {"dom_content_loaded": 221, "load": 257, "note": "includes building 5,000 rows from the data island"},
+  "container_15000": {"dom_content_loaded": 267, "load": 353},
+  "json_15000": {"dom_content_loaded": 170, "load": 256},
+  "current_wide_5000_report": {"dom_content_loaded": 74, "load": 149, "html_bytes": 1751508, "rows": 10052, "document_height_px": 601498}
+ },
+ "filter_by_toggling_hidden_on_every_row": {
+  "container_5000": {"one_match": 177, "1000_matches": 540, "clear_to_all_5000": 380},
+  "json_5000": {"one_match": 205, "1000_matches": 538, "clear_to_all_5000": 265},
+  "container_15000": {"one_match": 948, "1000_matches": 210, "clear_to_all_15000": 1108},
+  "json_15000_three_repeats": {"one_match": [142, 186, 128], "1000_matches": [115, 175, 129], "clear_to_all_15000": [1480, 1191, 1699]},
+  "current_wide_5000_report_9999_rows": {"one_match": [90, 70], "222_matches": 12, "clear_to_all": [473, 726]}
+ },
+ "filter_by_rebuilding_from_data": {
+  "json_15000_three_repeats": {"one_match": [146, 82, 73], "1000_matches": [42, 40, 43], "clear_to_all_15000": [1500, 1562, 1296]}
+ },
+ "filter_by_rebuilding_with_paged_rendering_500_rows": {
+  "json_15000_three_repeats": {"one_match": [464, 17, 11], "1000_matches_first_500": [26, 87, 47], "all_first_500": [26, 128, 53], "all_first_1000": [130, 140, 112]},
+  "note": "the 464 ms first call includes tearing down the previously rendered 15,000 rows"
+ },
+ "conclusion": "Loading is not the constraint at these sizes. Showing thousands of rows at once is: about 0.3-0.7 s for 5,000-10,000 rows and 1.1-1.7 s for 15,000 rows, whichever method is used. Rendering matches from the data island in pages of 500 keeps steady-state filtering at 11-140 ms."
+}

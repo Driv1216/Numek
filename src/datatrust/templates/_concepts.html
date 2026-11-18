@@ -1,0 +1,95 @@
+{# "Understand this report" (Report Experience plan E and F). Every placement and guide entry comes from the concept
+   manifest (report_concepts.build_manifest), built before rendering. Links are plain anchors that work without script
+   and offline; the report script upgrades them to one shared popover and turns the guide into a side drawer. In print,
+   the first placement of each concept names its Reading guide page; the guide prints every entry, so every page
+   reference has a target. #}
+
+{% macro styles() -%}
+.dt-terms { margin: 4px 0 12px; font-size: 13px; color: #5d6877; }
+.dt-terms a.dt-term { color: #176b87; text-decoration: underline; text-decoration-style: dotted; text-underline-offset: 2px; }
+.dt-terms a.dt-term:not(:last-child)::after { content: " ·"; color: #5d6877; text-decoration: none; display: inline-block; margin-right: 3px; }
+.dt-understand-link { font-size: 13px; }
+.dt-howto { border: 1px solid #c9e3eb; background: #f3f9fb; border-radius: 9px; padding: 12px 14px; margin: 14px 0; }
+.dt-howto h3 { margin: 0 0 6px; font-size: 15px; }
+.dt-howto dl { margin: 0; display: grid; grid-template-columns: minmax(150px, 220px) 1fr; gap: 6px 14px; font-size: 13.5px; }
+.dt-howto dt { font-weight: 650; } .dt-howto dd { margin: 0; }
+#understand .dt-entry { border-top: 1px solid #d8e0e9; padding: 10px 0 4px; }
+#understand .dt-entry h3 { margin: 0 0 4px; font-size: 15.5px; }
+#understand .dt-entry p { margin: 0 0 6px; }
+#understand .dt-group-title { margin: 18px 0 2px; font-size: 13px; text-transform: uppercase; letter-spacing: .04em; color: #5d6877; }
+.dt-layer-b { color: #17202d; } .dt-layer-c { color: #3d4756; font-size: 13.5px; }
+.dt-entry-meta { font-size: 12px; color: #5d6877; }
+.dt-guide-tools { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin: 8px 0; font-size: 13px; }
+.dt-guide-tools input, .dt-guide-tools select { font: inherit; padding: 4px 6px; border: 1px solid #c9d5df; border-radius: 4px; }
+#dt-pop { max-width: min(380px, 92vw); margin: 0; border: 1px solid #c9d5df; border-radius: 8px; padding: 12px 14px;
+  box-shadow: 0 8px 24px rgba(0,0,0,.14); background: #fff; color: #17202d; font-size: 14px; line-height: 1.45; }
+#dt-pop h3 { margin: 0 0 6px; font-size: 15px; } #dt-pop p { margin: 0 0 6px; }
+#dt-pop .dt-pop__close { font: inherit; font-size: 13px; padding: 2px 10px; }
+.dt-drawer-open #understand { position: fixed; top: 0; right: 0; bottom: 0; width: min(440px, 100vw); overflow-y: auto; z-index: 20;
+  background: #fff; border-left: 1px solid #c9d5df; box-shadow: -8px 0 24px rgba(0,0,0,.12); padding: 16px 18px; margin: 0; }
+.dt-drawer-close { float: right; font: inherit; font-size: 13px; padding: 2px 10px; }
+@media screen { .dt-print-guide-only { display: none; } }
+@media print {
+  .dt-terms a.dt-term:not(.dt-term--first), .dt-terms--repeat, .dt-guide-tools, .dt-understand-link, .dt-drawer-close { display: none !important; }
+  .dt-terms a.dt-term { color: inherit; text-decoration: none; }
+  /* Keep a section's heading and its terms line with the content they introduce (Stage 8; M5–M9 had it per template). */
+  .dt-terms { break-after: avoid; break-inside: avoid; }
+  .dt-terms a.dt-term--first::after { content: " (Reading guide, p. " target-counter(attr(href url), page) ")"; color: #5d6877; margin-right: 0; }
+  #understand { break-before: page; font-size: 8.6pt; line-height: 1.32; }
+  #understand > .section-note { margin-bottom: 4px; }
+  /* One column: WeasyPrint's multi-column layout cost about 0.6 s per report (Stage 3 measurement). */
+  #understand .dt-entry { break-inside: avoid; padding: 5px 0 2px; }
+  #understand .dt-entry h3 { font-size: 9.6pt; margin-bottom: 2px; }
+  #understand .dt-entry p { margin: 0 0 3px; }
+  #understand .dt-group-title { break-after: avoid; margin: 8px 0 0; font-size: 7.6pt; }
+  .dt-entry-meta { font-size: 7.4pt; }
+  #understand .dt-layer-c, #understand .dt-layer-b { font-size: inherit; }
+  #understand .dt-layer-b.dt-screen-example { display: none; }
+  .dt-screen-guide-only { display: none; }
+}
+{%- endmacro %}
+
+{% macro strip(M, section) -%}
+{% set s = M.section.get(section) %}
+{% if s and s.placements %}<p class="dt-terms{% if not s.has_first %} dt-terms--repeat{% endif %}"><span class="dt-terms__label">Explained terms:</span>
+{% for p in s.placements %}<a class="dt-term{% if p.first %} dt-term--first{% endif %}" id="{{ p.anchor }}" href="#concept-{{ p.concept }}" aria-label="Explain {{ p.term }}">{{ p.term }}</a>{% endfor %}</p>{% endif %}
+{%- endmacro %}
+
+{% macro understand_link() -%}
+<p class="dt-understand-link"><a href="#understand" data-dt-drawer>Understand this report</a> — plain-language explanations of the terms used here, with examples from this dataset.</p>
+{%- endmacro %}
+
+{% macro how_to_read(M) -%}
+{% if M.core %}<div class="dt-howto"><h3>How to read this report</h3><dl>
+{% for cid in M.core %}{% set c = M.by_id[cid] %}<dt><a href="#concept-{{ cid }}">{{ c.term }}</a></dt><dd>{{ c.definition }}</dd>{% endfor %}
+</dl></div>{% endif %}
+{%- endmacro %}
+
+{% macro popover() -%}
+<div id="dt-pop" popover="auto" role="dialog" aria-labelledby="dt-pop-title"><h3 id="dt-pop-title" tabindex="-1"></h3><div class="dt-pop__body"></div><button type="button" class="dt-pop__close">Close</button></div>
+{%- endmacro %}
+
+{% macro understand(M) -%}
+<section id="understand" aria-labelledby="understand-title">
+  <button type="button" class="dt-drawer-close" hidden>Close</button>
+  <h2 id="understand-title"><span class="dt-screen-guide-only">Understand this report</span><span class="dt-print-guide-only">Reading guide</span></h2>
+  <p class="section-note">Plain-language explanations of the terms this report uses, worded for its methodology ({{ M.methodology_id }}). “In this report” examples quote recorded values only. Concept catalogue {{ M.catalogue }}.</p>
+  <div class="dt-guide-tools" hidden><label>Find a term <input type="search" id="dt-guide-search" aria-controls="dt-guide-entries"></label>
+    <label>Section <select id="dt-guide-section"><option value="">All sections</option>{% for s in M.sections if s.has_first %}<option value="{{ s.id }}">{{ s.title }}</option>{% endfor %}</select></label>
+    <span id="dt-guide-status" role="status" aria-live="polite"></span></div>
+  <div id="dt-guide-entries">
+  {% for s in M.sections if s.has_first %}
+    <p class="dt-group-title" data-dt-group="{{ s.id }}">{{ s.title }}</p>
+    {% for c in M.concepts if c.section == s.id %}
+    <div class="dt-entry" id="concept-{{ c.id }}" data-dt-section="{{ s.id }}" data-dt-term="{{ c.term | lower }}">
+      <h3>{{ c.term }}</h3>
+      <p class="dt-layer dt-layer-a">{{ c.definition }}</p>
+      {% if c.example %}<p class="dt-layer dt-layer-b{% if not c.tied_to_finding %} dt-screen-example{% endif %}"><strong>In this report:</strong> {% if c.example.text %}{{ c.example.text }}{% else %}{{ c.example.unavailable }}{% endif %}</p>{% endif %}
+      {% if c.means %}<p class="dt-layer dt-layer-c"><strong>What it shows:</strong> {{ c.means }} <strong>What it does not establish:</strong> {{ c.does_not_mean }}</p>{% endif %}
+      <p class="dt-entry-meta"><a href="#{{ c.anchor }}">Back to {{ c.section_title | lower }}</a> · Methodology: {{ c.methodology_ref }}</p>
+    </div>
+    {% endfor %}
+  {% endfor %}
+  </div>
+</section>
+{%- endmacro %}

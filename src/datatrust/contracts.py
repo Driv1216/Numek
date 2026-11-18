@@ -717,10 +717,11 @@ class AnalysisResult:
         from datatrust.renderer import write_analysis_json
         return write_analysis_json(self, path)
 
-    def generate_artifacts(self, path, *, format="html", html_path=None, json_path=None):
+    def generate_artifacts(self, path, *, format="html", html_path=None, json_path=None, print_profile="focused"):
         from datatrust.renderer import write_report_artifacts
-        return write_report_artifacts(self, path, format=format, html_path=html_path, json_path=json_path)
+        return write_report_artifacts(self, path, format=format, html_path=html_path, json_path=json_path,
+                                      print_profile=print_profile)
 
-    def generate_report(self, path, *, format="html", html_path=None):
-        artifacts = self.generate_artifacts(path, format=format, html_path=html_path)
+    def generate_report(self, path, *, format="html", html_path=None, print_profile="focused"):
+        artifacts = self.generate_artifacts(path, format=format, html_path=html_path, print_profile=print_profile)
         return artifacts.pdf_path if format == "pdf" else artifacts.html_path

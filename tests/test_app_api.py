@@ -98,6 +98,25 @@ def test_core_classification_flow_and_session_ownership(app):
     assert str(app.extensions['datatrust_job_store'].root) not in json.dumps(view)
 
 
+def test_reports_are_served_for_the_viewer_under_a_load_nothing_policy(app):
+    """Report Experience Stage 7: the app viewer's report responses, and the guide its deep link opens."""
+    from datatrust.api_web import REPORT_CSP
+    from datatrust.report_format import report_csp
+    client = app.test_client()
+    token = _token(client)
+    _upload(client, token, CLASSIFICATION)
+    _post(client, token, '/core/job/configure', {'target': 'label', 'dataset_name': 'Demo', 'purpose': ''})
+    _post(client, token, '/core/job/generate')
+    response = client.get(f'{API}/core/job/report')
+    assert response.status_code == 200 and response.headers['X-Frame-Options'] == 'SAMEORIGIN'
+    assert response.headers['Content-Security-Policy'] == REPORT_CSP and response.headers['Referrer-Policy'] == 'no-referrer'
+    for directive in ("default-src 'none'", 'img-src data:', "base-uri 'none'", "form-action 'none'", "frame-ancestors 'self'"):
+        assert directive in REPORT_CSP
+    html = response.get_data(as_text=True)
+    assert 'id="understand"' in html and report_csp() in html.replace('&#39;', "'")   # the hash-pinned meta policy still applies
+    assert "location.hash === '#understand'" in html and "addEventListener('hashchange'" in html
+
+
 def test_errors_keep_classic_messages(app):
     client = app.test_client()
     token = _token(client)

@@ -52,7 +52,7 @@ def executive_summary(value):
         'scope':scope,'action_omissions':max(0,len(actions)-5),'duplicate_counts_are_additive':False}
 
 
-def report_view(result):
+def report_view(result,profile_name='focused'):
     value=result.to_dict();sections=[];checks={x['id']:x for x in value['checks']}
     for title,families in TOPICS:
         records=[]
@@ -83,4 +83,88 @@ def report_view(result):
         if 'profile' in data:entries['candidate_profile']=f"{data['profile']['bands']} bands × {data['profile']['rows']} rows; bucket cap {data['profile']['bucket_cap']}; calibration applies only to recorded fixtures"
         coverage.append({'family':family,'rows':[(k.replace('_',' ').capitalize(),display(v)) for k,v in entries.items()]})
     execution={k:v for k,v in value['execution'].items() if k not in {'effective_limits','text_limits','provenance','warnings'}}
-    return {'sections':sections,'executive':executive_summary(value),'coverage':coverage,'execution':[(k.replace('_',' ').capitalize(),display(v)) for k,v in execution.items()],'qa':{'analytical_topics':8,'pages_cut_to_budget':False,'target_executive_pages':2,'target_total_pages':12,'raw_content_default':False,'coverage_separate_from_invalidity':True}}
+    extra=stage6_view(value,sections,coverage,profile_name)
+    return {**extra,'sections':sections,'executive':executive_summary(value),'coverage':coverage,'execution':[(k.replace('_',' ').capitalize(),display(v)) for k,v in execution.items()],'qa':{'analytical_topics':8,'pages_cut_to_budget':False,'target_executive_pages':2,'target_total_pages':12,'raw_content_default':False,'coverage_separate_from_invalidity':True,'print_profile':profile_name}}
+
+
+# ——— Report Experience Stage 6: finding index, contract disclosures and complete retained evidence ———
+# display() and executive_summary() above are frozen: export JSON fields are computed from them (plan I.3).
+SECTION_IDS=('summary','integrity','duplication','tokens','conversations','retrieval','comparisons','methods')
+FAMILY_TITLES={'invalidity':'Invalid records and items','identities':'Repeated logical identities','corpus':'Corpus content',
+ 'exact_duplicates':'Exact duplicate content','near_duplicates':'Near-duplicate pairs','passages':'Shared literal passages',
+ 'repetition':'Repeated lines','annotations':'Annotation states','annotation_categories':'Annotation categories',
+ 'annotation_disagreement':'Annotation disagreement on repeated inputs','vocabulary':'Vocabulary','tokenizer_vocabulary':'Tokenizer vocabulary',
+ 'conversations':'Conversation requirements','retrieval':'Retrieval references and provenance','comparisons':'Source comparisons',
+ 'version_alignment':'Version alignment','lexical_comparison':'Lexical comparison','language':'Language identification',
+ 'semantic_similarity':'Semantic neighbours','lexical_selection':'Lexical selection'}
+MEANINGS={'deterministic_violation':'Deterministic violation','deterministic_fact':'Deterministic fact','contextual_observation':'Contextual observation',
+ 'heuristic_candidate':'Heuristic candidate','model_assisted_candidate':'Model-assisted candidate'}
+DETAIL_KEYS=('details','neighbors','parent_coverage')
+
+
+def family_title(family):
+    return FAMILY_TITLES.get(family,str(family).replace('_',' ').capitalize())
+
+
+def _abbreviated(value,limit=5):
+    """Whether display() leaves out part of a recorded value (it shows five entries per level)."""
+    if isinstance(value,dict):return len(value)>limit or any(_abbreviated(v,limit) for v in list(value.values())[:limit])
+    if isinstance(value,list):return len(value)>limit or any(_abbreviated(v,limit) for v in value[:limit])
+    return False
+
+
+def _entries(value):
+    from datatrust.report_structured import labelled
+    if isinstance(value,dict):return [[str(k).replace('_',' '),labelled(v)] for k,v in value.items()]
+    return [[str(n+1),labelled(v)] for n,v in enumerate(value)]
+
+
+def stage6_view(value,sections,coverage,profile_name):
+    """Anchors, the finding index and the complete retained-evidence tables for the projection built by report_view."""
+    from datatrust.report_structured import capped_tables,has_references
+    index={record['id']:i for i,record in enumerate(value['evidence'])}
+    rendered=set();described=[]
+    for section,ident in zip(sections,SECTION_IDS):
+        section['id']=ident
+        for record in section['records']:
+            i=index[record['id']];record['anchor']=f'ev-{i}';rendered.add(record['id']);record['disclosures']=[]
+            if record['applicability']=='not_applicable':continue
+            for key,item in record['data'].items():
+                if key in DETAIL_KEYS:
+                    shown=2;wide=key=='neighbors' and any(len(x.get('neighbors',[]))>2 for x in item[:2])
+                    if not (isinstance(item,list) and (len(item)>shown or wide or any(_abbreviated(x) for x in item[:shown]))):continue
+                elif isinstance(item,(list,dict)) and _abbreviated(item):shown=5
+                else:continue
+                rows=_entries(item);topic=f"{record['id']}-{key}"
+                described.append({'title':f"{family_title(record['family'])} · {key.replace('_',' ')}",'columns':['Entry','Recorded value'],
+                                  'rows':rows[:min(shown,len(rows))],'all_rows':rows,'topic':topic,'noun':'entries',
+                                  'pointer':f'/evidence/{i}/data/{key}','protected':has_references(item),'record':record})
+    families=value['coverage'].get('families',{});base=families.get('lexical_selection',{})
+    for item in coverage:
+        item['disclosures']=[];data=families.get(item['family'],{})
+        for key in ('selected_strata','profile'):
+            entries=data.get(key)
+            if not entries or key=='selected_strata' and item['family']!='lexical_selection' and entries==base.get('selected_strata'):continue
+            rows=_entries(entries)
+            described.append({'title':f"{family_title(item['family'])} · {key.replace('_',' ')}",'columns':['Entry','Recorded value'],'rows':[],
+                              'all_rows':rows,'topic':f"coverage-{item['family']}-{key}",'noun':'entries','pointer':f"/coverage/families/{item['family']}/{key}",
+                              'protected':has_references(entries),'record':item})
+    timings=value['execution'].get('phase_seconds')
+    execution={'disclosures':[]}
+    if isinstance(timings,dict) and _abbreviated(timings):
+        rows=_entries(timings)
+        described.append({'title':'Execution · phase seconds','columns':['Phase','Seconds'],'rows':rows[:5],'all_rows':rows,'topic':'execution-phase-seconds',
+                          'noun':'entries','pointer':'/execution/phase_seconds','protected':False,'record':execution})
+    disclosures,complete=capped_tables(described,profile_name,limit_label='summary selection',section_label='Complete retained evidence')
+    for table in described:
+        if table['topic'] in disclosures:table['record']['disclosures'].append(disclosures[table['topic']])
+    findings=[]
+    for n,f in enumerate(value['findings']):
+        record=value['evidence'][index[f['id']]] if f['id'] in index else {}
+        unit='groups' if f['family']=='exact_duplicates' else 'pairs' if f['family']=='near_duplicates' else 'items' if f['family']=='invalidity' else 'observations'
+        unit=unit[:-1] if f['count']==1 else unit
+        findings.append({'anchor':f"ev-{index[f['id']]}" if f['id'] in rendered else None,'index':n,'title':family_title(f['family']),
+                         'severity':MEANINGS.get(f['meaning'],str(f['meaning']).replace('_',' ')),
+                         'effect':f"{f['count']:,} {unit}"+(f" · {str(record.get('scope','')).replace('_',' ')}" if record.get('scope') else '')})
+    return {'disclosures':{t['topic']:disclosures[t['topic']] for t in described if t['topic'] in disclosures},'complete_tables':complete,'findings':findings,
+            'profile':profile_name,'execution_disclosures':execution['disclosures']}

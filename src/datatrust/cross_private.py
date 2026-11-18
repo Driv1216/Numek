@@ -132,7 +132,7 @@ def resolve_evidence(manifest,reference,report,*,allowed_roots,reveal_content=Fa
 
 
 class ExportView:
-    def __init__(self,result,disclosure,roots):
+    def __init__(self,result,disclosure,roots,print_profile='focused'):
         self.result=result;self.data=copy.deepcopy(result.to_dict());examples=[];size=0
         for ref in disclosure.excerpt_refs:
             resolved=result.resolve_evidence(ref,allowed_roots=roots,reveal_content=True)
@@ -147,7 +147,9 @@ class ExportView:
         self.data['profile']['export_identity']={'original_result_sha256':digest(result.to_dict()),'disclosure_sha256':digest(self.data['profile']['disclosure']),'examples_sha256':digest(examples),'template_sha256':digest(Path(__file__).with_name('templates').joinpath('cross_report.html').read_text()),'projection_sha256':digest(Path(__file__).with_name('cross_presentation.py').read_text())}
         from datatrust.renderer import render_analysis_result
         import hashlib
-        self.data['profile']['export_identity']['canonical_html_sha256']=hashlib.sha256(render_analysis_result(self).encode()).hexdigest()
+        self.data['profile']['export_identity']['canonical_html_sha256']=hashlib.sha256(render_analysis_result(self,print_profile=print_profile).encode()).hexdigest()
+        from datatrust.report_identity import identity  # additive (Report Experience I.3)
+        self.data['profile']['export_identity'].update(presentation_identity=identity('cross')['presentation_id'],print_profile=print_profile)
     def __getattr__(self,n): return getattr(self.result,n)
     def to_dict(self): return self.data
     def json_text(self): return json.dumps(self.data,ensure_ascii=False,indent=2,allow_nan=False)
@@ -161,13 +163,13 @@ def write_manifest(result,path):
     return publish_bytes(path,raw)
 
 
-def generate_artifacts(result,path,*,format='html',html_path=None,json_path=None,private_out=None,disclosure=None,allowed_roots=(),pdf_converter=None):
+def generate_artifacts(result,path,*,format='html',html_path=None,json_path=None,private_out=None,disclosure=None,allowed_roots=(),pdf_converter=None,print_profile='focused'):
     disclosure=disclosure or CrossDisclosureOptions()
     if not isinstance(disclosure,CrossDisclosureOptions): raise ValueError('Use CrossDisclosureOptions.')
     private=Path(private_out) if private_out else Path(path).parent/'.datatrust-private'/result.profile['audit_id']/'manifest.json'
     protect_source(result.source_paths,[path,html_path,json_path,private]);write_manifest(result,private)
-    view=ExportView(result,disclosure,allowed_roots)
-    try: artifacts=write_report_artifacts(view,path,format=format,html_path=html_path,json_path=json_path,pdf_converter=pdf_converter)
+    view=ExportView(result,disclosure,allowed_roots,print_profile)
+    try: artifacts=write_report_artifacts(view,path,format=format,html_path=html_path,json_path=json_path,pdf_converter=pdf_converter,print_profile=print_profile)
     except Exception as exc:
         a=getattr(exc,'artifacts',None)
         if a: exc.artifacts=CrossReportArtifacts(a.html_path,a.pdf_path,a.json_path,a.reused_html,str(private),qa_metadata=a.qa_metadata)

@@ -1,18 +1,35 @@
 """Bounded human report projection; analytical evidence is never mutated."""
 from datatrust.contracts import PresentationLimits
+from datatrust.report_layout import group_checks
 from collections import defaultdict
 
 
-def report_view(result):
+# Where each table's records live in the completed result, for disclosures (Report Experience, plan I5).
+POINTERS={'annotation target details':'/profile/annotations/targets','annotation state details':'/profile/annotations/targets',
+          'class distribution':'/profile/classification/distribution','label distributions':'/profile/multilabel/labels',
+          'partial positive bounds':'/profile/multilabel/partial_positive_count_bounds','cardinality distribution':'/profile/multilabel/cardinality_distribution',
+          'label pairs':'/profile/multilabel/pairs','label combinations':'/profile/multilabel/combinations/records',
+          'label constraints':'/profile/multilabel/constraints','numerical output summaries':'/profile/multioutput_regression/outputs',
+          'output distribution details':'/profile/multioutput_regression/outputs','output quantile details':'/profile/multioutput_regression/outputs',
+          'output declarations':'/profile/multioutput_regression/outputs','input-target relationships':'/profile/multioutput_regression/outputs',
+          'output dependencies':'/profile/multioutput_regression/output_dependencies','input coverage histogram':'/profile/readiness/observed_feature_count_histogram',
+          'binary sparsity':'/profile/readiness/binary_sparsity','categorical frequencies':'/profile/readiness/categorical_frequency',
+          'scale ratios':'/profile/readiness/scale_ratios','quantitative feature details':'/profile/readiness/quantitative_features',
+          'feature structure':'/profile/columns','nonempty cohort contrasts':'/profile/annotation_cohorts/records','technical check groups':'/checks'}
+
+
+def report_view(result,profile_name='focused'):
     p=result.profile; limits=PresentationLimits(**p.get('presentation_limits',{})); omitted=[]
     def take(records,cap,topic):
         records=list(records)
         if len(records)>cap:omitted.append({'topic':topic,'computed':len(records),'displayed':cap,'omitted':len(records)-cap})
         return records[:cap]
     def table(title,columns,rows,topic,cap=None):
-        # Rows have already been formatted into short scalar cells.
-        rows=take(rows,limits.table_rows if cap is None else cap,topic)
-        return {'title':title,'columns':columns,'rows':rows,'topic':topic}
+        # Rows have already been formatted into short scalar cells. The historical display limit keeps its meaning;
+        # every computed row is also kept so the complete table and its disclosure can be laid out.
+        rows=list(rows);cap=limits.table_rows if cap is None else cap
+        pointer=POINTERS.get(topic,'/profile/multioutput_regression/outputs' if topic.endswith('search ledger') else '/profile')
+        return {'title':title,'columns':columns,'rows':take(rows,cap,topic),'topic':topic,'all_rows':rows,'cap':cap,'pointer':pointer}
     fmt=lambda x:'Unavailable' if x is None else format(x,'.6g') if isinstance(x,float) else str(x)
     declaration=lambda x:'Undeclared' if x is None else fmt(x)
     pct=lambda x:'Unavailable' if x is None else f'{100*x:.1f}%'
@@ -28,9 +45,11 @@ def report_view(result):
                 if key in value:yield from mentions(value[key])
         elif isinstance(value,(list,tuple)):
             for item in value:yield from mentions(item)
+    referenced_by={}   # name -> the highest-priority finding that mentions it (first in recorded order on ties)
     for finding in result.findings:
         rank={'High':0,'Moderate':1,'Low':2}[finding['severity']]
         for name in mentions([finding.get('affected_columns',[]),finding.get('evidence',[])]):
+            if rank<priorities.get(name,3):referenced_by[name]=finding
             priorities[name]=min(priorities.get(name,3),rank)
     def ordered(records,key):return sorted(records,key=lambda record:priorities.get(record[key],3))
     annotation=[]; task_tables=[]; feature_tables=[]; appendix=[]
@@ -100,14 +119,7 @@ def report_view(result):
         feature_tables.append(table('Annotation population contrasts',['Cohort','Feature','Cohort sizes','Missing counts','Supported shape evidence'],
                                     [[c['cohort'],c['feature'],' / '.join(map(str,c['sizes'])),' / '.join(map(str,c['missing_counts'])),
                                       'TV = '+fmt(c['categorical']['total_variation_distance']) if c['categorical'] else '; '.join(f"median {fmt(v['median'])}, IQR {fmt(v['iqr'])}" for v in c['numerical']) if c['numerical'] else c['reason'] or 'Counts only'] for c in nonempty],'nonempty cohort contrasts'))
-    groups=defaultdict(list)
-    for c in result.checks:
-        groups[(c.check_id,str(getattr(c.applicability,'value',c.applicability)),str(getattr(c.execution,'value',c.execution)),c.reason)].append(c.scope)
-    technical=[]
-    for (check,app,execution,reason),scopes in groups.items():
-        unique=list(dict.fromkeys(scopes))
-        summary=', '.join(unique[:3])+(' ...' if len(unique)>3 else '')
-        technical.append([check.replace('_',' '),f'{len(scopes)} checks; {len(unique)} scopes: '+summary,app,execution,reason or 'Completed within declared scope'])
+    technical=group_checks(result.checks)
     appendix.append(table('Check applicability and execution (repeated checks aggregated)',['Check','Count and scope examples','Applicability','Execution','Reason'],technical,'technical check groups',min(limits.table_rows,limits.appendix_rows)))
     remaining=limits.appendix_rows-len(appendix[0]['rows'])
     for o in (r or {}).get('outputs',[]):
@@ -129,5 +141,13 @@ def report_view(result):
                        'meaning':f"{len(targets)} output searches; scope examples: {', '.join(targets[:3])}"+(' ...' if len(targets)>3 else '')+'. No observed relationship means only none verified in the searched scope; full per-output coverage is in JSON.'})
     qa={'limits':limits.__dict__,'presentation_omissions':omitted,'appendix_detail_rows':sum(len(t['rows']) for t in appendix),
         'executive_actions_displayed':len(actions),'analytical_bounds':bounds,'meaning':'Presentation omissions do not remove computed JSON evidence. Analytical bounds identify uncomputed scope. Execution failures are separate.'}
+    from datatrust.report_structured import capped_tables, finding_index, finding_signal
+    every=annotation+task_tables+feature_tables+appendix
+    for t in every:
+        t['signals']=[finding_signal(referenced_by[str(row[0])]) if row and str(row[0]) in referenced_by else None for row in t['all_rows']]
+    referenced={}
+    disclosures,complete=capped_tables(every,profile_name,referenced=referenced)
+    qa['print_profile']=profile_name
     return {'actions':actions,'annotation_tables':annotation,'task_tables':task_tables,'feature_tables':feature_tables,'appendix':appendix,'qa':qa,'bounds':bounds,
+            'disclosures':disclosures,'complete_tables':complete,'referenced':referenced,'findings':finding_index(result.to_dict()['findings'] if hasattr(result,'to_dict') else result.findings),
             'cohort_availability':cohort_availability, 'annotation_rows':(a or {}).get('rows'),'groups':(a or {}).get('groups'), 'multilabel_summary':m,'regression_summary':r,'readiness_summary':ready,'repetition':p.get('repeated_inputs') or (r or {}).get('repeated_inputs')}
