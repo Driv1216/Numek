@@ -1,0 +1,74 @@
+# CG7 implementation status
+
+The technical authority is the founder-approved CG7 plan: revised plan sections A–Q plus Addendum R2. This file
+records what is implemented and what evidence exists, stage by stage. Several kinds of standing are kept separate:
+engineering correctness, statistical qualification, resilience, measured performance, product completeness,
+independent review and founder acceptance.
+
+## S1 — Platform core (2026-11-19): implemented, focused checks passing
+
+New top-level package `src/numek_platform/`. Nothing in ConfidenceGuard or DataTrust was changed. `pyproject.toml`
+gains:
+
+- the `platform` extra;
+- the `numek` console script;
+- packaging of the SQL migrations.
+
+| Area | Module | What it does |
+|---|---|---|
+| Schema | `db/migrations/0001_core.sql`, `db/migrator.py` | Organisation-scoped tables with composite `(org_id, id)` foreign keys. Global `fact_index`, hash-partitioned by identity key (32 partitions): `UNIQUE(catalog, kind, key, revision)` plus a partial unique index that forbids correction forks. Checksummed, append-only migrations. |
+| Canonical identity | `canonical.py` | Byte-compatible restatement of `confidenceguard.contracts.digest` and `history_storage.serialized`, pinned by a test. |
+| Object store | `objects.py` | Content-addressed physical keys with generations. Staging per job attempt. **Verify-on-read hashes exactly the consumed bytes** (no metadata trust, no time-of-check/time-of-use window). |
+| Publication | `evidence/publish.py` | W1–W4. Fence first. Global lock order. Pending objects activated only for the owning attempt. `ON CONFLICT` identity insert classifying duplicate, conflict, ambiguous-batch and purged re-import. K assigned last, under the head-row lock. Idempotent request ids. |
+| Reading | `evidence/reader.py` | Committed read pins (K, tombstone epoch, maintenance floor). Locator resolution in one REPEATABLE READ snapshot. Purged selections refuse (v2 semantics). |
+| Maintenance | `evidence/maintenance.py`, `evidence/gc.py` | Purge at a new tombstone epoch and K. Compaction with per-row digest checks and locator moves at a new maintenance epoch. GC invariants I-1 to I-3 (pending vs live attempt, pins, holds, grace). Interrupted reclamation completes. Staging cleanup. |
+| Jobs | `execution/jobs.py` | Enqueue (idempotent), `SKIP LOCKED` claim with admission callback, fence on every claim/expiry, renew/complete/fail/cancel all `WHERE fence`. Inline jobs die rather than rerun. |
+| Controller | `execution/controller.py` | Leadership row with an epoch. Deposed leaders cannot act. Lease expiry. Periodic GC. |
+| Worker host | `execution/host.py`, `supervision.py`, `_child.py`, `probes.py` | Warm pools keyed by (org, thread cap) and isolated processes. Native thread caps set in the child environment before import. Process-group kill. Process-tree RSS. Deadline, cancellation and lease-loss kill with no write. Isolation probes recycle a warm process that leaked state. Host RSS/thread/device budgets with an essential-lane reserve. |
+| Execution context | `execution/context.py` | `SpawnContext` (today's supervision) and `InProcessContext` (platform jobs), ready for the S3 port of the 35 `compat.supervise` sites. |
+| Identity | `identity/__init__.py` | Principals (user/service/system). argon2id passwords. Server-side sessions with CSRF, idle and absolute expiry. SHA-256-stored scoped tokens that only narrow authority; `ingest` exists only as a per-source service-token scope. Role bindings by scope. Service principals cannot hold approval. No permission executes production changes. |
+| Audit | `audit.py` | Per-organisation hash chain, appended inside the audited transaction, with anchors exported to an external file sink. Tamper-evident within the stated threat model, not tamper-proof. |
+| Secrets | `secrets.py` | Owner-only secret store. AES-256-GCM data keys. `destroy_live` is recorded as live destruction only. Scrypt-wrapped backup keyrings refuse missing keys. |
+| Egress | `egress.py` | Allowlist on (scheme, host, port). One DNS resolution with every address checked; protected ranges are refused unless an entry's CIDR covers them. Connects to the checked IP with SNI. No redirects. Bounded response. |
+| Backup | `backup.py` | Recovery point is one exported snapshot S. Includes active objects and raw batches still needed for recovery, plus a wrapped keyring. Restore: new installation id, fence + 1 requeue, pending objects reclaimed, continuity `restore_unreconciled`. |
+| P-LOCAL | `local/__init__.py` | Managed PostgreSQL ≥ 16 cluster. Unix socket only, inside a 0700 directory. `LC_ALL` pinned (the macOS postmaster otherwise aborts with "became multithreaded during startup"). |
+| Migration skeleton | `legacy/catalog_v2.py`, `legacy/migration.py` | Read-only v2 reader. Freeze sets `user_version = 9002`, which every released runtime refuses (`history_storage.py:358-363`). Inventory and resume check. Inaccessible `migrating` catalog. Single-transaction cutover. Abandon before cutover only. Completion requires a recorded post-cutover backup. **Publication replay and equivalence validation are S3 work.** |
+| CLI | `cli.py` | `numek local init/start/stop/status`, `db migrate`, `gc`, `backup create/verify`, `worker`, `controller`. |
+
+### Evidence (S1 focused checks)
+
+Environment: `validation/cg7/py313.nosync`, which is git-ignored.
+
+- **Python:** CPython 3.13.17, from the accepted CG6 runtime lock `constraints/cg6-runtime-macos-arm64-py313.lock`.
+- **Added packages** (resolved before 2026-11-01): psycopg 3.3.6, argon2-cffi 25.1.0, cryptography 50.0.2, pytest 9.2.0, pypdf 6.21.4, gunicorn 23.0.0. gunicorn is not yet used.
+- **Server:** PostgreSQL 17.12 (Homebrew).
+- **Host:** macOS 27.0.1 arm64, 10 CPUs, 16 GiB.
+
+| Check | Result |
+|---|---|
+| `tests/platform` (56 tests, real PostgreSQL via P-LOCAL) | 56 passed, 21.9 s |
+| CLI lifecycle smoke (init, status, migrate, stop) | passed |
+| Large randomized interleaving (`NUMEK_INTERLEAVING_STEPS=1700`: 6 threads × 1,700 = 10,200 operations of publish, purge, compact and GC) | passed in 243.9 s: no deadlock, no unexpected error, surviving evidence exactly equals expected |
+
+The suite covers:
+- **Identity and publication:** canonical identity equivalence; checksummed migrations; JSONL and Parquet round trips; idempotent replay and conflicting reuse; duplicates, conflicts, quarantine and ambiguous batches; same-key timestamp corrections; fork and missing-predecessor refusal; purged re-import refusal; **K order = commit order under 6 concurrent writers**; concurrent identical identities published once; cross-organisation references refused by constraint; migrating catalogs inaccessible.
+- **Fencing and GC:** stale attempts cannot publish, renew or complete; retries, dead letters and cancellation; deposed controllers; verify-on-read against changed and missing bytes; generation dedupe; GC against live and stale pending objects, pins, holds and grace; interrupted reclamation.
+- **Compaction and purge:** compaction digests; purge during analysis aborts publication.
+- **Execution:** thread caps, warm reuse per organisation, isolation recycling, deadline and RSS kills, retry semantics, lease-loss kill without write, cancellation, child publication under its fence, budget admission.
+- **Security:** sessions and CSRF, token narrowing, separation of duties, cross-organisation bindings, audit tampering against anchors, keyrings and live destruction, egress protected ranges, allowlist and no-redirect.
+- **Backup and migration:** backup cut and restore, refusal on a missing key, migration freeze/abandon/resume/cutover, randomized interleavings.
+
+**Defects found and fixed during S1 verification:**
+1. Concurrent staging of identical bytes raced on generation allocation. Fixed with a per-(org, sha) transaction advisory lock.
+2. Staging into another organisation's catalog surfaced a raw foreign-key error. Fixed: catalog ownership is now checked in W2.
+3. The warm isolation probe registry was duplicated because the child runs as `__main__`. Moved to `execution/probes.py`.
+4. The PostgreSQL version parse failed on Homebrew's suffix.
+
+**Not established by S1:**
+- PostgreSQL RLS and hosted tenancy (deferred by plan).
+- The S3 object store and remote worker hosts.
+- Any performance or capacity claim; no M.5 workload has run.
+- Linux qualification.
+- Independent review.
+
+ConfidenceGuard persistence still runs on catalog v2 until S3.

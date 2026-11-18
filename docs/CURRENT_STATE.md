@@ -1,5 +1,36 @@
 # Numek Current State
 
+## ConfidenceGuard CG7 — S1 platform core (2026-11-19)
+
+The founder approved the revised CG7 plan with Addendum R2 and authorized stage S1. `src/numek_platform/` now holds the
+shared evidence and execution foundation:
+
+- PostgreSQL as the transactional authority, with an organisation-scoped schema and a global fact index;
+- an immutable object store with verify-on-read;
+- the fenced publication protocol, with K assigned at commit;
+- read pins, purge, compaction and garbage collection;
+- jobs, controller and worker hosts;
+- identity, audit, secrets and egress;
+- backup and restore;
+- a managed local PostgreSQL cluster (P-LOCAL);
+- the catalog-v2 migration state machine.
+
+**Not changed yet:**
+- ConfidenceGuard and DataTrust code. ConfidenceGuard persistence still uses catalog v2 until S3 ports it and migrates
+  existing workspaces.
+- `pyproject.toml` only gains the `platform` extra, the `numek` script and migration package data.
+
+**Checks:**
+- The 56 focused platform tests pass against a real PostgreSQL 17.12. Four defects found during verification were fixed.
+- No performance, Linux or independent-review standing is claimed.
+
+See [CG7 status](../validation/cg7/IMPLEMENTATION_STATUS.md).
+
+**Prerequisites for persistent use:**
+- PostgreSQL ≥ 16 binaries (installed on this Mac with Homebrew `postgresql@17`).
+- The isolated CG7 environment `validation/cg7/py313.nosync`, built from the CG6 Python 3.13 lock plus the platform
+  packages. The CG6 qualification environment was not modified.
+
 ## DataTrust Report Experience — review fixes (2026-11-18)
 
 Fixes for every finding of the technical review of the redesign, plus the validator problems. All presentation only,
