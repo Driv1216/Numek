@@ -1,5 +1,21 @@
 # Numek Current State
 
+## ConfidenceGuard CG7 — S3a CG3 on the platform (2026-11-19)
+
+`confidenceguard/platform_catalog.py` runs CG3 workspaces on the NUMEK platform. Existing `Catalog(root)` call sites open it
+automatically for platform-bound roots.
+
+- It is a full port of v2 publication semantics, with identities preserved (v2 object and operation ids become platform
+  UUIDs; K is the platform sequence).
+- CG3 inspect, analyze and restate now reserve the outcome-bearing population before reading, and the saved assessment
+  consumes the reservation.
+
+**Results:**
+- CG3 on the platform: 59 of 67 pass. The rest are deletion and backup, which are S3b, plus one replaced v2 lock assertion.
+- The v2 path is unchanged: CG3 67 passed, CG4–CG6 history tests 21 passed. The platform suite passes 71.
+
+S3b–S3d remain. See [CG7 status](../validation/cg7/IMPLEMENTATION_STATUS.md).
+
 ## ConfidenceGuard CG7 — S2 governance before access (2026-11-19)
 
 `numek_platform/governance` adds evidence-use reservations committed **before** any outcome-bearing read, ported from

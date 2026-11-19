@@ -16,7 +16,7 @@ from dataclasses import dataclass
 
 from ..errors import PlatformError
 from ..evidence import reader as evidence_reader
-from ..evidence.reader import PROTECTED_KINDS, _RESERVE_ROW
+from ..evidence.reader import _RESERVE_ROW
 from .ledger import decode_membership
 
 
@@ -41,7 +41,8 @@ def _reservation(db, reservation):
     return row
 
 
-def membership_from_index(db, read_pin, *, kinds=('opportunity',), event_tick_range=None, require_outcome=True):
+def membership_from_index(db, read_pin, *, kinds=('opportunity',), event_tick_range=None, require_outcome=True,
+                          namespace=None):
     """Membership pairs (event_hash, unit_hash) from non-outcome fields only.
 
     Uses identity hashes, clocks and the *existence* of an outcome fact at K;
@@ -51,33 +52,45 @@ def membership_from_index(db, read_pin, *, kinds=('opportunity',), event_tick_ra
     where = ['f.catalog_id = %s', 'p.sequence <= %s', 'f.kind = ANY(%s)', 'f.event_hash IS NOT NULL',
              'f.entity_hash IS NOT NULL']
     params = [read_pin.catalog_id, read_pin.k, list(kinds)]
+    if namespace is not None:
+        where.append('f.namespace = %s')
+        params.append(namespace)
     if event_tick_range is not None:
         where.append('f.event_tick >= %s AND f.event_tick < %s')
         params.extend(event_tick_range)
     if require_outcome:
         where.append('''EXISTS (SELECT 1 FROM fact_index o JOIN publications op ON op.id = o.publication_id
-                                WHERE o.catalog_id = f.catalog_id AND o.kind = 'outcome' AND o.event_hash = f.event_hash
+                                WHERE o.catalog_id = f.catalog_id AND o.kind = 'outcome'
+                                AND (o.event_hash = f.event_hash OR (f.target_key IS NOT NULL AND o.target_key = f.target_key))
                                 AND op.sequence <= %s)''')
         params.append(read_pin.k)
     with db.transaction('repeatable_read', read_only=True) as conn:
         rows = conn.execute(
-            f'''SELECT DISTINCT f.event_hash, f.entity_hash FROM fact_index f JOIN publications p ON p.id = f.publication_id
-                WHERE {' AND '.join(where)}''', params).fetchall()
-    return sorted((bytes(r['event_hash']).hex(), bytes(r['entity_hash']).hex()) for r in rows)
+            f'''SELECT DISTINCT f.event_hash, f.entity_hash, f.target_key FROM fact_index f
+                JOIN publications p ON p.id = f.publication_id WHERE {' AND '.join(where)}''', params).fetchall()
+    return sorted((bytes(r['event_hash']).hex(), bytes(r['entity_hash']).hex(),
+                   None if r['target_key'] is None else bytes(r['target_key']).hex()) for r in rows)
 
 
 def resolve(db, store, reservation, read_pin, *, strict=False, **filters):
     row = _reservation(db, reservation)
-    if row['read_k'] is not None and row['read_k'] != read_pin.k:
-        raise PlatformError('Reservation was made for a different catalog snapshot.', 'reservation_snapshot')
+    # A reservation covers knowledge up to its K; reading an earlier snapshot
+    # (for example a frozen prediction snapshot) is within it, a later one is not.
+    if row['read_k'] is not None and read_pin.k > row['read_k']:
+        raise PlatformError('Reservation was made for an earlier catalog snapshot.', 'reservation_snapshot')
     if read_pin.catalog_id != reservation.catalog_id:
         raise PlatformError('Read pin belongs to another catalog.', 'pin_mismatch')
-    events, units = decode_membership(store.read_verified(row['physical_key'], bytes(row['sha256']).hex(), row['bytes']))
+    events, units, targets = decode_membership(store.read_verified(row['physical_key'], bytes(row['sha256']).hex(),
+                                                                   row['bytes']))
     covariates_only = row['kind'] == 'covariate_inspection'
 
     def governance(conn):
         conn.execute('CREATE TEMP TABLE _gov_events (hash bytea PRIMARY KEY) ON COMMIT DROP')
         conn.execute('CREATE TEMP TABLE _gov_units (hash bytea PRIMARY KEY) ON COMMIT DROP')
+        conn.execute('CREATE TEMP TABLE _gov_targets (hash bytea PRIMARY KEY) ON COMMIT DROP')
+        with conn.cursor().copy('COPY _gov_targets (hash) FROM STDIN') as copy:
+            for value in targets:
+                copy.write_row((bytes.fromhex(value),))
         with conn.cursor().copy('COPY _gov_events (hash) FROM STDIN') as copy:
             for value in events:
                 copy.write_row((bytes.fromhex(value),))
@@ -85,11 +98,12 @@ def resolve(db, store, reservation, read_pin, *, strict=False, **filters):
             for value in units:
                 copy.write_row((bytes.fromhex(value),))
         if covariates_only:
-            protected = 'f.kind <> ALL(%s)'
+            protected = 'NOT f.protected'
         else:
-            protected = '(f.kind <> ALL(%s) OR f.event_hash IN (SELECT hash FROM _gov_events))'
+            protected = ('(NOT f.protected OR f.event_hash IN (SELECT hash FROM _gov_events) '
+                         'OR f.target_key IN (SELECT hash FROM _gov_targets))')
         reserve = f'(NOT {_RESERVE_ROW} OR f.entity_hash IN (SELECT hash FROM _gov_units))'
-        return f'{protected} AND {reserve}', [list(PROTECTED_KINDS)]
+        return f'{protected} AND {reserve}', []
 
     allowed = evidence_reader.resolve(db, read_pin, access='governed', _governance=governance, **filters)
     everything = evidence_reader.resolve(db, read_pin, access='maintenance', **filters)

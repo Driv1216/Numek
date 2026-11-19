@@ -191,7 +191,7 @@ def test_reserve_assignment_is_stable_versioned_and_starts_after_creation(platfo
 def test_reallocation_refuses_exposed_entities_and_release_keeps_history(platform, world):
     lease = lease_for(platform, kind='monitoring')
     read_pin, pairs = world.pairs(lease)
-    exposed_unit = next(u for _, u in pairs if u not in world.reserve_units())
+    exposed_unit = next(m[1] for m in pairs if m[1] not in world.reserve_units())
     world.reserve(lease, 'monitoring_outcome', [p for p in pairs if p[1] == exposed_unit], read_pin)
     fresh = world.publish(['fresh-entity'], tag='f')
     assert fresh.new_facts == 2
@@ -251,7 +251,7 @@ def test_exposure_history_survives_purge(platform, world):
     with platform.db.connect() as conn:
         outcome_keys = [bytes(r['key']).hex() for r in conn.execute(
             "SELECT key FROM fact_index WHERE catalog_id = %s AND kind = 'outcome' AND event_hash = ANY(%s)",
-            (platform.catalog_id, [bytes.fromhex(e) for e, _ in ordinary]))]
+            (platform.catalog_id, [bytes.fromhex(m[0]) for m in ordinary]))]
     purge_facts(platform.db, platform.scope, lease, platform.catalog_id, [('outcome', k, 'initial') for k in outcome_keys],
                 request_id='purge', reason='retention')
     later_pin, _ = world.pairs()

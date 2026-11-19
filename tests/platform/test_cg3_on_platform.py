@@ -1,0 +1,79 @@
+"""ConfidenceGuard CG3 on the platform: parity, governance before access, identity preservation.
+
+The full CG3 suite is also run with ``NUMEK_PLATFORM_DSN`` set (see the CG7
+status record). This test keeps a representative workflow in the default suite.
+"""
+import importlib.util
+from pathlib import Path
+
+import pytest
+
+ROOT = Path(__file__).resolve().parents[1]
+
+
+def _cg3_helpers():
+    spec = importlib.util.spec_from_file_location('cg3_history_helpers', ROOT / 'cg3' / 'test_history.py')
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+@pytest.fixture
+def cg3(platform, monkeypatch):
+    monkeypatch.setenv('NUMEK_PLATFORM_DSN', platform.db.dsn)
+    return _cg3_helpers()
+
+
+def test_cg3_history_workflow_runs_on_the_platform(platform, cg3, tmp_path):
+    from confidenceguard import EvaluationError
+    from confidenceguard.platform_catalog import PlatformCatalog
+    tmp_path = tmp_path.resolve()
+    ws = cg3.workspace(tmp_path)
+    assert isinstance(ws.catalog, PlatformCatalog) and not (ws.path / 'catalog.sqlite3').exists()
+    receipt = ws.ingest(cg3.batch(tmp_path))
+    assert receipt['catalog_sequence'] == 1 and receipt['new_facts'] > 0
+    again = ws.ingest(cg3.batch(tmp_path))      # identical bytes: only the per-operation capture metadata is new (as in v2)
+    assert again['new_facts'] == 1 and again['duplicate_occurrences'] == receipt['new_facts'] - 1
+    status = ws.status()
+    assert status['storage'] == 'numek_platform' and status['facts']['prediction'] == 12
+
+    request = cg3.longitudinal(ws)
+    first = ws.analyze(request, request_id='analysis-1')
+    retry = ws.analyze(request, request_id='analysis-1')
+    assert retry.to_private_dict() == first.to_private_dict()       # idempotent receipt
+    with pytest.raises(EvaluationError, match='different content'):
+        ws.analyze(cg3.longitudinal(ws, name='changed'), request_id='analysis-1')
+    reopened = ws.open(first.data['analysis_id'])
+    assert reopened.to_private_dict() == first.to_private_dict()
+
+    # Governance before access: the analysis reserved the namespace's outcomes
+    # and its saved assessment consumed that reservation.
+    with platform.db.connect() as conn:
+        uses = conn.execute("SELECT purpose, state, metadata->>'purpose' AS label FROM evidence_uses WHERE catalog_id = %s",
+                            (ws.catalog.catalog_id,)).fetchall()
+    assert {(u['label'], u['state']) for u in uses} >= {('historical_analysis', 'consumed')}
+
+    # Outcome facts are not readable without a reservation.
+    with pytest.raises(EvaluationError) as caught:
+        list(ws.catalog.iter_facts('outcome'))
+    assert caught.value.code == 'reservation_required'
+
+    # v2 identities preserved: object ids are 32-hex, sequences are contiguous.
+    fact = next(ws.catalog.iter_facts('prediction'))
+    assert len(fact['object_id']) == 32 and fact['recorded_sequence'] == 1
+
+
+def test_cg3_outcome_only_restatement_keeps_the_prediction_snapshot(platform, cg3, tmp_path):
+    tmp_path = tmp_path.resolve()
+    ws = cg3.workspace(tmp_path)
+    ws.ingest(cg3.batch(tmp_path))
+    analysis = ws.analyze(cg3.longitudinal(ws))
+    extra = cg3.batch(tmp_path, 'more', count=14)
+    path = Path(extra['evaluation']['sources'][0]['path'])
+    rows = path.read_text().splitlines()
+    path.write_text('\n'.join([rows[0]] + [','.join([str(100 + int(r.split(',')[0]))] + r.split(',')[1:]) for r in rows[1:]]) + '\n')
+    ws.ingest(extra)
+    restated = ws.restate(analysis.data['analysis_id'], as_of='2026-03-03T00:00:00Z', reason='Outcome-only snapshot')
+    assert [r['selected_predictions'] for r in restated.data['history']['window_coverage']] == [6, 6]
+    current = ws.analyze(cg3.longitudinal(ws))
+    assert [r['selected_predictions'] for r in current.data['history']['window_coverage']] == [13, 13]

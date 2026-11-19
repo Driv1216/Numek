@@ -25,6 +25,7 @@ PURPOSES = {
     'discover_D':                  ('discovery_selection',      'refuse'),
     'select_S4':                   ('discovery_selection',      'refuse'),
     'policy_S':                    ('discovery_selection',      'refuse'),
+    'discovery_selection':         ('discovery_selection',      'refuse'),
     'aux_F':                       ('discovery_selection',      'refuse'),
     'aux_S':                       ('discovery_selection',      'refuse'),
     'confirmation':                ('confirmation',             'consume'),

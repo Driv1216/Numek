@@ -51,9 +51,14 @@ class ReliabilityWorkspace:
         self.path = self.catalog.root
 
     @classmethod
-    def initialize(cls, path, config=None):
+    def initialize(cls, path, config=None, *, platform=None):
+        """Create a workspace. ``platform=True`` (or ``NUMEK_PLATFORM_DSN``) stores it on the NUMEK platform."""
         if isinstance(config, dict): config = WorkspaceConfig.from_dict(config)
-        Catalog(path, create=True, config=config or WorkspaceConfig())
+        if platform:
+            from .platform_catalog import PlatformCatalog
+            PlatformCatalog(path, create=True, config=config or WorkspaceConfig())
+        else:
+            Catalog(path, create=True, config=config or WorkspaceConfig())
         return cls(path)
 
     @property
@@ -177,9 +182,20 @@ class ReliabilityWorkspace:
             from .longitudinal import _inspect_history
             from .history_contracts import now
             with self.catalog.operation():
-                self._reserve_history_exposure(frozen,purpose='historical_population_preview',locked=True)
-                result['population_preview']=compat.supervise(_inspect_history,(str(self.path),frozen,sequence,frozen.as_of or now()),frozen.config).data
+                if self._platform():
+                    # Governance before access: reserve the namespace's outcome-bearing
+                    # population at this K, then read only under that reservation.
+                    lease,governance=self.catalog.reserve_history(namespace=frozen.namespace,k=sequence,purpose_label='historical_population_preview')
+                    try:result['population_preview']=compat.supervise(_inspect_history,(str(self.path),frozen,sequence,frozen.as_of or now(),governance),frozen.config).data
+                    finally:self.catalog.finish_attempt(lease)
+                else:
+                    self._reserve_history_exposure(frozen,purpose='historical_population_preview',locked=True)
+                    result['population_preview']=compat.supervise(_inspect_history,(str(self.path),frozen,sequence,frozen.as_of or now()),frozen.config).data
         return result
+
+    def _platform(self):
+        from .platform_catalog import PlatformCatalog
+        return isinstance(self.catalog, PlatformCatalog)
 
     def _reserve_history_exposure(self,spec,*,purpose,locked=False,progress=None,cancel=None,deadline=None):
         from .evidence_use import EvidenceUseLedger
@@ -220,6 +236,20 @@ class ReliabilityWorkspace:
                         left.pop(field, None); right.pop(field, None)
                     if left != right: raise EvaluationError('Outcome-only restatement changed frozen analysis declarations.', 'restatement_scope')
             from .longitudinal import analyze
+            if self._platform():
+                lease,governance=self.catalog.reserve_history(namespace=spec.namespace,k=spec.catalog_sequence,
+                    purpose_label='outcome_restatement' if spec.restates else 'historical_analysis')
+                try:
+                    result = analyze(self.path, spec, progress=progress, cancel=cancel,_deadline=deadline,governance=governance)
+                    if spec.restates:
+                        result.data['history']['restatement_changes'] = self._restatement_delta(prior, result)
+                        result.seal()
+                except BaseException:
+                    self.catalog.finish_attempt(lease, failed=True); raise
+                # The saved assessment consumes the reservation in its own publication.
+                self.catalog.add_assessment(result, request_id=request_id, cancel=cancel, request_digest=request_digest,
+                                            lease=lease, reservations=[governance['reservation']['id']])
+                return result
             self._reserve_history_exposure(spec,purpose='historical_analysis',locked=True,progress=progress,cancel=cancel,deadline=deadline)
             result = analyze(self.path, spec, progress=progress, cancel=cancel,_deadline=deadline)
             if spec.restates:

@@ -173,9 +173,15 @@ def forget_session_uses(owner,*,use_ids=(),purge=False,untracked=False):
 
 
 class EvidenceUseLedger:
-    def __init__(self,workspace):self.catalog=workspace.catalog if hasattr(workspace,'catalog') else Catalog(workspace)
+    def __init__(self,workspace):
+        self.catalog=workspace.catalog if hasattr(workspace,'catalog') else Catalog(workspace)
+        from .platform_catalog import PlatformCatalog
+        self.platform=isinstance(self.catalog,PlatformCatalog)
 
     def status(self):
+        if self.platform:
+            from numek_platform.governance.ledger import tracking_status
+            return tracking_status(self.catalog.db,self.catalog.scope,self.catalog.catalog_id)
         if self.catalog.catalog_version<2:return {'enabled':False,'continuity':'unknown','system_verified_external_independence':False}
         with closing(self.catalog._connect()) as db:
             settings={k:json.loads(v) for k,v in db.execute("SELECT key,value FROM settings WHERE key IN ('exposure_tracking','exposure_continuity','branch_id','exposure_continuity_token')")}
@@ -185,6 +191,9 @@ class EvidenceUseLedger:
 
     def enable(self,enabled):
         if not isinstance(enabled,bool):raise EvaluationError('Evidence-use consent must be Boolean.')
+        if self.platform:
+            from numek_platform.governance.ledger import set_tracking
+            return set_tracking(self.catalog.db,self.catalog.scope,self.catalog.catalog_id,enabled)
         if self.catalog.catalog_version<2:raise EvaluationError('Migrate the catalog explicitly before evidence tracking.','migration_required')
         with self.catalog.operation(),closing(self.catalog._connect()) as db:
             db.execute('BEGIN IMMEDIATE')
@@ -197,6 +206,10 @@ class EvidenceUseLedger:
         return self.status()
 
     def overlap(self,events,units,*,family_digest=None,population_digest=None,check=None):
+        if self.platform:
+            from numek_platform.governance.ledger import _overlap_reasons
+            with self.catalog.db.transaction() as conn:
+                return _overlap_reasons(conn,self.catalog.catalog_id,sorted(set(events)),sorted(set(units)),family_digest,population_digest)
         events=set(events);units=set(units);uses={};reasons=[]
         try:
             for fact in self.catalog.iter_facts('evidence_use',require_complete=True,check=check):uses[fact['payload']['id']]=fact['payload']
@@ -237,6 +250,9 @@ class EvidenceUseLedger:
     def record(self,kind,*,events,units,population_digest,family_digest=None,request_id=None,
                study_id=None,alpha=None,total_alpha=None,metadata=None,cancel=None,locked=False,deadline=None,session_max_bytes=512*1024**2,query_events=None):
         if kind not in {'discovery_selection','confirmation','outcome_disclosure','numerical_recomputation'}:raise EvaluationError('Invalid evidence-use purpose.')
+        if self.platform:
+            return self._record_platform(kind,events=events,units=units,population_digest=population_digest,family_digest=family_digest,
+                request_id=request_id,study_id=study_id,alpha=alpha,total_alpha=total_alpha,metadata=metadata,query_events=query_events)
         state=self.status()
         if not state['enabled']:raise EvaluationError('Explicit evidence-use tracking consent required.','exposure_tracking_disabled')
         events=sorted(set(events));units=sorted(set(units));request_id=request_id or uuid.uuid4().hex
@@ -296,6 +312,39 @@ class EvidenceUseLedger:
                  'continuity':state['continuity'],'continuity_token':state.get('continuity_token'),'state':'reserved' if kind in {'confirmation','numerical_recomputation'} else 'exposed'}
             writer.add('evidence_use',[uid],use);writer.finish({'capture_stages':['evidence_use'],'evidence_use':use})
             return remember(self.catalog.commit_capture(operation,cancel=cancel,receipt_extra={'evidence_use_id':uid,'continuity_context':state}))
+
+
+def _record_platform(self,kind,*,events,units,population_digest,family_digest,request_id,study_id,alpha,total_alpha,metadata,query_events):
+    """Durable platform reservation with the v2 receipt shape (exposure is recorded, never session-only)."""
+    from numek_platform.errors import PlatformError
+    from numek_platform.execution import jobs
+    from numek_platform.governance import ledger
+    from .platform_catalog import _translate
+    state=self.status()
+    if not state['enabled']:raise EvaluationError('Explicit evidence-use tracking consent required.','exposure_tracking_disabled')
+    catalog=self.catalog;request_id=request_id or uuid.uuid4().hex
+    try:
+        with catalog.db.connect() as conn:
+            lease,_row=jobs.start_inline(conn,catalog.scope,'cg_evidence_use',idempotency_key='cg-use:'+request_id,owner='confidenceguard')
+        if lease is None:
+            with catalog.db.connect() as conn:
+                row=conn.execute('SELECT id FROM evidence_uses WHERE catalog_id=%s AND request_id=%s',(catalog.catalog_id,request_id)).fetchone()
+            return {'evidence_use_id':row['id'],'continuity_context':state}
+        try:
+            reservation=ledger.reserve(catalog.db,catalog.store,catalog.scope,lease,catalog.catalog_id,purpose=kind,members=[],
+                extra_events=sorted(set(events)),extra_units=sorted(set(units)),population_digest=population_digest,family_digest=family_digest,
+                request_id=request_id,study_id=study_id,alpha=alpha,total_alpha=total_alpha,metadata=metadata,query_events=query_events,
+                consume_reserve=kind in {'confirmation','numerical_recomputation'})
+        finally:
+            with catalog.db.connect() as conn:jobs.complete(conn,lease,{})
+    except PlatformError as exc:
+        raise _translate(exc) from exc
+    if reservation.reused:
+        return {'evidence_use_id':reservation.id,'reused_reservation':True,'fresh_independent_evidence':False,'continuity_context':state}
+    return {'evidence_use_id':reservation.id,'catalog_sequence':catalog.head(),'continuity_context':state}
+
+
+EvidenceUseLedger._record_platform=_record_platform
 
 
 def commit_use(db,metadata,operation):

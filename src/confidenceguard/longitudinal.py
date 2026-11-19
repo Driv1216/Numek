@@ -493,11 +493,11 @@ def _temporal(stores, spec):
     return result
 
 
-def _execute_history(root, spec, sequence, effective_as_of, *, progress=None):
+def _execute_history(root, spec, sequence, effective_as_of, governance=None, *, progress=None):
     started = time.monotonic(); work = compat.workspace(spec.config, 512*1024**2, progress)
     try:
         if progress: progress({'owned_workspace': str(work.root), 'stage': 'historical_evidence_materialization'})
-        variants, scan = load_history(work, root, spec, sequence)
+        variants, scan = load_history(work, root, spec, sequence, governance)
         cutoff = select_history(work, spec, effective_as_of)
         context_links(work, root, sequence, spec.max_scan_records)
         stores = {}; runs = []; measurements = []; populations = {}; locators = {}; checks = []; coverage = []
@@ -662,10 +662,10 @@ def _execute_history(root, spec, sequence, effective_as_of, *, progress=None):
         work.close()
 
 
-def _inspect_history(root,spec,sequence,effective_as_of,*,progress=None):
+def _inspect_history(root,spec,sequence,effective_as_of,governance=None,*,progress=None):
     work=compat.workspace(spec.config,512*1024**2,progress)
     try:
-        variants,scan=load_history(work,root,spec,sequence)
+        variants,scan=load_history(work,root,spec,sequence,governance)
         cutoff=select_history(work,spec,effective_as_of);context_links(work,root,sequence,spec.max_scan_records)
         stores={};coverage=[]
         for variant,metadata in variants.items():
@@ -718,11 +718,11 @@ def exposure_population(root,spec,sequence,effective_as_of,*,progress=None):
     finally:work.close()
 
 
-def analyze(root, spec, *, progress=None, cancel=None,_deadline=None):
+def analyze(root, spec, *, progress=None, cancel=None,_deadline=None,governance=None):
     if isinstance(spec, dict): spec = LongitudinalSpec.from_dict(spec)
     sequence = spec.catalog_sequence
     if sequence is None: raise EvaluationError('Parent must freeze the catalog snapshot before execution.')
-    result = compat.supervise(_execute_history, (str(root), spec, sequence, spec.as_of or now()),
+    result = compat.supervise(_execute_history, (str(root), spec, sequence, spec.as_of or now(), governance),
                               replace(spec.config, result_bytes=spec.config.private_bytes+spec.config.result_bytes), progress=progress, cancel=cancel,deadline=_deadline)
     if cancel is not None and cancel.is_set(): raise EvaluationError('Cancelled before assessment commit.', 'cancelled')
     result.seal(); LongitudinalResult.from_dict(result.to_private_dict(), private=result.private)

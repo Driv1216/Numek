@@ -59,6 +59,7 @@ class Locator:
     loc_b: int
     event_hash: str | None = None
     entity_hash: str | None = None
+    protected: bool = False
 
 
 def pin(db, scope, catalog_id, *, lease=None, holder=None, ttl_seconds=3600, k=None, allow_migrating=False):
@@ -97,12 +98,14 @@ def release(db, read_pin):
 
 
 def resolve(db, read_pin, *, kinds=None, keys=None, opportunity_keys=None, target_keys=None, object_ids=None,
-            event_tick_range=None, require_complete=True, limit=None, access='plain', _governance=None):
+            event_tick_range=None, require_complete=True, limit=None, access='plain', _governance=None,
+            fact_digests=None, occurrence_publications=None, namespace=None, order='physical'):
     """Resolve visible fact locators at the pin's K (one REPEATABLE READ snapshot).
 
-    ``access='plain'`` never returns outcome-bearing kinds (requesting one
-    refuses with ``reservation_required``) and leaves out rows of sealed-reserve
-    entities. Governed access is reached only through
+    ``access='plain'`` never returns protected (outcome-bearing) facts: an
+    explicit kind request that would include one refuses with
+    ``reservation_required``; listing mode (no kinds) leaves them out. It also
+    leaves out rows of sealed-reserve entities. Governed access is reached only through
     ``numek_platform.governance.reader.resolve``. ``access='maintenance'``
     (compaction) moves bytes without exposing values to analysis.
     """
@@ -116,9 +119,23 @@ def resolve(db, read_pin, *, kinds=None, keys=None, opportunity_keys=None, targe
         where.append('f.kind = ANY(%s)')
         params.append(list(kinds))
     if access == 'plain':
-        where.append('f.kind <> ALL(%s)')
-        params.append(list(PROTECTED_KINDS))
+        # Listing mode (no kinds) leaves protected facts out. An explicit kind
+        # request that would include protected facts refuses below instead of
+        # silently handing an analysis a partial population.
+        if kinds is None:
+            where.append('NOT f.protected')
         where.append(f'NOT {_RESERVE_ROW}')
+    if fact_digests is not None:
+        where.append('f.fact_digest = ANY(%s)')
+        params.append([bytes.fromhex(v) for v in fact_digests])
+    if namespace is not None:
+        where.append('f.namespace = %s')
+        params.append(namespace)
+    if occurrence_publications is not None:
+        where.append('''EXISTS (SELECT 1 FROM fact_occurrences oc JOIN publications op ON op.id = oc.publication_id
+                        WHERE oc.catalog_id = f.catalog_id AND oc.kind = f.kind AND oc.key = f.key
+                        AND oc.revision = f.revision AND oc.publication_id = ANY(%s) AND op.sequence <= %s)''')
+        params.extend([list(occurrence_publications), read_pin.k])
     for column, values in (('key', keys), ('opportunity_key', opportunity_keys), ('target_key', target_keys)):
         if values is not None:
             where.append(f'f.{column} = ANY(%s)')
@@ -136,7 +153,8 @@ def resolve(db, read_pin, *, kinds=None, keys=None, opportunity_keys=None, targe
             where.append(extra)
             params.extend(extra_params)
         clause = ' AND '.join(where)
-        tail = ' ORDER BY o.physical_key, f.loc_a' + (' LIMIT %s' if limit else '')
+        tail = (' ORDER BY o.physical_key, f.loc_a' if order == 'physical' else ' ORDER BY p.sequence, o.created_at, f.loc_a') \
+            + (' LIMIT %s' if limit else '')
         if limit:
             params.append(limit)
         if require_complete:
@@ -151,11 +169,13 @@ def resolve(db, read_pin, *, kinds=None, keys=None, opportunity_keys=None, targe
         rows = conn.execute(
             f'''SELECT f.kind, f.key, f.revision, f.fact_digest, f.predecessor, p.sequence, f.object_id,
                        o.physical_key, o.sha256, o.bytes, o.codec, o.state AS object_state,
-                       f.locator_kind, f.loc_a, f.loc_b, f.event_hash, f.entity_hash
+                       f.locator_kind, f.loc_a, f.loc_b, f.event_hash, f.entity_hash, f.protected
                 FROM fact_index f JOIN publications p ON p.id = f.publication_id
                 JOIN objects o ON o.id = f.object_id
                 WHERE {clause} AND NOT EXISTS (SELECT 1 FROM fact_tombstones t WHERE t.catalog_id = f.catalog_id
                       AND t.kind = f.kind AND t.key = f.key AND t.revision = f.revision){tail}''', params).fetchall()
+    if access == 'plain' and any(r['protected'] for r in rows):
+        raise PlatformError('This selection includes outcome-bearing evidence; reserve it first.', 'reservation_required')
     out = []
     for r in rows:
         if r['object_state'] not in ('active', 'tombstoned'):
@@ -165,7 +185,7 @@ def resolve(db, read_pin, *, kinds=None, keys=None, opportunity_keys=None, targe
                            r['object_id'], r['physical_key'], bytes(r['sha256']).hex(), r['bytes'], r['codec'],
                            r['locator_kind'], r['loc_a'], r['loc_b'],
                            None if r['event_hash'] is None else bytes(r['event_hash']).hex(),
-                           None if r['entity_hash'] is None else bytes(r['entity_hash']).hex()))
+                           None if r['entity_hash'] is None else bytes(r['entity_hash']).hex(), r['protected']))
     return out
 
 

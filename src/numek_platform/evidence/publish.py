@@ -55,6 +55,8 @@ class FactRow:
     entity_hash: str | None = None    # governance unit hash: digest([namespace, entity or event])
     event_hash: str | None = None     # governance event hash: digest([namespace, event])
     event_tick: int | None = None
+    namespace: str | None = None
+    protected: bool | None = None     # outcome-bearing; None derives it from the kind
     available_tick: int | None = None
 
 
@@ -81,8 +83,14 @@ def _b(hex_value):
 # W1-W3 ------------------------------------------------------------------------
 
 def stage_object(db, store, lease, data, *, catalog_id, codec, records=0, key_id=None,
-                 retained_for_recovery=False):
-    """Stage one immutable object for this attempt; dedupe against active objects."""
+                 retained_for_recovery=False, object_id=None, dedupe=True):
+    """Stage one immutable object for this attempt; dedupe against active objects.
+
+    ``object_id`` lets a producer keep an identity it already uses (ConfidenceGuard
+    object ids); such objects are never deduplicated by content.
+    """
+    if object_id is not None:
+        dedupe = False
     staged = store.write_staged(lease.job_id, lease.fence, data)
     sha = bytes.fromhex(staged.sha256)
     from ..scope import OrgScope
@@ -91,7 +99,7 @@ def stage_object(db, store, lease, data, *, catalog_id, codec, records=0, key_id
         require_active(catalog(conn, OrgScope(lease.org_id), catalog_id, lock='share'), allow_migrating=True)
         # Serialize generation allocation for identical bytes.
         conn.execute('SELECT pg_advisory_xact_lock(hashtextextended(%s, 0))', (f'object:{lease.org_id}:{staged.sha256}',))
-        existing = conn.execute(
+        existing = None if not dedupe else conn.execute(
             '''SELECT id, generation, physical_key, codec, bytes FROM objects
                WHERE org_id = %s AND sha256 = %s AND state = 'active' AND catalog_id = %s
                      AND codec = %s AND key_id IS NOT DISTINCT FROM %s
@@ -103,7 +111,7 @@ def stage_object(db, store, lease, data, *, catalog_id, codec, records=0, key_id
                              existing['codec'], existing['bytes'], reused=True)
         generation = conn.execute('SELECT coalesce(max(generation) + 1, 0) AS g FROM objects WHERE org_id = %s AND sha256 = %s',
                                   (lease.org_id, sha)).fetchone()['g']
-        object_id = uuid.uuid4()
+        object_id = object_id or uuid.uuid4()
         key = store.physical_key(lease.org_id, staged.sha256, generation)
         conn.execute(
             '''INSERT INTO objects(org_id, id, catalog_id, sha256, generation, physical_key, codec, bytes, records,
@@ -131,7 +139,7 @@ def _existing_receipt(conn, catalog_id, request_id, request_digest):
 
 def publish(db, scope, lease, catalog_id, *, request_id, request_digest, kind, objects=(), facts=(),
             pin=None, on_conflict='refuse', allow_migrating=False, exposure_lock=False,
-            before_head=None, after_head=None, receipt_extra=None, reservations=()):
+            before_head=None, after_head=None, receipt_extra=None, reservations=(), publication_id=None):
     """Atomically publish facts and objects as one catalog sequence step.
 
     ``before_head(conn, publication_id)`` and ``after_head(conn, publication_id, K)``
@@ -150,7 +158,7 @@ def publish(db, scope, lease, catalog_id, *, request_id, request_digest, kind, o
         try:
             return _publish_once(db, scope, lease, catalog_id, request_id, request_digest, kind, list(objects),
                                  list(facts), pin, on_conflict, allow_migrating, exposure_lock or bool(reservations),
-                                 before_head, after_head, receipt_extra, list(reservations))
+                                 before_head, after_head, receipt_extra, list(reservations), publication_id)
         except psycopg.errors.UniqueViolation as exc:
             constraint = getattr(exc.diag, 'constraint_name', '') or ''
             if 'request_id' in constraint and attempt < 2:
@@ -161,7 +169,8 @@ def publish(db, scope, lease, catalog_id, *, request_id, request_digest, kind, o
 
 
 def _publish_once(db, scope, lease, catalog_id, request_id, request_digest, kind, objects, facts, pin,
-                  on_conflict, allow_migrating, exposure_lock, before_head, after_head, receipt_extra, reservations):
+                  on_conflict, allow_migrating, exposure_lock, before_head, after_head, receipt_extra, reservations,
+                  publication_id=None):
     with db.transaction() as conn:
         assert_fence(conn, lease)                                           # 1 job
         previous = _existing_receipt(conn, catalog_id, request_id, request_digest)
@@ -200,7 +209,7 @@ def _publish_once(db, scope, lease, catalog_id, request_id, request_digest, kind
         if pin is not None:
             _check_deletion_since_pin(conn, catalog_id, pin, tombstone_epoch)
 
-        publication_id = uuid.uuid4()
+        publication_id = publication_id or uuid.uuid4()
         conn.execute(
             '''INSERT INTO publications(org_id, catalog_id, id, request_id, request_digest, kind, job_id, fence)
                VALUES (%s, %s, %s, %s, %s, %s, %s, %s)''',
@@ -242,7 +251,9 @@ def _check_deletion_since_pin(conn, catalog_id, pin, tombstone_epoch):
 
 
 _COLUMNS = ('kind', 'key', 'revision', 'fact_digest', 'predecessor', 'object_id', 'locator_kind', 'loc_a', 'loc_b',
-            'opportunity_key', 'target_key', 'entity_hash', 'event_hash', 'event_tick', 'available_tick')
+            'opportunity_key', 'target_key', 'entity_hash', 'event_hash', 'event_tick', 'available_tick', 'namespace',
+            'protected')
+PROTECTED_BY_DEFAULT = ('outcome', 'raw')
 
 
 def _insert_facts(conn, scope, catalog_id, publication_id, facts):
@@ -264,12 +275,14 @@ def _insert_facts(conn, scope, catalog_id, publication_id, facts):
     conn.execute(
         '''CREATE TEMP TABLE _facts (kind text, key bytea, revision text, fact_digest bytea, predecessor bytea,
                object_id uuid, locator_kind text, loc_a bigint, loc_b bigint, opportunity_key bytea, target_key bytea,
-               entity_hash bytea, event_hash bytea, event_tick numeric, available_tick numeric) ON COMMIT DROP''')
+               entity_hash bytea, event_hash bytea, event_tick numeric, available_tick numeric, namespace text,
+               protected boolean) ON COMMIT DROP''')
     with conn.cursor().copy(f'COPY _facts ({", ".join(_COLUMNS)}) FROM STDIN') as copy:
         for f in unique:
             copy.write_row((f.kind, _b(f.key), f.revision, _b(f.fact_digest), _b(f.predecessor), f.object_id,
                             f.locator_kind, f.loc_a, f.loc_b, _b(f.opportunity_key), _b(f.target_key),
-                            _b(f.entity_hash), _b(f.event_hash), f.event_tick, f.available_tick))
+                            _b(f.entity_hash), _b(f.event_hash), f.event_tick, f.available_tick, f.namespace,
+                            f.kind in PROTECTED_BY_DEFAULT if f.protected is None else bool(f.protected)))
 
     # Predecessors must already exist on the same identity chain (or in this batch) and not be purged.
     missing = conn.execute(

@@ -5,6 +5,59 @@ records what is implemented and what evidence exists, stage by stage. Several ki
 engineering correctness, statistical qualification, resilience, measured performance, product completeness,
 independent review and founder acceptance.
 
+## S3a: ConfidenceGuard CG3 on the platform (2026-11-19). Implemented; gate passing for the ported scope.
+
+S3 is executed in four gated steps:
+
+| Step | Scope | Status |
+|---|---|---|
+| S3a | CG3 catalog on the platform | **this record** |
+| S3b | CG4/CG5/CG6 storage, raw-SQL and object-path sites, deletion and backup | pending |
+| S3c | v2 → platform replay and equivalence validation | pending |
+| S3d | `ctx.run` refactor, remaining test port, v2 writer retirement | pending |
+
+### Implemented
+
+- **Migration `0003_confidenceguard.sql`.**
+  - Per-fact `protected` flag (outcomes, raw rows, and predictions carrying an inline outcome assertion) and a `namespace` column.
+  - `cg_*` relations: settings, variants, assessments, artifact dependencies, vector locations, deletions.
+- **Platform changes.**
+  - Protection is now a property of each fact. Plain reads refuse an explicit kind request that would include a protected fact (no silent partial populations), and list mode leaves protected facts out.
+  - Governed membership carries target keys, because outcome facts are keyed by target.
+  - A reservation covers knowledge up to its K, so reading an earlier frozen snapshot is allowed.
+  - `publish` accepts a fixed publication id; `stage_object` accepts a fixed object id without content dedupe.
+- **`confidenceguard/platform_catalog.py` (`PlatformCatalog(Catalog)`).**
+  - `Catalog(root)` opens it automatically for a root holding `platform.json`, or for a new workspace created with `NUMEK_PLATFORM_DSN` set. Worker children reach it unchanged. The binding stores the variable name, never the connection string.
+  - Full port of v2 `commit_capture`: record and directory identities; correction predecessor, reason, availability and chronology; prediction role, entity and authority immutability; revision conflicts; duplicate content equality; purged re-import refusal; vector dedup without resurrection; fact, object and vector dependencies; blob descriptors; variant and predictor-version immutability; assessments. v2 receipt counting and the v2 fault-injection boundaries are kept.
+  - Identities kept: v2 object ids (32-hex) are the platform object UUIDs, operation ids are publication UUIDs, and K is the platform sequence.
+- **Governance before access in CG3.**
+  - `inspect` (population preview), `analyze` and `restate` reserve the namespace's outcome-bearing population at K before reading. Membership comes from identity hashes and outcome *existence* only.
+  - The reservation is passed explicitly through `longitudinal.analyze → _execute_history → load_history`.
+  - The saved assessment consumes it in its own publication.
+  - `EvidenceUseLedger` (status, enable, overlap, record) delegates to platform governance with the v2 receipt shape. The session ledger is not used for platform workspaces.
+
+### Evidence
+
+Fresh P-LOCAL cluster, `validation/cg7/py313.nosync`.
+
+| Check | Result |
+|---|---|
+| `tests/cg3` on the v2 backend (regression) | 67 passed |
+| `tests/cg3` with every workspace on the platform (`NUMEK_PLATFORM_DSN`) | **59 passed, 8 expected failures**: 7 `platform_unported` (deletion and backup, which are S3b) and 1 v2 lock-contention assertion (`workspace_busy`), which the plan replaces with platform concurrency tests |
+| `tests/cg4/test_history.py`, `test_exposure.py`, `tests/cg5/test_interfaces_history.py`, `tests/cg6/test_integration.py` on v2 | 21 passed (CG4 needs `--import-mode=importlib`: `tests/cg4` has relative imports but no `__init__.py`, which predates CG7) |
+| `tests/platform`, including the new `test_cg3_on_platform.py` | 71 passed |
+
+The new test runs CG3 ingest, analyze and restate on the platform, and checks:
+- duplicate receipts and idempotency;
+- the reservation is consumed with the saved assessment;
+- plain outcome reads are refused;
+- v2 object identities are kept;
+- outcome-only restatement keeps the prediction snapshot.
+
+**Defects found and fixed in S3a:**
+- Governed reads forced every kind to the reservation K, which broke outcome-only restatements (13 vs 6 selected predictions).
+- The crash-hook boundaries were missing.
+
 ## S2: governance before access (2026-11-19). Implemented; focused checks pass.
 
 Migration `0002_governance.sql` and the package `numek_platform/governance/`. Governance identities use the

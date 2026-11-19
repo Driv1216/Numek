@@ -62,11 +62,12 @@ def _hexes(values, label):
     return out
 
 
-def encode_membership(events, units):
+def encode_membership(events, units, targets=()):
     import pyarrow as pa
     import pyarrow.parquet as pq
-    kinds = ['event'] * len(events) + ['unit'] * len(units)
-    table = pa.table({'member_kind': pa.array(kinds, pa.string()), 'hash': pa.array(list(events) + list(units), pa.string())})
+    kinds = ['event'] * len(events) + ['unit'] * len(units) + ['target'] * len(targets)
+    table = pa.table({'member_kind': pa.array(kinds, pa.string()),
+                      'hash': pa.array(list(events) + list(units) + list(targets), pa.string())})
     sink = io.BytesIO()
     pq.write_table(table, sink, compression='zstd')
     return sink.getvalue()
@@ -76,10 +77,10 @@ def decode_membership(data):
     import pyarrow as pa
     import pyarrow.parquet as pq
     table = pq.read_table(pa.BufferReader(data))
-    events, units = [], []
+    groups = {'event': [], 'unit': [], 'target': []}
     for kind, value in zip(table['member_kind'].to_pylist(), table['hash'].to_pylist()):
-        (events if kind == 'event' else units).append(value)
-    return events, units
+        groups[kind].append(value)
+    return groups['event'], groups['unit'], groups['target']
 
 
 def membership_digest(events, units):
@@ -132,7 +133,7 @@ def _apply_reserve_mode(conn, catalog_id, mode, members, extra_units, consume_re
     Units already spent are reported by :func:`_spent`; the caller refuses them
     only after the ported same-family reuse rule has had its chance.
     """
-    units = sorted({u for _e, u in members} | set(extra_units))
+    units = sorted({m[1] for m in members} | set(extra_units))
     reserved = _reserve_units(conn, catalog_id, units)
     if not reserved:
         return members, extra_units, [], []
@@ -147,7 +148,7 @@ def _apply_reserve_mode(conn, catalog_id, mode, members, extra_units, consume_re
             raise PlatformError('This population contains sealed-reserve entities; explicit reserve consumption '
                                 '(reserve:consume) is required.', 'reserve_access_refused')
         return members, extra_units, [], sorted(reserved)
-    kept = [(e, u) for e, u in members if u not in reserved]
+    kept = [m for m in members if m[1] not in reserved]
     return kept, [u for u in extra_units if u not in reserved], sorted(reserved), []
 
 
@@ -248,15 +249,18 @@ def reserve(db, store, scope, lease, catalog_id, *, purpose, members, population
             study_id=None, alpha=None, total_alpha=None, metadata=None, consume_reserve=False, query_events=None):
     """Commit an evidence-use reservation before reading protected evidence.
 
-    ``members`` is [(event_hash, unit_hash)] (platform-native identities);
+    ``members`` is [(event_hash, unit_hash)] or [(event_hash, unit_hash, target_key)]
+    (platform-native identities; the target key admits the outcome facts of
+    that opportunity, which are keyed by target rather than by event);
     ``extra_events`` / ``extra_units`` carry legacy source aliases that have no
     entity pairing. Returns a :class:`Reservation`.
     """
     kind, mode = purpose_rules(purpose)
     metadata = dict(metadata or {}, purpose=metadata.get('purpose', purpose) if metadata else purpose)
-    members = sorted({(e, u) for e, u in members})
-    _hexes([e for e, _ in members] + list(extra_events), 'event')
-    _hexes([u for _, u in members] + list(extra_units), 'unit')
+    members = sorted({tuple(m) if len(m) == 3 else (m[0], m[1], None) for m in members})
+    _hexes([m[0] for m in members] + list(extra_events), 'event')
+    _hexes([m[1] for m in members] + list(extra_units), 'unit')
+    _hexes([m[2] for m in members if m[2] is not None], 'target')
     request_id = request_id or uuid.uuid4().hex
 
     # Reserve states change only under the exposure lock; read them now to
@@ -264,17 +268,19 @@ def reserve(db, store, scope, lease, catalog_id, *, purpose, members, population
     with db.connect() as conn:
         kept, kept_extra_units, withheld, consumed = _apply_reserve_mode(conn, catalog_id, mode, members,
                                                                          list(extra_units), consume_reserve)
-    events = _hexes([e for e, _ in kept] + list(extra_events), 'event')
-    units = _hexes([u for _, u in kept] + kept_extra_units, 'unit')
+    events = _hexes([m[0] for m in kept] + list(extra_events), 'event')
+    units = _hexes([m[1] for m in kept] + kept_extra_units, 'unit')
+    targets = _hexes([m[2] for m in kept if m[2] is not None], 'target')
     request = {'kind': kind, 'purpose': purpose, 'events': events, 'units': units, 'population_digest': population_digest,
                'family_digest': family_digest, 'study_id': study_id, 'alpha': None if alpha is None else str(alpha),
                'total_alpha': None if total_alpha is None else str(total_alpha), 'metadata': metadata,
-               'read_k': read_k, 'as_of': as_of, 'selection_digest': selection_digest}
+               'read_k': read_k, 'as_of': as_of, 'selection_digest': selection_digest,
+               **({'targets': targets} if targets else {})}
     request_digest = digest(request)
     use_id = digest([kind, population_digest, family_digest, request_id])[:32]
     member_digest = membership_digest(events, units)
-    ref = stage_object(db, store, lease, encode_membership(events, units), catalog_id=catalog_id, codec=MEMBERSHIP_CODEC,
-                       records=len(events) + len(units))
+    ref = stage_object(db, store, lease, encode_membership(events, units, targets), catalog_id=catalog_id,
+                       codec=MEMBERSHIP_CODEC, records=len(events) + len(units) + len(targets))
 
     with db.transaction() as conn:
         assert_fence(conn, lease)                                                        # 1 job

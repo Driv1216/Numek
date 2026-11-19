@@ -252,7 +252,20 @@ class EvidenceWriter:
 
 
 class Catalog:
-    """Parent-owned durable state; all filesystem entry points are root constrained."""
+    """Parent-owned durable state; all filesystem entry points are root constrained.
+
+    A root that holds a ``platform.json`` binding (or a new workspace created
+    while ``NUMEK_PLATFORM_DSN`` is set) opens the platform-backed
+    implementation, so every existing call site, including worker children,
+    reaches the right storage.
+    """
+
+    def __new__(cls, root=None, *args, create=False, config=None, **kwargs):
+        if cls is Catalog and root is not None:
+            from .platform_catalog import DSN_ENV, PlatformCatalog, platform_bound
+            if platform_bound(root) or (create and os.environ.get(DSN_ENV) and not (Path(root) / 'catalog.sqlite3').exists()):
+                return super().__new__(PlatformCatalog)
+        return super().__new__(cls)
     def __init__(self, root, *, create=False, config=None):
         self.root = private_directory(root) if create else Path(root).absolute()
         if not self.root.is_dir():
