@@ -1,1 +1,1 @@
-"""Durable jobs, fencing, worker hosts and execution contexts."""
+"""Durable jobs, fencing and worker hosts (execution contexts: ``confidenceguard.execution_context``)."""

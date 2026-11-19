@@ -13,7 +13,8 @@ def test_native_allocator_oom(device):
     import torch
     available=torch.backends.mps.is_available() if device=='mps' else torch.cuda.is_available()
     if not available:pytest.skip('not_run_hardware_unavailable: '+device+' allocator qualification requires compatible hardware')
-    r=compat.supervise(allocator_oom_worker,(device,),EvaluationConfig(max_seconds=30,free_disk_bytes=1)).to_dict()
+    from confidenceguard.execution_context import ctx
+    r=ctx.run(allocator_oom_worker,(device,),EvaluationConfig(max_seconds=30,free_disk_bytes=1)).to_dict()
     assert r['native_oom_observed'],r
 
 

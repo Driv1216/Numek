@@ -1,5 +1,4 @@
 """Worker host: warm/isolated classes, thread caps, budgets, lease loss, cancellation, isolation."""
-import threading
 import time
 
 import pytest
@@ -7,8 +6,6 @@ import pytest
 from numek_platform.evidence.reader import pin, resolve
 from numek_platform.execution import jobs
 from numek_platform.execution.host import HostBudget, JobKind, Registry, WorkerHost
-from numek_platform.execution.context import InProcessContext
-from numek_platform.errors import PlatformError
 
 MiB = 1024**2
 
@@ -122,13 +119,3 @@ def test_budget_admission_bounds_concurrency(platform, job_path):
         assert host.wait_idle(20)
     finally:
         host.shutdown()
-
-
-def test_in_process_context_checks_deadline_and_cancellation():
-    cancelled = threading.Event()
-    ctx = InProcessContext(deadline=time.monotonic() + 60, cancelled=cancelled.is_set)
-    assert ctx.run(lambda a, progress: a * 2, (21,)) == 42
-    cancelled.set()
-    with pytest.raises(PlatformError) as caught:
-        ctx.run(lambda a, progress: a, (1,))
-    assert caught.value.code == 'cancelled'

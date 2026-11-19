@@ -12,6 +12,7 @@ from .contracts import EvaluationError, EvaluationConfig, digest
 from .history_contracts import PredictionBatchSpec, OutcomeRevisionSpec, LongitudinalSpec
 from .workspace import ReliabilityWorkspace
 from . import compat
+from .execution_context import ctx
 
 
 class LaunchLogFilter(logging.Filter):
@@ -212,7 +213,7 @@ def register(bp, app, sessions, *, workspace_path=None, launch_token=None):
                     if fmt not in {'html', 'pdf'} or audience not in {'local', 'shareable'}: raise EvaluationError('Invalid historical export.')
                     directory = compat.protected_directory(state['directory']/('history-export-'+jid))
                     from .transport import _export
-                    packet = compat.supervise(_export, (result, str(directory/('report.'+fmt)), fmt, audience, None), config, **kwargs)
+                    packet = ctx.run(_export, (result, str(directory/('report.'+fmt)), fmt, audience, None), config, **kwargs)
                     ids = []
                     for field, path in packet.data['artifacts'].items():
                         if not field.endswith('_path') or not path: continue

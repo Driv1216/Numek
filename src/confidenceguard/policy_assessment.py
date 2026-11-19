@@ -16,6 +16,7 @@ from .policy_store import prepared_policy
 from .policy_runtime import Interpreter
 from .policy_metrics import metric_result,public_stat,RATES,F1,FORMAL_UNSUPPORTED,bernoulli_contribution,claim_parameters
 from .policies import arguments,workspace_for,_identity_worker,_reserve,_finish,make_result
+from .execution_context import ctx
 
 
 def freeze_policy_family(result,policy_digests=None,*,assessment=None,assessment_preview=None):
@@ -205,7 +206,7 @@ def inspect_policy_assessment(frozen,config=None,*,assessment_input=None,allowed
     workspace=workspace_for(study.input,workspace)
     from .platform_catalog import governed_call
     claim=_reserve_claim(frozen,study,protocol,roots,workspace)   # G.8: before any inspection read
-    identity=compat.supervise(governed_call,(claim,_identity_worker,study.input,config,study.limits,roots,'E','identity'),config,progress=progress,cancel=cancel,deadline=_deadline).to_dict()
+    identity=ctx.run(governed_call,(claim,_identity_worker,study.input,config,study.limits,roots,'E','identity'),config,progress=progress,cancel=cancel,deadline=_deadline).to_dict()
     population=identity['population']; reasons=[]
     if frozen.data['provenance'].get('imported_membership_available') is False: reasons.append('imported_policy_development_membership_unavailable')
     if set(population['events']).intersection(frozen.data['development_events']) or set(population['units']).intersection(frozen.data['development_units']): reasons.append('observable_development_assessment_overlap')
@@ -424,7 +425,7 @@ def assess_policies(frozen,config=None,*,assessment_input=None,allowed_roots=Non
                       'exposure_history_token':protocol.exposure_history_token,
                       'restatement_schedule':[s.to_dict() for s in protocol.restatement_schedule],
                       **({'initial_use_id':_scheduled['initial_use_id'],'look_id':_scheduled['look']['id'],'predeclared_look':_scheduled['look']} if _scheduled else {})})
-    result=compat.supervise(_assess_worker,(frozen,study,protocol,config,roots,inspection,reservation),
+    result=ctx.run(_assess_worker,(frozen,study,protocol,config,roots,inspection,reservation),
                             replace(config,result_bytes=config.private_bytes+config.result_bytes),progress=progress,cancel=cancel,deadline=deadline)
     if cancel is not None and cancel.is_set(): raise EvaluationError('Assessment cancelled before commit.','cancelled')
     if _scheduled: result.data['policy']['predeclared_restatement']={**_scheduled,'fresh_independent_evidence':False}

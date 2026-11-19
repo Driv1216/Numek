@@ -91,15 +91,15 @@ def test_backup_refuses_when_a_required_key_is_missing(platform):
 
 @pytest.fixture
 def legacy_root(platform):
-    from confidenceguard import ReliabilityWorkspace, WorkspaceConfig
-    root = platform.root / 'legacy-workspace'
-    ReliabilityWorkspace.initialize(str(root), WorkspaceConfig(saving=True))
-    return root
+    """A frozen catalog v2 fixture workspace (catalog v2 can no longer be created)."""
+    from test_v2_migration import fixture
+    return fixture('cg3', platform.root)[0]
 
 
 def _legacy_opens(root):
-    from confidenceguard.history_storage import Catalog
-    Catalog(root)
+    """The check every released catalog v2 runtime makes on open (``user_version in (1, 2)``)."""
+    if catalog_v2.user_version(root) not in catalog_v2.LIVE_VERSIONS:
+        raise PlatformError('Unsupported catalog version.', 'catalog_version')
 
 
 def test_freeze_locks_out_legacy_runtimes_and_abandon_restores(platform, legacy_root):
@@ -132,11 +132,20 @@ def test_cutover_is_the_point_of_no_return(platform, legacy_root):
     migration_id, catalog_id = migration.plan(platform.db, platform.scope, legacy_root, catalog_name='legacy')
     migration.freeze(platform.db, platform.scope, migration_id)
     migration.begin_copy(platform.db, platform.scope, migration_id)
-    migration.begin_validation(platform.db, platform.scope, migration_id)   # empty catalog: head 0 copied
+    with pytest.raises(PlatformError) as caught:                            # nothing copied yet
+        migration.begin_validation(platform.db, platform.scope, migration_id)
+    assert caught.value.code == 'migration_incomplete'
+    from confidenceguard.migration import Legacy, _Replay
+    from numek_platform.execution import jobs
+    legacy = Legacy(legacy_root)
+    with platform.db.connect() as conn:
+        lease, _row = jobs.start_inline(conn, platform.scope, 'copy', idempotency_key='copy', owner='test')
+    _Replay(platform.db, platform.scope, platform.store, legacy, catalog_id, migration_id, lease).run(1, legacy.events())
+    migration.begin_validation(platform.db, platform.scope, migration_id)   # every legacy K copied
     with pytest.raises(PlatformError):
         migration.cutover(platform.db, platform.scope, migration_id, {'passed': False})
     migration.cutover(platform.db, platform.scope, migration_id, {'passed': True, 'checks': ['inventory']})
-    assert pin(platform.db, platform.scope, catalog_id, holder='x').k == 0   # now accessible
+    assert pin(platform.db, platform.scope, catalog_id, holder='x').k == legacy.settings['sequence']   # now accessible
     assert catalog_v2.read_marker(legacy_root)['state'] == 'cutover_committed'
     assert migration.status(platform.db, platform.scope, migration_id)['complete'] is False
     migration.record_post_cutover_backup(platform.db, platform.scope, migration_id,

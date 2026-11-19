@@ -1,5 +1,35 @@
 # Numek Current State
 
+## ConfidenceGuard CG7 — S3 complete: migration, execution contexts, v2 writer retired (2026-11-20)
+
+**Persistence is platform-only.** Every persistent ConfidenceGuard workspace now lives on the NUMEK platform: a shared
+installation via `NUMEK_PLATFORM_DSN`, or the workspace's own P-LOCAL cluster. Catalog v2 is retired as a writer. A v2
+workspace is refused with `migration_required` until it is migrated (`confidenceguard workspace migrate`); a read-only
+legacy view and the migration tooling remain.
+
+**Migration (S3c).**
+- **Replay.** Each v2 operation and deletion becomes the platform publication at the same K, with the same ids,
+  request ids, receipts, object bytes and facts. Evidence uses become durable governance records.
+- **Validation before cutover.** Structural equality of everything replayed, full byte verification, byte-equal
+  reconstruction of every retained fact, identical assessments, deletion previews and evidence-use overlap answers,
+  and equal re-execution of every retained CG3 analysis.
+- **Cutover.** A single transaction, which requires the passing report.
+- **Safety.** Resumable at every boundary, refuses a changed source, and can be abandoned before cutover.
+
+**Execution.** All 36 `compat.supervise` sites now call `ctx.run`. The workbench keeps spawned supervised phases.
+Platform jobs and migration validation run phases in-process, with phase-boundary budgets and per-phase governance
+isolation. Both give identical results.
+
+**Defect fixed.** CG3 history selection streamed rows in a nondeterministic order.
+
+**Results:** CG1–CG6 671 passed with 2 test-only failures, fixed and rerun; platform suite 99 passed; DataTrust failure set unchanged from the S3d baseline in the same environment (environmental only). No product regressions.
+
+**Tracked limitation D-1.** Shared-installation workspaces keep per-workspace object stores that the installation
+backup does not cover. There is no supported installation-wide backup for them, and no production-readiness claim
+until D-1 is done (S9/S10).
+
+See [CG7 status](../validation/cg7/IMPLEMENTATION_STATUS.md).
+
 ## ConfidenceGuard CG7 — S3d reserve-backed assessments and the platform test port (2026-11-19)
 
 **Reserve-backed assessments.** CG4 confirmations and CG5 policy assessments can now use the sealed reserve end to end, in

@@ -24,6 +24,7 @@ from .sources import rows
 from .analytics import Evidence, evaluate_scope, distributions, policies, compare, literal
 from .result import EvaluationResult, Inspection
 from . import compat
+from .execution_context import ctx
 
 
 def _view(spec,**changes):
@@ -901,7 +902,7 @@ def _service(spec,config,operation,*,progress=None,cancel=None,allowed_roots=Non
         stat=os.fstat(fd);os.close(fd)
         staging={'path':str(stage),'writing':str(writing),'device':stat.st_dev,'inode':stat.st_ino}
     try:
-        result=compat.supervise(_execute2,(spec,config,roots,operation,expected_fingerprint,staging,_capture),worker_config,progress=progress,cancel=cancel,deadline=_deadline)
+        result=ctx.run(_execute2,(spec,config,roots,operation,expected_fingerprint,staging,_capture),worker_config,progress=progress,cancel=cancel,deadline=_deadline)
         if operation=='inspect':return result.to_dict()
         if cancel is not None and cancel.is_set():raise EvaluationError('CG2 cancelled before commit.','cancelled')
         if staging:result.execution['application_committed']=True

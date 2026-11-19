@@ -1,12 +1,11 @@
 """Protected, study-scoped evidence use. Missing history never proves freshness."""
-from contextlib import closing,nullcontext
-from decimal import Decimal
+from contextlib import closing
 import json
 import uuid
 import threading
 import hashlib
 from .contracts import EvaluationError,digest
-from .history_storage import Catalog,EvidenceWriter
+from .history_storage import Catalog
 
 # Ephemeral process observations supplement the durable ledger. Process loss is
 # unknown history, never evidence of freshness. Only canonical hashed identifiers
@@ -182,6 +181,7 @@ class EvidenceUseLedger:
         if self.platform:
             from numek_platform.governance.ledger import tracking_status
             return tracking_status(self.catalog.db,self.catalog.scope,self.catalog.catalog_id)
+        # Read-only legacy catalog v2 (migration validation and historical reproduction).
         if self.catalog.catalog_version<2:return {'enabled':False,'continuity':'unknown','system_verified_external_independence':False}
         with closing(self.catalog._connect()) as db:
             settings={k:json.loads(v) for k,v in db.execute("SELECT key,value FROM settings WHERE key IN ('exposure_tracking','exposure_continuity','branch_id','exposure_continuity_token')")}
@@ -191,19 +191,9 @@ class EvidenceUseLedger:
 
     def enable(self,enabled):
         if not isinstance(enabled,bool):raise EvaluationError('Evidence-use consent must be Boolean.')
-        if self.platform:
-            from numek_platform.governance.ledger import set_tracking
-            return set_tracking(self.catalog.db,self.catalog.scope,self.catalog.catalog_id,enabled)
-        if self.catalog.catalog_version<2:raise EvaluationError('Migrate the catalog explicitly before evidence tracking.','migration_required')
-        with self.catalog.operation(),closing(self.catalog._connect()) as db:
-            db.execute('BEGIN IMMEDIATE')
-            db.execute("UPDATE settings SET value=? WHERE key='exposure_tracking'",(json.dumps(enabled),))
-            # Starting tracking does not establish anything about earlier use.
-            if not enabled:db.execute("UPDATE settings SET value='\"incomplete\"' WHERE key='exposure_continuity'")
-            if not enabled or db.execute("SELECT value FROM settings WHERE key='exposure_continuity_token'").fetchone() is None:
-                db.execute('INSERT OR REPLACE INTO settings VALUES (?,?)',('exposure_continuity_token',json.dumps(uuid.uuid4().hex)))
-            db.commit()
-        return self.status()
+        if not self.platform:raise EvaluationError('Catalog v2 is read-only; migrate the workspace to the NUMEK platform.','migration_required')
+        from numek_platform.governance.ledger import set_tracking
+        return set_tracking(self.catalog.db,self.catalog.scope,self.catalog.catalog_id,enabled)
 
     def overlap(self,events,units,*,family_digest=None,population_digest=None,check=None):
         if self.platform:
@@ -250,68 +240,9 @@ class EvidenceUseLedger:
     def record(self,kind,*,events,units,population_digest,family_digest=None,request_id=None,
                study_id=None,alpha=None,total_alpha=None,metadata=None,cancel=None,locked=False,deadline=None,session_max_bytes=512*1024**2,query_events=None):
         if kind not in {'discovery_selection','confirmation','outcome_disclosure','numerical_recomputation'}:raise EvaluationError('Invalid evidence-use purpose.')
-        if self.platform:
-            return self._record_platform(kind,events=events,units=units,population_digest=population_digest,family_digest=family_digest,
-                request_id=request_id,study_id=study_id,alpha=alpha,total_alpha=total_alpha,metadata=metadata,query_events=query_events)
-        state=self.status()
-        if not state['enabled']:raise EvaluationError('Explicit evidence-use tracking consent required.','exposure_tracking_disabled')
-        events=sorted(set(events));units=sorted(set(units));request_id=request_id or uuid.uuid4().hex
-        request={'kind':kind,'events':events,'units':units,'population_digest':population_digest,'family_digest':family_digest,
-                 'study_id':study_id,'alpha':alpha,'total_alpha':total_alpha,'metadata':metadata or {}}
-        request_digest=digest(request)
-        def remember(receipt):
-            record_session(kind,events,units,family=family_digest,population=population_digest,max_bytes=session_max_bytes,
-                numerical_origin=(metadata or {}).get('origin_analysis_digest') if kind=='numerical_recomputation' else None,
-                numerical_replicates=(metadata or {}).get('replicates') if kind=='numerical_recomputation' else None,
-                workspace=self.catalog,use_id=receipt['evidence_use_id'],_locked=True,metadata=metadata)
-            return receipt
-        def check(*args):
-            import time
-            if cancel is not None and cancel.is_set():raise EvaluationError('Evidence reservation cancelled.','cancelled')
-            if deadline is not None and time.monotonic()>deadline:raise EvaluationError('Evidence reservation deadline exhausted.','deadline_exceeded')
-        with (nullcontext() if locked else self.catalog.operation()):
-            check()
-            state=self.status()
-            if not state['enabled']:raise EvaluationError('Evidence tracking was disabled before reservation.','exposure_tracking_disabled')
-            gap=state['continuity'] in {'incomplete','restore_unreconciled'}
-            current=(metadata or {}).get('exposure_history_token')
-            if kind=='confirmation' and gap and (not current or current!=state.get('continuity_token')):
-                raise EvaluationError('This history gap requires a current explicit scoped declaration, not an earlier unexposed assertion.','exposure_history_gap_requires_current_declaration')
-            if kind=='numerical_recomputation' and ((metadata or {}).get('continuity_token')!=state.get('continuity_token') or (metadata or {}).get('branch_id')!=state['branch_id'] or gap):
-                raise EvaluationError('Numerical-attempt continuity changed before reservation.','numerical_retry_provenance')
-            previous=self.catalog.receipt('evidence:'+request_id,request_digest)
-            if previous:return remember(previous)
-            if kind=='confirmation':
-                uses=[fact['payload'] for fact in self.catalog.iter_facts('evidence_use',check=check)]
-                declared=(metadata or {}).get('predeclared_look');look_id=(metadata or {}).get('look_id')
-                if declared:
-                    initial=next((use for use in uses if use['id']==(metadata or {}).get('initial_use_id') and use['kind']=='confirmation' and use.get('family_digest')==family_digest and use.get('metadata',{}).get('look_id') is None),None)
-                    membership=digest({'events':events,'units':units})
-                    if initial is None or declared not in initial.get('metadata',{}).get('restatement_schedule',[]) or declared.get('id')!=look_id or Decimal(str(declared['alpha']))!=Decimal(str(alpha)) or initial['membership_digest']!=membership:
-                        raise EvaluationError('Scheduled reuse lacks the original durable family, schedule or identical planned population.','scheduled_restatement_provenance')
-                    if any(use['kind']=='confirmation' and use.get('family_digest')==family_digest and use.get('metadata',{}).get('look_id')==look_id and use['population_digest']!=population_digest for use in uses):
-                        raise EvaluationError('This scheduled look was already reserved against a different outcome snapshot. Use descriptive restatement; its allocation cannot be reset.','scheduled_look_already_assessed')
-                for prior in uses:
-                    if prior['kind']=='confirmation' and prior.get('family_digest')==family_digest and prior['population_digest']==population_digest and prior.get('metadata',{}).get('look_id')==look_id:
-                        return remember({'evidence_use_id':prior['id'],'reused_reservation':True,'fresh_independent_evidence':False,
-                            'continuity_context':{'enabled':True,'branch_id':prior['branch_id'],'continuity':prior['continuity'],'continuity_token':prior.get('continuity_token')}})
-                reasons=self.overlap(query_events if query_events is not None else events,units,family_digest=family_digest,population_digest=population_digest,check=check)
-                if current and current==state.get('continuity_token') and (metadata or {}).get('external_exposure')=='declared_unexposed' and (metadata or {}).get('declaration_author') and (metadata or {}).get('declaration_reason'):
-                    reasons=[r for r in reasons if r not in {'exposure_history_unavailable','exposure_history_incomplete'}]
-                if declared:reasons=[r for r in reasons if r not in {'previously_exposed_confirmation_population','exposure_history_unavailable','exposure_history_incomplete'}]
-                if reasons:raise EvaluationError('Confirmation population has conflicting or incomplete exposure history.','confirmation_population_exposed')
-            operation,_=self.catalog.begin('evidence:'+request_id,request_digest,require_saving=False)
-            uid=digest([kind,population_digest,family_digest,request_id])[:32]
-            writer=EvidenceWriter(self.catalog.root/'staging'/operation,self.catalog.config,operation,check)
-            membership_digest=digest({'events':events,'units':units})
-            for start in range(0,max(len(events),len(units)),512):
-                writer.add('exposure_members',[uid,start//512],{'use_id':uid,'events':events[start:start+512],'units':units[start:start+512]})
-            use={'id':uid,'kind':kind,'request_id':request_id,'request_digest':request_digest,'population_digest':population_digest,
-                 'family_digest':family_digest,'membership_digest':membership_digest,'event_count':len(events),'unit_count':len(units),
-                 'study_id':study_id,'alpha':alpha,'total_alpha':total_alpha,'metadata':metadata or {},'branch_id':state['branch_id'],
-                 'continuity':state['continuity'],'continuity_token':state.get('continuity_token'),'state':'reserved' if kind in {'confirmation','numerical_recomputation'} else 'exposed'}
-            writer.add('evidence_use',[uid],use);writer.finish({'capture_stages':['evidence_use'],'evidence_use':use})
-            return remember(self.catalog.commit_capture(operation,cancel=cancel,receipt_extra={'evidence_use_id':uid,'continuity_context':state}))
+        if not self.platform:raise EvaluationError('Catalog v2 is read-only; migrate the workspace to the NUMEK platform.','migration_required')
+        return self._record_platform(kind,events=events,units=units,population_digest=population_digest,family_digest=family_digest,
+            request_id=request_id,study_id=study_id,alpha=alpha,total_alpha=total_alpha,metadata=metadata,query_events=query_events)
 
 
 def _record_platform(self,kind,*,events,units,population_digest,family_digest,request_id,study_id,alpha,total_alpha,metadata,query_events):
@@ -378,18 +309,3 @@ def _records(self):
 EvidenceUseLedger.records=_records
 
 
-def commit_use(db,metadata,operation):
-    """Called inside the catalog visibility transaction, never after H access."""
-    use=metadata.get('evidence_use')
-    if not use:return
-    object_row=db.execute("SELECT object_id FROM facts WHERE kind='evidence_use' AND key=?",(digest([use['id']]),)).fetchone()
-    if object_row is None:raise EvaluationError('Evidence-use protected record is absent.','capture_changed')
-    public={k:use[k] for k in ('branch_id','continuity','event_count','unit_count','membership_digest')}
-    db.execute('INSERT INTO evidence_uses VALUES (?,?,?,?,?,?,?,?,?,?)',
-               (use['id'],use['request_id'],use['request_digest'],use['kind'],use['population_digest'],use.get('family_digest'),use['state'],object_row[0],json.dumps(public),__import__('datetime').datetime.now(__import__('datetime').timezone.utc).isoformat()))
-    if use.get('study_id'):
-        alpha=Decimal(str(use['alpha']));total=Decimal(str(use['total_alpha']))
-        prior=db.execute('SELECT alpha,total_alpha FROM study_allocations WHERE study_id=?',(use['study_id'],)).fetchall()
-        if alpha<=0 or any(Decimal(str(row[1]))!=total for row in prior) or sum((Decimal(str(row[0])) for row in prior),Decimal(0))+alpha>total:
-            raise EvaluationError('Predeclared study error allocation exhausted or changed.','study_alpha_exhausted')
-        db.execute('INSERT INTO study_allocations VALUES (?,?,?,?)',(use['study_id'],use['id'],float(alpha),float(total)))

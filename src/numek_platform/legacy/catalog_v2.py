@@ -72,9 +72,14 @@ def inventory(root):
         fact_counts = {r[0]: r[1] for r in conn.execute('SELECT kind, count(*) FROM facts GROUP BY kind ORDER BY kind')}
         uses = [dict(r) for r in conn.execute('SELECT id, kind, population_digest, state FROM evidence_uses ORDER BY id')] \
             if 'evidence_uses' in tables else []
-        deletions = [dict(r) for r in conn.execute('SELECT id, state FROM deletions ORDER BY id')]
-    sequences = [o['sequence'] for o in operations]
-    if sequences != list(range(1, len(sequences) + 1)):
+        deletions = [dict(r) for r in conn.execute('SELECT id, state, plan FROM deletions ORDER BY id')]
+    # Every K is either one committed operation or one deletion (a v2 deletion advances K
+    # without an operation row; its plan records the K it was planned at).
+    deletion_ks = [json.loads(d.pop('plan'))['catalog_sequence'] + 1 for d in deletions]
+    for d, k in zip(deletions, deletion_ks):
+        d['k'] = k
+    sequences = sorted([o['sequence'] for o in operations] + deletion_ks)
+    if sequences != list(range(1, len(sequences) + 1)) or len(sequences) != (stored.get('sequence') or 0):
         raise PlatformError('Legacy catalog sequence is not contiguous.', 'migration_inventory')
     stored.pop(SETTINGS_KEY, None)
     body = {'instance_id': stored.get('instance_id'), 'catalog_version': stored.get('schema'),

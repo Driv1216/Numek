@@ -13,6 +13,7 @@ from .contracts import ArtifactFile
 from .adapters import capture_artifacts,Adapter,host_bindings
 from .services import arguments,make_result
 from .store import PreparedExecution
+from ..execution_context import ctx
 
 
 def _convert(spec,config,roots,staging,trusted_sha256,registrations,*,progress=None):
@@ -42,7 +43,7 @@ def convert_legacy_predictor(spec,*,trusted_sha256,config=None,allowed_roots=Non
     spec,config,roots=arguments(spec,config,allowed_roots)
     staging=compat.protected_directory(tempfile.mkdtemp(prefix='numek-cg6-conversion-',dir=config.scratch_directory))
     try:
-        result=compat.supervise(_convert,(spec,config,roots,str(staging),trusted_sha256,host_bindings()),replace(config,result_bytes=config.private_bytes+config.result_bytes),progress=progress,cancel=cancel)
+        result=ctx.run(_convert,(spec,config,roots,str(staging),trusted_sha256,host_bindings()),replace(config,result_bytes=config.private_bytes+config.result_bytes),progress=progress,cancel=cancel)
         if cancel is not None and cancel.is_set():raise EvaluationError('Cancelled before legacy conversion publication.','cancelled')
         result.seal()
         if len(result.json_text().encode())>config.private_bytes or len(json.dumps(result.to_dict()).encode())>config.result_bytes:raise EvaluationError('Converted predictor metadata exceeds result admission.','result_limit')

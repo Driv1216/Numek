@@ -54,7 +54,7 @@ def test_partial_export_keeps_failed_job_and_surviving_public_artifacts(tmp_path
     from confidenceguard import transport
     result=investigate(binary(tmp_path));before=result.to_private_dict()
     app=create_app(tmp_path/'host',data_roots=(tmp_path,));app.testing=True;client=app.test_client()
-    original_supervise=transport.compat.supervise
+    original_run=transport.ctx.run
     def supervised(function,args,config,**options):
         if function is transport._export:
             # Exercise the real export coordinator and job serialization while
@@ -63,8 +63,8 @@ def test_partial_export_keeps_failed_job_and_surviving_public_artifacts(tmp_path
             with monkeypatch.context() as patch:
                 patch.setattr(transport.compat,'pdf',failed_renderer)
                 return function(*args)
-        return original_supervise(function,args,config,**options)
-    monkeypatch.setattr(transport.compat,'supervise',supervised)
+        return original_run(function,args,config,**options)
+    monkeypatch.setattr(transport.ctx,'run',supervised)
     try:
         headers={'X-CSRF-Token':client.get(BASE+'/session').json['data']['csrf_token']}
         imported=client.post(BASE+'/results/import',headers=headers,data={

@@ -27,7 +27,7 @@ def test_public_frozen_application_is_supervised_and_preserves_ternary_membershi
 def test_bad_alignment_types_and_resource_requirements_refuse_before_native_worker(monkeypatch):
     artifact=MembershipArtifact(gate());cells=[normalize('1',FeatureField('x','x'))]
     def unexpected(*args,**kwargs):raise AssertionError('Malformed input reached the worker')
-    monkeypatch.setattr('confidenceguard.compat.supervise',unexpected)
+    monkeypatch.setattr('confidenceguard.execution_context.ctx.run',unexpected)   # no phase may execute
     with pytest.raises(EvaluationError):artifact.apply({'x':cells,'other':[]})
     with pytest.raises(EvaluationError):artifact.apply({'x':[{'kind':[], 'state':'observed'}]})
     with pytest.raises(EvaluationError) as kind:artifact.apply({'x':[normalize('1',FeatureField('x','x','integer'))]})

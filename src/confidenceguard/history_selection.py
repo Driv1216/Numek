@@ -198,6 +198,9 @@ class HistoryStore:
         query = query.replace('count(*) OVER(PARTITION BY p.logical_prediction) attempts',
             'count(*) OVER(PARTITION BY p.logical_prediction) attempts,sel.outcome_payload,sel.outcome_digest,sel.reason')
         query = query.replace(f'WHERE p.variant=?', f'LEFT JOIN {outcome_plan} sel ON sel.opportunity_key=p.opportunity_key WHERE p.variant=?')
+        # The selected-fact digest and record ordinals are computed while streaming; parallel
+        # joins return rows in varying order, so the stream is ordered explicitly.
+        query += ' ORDER BY p.opportunity_key,p.fact_digest'
         import hashlib
         h = hashlib.sha256(); ordinal = 0; pending = []; uncertainty = []
         for raw, fact_digest, revision, heads, opp_raw, opp_heads, ctx_raw, ctx_heads, attempts, selected_raw, selected_digest, selected_reason in rows(con, query, [variant, start, end], batch=512):

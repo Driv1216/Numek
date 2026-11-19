@@ -59,6 +59,38 @@ _WORKER_GOVERNANCE = {}
 _STUDY_AUTHORITY = {'use_id': None}
 
 
+_ATTEMPT_SCOPES = []      # stack of in-process phase scopes (lists of open worker attempts)
+# Catalogs a v2 -> platform migration is validating in this process. Only the migration
+# job reads a ``migrating`` catalog (in process); every other reader is refused.
+_MIGRATION_VALIDATION = set()
+
+
+@contextlib.contextmanager
+def process_scope():
+    """Isolate process-local governance for one in-process phase (see ``execution_context``).
+
+    A spawned phase starts with no worker reservation or study authority and its
+    access-reservation attempts close when the process exits. An in-process
+    phase gets the same: fresh state on entry, its own attempts completed on
+    exit, and the caller's state restored afterwards.
+    """
+    saved_governance = dict(_WORKER_GOVERNANCE)
+    saved_authority = _STUDY_AUTHORITY['use_id']
+    _WORKER_GOVERNANCE.clear()
+    _STUDY_AUTHORITY['use_id'] = None
+    attempts = []
+    _ATTEMPT_SCOPES.append(attempts)
+    try:
+        yield
+    finally:
+        _ATTEMPT_SCOPES.remove(attempts)
+        for dsn, lease in attempts:
+            PlatformCatalog._close_attempt(dsn, lease)
+        _WORKER_GOVERNANCE.clear()
+        _WORKER_GOVERNANCE.update(saved_governance)
+        _STUDY_AUTHORITY['use_id'] = saved_authority
+
+
 def governed_call(authority, operation, *arguments, progress=None):
     """Run a supervised worker operation under a study's authority (picklable entry point)."""
     with study_authority(authority):
@@ -104,6 +136,51 @@ def _translate(exc):
     return exc
 
 
+def installation(root):
+    """The platform installation a workspace at ``root`` uses: (database, org scope, binding base).
+
+    ``NUMEK_PLATFORM_DSN`` names a shared installation (the binding stores the
+    variable name, never the connection string); otherwise the workspace gets its
+    own P-LOCAL cluster under ``root/platform``. The schema is migrated and the
+    ConfidenceGuard organisation is created on first use.
+    """
+    from numek_platform.db import Database
+    from numek_platform.db.migrator import migrate
+    from numek_platform.errors import PlatformError
+    from numek_platform.scope import create_org, get_org
+    root = Path(root)
+    binding = {'format': BINDING_FORMAT, 'store': 'platform-objects'}
+    if os.environ.get(DSN_ENV):
+        binding['dsn_env'] = DSN_ENV
+        dsn = os.environ[DSN_ENV]
+    else:
+        from numek_platform.local import LocalCluster
+        cluster = LocalCluster(root / 'platform')
+        cluster.start()
+        binding['local_cluster'] = 'platform'
+        dsn = cluster.dsn()
+    database = Database(dsn)
+    migrate(database)
+    with database.transaction() as conn:
+        conn.execute('SELECT pg_advisory_xact_lock(hashtextextended(%s, 0))', ('numek:org:' + ORG_NAME,))
+        try:
+            scope = get_org(conn, ORG_NAME)
+        except PlatformError:
+            scope = create_org(conn, ORG_NAME)
+    return database, scope, binding
+
+
+def write_binding(root, binding, scope, catalog_id):
+    """Durably bind ``root`` to its platform catalog (``platform.json``)."""
+    value = dict(binding, org_id=str(scope.org_id), catalog_id=str(catalog_id))
+    with private_file(Path(root) / BINDING) as stream:
+        stream.write(serialized(value))
+        stream.flush()
+        os.fsync(stream.fileno())
+    fsync_directory(Path(root))
+    return value
+
+
 class PlatformCatalog(Catalog):
     """Platform-backed ConfidenceGuard catalog (see module docstring)."""
 
@@ -125,6 +202,8 @@ class PlatformCatalog(Catalog):
         private_directory(self.root / 'staging')
         private_directory(self.root / 'objects')        # materialized verified copies (v2 layout)
         if create and not platform_bound(self.root):
+            if (self.root / 'catalog.sqlite3').exists():
+                raise EvaluationError('A catalog v2 workspace already exists here; migrate it instead.', 'workspace_exists')
             self._create_binding(config or WorkspaceConfig())
         binding = strict_json((self.root / BINDING).read_bytes())
         if binding.get('format') != BINDING_FORMAT:
@@ -155,31 +234,11 @@ class PlatformCatalog(Catalog):
         return cluster.dsn()
 
     def _create_binding(self, config):
-        from numek_platform.db import Database
-        from numek_platform.db.migrator import migrate
-        from numek_platform.evidence.catalogs import create_catalog
-        from numek_platform.scope import create_org, get_org
-        from numek_platform.errors import PlatformError
-        from psycopg.types.json import Jsonb
-        binding = {'format': BINDING_FORMAT, 'store': 'platform-objects'}
-        if os.environ.get(DSN_ENV):
-            binding['dsn_env'] = DSN_ENV          # the connection string itself is never written to disk
-            dsn = os.environ[DSN_ENV]
-        else:
-            from numek_platform.local import LocalCluster
-            cluster = LocalCluster(self.root / 'platform')
-            cluster.start()
-            binding['local_cluster'] = 'platform'
-            dsn = cluster.dsn()
-        database = Database(dsn)
-        migrate(database)
+        database, scope, binding = installation(self.root)
         instance_id = uuid.uuid4().hex
+        from numek_platform.evidence.catalogs import create_catalog
+        from psycopg.types.json import Jsonb
         with database.transaction() as conn:
-            conn.execute('SELECT pg_advisory_xact_lock(hashtextextended(%s, 0))', ('numek:org:' + ORG_NAME,))
-            try:
-                scope = get_org(conn, ORG_NAME)
-            except PlatformError:
-                scope = create_org(conn, ORG_NAME)
             catalog_id = create_catalog(conn, scope, f'workspace:{instance_id}', analytical_instance_id=instance_id,
                                         branch_id=uuid.uuid4().hex, continuity_state='unknown',
                                         continuity_token=uuid.uuid4().hex, config=config.to_dict())
@@ -188,12 +247,7 @@ class PlatformCatalog(Catalog):
                                'schema': CATALOG_VERSION, 'created_at': now()}.items():
                 conn.execute('INSERT INTO cg_settings(catalog_id, key, value) VALUES (%s, %s, %s)',
                              (catalog_id, key, Jsonb(value)))
-        binding.update(org_id=str(scope.org_id), catalog_id=str(catalog_id))
-        with private_file(self.root / BINDING) as stream:
-            stream.write(serialized(binding))
-            stream.flush()
-            os.fsync(stream.fileno())
-        fsync_directory(self.root)
+        write_binding(self.root, binding, scope, catalog_id)
 
     def _setting(self, conn, key):
         row = conn.execute('SELECT value FROM cg_settings WHERE catalog_id = %s AND key = %s', (self.catalog_id, key)).fetchone()
@@ -204,13 +258,18 @@ class PlatformCatalog(Catalog):
             row = conn.execute('SELECT state FROM catalogs WHERE id = %s', (self.catalog_id,)).fetchone()
             if row is None:
                 raise EvaluationError('Workspace catalog is missing from the platform.', 'workspace_missing')
-            retired = row['state'] == 'retired' or self._setting(conn, 'retired')
+            # Only a ConfidenceGuard purge (which sets the retired setting) may finish physical removal;
+            # a catalog retired for another reason (an abandoned migration) is simply unavailable.
+            retired = bool(self._setting(conn, 'retired'))
+            if row['state'] == 'retired' and not retired:
+                raise EvaluationError('This catalog is not available for use.', 'catalog_unavailable')
         if retired:
             # The purge committed atomically; finish physical removal if the process died before it.
             self._retire_files()
             raise EvaluationError('Workspace was retired.', 'workspace_retired')
         with self.db.connect() as conn:
-            if row['state'] != 'active':
+            self._migrating = row['state'] == 'migrating' and self.catalog_id in _MIGRATION_VALIDATION
+            if row['state'] != 'active' and not self._migrating:
                 raise EvaluationError('This catalog is not available for use.', 'catalog_unavailable')
             self.instance_id = self._setting(conn, 'instance_id')
             self.config = WorkspaceConfig.from_dict(self._setting(conn, 'config'))
@@ -381,8 +440,8 @@ class PlatformCatalog(Catalog):
         from numek_platform.evidence.gc import GarbageCollector
         import datetime as dt
         GarbageCollector(self.db, self.store, grace=dt.timedelta(0), catalog_id=self.catalog_id).run_once()
-        for oid in object_ids:
-            for suffix in ('.cgblob', '.parquet'):
+        for oid in object_ids:      # materialized copies, and frozen catalog v2 bytes of a migrated workspace
+            for suffix in ('.cgblob', '.parquet', '.jsonl', '.npy'):
                 path = self.root / 'objects' / (oid + suffix)
                 if path.is_file() and not path.is_symlink():
                     path.unlink()
@@ -403,6 +462,11 @@ class PlatformCatalog(Catalog):
                     else:
                         path.unlink()
                 fsync_directory(target)
+        # A migrated workspace's frozen catalog v2 goes with it: a purge leaves no copy behind.
+        for name in ('catalog.sqlite3', 'catalog.sqlite3-wal', 'catalog.sqlite3-shm', '.numek-migration.json'):
+            path = self.root / name
+            if path.is_file() and not path.is_symlink():
+                path.unlink()
         marker = self.root / '.retired'
         if not marker.exists():
             marker.write_bytes(b'workspace retired\n')
@@ -997,8 +1061,11 @@ class PlatformCatalog(Catalog):
         lease, governance = self.reserve_history(namespace=namespace, k=k, purpose_label=purpose_label, exposure=False,
                                                  authority=authority)
         governance.update(auto=True, namespace=namespace, purpose_label=purpose_label, authority=authority)
-        from multiprocessing import util
-        util.Finalize(None, PlatformCatalog._close_attempt, args=(self.db.dsn, lease), exitpriority=10)
+        if _ATTEMPT_SCOPES:                       # in-process phase: closed when the phase ends
+            _ATTEMPT_SCOPES[-1].append((self.db.dsn, lease))
+        else:                                     # spawned phase: closed when the process exits
+            from multiprocessing import util
+            util.Finalize(None, PlatformCatalog._close_attempt, args=(self.db.dsn, lease), exitpriority=10)
         if not install:
             return governance
         _WORKER_GOVERNANCE[str(self.root)] = governance
@@ -1025,7 +1092,8 @@ class PlatformCatalog(Catalog):
         try:
             head = self.head()
             k = head if sequence is None else min(int(sequence), head)
-            read_pin = reader.pin(self.db, self.scope, self.catalog_id, holder=f'confidenceguard:{os.getpid()}', k=k)
+            read_pin = reader.pin(self.db, self.scope, self.catalog_id, holder=f'confidenceguard:{os.getpid()}', k=k,
+                                  allow_migrating=self._migrating)
             try:
                 filters = {'kinds': None if kind is None else [kind], 'keys': None if keys is None else list(keys),
                            'fact_digests': list(fact_digests) or None, 'require_complete': require_complete,
@@ -1313,7 +1381,7 @@ class PlatformCatalog(Catalog):
                 lease, _row = jobs.start_inline(conn, self.scope, 'cg_reserve_claim', idempotency_key=uuid.uuid4().hex,
                                                 owner=f'confidenceguard:{os.getpid()}')
             try:
-                read_pin = reader.pin(self.db, self.scope, self.catalog_id, lease=lease, k=k)
+                read_pin = reader.pin(self.db, self.scope, self.catalog_id, lease=lease, k=k, allow_migrating=self._migrating)
                 identities = governed_reader.reserve_identities(self.db, self.store, read_pin, namespace=namespace,
                                                                 tick_ranges=tick_ranges, family_digest=family_digest)
                 members = sorted({(i['event_hash'], i['entity_hash'], i['target_key']) for i in identities if eligible(i)})
@@ -1352,12 +1420,13 @@ class PlatformCatalog(Catalog):
             with self.db.connect() as conn:
                 lease, _row = jobs.start_inline(conn, self.scope, 'cg_history_analysis', idempotency_key=uuid.uuid4().hex,
                                                 owner=f'confidenceguard:{os.getpid()}')
-            read_pin = reader.pin(self.db, self.scope, self.catalog_id, lease=lease, k=k)
+            read_pin = reader.pin(self.db, self.scope, self.catalog_id, lease=lease, k=k, allow_migrating=self._migrating)
             members = governed_reader.membership_from_index(self.db, read_pin, namespace=namespace)
             disclosed = exposure and ledger.tracking_status(self.db, self.scope, self.catalog_id)['enabled']
             reservation = ledger.reserve(
                 self.db, self.store, self.scope, lease, self.catalog_id,
                 purpose='outcome_disclosure' if disclosed else 'selection_access', members=members,
+                allow_migrating=self._migrating,
                 population_digest=digest(sorted(members)), read_k=k,
                 metadata={'purpose': purpose_label, 'namespace': namespace, **(metadata or {})},
                 authority=None if disclosed else authority)

@@ -6,6 +6,7 @@ from types import SimpleNamespace
 import numpy as np
 from .contracts import EvaluationError
 from .investigation_contracts import ConfirmationSpec
+from .execution_context import ctx
 
 
 @dataclass(frozen=True)
@@ -417,7 +418,7 @@ def inspect_confirmation(frozen,config=None,*,confirmation_input=None,allowed_ro
     frozen,spec=_input(frozen,confirmation_input);spec,config,roots=arguments(spec,_configuration(frozen,config),allowed_roots)
     from .platform_catalog import governed_call
     claim=_reserve_claim(frozen,spec,roots,workspace)   # G.8: before any inspection read
-    result=compat.supervise(governed_call,(claim,_inspect_confirmation,frozen,spec,config,roots,confirmation_input is None,_scheduled,_numerical_extension),config,progress=progress,cancel=cancel,deadline=_deadline).to_dict()
+    result=ctx.run(governed_call,(claim,_inspect_confirmation,frozen,spec,config,roots,confirmation_input is None,_scheduled,_numerical_extension),config,progress=progress,cancel=cancel,deadline=_deadline).to_dict()
     from .investigation_contracts import InvestigationSpec
     workspace=historical_workspace(InvestigationSpec.from_dict(result['_effective_spec']),workspace)
     population=result['_protected_population'];reasons=result['admissibility_reasons']
@@ -649,7 +650,7 @@ def confirm_investigation(frozen,config=None,*,confirmation_input=None,allowed_r
                     'initial_use_id':_scheduled['initial_use_id'] if _scheduled else None,
                     'restatement_schedule':[s.to_dict() for s in ConfirmationSpec.from_dict(frozen.data['confirmation_spec']).restatement_schedule]})
         else:record_session('confirmation',population['events'],population['units'],family=frozen.evidence_family_digest,population=population['population_digest'],max_bytes=config.max_rss_bytes//8,workspace=workspace)
-    result=compat.supervise(_assess,(frozen,spec,config,roots,inspection,reservation,_scheduled,_numerical_extension),config,progress=progress,cancel=cancel,deadline=deadline)
+    result=ctx.run(_assess,(frozen,spec,config,roots,inspection,reservation,_scheduled,_numerical_extension),config,progress=progress,cancel=cancel,deadline=deadline)
     result.execution['end_to_end_seconds']=time.monotonic()-started
     result.execution['requested_operation_deadline_seconds']=config.max_seconds
     if workspace is not None:

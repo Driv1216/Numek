@@ -16,6 +16,7 @@ from .contracts import ExecutionSpec
 from .artifact_bytes import verify_artifact
 from .store import PreparedExecution
 from .services import make_result
+from ..execution_context import ctx
 
 
 @dataclass(frozen=True)
@@ -166,7 +167,7 @@ def restate_execution(parent,spec,config=None,*,allowed_roots=None,workspace=Non
             from .exposure import reserve
             inherited={**identity,'query_events':identity['events'],'fingerprint':digest({'parent':parent.binding,'restatement':spec.to_dict()})}
             reservation,checks=reserve(inherited,'restatement',{},tracking_workspace or workspace,request_id,config)
-        result=compat.supervise(_worker,(parent,spec,config,roots,str(staging),inspected['fingerprint']),replace(config,result_bytes=config.private_bytes+config.result_bytes),progress=progress,cancel=cancel)
+        result=ctx.run(_worker,(parent,spec,config,roots,str(staging),inspected['fingerprint']),replace(config,result_bytes=config.private_bytes+config.result_bytes),progress=progress,cancel=cancel)
         if cancel is not None and cancel.is_set():raise EvaluationError('Cancelled before restatement publication.','cancelled')
         if reservation:
             result.private['evidence_use_reservation']=reservation

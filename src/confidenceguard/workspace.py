@@ -12,6 +12,7 @@ from .history_contracts import (WorkspaceConfig, PredictionBatchSpec, OutcomeRev
 from .history_storage import Catalog, EvidenceWriter, serialized, private_file, file_lock
 from .history_capture import CaptureDescriptor, ingest_worker, outcomes_worker
 from . import compat
+from .execution_context import ctx
 
 
 def _append_assessment(stage, result, config):
@@ -52,13 +53,11 @@ class ReliabilityWorkspace:
 
     @classmethod
     def initialize(cls, path, config=None, *, platform=None):
-        """Create a workspace. ``platform=True`` (or ``NUMEK_PLATFORM_DSN``) stores it on the NUMEK platform."""
+        """Create a workspace on the NUMEK platform: a shared installation when ``NUMEK_PLATFORM_DSN``
+        is set, otherwise the workspace's own P-LOCAL cluster. (``platform`` is accepted for
+        compatibility; catalog v2 is retired.)"""
         if isinstance(config, dict): config = WorkspaceConfig.from_dict(config)
-        if platform:
-            from .platform_catalog import PlatformCatalog
-            PlatformCatalog(path, create=True, config=config or WorkspaceConfig())
-        else:
-            Catalog(path, create=True, config=config or WorkspaceConfig())
+        Catalog(path, create=True, config=config or WorkspaceConfig())
         return cls(path)
 
     @property
@@ -86,7 +85,7 @@ class ReliabilityWorkspace:
         inputs=None
         if batch.feature_views or batch.discovery_representations or tracking:
             from .history_capture import capture_inputs_worker
-            inputs=compat.supervise(capture_inputs_worker,(batch.to_dict(),config,roots),config,progress=progress,cancel=cancel,deadline=deadline).data
+            inputs=ctx.run(capture_inputs_worker,(batch.to_dict(),config,roots),config,progress=progress,cancel=cancel,deadline=deadline).data
             if identities!={k:v['sha256'] for k,v in inputs['sources'].items()}:raise EvaluationError('Sources changed during capture admission.','source_changed')
         request_digest = digest({'batch': batch.to_dict(), 'config': config.to_dict(), 'sources': identities,
                                  **({'external':inputs['external']} if inputs is not None and inputs['external'] else {})})
@@ -107,7 +106,7 @@ class ReliabilityWorkspace:
             result = None
             try:
                 if batch.operation == 'ingest':
-                    compat.supervise(ingest_worker, (batch.to_dict(), config, roots, descriptor), config, progress=progress, cancel=cancel,deadline=deadline)
+                    ctx.run(ingest_worker, (batch.to_dict(), config, roots, descriptor), config, progress=progress, cancel=cancel,deadline=deadline)
                 else:
                     from .engine import evaluate
                     from .methods import study, fit_methods, apply_methods
@@ -136,7 +135,7 @@ class ReliabilityWorkspace:
             self.catalog.reserve()
             operation, previous = self.catalog.begin(request_id or uuid.uuid4().hex, digest([specification.to_dict(), identity, config.to_dict()]))
             if previous: return previous
-            compat.supervise(outcomes_worker, (specification.to_dict(), config, roots, str(self.path/'staging'/operation), operation, self.catalog.config.to_dict()),
+            ctx.run(outcomes_worker, (specification.to_dict(), config, roots, str(self.path/'staging'/operation), operation, self.catalog.config.to_dict()),
                              config, progress=progress, cancel=cancel)
             return self.catalog.commit_capture(operation, cancel=cancel)
 
@@ -182,35 +181,19 @@ class ReliabilityWorkspace:
             from .longitudinal import _inspect_history
             from .history_contracts import now
             with self.catalog.operation():
-                if self._platform():
-                    # Governance before access: reserve the namespace's outcome-bearing
-                    # population at this K, then read only under that reservation.
-                    lease,governance=self.catalog.reserve_history(namespace=frozen.namespace,k=sequence,purpose_label='historical_population_preview')
-                    try:result['population_preview']=compat.supervise(_inspect_history,(str(self.path),frozen,sequence,frozen.as_of or now(),governance),frozen.config).data
-                    finally:self.catalog.finish_attempt(lease)
-                else:
-                    self._reserve_history_exposure(frozen,purpose='historical_population_preview',locked=True)
-                    result['population_preview']=compat.supervise(_inspect_history,(str(self.path),frozen,sequence,frozen.as_of or now()),frozen.config).data
+                # Governance before access: reserve the namespace's outcome-bearing
+                # population at this K, then read only under that reservation.
+                lease,governance=self.catalog.reserve_history(namespace=frozen.namespace,k=sequence,purpose_label='historical_population_preview')
+                try:result['population_preview']=ctx.run(_inspect_history,(str(self.path),frozen,sequence,frozen.as_of or now(),governance),frozen.config).data
+                finally:self.catalog.finish_attempt(lease)
         return result
-
-    def _platform(self):
-        from .platform_catalog import PlatformCatalog
-        return isinstance(self.catalog, PlatformCatalog)
-
-    def _reserve_history_exposure(self,spec,*,purpose,locked=False,progress=None,cancel=None,deadline=None):
-        from .evidence_use import EvidenceUseLedger
-        from .longitudinal import exposure_population
-        ledger=EvidenceUseLedger(self)
-        if not ledger.status()['enabled']:return
-        population=compat.supervise(exposure_population,(str(self.path),spec,spec.catalog_sequence,spec.as_of or __import__('datetime').datetime.now(__import__('datetime').timezone.utc).isoformat()),spec.config,progress=progress,cancel=cancel,deadline=deadline).data
-        ledger.record('outcome_disclosure',**population,metadata={'purpose':purpose,'namespace':spec.namespace},locked=locked,cancel=cancel,deadline=deadline,session_max_bytes=spec.config.max_rss_bytes//8)
 
     def _reserve_live_exposure(self,spec,config,roots,*,operation,request_id,progress=None,cancel=None,deadline=None):
         from .evidence_use import EvidenceUseLedger,evaluation_exposure_worker
         base=spec.evaluation if hasattr(spec,'evaluation') else spec
         ledger=EvidenceUseLedger(self)
         if base.effective_outcomes is None or not ledger.status()['enabled']:return None
-        packet=compat.supervise(evaluation_exposure_worker,(spec,config,roots,operation),config,progress=progress,cancel=cancel,deadline=deadline).data
+        packet=ctx.run(evaluation_exposure_worker,(spec,config,roots,operation),config,progress=progress,cancel=cancel,deadline=deadline).data
         sources=packet.pop('sources')
         return ledger.record('outcome_disclosure',**packet,request_id=request_id,metadata={'purpose':'live_browser_outcome_assessment','operation':operation,'sources':sources},
             cancel=cancel,deadline=deadline,session_max_bytes=config.max_rss_bytes//8)
@@ -236,26 +219,18 @@ class ReliabilityWorkspace:
                         left.pop(field, None); right.pop(field, None)
                     if left != right: raise EvaluationError('Outcome-only restatement changed frozen analysis declarations.', 'restatement_scope')
             from .longitudinal import analyze
-            if self._platform():
-                lease,governance=self.catalog.reserve_history(namespace=spec.namespace,k=spec.catalog_sequence,
-                    purpose_label='outcome_restatement' if spec.restates else 'historical_analysis')
-                try:
-                    result = analyze(self.path, spec, progress=progress, cancel=cancel,_deadline=deadline,governance=governance)
-                    if spec.restates:
-                        result.data['history']['restatement_changes'] = self._restatement_delta(prior, result)
-                        result.seal()
-                except BaseException:
-                    self.catalog.finish_attempt(lease, failed=True); raise
-                # The saved assessment consumes the reservation in its own publication.
-                self.catalog.add_assessment(result, request_id=request_id, cancel=cancel, request_digest=request_digest,
-                                            lease=lease, reservations=[governance['reservation']['id']])
-                return result
-            self._reserve_history_exposure(spec,purpose='historical_analysis',locked=True,progress=progress,cancel=cancel,deadline=deadline)
-            result = analyze(self.path, spec, progress=progress, cancel=cancel,_deadline=deadline)
-            if spec.restates:
-                result.data['history']['restatement_changes'] = self._restatement_delta(prior, result)
-                result.seal()
-            receipt = self.catalog.add_assessment(result, request_id=request_id, cancel=cancel, request_digest=request_digest)
+            lease,governance=self.catalog.reserve_history(namespace=spec.namespace,k=spec.catalog_sequence,
+                purpose_label='outcome_restatement' if spec.restates else 'historical_analysis')
+            try:
+                result = analyze(self.path, spec, progress=progress, cancel=cancel,_deadline=deadline,governance=governance)
+                if spec.restates:
+                    result.data['history']['restatement_changes'] = self._restatement_delta(prior, result)
+                    result.seal()
+            except BaseException:
+                self.catalog.finish_attempt(lease, failed=True); raise
+            # The saved assessment consumes the reservation in its own publication.
+            self.catalog.add_assessment(result, request_id=request_id, cancel=cancel, request_digest=request_digest,
+                                        lease=lease, reservations=[governance['reservation']['id']])
             return result
 
     def restate(self, assessment_id, *, as_of=None, reason, outcome_only=True, **kwargs):
@@ -364,8 +339,15 @@ class ReliabilityWorkspace:
     def deletion_preview(self, **kwargs): return self.catalog.deletion_preview(**kwargs)
     def delete(self, preview): return self.catalog.delete(preview)
 
-    def migrate(self, backup_destination):
-        return self.catalog.migrate(backup_destination)
+    @staticmethod
+    def migrate(path, backup_destination=None):
+        """Migrate the retired catalog v2 workspace at ``path`` onto the NUMEK platform (validated, resumable).
+
+        See ``confidenceguard.migration``. With ``backup_destination`` (workspaces with their own
+        P-LOCAL cluster) the required post-cutover backup is taken and the migration completes.
+        """
+        from .migration import migrate_workspace
+        return migrate_workspace(path, backup_destination=backup_destination)
 
     def evidence_tracking(self,enabled=None):
         from .evidence_use import EvidenceUseLedger
@@ -384,7 +366,7 @@ class ReliabilityWorkspace:
         with self.catalog.operation():
             self.catalog.reserve();operation,previous=self.catalog.begin(request_id or uuid.uuid4().hex,digest([specification.to_dict(),config.to_dict(),identity]))
             if previous:return previous
-            compat.supervise(enrich_worker,(specification.to_dict(),config,roots,str(self.path),str(self.path/'staging'/operation),operation,self.catalog.config.to_dict()),config,progress=progress,cancel=cancel)
+            ctx.run(enrich_worker,(specification.to_dict(),config,roots,str(self.path),str(self.path/'staging'/operation),operation,self.catalog.config.to_dict()),config,progress=progress,cancel=cancel)
             return self.catalog.commit_capture(operation,cancel=cancel)
 
     def prepare_representations(self,batch,config=None,**kwargs):

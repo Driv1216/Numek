@@ -1,26 +1,24 @@
-"""Owner-only immutable JSONL objects and an authoritative SQLite catalog.
+"""Evidence staging, record decoding and catalog entry points for ConfidenceGuard workspaces.
 
-The catalog commit is the visibility boundary. Pending rows and orphan files never
-become evidence merely because they exist. Workers only write parent-owned staging.
+Workers write parent-owned staging (``EvidenceWriter``); the platform publication
+is the visibility boundary (``platform_catalog``). The retired catalog v2 is read
+only through :class:`LegacyCatalog` (migration and historical reproduction).
 """
 from contextlib import contextmanager, closing
-from datetime import datetime, timezone
 import hashlib
 import json
 import math
 import os
 from pathlib import Path
 import re
-import secrets
 import shutil
 import sqlite3
 import stat
 import threading
-import time
 import uuid
 
 from .contracts import EvaluationError, digest, strict_json
-from .history_contracts import WorkspaceConfig, HistoricalEvidenceManifest, now
+from .history_contracts import WorkspaceConfig, HistoricalEvidenceManifest
 
 CATALOG_VERSION = 2
 HEX = re.compile(r'^[0-9a-f]{32}$')
@@ -258,179 +256,31 @@ def authority_file(root):
 
 
 class Catalog:
-    """Parent-owned durable state; all filesystem entry points are root constrained.
+    """ConfidenceGuard evidence catalog: every workspace is stored on the NUMEK platform.
 
-    A root that holds a ``platform.json`` binding (or a new workspace created
-    while ``NUMEK_PLATFORM_DSN`` is set) opens the platform-backed
-    implementation, so every existing call site, including worker children,
-    reaches the right storage.
+    ``Catalog(root)`` opens the platform-backed implementation for a root bound
+    to the platform (``platform.json``), and ``Catalog(root, create=True)``
+    creates one. Catalog v2 has been retired as a writer (CG7 S3): a v2 root is
+    refused with ``migration_required`` until ``confidenceguard.migration``
+    migrates it, and :class:`LegacyCatalog` remains as its read-only view for
+    migration and historical reproduction. This base holds only behaviour both
+    share.
     """
 
     def __new__(cls, root=None, *args, create=False, config=None, **kwargs):
         if cls is Catalog and root is not None:
-            from .platform_catalog import DSN_ENV, PlatformCatalog, platform_bound
-            if platform_bound(root) or (create and os.environ.get(DSN_ENV) and not (Path(root) / 'catalog.sqlite3').exists()):
+            from .platform_catalog import PlatformCatalog, platform_bound
+            if platform_bound(root) or create:
                 return super().__new__(PlatformCatalog)
-        return super().__new__(cls)
-    def __init__(self, root, *, create=False, config=None):
-        self.root = private_directory(root) if create else Path(root).absolute()
-        if not self.root.is_dir():
+            if (Path(root) / 'catalog.sqlite3').exists():
+                raise EvaluationError('This workspace uses the retired catalog v2. Migrate it to the NUMEK platform '
+                                      '(confidenceguard workspace migrate --path ...).', 'migration_required')
             raise EvaluationError('Initialize the workspace explicitly.', 'workspace_missing')
-        info=self.root.stat()
-        if info.st_mode & 0o077 or hasattr(os,'getuid') and info.st_uid != os.getuid():raise EvaluationError('Workspace ownership/permissions differ.','unsafe_workspace')
-        for path in (self.root, *self.root.parents):
-            if path.is_symlink():
-                raise EvaluationError('Unsafe workspace path.', 'unsafe_workspace')
-        self.db_path = self.root / 'catalog.sqlite3'
-        self.operation_path = self.root / '.operation.lock'; self.objects_lock = self.root / '.objects.lock'
-        self._verified = {}; self._guard = threading.RLock()
-        if create:
-            with file_lock(self.operation_path), file_lock(self.objects_lock):
-                if self.db_path.exists():
-                    raise EvaluationError('Workspace already exists.', 'workspace_exists')
-                for part in ('objects', 'staging'):
-                    private_directory(self.root / part)
-                fd = os.open(self.db_path, os.O_CREAT | os.O_EXCL | os.O_RDWR, 0o600); os.close(fd)
-                self._initialize(config or WorkspaceConfig())
-        self._resume_retirement()
-        self._validate()
+        return super().__new__(cls)
 
-    def _connect(self):
-        if self.db_path.is_symlink():
-            raise EvaluationError('Unsafe catalog.', 'unsafe_workspace')
-        with private_file(self.db_path, 'rb'):
-            pass
-        db = sqlite3.connect(self.db_path, timeout=1, isolation_level=None)
-        db.row_factory = sqlite3.Row
-        db.execute('PRAGMA foreign_keys=ON'); db.execute('PRAGMA busy_timeout=1000'); db.execute('PRAGMA synchronous=FULL')
-        return db
-
-    def _initialize(self, config):
-        v = sqlite3.sqlite_version_info
-        fixed = v >= (3, 51, 3) or (3, 44, 6) <= v < (3, 45, 0) or (3, 50, 7) <= v < (3, 51, 0)
-        with closing(self._connect()) as db:
-            db.execute('PRAGMA journal_mode=' + ('WAL' if fixed else 'DELETE'))
-            db.executescript('''
-                CREATE TABLE settings(key TEXT PRIMARY KEY,value TEXT NOT NULL);
-                CREATE TABLE operations(id TEXT PRIMARY KEY,request_id TEXT UNIQUE NOT NULL,request_digest TEXT NOT NULL,
-                    state TEXT NOT NULL,sequence INTEGER UNIQUE,created_at TEXT NOT NULL,receipt TEXT,metadata TEXT);
-                CREATE TABLE objects(id TEXT PRIMARY KEY,operation_id TEXT NOT NULL REFERENCES operations(id),
-                    sha256 TEXT NOT NULL,bytes INTEGER NOT NULL,kind TEXT NOT NULL,records INTEGER NOT NULL,state TEXT NOT NULL);
-                CREATE TABLE facts(id INTEGER PRIMARY KEY,kind TEXT NOT NULL,key TEXT NOT NULL,revision TEXT NOT NULL,
-                    fact_digest TEXT NOT NULL,object_id TEXT NOT NULL REFERENCES objects(id),offset INTEGER NOT NULL,
-                    length INTEGER NOT NULL,operation_id TEXT NOT NULL REFERENCES operations(id));
-                CREATE UNIQUE INDEX fact_identity ON facts(kind,key,revision);
-                CREATE INDEX fact_kind_key ON facts(kind,key);
-                CREATE TABLE occurrences(operation_id TEXT NOT NULL REFERENCES operations(id),fact_id INTEGER NOT NULL REFERENCES facts(id),
-                    PRIMARY KEY(operation_id,fact_id));
-                CREATE TABLE variants(id TEXT PRIMARY KEY,metadata TEXT NOT NULL,operation_id TEXT NOT NULL REFERENCES operations(id));
-                CREATE TABLE assessments(id TEXT PRIMARY KEY,object_id TEXT NOT NULL REFERENCES objects(id),
-                    operation_id TEXT NOT NULL REFERENCES operations(id),digest TEXT NOT NULL,predecessor TEXT,state TEXT NOT NULL);
-                CREATE TABLE deletions(id TEXT PRIMARY KEY,plan TEXT NOT NULL,state TEXT NOT NULL);
-            ''')
-            values = {'instance_id': uuid.uuid4().hex, 'config': config.to_dict(), 'retired': False, 'sequence': 0,
-                      'schema': CATALOG_VERSION, 'created_at': now()}
-            db.execute('BEGIN IMMEDIATE')
-            for key, value in values.items():
-                db.execute('INSERT INTO settings VALUES (?,?)', (key, json.dumps(value)))
-            self._create_v2(db)
-            db.execute(f'PRAGMA user_version={CATALOG_VERSION}'); db.commit()
-        fsync_directory(self.root)
-
-    def _resume_retirement(self):
-        # A durable full-purge plan authorizes completion even after the process
-        # died after tombstones or while removing the catalog itself.
-        if not self.db_path.exists():return
-        try:
-            with closing(self._connect()) as db:
-                if db.execute('PRAGMA user_version').fetchone()[0] not in (1,CATALOG_VERSION):return
-                retire=any(strict_json(row[0]).get('purge') for row in db.execute('SELECT plan FROM deletions'))
-            if retire:
-                self._retire_files()
-                raise EvaluationError('Workspace was retired.','workspace_retired')
-        except sqlite3.DatabaseError:return  # _validate supplies the corruption diagnosis.
-
-    def _retire_files(self):
-        with file_lock(self.operation_path),file_lock(self.objects_lock):
-            # Retirement recovery can run before _validate initializes the
-            # cached identity. Remove only this instance's in-process references.
-            with closing(self._connect()) as db:
-                owner=json.loads(db.execute("SELECT value FROM settings WHERE key='instance_id'").fetchone()[0])
-            from .evidence_use import forget_session_uses
-            forget_session_uses(owner,purge=True)
-            for folder in ('objects','staging'):
-                for path in (self.root/folder).iterdir():
-                    if path.is_dir():self._remove_owned_stage(path)
-                    else:
-                        with private_file(path,'rb'):pass
-                        path.unlink()
-            for suffix in ('-wal','-shm',''):
-                path=Path(str(self.db_path)+suffix)
-                if path.exists():
-                    with private_file(path,'rb'):pass
-                    path.unlink()
-            marker=self.root/'.retired'
-            if not marker.exists():
-                with private_file(marker) as stream:stream.write(b'workspace retired\n')
-            fsync_directory(self.root)
-
-    def _validate(self):
-        try:
-            with closing(self._connect()) as db:
-                self.catalog_version=db.execute('PRAGMA user_version').fetchone()[0]
-                if self.catalog_version not in (1,CATALOG_VERSION):
-                    raise EvaluationError('Unsupported catalog version; preserve it and use a compatible release.', 'catalog_version')
-                settings = {r['key']: strict_json(r['value']) for r in db.execute('SELECT * FROM settings')}
-                if settings.get('retired'):
-                    raise EvaluationError('Workspace was retired.', 'workspace_retired')
-                self.instance_id = settings['instance_id']; self.config = WorkspaceConfig.from_dict(settings['config'])
-        except sqlite3.DatabaseError as exc:
-            raise EvaluationError('Catalog is corrupt; restore explicitly. It was not rebuilt.', 'catalog_corrupt') from exc
-
-    @contextmanager
-    def operation(self, *, exclusive_objects=False):
-        with self._guard, file_lock(self.operation_path), file_lock(self.objects_lock, exclusive_objects):
-            self._validate()
-            yield
 
     def _fault(self, boundary):
         """Test-only injection point; no environment-driven production fault behavior."""
-
-    def _object_path(self, identifier):
-        identifier=_safe_name(identifier);codec='utf8_jsonl_v1'
-        if self.catalog_version>=2:
-            with closing(self._connect()) as db:
-                row=db.execute('SELECT encoding FROM objects WHERE id=?',(identifier,)).fetchone()
-                if row:codec=row[0]
-        from .feature_storage import extension
-        return self.root / 'objects' / (identifier+extension(codec))
-
-    @staticmethod
-    def _create_v2(db):
-        db.execute("ALTER TABLE objects ADD COLUMN encoding TEXT NOT NULL DEFAULT 'utf8_jsonl_v1'")
-        db.execute("ALTER TABLE facts ADD COLUMN locator_kind TEXT NOT NULL DEFAULT 'byte_range'")
-        db.execute('CREATE TABLE artifact_dependencies(object_id TEXT NOT NULL REFERENCES objects(id),depends_on TEXT NOT NULL REFERENCES objects(id),PRIMARY KEY(object_id,depends_on))')
-        db.execute('CREATE TABLE vector_locations(digest TEXT PRIMARY KEY,object_id TEXT NOT NULL REFERENCES objects(id),row_index INTEGER NOT NULL,dtype TEXT NOT NULL,dimensions INTEGER NOT NULL)')
-        db.execute('CREATE TABLE evidence_uses(id TEXT PRIMARY KEY,request_id TEXT UNIQUE NOT NULL,request_digest TEXT NOT NULL,kind TEXT NOT NULL,population_digest TEXT NOT NULL,hypothesis_digest TEXT,state TEXT NOT NULL,object_id TEXT REFERENCES objects(id),metadata TEXT NOT NULL,created_at TEXT NOT NULL)')
-        db.execute('CREATE TABLE study_allocations(study_id TEXT NOT NULL,reservation_id TEXT PRIMARY KEY REFERENCES evidence_uses(id),alpha REAL NOT NULL,total_alpha REAL NOT NULL)')
-        for key,value in {'exposure_tracking':False,'exposure_continuity':'unknown','branch_id':uuid.uuid4().hex,'exposure_continuity_token':uuid.uuid4().hex}.items():
-            db.execute('INSERT INTO settings VALUES (?,?)',(key,json.dumps(value)))
-
-    def migrate(self, backup_destination):
-        """Explicit, backed-up schema migration; immutable evidence is not rewritten."""
-        if self.catalog_version==2:return {'catalog_version':2,'changed':False}
-        manifest=self.backup(backup_destination)
-        with self.operation(exclusive_objects=True),closing(self._connect()) as db:
-            sequence=json.loads(db.execute("SELECT value FROM settings WHERE key='sequence'").fetchone()[0])
-            if sequence!=manifest['catalog_sequence']:raise EvaluationError('Workspace changed after migration backup.','stale_migration')
-            db.execute('BEGIN IMMEDIATE')
-            try:
-                self._create_v2(db)
-                db.execute("UPDATE settings SET value='2' WHERE key='schema'")
-                db.execute('PRAGMA user_version=2');self._fault('before_migration_commit');db.commit()
-            except BaseException:db.rollback();raise
-        self._validate();fsync_directory(self.root)
-        return {'catalog_version':2,'changed':True,'backup_digest':manifest['content_digest']}
 
     def _read_record(self,path,codec,offset,length,cache):
         if codec=='utf8_jsonl_v1':
@@ -459,22 +309,90 @@ class Catalog:
             return json.loads(json.dumps(value))
         raise EvaluationError('Objects of this codec do not contain facts.','unsupported_codec')
 
-    def reserve(self, additional=0):
-        total = 0
-        for base, dirs, files in os.walk(self.root, followlinks=False):
-            if any((Path(base) / d).is_symlink() for d in dirs):
-                raise EvaluationError('Unexpected symbolic link in workspace.', 'unsafe_workspace')
-            for filename in files:
-                path = Path(base) / filename
-                info = path.lstat()
-                if not stat.S_ISREG(info.st_mode) or info.st_nlink != 1:
-                    raise EvaluationError('Unexpected nonregular workspace content.', 'unsafe_workspace')
-                total += max(info.st_size, getattr(info, 'st_blocks', 0) * 512)
-        if total + additional > self.config.max_bytes:
-            raise EvaluationError('Persistent storage quota would be exceeded.', 'history_quota')
-        if shutil.disk_usage(self.root).free < self.config.free_disk_bytes + additional:
-            raise EvaluationError('Persistent storage reserve unavailable.', 'disk_exhausted')
-        return total
+    def sealed_reserve_units(self, units):
+        """Units that are sealed-reserve entities (v2 catalogs have no reserve)."""
+        return set()
+
+    def assessment(self, aid):
+        # Fact receipt is authoritative even after a crash before the optional list index.
+        values = list(self.iter_facts('assessment', keys=[digest([aid])], max_records=1))
+        if not values: raise EvaluationError('Assessment is unavailable.', 'assessment_unavailable')
+        from .investigation_storage import read_packet
+        packet = read_packet(self,values[0])
+        from .history_result import LongitudinalResult
+        if packet['result'].get('schema_version') == 'confidenceguard.longitudinal_result/1.0':
+            result = LongitudinalResult.from_dict(packet['result'], private=packet['manifest'])
+            result._workspace_location = str(self.root)
+            return result
+        from .result import EvaluationResult
+        result=EvaluationResult.from_dict(packet['result'], private=packet['manifest'])
+        if result.data.get('methodology_id') in {'failure_investigation_v1','policy_selection_v1','predictor_robustness_v1'}:result._workspace_location=str(self.root)
+        return result
+
+    @classmethod
+    def restore(cls, backup, destination):
+        """Restore a workspace backup as a new platform workspace (a catalog v2 backup is restored, then migrated)."""
+        from .platform_catalog import PlatformCatalog
+        if (Path(backup) / 'platform').is_dir():
+            return PlatformCatalog.restore(backup, destination)
+        from .migration import restore_legacy_backup
+        return restore_legacy_backup(backup, destination)
+
+
+class LegacyCatalog(Catalog):
+    """Read-only view of a catalog v1/v2 workspace, including one frozen for platform migration.
+
+    Used by the v2 -> platform migration to read the source and to compute the
+    reference answers its validation compares against (fact reconstruction,
+    assessments, deletion previews, evidence-use overlap). It never writes: the
+    SQLite connection is opened read-only and every mutating method refuses.
+    """
+    FROZEN_VERSION = 9002
+
+    def __new__(cls, root=None, *args, **kwargs):
+        return object.__new__(cls)
+
+    def __init__(self, root):
+        self.root = Path(root).absolute()
+        if not self.root.is_dir() or not (self.root / 'catalog.sqlite3').is_file():
+            raise EvaluationError('Legacy catalog not found.', 'workspace_missing')
+        self.db_path = self.root / 'catalog.sqlite3'
+        self.operation_path = self.root / '.operation.lock'; self.objects_lock = self.root / '.objects.lock'
+        self._verified = {}; self._guard = threading.RLock()
+        self._validate()
+
+    def _connect(self):
+        if self.db_path.is_symlink():
+            raise EvaluationError('Unsafe catalog.', 'unsafe_workspace')
+        db = sqlite3.connect(f'file:{self.db_path}?mode=ro', uri=True, timeout=1, isolation_level=None)
+        db.row_factory = sqlite3.Row
+        return db
+
+    def _validate(self):
+        with closing(self._connect()) as db:
+            version = db.execute('PRAGMA user_version').fetchone()[0]
+            settings = {r['key']: strict_json(r['value']) for r in db.execute('SELECT * FROM settings')}
+        if version == self.FROZEN_VERSION:
+            version = (settings.get('numek_migration') or {}).get('original_user_version')
+        if version not in (1, CATALOG_VERSION):
+            raise EvaluationError('Unsupported legacy catalog version.', 'catalog_version')
+        self.catalog_version = version
+        self.settings = settings
+        self.instance_id = settings['instance_id']; self.config = WorkspaceConfig.from_dict(settings['config'])
+
+    @contextmanager
+    def operation(self, *, exclusive_objects=False):
+        yield
+
+    # v2 read paths (moved from the retired v2 catalog) -------------------------------------
+    def _object_path(self, identifier):
+        identifier=_safe_name(identifier);codec='utf8_jsonl_v1'
+        if self.catalog_version>=2:
+            with closing(self._connect()) as db:
+                row=db.execute('SELECT encoding FROM objects WHERE id=?',(identifier,)).fetchone()
+                if row:codec=row[0]
+        from .feature_storage import extension
+        return self.root / 'objects' / (identifier+extension(codec))
 
     def status(self):
         with closing(self._connect()) as db:
@@ -485,15 +403,6 @@ class Catalog:
                     'sqlite_version': sqlite3.sqlite_version, 'automatic_eviction': False,'catalog_version':self.catalog_version,
                     'exposure_continuity':json.loads(db.execute("SELECT value FROM settings WHERE key='exposure_continuity'").fetchone()[0]) if self.catalog_version>=2 else 'unknown'}
 
-    def set_saving(self, enabled):
-        if not isinstance(enabled, bool):
-            raise EvaluationError('saving must be boolean.')
-        with self.operation(), closing(self._connect()) as db:
-            values = self.config.to_dict(); values['saving'] = enabled
-            db.execute("UPDATE settings SET value=? WHERE key='config'", (json.dumps(values),))
-            self.config = WorkspaceConfig.from_dict(values)
-        return self.status()
-
     def receipt(self, request_id, request_digest):
         with closing(self._connect()) as db:
             row = db.execute('SELECT request_digest,state,receipt FROM operations WHERE request_id=?',(request_id,)).fetchone()
@@ -501,23 +410,6 @@ class Catalog:
             if row['request_digest'] != request_digest:raise EvaluationError('Request ID already has different content.','idempotency_conflict')
             if row['state'] != 'committed':raise EvaluationError('Recover the unfinished operation before retry.','operation_incomplete')
             return strict_json(row['receipt'])
-
-    def begin(self, request_id, request_digest, *, require_saving=True):
-        if require_saving and not self.config.saving:
-            raise EvaluationError('Historical saving is off; enable it explicitly.', 'persistence_disabled')
-        with closing(self._connect()) as db:
-            previous = db.execute('SELECT * FROM operations WHERE request_id=?', (request_id,)).fetchone()
-            if previous:
-                if previous['request_digest'] != request_digest:
-                    raise EvaluationError('Request ID already has different content.', 'idempotency_conflict')
-                if previous['state'] == 'committed':
-                    return None, strict_json(previous['receipt'])
-                raise EvaluationError('Recover the unfinished operation before retry.', 'operation_incomplete')
-            identifier = uuid.uuid4().hex
-            db.execute('INSERT INTO operations(id,request_id,request_digest,state,created_at) VALUES (?,?,?,?,?)',
-                       (identifier, request_id, request_digest, 'pending', now()))
-        private_directory(self.root / 'staging' / identifier)
-        return identifier, None
 
     def _verify_object(self, identifier, sha, size):
         path = self._object_path(identifier)
@@ -530,251 +422,6 @@ class Catalog:
                 raise EvaluationError('Committed evidence changed; no substitute was used.', 'evidence_changed')
             self._verified[identifier] = token
         return path
-
-    def commit_capture(self, identifier, *, cancel=None, receipt_extra=None):
-        stage = self.root / 'staging' / _safe_name(identifier)
-        with private_file(stage / 'capture.json', 'rb') as stream:
-            raw = stream.read(64 * 1024**2 + 1)
-        if len(raw) > 64 * 1024**2:
-            raise EvaluationError('Capture manifest exceeds admission.', 'manifest_limit')
-        manifest = strict_json(raw); expected = manifest.pop('content_digest', None)
-        if expected != digest(manifest) or manifest.get('operation_id') != identifier:
-            raise EvaluationError('Capture identity differs.', 'capture_changed')
-        HistoricalEvidenceManifest.from_dict(manifest)
-        objects = {v['id']: v for v in manifest['objects']}
-        from .feature_storage import extension,validate_matrix
-        if self.catalog_version<2 and any(o.get('encoding','utf8_jsonl_v1')!='utf8_jsonl_v1' for o in objects.values()):
-            raise EvaluationError('Explicit backed-up catalog migration required.','migration_required')
-        new = duplicates = 0; used = set()
-        with closing(self._connect()) as db:
-            # Preparatory rows remain hidden through operations.state.
-            db.execute('BEGIN IMMEDIATE')
-            try:
-                for obj in objects.values():
-                    _safe_name(obj['id'])
-                    codec=obj.get('encoding','utf8_jsonl_v1')
-                    sha, size = file_digest(stage / (obj['id'] + extension(codec)))
-                    if sha != obj['sha256'] or size != obj['bytes']:
-                        raise EvaluationError('Staged evidence identity differs.', 'capture_changed')
-                    db.execute('INSERT INTO objects(id,operation_id,sha256,bytes,kind,records,state) VALUES (?,?,?,?,?,?,?)', (obj['id'], identifier, sha, size, obj['kind'], obj['records'], 'pending'))
-                    if self.catalog_version>=2:db.execute('UPDATE objects SET encoding=? WHERE id=?',(codec,obj['id']))
-                cached = {}
-                with private_file(stage / 'index.jsonl', 'rb') as stream:
-                    for raw in stream:
-                        if len(raw) > 16384:
-                            raise EvaluationError('Invalid capture index.', 'capture_changed')
-                        if (new+duplicates)%4096==0:
-                            if cancel is not None and cancel.is_set():raise EvaluationError('Cancelled before historical publication.','cancelled')
-                            self.reserve()
-                        entry = strict_json(raw)
-                        if entry.get('kind')=='vector_location':
-                            import numpy as np
-                            obj=objects.get(entry['object_id'])
-                            if obj is None or obj.get('encoding')!='dense_vectors_npy_v1':raise EvaluationError('Vector index codec differs.','capture_changed')
-                            path=stage/(obj['id']+'.npy')
-                            cache_key=('vector',obj['id'])
-                            if cache_key not in cached:cached[cache_key]=(validate_matrix(path,max_bytes=self.config.max_bytes),np.load(path,mmap_mode='r',allow_pickle=False,max_header_size=10000))
-                            info,matrix=cached[cache_key]
-                            if not isinstance(entry.get('row'),int) or not 0<=entry['row']<info['rows']:raise EvaluationError('Vector row index differs.','capture_changed')
-                            vector=matrix[entry['row']]
-                            actual=hashlib.sha256(matrix.dtype.str.encode()+vector.tobytes()).hexdigest()
-                            if not np.isfinite(vector).all() or actual!=entry['vector_digest']:raise EvaluationError('Vector logical digest differs.','capture_changed')
-                            previous=db.execute('SELECT object_id FROM vector_locations WHERE digest=?',(actual,)).fetchone()
-                            if previous:
-                                state=db.execute('SELECT state FROM objects WHERE id=?',(previous[0],)).fetchone()[0]
-                                if state not in {'active','pending'}:raise EvaluationError('Previously deleted vectors cannot be resurrected.','historical_evidence_unavailable')
-                            else:
-                                db.execute('INSERT INTO vector_locations VALUES (?,?,?,?,?)',(actual,obj['id'],entry['row'],info['dtype'],info['dimensions']))
-                                used.add(obj['id'])
-                            continue
-                        obj = objects.get(entry['object_id'])
-                        codec=obj.get('encoding','utf8_jsonl_v1') if obj else None
-                        if obj is None or entry['offset'] < 0 or entry['length'] <= 0 or codec=='utf8_jsonl_v1' and entry['offset'] + entry['length'] > obj['bytes']:
-                            raise EvaluationError('Invalid evidence location.', 'capture_changed')
-                        oid = entry['object_id']
-                        fact=self._read_record(stage/(oid+extension(codec)),codec,entry['offset'],entry['length'],cached)
-                        claimed = fact.pop('fact_digest', None)
-                        if (claimed != entry['fact_digest'] or digest(fact) != claimed or digest(fact['identity']) != entry['key']
-                                or fact['kind'] != entry['kind'] or fact['revision'] != entry['revision']):
-                            raise EvaluationError('Record and directory identities differ.', 'capture_changed')
-                        same = db.execute('SELECT fact_digest FROM facts WHERE kind=? AND key=? AND revision=?', (entry['kind'], entry['key'], entry['revision'])).fetchone()
-                        prior_exists = db.execute('SELECT 1 FROM facts WHERE kind=? AND key=? LIMIT 1', (entry['kind'], entry['key'])).fetchone()
-                        is_correction = fact.get('predecessor') is not None or prior_exists and same is None
-                        if entry['kind'] in {'prediction', 'context', 'opportunity','feature','representation'} and is_correction:
-                            parent = db.execute('SELECT * FROM facts WHERE kind=? AND key=? AND fact_digest=?',
-                                                (entry['kind'], entry['key'], fact['predecessor'])).fetchone()
-                            if parent is None or not fact.get('reason') or fact.get('available_ns') is None:
-                                raise EvaluationError('Correction requires a matching predecessor, reason and availability.', 'correction_predecessor')
-                            if fact.get('available_ns') is not None:
-                                parent_codec=db.execute('SELECT encoding FROM objects WHERE id=?',(parent['object_id'],)).fetchone()[0] if self.catalog_version>=2 else 'utf8_jsonl_v1'
-                                parent_path=stage/(parent['object_id']+extension(parent_codec)) if parent['operation_id']==identifier else self._object_path(parent['object_id'])
-                                parent_record=self._read_record(parent_path,parent_codec,parent['offset'],parent['length'],cached)
-                                if parent_record.get('available_ns') is not None and int(fact['available_ns'])<int(parent_record['available_ns']):raise EvaluationError('Correction availability precedes its predecessor.','correction_chronology')
-                            if entry['kind'] == 'prediction':
-                                parent_path = stage/(parent['object_id']+'.jsonl') if parent['operation_id'] == identifier else self._object_path(parent['object_id'])
-                                with private_file(parent_path, 'rb') as parent_stream:
-                                    parent_stream.seek(parent['offset']); parent_fact = strict_json(parent_stream.read(parent['length']))
-                                before = parent_fact['payload']; after = fact['payload']
-                                if before['role'] != after['role'] or before['normalized'].get('entity_key') != after['normalized'].get('entity_key'):
-                                    raise EvaluationError('Corrections cannot relabel historical role/entity separation.', 'historical_role_reassignment')
-                                if parent_fact['authority'] != fact['authority']:
-                                    raise EvaluationError('Prediction correction authority differs.', 'correction_authority')
-                            # A cycle cannot be introduced: the predecessor must
-                            # already exist and a revision ID is immutable.
-                            forks = db.execute('SELECT revision FROM facts WHERE kind=? AND key=?', (entry['kind'], entry['key'])).fetchall()
-                            if entry['revision'] in {r[0] for r in forks} and not db.execute('SELECT 1 FROM facts WHERE kind=? AND key=? AND revision=? AND fact_digest=?', (entry['kind'], entry['key'], entry['revision'], claimed)).fetchone():
-                                raise EvaluationError('Correction revision conflicts.', 'historical_identity_conflict')
-                        previous = db.execute('SELECT f.*,p.state FROM facts f JOIN operations p ON p.id=f.operation_id WHERE f.kind=? AND f.key=? AND f.revision=?',
-                                              (entry['kind'], entry['key'], entry['revision'])).fetchone()
-                        if previous:
-                            if previous['fact_digest'] != entry['fact_digest']:
-                                raise EvaluationError('Same fact identity/revision has different content.', 'historical_identity_conflict')
-                            state = db.execute('SELECT state FROM objects WHERE id=?',(previous['object_id'],)).fetchone()[0]
-                            if state != 'active' and previous['operation_id'] != identifier:
-                                raise EvaluationError('Previously retained fact was purged or is unavailable; restore a verified backup into a new workspace.','historical_evidence_unavailable')
-                            prior_id=previous['object_id']
-                            prior_codec=db.execute('SELECT encoding FROM objects WHERE id=?',(prior_id,)).fetchone()[0] if self.catalog_version>=2 else 'utf8_jsonl_v1'
-                            prior_path=stage/(prior_id+extension(prior_codec)) if previous['operation_id']==identifier else self._object_path(prior_id)
-                            prior_record=self._read_record(prior_path,prior_codec,previous['offset'],previous['length'],cached);prior_digest=prior_record.pop('fact_digest',None)
-                            if prior_digest!=claimed or digest(prior_record)!=claimed or prior_record!=fact:
-                                raise EvaluationError('Indexed duplicate differs from retained canonical identity/payload.','historical_identity_conflict')
-                            fact_id = previous['id']; duplicates += 1
-                        else:
-                            cursor = db.execute('INSERT INTO facts(kind,key,revision,fact_digest,object_id,offset,length,operation_id) VALUES (?,?,?,?,?,?,?,?)',
-                                                tuple(entry[k] for k in ('kind', 'key', 'revision', 'fact_digest', 'object_id', 'offset', 'length')) + (identifier,))
-                            fact_id = cursor.lastrowid; used.add(entry['object_id']); new += 1
-                            if self.catalog_version>=2:
-                                db.execute('UPDATE facts SET locator_kind=? WHERE id=?',(entry.get('locator_kind','byte_range'),fact_id))
-                        vector_digest=fact.get('payload',{}).get('vector_digest')
-                        actual_object=db.execute('SELECT object_id FROM facts WHERE id=?',(fact_id,)).fetchone()[0]
-                        if vector_digest:
-                            vector=db.execute('SELECT object_id FROM vector_locations WHERE digest=?',(vector_digest,)).fetchone()
-                            if vector is None:raise EvaluationError('Representation vector dependency is absent.','capture_changed')
-                            db.execute('INSERT OR IGNORE INTO artifact_dependencies VALUES (?,?)',(actual_object,vector[0]))
-                        for dependency in fact.get('payload',{}).get('depends_on_facts',[]):
-                            dependency_row=db.execute('SELECT o.id,o.state,o.operation_id FROM facts f JOIN objects o ON f.object_id=o.id WHERE f.fact_digest=?',(dependency,)).fetchone()
-                            if dependency_row is None or dependency_row[1]!='active' and dependency_row[2]!=identifier:raise EvaluationError('Required fact dependency is absent or deleted.','capture_changed')
-                            if actual_object!=dependency_row[0]:db.execute('INSERT OR IGNORE INTO artifact_dependencies VALUES (?,?)',(actual_object,dependency_row[0]))
-                        for dependency in fact.get('payload',{}).get('depends_on_objects',[]):
-                            dependency_row=db.execute('SELECT state,operation_id FROM objects WHERE id=?',(_safe_name(dependency),)).fetchone()
-                            if dependency_row is None or dependency_row[0]!='active' and dependency_row[1]!=identifier:raise EvaluationError('Required protected object is absent or deleted.','dependency_unavailable')
-                            if actual_object!=dependency:db.execute('INSERT OR IGNORE INTO artifact_dependencies VALUES (?,?)',(actual_object,dependency))
-                            # Opaque CG6 objects have no row locator. They become
-                            # publishable only through a verified descriptor fact.
-                            if dependency in objects and objects[dependency].get('encoding')=='opaque_artifact_bytes_v1':
-                                blob=objects[dependency]
-                                if fact['kind']!='cg6_artifact_descriptor' or fact['payload'].get('object_id')!=dependency or fact['payload'].get('sha256')!=blob['sha256'] or fact['payload'].get('bytes')!=blob['bytes']:
-                                    # Other facts may depend on an already admitted
-                                    # blob, but cannot be its only owning descriptor.
-                                    if dependency not in used:raise EvaluationError('Binary artifact descriptor differs.','capture_changed')
-                                else:used.add(dependency)
-                        db.execute('INSERT OR IGNORE INTO occurrences VALUES (?,?)', (identifier, fact_id))
-                for stream in cached.values():
-                    if hasattr(stream,'close'):stream.close()
-                db.commit()
-            except BaseException:
-                for stream in locals().get('cached', {}).values():
-                    if hasattr(stream,'close'):stream.close()
-                db.rollback(); raise
-            for oid in used:
-                src = stage / (oid + extension(objects[oid].get('encoding','utf8_jsonl_v1'))); dest = self._object_path(oid)
-                os.link(src, dest); src.unlink()
-            fsync_directory(self.root / 'objects'); self._fault('objects_published')
-            self.reserve()
-            if cancel is not None and cancel.is_set():
-                raise EvaluationError('Cancelled before historical commit.', 'cancelled')
-            metadata = manifest['metadata']
-            db.execute('BEGIN IMMEDIATE')
-            try:
-                sequence = int(json.loads(db.execute("SELECT value FROM settings WHERE key='sequence'").fetchone()[0])) + 1
-                for vid, value in metadata.get('variants', {}).items():
-                    previous = db.execute('SELECT metadata FROM variants WHERE id=?', (vid,)).fetchone()
-                    for existing in db.execute('SELECT metadata FROM variants').fetchall():
-                        old_model = strict_json(existing[0])['signature']['model']; new_model = value['signature']['model']
-                        predictor_fields = ('id', 'version', 'artifact_sha256', 'preprocessing')
-                        if (old_model['id'], old_model['version']) == (new_model['id'], new_model['version']) and any(old_model.get(k) != new_model.get(k) for k in predictor_fields):
-                            raise EvaluationError('Existing predictor version cannot change artifact or preprocessing identity.', 'model_version_conflict')
-                    if previous:
-                        old = strict_json(previous[0])
-                        immutable = ('signature', 'task', 'namespace', 'outcome_definition_version', 'normalized_columns')
-                        if any(old.get(k) != value.get(k) for k in immutable):
-                            raise EvaluationError('Variant mathematics or normalized representation conflicts.', 'variant_conflict')
-                        features = {**old.get('features', {}), **value.get('features', {})}
-                        if any(k in old.get('features', {}) and old['features'][k] != v for k,v in value.get('features', {}).items()):
-                            raise EvaluationError('Retained feature semantics changed.', 'feature_semantics_conflict')
-                        old['features'] = features
-                        db.execute('UPDATE variants SET metadata=? WHERE id=?', (serialized(old).decode(), vid))
-                    if not previous:
-                        db.execute('INSERT INTO variants VALUES (?,?,?)', (vid, serialized(value).decode(), identifier))
-                if metadata.get('assessment_id'):
-                    aid = metadata['assessment_id']
-                    fact = db.execute("SELECT object_id FROM facts WHERE kind='assessment' AND key=?", (digest([aid]),)).fetchone()
-                    db.execute('INSERT INTO assessments VALUES (?,?,?,?,?,?)', (aid, fact[0], identifier, expected, None, 'active'))
-                if metadata.get('evidence_use'):
-                    from .evidence_use import commit_use
-                    commit_use(db,metadata,identifier)
-                receipt = {'operation_id': identifier, 'catalog_sequence': sequence, 'new_facts': new, 'duplicate_occurrences': duplicates,
-                           'capture_digest': expected, **(receipt_extra or {})}
-                catalog_metadata = {key: metadata[key] for key in ('assessment_id', 'capture_stages') if key in metadata}
-                catalog_metadata['variant_ids'] = list(metadata.get('variants', {}))
-                db.execute("UPDATE operations SET state='committed',sequence=?,receipt=?,metadata=? WHERE id=?", (sequence, serialized(receipt).decode(), serialized(catalog_metadata).decode(), identifier))
-                db.execute("UPDATE objects SET state='active' WHERE operation_id=?", (identifier,))
-                for oid in set(objects) - used:
-                    db.execute('DELETE FROM objects WHERE id=?', (oid,))
-                db.execute("UPDATE settings SET value=? WHERE key='sequence'", (json.dumps(sequence),))
-                self._fault('before_catalog_commit'); db.commit()
-            except BaseException:
-                db.rollback(); raise
-        self._fault('catalog_committed')
-        shutil.rmtree(stage); fsync_directory(self.root / 'staging')
-        return receipt
-
-    def recover(self):
-        with self.operation(exclusive_objects=True), closing(self._connect()) as db:
-            pending = [r[0] for r in db.execute("SELECT id FROM operations WHERE state='pending'")]
-            for identifier in pending:
-                objects = [r[0] for r in db.execute('SELECT id FROM objects WHERE operation_id=?', (identifier,))]
-                db.execute('BEGIN IMMEDIATE')
-                db.execute('DELETE FROM occurrences WHERE operation_id=?', (identifier,))
-                if self.catalog_version>=2:
-                    db.execute('DELETE FROM artifact_dependencies WHERE object_id IN (SELECT id FROM objects WHERE operation_id=?) OR depends_on IN (SELECT id FROM objects WHERE operation_id=?)',(identifier,identifier))
-                    db.execute('DELETE FROM vector_locations WHERE object_id IN (SELECT id FROM objects WHERE operation_id=?)',(identifier,))
-                db.execute('DELETE FROM facts WHERE operation_id=?', (identifier,))
-                db.execute('DELETE FROM objects WHERE operation_id=?', (identifier,))
-                db.execute('DELETE FROM operations WHERE id=?', (identifier,)); db.commit()
-                for oid in objects:
-                    path = self._object_path(oid)
-                    if path.exists():
-                        with private_file(path, 'rb'): pass
-                        path.unlink()
-                directory = self.root / 'staging' / identifier
-                if directory.exists(): self._remove_owned_stage(directory)
-            known = {r[0] for r in db.execute('SELECT id FROM objects')}
-            for path in (self.root / 'objects').iterdir():
-                from .feature_storage import CODECS
-                if path.suffix not in CODECS.values() or not HEX.fullmatch(path.stem):
-                    raise EvaluationError('Unrecognized workspace object; left untouched.', 'unsafe_workspace')
-                if path.stem not in known:
-                    with private_file(path, 'rb'): pass
-                    path.unlink()
-            for directory in (self.root / 'staging').iterdir():
-                if HEX.fullmatch(directory.name): self._remove_owned_stage(directory)
-            unavailable = []
-            for row in db.execute("SELECT * FROM objects WHERE state='active'").fetchall():
-                try: self._verify_object(row['id'], row['sha256'], row['bytes'])
-                except (OSError, EvaluationError):
-                    db.execute("UPDATE objects SET state='unavailable' WHERE id=?", (row['id'],)); unavailable.append(row['id'])
-            for row in db.execute("SELECT * FROM deletions WHERE state='pending'").fetchall():
-                self._finish_deletion(db, strict_json(row['plan']))
-        return {'pending_operations_removed': len(pending), 'unavailable_objects': unavailable}
-
-    def _remove_owned_stage(self, directory):
-        if directory.is_symlink() or not directory.is_dir():
-            raise EvaluationError('Unsafe staging directory.', 'unsafe_workspace')
-        for path in directory.iterdir():
-            with private_file(path, 'rb'): pass
-            path.unlink()
-        directory.rmdir()
 
     def iter_facts(self, kind=None, *, sequence=None, keys=None, fact_digests=(), batch_ids=(), require_complete=True, max_records=30000000, check=None, _logical_order=False):
         where = ["p.state='committed'", "o.state='active'"]; args = []
@@ -823,6 +470,7 @@ class Catalog:
             return {r['id']: strict_json(r['metadata']) for r in db.execute("SELECT v.* FROM variants v JOIN operations p ON p.id=v.operation_id WHERE p.state='committed'")}
 
     # Backend-neutral queries used by CG4-CG6 (the platform catalog implements the same API).
+
     @property
     def authority_file(self):
         return self.root / 'catalog.sqlite3'
@@ -867,70 +515,9 @@ class Catalog:
         path = self._verify_object(location['object_id'], location['sha256'], location['bytes'])
         return np.load(path, mmap_mode='r', allow_pickle=False, max_header_size=10000)
 
-    def sealed_reserve_units(self, units):
-        """Units that are sealed-reserve entities (v2 catalogs have no reserve)."""
-        return set()
-
     def blob_path(self, object_id):
         """Path of a verified retained opaque object (CG6 models, outputs, media)."""
         return self._object_path(_safe_name(object_id))
-
-    def add_assessment(self, result, *, request_id=None, cancel=None, request_digest=None):
-        cg4=result.data.get('methodology_id')=='failure_investigation_v1'
-        cg5=result.data.get('methodology_id')=='policy_selection_v1'
-        if (cg4 or cg5) and self.catalog_version<2:raise EvaluationError('Explicit backed-up catalog migration is required before retaining extended evidence.','migration_required')
-        request_id = request_id or uuid.uuid4().hex
-        identifier, previous = self.begin(request_id, request_digest or digest(result.to_private_dict()), require_saving=False)
-        if previous: return previous
-        writer = EvidenceWriter(self.root / 'staging' / identifier, self.config, identifier)
-        aid = result.data['analysis_id']
-        payload={'result':result.to_private_dict(),'manifest':result.private}
-        if cg4 or cg5:
-            binding=result.private.get('history_binding') or {};dependencies=set(binding.get('source_objects',())) if binding.get('instance_id')==self.instance_id else set()
-            panel=result.data.get('investigation') or result.data.get('policy',{});parents=[panel.get('origin_analysis_id'),result.private.get('origin_analysis_id'),(panel.get('annotation_parent') or {}).get('analysis_id'),(panel.get('numerical_recomputation') or {}).get('origin_analysis_id')]
-            with closing(self._connect()) as db:
-                for parent in parents:
-                    if parent:dependencies.update(r[0] for r in db.execute("SELECT object_id FROM facts WHERE kind='assessment' AND key=?",(digest([parent]),)))
-                if cg5:
-                    frozen=result.private.get('frozen_family') or {}
-                    if frozen.get('content_digest'):dependencies.update(r[0] for r in db.execute("SELECT object_id FROM facts WHERE kind='policy_family' AND key=?",(digest([frozen['content_digest']]),)))
-                    reservation=panel.get('reservation') or {}
-                    if reservation.get('evidence_use_id'):dependencies.update(r[0] for r in db.execute("SELECT object_id FROM facts WHERE kind='evidence_use' AND key=?",(digest([reservation['evidence_use_id']]),)))
-            # A standalone run can reuse the exact bytes already retained here.
-            # Link those known copies for deletion without inferring statistical
-            # independence or identity from different files with similar values.
-            hashes={v.get('sha256') for v in result.private.get('files',{}).values() if isinstance(v,dict)}-{None}
-            if hashes:
-                for fact in self.iter_facts('capture_metadata',require_complete=False):
-                    metadata=fact['payload'];inputs=list(metadata.get('sources',{}).values())
-                    inputs.extend(v for k,v in metadata.get('external_inputs',{}).items() if ':model:' not in k and not k.endswith(':manifest'))
-                    if hashes.intersection(v.get('sha256') for v in inputs if isinstance(v,dict)):
-                        with closing(self._connect()) as db:
-                            dependencies.update(r[0] for r in db.execute("SELECT o.id FROM objects o JOIN operations p ON p.id=o.operation_id WHERE p.id=? AND p.state='committed' AND o.state='active'",(fact['identity'][0],)))
-            payload['depends_on_objects']=sorted(dependencies)
-        if cg4 or cg5:
-            from .investigation_storage import write_packet
-            write_packet(writer,'assessment',[aid],payload)
-        else:writer.add('assessment', [aid], payload)
-        writer.finish({'assessment_id': aid})
-        receipt = self.commit_capture(identifier, cancel=cancel, receipt_extra={'assessment_id': aid})
-        return receipt
-
-    def assessment(self, aid):
-        # Fact receipt is authoritative even after a crash before the optional list index.
-        values = list(self.iter_facts('assessment', keys=[digest([aid])], max_records=1))
-        if not values: raise EvaluationError('Assessment is unavailable.', 'assessment_unavailable')
-        from .investigation_storage import read_packet
-        packet = read_packet(self,values[0])
-        from .history_result import LongitudinalResult
-        if packet['result'].get('schema_version') == 'confidenceguard.longitudinal_result/1.0':
-            result = LongitudinalResult.from_dict(packet['result'], private=packet['manifest'])
-            result._workspace_location = str(self.root)
-            return result
-        from .result import EvaluationResult
-        result=EvaluationResult.from_dict(packet['result'], private=packet['manifest'])
-        if result.data.get('methodology_id') in {'failure_investigation_v1','policy_selection_v1','predictor_robustness_v1'}:result._workspace_location=str(self.root)
-        return result
 
     def deletion_preview(self, *, object_ids=(), assessment_ids=(), batch_ids=(), purge=False):
         if not isinstance(purge,bool):raise EvaluationError('purge must be boolean.')
@@ -991,119 +578,12 @@ class Catalog:
             plan['confirmation'] = digest(plan)
             return plan
 
-    def delete(self, plan):
-        supplied = dict(plan); confirmation = supplied.pop('confirmation', None)
-        if confirmation != digest(supplied) or plan.get('instance_id') != self.instance_id:
-            raise EvaluationError('Deletion preview differs.', 'stale_deletion')
-        with self.operation(exclusive_objects=True), closing(self._connect()) as db:
-            if self.status()['catalog_sequence'] != plan['catalog_sequence']:
-                raise EvaluationError('Catalog changed; inspect a new deletion preview.', 'stale_deletion')
-            current=self.deletion_preview(object_ids=plan['object_ids'],assessment_ids=plan['assessment_ids'],batch_ids=plan['batch_ids'],purge=plan['purge'])
-            for field in ('object_ids','affected_batches','potentially_impacted_assessments'):
-                if current[field]!=plan.get(field):raise EvaluationError('Deletion dependencies differ; inspect a new preview.','stale_deletion')
-            db.execute('BEGIN IMMEDIATE')
-            db.execute('INSERT INTO deletions VALUES (?,?,?)', (plan['id'], serialized(plan).decode(), 'pending'))
-            for oid in plan['object_ids']:
-                db.execute("UPDATE objects SET state='deleted' WHERE id=?", (oid,))
-            for bid in plan['batch_ids']:
-                db.execute('DELETE FROM occurrences WHERE operation_id=?', (bid,))
-            if self.catalog_version>=2 and plan['object_ids']:
-                db.execute("UPDATE settings SET value='\"incomplete\"' WHERE key='exposure_continuity'")
-                db.execute('INSERT OR REPLACE INTO settings VALUES (?,?)',('exposure_continuity_token',json.dumps(uuid.uuid4().hex)))
-            db.execute("UPDATE settings SET value=? WHERE key='sequence'", (json.dumps(plan['catalog_sequence'] + 1),)); db.commit()
-            self._forget_deleted_exposure(db,plan)
-            self._fault('deletion_tombstoned')
-            self._finish_deletion(db, plan)
-        if plan['purge']:
-            self._retire_files()
-        return {'deleted_objects': len(plan['object_ids']), 'workspace_retired': plan['purge']}
+    def _refuse(self, *args, **kwargs):
+        raise EvaluationError('Catalog v2 is read-only; migrate the workspace to the NUMEK platform.', 'migration_required')
 
-    def _finish_deletion(self, db, plan):
-        self._forget_deleted_exposure(db,plan)
-        for oid in plan['object_ids']:
-            path = self._object_path(oid)
-            if path.exists():
-                with private_file(path, 'rb'): pass
-                path.unlink()
-            self._verified.pop(oid, None)
-        if plan['purge']:
-            db.execute("UPDATE settings SET value='true' WHERE key='retired'")
-        db.execute("UPDATE deletions SET state='completed' WHERE id=?", (plan['id'],))
-        fsync_directory(self.root / 'objects')
+    def reserve(self, additional=0):
+        if additional:
+            self._refuse()
+        return 0                                   # no write admission is ever needed
 
-    def _forget_deleted_exposure(self,db,plan):
-        from .evidence_use import forget_session_uses
-        objects=set(plan['object_ids'])
-        uses=[r[0] for r in db.execute('SELECT id,object_id FROM evidence_uses') if r[1] in objects] if self.catalog_version>=2 else []
-        # Untracked workspace observations have no durable locator. Deletion
-        # releases them and retains the continuity-loss marker, never freshness.
-        forget_session_uses(self.instance_id,use_ids=uses,purge=plan['purge'],untracked=bool(objects))
-
-    def backup(self, destination):
-        destination = Path(destination).absolute()
-        if destination == self.root or self.root in destination.parents or destination in self.root.parents or destination.exists():
-            raise EvaluationError('Choose a new backup destination outside the workspace.', 'backup_destination')
-        with self.operation(), closing(self._connect()) as source:
-            private_directory(destination); inventory = {}
-            db_path = destination / 'catalog.sqlite3'
-            fd = os.open(db_path, os.O_CREAT | os.O_EXCL | os.O_RDWR, 0o600); os.close(fd)
-            with closing(sqlite3.connect(db_path)) as target:
-                source.backup(target)
-                target.execute('PRAGMA journal_mode=DELETE'); target.commit()
-            inventory['catalog.sqlite3'] = file_digest(db_path)
-            private_directory(destination / 'objects')
-            for row in source.execute("SELECT * FROM objects WHERE state='active'"):
-                path = self._verify_object(row['id'], row['sha256'], row['bytes'])
-                dest = destination / 'objects' / path.name
-                with private_file(path, 'rb') as inp, private_file(dest) as out:
-                    shutil.copyfileobj(inp, out, 1024**2); out.flush(); os.fsync(out.fileno())
-                inventory['objects/' + path.name] = file_digest(dest)
-            manifest = {'schema_version': 'confidenceguard.workspace_backup/1.0', 'instance_id': self.instance_id,
-                        'catalog_sequence': self.status()['catalog_sequence'], 'files': inventory}
-            manifest['content_digest'] = digest(manifest)
-            with private_file(destination / 'backup.json') as out:
-                out.write(serialized(manifest)); out.flush(); os.fsync(out.fileno())
-            fsync_directory(destination / 'objects'); fsync_directory(destination)
-            return manifest
-
-    @classmethod
-    def restore(cls, backup, destination):
-        if cls is Catalog and (Path(backup) / 'platform').is_dir():
-            from .platform_catalog import PlatformCatalog
-            return PlatformCatalog.restore(backup, destination)
-        backup = Path(backup).absolute(); destination = Path(destination).absolute()
-        if destination.exists() or destination == backup or backup in destination.parents:
-            raise EvaluationError('Restore requires a new destination.', 'restore_destination')
-        if not (backup / 'backup.json').is_file():
-            raise EvaluationError('Backup is incomplete or changed.', 'backup_changed')
-        with private_file(backup / 'backup.json', 'rb') as stream:
-            manifest = strict_json(stream.read(64 * 1024**2 + 1))
-        expected = manifest.pop('content_digest', None)
-        if expected != digest(manifest) or manifest.get('schema_version') != 'confidenceguard.workspace_backup/1.0':
-            raise EvaluationError('Backup is incomplete or changed.', 'backup_changed')
-        for relative, expected in manifest['files'].items():
-            path = Path(relative)
-            from .feature_storage import CODECS
-            if path.is_absolute() or '..' in path.parts or str(path) not in {'catalog.sqlite3'} and not (len(path.parts) == 2 and path.parts[0] == 'objects' and HEX.fullmatch(path.stem) and path.suffix in CODECS.values()):
-                raise EvaluationError('Unsafe backup inventory.', 'backup_changed')
-            if list(file_digest(backup / relative)) != list(expected):
-                raise EvaluationError('Backup bytes differ.', 'backup_changed')
-        private_directory(destination)
-        try:
-            for relative in manifest['files']:
-                target = destination / relative; private_directory(target.parent)
-                with private_file(backup / relative, 'rb') as inp, private_file(target) as out:
-                    shutil.copyfileobj(inp, out, 1024**2); out.flush(); os.fsync(out.fileno())
-            private_directory(destination / 'objects'); private_directory(destination / 'staging')
-            loaded = cls(destination)
-            with closing(loaded._connect()) as db:
-                db.execute("UPDATE settings SET value=? WHERE key='instance_id'", (json.dumps(uuid.uuid4().hex),))
-                if loaded.catalog_version>=2:
-                    db.execute("UPDATE settings SET value='\"restore_unreconciled\"' WHERE key='exposure_continuity'")
-                    db.execute("UPDATE settings SET value=? WHERE key='branch_id'",(json.dumps(uuid.uuid4().hex),))
-                    db.execute('INSERT OR REPLACE INTO settings VALUES (?,?)',('exposure_continuity_token',json.dumps(uuid.uuid4().hex)))
-            loaded._validate(); loaded.recover(); fsync_directory(destination)
-            return loaded
-        except BaseException:
-            # Preserve failed restore for diagnosis; it is never attached implicitly.
-            raise
+    begin = commit_capture = add_assessment = delete = set_saving = recover = backup = migrate = _refuse

@@ -12,6 +12,7 @@ from .contracts import EvaluationError,PredictionRunSpec,digest
 from .history_contracts import LongitudinalSpec,instant
 from .history_storage import Catalog,file_lock,serialized
 from .sources import rows
+from .execution_context import ctx
 
 
 def identity_role(roles,unit):
@@ -294,10 +295,10 @@ def analyze_policy_history(spec,config=None,*,allowed_roots=None,workspace=None,
     spec,config,roots=arguments(spec,config,allowed_roots,PolicyApplicationSpec)
     if spec.input.history is None: raise EvaluationError('Policy history needs retained immutable evidence.','policy_history_required')
     workspace=workspace_for(spec.input,workspace); study=_application_study(spec); deadline=_deadline or time.monotonic()+config.max_seconds
-    identity=compat.supervise(_identity_worker,(spec.input,config,spec.limits,roots,spec.role,'history'),config,progress=progress,cancel=cancel,deadline=deadline).to_dict()
+    identity=ctx.run(_identity_worker,(spec.input,config,spec.limits,roots,spec.role,'history'),config,progress=progress,cancel=cancel,deadline=deadline).to_dict()
     reservation=_reserve('outcome_disclosure',identity['population'],spec.input,workspace,config,request_id=request_id,cancel=cancel,deadline=deadline,
                          metadata={'purpose':'policy_historical_replay','identity_policy':'canonical_and_original_source_aliases_v1','local_identity_scope':identity['population']['identity_scope']})
-    result=compat.supervise(_policy_history_worker,(spec,study,config,roots,reservation,identity['fingerprint']),replace(config,result_bytes=config.private_bytes+config.result_bytes),progress=progress,cancel=cancel,deadline=deadline)
+    result=ctx.run(_policy_history_worker,(spec,study,config,roots,reservation,identity['fingerprint']),replace(config,result_bytes=config.private_bytes+config.result_bytes),progress=progress,cancel=cancel,deadline=deadline)
     return _finish(result,config)
 
 

@@ -5,6 +5,175 @@ records what is implemented and what evidence exists, stage by stage. Several ki
 engineering correctness, statistical qualification, resilience, measured performance, product completeness,
 independent review and founder acceptance.
 
+## S3 closure: v2 -> platform migration (S3c), execution contexts, catalog v2 writer retirement (2026-11-20). Implemented; closure gate passing.
+
+S3 is complete with this record: S3a (CG3), S3b (CG4–CG6 storage), S3c (migration and equivalence), S3d (G.8 reserve
+and test port), and the remaining S3 items, the `ctx.run` refactor and v2 writer retirement.
+
+### S3c: catalog v2 -> platform migration
+
+`confidenceguard.migration.migrate_workspace(path)` migrates one workspace in place. It is also available as
+`ReliabilityWorkspace.migrate(path, backup)` and through the CLI: `confidenceguard workspace migrate`, `migrate-status`
+and `migrate-abandon`. It drives the R2.6 state machine in `numek_platform.legacy`:
+
+1. **Plan.** Create a `migrating` catalog carrying the v2 analytical identity (instance id, branch, continuity state and
+   token, tracking, configuration, creation time), and bind the root to it. The catalog is inaccessible to every reader,
+   writer and API, except the migration's own in-process validation (see "Analytical equivalence" below).
+2. **Freeze.** Set `user_version = 9002`, which every released runtime refuses, and record the inventory. A v2
+   deletion consumes a K without an operation row; the inventory now accounts for those Ks.
+3. **Replay in K order.** One platform transaction per K, resumable from the last committed K (recorded in that same
+   transaction).
+   - Each v2 operation becomes the publication with the same K, id, request id, request digest and receipt.
+   - Its objects keep their ids and bytes, re-verified on copy. Its facts keep kind, key, revision, digest and locator.
+   - Its occurrences, variants, assessments, artifact dependencies, vector locations and object kinds are written in
+     the same transaction.
+   - A v2 deletion becomes a deletion publication at its K that tombstones its facts. Its bytes were already gone, so
+     those objects are recorded as reclaimed placeholders.
+   - Each v2 evidence use becomes a durable legacy governance record inside its K's transaction. It keeps its v2 id,
+     kind, digests and counts, and its membership is rebuilt from the v2 ledger's own membership facts. The exposure
+     registry, confirmation members and study allocation are rebuilt with it.
+4. **Validate** (`validate`; the report gates cutover). Structural checks:
+   - K sequence and every publication;
+   - fact identity, digest and locator;
+   - occurrences and deletion tombstones;
+   - object identity, plus full verify-on-read of every copied byte;
+   - every ConfidenceGuard relation;
+   - identity and settings;
+   - evidence governance, use for use: fields, decoded membership against the v2 digest, registry flags, confirmation
+     members, study allocations.
+
+   Then analytical checks (run by the migration job in-process, under `InProcessContext`):
+   - **Historical reconstruction:** every retained logical fact decodes byte-equal.
+   - **Retained assessments:** every retained assessment reopens identically.
+   - **Deletion previews:** equal for every retained assessment and for one object of every evidence kind.
+   - **Evidence-use overlap:** equal answers on every recorded population (sampled) and an unrelated one.
+   - **CG3 re-execution:** every retained CG3 analysis (including restatements) re-executes at its own K and equals the
+     stored v2 result. Numbers are compared with a 1e-12 absolute / 1e-9 relative tolerance. The only exclusions are the
+     result's own id, time and execution metadata, read accounting, and population labels that v2 derived from an
+     unordered selection stream (see "Defects found"). An analysis that v2's conservative "potentially impacted" list
+     covers after an evidence deletion must either re-execute equal or refuse exactly as v2 does.
+5. **Cutover.** A single transaction, allowed only with a passing report; it is the point of no return. v2 stays frozen
+   read-only. Purging the migrated workspace also removes the frozen v2 catalog and its bytes.
+6. **Completion.** Reported only after a post-cutover backup. A workspace with its own P-LOCAL cluster takes it
+   automatically when given a destination. A shared installation reports
+   `post_cutover_backup_required_on_shared_installation` (tracked item D-1).
+
+Interruption and recovery:
+- A crash at any boundary (planned, frozen, any K, copied, cutover) resumes from durable state.
+- A source changed after freezing refuses with `migration_source_changed`, including on a resumed freeze. Tampered
+  evidence bytes refuse with `evidence_changed`.
+- `abandon_workspace` (before cutover only) removes the platform copy, including governance and ConfidenceGuard rows
+  and the never-readable object copies, and restores v2 exactly (same inventory digest). The workspace can then be
+  migrated again.
+- A catalog v2 backup (`workspace_backup/1.0`) still restores: it becomes a new instance and is then migrated
+  (`restore_legacy_backup`).
+
+Frozen test sources:
+- `tests/fixtures/catalog_v2/` holds three catalog v2 workspaces (about 3.8 MB):
+  - CG3 with a restatement, evidence uses and an assessment deletion;
+  - CG3 with an evidence deletion;
+  - CG4/CG5/CG6 with typed features, discovery and confirmation uses with a study budget, a policy family and CG6
+    binary artifacts.
+- They were generated by the last runtime with the v2 writer (`validation/cg7/generate_catalog_v2_fixtures.py`). Its
+  identity (commit `c94feb90` plus the S3 working tree) and the archive digests are in `manifest.json`.
+
+### Execution-agnostic services (`ctx.run`)
+
+- **Call sites.** All 36 `compat.supervise` call sites in 16 modules now call `ctx.run(operation, arguments, config,
+  progress=, cancel=, deadline=)` from `confidenceguard.execution_context`. (The plan counted 35; the count at
+  migration was 36.)
+- **No parallel path remains.** `compat.supervise` and the S1 placeholder `numek_platform/execution/context.py` are
+  removed.
+- **`SpawnContext`** is the default (the ephemeral workbench and every caller that sets nothing). It keeps the
+  previous behaviour exactly: a fresh supervised interpreter per phase, with DataTrust's process-tree limits.
+- **`InProcessContext`** is for persistent platform jobs, whose process the worker host already isolates and budgets,
+  and for migration validation. It runs phases directly, with:
+  - spawn-equivalent data isolation (arguments and results are pickled across the boundary);
+  - cancellation and deadline checks at phase boundaries;
+  - `platform_catalog.process_scope()`: each phase starts with no worker reservation or study authority, its own
+    access-reservation attempts are closed when it ends, and the caller's state is restored.
+- **Activation** is through `execution_context.using(context)`.
+- **Equivalence (tested).** A CG3 platform analysis and a CG1 workbench evaluation are identical in-process and
+  spawned. The only difference is the time-dependent `effective_cutoff_ns`.
+
+### Catalog v2 writer retirement (after the migration and execution-context checks)
+
+- **v2 roots.** `Catalog(root)` on an unmigrated v2 root refuses with `migration_required`, naming the migration
+  command.
+- **New workspaces.** `Catalog(root, create=True)` and `ReliabilityWorkspace.initialize` always create platform
+  workspaces: a shared installation when `NUMEK_PLATFORM_DSN` is set, otherwise the workspace's own P-LOCAL cluster.
+- **v2 writer code removed** from `history_storage`:
+  - creation, open and retirement handling;
+  - v1 -> v2 migration;
+  - capture commit and recovery;
+  - assessment writing;
+  - deletion and backup.
+
+  `history_storage.py` went from 1,109 to 591 lines.
+- **v2 branches removed** from the workspace (history exposure, analysis, inspection), the evidence-use ledger
+  (v2 tracking writes, `commit_use`) and CG6 retained paths.
+- **What remains for v2 is read-only tooling.**
+  - `LegacyCatalog` is the read-only view of live or frozen catalog v2 (read-only SQLite; every mutating method
+    refuses). It keeps the v2 read paths that migration validation compares against: fact iteration, assessments,
+    deletion preview, ledger overlap and status.
+  - `numek_platform.legacy` holds the read-only reader, freeze/unfreeze and the state machine.
+  - `confidenceguard.migration` holds replay, validation and v2 backup restore.
+- **No dual-write and no dual-backend runtime remains.**
+- **Tests.**
+  - The suites run on one session-scoped P-LOCAL cluster that `tests/conftest.py` starts unless a DSN is given; plan
+    E.4 specified this test migration.
+  - Tests that needed v2 workspaces use the frozen fixtures.
+  - The S3d-era v2 branches of ported tests are removed, so their platform invariants are now unconditional.
+
+### Defects found and fixed in this step
+
+- **CG3 history selection was not reproducible.** The query streaming the selected predictions had no `ORDER BY`, and
+  DuckDB's parallel joins return rows in varying order. The selected-fact digest, the record ordinals and population
+  labels therefore varied between identical runs on either backend: 2 of 3 repeated runs differed. The stream is now
+  ordered.
+- **Abandon left the catalog unusable.** The generic abandon did not remove a catalog's governance and ConfidenceGuard
+  rows (a foreign-key violation) and kept its object rows, which blocked a second migration.
+- **A resumed freeze accepted a changed source.** It re-recorded the inventory instead of comparing against the
+  recorded one.
+- **Migration-abandoned catalogs could trigger purge completion.** An abandoned catalog is `retired`. With a binding
+  file present, opening it ran the purge-completion path (emptying `objects/`). File retirement now requires
+  ConfidenceGuard's own purge marker.
+- **Initialization over an existing v2 root.** It is now refused (`workspace_exists`).
+
+### Tracked deferred items (not part of S3, no claim made)
+
+- **D-1: shared-installation object store and backup.**
+  - *Current state.* ConfidenceGuard workspaces on a shared installation keep a per-workspace object store
+    (`platform-objects/`). `numek backup create` reads exactly one object store, so it does not cover them; workspace
+    backup refuses with `backup_scope`. Such workspaces therefore have no supported installation-wide backup, and
+    their migration is reported `cutover_committed` but not `complete`.
+  - *Acceptance.* An installation object store configured once per installation (deployment configuration, S9/S10)
+    and used by every bound workspace. One installation backup covering all their objects, with a restore test. The
+    post-cutover migration backup recorded through it.
+  - *No production-readiness claim is made* for shared installations until D-1 is done.
+- **D-2: PostgreSQL row-level security and multi-tenant isolation.** Deferred by the plan; unchanged.
+
+### Evidence
+
+| Check | Result |
+|---|---|
+| `tests/cg1`–`tests/cg6` (session P-LOCAL cluster; catalog v2 retired) | 671 passed, 2 failed, 11 skipped (one run). Both failures were tests still patching the removed `compat.supervise` (missed in the port); they now patch `ctx.run` and pass on rerun (3 passed, 2 hardware skips). No product failure. |
+| `tests/platform` (migration, execution context, authority, reserve-backed studies, governance, publication, GC, backup) | **99 passed** |
+| DataTrust suites (root, `m4`–`m9`; workbench transport now uses `ctx.run`) | Failure set identical to the same suites run at the S3d commit (`c94feb90`) in a clean worktree with the same environment. Every failure is environmental: the CG7 environment does not include DataTrust's optional extras (`reportlab`, `docx`, `ijson`, `pycocotools`, the pinned text-embeddings `transformers`). One test shows as new only because the baseline worktree lacked the locally downloaded model and skipped it; here it runs and fails for missing `transformers`. **No DataTrust regression.** |
+
+### Remaining limitations
+
+- D-1 above. Shared installations have no supported installation-wide backup, and no production readiness is claimed.
+- Analytical migration validation re-executes retained CG3 analyses. CG4, CG5 and CG6 results are validated by
+  byte-equal reconstruction of their inputs, identical reopening and the deletion closure, and a CG4 re-execution is
+  checked in the tests. CG5 and CG6 re-execution is not part of the validation report.
+- Population labels in v2 CG3 results came from an unordered stream, so they are excluded from re-execution equality;
+  every measured value, count and state is compared. Results sealed before the ordering fix keep the labels they were
+  sealed with.
+- A catalog v2 runtime cannot be used again after cutover (no reverse migration); recovery is through platform backups.
+- The frozen v2 fixtures are generated inputs: regenerating them needs the pre-retirement runtime recorded in their
+  manifest.
+
 ## S3d: reserve-backed assessments (G.8) and the v2-specific test port (2026-11-19). Implemented; closure gate passing.
 
 ### Implemented
@@ -190,8 +359,8 @@ S3 is executed in four gated steps:
 |---|---|---|
 | S3a | CG3 catalog on the platform | implemented |
 | S3b | CG4/CG5/CG6 storage, raw-SQL and object-path sites, deletion and backup | implemented |
-| S3c | v2 → platform replay and equivalence validation | pending |
-| S3d | reserve-backed assessments (G.8) and the v2-specific test port | **implemented (record at the top)**; `ctx.run` refactor and v2 writer retirement remain (v2 writer retirement needs S3c) |
+| S3c | v2 → platform replay and equivalence validation | **implemented (S3 closure record)** |
+| S3d | reserve-backed assessments (G.8) and the v2-specific test port | implemented; `ctx.run` refactor and v2 writer retirement completed in the S3 closure record |
 
 ### Implemented
 

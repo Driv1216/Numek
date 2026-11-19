@@ -9,6 +9,7 @@ from pathlib import Path
 import numpy as np
 from .contracts import EvaluationError,digest,strict_json
 from .features import value,learner_number,predicate_masks
+from .execution_context import ctx
 
 SCHEMA='confidenceguard.membership_artifact/1.0'
 
@@ -144,7 +145,7 @@ class MembershipArtifact:
         if not isinstance(limits,InvestigationLimits):raise EvaluationError('InvestigationLimits required.')
         packet=validate(self.data,models=self.models if self.models else None)
         features,representations,n=_application_inputs(packet,features,representations or {},config,limits)
-        result=compat.supervise(_membership_application,(packet,self.models,features,representations,n,config,limits),config,progress=progress,cancel=cancel)
+        result=ctx.run(_membership_application,(packet,self.models,features,representations,n,config,limits),config,progress=progress,cancel=cancel)
         data=result.to_dict()
         return {'member':np.asarray(data['member'],bool),'available':np.asarray(data['available'],bool),
                 'reason':np.asarray(data['reason'],object),

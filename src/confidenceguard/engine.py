@@ -12,6 +12,7 @@ from . import compat
 from .sources import Store, rows
 from .result import EvaluationResult, Inspection
 from .analytics import Evidence,evaluate_scope,policies,compare,literal,distributions
+from .execution_context import ctx
 
 
 def preflight(spec,config):
@@ -150,7 +151,7 @@ def evaluate(spec,config=None,*,progress=None,cancel=None,allowed_roots=None,exp
     spec,config,roots=_arguments(spec,config,allowed_roots)
     # The legacy worker protocol must budget the full protected return value.
     worker_config=replace(config,result_bytes=config.private_bytes+config.result_bytes)
-    result=compat.supervise(_execute,(spec,config,roots,False,expected_fingerprint,_capture),worker_config,progress=progress,cancel=cancel,deadline=_deadline)
+    result=ctx.run(_execute,(spec,config,roots,False,expected_fingerprint,_capture),worker_config,progress=progress,cancel=cancel,deadline=_deadline)
     if cancel is not None and cancel.is_set():raise EvaluationError('Evaluation cancelled before commit.','cancelled')
     result.seal()
     if len(result.json_text().encode())>config.private_bytes:raise EvaluationError('Final protected result exceeds budget.','private_result_limit')
@@ -165,7 +166,7 @@ def inspect(spec,config=None,*,progress=None,cancel=None,allowed_roots=None):
         from .methods import inspect_methods
         return inspect_methods(spec,config,progress=progress,cancel=cancel,allowed_roots=allowed_roots)
     spec,config,roots=_arguments(spec,config,allowed_roots)
-    result=compat.supervise(_execute,(spec,config,roots,True,None),config,progress=progress,cancel=cancel)
+    result=ctx.run(_execute,(spec,config,roots,True,None),config,progress=progress,cancel=cancel)
     return result.to_dict()
 
 

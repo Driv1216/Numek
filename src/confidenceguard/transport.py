@@ -20,6 +20,7 @@ from . import compat
 from . import schema
 from .method_contracts import ReliabilitySpec,parse_spec
 from .methods import fit_methods,apply_methods,study
+from .execution_context import ctx
 
 PREFIX='/api/confidenceguard/v1'
 
@@ -313,14 +314,14 @@ def register(app,workspace,roots,*,persistent_workspace=None,launch_token=None):
                                 j['output']['artifact_ids']=remember(state,rid,{'application_path':result.private['application_export']['path']},'local')
                             j['state']='succeeded'
                 elif kind=='resolve_evidence':
-                    packet=compat.supervise(_resolve,(item['result'],value['reference'],authorized,bool(value.get('reveal_values',False))),config,progress=progress,cancel=j['cancel'])
+                    packet=ctx.run(_resolve,(item['result'],value['reference'],authorized,bool(value.get('reveal_values',False))),config,progress=progress,cancel=j['cancel'])
                     with store.guard:
                         j['output']=packet.data;j['state']='cancelled' if j['cancel'].is_set() else 'succeeded'
                         if j['state']=='cancelled':j['output']={}
                 else:
                     rid=value['result_id'];directory=compat.protected_directory(state['directory']/rid/'exports'/jid)
                     path=directory/('report.pdf' if value.get('format')=='pdf' else 'report.html')
-                    packet=compat.supervise(_export,(item['result'],str(path),value.get('format','html'),value.get('audience','shareable'),value.get('disclosure')),config,progress=progress,cancel=j['cancel'])
+                    packet=ctx.run(_export,(item['result'],str(path),value.get('format','html'),value.get('audience','shareable'),value.get('disclosure')),config,progress=progress,cancel=j['cancel'])
                     with store.guard:
                         ids=remember(state,rid,packet.data['artifacts'],value.get('audience','shareable'));j['output']={'artifact_ids':ids}
                         if packet.data.get('export_error'):j['output']['export_error']=packet.data['export_error']

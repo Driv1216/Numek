@@ -28,7 +28,7 @@ def test_supplied_policy_changes_refuse_before_any_H_worker(supplied,change,monk
     revised=replace(spec,feature_time_view='retrospective') if change=='feature_view' else replace(spec,
         evaluation=replace(spec.evaluation,outcomes=replace(outcome,**changes[change])))
     def unexpected(*args,**kwargs):raise AssertionError('Revised observation policy reached a worker/H admission')
-    monkeypatch.setattr('confidenceguard.compat.supervise',unexpected)
+    monkeypatch.setattr('confidenceguard.execution_context.ctx.run',unexpected)   # no phase may execute
     from confidenceguard import inspect_confirmation
     with pytest.raises(EvaluationError) as caught:inspect_confirmation(family,confirmation_input=revised)
     assert caught.value.code=='confirmation_observation_policy'
@@ -107,6 +107,6 @@ def test_retrospective_feature_cutoff_is_guarded_before_H_loading(tmp_path,monke
     assert _input(family,equivalent)[1]==equivalent
     from confidenceguard import inspect_confirmation
     def unexpected(*args,**kwargs):raise AssertionError('Changed retrospective feature cutoff reached H')
-    monkeypatch.setattr('confidenceguard.compat.supervise',unexpected)
+    monkeypatch.setattr('confidenceguard.execution_context.ctx.run',unexpected)   # no phase may execute
     with pytest.raises(EvaluationError) as caught:inspect_confirmation(family,confirmation_input=replace(spec,as_of='2026-01-03T00:00:00Z'))
     assert caught.value.code=='confirmation_observation_policy'

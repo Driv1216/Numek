@@ -64,12 +64,12 @@ def test_missing_assumptions_and_general_cluster_design_refuse_without_metrics(t
 def test_failed_assessment_reservation_remains_spent(tmp_path,monkeypatch):
     from confidenceguard import policy_assessment
     result=optimize_policies(study(tmp_path),CONFIG);frozen=freeze_policy_family(result,assessment=protocol(result))
-    original=policy_assessment.compat.supervise
+    original=policy_assessment.ctx.run
     def fail(operation,args,config,**kwargs):
         if operation is policy_assessment._assess_worker: raise EvaluationError('Injected worker interruption','cancelled')
         return original(operation,args,config,**kwargs)
     with monkeypatch.context() as patch:
-        patch.setattr(policy_assessment.compat,'supervise',fail)
+        patch.setattr(policy_assessment.ctx,'run',fail)
         with pytest.raises(EvaluationError): assess_policies(frozen,CONFIG)
     other=freeze_policy_family(result,assessment=protocol(result,.7))
     assert 'assessment_population_previously_exposed' in inspect_policy_assessment(other,CONFIG)['admissibility_reasons']

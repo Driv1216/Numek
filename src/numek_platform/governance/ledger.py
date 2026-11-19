@@ -293,7 +293,7 @@ def _confirmation_rules(conn, catalog_id, kind, row, metadata, family_digest, po
 def reserve(db, store, scope, lease, catalog_id, *, purpose, members, population_digest, extra_events=(),
             extra_units=(), read_k=None, as_of=None, selection_digest=None, family_digest=None, request_id=None,
             study_id=None, alpha=None, total_alpha=None, metadata=None, consume_reserve=False, query_events=None,
-            authority=None):
+            authority=None, allow_migrating=False):
     """Commit an evidence-use reservation before reading protected evidence.
 
     ``members`` is [(event_hash, unit_hash)] or [(event_hash, unit_hash, target_key)]
@@ -338,7 +338,7 @@ def reserve(db, store, scope, lease, catalog_id, *, purpose, members, population
     with db.transaction() as conn:
         assert_fence(conn, lease)                                                        # 1 job
         conn.execute('SELECT pg_advisory_xact_lock(hashtextextended(%s, 0))', (f'exposure:{catalog_id}',))  # 2
-        row = require_active(catalog(conn, scope, catalog_id, lock='share'))             # 3 catalog
+        row = require_active(catalog(conn, scope, catalog_id, lock='share'), allow_migrating=allow_migrating)  # 3 catalog
         existing = conn.execute('SELECT * FROM evidence_uses WHERE catalog_id = %s AND request_id = %s',
                                 (catalog_id, request_id)).fetchone()
         if existing is not None:

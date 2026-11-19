@@ -21,6 +21,7 @@ from .store import PreparedExecution
 from .adapters import Adapter,normalize_outputs,host_bindings
 from .result import ExecutionResult,LIMITATIONS
 from . import devices
+from ..execution_context import ctx
 
 
 def arguments(spec,config,allowed_roots):
@@ -410,12 +411,12 @@ def service(spec,config=None,*,operation='execute',allowed_roots=None,expected_f
             from .exposure import identity_worker,reserve
             roles={'F','S'} if operation=='auxiliary_fit' else {'E'} if operation in {'auxiliary_assess','robustness_assess'} else None
             if operation=='robustness' and options.get('robustness',{}).get('role'):roles={options['robustness']['role']}
-            identity=compat.supervise(identity_worker,(spec,config,roots,roles,options),budget,progress=progress,cancel=cancel,deadline=deadline).data
+            identity=ctx.run(identity_worker,(spec,config,roots,roles,options),budget,progress=progress,cancel=cancel,deadline=deadline).data
             if expected_fingerprint and identity['fingerprint']!=expected_fingerprint:raise EvaluationError('Confirmed inputs changed.','stale_confirmation')
             expected_fingerprint=identity['fingerprint']
             reservation,checks=reserve(identity,operation,options,tracking_workspace or workspace,request_id,config)
             options.update(reservation=reservation,exposure_checks=checks)
-        result=compat.supervise(_worker,(spec,config,roots,operation,expected_fingerprint,str(staging),host_bindings(),options),budget,progress=progress,cancel=cancel,deadline=deadline)
+        result=ctx.run(_worker,(spec,config,roots,operation,expected_fingerprint,str(staging),host_bindings(),options),budget,progress=progress,cancel=cancel,deadline=deadline)
         if operation=='inspect':
             shutil.rmtree(staging);return result.to_dict()
         if cancel is not None and cancel.is_set():raise EvaluationError('Cancelled before CG6 publication.','cancelled')

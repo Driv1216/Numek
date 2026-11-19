@@ -9,23 +9,6 @@ def options(config):
     return ExecutionOptions(**{f.name:getattr(config,f.name) for f in fields(ExecutionOptions) if hasattr(config,f.name)})
 
 
-def supervise(operation,arguments,config,*,progress=None,cancel=None,deadline=None):
-    from datatrust.worker import run_supervised
-    from datatrust.contracts import AnalysisError
-    limits=options(config)
-    if deadline is not None:
-        import time
-        from dataclasses import replace
-        remaining=deadline-time.monotonic()
-        if remaining<=0:raise EvaluationError('Operation deadline exhausted before the next phase.','deadline_exceeded')
-        limits=replace(limits,max_seconds=min(limits.max_seconds,remaining))
-    try:return run_supervised(operation,arguments,limits,progress=progress,cancel=cancel)
-    except AnalysisError as exc:
-        error=EvaluationError('Evaluation stopped; inspect the execution code and configured limits.',exc.code,exc.stage)
-        error.execution=getattr(exc,'execution',{})
-        raise error from exc
-
-
 def workspace(config,estimate,progress):
     from datatrust.scalable import Workspace
     return Workspace(options(config),[],progress,phase_plan={'estimated_peak_workspace_bytes':estimate,'kind':'confidenceguard_projected_predictions'})

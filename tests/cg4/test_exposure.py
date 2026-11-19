@@ -1,5 +1,4 @@
 import csv
-from contextlib import closing
 from dataclasses import replace
 import json
 import numpy as np
@@ -77,28 +76,19 @@ def test_ledger_checks_all_membership_chunks_even_after_index_loss(tmp_path):
     ledger.record('outcome_disclosure',events=events,units=units,population_digest=digest('population'))
     assert ledger.overlap([events[0]],[])==['previously_exposed_confirmation_population']
     assert ledger.overlap([digest('unrelated')],[])==[]
-    from tests.backend_support import on_platform
-    if on_platform(ws):
-        # Platform: no chunked membership index exists to lose. The equivalent completeness
-        # invariant: every member (not only the first chunk's) is in the durable registry,
-        # and the use's immutable membership object holds exactly its digested membership.
-        from numek_platform.governance.ledger import decode_membership,membership_digest
-        for event in (events[0],events[511],events[512],events[-1]):
-            assert ledger.overlap([event],[])==['previously_exposed_confirmation_population']
-        assert ledger.overlap([],[units[-1]])==['previously_exposed_confirmation_population']
-        with ws.catalog.db.connect() as conn:
-            row=conn.execute('''SELECT u.membership_digest,o.physical_key,o.sha256,o.bytes FROM evidence_uses u
-                                JOIN objects o ON o.id=u.membership_object WHERE u.catalog_id=%s''',(ws.catalog.catalog_id,)).fetchone()
-        stored=decode_membership(ws.catalog.store.read_verified(row['physical_key'],bytes(row['sha256']).hex(),row['bytes']))
-        assert (stored[0],stored[1])==(sorted(events),sorted(units))
-        assert row['membership_digest']==membership_digest(sorted(events),sorted(units))==evidence_uses(ws)[0]['membership_digest']
-        return
-    missing=list(ws.catalog.iter_facts('exposure_members',_logical_order=True))[1]
-    # Simulate partial index loss, rather than a physical checksum failure.
-    with closing(ws.catalog._connect()) as db:
-        fid=db.execute('SELECT id FROM facts WHERE kind=? AND key=?',('exposure_members',missing['key'])).fetchone()[0]
-        db.execute('DELETE FROM occurrences WHERE fact_id=?',(fid,));db.execute('DELETE FROM facts WHERE id=?',(fid,));db.commit()
-    assert 'exposure_history_incomplete' in ledger.overlap([digest('unrelated')],[])
+    # Platform: no chunked membership index exists to lose. The equivalent completeness
+    # invariant: every member (not only the first chunk's) is in the durable registry,
+    # and the use's immutable membership object holds exactly its digested membership.
+    from numek_platform.governance.ledger import decode_membership,membership_digest
+    for event in (events[0],events[511],events[512],events[-1]):
+        assert ledger.overlap([event],[])==['previously_exposed_confirmation_population']
+    assert ledger.overlap([],[units[-1]])==['previously_exposed_confirmation_population']
+    with ws.catalog.db.connect() as conn:
+        row=conn.execute('''SELECT u.membership_digest,o.physical_key,o.sha256,o.bytes FROM evidence_uses u
+                            JOIN objects o ON o.id=u.membership_object WHERE u.catalog_id=%s''',(ws.catalog.catalog_id,)).fetchone()
+    stored=decode_membership(ws.catalog.store.read_verified(row['physical_key'],bytes(row['sha256']).hex(),row['bytes']))
+    assert (stored[0],stored[1])==(sorted(events),sorted(units))
+    assert row['membership_digest']==membership_digest(sorted(events),sorted(units))==evidence_uses(ws)[0]['membership_digest']
 
 
 def test_source_instance_aliases_survive_namespace_rename_and_outcome_revision(tmp_path):

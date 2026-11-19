@@ -70,7 +70,15 @@ def freeze(db, scope, migration_id):
     if row['state'] not in ('planned', 'frozen'):
         raise PlatformError('Migration cannot be frozen in its current state.', 'migration_state')
     original = catalog_v2.freeze(row['legacy_root'], migration_id)          # durable lockout first
-    body, inventory_digest = catalog_v2.inventory(row['legacy_root'])
+    if row['inventory_digest'] is not None:
+        body, inventory_digest = _current_inventory(row['legacy_root'])
+    else:
+        body, inventory_digest = catalog_v2.inventory(row['legacy_root'])
+    if row['inventory_digest'] is not None:
+        # Resumed after the inventory was recorded: the source must still match it.
+        if inventory_digest != row['inventory_digest']:
+            raise PlatformError('Legacy catalog changed after it was frozen.', 'migration_source_changed')
+        return inventory_digest
     with db.transaction() as conn:
         _advance(conn, scope, migration_id, ('planned', 'frozen'), 'frozen', original_user_version=original,
                  inventory=body, inventory_digest=inventory_digest)
@@ -79,13 +87,21 @@ def freeze(db, scope, migration_id):
     return inventory_digest
 
 
+def _current_inventory(root):
+    """Inventory of a source that was valid when frozen; any failure now means it changed."""
+    try:
+        return catalog_v2.inventory(root)
+    except PlatformError as exc:
+        raise PlatformError('Legacy catalog changed after it was frozen.', 'migration_source_changed') from exc
+
+
 def check_source(db, scope, migration_id):
     """Resume guard: the frozen source must still match its recorded inventory."""
     with db.connect() as conn:
         row = _row(conn, scope, migration_id, lock=False)
     if catalog_v2.user_version(row['legacy_root']) != catalog_v2.FROZEN_VERSION:
         raise PlatformError('Legacy catalog is no longer frozen.', 'migration_source_changed')
-    _body, current = catalog_v2.inventory(row['legacy_root'])
+    _body, current = _current_inventory(row['legacy_root'])
     if current != row['inventory_digest']:
         raise PlatformError('Legacy catalog changed after it was frozen.', 'migration_source_changed')
     return row
@@ -138,14 +154,24 @@ def status(db, scope, migration_id):
             'catalog_id': str(row['catalog_id'])}
 
 
-def abandon(db, scope, migration_id):
-    """Before cutover only: drop the platform copy, then restore the legacy catalog. Idempotent."""
+def abandon(db, scope, migration_id, *, cleanup=None, store=None):
+    """Before cutover only: drop the platform copy, then restore the legacy catalog. Idempotent.
+
+    ``cleanup(conn, catalog_id)`` removes the product's own rows for the catalog
+    (for ConfidenceGuard: its relations) in the same transaction.
+    """
     with db.transaction() as conn:
         row = _row(conn, scope, migration_id)
         if row['state'] == 'cutover_committed':
             raise PlatformError('Cutover is final; recover through platform backups.', 'migration_state')
         if row['state'] != 'abandoned':
             catalog_id = row['catalog_id']
+            if cleanup is not None:
+                cleanup(conn, catalog_id)
+            # Governance copied from the legacy ledger (the legacy ledger itself is untouched).
+            for table in ('study_allocations', 'confirmation_members', 'exposure_registry'):
+                conn.execute(f'DELETE FROM {table} WHERE catalog_id = %s', (catalog_id,))
+            conn.execute('DELETE FROM evidence_uses WHERE catalog_id = %s', (catalog_id,))
             for table in ('fact_tombstones', 'fact_occurrences'):
                 conn.execute(f'DELETE FROM {table} WHERE catalog_id = %s', (catalog_id,))
             conn.execute('DELETE FROM fact_index WHERE catalog_id = %s', (catalog_id,))
@@ -153,11 +179,20 @@ def abandon(db, scope, migration_id):
             conn.execute('DELETE FROM publications WHERE catalog_id = %s', (catalog_id,))
             mepoch = conn.execute('UPDATE catalog_maintenance SET epoch = epoch + 1 WHERE catalog_id = %s RETURNING epoch',
                                   (catalog_id,)).fetchone()['epoch']
-            conn.execute(
-                """UPDATE objects SET state = 'tombstoned', tombstoned_at = clock_timestamp(), tombstone_mepoch = %s
-                   WHERE catalog_id = %s AND state IN ('active', 'pending')""", (mepoch, catalog_id))
+            if store is not None:
+                # A migrating catalog was never readable: its copies go now, so the same legacy
+                # object identities can be migrated again.
+                removed = [r['physical_key'] for r in conn.execute(
+                    'DELETE FROM objects WHERE catalog_id = %s RETURNING physical_key', (catalog_id,)).fetchall()]
+            else:
+                conn.execute(
+                    """UPDATE objects SET state = 'tombstoned', tombstoned_at = clock_timestamp(), tombstone_mepoch = %s
+                       WHERE catalog_id = %s AND state IN ('active', 'pending')""", (mepoch, catalog_id))
             conn.execute("UPDATE catalogs SET state = 'retired', name = name || ':abandoned:' || id::text WHERE id = %s",
                          (catalog_id,))
             conn.execute("UPDATE legacy_migrations SET state = 'abandoned', updated_at = now() WHERE id = %s", (migration_id,))
+    if store is not None and row['state'] != 'abandoned':
+        for key in removed:                                   # after the rows are gone (I-1)
+            store.unlink(key)
     catalog_v2.unfreeze(row['legacy_root'], migration_id)
     catalog_v2.remove_marker(row['legacy_root'])

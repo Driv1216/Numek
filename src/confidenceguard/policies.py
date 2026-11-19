@@ -17,6 +17,7 @@ from .policy_store import prepared_policy
 from .policy_optimization import search,frontier,evaluate_candidate,choose,all_metrics
 from .policy_metrics import metric_result,public_stat,native_measurements
 from .policy_runtime import Interpreter
+from .execution_context import ctx
 
 
 def action_record(event,action):
@@ -165,7 +166,7 @@ def _inspect_worker(study,config,roots,*,progress=None):
 
 def inspect_policy_study(spec,config=None,*,allowed_roots=None,progress=None,cancel=None):
     spec,config,roots=arguments(spec,config,allowed_roots)
-    return compat.supervise(_inspect_worker,(spec,config,roots),config,progress=progress,cancel=cancel).to_dict()
+    return ctx.run(_inspect_worker,(spec,config,roots),config,progress=progress,cancel=cancel).to_dict()
 
 
 def _optimize_worker(study,config,roots,expected,development,reservation,*,progress=None):
@@ -219,11 +220,11 @@ def _optimize_worker(study,config,roots,expected,development,reservation,*,progr
 def optimize_policies(spec,config=None,*,allowed_roots=None,expected_fingerprint=None,workspace=None,request_id=None,progress=None,cancel=None,_deadline=None):
     spec,config,roots=arguments(spec,config,allowed_roots); workspace=workspace_for(spec.input,workspace)
     deadline=_deadline or time.monotonic()+config.max_seconds
-    identity=compat.supervise(_identity_worker,(spec.input,config,spec.limits,roots,'S','selection'),config,progress=progress,cancel=cancel,deadline=deadline).to_dict()
+    identity=ctx.run(_identity_worker,(spec.input,config,spec.limits,roots,'S','selection'),config,progress=progress,cancel=cancel,deadline=deadline).to_dict()
     if expected_fingerprint and identity['fingerprint']!=expected_fingerprint: raise EvaluationError('Policy inspection is stale.','stale_confirmation')
     reservation=_reserve('discovery_selection',identity['population'],spec.input,workspace,config,request_id=request_id,cancel=cancel,deadline=deadline)
     worker=replace(config,result_bytes=config.private_bytes+config.result_bytes)
-    result=compat.supervise(_optimize_worker,(spec,config,roots,identity['fingerprint'],identity['population'],reservation),worker,progress=progress,cancel=cancel,deadline=deadline)
+    result=ctx.run(_optimize_worker,(spec,config,roots,identity['fingerprint'],identity['population'],reservation),worker,progress=progress,cancel=cancel,deadline=deadline)
     if cancel is not None and cancel.is_set(): raise EvaluationError('Cancelled before policy commit.','cancelled')
     return _finish(result,config)
 
@@ -258,11 +259,11 @@ def _replay_worker(application,study,config,roots,expected,reservation,*,progres
 def replay_policy(spec,config=None,*,allowed_roots=None,expected_fingerprint=None,workspace=None,request_id=None,progress=None,cancel=None,_deadline=None):
     spec,config,roots=arguments(spec,config,allowed_roots,PolicyApplicationSpec); study=_application_study(spec)
     workspace=workspace_for(spec.input,workspace); deadline=_deadline or time.monotonic()+config.max_seconds
-    identity=compat.supervise(_identity_worker,(spec.input,config,spec.limits,roots,spec.role,'replay'),config,progress=progress,cancel=cancel,deadline=deadline).to_dict()
+    identity=ctx.run(_identity_worker,(spec.input,config,spec.limits,roots,spec.role,'replay'),config,progress=progress,cancel=cancel,deadline=deadline).to_dict()
     if expected_fingerprint and identity['fingerprint']!=expected_fingerprint: raise EvaluationError('Policy replay inspection is stale.','stale_confirmation')
     reservation=_reserve('outcome_disclosure',identity['population'],spec.input,workspace,config,request_id=request_id,cancel=cancel,deadline=deadline,
                          metadata={'purpose':'policy_replay','identity_policy':'canonical_and_original_source_aliases_v1','local_identity_scope':identity['population']['identity_scope']})
-    result=compat.supervise(_replay_worker,(spec,study,config,roots,identity['fingerprint'],reservation),replace(config,result_bytes=config.private_bytes+config.result_bytes),progress=progress,cancel=cancel,deadline=deadline)
+    result=ctx.run(_replay_worker,(spec,study,config,roots,identity['fingerprint'],reservation),replace(config,result_bytes=config.private_bytes+config.result_bytes),progress=progress,cancel=cancel,deadline=deadline)
     return _finish(result,config)
 
 

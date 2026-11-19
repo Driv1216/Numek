@@ -110,12 +110,26 @@ def register(main):
 
     workspace=main.commands['workspace']
     @workspace.command('migrate')
-    @click.option('--backup',required=True,type=click.Path())
+    @click.option('--backup',type=click.Path(),default=None,help='Post-cutover backup destination (own P-LOCAL cluster).')
     @click.pass_obj
     @guarded
     def migrate(path,backup):
+        """Migrate a catalog v2 workspace onto the NUMEK platform (validated, resumable)."""
         from .workspace import ReliabilityWorkspace
-        emit(ReliabilityWorkspace(path).migrate(backup))
+        emit(ReliabilityWorkspace.migrate(path,backup))
+    @workspace.command('migrate-status')
+    @click.pass_obj
+    @guarded
+    def migrate_status(path):
+        from .migration import migration_status
+        emit(migration_status(path))
+    @workspace.command('migrate-abandon')
+    @click.pass_obj
+    @guarded
+    def migrate_abandon(path):
+        """Before cutover only: drop the platform copy and restore catalog v2."""
+        from .migration import abandon_workspace
+        emit(abandon_workspace(path))
     @workspace.command('evidence-tracking')
     @click.argument('choice',type=click.Choice(['status','on','off']),default='status')
     @click.pass_obj

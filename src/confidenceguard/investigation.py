@@ -21,6 +21,7 @@ from .history_contracts import instant
 from .investigation_result import InvestigationResult
 from .result import Inspection
 from . import compat
+from .execution_context import ctx
 
 
 CG4_RESULT_BYTES=256*1024**2
@@ -335,7 +336,7 @@ def _inspect(spec,config,roots,*,progress=None):
 
 def inspect_investigation(spec,config=None,*,allowed_roots=None,progress=None,cancel=None):
     spec,config,roots=arguments(spec,config,allowed_roots)
-    return compat.supervise(_inspect,(spec,config,roots),config,progress=progress,cancel=cancel).to_dict()
+    return ctx.run(_inspect,(spec,config,roots),config,progress=progress,cancel=cancel).to_dict()
 
 
 def propose_diagnostic_targets(strategy,features,representations,objective,targets,limits,*,directory,models,threads,reserve_fit,check,memory_budget):
@@ -533,7 +534,7 @@ def investigate(spec,config=None,*,allowed_roots=None,expected_fingerprint=None,
     spec,config,roots=arguments(spec,config,allowed_roots)
     started=time.monotonic();deadline=started+config.max_seconds
     from .evidence_use import record_session
-    population=compat.supervise(_discovery_population,(spec,config,roots),config,progress=progress,cancel=cancel,deadline=deadline).data
+    population=ctx.run(_discovery_population,(spec,config,roots),config,progress=progress,cancel=cancel,deadline=deadline).data
     spec=InvestigationSpec.from_dict(population['effective_spec'])
     workspace=historical_workspace(spec,workspace)
     tracked=False
@@ -544,7 +545,7 @@ def investigate(spec,config=None,*,allowed_roots=None,expected_fingerprint=None,
             ledger.record('discovery_selection',events=population['events'],units=population['units'],population_digest=population['population_digest'],request_id=request_id,cancel=cancel,deadline=deadline,session_max_bytes=config.max_rss_bytes//8)
             tracked=True
     if not tracked:record_session('discovery_selection',population['events'],population['units'],max_bytes=config.max_rss_bytes//8,workspace=workspace)
-    result=compat.supervise(_discover,(spec,config,roots,expected_fingerprint,population['fingerprint']),config,progress=progress,cancel=cancel,deadline=deadline)
+    result=ctx.run(_discover,(spec,config,roots,expected_fingerprint,population['fingerprint']),config,progress=progress,cancel=cancel,deadline=deadline)
     result.execution['end_to_end_seconds']=time.monotonic()-started
     result.execution['requested_operation_deadline_seconds']=config.max_seconds
     return result.seal()

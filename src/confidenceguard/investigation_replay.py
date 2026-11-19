@@ -11,6 +11,7 @@ from .investigation_result import InvestigationResult
 from .investigation import arguments,prepared
 from .investigation_membership import apply
 from . import compat
+from .execution_context import ctx
 
 
 def _population(spec,config,roots,H_only,*,progress=None):
@@ -106,7 +107,7 @@ def replay_investigation(origin,spec,config=None,*,reason,workspace=None,allowed
     spec,config,roots=arguments(spec,config or origin.private['config'],allowed_roots)
     if spec.history is None:raise EvaluationError('Historical replay requires an explicit retained historical selection.')
     started=time.monotonic();deadline=started+config.max_seconds
-    population=compat.supervise(_population,(spec,config,roots,H_only),config,progress=progress,cancel=cancel,deadline=deadline).data
+    population=ctx.run(_population,(spec,config,roots,H_only),config,progress=progress,cancel=cancel,deadline=deadline).data
     spec=InvestigationSpec.from_dict(population['effective_spec'])
     from .investigation import historical_workspace
     workspace=historical_workspace(spec,workspace)
@@ -115,7 +116,7 @@ def replay_investigation(origin,spec,config=None,*,reason,workspace=None,allowed
     if workspace is not None and EvidenceUseLedger(workspace).status()['enabled']:
         EvidenceUseLedger(workspace).record('outcome_disclosure',events=population['events'],units=population['units'],population_digest=population['population_digest'],metadata=metadata,cancel=cancel,deadline=deadline,session_max_bytes=config.max_rss_bytes//8)
     else:record_session('outcome_disclosure',population['events'],population['units'],max_bytes=config.max_rss_bytes//8,workspace=workspace,metadata=metadata)
-    result=compat.supervise(_replay,(origin,spec,config,roots,population,reason,restatement,H_only),config,progress=progress,cancel=cancel,deadline=deadline)
+    result=ctx.run(_replay,(origin,spec,config,roots,population,reason,restatement,H_only),config,progress=progress,cancel=cancel,deadline=deadline)
     result.execution['end_to_end_seconds']=time.monotonic()-started;return result.seal()
 
 
