@@ -27,6 +27,12 @@ def load_history(work, root, spec, sequence, governance=None):
     catalog = Catalog(root)
     if governance is not None:
         catalog.governed(governance)
+        if hasattr(catalog, 'ensure_governance'):
+            from .platform_catalog import _WORKER_GOVERNANCE
+            _WORKER_GOVERNANCE[str(catalog.root)] = governance      # worker-process scope
+    elif hasattr(catalog, 'ensure_governance'):
+        # Platform workspaces: CG4/CG5 history workers reserve before their first outcome read.
+        catalog.ensure_governance(namespace=spec.namespace, k=sequence, purpose_label='historical_selection')
     con = work.con
     con.execute('CREATE TABLE hf(kind VARCHAR,key VARCHAR,revision VARCHAR,fact_digest VARCHAR,predecessor VARCHAR,available HUGEINT,authority VARCHAR,sequence BIGINT,payload VARCHAR,identity VARCHAR)')
     scanned = 0; parsed_bytes = 0; record_bytes = 0; objects = set(); pending = []

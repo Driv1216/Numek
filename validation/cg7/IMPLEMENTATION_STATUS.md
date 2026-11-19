@@ -5,14 +5,100 @@ records what is implemented and what evidence exists, stage by stage. Several ki
 engineering correctness, statistical qualification, resilience, measured performance, product completeness,
 independent review and founder acceptance.
 
+## S3b: CG4/CG5/CG6 storage, deletion, backup and scoped study authority (2026-11-19). Implemented; gate classified.
+
+### Implemented
+
+- **Storage helpers instead of v2 internals.**
+  - The v2 `Catalog` and `PlatformCatalog` share one helper API: `authority_file`, `object_ids_for_key`, `object_ids_for_fact_digests`, `prediction_digests_in_operation`, `object_operations`, `vector_location`, `vector_matrix`, `blob_path`.
+  - `policy_history`, `investigation_history`, `investigation_result`, `confirmation`, `execution/storage`, `execution/result` and `workspace` no longer open SQLite, verify objects or build `catalog.sqlite3` paths themselves.
+- **Platform reads of v2 object kinds.**
+  - Typed feature rows (`typed_feature_rows_v1`) are read through a verified, materialized copy.
+  - Retained CG6 blobs are recreated at their v2 paths (`objects/<oid>.cgblob`) when a result is opened.
+  - Migration `0004_cg_objects.sql` records each object's ConfidenceGuard kind and creating operation (needed by the deletion closure).
+- **Deletion and purge** (port of v2 semantics).
+  - Preview and closure work as in v2. A deletion writes tombstones, advances K by one and makes continuity incomplete.
+  - Garbage collection is scoped to the catalog.
+  - A full purge retires the catalog. If the process dies after the purge committed, reopening the workspace finishes the physical removal (empties `objects/` and `staging/`, writes `.retired`), as v2 does.
+- **Backup and restore** for workspaces with their own P-LOCAL cluster: a snapshot-consistent platform backup, and a restore into a new cluster that is a new instance (new instance id, branch and continuity token; continuity `restore_unreconciled`). Workspaces on a shared installation refuse with `backup_scope`; the installation backup (`numek backup create`) covers them. The platform backup no longer requires a keyring when no encrypted objects exist.
+- **Access-only reservations.**
+  - Migration `0005_access_reservations.sql` adds `selection_access` (class `access`). It authorizes a governed read and records **no** exposure. It is not an evidence use: it is absent from `EvidenceUseLedger.records()`, from overlap checks and from the exposure registry, and it can never grant study authority.
+  - CG4/CG5 history workers reserve with it before their first protected read. As in v2, CG3 analyses record `outcome_disclosure` only when evidence-use tracking is enabled.
+  - Without this, a worker's automatic reservation marked the whole namespace as outcome-exposed and refused every later confirmation.
+- **Scoped study authority for the sealed reserve.**
+  - A confirmation-class reservation (CG4 confirmation, numerical recomputation and scheduled looks; CG5 policy assessment and scheduled looks) now records its snapshot (`read_k`).
+  - The assessment worker runs inside `study_authority(reservation)`. Its access reservation inherits that authority and admits only the sealed-reserve units that:
+    - are in the authority's own membership;
+    - were spent by a confirmation-class use of the **same study family**;
+    - lie within the authority's snapshot (`authority_snapshot` otherwise).
+  - Any other purpose that names an authority refuses with `authority_scope`. Unrelated studies, monitoring, exploratory and development reads keep those units withheld or refused.
+  - A predeclared scheduled look or numerical recomputation of the same family may reuse units its family already spent. Units spent by another family still refuse.
+  - Retries rebind the original reservation (unchanged authorization). Interrupted studies keep their units spent; freshness is never restored.
+- **Snapshot rules for governed reads.**
+  - There is no plain-reader fallback.
+  - A reservation handed to an analysis is never widened: a read beyond its K refuses with `reservation_snapshot`.
+  - Only a worker's own access reservation is renewed at a later K, with the same authority, which itself refuses beyond the study's snapshot.
+- **Smaller fixes.**
+  - `EvidenceUseLedger.records()` gives v2-shaped evidence-use records on both backends. Scheduled-look provenance in CG4 and CG5 uses it.
+  - A repeated evidence-use request no longer crashes on the platform: each call is its own attempt, and the ledger's request id provides idempotency.
+
+**Defect found by the gate and fixed (pre-existing, both backends).**
+- CG3 built `label_observation_by_feature` with an unordered DuckDB `GROUP BY`, and the categorical Jensen–Shannon sum iterated another unordered `GROUP BY`.
+- Parallel hash aggregation returns groups in varying order. Sealed CG3 results were therefore not byte-reproducible: the platform backup/restore test failed in 2 of about 8 full-suite runs under load.
+- Both queries are now ordered. Results sealed before this fix keep the order they were sealed with.
+
+### Evidence
+
+Shared gate cluster (`NUMEK_PLATFORM_DSN`), `validation/cg7/py313.nosync`.
+
+| Check | Result |
+|---|---|
+| `tests/cg3`–`tests/cg6` with every workspace on the platform (one run on the final code) | **562 passed, 30 failed, 10 skipped.** Every failure is classified below. One was a genuine defect, fixed after the run and rechecked in its own file and in `tests/platform` (80 passed). |
+| `tests/platform` (now including `test_study_authority.py`) | 80 passed, 4 consecutive runs under concurrent gate load |
+| `tests/cg3` on v2 (regression) | 67 passed |
+| Touched CG4/CG5 files on v2, after the authority change (scheduled looks, entity-arm confirmation, history, exposure, policy history) | 26 passed |
+| CG6 integration and CG3 lifecycle on v2, earlier in S3b (the authority change does not touch them) | 20 passed |
+
+`test_study_authority.py` covers:
+- authorized access to exactly the consumed units;
+- population boundaries;
+- refusal for unrelated studies and every non-access purpose;
+- the authority snapshot;
+- retries, reuse and scheduled looks;
+- interrupted studies;
+- worker inheritance through `PlatformCatalog`;
+- non-widening of handed-in reservations.
+
+**Genuine defect found by the gate (fixed).**
+- `evidence_uses` had primary key `(org_id, id)`. ConfidenceGuard use ids are the v2 per-catalog `digest([kind, population, family, request])[:32]`, and every ConfidenceGuard workspace of an installation shares one organization. Two workspaces recording the same request therefore collided (`UniqueViolation`, `test_deleted_exposure_releases_only_its_owned_session_identifiers`).
+- Migration `0006_evidence_use_identity.sql` makes the key `(org_id, catalog_id, id)`.
+- After the fix, the test runs until it reaches its session-ledger assertion (third row of the table below).
+
+**The other 29 failures are obsolete v2-specific assertions** (they are the S3d test port). Each was checked against its failing line:
+
+| Category | Count | Tests | S3d handling |
+|---|---|---|---|
+| Backup of a workspace on a shared installation (`backup_scope`, by design) | 7 | cg3 `test_backup_preserves_assessment…`, `test_saving_and_backup`, `test_inspection_effective_populations_and_backup_refusal`; cg4 `test_mixed_codec_commit…`, `test_large_sealed_packet…`, `test_restore_and_later_consent_gaps…`; cg5 `test_policy_family_packet_backup…` | Run them on P-LOCAL workspaces |
+| Raw v2 SQL (`ws.catalog._connect()`) | 5 | cg4 `test_implicit_inline_outcomes…`, `test_deleting_historical_features…`, `test_standalone_byte_identical…`, `test_capture_metadata_used…`; cg6 `test_binary_codec_catalog_v2_backup_reopen` | Assert through the storage helpers and platform tables |
+| v2 `evidence_use` facts (`iter_facts('evidence_use')`) | 8 | cg4 `test_exposure.py` ×3, `test_historical_API_infers_tracking…`, `test_live_CG4_tracks…`, `test_live_CG1_records…`, `test_scheduled_look…`; cg5 `test_policy_scheduled_look…` | Use `EvidenceUseLedger.records()`. In both scheduled-look tests, every product step before that assertion passes. |
+| Process-local session ledger (`session_overlap`); platform workspaces record every use durably | 3 | cg4 `test_exposure_deletion.py` ×3 | Assert durable ledger state instead |
+| v2 `objects/` layout: byte snapshots of the folder, or tampering with `objects/<oid>.jsonl` (no longer the authority; platform verify-on-read and tamper refusal are tested in `tests/platform`) | 6 | cg4 `test_old_or_invalid_retained_cutoff…` ×5; cg3 `test_fault_recovery_deletion_and_tamper` | Snapshot or tamper the platform store. Possible S3d improvement: read typed features from verified in-memory bytes instead of a materialized copy. |
+| v2 lock-contention assertion (`workspace_busy`) | 1 | `test_operation_and_download_locks_are_bounded` | Replace with platform concurrency tests (plan E.2) |
+
+**Limitation, for the founder.**
+- CG4/CG5 confirmation inspection runs before the study's reservation and reads under `selection_access`, so sealed-reserve entities are withheld from the inspected population.
+- Platform ConfidenceGuard workspaces also do not register entities with a reserve yet; entity registration at publication arrives with ingestion in S4.
+- Today a CG population therefore never contains reserve units, and the authority path is verified at the platform level and through the worker plumbing, not end to end through CG4.
+- Making reserve-backed confirmations reachable end to end needs the G.8 ordering: freeze the family, reserve and consume reserve entities from identity-only membership, then inspect and assess under that authority. That changes CG4/CG5 inspection semantics and is not done here.
+
 ## S3a: ConfidenceGuard CG3 on the platform (2026-11-19). Implemented; gate passing for the ported scope.
 
 S3 is executed in four gated steps:
 
 | Step | Scope | Status |
 |---|---|---|
-| S3a | CG3 catalog on the platform | **this record** |
-| S3b | CG4/CG5/CG6 storage, raw-SQL and object-path sites, deletion and backup | pending |
+| S3a | CG3 catalog on the platform | implemented |
+| S3b | CG4/CG5/CG6 storage, raw-SQL and object-path sites, deletion and backup | **implemented (record above)** |
 | S3c | v2 → platform replay and equivalence validation | pending |
 | S3d | `ctx.run` refactor, remaining test port, v2 writer retirement | pending |
 

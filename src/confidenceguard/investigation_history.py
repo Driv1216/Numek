@@ -1,5 +1,5 @@
 """CG4 immutable enrichment and historical adapters; CG3 selection stays authoritative."""
-from contextlib import contextmanager,closing
+from contextlib import contextmanager
 from dataclasses import replace
 import copy
 import hashlib
@@ -255,7 +255,8 @@ def prepare_history(spec,config,roots,progress,*,identity_only=False):
     from .history_selection import load_history,select_history,context_links,HistoryStore
     from .investigation import Prepared
     root,selection=frozen_selection(spec)
-    with compat.secure_open(root/'catalog.sqlite3',roots):pass
+    from .history_storage import authority_file
+    with compat.secure_open(authority_file(root),roots):pass
     selection=replace(selection,config=config)
     catalog=Catalog(root);work=compat.workspace(config,512*1024**2,progress)
     try:
@@ -312,13 +313,7 @@ def prepare_history(spec,config,roots,progress,*,identity_only=False):
             representation_facts=visible_heads(catalog,'representation',feature_sequence,feature_asof,selection.namespace,work.check)
             source_objects={f['object_id'] for f in feature_facts if f['payload']['view']['id'] in {v.id for v in spec.features}}
             source_objects.update(f['object_id'] for f in representation_facts if f['payload']['representation'] in {r.id for r in spec.representations})
-            with closing(catalog._connect()) as db:
-                pending=[]
-                for row in rows(work.con,'SELECT DISTINCT fact_digest FROM hf',batch=512):
-                    pending.append(row[0])
-                    if len(pending)==512:
-                        source_objects.update(r[0] for r in db.execute('SELECT DISTINCT object_id FROM facts WHERE fact_digest IN ('+','.join('?' for _ in pending)+')',pending));pending=[]
-                if pending:source_objects.update(r[0] for r in db.execute('SELECT DISTINCT object_id FROM facts WHERE fact_digest IN ('+','.join('?' for _ in pending)+')',pending))
+            source_objects.update(catalog.object_ids_for_fact_digests([row[0] for row in rows(work.con,'SELECT DISTINCT fact_digest FROM hf',batch=512)]))
             predictions={f['fact_digest']:f for f in catalog.iter_facts('prediction',sequence=feature_sequence,check=work.check)}
             # Exposure knowledge is current knowledge, even when analytical values
             # are reconstructed from an older K. An old snapshot cannot reset use.
@@ -334,9 +329,8 @@ def prepare_history(spec,config,roots,progress,*,identity_only=False):
                 if payload.get('batch',{}).get('operation') in {'evaluate','study'}:exposed_operations.append(metadata['identity'][0])
                 sidecars.extend(payload.get('membership_sidecars',[]))
             exposed_facts=set()
-            with closing(catalog._connect()) as db:
-                for operation in exposed_operations:
-                    exposed_facts.update(r[0] for r in db.execute("SELECT f.fact_digest FROM facts f JOIN occurrences c ON c.fact_id=f.id WHERE f.kind='prediction' AND c.operation_id=?",(operation,)))
+            for operation in exposed_operations:
+                exposed_facts.update(catalog.prediction_digests_in_operation(operation))
             origin_facts=[f['payload'] for f in catalog.iter_facts('prediction_origin',sequence=feature_sequence,check=work.check) if f['payload'].get('namespace')==selection.namespace]
             origins={f['opportunity_key']:f['original_event_key'] for f in origin_facts}
             base.cg4_known_exposed_facts=exposed_facts;base.cg4_sidecars=sidecars;base.cg4_original_keys=origins
@@ -353,11 +347,7 @@ def prepare_history(spec,config,roots,progress,*,identity_only=False):
                     fact=predictions[fact_digest]
                     if fact['payload']['opportunity_key'] not in base.cg4_source_identities:missing.append(fact)
             if missing:
-                object_operations={};object_ids=sorted({f['object_id'] for f in missing})
-                with closing(catalog._connect()) as db:
-                    for start in range(0,len(object_ids),512):
-                        chunk=object_ids[start:start+512]
-                        object_operations.update(db.execute('SELECT id,operation_id FROM objects WHERE id IN ('+','.join('?' for _ in chunk)+')',chunk))
+                object_operations=catalog.object_operations(sorted({f['object_id'] for f in missing}))
                 legacy_opportunities={digest(f['identity']):f for f in catalog.iter_facts('opportunity',sequence=feature_sequence,
                     keys={f['payload']['opportunity_key'] for f in missing},require_complete=False,max_records=selection.max_scan_records,check=work.check)}
                 for fact in missing:
@@ -409,7 +399,7 @@ def prepare_history(spec,config,roots,progress,*,identity_only=False):
                     admit_aligned_matrix(len(self.keys),dimension,'<f8',self.config)
                     matrix=np.full((len(self.keys),dimension),np.nan,dtype='<f8');available=np.zeros(len(self.keys),bool);reasons=['representation_not_retained']*len(self.keys);opened={}
                     content_views={(f['payload']['view']['id'],f['payload']['owner_key']):f['payload']['view'] for f in feature_facts}
-                    with closing(catalog._connect()) as db:
+                    if True:
                         for i,record in enumerate(self.records):
                             owner_record=self.run_records.get(representation.run or self.primary.id,{}).get(record['event_key'])
                             if owner_record is None:reasons[i]='owner_prediction_unavailable';continue
@@ -417,14 +407,10 @@ def prepare_history(spec,config,roots,progress,*,identity_only=False):
                             if not payload or payload['state']!='observed':continue
                             original=payload['spec']
                             if representation.model_digest and representation.model_digest!=original.get('model_digest'):raise EvaluationError('Retained representation identity differs.','representation_changed')
-                            location=db.execute('SELECT * FROM vector_locations WHERE digest=?',(payload['vector_digest'],)).fetchone()
+                            location=catalog.vector_location(payload['vector_digest'])
                             if location is None:raise EvaluationError('Retained vector location is absent.','historical_evidence_unavailable')
                             oid=location['object_id']
-                            if oid not in opened:
-                                obj=db.execute('SELECT * FROM objects WHERE id=?',(oid,)).fetchone()
-                                if obj is None or obj['state']!='active':raise EvaluationError('Retained vector is unavailable.','historical_evidence_unavailable')
-                                path=catalog._verify_object(oid,obj['sha256'],obj['bytes'])
-                                opened[oid]=np.load(path,mmap_mode='r',allow_pickle=False,max_header_size=10000)
+                            if oid not in opened:opened[oid]=catalog.vector_matrix(location)
                             vector=opened[oid][location['row_index']]
                             if vector.shape!=(dimension,) or hashlib.sha256(opened[oid].dtype.str.encode()+vector.tobytes()).hexdigest()!=payload['vector_digest']:raise EvaluationError('Retained vector changed.','historical_evidence_changed')
                             tick,state=payload.get('content_available') or (None,'undeclared');limit=instant(self.spec.as_of or selection.as_of) if self.spec.feature_time_view=='retrospective' else owner_record.get('prediction_tick')

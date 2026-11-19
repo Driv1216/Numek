@@ -77,3 +77,59 @@ def test_cg3_outcome_only_restatement_keeps_the_prediction_snapshot(platform, cg
     assert [r['selected_predictions'] for r in restated.data['history']['window_coverage']] == [6, 6]
     current = ws.analyze(cg3.longitudinal(ws))
     assert [r['selected_predictions'] for r in current.data['history']['window_coverage']] == [13, 13]
+
+
+def test_cg3_deletion_on_the_platform(platform, cg3, tmp_path):
+    from confidenceguard import EvaluationError, ReliabilityWorkspace
+    tmp_path = tmp_path.resolve()
+    ws = cg3.workspace(tmp_path)
+    ws.ingest(cg3.batch(tmp_path))
+    analysis = ws.analyze(cg3.longitudinal(ws))
+    fact = next(ws.catalog.iter_facts('prediction'))
+    preview = ws.deletion_preview(object_ids=[fact['object_id']])
+    assert analysis.data['analysis_id'] in preview['potentially_impacted_assessments']
+    assert fact['object_id'] in preview['object_ids'] and preview['affected_batches']
+    before = ws.status()['catalog_sequence']
+    assert ws.delete(preview)['deleted_objects'] == len(preview['object_ids'])
+    assert ws.status()['catalog_sequence'] == before + 1                 # v2: deletion advances K by one
+    assert ws.evidence_tracking()['continuity'] == 'incomplete'
+    with pytest.raises(EvaluationError) as caught:                     # deleted evidence never shrinks silently
+        ws.analyze(cg3.longitudinal(ws))
+    assert caught.value.code == 'historical_evidence_unavailable'
+    with pytest.raises(EvaluationError) as caught:                     # and cannot be resurrected
+        ws.ingest(cg3.batch(tmp_path))
+    assert caught.value.code == 'historical_evidence_unavailable'
+    with pytest.raises(EvaluationError) as caught:
+        ws.delete(preview)
+    assert caught.value.code == 'stale_deletion'
+    purge = ws.deletion_preview(purge=True)
+    assert ws.delete(purge)['workspace_retired'] is True
+    with pytest.raises(EvaluationError) as caught:
+        ReliabilityWorkspace(ws.path)
+    assert caught.value.code == 'workspace_retired'
+
+
+def test_cg3_local_workspace_backup_and_restore(tmp_path, monkeypatch, cluster):
+    """A workspace with its own P-LOCAL cluster backs up and restores into a new instance."""
+    from confidenceguard import ReliabilityWorkspace, WorkspaceConfig
+    from numek_platform.local import LocalCluster
+    monkeypatch.delenv('NUMEK_PLATFORM_DSN', raising=False)
+    helpers = _cg3_helpers()
+    tmp_path = tmp_path.resolve()
+    ws = ReliabilityWorkspace.initialize(tmp_path / 'workspace', WorkspaceConfig(saving=True, free_disk_bytes=1), platform=True)
+    restored = None
+    try:
+        ws.ingest(helpers.batch(tmp_path))
+        analysis = ws.analyze(helpers.longitudinal(ws))
+        ws.backup(tmp_path / 'backup')
+        restored = ReliabilityWorkspace.restore(tmp_path / 'backup', tmp_path / 'restored')
+        assert restored.instance_id != ws.instance_id
+        assert restored.open(analysis.data['analysis_id']).to_private_dict() == analysis.to_private_dict()
+        assert restored.status()['catalog_sequence'] == ws.status()['catalog_sequence']
+        assert restored.evidence_tracking()['continuity'] == 'restore_unreconciled'
+        again = restored.analyze(helpers.longitudinal(restored))
+        assert again.data['history']['window_coverage'] == analysis.data['history']['window_coverage']
+    finally:
+        for root in (tmp_path / 'workspace', tmp_path / 'restored'):
+            if (root / 'platform').exists():
+                LocalCluster(root / 'platform').stop()

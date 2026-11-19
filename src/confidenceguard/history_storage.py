@@ -251,6 +251,12 @@ class EvidenceWriter:
         return descriptor
 
 
+def authority_file(root):
+    """The file that proves a workspace root: the platform binding or the v2 catalog."""
+    root = Path(root)
+    return root / 'platform.json' if (root / 'platform.json').is_file() else root / 'catalog.sqlite3'
+
+
 class Catalog:
     """Parent-owned durable state; all filesystem entry points are root constrained.
 
@@ -816,6 +822,55 @@ class Catalog:
         with closing(self._connect()) as db:
             return {r['id']: strict_json(r['metadata']) for r in db.execute("SELECT v.* FROM variants v JOIN operations p ON p.id=v.operation_id WHERE p.state='committed'")}
 
+    # Backend-neutral queries used by CG4-CG6 (the platform catalog implements the same API).
+    @property
+    def authority_file(self):
+        return self.root / 'catalog.sqlite3'
+
+    def object_ids_for_key(self, kind, key):
+        with closing(self._connect()) as db:
+            return {r[0] for r in db.execute('SELECT object_id FROM facts WHERE kind=? AND key=?', (kind, key))}
+
+    def object_ids_for_fact_digests(self, digests):
+        found, digests = set(), list(digests)
+        with closing(self._connect()) as db:
+            for start in range(0, len(digests), 512):
+                chunk = digests[start:start+512]
+                found.update(r[0] for r in db.execute('SELECT DISTINCT object_id FROM facts WHERE fact_digest IN ('+','.join('?' for _ in chunk)+')', chunk))
+        return found
+
+    def prediction_digests_in_operation(self, operation_id):
+        with closing(self._connect()) as db:
+            return {r[0] for r in db.execute("SELECT f.fact_digest FROM facts f JOIN occurrences c ON c.fact_id=f.id WHERE f.kind='prediction' AND c.operation_id=?", (operation_id,))}
+
+    def object_operations(self, object_ids):
+        found, object_ids = {}, list(object_ids)
+        with closing(self._connect()) as db:
+            for start in range(0, len(object_ids), 512):
+                chunk = object_ids[start:start+512]
+                found.update(db.execute('SELECT id,operation_id FROM objects WHERE id IN ('+','.join('?' for _ in chunk)+')', chunk))
+        return found
+
+    def vector_location(self, vector_digest):
+        """Location of a retained vector, or None. Raises when its object is no longer active."""
+        with closing(self._connect()) as db:
+            location = db.execute('SELECT * FROM vector_locations WHERE digest=?', (vector_digest,)).fetchone()
+            if location is None:
+                return None
+            obj = db.execute('SELECT * FROM objects WHERE id=?', (location['object_id'],)).fetchone()
+        if obj is None or obj['state'] != 'active':
+            raise EvaluationError('Retained vector is unavailable.', 'historical_evidence_unavailable')
+        return {'object_id': location['object_id'], 'row_index': location['row_index'], 'sha256': obj['sha256'], 'bytes': obj['bytes']}
+
+    def vector_matrix(self, location):
+        import numpy as np
+        path = self._verify_object(location['object_id'], location['sha256'], location['bytes'])
+        return np.load(path, mmap_mode='r', allow_pickle=False, max_header_size=10000)
+
+    def blob_path(self, object_id):
+        """Path of a verified retained opaque object (CG6 models, outputs, media)."""
+        return self._object_path(_safe_name(object_id))
+
     def add_assessment(self, result, *, request_id=None, cancel=None, request_digest=None):
         cg4=result.data.get('methodology_id')=='failure_investigation_v1'
         cg5=result.data.get('methodology_id')=='policy_selection_v1'
@@ -1009,6 +1064,9 @@ class Catalog:
 
     @classmethod
     def restore(cls, backup, destination):
+        if cls is Catalog and (Path(backup) / 'platform').is_dir():
+            from .platform_catalog import PlatformCatalog
+            return PlatformCatalog.restore(backup, destination)
         backup = Path(backup).absolute(); destination = Path(destination).absolute()
         if destination.exists() or destination == backup or backup in destination.parents:
             raise EvaluationError('Restore requires a new destination.', 'restore_destination')

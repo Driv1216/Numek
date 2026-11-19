@@ -1,5 +1,33 @@
 # Numek Current State
 
+## ConfidenceGuard CG7 — S3b CG4–CG6 storage on the platform (2026-11-19)
+
+CG4, CG5 and CG6 workspaces now run on the NUMEK platform, with v2 deletion, purge, P-LOCAL backup and restore semantics.
+Call sites use one storage helper API instead of v2 SQLite internals.
+
+**Governance.**
+- Worker reads use access-only reservations (`selection_access`), which record no exposure. As in v2, CG3 analyses record
+  outcome exposure only when evidence-use tracking is enabled.
+- Confirmation workers inherit scoped study authority. They can read only the sealed-reserve units their own study family
+  consumed, within the study's snapshot. All other purposes are refused or have those units withheld.
+- A reservation handed to an analysis is never widened to a later snapshot.
+
+**Fixed defects.**
+- Unordered DuckDB aggregations made sealed CG3 results non-reproducible. This affected both backends and predates CG7.
+- Evidence-use ids collided across workspaces of one installation.
+
+**Results.**
+- CG3–CG6 on the platform: 562 passed. Every remaining failure is an obsolete v2-specific test assertion (S3d test port),
+  a by-design refusal to back up a workspace on a shared installation, or the replaced v2 lock assertion.
+- Platform suite: 80 passed.
+- The v2 path still passes.
+
+**Known limitation.** Platform ConfidenceGuard populations do not yet contain reserve entities. Inspection runs before the
+study reservation, and entity registration arrives with ingestion in S4. End-to-end reserve-backed confirmations need the
+G.8 ordering (reserve and consume first, then inspect).
+
+S3c and S3d remain. See [CG7 status](../validation/cg7/IMPLEMENTATION_STATUS.md).
+
 ## ConfidenceGuard CG7 — S3a CG3 on the platform (2026-11-19)
 
 `confidenceguard/platform_catalog.py` runs CG3 workspaces on the NUMEK platform. Existing `Catalog(root)` call sites open it

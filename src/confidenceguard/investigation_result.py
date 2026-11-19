@@ -48,7 +48,8 @@ class InvestigationResult(EvaluationResult):
             from .history_storage import Catalog,file_lock
             from pathlib import Path
             root=getattr(self,'_workspace_location',self.private['workspace_path'])
-            with compat.secure_open(Path(root)/'catalog.sqlite3',allowed_roots):pass
+            from .history_storage import authority_file
+            with compat.secure_open(authority_file(root),allowed_roots):pass
             catalog=Catalog(root)
             with file_lock(catalog.objects_lock,False):
                 matches=list(catalog.iter_facts(fact_digests=[locator['fact_digest']],max_records=1))

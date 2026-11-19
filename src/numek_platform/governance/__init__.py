@@ -9,6 +9,11 @@ how sealed-reserve entities are treated:
 ``consume``       reserve units are admitted only with explicit consumption
                   (``reserve:consume``) and become spent at entity level
 ``covariates``    governed by the reserve's covariate policy (exclude/inspect)
+
+``selection_access`` (class ``access``) authorizes reading a population without
+recording outcome exposure. ConfidenceGuard workers use it where v2 read
+outcomes without a ledger entry: the governed exposure (if any) is recorded
+separately by the caller's own evidence-use record, as in v2.
 """
 from ..errors import PlatformError
 
@@ -32,6 +37,7 @@ PURPOSES = {
     'assessment':                  ('confirmation',             'consume'),
     'numerical_recomputation':     ('numerical_recomputation',  'consume'),
     'covariate_inspection':        ('covariate_inspection',     'covariates'),
+    'selection_access':            ('access',                   'withhold'),
 }
 CONFIRMATION_CLASSES = ('confirmation', 'numerical_recomputation')
 REPLAY_PURPOSES = ('historical_replay', 'outcome_restatement', 'policy_historical_replay', 'policy_outcome_restatement')

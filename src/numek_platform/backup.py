@@ -70,9 +70,13 @@ def create_backup(db, store, secret_store, destination, *, passphrase, include_t
                 raise PlatformError('Database dump failed: ' + result.stderr.strip()[-300:], 'backup_failed')
         os.chmod(dump, 0o600)
         files['database.dump'] = _sha_file(dump)
-        keyring = export_keyring(secret_store, keys, passphrase)
-        write_atomic(destination / 'keyring.bin', keyring)
-        files['keyring.bin'] = hashlib.sha256(keyring).hexdigest()
+        if keys or passphrase is not None:
+            if passphrase is None:
+                raise PlatformError('This backup includes encrypted objects; a backup passphrase is required.',
+                                    'backup_passphrase')
+            keyring = export_keyring(secret_store, keys, passphrase)
+            write_atomic(destination / 'keyring.bin', keyring)
+            files['keyring.bin'] = hashlib.sha256(keyring).hexdigest()
         object_root = private_directory(destination / 'objects')
         for row in objects:
             data = store.read_verified(row['physical_key'], bytes(row['sha256']).hex(), row['bytes'])
@@ -120,7 +124,8 @@ def restore_backup(source, db, store, secret_store, *, passphrase):
                              str(source / 'database.dump')], capture_output=True, text=True, env=server_env())
     if result.returncode != 0:
         raise PlatformError('Database restore failed: ' + result.stderr.strip()[-300:], 'restore_failed')
-    import_keyring(secret_store, (source / 'keyring.bin').read_bytes(), passphrase)
+    if (source / 'keyring.bin').exists():
+        import_keyring(secret_store, (source / 'keyring.bin').read_bytes(), passphrase)
     with db.connect() as conn:
         rows = conn.execute("SELECT id, physical_key, sha256, bytes FROM objects WHERE state = 'active'").fetchall()
     restored = 0

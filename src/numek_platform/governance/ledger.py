@@ -127,14 +127,45 @@ def _covariate_policy(conn, catalog_id):
     return 'exclude' if any(r['covariate_policy'] == 'exclude' for r in rows) or not rows else 'inspect'
 
 
-def _apply_reserve_mode(conn, catalog_id, mode, members, extra_units, consume_reserve):
+def _authorized_units(conn, catalog_id, authority, purpose, read_k):
+    """Sealed-reserve units a worker read may inherit from a confirmation-class study.
+
+    Scoped study authority: only for ``selection_access`` reads; only units in
+    the authority use's own membership; only units spent by a confirmation-class
+    use of the *same* study family (the original reservation, a predeclared
+    scheduled look, a linked numerical recomputation); never beyond the
+    authority's snapshot. Anything else stays withheld.
+    """
+    if authority is None:
+        return frozenset()
+    if purpose != 'selection_access':
+        raise PlatformError('Study authority is inherited only by access reservations.', 'authority_scope')
+    row = conn.execute('SELECT * FROM evidence_uses WHERE catalog_id = %s AND id = %s', (catalog_id, authority)).fetchone()
+    if row is None or row['kind'] not in CONFIRMATION_CLASSES:
+        raise PlatformError('Study authority must be a confirmation-class reservation of this catalog.', 'authority_scope')
+    if row['read_k'] is not None and (read_k is None or read_k > row['read_k']):
+        raise PlatformError('Study authority does not cover this catalog snapshot.', 'authority_snapshot')
+    spenders = ('(u.id = %s)' if row['family_digest'] is None else
+                '(u.kind = ANY(%s) AND u.family_digest = %s)')
+    params = [row['id']] if row['family_digest'] is None else [list(CONFIRMATION_CLASSES), row['family_digest']]
+    units = conn.execute(
+        f'''SELECT m.hash FROM confirmation_members m
+            JOIN entity_registry e ON e.catalog_id = m.catalog_id AND e.unit_hash = m.hash AND e.reserve_state = 'reserve'
+            JOIN evidence_uses u ON u.catalog_id = e.catalog_id AND u.id = e.spent_by_use
+            WHERE m.catalog_id = %s AND m.use_id = %s AND m.member_kind = 'unit' AND {spenders}''',
+        [catalog_id, row['id'], *params]).fetchall()
+    return frozenset(bytes(r['hash']).hex() for r in units)
+
+
+def _apply_reserve_mode(conn, catalog_id, mode, members, extra_units, consume_reserve, authorized=frozenset()):
     """Return (members, extra_units, withheld_units, consumed_units) after the purpose's reserve rule.
 
     Units already spent are reported by :func:`_spent`; the caller refuses them
     only after the ported same-family reuse rule has had its chance.
+    ``authorized`` units (inherited study authority) are admitted by ``withhold``.
     """
     units = sorted({m[1] for m in members} | set(extra_units))
-    reserved = _reserve_units(conn, catalog_id, units)
+    reserved = {u: r for u, r in _reserve_units(conn, catalog_id, units).items() if u not in authorized}
     if not reserved:
         return members, extra_units, [], []
     if mode == 'covariates':
@@ -152,11 +183,17 @@ def _apply_reserve_mode(conn, catalog_id, mode, members, extra_units, consume_re
     return kept, [u for u in extra_units if u not in reserved], sorted(reserved), []
 
 
-def _spent(conn, catalog_id, units):
+def _spent(conn, catalog_id, units, family_digest=None):
+    """Units spent by another study. Units spent by the same study family stay usable by its later
+    predeclared looks and numerical recomputations (whose own admission rules already ran)."""
     if not units:
         return []
-    rows = conn.execute('SELECT unit_hash FROM entity_registry WHERE catalog_id = %s AND unit_hash = ANY(%s) '
-                        'AND spent_by_use IS NOT NULL', (catalog_id, [bytes.fromhex(u) for u in units])).fetchall()
+    rows = conn.execute('''SELECT e.unit_hash FROM entity_registry e LEFT JOIN evidence_uses u
+                               ON u.catalog_id = e.catalog_id AND u.id = e.spent_by_use
+                           WHERE e.catalog_id = %s AND e.unit_hash = ANY(%s) AND e.spent_by_use IS NOT NULL
+                           AND NOT (%s::text IS NOT NULL AND u.kind = ANY(%s) AND u.family_digest = %s)''',
+                        (catalog_id, [bytes.fromhex(u) for u in units], family_digest, list(CONFIRMATION_CLASSES),
+                         family_digest)).fetchall()
     return [bytes(r['unit_hash']).hex() for r in rows]
 
 
@@ -246,12 +283,16 @@ def _confirmation_rules(conn, catalog_id, kind, row, metadata, family_digest, po
 
 def reserve(db, store, scope, lease, catalog_id, *, purpose, members, population_digest, extra_events=(),
             extra_units=(), read_k=None, as_of=None, selection_digest=None, family_digest=None, request_id=None,
-            study_id=None, alpha=None, total_alpha=None, metadata=None, consume_reserve=False, query_events=None):
+            study_id=None, alpha=None, total_alpha=None, metadata=None, consume_reserve=False, query_events=None,
+            authority=None):
     """Commit an evidence-use reservation before reading protected evidence.
 
     ``members`` is [(event_hash, unit_hash)] or [(event_hash, unit_hash, target_key)]
     (platform-native identities; the target key admits the outcome facts of
     that opportunity, which are keyed by target rather than by event);
+    ``authority`` (``selection_access`` only) is the id of a confirmation-class
+    reservation whose consumed sealed-reserve units this read may see (see
+    :func:`_authorized_units`);
     ``extra_events`` / ``extra_units`` carry legacy source aliases that have no
     entity pairing. Returns a :class:`Reservation`.
     """
@@ -262,12 +303,15 @@ def reserve(db, store, scope, lease, catalog_id, *, purpose, members, population
     _hexes([m[1] for m in members] + list(extra_units), 'unit')
     _hexes([m[2] for m in members if m[2] is not None], 'target')
     request_id = request_id or uuid.uuid4().hex
+    if authority is not None:
+        metadata['authority_use_id'] = authority
 
     # Reserve states change only under the exposure lock; read them now to
     # build the membership object, then re-check inside the transaction.
     with db.connect() as conn:
+        authorized = _authorized_units(conn, catalog_id, authority, purpose, read_k)
         kept, kept_extra_units, withheld, consumed = _apply_reserve_mode(conn, catalog_id, mode, members,
-                                                                         list(extra_units), consume_reserve)
+                                                                         list(extra_units), consume_reserve, authorized)
     events = _hexes([m[0] for m in kept] + list(extra_events), 'event')
     units = _hexes([m[1] for m in kept] + kept_extra_units, 'unit')
     targets = _hexes([m[2] for m in kept if m[2] is not None], 'target')
@@ -292,7 +336,8 @@ def reserve(db, store, scope, lease, catalog_id, *, purpose, members, population
             if existing['request_digest'] != request_digest:
                 raise PlatformError('This request id was already used for different content.', 'idempotency_conflict')
             return _rebind(conn, existing, lease)
-        again = _apply_reserve_mode(conn, catalog_id, mode, members, list(extra_units), consume_reserve)
+        again = _apply_reserve_mode(conn, catalog_id, mode, members, list(extra_units), consume_reserve,
+                                    _authorized_units(conn, catalog_id, authority, purpose, read_k))
         if (again[0], again[1], again[2], again[3]) != (kept, kept_extra_units, withheld, consumed):
             raise PlatformError('Reserve assignments changed during the reservation; retry.', 'governance_changed',
                                 retryable=True)
@@ -302,7 +347,7 @@ def reserve(db, store, scope, lease, catalog_id, *, purpose, members, population
             if reuse is not None:
                 prior = conn.execute('SELECT * FROM evidence_uses WHERE catalog_id = %s AND id = %s', (catalog_id, reuse)).fetchone()
                 return _rebind(conn, prior, lease)
-        if _spent(conn, catalog_id, consumed):
+        if _spent(conn, catalog_id, consumed, family_digest if kind in CONFIRMATION_CLASSES else None):
             raise PlatformError('Some sealed-reserve entities were already spent by another study.', 'reserve_access_refused')
         if ref.reused:                                                                   # identical membership bytes
             object_id = ref.id
@@ -371,6 +416,8 @@ def _allocate(conn, catalog_id, study_id, use_id, alpha, total_alpha):
 
 
 def _register_exposure(conn, scope, catalog_id, use_id, kind, events, units):
+    if kind == 'access':                 # authorizes the read; records no exposure
+        return
     outcome = kind in ('outcome_disclosure', 'discovery_selection')
     development = kind == 'discovery_selection'
     covariates = kind == 'covariate_inspection'

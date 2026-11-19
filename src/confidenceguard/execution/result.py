@@ -108,7 +108,12 @@ class ExecutionResult(EvaluationResult):
     def retained_path(self,path):
         oid=self.private.get('retained_binary_paths',{}).get(path)
         location=getattr(self,'_workspace_location',None)
-        if oid and location:return str(Path(location)/'objects'/(oid+'.cgblob'))
+        if oid and location:
+            from ..platform_catalog import platform_bound
+            if platform_bound(location):
+                from ..history_storage import Catalog
+                return str(Catalog(location).blob_path(oid))   # verified materialization at the v2 path
+            return str(Path(location)/'objects'/(oid+'.cgblob'))
         return path
 
 

@@ -20,12 +20,10 @@ def save_result(workspace,result,*,request_id=None,cancel=None,request_digest=No
         if previous:return previous
         writer=EvidenceWriter(cat.root/'staging'/operation,cat.config,operation)
         dependencies=set();old_private=copy.deepcopy(result.private)
-        from contextlib import closing
-        with closing(cat._connect()) as db:
-            parent=result.data['cg6'].get('parent_analysis_id')
-            if parent:dependencies.update(r[0] for r in db.execute("SELECT object_id FROM facts WHERE kind='assessment' AND key=?",(digest([parent]),)))
-            reservation=result.private.get('evidence_use_reservation') or {}
-            if reservation.get('evidence_use_id'):dependencies.update(r[0] for r in db.execute("SELECT object_id FROM facts WHERE kind='evidence_use' AND key=?",(digest([reservation['evidence_use_id']]),)))
+        parent=result.data['cg6'].get('parent_analysis_id')
+        if parent:dependencies.update(cat.object_ids_for_key('assessment',digest([parent])))
+        reservation=result.private.get('evidence_use_reservation') or {}
+        if reservation.get('evidence_use_id'):dependencies.update(cat.object_ids_for_key('evidence_use',digest([reservation['evidence_use_id']])))
         locations=result.private.setdefault('retained_binary_paths',{})
         try:
             artifact=result.private.get('output_artifact')

@@ -337,14 +337,12 @@ class ReliabilityWorkspace:
     def freeze_robustness(self,result,claims,*,request_id=None,**kwargs):
         from .robustness.services import freeze_robustness
         from .investigation_storage import write_packet
-        from contextlib import closing
         result=self.open(result) if isinstance(result,str) else result
         frozen=freeze_robustness(result,claims,**kwargs)
         with self.catalog.operation():
             operation,previous=self.catalog.begin(request_id or uuid.uuid4().hex,frozen.content_digest,require_saving=False)
             if previous:return self.open_robustness_protocol(frozen.content_digest)
-            with closing(self.catalog._connect()) as db:
-                parents=[r[0] for r in db.execute("SELECT object_id FROM facts WHERE kind='assessment' AND key=?",(digest([result.data['analysis_id']]),))]
+            parents=sorted(self.catalog.object_ids_for_key('assessment',digest([result.data['analysis_id']])))
             writer=EvidenceWriter(self.path/'staging'/operation,self.catalog.config,operation)
             write_packet(writer,'robustness_protocol',[frozen.content_digest],{'protocol':frozen.to_dict(),'depends_on_objects':parents})
             writer.finish({'capture_stages':['frozen_robustness_protocol']});self.catalog.commit_capture(operation)
@@ -429,9 +427,7 @@ class ReliabilityWorkspace:
             operation,previous=self.catalog.begin(request_id or uuid.uuid4().hex,frozen.data['content_digest'])
             if previous:return frozen
             writer=EvidenceWriter(self.path/'staging'/operation,self.catalog.config,operation)
-            from contextlib import closing
-            with closing(self.catalog._connect()) as db:
-                parents=[r[0] for r in db.execute("SELECT object_id FROM facts WHERE kind='assessment' AND key=?",(digest([result.data['analysis_id']]),))]
+            parents=sorted(self.catalog.object_ids_for_key('assessment',digest([result.data['analysis_id']])))
             binding=result.private.get('history_binding') or {}
             if binding.get('instance_id')==self.instance_id:parents.extend(binding.get('source_objects',()))
             from .investigation_storage import write_packet
@@ -516,15 +512,13 @@ class ReliabilityWorkspace:
     def freeze_policy_family(self,result,policy_digests=None,*,request_id=None,**kwargs):
         from .policy_assessment import freeze_policy_family
         from .investigation_storage import write_packet
-        from contextlib import closing
         if self.catalog.catalog_version<2:raise EvaluationError('Migrate explicitly before retaining policy families.','migration_required')
         frozen=freeze_policy_family(result,policy_digests,**kwargs)
         with self.catalog.operation():
             operation,previous=self.catalog.begin(request_id or uuid.uuid4().hex,frozen.data['content_digest'])
             if previous:return frozen
             parents=set((result.private.get('history_binding') or {}).get('source_objects',[]))
-            with closing(self.catalog._connect()) as db:
-                parents.update(row[0] for row in db.execute("SELECT object_id FROM facts WHERE kind='assessment' AND key=?",(digest([result.data['analysis_id']]),)))
+            parents.update(self.catalog.object_ids_for_key('assessment',digest([result.data['analysis_id']])))
             writer=EvidenceWriter(self.path/'staging'/operation,self.catalog.config,operation)
             write_packet(writer,'policy_family',[frozen.data['content_digest']],{'frozen_policy_family':frozen.to_dict(),'depends_on_objects':sorted(parents)})
             writer.finish({'capture_stages':['frozen_policy_family']});self.catalog.commit_capture(operation)

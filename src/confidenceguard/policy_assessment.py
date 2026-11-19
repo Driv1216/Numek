@@ -296,7 +296,8 @@ def _entity_refusal(events,records,metric,outputs,protocol):
 
 
 def _assess_worker(frozen,study,protocol,config,roots,inspection,reservation,*,progress=None):
-    with prepared_policy(study.input,config,study.limits,roots,progress,phase='assessment') as p:
+    from .platform_catalog import study_authority
+    with study_authority(reservation),prepared_policy(study.input,config,study.limits,roots,progress,phase='assessment') as p:
         if p.fingerprint!=inspection['_input_fingerprint']: raise EvaluationError('Assessment snapshot changed after reservation.','stale_confirmation')
         definitions={q.policy_digest:q for q in (PolicySpec.from_dict(v) for v in frozen.data['policies'])}
         for definition in definitions.values(): p.bind_policy(definition)
@@ -425,7 +426,7 @@ def _scheduled_context(prior,look_id,workspace):
     if look is None: raise EvaluationError('Look was not frozen before E.','unplanned_confirmation_look')
     if instant(look.as_of)>instant(now()): raise EvaluationError('Look is not due.','scheduled_look_not_due')
     state=EvidenceUseLedger(workspace).status()
-    uses=[f['payload'] for f in workspace.catalog.iter_facts('evidence_use')]
+    uses=EvidenceUseLedger(workspace).records()
     initial=next((u for u in uses if u['kind']=='confirmation' and u.get('family_digest')==frozen.family_digest and u.get('metadata',{}).get('look_id') is None),None)
     if not state['enabled'] or state['continuity'] in {'incomplete','restore_unreconciled'} or initial is None or initial['branch_id']!=state['branch_id'] or initial['metadata'].get('restatement_schedule')!=[s.to_dict() for s in protocol.restatement_schedule]:
         raise EvaluationError('Original schedule and uninterrupted reservation continuity are required.','scheduled_restatement_provenance')

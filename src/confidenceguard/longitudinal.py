@@ -438,7 +438,7 @@ def _drift(left, right, spec, edge):
         if na and nb:
             record.update(categorical_effect(con, temporary+'_a', 'v', 'true', temporary+'_b', 'v', 'true', na, nb))
             counts = con.execute(f'''WITH x AS(SELECT v,count(*) a,0::BIGINT b FROM {temporary}_a GROUP BY v UNION ALL SELECT v,0::BIGINT,count(*) FROM {temporary}_b GROUP BY v)
-                SELECT v,sum(a),sum(b) FROM x GROUP BY v''').fetchall()
+                SELECT v,sum(a),sum(b) FROM x GROUP BY v ORDER BY v NULLS LAST''').fetchall()
             js = 0.
             for category, a, b in counts:
                 p, q = a/na, b/nb; m = (p+q)/2
@@ -516,12 +516,12 @@ def _execute_history(root, spec, sequence, effective_as_of, governance=None, *, 
                     expr='json_extract_string(history_context,'+literal('$.'+json.dumps(feature))+')'
                     if meaning=='numeric':
                         numeric=f'try_cast({expr} AS DOUBLE)'
-                        profile=store.con.execute(f'SELECT outcome_valid,count(*),count({numeric}),avg({numeric}) FILTER(WHERE isfinite({numeric})),min({numeric}) FILTER(WHERE isfinite({numeric})),max({numeric}) FILTER(WHERE isfinite({numeric})) FROM {store.table} GROUP BY outcome_valid').fetchall()
+                        profile=store.con.execute(f'SELECT outcome_valid,count(*),count({numeric}),avg({numeric}) FILTER(WHERE isfinite({numeric})),min({numeric}) FILTER(WHERE isfinite({numeric})),max({numeric}) FILTER(WHERE isfinite({numeric})) FROM {store.table} GROUP BY outcome_valid ORDER BY outcome_valid NULLS LAST').fetchall()
                         store.coverage['label_observation_by_feature'].append({'feature':feature,'kind':meaning,'rows':[{'observed_eligible':v[0],'support':v[1],'nonmissing':v[2],'mean':v[3],'minimum':v[4],'maximum':v[5]} for v in profile]})
                     else:
                         cardinality=store.con.execute(f'SELECT count(DISTINCT {expr}) FROM {store.table}').fetchone()[0]
                         if cardinality>spec.config.max_groups:raise EvaluationError('Observation profile category admission exceeded.','history_category_limit')
-                        profile=store.con.execute(f'SELECT outcome_valid,{expr},count(*) FROM {store.table} GROUP BY 1,2').fetchall()
+                        profile=store.con.execute(f'SELECT outcome_valid,{expr},count(*) FROM {store.table} GROUP BY 1,2 ORDER BY 1 NULLS LAST,2 NULLS LAST').fetchall()  # deterministic sealed output
                         store.coverage['label_observation_by_feature'].append({'feature':feature,'kind':meaning,'rows':[{'observed_eligible':v[0],'category':v[1],'support':v[2]} for v in profile]})
                 _evaluate(store, distributions_enabled=True)
                 for index, cohort in enumerate(spec.cohorts):

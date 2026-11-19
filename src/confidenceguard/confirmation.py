@@ -444,7 +444,8 @@ def _assess(frozen,spec,config,roots,inspection,reservation,scheduled=None,numer
     from .contracts import digest
     started=time.monotonic();protocol=_protocol(frozen,scheduled,numerical_extension)
     protocol=replace(protocol,replicates=inspection['feasibility']['effective_replicates']) if protocol.method!='finite' and inspection['feasibility']['effective_replicates']<=protocol.max_replicates else protocol
-    with prepared(spec,config,roots,progress) as p:
+    from .platform_catalog import study_authority
+    with study_authority(reservation),prepared(spec,config,roots,progress) as p:
         if p.fingerprint!=inspection['input_fingerprint']:raise EvaluationError('Confirmation input changed after inspection/reservation.','stale_confirmation')
         p.store.cg4_confirmation=True
         indices,features,reps=p.role_data('H');n=len(indices);cache={'_models':frozen.data['models'],'_directory':str(p.work.root),'_max_distance_ops':spec.limits.max_distance_operations,'_population_size':n,'_membership_memory_bytes':config.max_rss_bytes//3,'_threads':config.threads}
@@ -661,7 +662,8 @@ def retry_confirmation(prior,*,replicates,config=None,confirmation_input=None,wo
         from pathlib import Path
         from . import compat
         root=Path(origin_workspace).absolute()
-        with compat.secure_open(root/'catalog.sqlite3',allowed_roots if allowed_roots is not None else (root,)):pass
+        from .history_storage import authority_file
+        with compat.secure_open(authority_file(root),allowed_roots if allowed_roots is not None else (root,)):pass
         from .workspace import ReliabilityWorkspace
         workspace=ReliabilityWorkspace(root)
     if workspace is None and prior.private.get('numerical_continuity',{}).get('enabled'):
@@ -725,7 +727,7 @@ def _scheduled_context(prior,look_id,workspace):
     if not any(a.get('H_outcomes_disclosed') for a in prior.data['investigation']['assessments']) and prior.data['investigation'].get('predeclared_restatement'):
         origin=workspace.open(prior.data['investigation']['predeclared_restatement']['origin_analysis_id'])
     if not any(a.get('H_outcomes_disclosed') for a in origin.data['investigation']['assessments']):raise EvaluationError('The prior assessment did not establish an admitted original H use.','scheduled_restatement_provenance')
-    uses=[f['payload'] for f in workspace.catalog.iter_facts('evidence_use')]
+    uses=EvidenceUseLedger(workspace).records()
     initial=next((u for u in uses if u['kind']=='confirmation' and u.get('family_digest')==frozen.evidence_family_digest and u.get('metadata',{}).get('look_id') is None),None)
     schedule=[s.to_dict() for s in protocol.restatement_schedule]
     if initial is None or initial['branch_id']!=state['branch_id'] or initial.get('metadata',{}).get('restatement_schedule')!=schedule:raise EvaluationError('Original schedule/branch continuity cannot be verified; restored or incomplete histories cannot reset look allocations.','scheduled_restatement_provenance')

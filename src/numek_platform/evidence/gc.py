@@ -25,9 +25,11 @@ LIVE_PIN = '''
 
 
 class GarbageCollector:
-    def __init__(self, db, store, *, grace=dt.timedelta(hours=24), pending_ttl=dt.timedelta(hours=6)):
+    def __init__(self, db, store, *, grace=dt.timedelta(hours=24), pending_ttl=dt.timedelta(hours=6), catalog_id=None):
+        """``catalog_id`` scopes reclamation to one catalog (required when that catalog has its own store)."""
         self.db, self.store = db, store
         self.grace, self.pending_ttl = grace, pending_ttl
+        self.catalog_id = catalog_id
 
     def run_once(self):
         report = {'pins_released': self.release_dead_pins(), 'reclaimed': 0, 'staging_removed': 0}
@@ -46,19 +48,20 @@ class GarbageCollector:
         return len(rows)
 
     def _eligible_sql(self):
-        return f'''
+        scope = '' if self.catalog_id is None else 'o.catalog_id = %(catalog)s AND '
+        return f'''{scope}(
             (o.state = 'pending' AND o.created_at < now() - %(pending_ttl)s
              AND NOT EXISTS (SELECT 1 FROM jobs j WHERE j.id = o.job_id AND j.fence = o.fence AND j.state = 'running'))
             OR
             (o.state = 'tombstoned' AND o.tombstoned_at < now() - %(grace)s
              AND NOT EXISTS (SELECT 1 FROM gc_holds h WHERE h.released_at IS NULL)
              AND NOT EXISTS (SELECT 1 FROM read_pins WHERE read_pins.catalog_id = o.catalog_id
-                             AND read_pins.maintenance_epoch < o.tombstone_mepoch AND {LIVE_PIN}))'''
+                             AND read_pins.maintenance_epoch < o.tombstone_mepoch AND {LIVE_PIN})))'''
 
     def _candidates(self):
         with self.db.connect() as conn:
             rows = conn.execute(f'SELECT o.id FROM objects o WHERE {self._eligible_sql()} ORDER BY o.id',
-                                {'pending_ttl': self.pending_ttl, 'grace': self.grace}).fetchall()
+                                {'pending_ttl': self.pending_ttl, 'grace': self.grace, 'catalog': self.catalog_id}).fetchall()
         return [r['id'] for r in rows]
 
     def _reclaim(self, object_id):
@@ -66,7 +69,7 @@ class GarbageCollector:
             row = conn.execute(
                 f'''SELECT o.id, o.physical_key FROM objects o WHERE o.id = %(id)s AND ({self._eligible_sql()})
                     FOR UPDATE OF o''',
-                {'id': object_id, 'pending_ttl': self.pending_ttl, 'grace': self.grace}).fetchone()
+                {'id': object_id, 'pending_ttl': self.pending_ttl, 'grace': self.grace, 'catalog': self.catalog_id}).fetchone()
             if row is None:
                 return False
             conn.execute("UPDATE objects SET state = 'reclaiming' WHERE id = %s", (object_id,))
@@ -78,7 +81,9 @@ class GarbageCollector:
     def _finish_interrupted(self):
         """Complete reclamations interrupted between commit and unlink."""
         with self.db.connect() as conn:
-            rows = conn.execute("SELECT id, physical_key FROM objects WHERE state = 'reclaiming'").fetchall()
+            rows = conn.execute("SELECT id, physical_key FROM objects WHERE state = 'reclaiming'"
+                                + ('' if self.catalog_id is None else ' AND catalog_id = %(catalog)s'),
+                                {'catalog': self.catalog_id}).fetchall()
         for row in rows:
             self.store.unlink(row['physical_key'])
             with self.db.transaction() as conn:

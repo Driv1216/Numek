@@ -51,6 +51,31 @@ BINDING_FORMAT = 'numek_platform_binding/1'
 DSN_ENV = 'NUMEK_PLATFORM_DSN'
 ORG_NAME = 'local'
 FACT_KINDS_WITH_EVENTS = ('opportunity', 'prediction', 'context', 'sample')
+# Reservations adopted by worker processes, keyed by workspace root. A supervised
+# worker is a fresh process per job, so this never outlives the attempt it serves.
+_WORKER_GOVERNANCE = {}
+# Scoped study authority inherited by this process's access reservations: the id
+# of a confirmation-class evidence use (see ``study_authority``).
+_STUDY_AUTHORITY = {'use_id': None}
+
+
+@contextlib.contextmanager
+def study_authority(reservation):
+    """Let worker reads inside this block see the sealed-reserve units consumed by ``reservation``.
+
+    ``reservation`` is a confirmation-class evidence-use receipt (CG4
+    confirmation, numerical recomputation and scheduled looks; CG5 policy
+    assessment and scheduled looks). The ledger bounds what the authority
+    admits (same study family, the reservation's own membership, its
+    snapshot); other receipts and v2 workspaces grant nothing.
+    """
+    use_id = (reservation or {}).get('evidence_use_id') if isinstance(reservation, dict) else None
+    previous = _STUDY_AUTHORITY['use_id']
+    _STUDY_AUTHORITY['use_id'] = use_id
+    try:
+        yield use_id
+    finally:
+        _STUDY_AUTHORITY['use_id'] = previous
 
 
 def platform_bound(root):
@@ -82,7 +107,7 @@ class PlatformCatalog(Catalog):
         self._guard = threading.RLock()
         self._verified = {}
         self._leases = {}
-        self.governance = None
+        self.governance = _WORKER_GOVERNANCE.get(str(self.root))
         self.operation_path = self.root / '.operation.lock'
         self.objects_lock = self.root / '.objects.lock'
         for lock in (self.operation_path, self.objects_lock):
@@ -90,13 +115,14 @@ class PlatformCatalog(Catalog):
                 with private_file(lock):
                     pass
         private_directory(self.root / 'staging')
+        private_directory(self.root / 'objects')        # materialized verified copies (v2 layout)
         if create and not platform_bound(self.root):
             self._create_binding(config or WorkspaceConfig())
         binding = strict_json((self.root / BINDING).read_bytes())
         if binding.get('format') != BINDING_FORMAT:
             raise EvaluationError('Unsupported platform binding.', 'catalog_version')
         self.binding = binding
-        self.db = Database(self._dsn(binding), application_name='confidenceguard')
+        self.db = Database(self._dsn(binding, self.root), application_name='confidenceguard')
         self.store = LocalObjectStore(self.root / binding['store'])
         from numek_platform.scope import OrgScope
         self.scope = OrgScope(uuid.UUID(binding['org_id']))
@@ -105,15 +131,17 @@ class PlatformCatalog(Catalog):
         self._validate()
 
     @staticmethod
-    def _dsn(binding):
+    def _dsn(binding, root):
         if binding.get('dsn_env'):
             dsn = os.environ.get(binding['dsn_env'])
             if not dsn:
                 raise EvaluationError('The platform connection for this workspace is not configured.', 'platform_unavailable')
             return dsn
         from numek_platform.local import LocalCluster
-        cluster = LocalCluster(Path(binding['local_cluster']) if Path(binding['local_cluster']).is_absolute()
-                               else Path(binding['_root']) / binding['local_cluster'])
+        relative = Path(binding['local_cluster'])
+        if relative.is_absolute() or '..' in relative.parts:
+            raise EvaluationError('Unsafe platform binding.', 'unsafe_workspace')
+        cluster = LocalCluster(Path(root) / relative)
         if not cluster.running():
             cluster.start()
         return cluster.dsn()
@@ -168,8 +196,12 @@ class PlatformCatalog(Catalog):
             row = conn.execute('SELECT state FROM catalogs WHERE id = %s', (self.catalog_id,)).fetchone()
             if row is None:
                 raise EvaluationError('Workspace catalog is missing from the platform.', 'workspace_missing')
-            if row['state'] == 'retired' or self._setting(conn, 'retired'):
-                raise EvaluationError('Workspace was retired.', 'workspace_retired')
+            retired = row['state'] == 'retired' or self._setting(conn, 'retired')
+        if retired:
+            # The purge committed atomically; finish physical removal if the process died before it.
+            self._retire_files()
+            raise EvaluationError('Workspace was retired.', 'workspace_retired')
+        with self.db.connect() as conn:
             if row['state'] != 'active':
                 raise EvaluationError('This catalog is not available for use.', 'catalog_unavailable')
             self.instance_id = self._setting(conn, 'instance_id')
@@ -179,14 +211,243 @@ class PlatformCatalog(Catalog):
     def _connect(self):
         raise EvaluationError('This workspace runs on the platform; this operation is not yet ported.', 'platform_unported')
 
-    def deletion_preview(self, **_kwargs):
-        return self._connect()
 
-    def delete(self, _plan):
-        return self._connect()
+    # Deletion (port of v2 deletion_preview / delete) ----------------------------------------------------
+    def _object_kind(self, conn, object_hex):
+        row = conn.execute('SELECT kind, operation_id FROM cg_objects WHERE catalog_id = %s AND object_id = %s',
+                           (self.catalog_id, _uuid(object_hex))).fetchone()
+        return (row['kind'], row['operation_id'].hex) if row else (None, None)
 
-    def backup(self, _destination):
-        return self._connect()
+    def _operation_objects(self, conn, operation_hex, kinds=None):
+        sql = 'SELECT object_id FROM cg_objects WHERE catalog_id = %s AND operation_id = %s'
+        params = [self.catalog_id, _uuid(operation_hex)]
+        if kinds:
+            sql += ' AND kind = ANY(%s)'
+            params.append(list(kinds))
+        return {r['object_id'].hex for r in conn.execute(sql, params)}
+
+    def _occurring_operations(self, conn, object_hexes):
+        if not object_hexes:
+            return set()
+        return {r['publication_id'].hex for r in conn.execute(
+            '''SELECT DISTINCT oc.publication_id FROM fact_index f JOIN fact_occurrences oc ON oc.catalog_id = f.catalog_id
+               AND oc.kind = f.kind AND oc.key = f.key AND oc.revision = f.revision
+               WHERE f.catalog_id = %s AND f.object_id = ANY(%s)''', (self.catalog_id, [_uuid(o) for o in object_hexes]))}
+
+    def deletion_preview(self, *, object_ids=(), assessment_ids=(), batch_ids=(), purge=False):
+        if not isinstance(purge, bool):
+            raise EvaluationError('purge must be boolean.')
+        status = self.status()
+        owned = ('cg4_packet_part', 'cg6_artifact', 'cg6_artifact_descriptor')
+        with self.db.connect() as conn:
+            objects = {_safe_name(o) for o in object_ids}
+            for bid in batch_ids:
+                if not conn.execute('SELECT 1 FROM publications WHERE catalog_id = %s AND id = %s',
+                                    (self.catalog_id, _uuid(bid))).fetchone():
+                    raise EvaluationError('Unknown batch association.', 'unknown_batch')
+            for aid in assessment_ids:
+                if not conn.execute('SELECT 1 FROM cg_assessments WHERE catalog_id = %s AND id = %s', (self.catalog_id, aid)).fetchone():
+                    raise EvaluationError('Unknown assessment.', 'assessment_unavailable')
+                objects |= self.object_ids_for_key('assessment', digest([aid]))
+            for oid in tuple(objects):
+                kind, operation = self._object_kind(conn, oid)
+                if kind == 'assessment':
+                    objects |= self._operation_objects(conn, operation, owned)
+            if purge:
+                objects = {r['id'].hex for r in conn.execute(
+                    "SELECT id FROM objects WHERE catalog_id = %s AND state IN ('active', 'pending')", (self.catalog_id,))}
+            for oid in objects:
+                if not conn.execute('SELECT 1 FROM objects WHERE catalog_id = %s AND id = %s', (self.catalog_id, _uuid(oid))).fetchone():
+                    raise EvaluationError('Unknown deletion object.', 'unknown_object')
+            evidence_objects = [o for o in objects if self._object_kind(conn, o)[0] != 'assessment']
+            if objects:
+                expanded = True
+                while expanded:
+                    before = len(objects)
+                    for oid in tuple(objects):
+                        kind, operation = self._object_kind(conn, oid)
+                        if kind == 'assessment':
+                            objects |= self._operation_objects(conn, operation, owned)
+                    captures = self._occurring_operations(conn, [o for o in objects if self._object_kind(conn, o)[0] != 'assessment'])
+                    for operation in captures:
+                        objects |= self._operation_objects(conn, operation)
+                    for row in conn.execute('SELECT object_id, depends_on FROM cg_artifact_dependencies WHERE catalog_id = %s',
+                                            (self.catalog_id,)):
+                        if row['depends_on'].hex in objects:
+                            objects.add(row['object_id'].hex)
+                    expanded = len(objects) != before
+            affected = self._occurring_operations(conn, objects)
+            impacted = [r['id'] for r in conn.execute("SELECT id FROM cg_assessments WHERE catalog_id = %s AND state = 'active' ORDER BY id",
+                                                      (self.catalog_id,))] if evidence_objects else []
+        plan = {'id': uuid.uuid4().hex, 'instance_id': self.instance_id, 'catalog_sequence': status['catalog_sequence'],
+                'object_ids': sorted(objects), 'assessment_ids': list(assessment_ids), 'batch_ids': list(batch_ids),
+                'affected_batches': sorted(affected), 'potentially_impacted_assessments': impacted, 'purge': bool(purge),
+                'retained_assessments_may_contain_values': True}
+        plan['confirmation'] = digest(plan)
+        return plan
+
+    def delete(self, plan):
+        from psycopg.types.json import Jsonb
+        from numek_platform.execution import jobs
+        from numek_platform.execution.jobs import assert_fence
+        supplied = dict(plan)
+        confirmation = supplied.pop('confirmation', None)
+        if confirmation != digest(supplied) or plan.get('instance_id') != self.instance_id:
+            raise EvaluationError('Deletion preview differs.', 'stale_deletion')
+        with self.operation():
+            if self.head() != plan['catalog_sequence']:
+                raise EvaluationError('Catalog changed; inspect a new deletion preview.', 'stale_deletion')
+            current = self.deletion_preview(object_ids=plan['object_ids'], assessment_ids=plan['assessment_ids'],
+                                            batch_ids=plan['batch_ids'], purge=plan['purge'])
+            for field in ('object_ids', 'affected_batches', 'potentially_impacted_assessments'):
+                if current[field] != plan.get(field):
+                    raise EvaluationError('Deletion dependencies differ; inspect a new preview.', 'stale_deletion')
+            with self.db.connect() as conn:
+                lease, _row = jobs.start_inline(conn, self.scope, 'cg_deletion', idempotency_key='cg-deletion:' + plan['id'],
+                                                owner=f'confidenceguard:{os.getpid()}')
+            object_uuids = sorted((_uuid(o) for o in plan['object_ids']), key=str)
+            with self.db.transaction() as conn:                                     # global lock order
+                assert_fence(conn, lease)                                           # 1 job
+                conn.execute('SELECT id FROM catalogs WHERE id = %s ' + ('FOR UPDATE' if plan['purge'] else 'FOR SHARE'),
+                             (self.catalog_id,))                                    # 3 catalog
+                if object_uuids:
+                    conn.execute('SELECT id FROM objects WHERE id = ANY(%s) ORDER BY id FOR UPDATE', (object_uuids,))  # 4
+                conn.execute("INSERT INTO cg_deletions(catalog_id, id, plan, state) VALUES (%s, %s, %s, 'pending')",
+                             (self.catalog_id, plan['id'], Jsonb(plan)))
+                epoch = conn.execute('UPDATE catalog_tombstones SET epoch = epoch + 1 WHERE catalog_id = %s RETURNING epoch',
+                                     (self.catalog_id,)).fetchone()['epoch']        # 5
+                mepoch = conn.execute('UPDATE catalog_maintenance SET epoch = epoch + 1 WHERE catalog_id = %s RETURNING epoch',
+                                      (self.catalog_id,)).fetchone()['epoch']       # 6
+                head = conn.execute('SELECT head FROM catalog_heads WHERE catalog_id = %s FOR UPDATE',
+                                    (self.catalog_id,)).fetchone()['head']          # 7
+                publication = uuid.uuid4()
+                conn.execute('''INSERT INTO publications(org_id, catalog_id, id, request_id, request_digest, kind, job_id, fence,
+                                                         sequence, receipt, committed_at)
+                                VALUES (%s, %s, %s, %s, %s, 'cg_deletion', %s, %s, %s, %s, clock_timestamp())''',
+                             (self.scope.org_id, self.catalog_id, publication, 'deletion:' + plan['id'], confirmation,
+                              lease.job_id, lease.fence, head + 1, Jsonb({'cg': {'deletion_id': plan['id']}})))
+                if object_uuids:
+                    conn.execute('''INSERT INTO fact_tombstones(org_id, catalog_id, kind, key, revision, epoch, publication_id)
+                                    SELECT %s, catalog_id, kind, key, revision, %s, %s FROM fact_index
+                                    WHERE catalog_id = %s AND object_id = ANY(%s) ON CONFLICT DO NOTHING''',
+                                 (self.scope.org_id, epoch, publication, self.catalog_id, object_uuids))
+                    conn.execute("UPDATE objects SET state = 'tombstoned', tombstoned_at = clock_timestamp(), tombstone_mepoch = %s "
+                                 "WHERE id = ANY(%s) AND state IN ('active', 'pending')", (mepoch, object_uuids))
+                    conn.execute("UPDATE cg_assessments SET state = 'deleted' WHERE catalog_id = %s AND object_id = ANY(%s)",
+                                 (self.catalog_id, object_uuids))
+                    # v2 semantics: removing evidence leaves exposure continuity incomplete.
+                    conn.execute("UPDATE catalogs SET continuity_state = 'incomplete', continuity_token = %s WHERE id = %s",
+                                 (uuid.uuid4().hex, self.catalog_id))
+                if plan['batch_ids']:
+                    conn.execute('DELETE FROM fact_occurrences WHERE catalog_id = %s AND publication_id = ANY(%s)',
+                                 (self.catalog_id, [_uuid(b) for b in plan['batch_ids']]))
+                if plan['purge']:
+                    conn.execute("UPDATE cg_settings SET value = 'true'::jsonb WHERE catalog_id = %s AND key = 'retired'",
+                                 (self.catalog_id,))
+                    conn.execute("UPDATE catalogs SET state = 'retired' WHERE id = %s", (self.catalog_id,))
+                conn.execute('UPDATE catalog_heads SET head = %s WHERE catalog_id = %s', (head + 1, self.catalog_id))
+                conn.execute("UPDATE cg_deletions SET state = 'completed' WHERE catalog_id = %s AND id = %s",
+                             (self.catalog_id, plan['id']))
+            with self.db.connect() as conn:
+                jobs.complete(conn, lease, {'deleted_objects': len(object_uuids)})
+        self._fault('deletion_tombstoned')
+        if plan['purge']:
+            self._retire_files()
+        else:
+            self._reclaim_deleted(plan['object_ids'])
+        return {'deleted_objects': len(plan['object_ids']), 'workspace_retired': plan['purge']}
+
+    def _reclaim_deleted(self, object_ids):
+        """Physical removal: platform GC (pins and holds still protect live readers), then local copies."""
+        from numek_platform.evidence.gc import GarbageCollector
+        import datetime as dt
+        GarbageCollector(self.db, self.store, grace=dt.timedelta(0), catalog_id=self.catalog_id).run_once()
+        for oid in object_ids:
+            for suffix in ('.cgblob', '.parquet'):
+                path = self.root / 'objects' / (oid + suffix)
+                if path.is_file() and not path.is_symlink():
+                    path.unlink()
+
+    def _retire_files(self):
+        """Complete a committed full purge (idempotent): reclaim bytes, empty local folders, mark retired."""
+        self._reclaim_deleted(())
+        for folder in ('objects', 'staging'):
+            target = self.root / folder
+            if target.is_dir() and not target.is_symlink():
+                for path in target.iterdir():
+                    if path.is_dir() and not path.is_symlink():
+                        shutil.rmtree(path)
+                    else:
+                        path.unlink()
+                fsync_directory(target)
+        marker = self.root / '.retired'
+        if not marker.exists():
+            marker.write_bytes(b'workspace retired\n')
+            os.chmod(marker, 0o600)
+        fsync_directory(self.root)
+
+    # Backup and restore (workspaces with their own P-LOCAL cluster) ------------------------------------------
+    def backup(self, destination):
+        from numek_platform.backup import create_backup
+        destination = Path(destination).absolute()
+        if self.binding.get('dsn_env'):
+            raise EvaluationError('This workspace shares a platform installation; back up the installation instead '
+                                  '(numek backup create).', 'backup_scope')
+        if destination == self.root or self.root in destination.parents or destination in self.root.parents or destination.exists():
+            raise EvaluationError('Choose a new backup destination outside the workspace.', 'backup_destination')
+        private_directory(destination)
+        manifest = create_backup(self.db, self.store, None, destination / 'platform', passphrase=None)
+        with private_file(destination / BINDING) as stream:
+            stream.write(serialized(self.binding))
+        summary = {'schema_version': 'confidenceguard.workspace_backup/2.0', 'instance_id': self.instance_id,
+                   'catalog_sequence': self.head(), 'platform_manifest': digest(manifest), 'storage': 'numek_platform'}
+        summary['content_digest'] = digest(summary)
+        with private_file(destination / 'backup.json') as stream:
+            stream.write(serialized(summary))
+            stream.flush()
+            os.fsync(stream.fileno())
+        fsync_directory(destination)
+        return summary
+
+    @classmethod
+    def restore(cls, backup, destination):
+        from numek_platform.backup import restore_backup, verify_backup
+        from numek_platform.db import Database
+        from numek_platform.local import LocalCluster
+        from numek_platform.objects import LocalObjectStore
+        backup = Path(backup).absolute()
+        destination = Path(destination).absolute()
+        if destination.exists() or destination == backup or backup in destination.parents:
+            raise EvaluationError('Restore requires a new destination.', 'restore_destination')
+        summary = strict_json((backup / 'backup.json').read_bytes())
+        expected = summary.pop('content_digest', None)
+        if expected != digest(summary) or summary.get('schema_version') != 'confidenceguard.workspace_backup/2.0':
+            raise EvaluationError('Backup is incomplete or changed.', 'backup_changed')
+        try:
+            manifest = verify_backup(backup / 'platform')
+        except Exception as exc:
+            raise EvaluationError('Backup is incomplete or changed.', 'backup_changed') from exc
+        if digest(manifest) != summary['platform_manifest']:
+            raise EvaluationError('Backup is incomplete or changed.', 'backup_changed')
+        binding = strict_json((backup / BINDING).read_bytes())
+        private_directory(destination)
+        cluster = LocalCluster(destination / 'platform')
+        cluster.start()
+        database = Database(cluster.dsn())
+        restore_backup(backup / 'platform', database, LocalObjectStore(destination / binding['store']), None, passphrase=None)
+        binding = {k: v for k, v in binding.items() if k != 'dsn_env'}
+        binding['local_cluster'] = 'platform'
+        with private_file(destination / BINDING) as stream:
+            stream.write(serialized(binding))
+        from psycopg.types.json import Jsonb
+        with database.transaction() as conn:                         # a restore is a new instance (v2 semantics)
+            catalog_id = uuid.UUID(binding['catalog_id'])
+            conn.execute("UPDATE cg_settings SET value = %s WHERE catalog_id = %s AND key = 'instance_id'",
+                         (Jsonb(uuid.uuid4().hex), catalog_id))
+            conn.execute('UPDATE catalogs SET branch_id = %s, continuity_token = %s WHERE id = %s',
+                         (uuid.uuid4().hex, uuid.uuid4().hex, catalog_id))
+        fsync_directory(destination)
+        return cls(destination)
 
     def migrate(self, _backup_destination):
         return {'catalog_version': CATALOG_VERSION, 'changed': False}
@@ -324,8 +585,10 @@ class PlatformCatalog(Catalog):
             except Exception as exc:
                 raise _translate(exc) from exc
         data = cache[key]
+        if codec == 'typed_feature_rows_v1':
+            return self._read_record(self._materialize(object_id.hex, '.parquet'), codec, offset, length, cache)
         if codec != codecs.JSONL:
-            raise EvaluationError('This evidence codec is not yet readable from the platform.', 'platform_unported')
+            raise EvaluationError('Objects of this codec do not contain facts.', 'unsupported_codec')
         raw = data[offset:offset + length]
         if len(raw) != length or length > self.config.max_record_bytes:
             raise EvaluationError('Invalid retained record location.', 'evidence_changed')
@@ -464,8 +727,13 @@ class PlatformCatalog(Catalog):
         metadata = manifest['metadata']
         request_id, request_digest = getattr(self, '_requests', {}).get(identifier, (f'operation:{identifier}', expected))
 
+        object_kinds = [(_uuid(oid), objects[oid]['kind']) for oid in sorted(used)]
+
         def before_head(conn, publication_id):
             self._record_relations(conn, publication_id, metadata, rows, dependencies, vector_rows, expected)
+            for object_uuid, kind in object_kinds:
+                conn.execute('INSERT INTO cg_objects(catalog_id, object_id, kind, operation_id) VALUES (%s, %s, %s, %s)',
+                             (self.catalog_id, object_uuid, kind, publication_id))
 
         cg_receipt = {'operation_id': identifier, 'new_facts': new, 'duplicate_occurrences': duplicates,
                       'capture_digest': expected, **(receipt_extra or {})}
@@ -673,6 +941,42 @@ class PlatformCatalog(Catalog):
         self.governance = governance
         return self
 
+    def ensure_governance(self, *, namespace, k, purpose_label):
+        """Reserve before the first outcome read in a process that was not handed a reservation.
+
+        Used by CG4/CG5 history workers. The reservation is committed before any
+        protected read; its attempt is completed when the process exits (a crash
+        leaves it reserved, so the exposure stays recorded).
+        """
+        held = self.governance
+        authority = _STUDY_AUTHORITY['use_id']
+        if held is not None and not held.get('auto'):
+            return self                   # handed-in reservations are never widened (later K refuses on read)
+        if (held is not None and held.get('authority') == authority and held['namespace'] == namespace
+                and held['reservation']['read_k'] >= k):
+            return self
+        return self._auto_reserve(namespace=namespace, k=k, purpose_label=purpose_label, authority=authority)
+
+    def _auto_reserve(self, *, namespace, k, purpose_label, authority):
+        lease, governance = self.reserve_history(namespace=namespace, k=k, purpose_label=purpose_label, exposure=False,
+                                                 authority=authority)
+        governance.update(auto=True, namespace=namespace, purpose_label=purpose_label, authority=authority)
+        from multiprocessing import util
+        util.Finalize(None, PlatformCatalog._close_attempt, args=(self.db.dsn, lease), exitpriority=10)
+        _WORKER_GOVERNANCE[str(self.root)] = governance
+        return self.governed(governance)
+
+    @staticmethod
+    def _close_attempt(dsn, lease):
+        from numek_platform.db import Database
+        from numek_platform.errors import FenceLost
+        from numek_platform.execution import jobs
+        try:
+            with Database(dsn).connect() as conn:
+                jobs.complete(conn, lease, {})
+        except (FenceLost, Exception):
+            pass
+
     def iter_facts(self, kind=None, *, sequence=None, keys=None, fact_digests=(), batch_ids=(), require_complete=True,
                    max_records=30000000, check=None, _logical_order=False):
         from numek_platform.evidence import reader
@@ -688,7 +992,14 @@ class PlatformCatalog(Catalog):
                            'fact_digests': list(fact_digests) or None, 'require_complete': require_complete,
                            'occurrence_publications': [_uuid(b) for b in batch_ids] or None,
                            'order': 'logical' if _logical_order else 'physical'}
-                if self.governance is not None:
+                held = self.governance
+                if held is not None and held.get('auto') and k > held['reservation']['read_k']:
+                    # Worker access reservations follow the snapshot a worker reads,
+                    # with the same study authority (which refuses beyond its own K).
+                    self._auto_reserve(namespace=held['namespace'], k=k, purpose_label=held['purpose_label'],
+                                       authority=held.get('authority'))
+                    held = self.governance
+                if held is not None:
                     reservation = Reservation(**{k2: (uuid.UUID(v) if k2 in ('catalog_id', 'job_id') and v else v)
                                                  for k2, v in self.governance['reservation'].items()})
                     locators = governed_reader.resolve(self.db, self.store, reservation, read_pin, **filters).locators
@@ -697,7 +1008,7 @@ class PlatformCatalog(Catalog):
                 if len(locators) > max_records:
                     raise EvaluationError('Historical scan record admission exceeded.', 'history_scan_limit')
                 count = 0
-                for locator, record in reader.read(self.store, locators, max_record_bytes=self.config.max_record_bytes):
+                for locator, record in self._read_locators(locators):
                     count += 1
                     if check and count % 512 == 0:
                         check('historical evidence scan')
@@ -716,6 +1027,24 @@ class PlatformCatalog(Catalog):
                 reader.release(self.db, read_pin)
         except PlatformError as exc:
             raise _translate(exc) from exc
+
+    def _read_locators(self, locators):
+        """Decode locators: platform codecs via verify-on-read, legacy typed features via the v2 row reader."""
+        from numek_platform.evidence import reader
+        native = [l for l in locators if l.codec in ('utf8_jsonl_v1', 'observation_facts_parquet_v1')]
+        other = [l for l in locators if l not in native]
+        yield from reader.read(self.store, native, max_record_bytes=self.config.max_record_bytes)
+        cache = {}
+        try:
+            for locator in other:
+                if locator.codec != 'typed_feature_rows_v1':
+                    raise EvaluationError('Objects of this codec do not contain facts.', 'unsupported_codec')
+                path = self._materialize(locator.object_id.hex, '.parquet')
+                yield locator, self._read_record(path, locator.codec, locator.loc_a, locator.loc_b, cache)
+        finally:
+            for value in cache.values():
+                if hasattr(value, 'close'):
+                    value.close()
 
     def variants(self):
         with self.db.connect() as conn:
@@ -766,11 +1095,116 @@ class PlatformCatalog(Catalog):
         writer.finish({'assessment_id': aid})
         return self.commit_capture(identifier, cancel=cancel, receipt_extra={'assessment_id': aid})
 
+    # Backend-neutral queries (same API as the v2 Catalog) ---------------------------------------------
+    @property
+    def authority_file(self):
+        return self.root / BINDING
+
+    def object_ids_for_key(self, kind, key):
+        with self.db.connect() as conn:
+            return {r['object_id'].hex for r in conn.execute(
+                'SELECT object_id FROM fact_index WHERE catalog_id = %s AND kind = %s AND key = %s',
+                (self.catalog_id, kind, bytes.fromhex(key)))}
+
+    def object_ids_for_fact_digests(self, digests):
+        digests = [bytes.fromhex(d) for d in digests]
+        found = set()
+        with self.db.connect() as conn:
+            for start in range(0, len(digests), 4096):
+                found.update(r['object_id'].hex for r in conn.execute(
+                    'SELECT DISTINCT object_id FROM fact_index WHERE catalog_id = %s AND fact_digest = ANY(%s)',
+                    (self.catalog_id, digests[start:start + 4096])))
+        return found
+
+    def prediction_digests_in_operation(self, operation_id):
+        with self.db.connect() as conn:
+            return {bytes(r['fact_digest']).hex() for r in conn.execute(
+                '''SELECT f.fact_digest FROM fact_occurrences c JOIN fact_index f ON f.catalog_id = c.catalog_id
+                      AND f.kind = c.kind AND f.key = c.key AND f.revision = c.revision
+                   WHERE c.catalog_id = %s AND c.publication_id = %s AND c.kind = %s''',
+                (self.catalog_id, _uuid(operation_id), 'prediction'))}
+
+    def object_operations(self, object_ids):
+        ids = [_uuid(o) for o in object_ids]
+        with self.db.connect() as conn:
+            return {r['object_id'].hex: r['publication_id'].hex for r in conn.execute(
+                '''SELECT DISTINCT ON (object_id) object_id, publication_id FROM fact_index
+                   WHERE catalog_id = %s AND object_id = ANY(%s) ORDER BY object_id, publication_id''',
+                (self.catalog_id, ids))}
+
+    def vector_location(self, vector_digest):
+        with self.db.connect() as conn:
+            row = conn.execute(
+                '''SELECT v.object_id, v.row_index, o.sha256, o.bytes, o.state FROM cg_vector_locations v
+                   JOIN objects o ON o.id = v.object_id WHERE v.catalog_id = %s AND v.digest = %s''',
+                (self.catalog_id, vector_digest)).fetchone()
+        if row is None:
+            return None
+        if row['state'] != 'active':
+            raise EvaluationError('Retained vector is unavailable.', 'historical_evidence_unavailable')
+        return {'object_id': row['object_id'].hex, 'row_index': row['row_index'], 'sha256': bytes(row['sha256']).hex(),
+                'bytes': row['bytes']}
+
+    def vector_matrix(self, location):
+        import io
+        import numpy as np
+        data = self._verified_bytes(_uuid(location['object_id']))
+        return np.load(io.BytesIO(data), allow_pickle=False, max_header_size=10000)
+
+    def assessment(self, aid):
+        """v2 parity: retained binaries a result names exist at their v2 paths (verified copies)."""
+        result = super().assessment(aid)
+        for oid in sorted(set((getattr(result, 'private', None) or {}).get('retained_binary_paths', {}).values())):
+            self.blob_path(oid)
+        return result
+
+    def blob_path(self, object_id):
+        """Verified local copy of a retained opaque object at its v2 path (objects/<oid>.cgblob)."""
+        return self._materialize(object_id, '.cgblob')
+
+    def _object_row(self, object_uuid):
+        with self.db.connect() as conn:
+            row = conn.execute('SELECT physical_key, sha256, bytes, state, codec FROM objects WHERE id = %s AND catalog_id = %s',
+                               (object_uuid, self.catalog_id)).fetchone()
+        if row is None or row['state'] not in ('active', 'tombstoned'):
+            raise EvaluationError('Retained evidence is unavailable.', 'historical_evidence_unavailable')
+        return row
+
+    def _verified_bytes(self, object_uuid):
+        row = self._object_row(object_uuid)
+        try:
+            return self.store.read_verified(row['physical_key'], bytes(row['sha256']).hex(), row['bytes'])
+        except Exception as exc:
+            raise _translate(exc) from exc
+
+    def _materialize(self, object_id, suffix):
+        """Write verified bytes once to objects/<oid><suffix> (0600); consumers re-verify on use."""
+        target = private_directory(self.root / 'objects') / (_safe_name(object_id) + suffix)
+        row = self._object_row(_uuid(object_id))
+        expected = bytes(row['sha256']).hex()
+        if target.is_file() and not target.is_symlink():
+            sha, size = file_digest(target)
+            if sha == expected and size == row['bytes']:
+                return target
+            target.unlink()
+        data = self._verified_bytes(_uuid(object_id))
+        temporary = target.with_name('.' + target.name + '.' + uuid.uuid4().hex)
+        with private_file(temporary) as stream:
+            stream.write(data)
+            stream.flush()
+            os.fsync(stream.fileno())
+        os.replace(temporary, target)
+        fsync_directory(target.parent)
+        return target
+
     # Governance for historical analysis -----------------------------------------------------------
-    def reserve_history(self, *, namespace, k, purpose_label, metadata=None):
+    def reserve_history(self, *, namespace, k, purpose_label, metadata=None, exposure=True, authority=None):
         """Reserve every opportunity of ``namespace`` that has an outcome at K, before reading any.
 
-        Membership comes from identity hashes and outcome *existence* only. Returns
+        Membership comes from identity hashes and outcome *existence* only. As in
+        v2, the read is recorded as outcome exposure only when it is a disclosure
+        (``exposure``) and evidence-use tracking is enabled; otherwise the
+        reservation is access-only (``selection_access``). Returns
         (lease, governance) for the analysis attempt; the caller publishes its
         result under the same lease (consuming the reservation) or abandons it
         (the exposure remains recorded).
@@ -785,10 +1219,13 @@ class PlatformCatalog(Catalog):
                                                 owner=f'confidenceguard:{os.getpid()}')
             read_pin = reader.pin(self.db, self.scope, self.catalog_id, lease=lease, k=k)
             members = governed_reader.membership_from_index(self.db, read_pin, namespace=namespace)
+            disclosed = exposure and ledger.tracking_status(self.db, self.scope, self.catalog_id)['enabled']
             reservation = ledger.reserve(
-                self.db, self.store, self.scope, lease, self.catalog_id, purpose='outcome_disclosure', members=members,
+                self.db, self.store, self.scope, lease, self.catalog_id,
+                purpose='outcome_disclosure' if disclosed else 'selection_access', members=members,
                 population_digest=digest(sorted(members)), read_k=k,
-                metadata={'purpose': purpose_label, 'namespace': namespace, **(metadata or {})})
+                metadata={'purpose': purpose_label, 'namespace': namespace, **(metadata or {})},
+                authority=None if disclosed else authority)
             reader.release(self.db, read_pin)
         except PlatformError as exc:
             raise _translate(exc) from exc

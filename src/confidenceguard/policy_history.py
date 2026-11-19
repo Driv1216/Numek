@@ -1,5 +1,5 @@
 """Policy reconstruction reuses CG3 selection, revisions and typed CG4 evidence."""
-from contextlib import contextmanager,closing
+from contextlib import contextmanager
 from dataclasses import replace
 import hashlib
 import copy
@@ -44,7 +44,8 @@ def prepared_policy_history(spec,config,limits,roots,progress=None,*,phase='sele
     from .investigation_history import visible_heads,captured_outcome_columns,captured_context_outcome_columns
     from .policy_store import PolicyStore
     root=Path(spec.history['workspace_path']).absolute(); catalog=Catalog(root)
-    with compat.secure_open(root/'catalog.sqlite3',roots): pass
+    from .history_storage import authority_file
+    with compat.secure_open(authority_file(root),roots): pass
     selection=LongitudinalSpec.from_dict(spec.history['selection'])
     if selection.catalog_sequence is None: selection=replace(selection,catalog_sequence=catalog.status()['catalog_sequence'])
     selection=replace(selection,config=config)
@@ -101,8 +102,7 @@ def prepared_policy_history(spec,config,limits,roots,progress=None,*,phase='sele
                     outcome_origins.update(captured_outcome_columns(packet,variant))
                     context_origins.update(captured_context_outcome_columns(packet,variant))
                 if packet.get('batch',{}).get('operation') in {'evaluate','study'}:
-                    with closing(catalog._connect()) as db:
-                        exposed.update(r[0] for r in db.execute("SELECT f.fact_digest FROM facts f JOIN occurrences c ON c.fact_id=f.id WHERE f.kind='prediction' AND c.operation_id=?",(fact['identity'][0],)))
+                    exposed.update(catalog.prediction_digests_in_operation(fact['identity'][0]))
             heads=visible_heads(catalog,'feature',feature_sequence,feature_asof,selection.namespace,work.check)
             by_owner={}
             for fact in heads:
@@ -131,13 +131,7 @@ def prepared_policy_history(spec,config,limits,roots,progress=None,*,phase='sele
                 if event in owners:
                     aliases.setdefault(event,[]).append((p['source'],p['original_event_key'],p.get('original_entity_key'))); source_objects.add(fact['object_id'])
             # Every reconstructed input and authority record participates in deletion.
-            pending=[]
-            with closing(catalog._connect()) as db:
-                for factdigest, in rows(con,'SELECT DISTINCT fact_digest FROM hf'):
-                    pending.append(factdigest)
-                    if len(pending)>=512:
-                        source_objects.update(r[0] for r in db.execute('SELECT object_id FROM facts WHERE fact_digest IN ('+','.join('?' for _ in pending)+')',pending)); pending=[]
-                if pending: source_objects.update(r[0] for r in db.execute('SELECT object_id FROM facts WHERE fact_digest IN ('+','.join('?' for _ in pending)+')',pending))
+            source_objects.update(catalog.object_ids_for_fact_digests([d for d, in rows(con,'SELECT DISTINCT fact_digest FROM hf')]))
             history={'instance_id':catalog.instance_id,'workspace_path':str(root),'catalog_sequence':selection.catalog_sequence,
                      'method_digests':{k:v.get('method_digests',[]) for k,v in variants.items()},
                      'selection':selection.to_dict(),'source_objects':sorted(source_objects),'source_aliases':aliases,
@@ -152,18 +146,17 @@ def prepared_policy_history(spec,config,limits,roots,progress=None,*,phase='sele
                 if not dimensions: raise EvaluationError('Representation dimensions were not retained.','representation_not_retained')
                 policy.budget.materialize(len(events)*dimensions*8*2)
                 matrix=np.full((len(events),dimensions),np.nan); available=np.zeros(len(events),bool); reasons=['representation_not_retained']*len(events)
-                with closing(catalog._connect()) as db:
+                matrices={}
+                if True:
                     for i,event in enumerate(events):
                         pred=owners_by_run.get(target,{}).get(event['event_key']); fact=mapping.get(digest([pred['key'],pred['revision']])) if pred else None
                         if not fact or fact['payload']['state']!='observed': continue
                         payload=fact['payload']; original=payload['spec']
                         if rep.model_digest and original.get('model_digest')!=rep.model_digest or original.get('normalization','none')!=rep.normalization: raise EvaluationError('Retained representation contract differs.','representation_changed')
-                        location=db.execute('SELECT * FROM vector_locations WHERE digest=?',(payload['vector_digest'],)).fetchone()
+                        location=catalog.vector_location(payload['vector_digest'])
                         if location is None: raise EvaluationError('Retained vector unavailable.','historical_evidence_unavailable')
-                        obj=db.execute('SELECT * FROM objects WHERE id=?',(location['object_id'],)).fetchone()
-                        if obj is None or obj['state']!='active': raise EvaluationError('Retained vector unavailable.','historical_evidence_unavailable')
-                        path=catalog._verify_object(location['object_id'],obj['sha256'],obj['bytes'])
-                        vectors=np.load(path,mmap_mode='r',allow_pickle=False,max_header_size=10000); vector=vectors[location['row_index']]
+                        if location['object_id'] not in matrices: matrices[location['object_id']]=catalog.vector_matrix(location)
+                        vectors=matrices[location['object_id']]; vector=vectors[location['row_index']]
                         if vector.shape!=(dimensions,) or hashlib.sha256(vectors.dtype.str.encode()+vector.tobytes()).hexdigest()!=payload['vector_digest']: raise EvaluationError('Retained vector changed.','historical_evidence_changed')
                         clock=event['inputs'].get(rep.run or policy.anchor,{}).get('prediction_tick'); tick,state=payload.get('content_available') or (None,'undeclared')
                         admitted=original.get('availability')=='at_decision' or payload.get('content_availability_declaration')=='at_decision' or state=='valid' and tick is not None and clock is not None and tick<=clock

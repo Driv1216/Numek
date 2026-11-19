@@ -325,16 +325,14 @@ def _record_platform(self,kind,*,events,units,population_digest,family_digest,re
     catalog=self.catalog;request_id=request_id or uuid.uuid4().hex
     try:
         with catalog.db.connect() as conn:
-            lease,_row=jobs.start_inline(conn,catalog.scope,'cg_evidence_use',idempotency_key='cg-use:'+request_id,owner='confidenceguard')
-        if lease is None:
-            with catalog.db.connect() as conn:
-                row=conn.execute('SELECT id FROM evidence_uses WHERE catalog_id=%s AND request_id=%s',(catalog.catalog_id,request_id)).fetchone()
-            return {'evidence_use_id':row['id'],'continuity_context':state}
+            # One attempt per call; a repeated request id is idempotent in the ledger itself.
+            lease,_row=jobs.start_inline(conn,catalog.scope,'cg_evidence_use',idempotency_key=uuid.uuid4().hex,owner='confidenceguard')
         try:
             reservation=ledger.reserve(catalog.db,catalog.store,catalog.scope,lease,catalog.catalog_id,purpose=kind,members=[],
                 extra_events=sorted(set(events)),extra_units=sorted(set(units)),population_digest=population_digest,family_digest=family_digest,
                 request_id=request_id,study_id=study_id,alpha=alpha,total_alpha=total_alpha,metadata=metadata,query_events=query_events,
-                consume_reserve=kind in {'confirmation','numerical_recomputation'})
+                consume_reserve=kind in {'confirmation','numerical_recomputation'},
+                read_k=catalog.head())   # the study's snapshot: inherited worker authority never reads beyond it
         finally:
             with catalog.db.connect() as conn:jobs.complete(conn,lease,{})
     except PlatformError as exc:
@@ -345,6 +343,24 @@ def _record_platform(self,kind,*,events,units,population_digest,family_digest,re
 
 
 EvidenceUseLedger._record_platform=_record_platform
+
+
+def _records(self):
+    """Every durable evidence-use record in the v2 payload shape (access-only platform reads are not uses)."""
+    if not self.platform:
+        return [fact['payload'] for fact in self.catalog.iter_facts('evidence_use')]
+    with self.catalog.db.connect() as conn:
+        rows=conn.execute("SELECT * FROM evidence_uses WHERE catalog_id=%s AND kind<>'access' ORDER BY created_at,id",(self.catalog.catalog_id,)).fetchall()
+    def number(value):
+        return None if value is None else (int(value) if value==int(value) else float(value))
+    return [{'id':r['id'],'kind':r['kind'],'request_id':r['request_id'],'request_digest':r['request_digest'],'population_digest':r['population_digest'],
+             'family_digest':r['family_digest'],'membership_digest':r['membership_digest'],'event_count':r['event_count'],'unit_count':r['unit_count'],
+             'study_id':r['study_id'],'alpha':number(r['alpha']),'total_alpha':number(r['total_alpha']),'metadata':r['metadata'] or {},'branch_id':r['branch_id'],
+             'continuity':r['continuity'],'continuity_token':r['continuity_token'],
+             'state':'reserved' if r['kind'] in {'confirmation','numerical_recomputation'} else 'exposed'} for r in rows]
+
+
+EvidenceUseLedger.records=_records
 
 
 def commit_use(db,metadata,operation):
