@@ -23,6 +23,13 @@ from ..errors import PlatformError
 from . import codecs
 from .catalogs import catalog, require_active
 
+# Outcome-bearing kinds: readable only through an evidence-use reservation
+# (``numek_platform.governance.reader``). Raw projected rows carry outcome columns.
+PROTECTED_KINDS = ('outcome', 'raw')
+ACCESS = ('plain', 'governed', 'maintenance')
+_RESERVE_ROW = '''EXISTS (SELECT 1 FROM entity_registry e WHERE e.catalog_id = f.catalog_id
+                  AND e.unit_hash = f.entity_hash AND e.reserve_state = 'reserve')'''
+
 
 @dataclass(frozen=True)
 class ReadPin:
@@ -50,6 +57,8 @@ class Locator:
     locator_kind: str
     loc_a: int
     loc_b: int
+    event_hash: str | None = None
+    entity_hash: str | None = None
 
 
 def pin(db, scope, catalog_id, *, lease=None, holder=None, ttl_seconds=3600, k=None, allow_migrating=False):
@@ -88,13 +97,28 @@ def release(db, read_pin):
 
 
 def resolve(db, read_pin, *, kinds=None, keys=None, opportunity_keys=None, target_keys=None, object_ids=None,
-            event_tick_range=None, require_complete=True, limit=None):
-    """Resolve visible fact locators at the pin's K (one REPEATABLE READ snapshot)."""
+            event_tick_range=None, require_complete=True, limit=None, access='plain', _governance=None):
+    """Resolve visible fact locators at the pin's K (one REPEATABLE READ snapshot).
+
+    ``access='plain'`` never returns outcome-bearing kinds (requesting one
+    refuses with ``reservation_required``) and leaves out rows of sealed-reserve
+    entities. Governed access is reached only through
+    ``numek_platform.governance.reader.resolve``. ``access='maintenance'``
+    (compaction) moves bytes without exposing values to analysis.
+    """
+    if access not in ACCESS or (access == 'governed') != (_governance is not None):
+        raise PlatformError('Invalid evidence access mode.', 'invalid_access')
     where = ['f.catalog_id = %s', 'p.sequence IS NOT NULL', 'p.sequence <= %s']
     params = [read_pin.catalog_id, read_pin.k]
     if kinds is not None:
+        if access == 'plain' and set(kinds) & set(PROTECTED_KINDS):
+            raise PlatformError('Outcome-bearing evidence requires an evidence-use reservation.', 'reservation_required')
         where.append('f.kind = ANY(%s)')
         params.append(list(kinds))
+    if access == 'plain':
+        where.append('f.kind <> ALL(%s)')
+        params.append(list(PROTECTED_KINDS))
+        where.append(f'NOT {_RESERVE_ROW}')
     for column, values in (('key', keys), ('opportunity_key', opportunity_keys), ('target_key', target_keys)):
         if values is not None:
             where.append(f'f.{column} = ANY(%s)')
@@ -106,11 +130,15 @@ def resolve(db, read_pin, *, kinds=None, keys=None, opportunity_keys=None, targe
         lower, upper = event_tick_range
         where.append('f.event_tick >= %s AND f.event_tick < %s')
         params.extend([lower, upper])
-    clause = ' AND '.join(where)
-    tail = ' ORDER BY o.physical_key, f.loc_a' + (' LIMIT %s' if limit else '')
-    if limit:
-        params.append(limit)
-    with db.transaction('repeatable_read', read_only=True) as conn:
+    with db.transaction('repeatable_read', read_only=access != 'governed') as conn:
+        if _governance is not None:
+            extra, extra_params = _governance(conn)
+            where.append(extra)
+            params.extend(extra_params)
+        clause = ' AND '.join(where)
+        tail = ' ORDER BY o.physical_key, f.loc_a' + (' LIMIT %s' if limit else '')
+        if limit:
+            params.append(limit)
         if require_complete:
             purged = conn.execute(
                 f'''SELECT 1 FROM fact_index f JOIN publications p ON p.id = f.publication_id
@@ -123,7 +151,7 @@ def resolve(db, read_pin, *, kinds=None, keys=None, opportunity_keys=None, targe
         rows = conn.execute(
             f'''SELECT f.kind, f.key, f.revision, f.fact_digest, f.predecessor, p.sequence, f.object_id,
                        o.physical_key, o.sha256, o.bytes, o.codec, o.state AS object_state,
-                       f.locator_kind, f.loc_a, f.loc_b
+                       f.locator_kind, f.loc_a, f.loc_b, f.event_hash, f.entity_hash
                 FROM fact_index f JOIN publications p ON p.id = f.publication_id
                 JOIN objects o ON o.id = f.object_id
                 WHERE {clause} AND NOT EXISTS (SELECT 1 FROM fact_tombstones t WHERE t.catalog_id = f.catalog_id
@@ -135,7 +163,9 @@ def resolve(db, read_pin, *, kinds=None, keys=None, opportunity_keys=None, targe
         out.append(Locator(r['kind'], bytes(r['key']).hex(), r['revision'], bytes(r['fact_digest']).hex(),
                            None if r['predecessor'] is None else bytes(r['predecessor']).hex(), r['sequence'],
                            r['object_id'], r['physical_key'], bytes(r['sha256']).hex(), r['bytes'], r['codec'],
-                           r['locator_kind'], r['loc_a'], r['loc_b']))
+                           r['locator_kind'], r['loc_a'], r['loc_b'],
+                           None if r['event_hash'] is None else bytes(r['event_hash']).hex(),
+                           None if r['entity_hash'] is None else bytes(r['entity_hash']).hex()))
     return out
 
 

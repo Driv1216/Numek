@@ -73,7 +73,7 @@ def compact(db, store, scope, lease, catalog_id, object_ids):
         if len(objects) != len(object_ids) or any(o['codec'] not in codecs.COMPACTABLE or o['state'] != 'active'
                                                    for o in objects):
             raise PlatformError('Only active columnar observation objects can be compacted.', 'not_compactable')
-        locators = resolve(db, read_pin, object_ids=object_ids, require_complete=False)
+        locators = resolve(db, read_pin, object_ids=object_ids, require_complete=False, access='maintenance')
         records, moves = [], []
         for locator, record in read(store, locators):
             codecs.verify_record(record, key=locator.key, fact_digest=locator.fact_digest)

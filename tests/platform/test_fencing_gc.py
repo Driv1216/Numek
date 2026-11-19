@@ -197,12 +197,12 @@ def test_compaction_preserves_identity_and_excludes_purged_rows(platform):
 
 
 def test_purge_during_analysis_aborts_publication_and_refuses_reads(platform):
-    fact = record('outcome', ['ns', 'e1', 'v', 't'], {'value': 1})
+    fact = record('context', ['ns', 'e1'], {'value': 1})
     _, _, lease = publish_records(platform, [fact])
     analysis = lease_for(platform, kind='analysis')
     read_pin = pin(platform.db, platform.scope, platform.catalog_id, lease=analysis)
     assert len(resolve(platform.db, read_pin)) == 1
-    purge_facts(platform.db, platform.scope, lease, platform.catalog_id, [('outcome', fact['key'], 'initial')],
+    purge_facts(platform.db, platform.scope, lease, platform.catalog_id, [('context', fact['key'], 'initial')],
                 request_id='purge', reason='withdrawn')
     with pytest.raises(PlatformError) as caught:
         publish_records(platform, [record('context', ['ns', 'derived'], {})], lease=analysis, pin=read_pin)

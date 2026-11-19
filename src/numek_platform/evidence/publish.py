@@ -52,7 +52,8 @@ class FactRow:
     predecessor: str | None = None
     opportunity_key: str | None = None
     target_key: str | None = None
-    entity_hash: str | None = None
+    entity_hash: str | None = None    # governance unit hash: digest([namespace, entity or event])
+    event_hash: str | None = None     # governance event hash: digest([namespace, event])
     event_tick: int | None = None
     available_tick: int | None = None
 
@@ -130,13 +131,16 @@ def _existing_receipt(conn, catalog_id, request_id, request_digest):
 
 def publish(db, scope, lease, catalog_id, *, request_id, request_digest, kind, objects=(), facts=(),
             pin=None, on_conflict='refuse', allow_migrating=False, exposure_lock=False,
-            before_head=None, after_head=None, receipt_extra=None):
+            before_head=None, after_head=None, receipt_extra=None, reservations=()):
     """Atomically publish facts and objects as one catalog sequence step.
 
     ``before_head(conn, publication_id)`` and ``after_head(conn, publication_id, K)``
-    let callers add rows (measurements, evidence use, incident updates) inside
-    the same transaction. Raises on stale fences, conflicts (when refusing),
-    forks, purged identities or deletion of evidence the caller read.
+    let callers add rows (measurements, incident updates) inside the same
+    transaction. ``reservations`` are evidence-use reservations this attempt
+    made before reading; they become ``consumed`` atomically with the result,
+    so a result can never exist without its evidence-use records. Raises on
+    stale fences, conflicts (when refusing), forks, purged identities or
+    deletion of evidence the caller read.
     """
     if on_conflict not in ON_CONFLICT:
         raise ValueError(on_conflict)
@@ -145,8 +149,8 @@ def publish(db, scope, lease, catalog_id, *, request_id, request_digest, kind, o
     for attempt in range(3):
         try:
             return _publish_once(db, scope, lease, catalog_id, request_id, request_digest, kind, list(objects),
-                                 list(facts), pin, on_conflict, allow_migrating, exposure_lock, before_head,
-                                 after_head, receipt_extra)
+                                 list(facts), pin, on_conflict, allow_migrating, exposure_lock or bool(reservations),
+                                 before_head, after_head, receipt_extra, list(reservations))
         except psycopg.errors.UniqueViolation as exc:
             constraint = getattr(exc.diag, 'constraint_name', '') or ''
             if 'request_id' in constraint and attempt < 2:
@@ -157,7 +161,7 @@ def publish(db, scope, lease, catalog_id, *, request_id, request_digest, kind, o
 
 
 def _publish_once(db, scope, lease, catalog_id, request_id, request_digest, kind, objects, facts, pin,
-                  on_conflict, allow_migrating, exposure_lock, before_head, after_head, receipt_extra):
+                  on_conflict, allow_migrating, exposure_lock, before_head, after_head, receipt_extra, reservations):
     with db.transaction() as conn:
         assert_fence(conn, lease)                                           # 1 job
         previous = _existing_receipt(conn, catalog_id, request_id, request_digest)
@@ -187,6 +191,9 @@ def _publish_once(db, scope, lease, catalog_id, request_id, request_digest, kind
             if pending:
                 conn.execute("UPDATE objects SET state = 'active', activated_at = clock_timestamp() WHERE org_id = %s AND id = ANY(%s)",
                              (scope.org_id, pending))
+        if reservations:                                                     # governance rows (exposure lock held)
+            from ..governance.ledger import consume
+            consume(conn, scope, lease, catalog_id, reservations)
 
         tombstone_epoch = conn.execute(                                       # 5 tombstones (share)
             'SELECT epoch FROM catalog_tombstones WHERE catalog_id = %s FOR SHARE', (catalog_id,)).fetchone()['epoch']
@@ -235,7 +242,7 @@ def _check_deletion_since_pin(conn, catalog_id, pin, tombstone_epoch):
 
 
 _COLUMNS = ('kind', 'key', 'revision', 'fact_digest', 'predecessor', 'object_id', 'locator_kind', 'loc_a', 'loc_b',
-            'opportunity_key', 'target_key', 'entity_hash', 'event_tick', 'available_tick')
+            'opportunity_key', 'target_key', 'entity_hash', 'event_hash', 'event_tick', 'available_tick')
 
 
 def _insert_facts(conn, scope, catalog_id, publication_id, facts):
@@ -257,12 +264,12 @@ def _insert_facts(conn, scope, catalog_id, publication_id, facts):
     conn.execute(
         '''CREATE TEMP TABLE _facts (kind text, key bytea, revision text, fact_digest bytea, predecessor bytea,
                object_id uuid, locator_kind text, loc_a bigint, loc_b bigint, opportunity_key bytea, target_key bytea,
-               entity_hash bytea, event_tick numeric, available_tick numeric) ON COMMIT DROP''')
+               entity_hash bytea, event_hash bytea, event_tick numeric, available_tick numeric) ON COMMIT DROP''')
     with conn.cursor().copy(f'COPY _facts ({", ".join(_COLUMNS)}) FROM STDIN') as copy:
         for f in unique:
             copy.write_row((f.kind, _b(f.key), f.revision, _b(f.fact_digest), _b(f.predecessor), f.object_id,
                             f.locator_kind, f.loc_a, f.loc_b, _b(f.opportunity_key), _b(f.target_key),
-                            _b(f.entity_hash), f.event_tick, f.available_tick))
+                            _b(f.entity_hash), _b(f.event_hash), f.event_tick, f.available_tick))
 
     # Predecessors must already exist on the same identity chain (or in this batch) and not be purged.
     missing = conn.execute(
@@ -311,6 +318,21 @@ def _insert_facts(conn, scope, catalog_id, publication_id, facts):
             'DELETE FROM fact_occurrences WHERE publication_id = %s AND (kind, encode(key, %s), revision) IN (SELECT * FROM unnest(%s::text[], %s::text[], %s::text[]))',
             (publication_id, 'hex', [c[0] for c in conflict_ids], [c[1] for c in conflict_ids], [c[2] for c in conflict_ids]))
     return len(inserted_ids), duplicates, conflicts
+
+
+def activate_pending(conn, scope, lease, catalog_id, object_ids):
+    """Activate this attempt's pending objects outside a K publication (governance records).
+
+    Caller holds the job row (fence) and the exposure lock; locks objects sorted (step 4).
+    """
+    object_ids = sorted(set(object_ids), key=str)
+    rows = conn.execute('SELECT id, state, job_id, fence, catalog_id FROM objects WHERE org_id = %s AND id = ANY(%s) '
+                        'ORDER BY id FOR UPDATE', (scope.org_id, object_ids)).fetchall()
+    if len(rows) != len(object_ids) or any(r['state'] != 'pending' or r['job_id'] != lease.job_id or r['fence'] != lease.fence
+                                           or r['catalog_id'] != catalog_id for r in rows):
+        raise PlatformError('Staged object belongs to another attempt.', 'object_owner')
+    conn.execute("UPDATE objects SET state = 'active', activated_at = clock_timestamp() WHERE org_id = %s AND id = ANY(%s)",
+                 (scope.org_id, object_ids))
 
 
 def request_digest_of(value):

@@ -22,7 +22,7 @@ def lease_for(platform, kind='test', scope=None, key=None):
 
 
 def publish_records(platform, records, *, codec=codecs.OBSERVATIONS, request_id=None, lease=None, scope=None,
-                    catalog_id=None, event_ticks=None, **kwargs):
+                    catalog_id=None, event_ticks=None, event_hashes=None, entity_hashes=None, **kwargs):
     scope = scope or platform.scope
     catalog_id = catalog_id or platform.catalog_id
     lease = lease or lease_for(platform, scope=scope)
@@ -38,7 +38,9 @@ def publish_records(platform, records, *, codec=codecs.OBSERVATIONS, request_id=
     for i, (rec, (kind, a, b)) in enumerate(zip(records, locations)):
         facts.append(FactRow(rec['kind'], rec['key'], rec['revision'], rec['fact_digest'], ref.id, kind, a, b,
                              predecessor=rec['predecessor'],
-                             event_tick=None if event_ticks is None else event_ticks[i]))
+                             event_tick=None if event_ticks is None else event_ticks[i],
+                             event_hash=None if event_hashes is None else event_hashes[i],
+                             entity_hash=None if entity_hashes is None else entity_hashes[i]))
     receipt = publish(platform.db, scope, lease, catalog_id, request_id=request_id or uuid.uuid4().hex,
                       request_digest=digest([r['fact_digest'] for r in records]), kind='ingest',
                       objects=[ref], facts=facts, **kwargs)

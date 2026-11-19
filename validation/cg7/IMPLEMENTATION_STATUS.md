@@ -5,6 +5,55 @@ records what is implemented and what evidence exists, stage by stage. Several ki
 engineering correctness, statistical qualification, resilience, measured performance, product completeness,
 independent review and founder acceptance.
 
+## S2: governance before access (2026-11-19). Implemented; focused checks pass.
+
+Migration `0002_governance.sql` and the package `numek_platform/governance/`. Governance identities use the
+ConfidenceGuard v2 hash space (`digest([namespace, event])`, `digest([namespace, entity or event])`). Facts now carry
+`event_hash`, so migrated v2 uses and platform-native uses overlap-check against each other.
+
+| Area | What it does |
+|---|---|
+| Purposes | Each purpose maps to a legacy evidence-use class (`outcome_disclosure`, `discovery_selection`, `confirmation`, `numerical_recomputation`) plus a reserve mode. The new `covariate_inspection` class is not outcome exposure. Monitoring, detector, reference and outcome-disclosure purposes withhold reserve entities. Every fitting, selection and discovery role refuses them. Confirmation, assessment, numerical retries and exports admit reserve entities only with explicit consumption. Covariate inspection follows the reserve's covariate policy. |
+| Reservation (`ledger.reserve`) | Committed **before** any protected read. The membership object (`exposure_membership_v1`) is staged through W1–W3 and activated in the reservation transaction. Lock order: job, exposure lock, catalog, objects, governance rows. Ported from `confidenceguard.evidence_use`: legacy use ids and membership digests, tracking consent, continuity gaps requiring a current declaration, numerical-retry continuity, predeclared scheduled looks, reuse of an identical confirmation family and population, overlap refusal (excluding the same confirmation family and population), incomplete replay aliases, study alpha budgets. Idempotent by request id; a retried attempt *rebinds* the reservation and the earlier owner is kept. |
+| Exposure records | `exposure_registry` (one row per exposed identity, with flags: outcome, development, covariate) plus `confirmation_members` (per use, confirmation classes only). Overlap checks cost is proportional to the request, not the history. **Exposure history is never deleted**: purging facts does not erase it, so fact deletion no longer forces continuity to "incomplete" (stronger than v2). The process-local session ledger is gone; every use is durable. |
+| Consumption | `publish(..., reservations=[...])` marks the attempt's reservations `consumed` in the result's own transaction. A result cannot exist without its evidence-use records. Failure, cancellation or fence loss leave the reservation `reserved` permanently, so it still counts as exposure. |
+| Sealed reserve (`reserve.py`) | Namespace-level reserve. Founder defaults: 10%, covariate policy `exclude`. Assignment is materialized at first observation (HMAC-SHA256 against the version effective at first-seen K). `pre_reserve` applies before creation. Rotation and fraction changes are new versions for new entities only. Explicit reallocation covers only unexposed, undeveloped entities (and uninspected ones under `exclude`). Explicit release keeps history. Consumption is entity level (`spent_by_use`). Every event is ledgered in `reserve_events`. |
+| Governed reader (`reader.py`) | The only path to outcome-bearing kinds (`outcome`, `raw`). Results are restricted in-snapshot to the reservation's membership events and admitted reserve units. The reservation must belong to the live attempt and to the same K. Withheld rows are counted; `strict` refuses instead. Covariate reservations never open outcomes. `membership_from_index` builds membership from identity hashes, clocks and outcome *existence* only. |
+| Plain reader | Refuses outcome-bearing kinds (`reservation_required`) and leaves out reserve entities' rows. Only compaction uses `maintenance` access. |
+
+### Evidence (S2 focused checks)
+
+| Check | Result |
+|---|---|
+| `tests/platform` | 69 passed, 24.9 s (56 from S1 + 13 governance) |
+| `tests/platform/test_governance.py` repeated 12 times, each with fresh random reserve secrets | 12 of 12 passed |
+| pyflakes over `numek_platform` and `tests/platform` | clean apart from one intentional re-export |
+
+The governance tests cover:
+
+- plain reads never exposing outcomes or reserve rows;
+- reservation before access, consumption with the result, and the window measurement published under it;
+- a crashed attempt keeping its exposure and losing access;
+- monitoring exposure refusing a later confirmation while the reserve stays fresh;
+- explicit consumption required, with entity-level spending;
+- ported same-family reuse with rebinding, and a different family refused;
+- development roles refused on reserve entities;
+- covariate policy `exclude` vs `inspect`;
+- reserve assignment stable across rotation and fraction changes, with `pre_reserve` before creation and about 10% of 2,000 entities assigned;
+- reallocation refusing exposed entities, and release;
+- tracking consent and continuity-gap declarations;
+- study alpha exhaustion;
+- exposure surviving purge;
+- request-id idempotency, rebinding and reservation ownership at publication.
+
+**Defects found and fixed during S2 verification:**
+- An already-spent reserve check ran before the ported same-family reuse rule. It now runs after it, inside the transaction.
+- One test assumed a fixed random assignment.
+
+**Not yet done:**
+- ConfidenceGuard read paths still use catalog v2. Porting them onto the governed reader is S3.
+- Ingestion-time entity registration is wired in S4.
+
 ## S1 — Platform core (2026-11-19): implemented, focused checks passing
 
 New top-level package `src/numek_platform/`. Nothing in ConfidenceGuard or DataTrust was changed. `pyproject.toml`

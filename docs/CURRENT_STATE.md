@@ -1,5 +1,28 @@
 # Numek Current State
 
+## ConfidenceGuard CG7 — S2 governance before access (2026-11-19)
+
+`numek_platform/governance` adds evidence-use reservations committed **before** any outcome-bearing read, ported from
+the ConfidenceGuard ledger:
+
+- overlap and continuity rules;
+- scheduled looks;
+- study alpha budgets;
+- same-family reuse.
+
+It also adds:
+
+- **Durable exposure registries.** History is never deleted by fact purges.
+- **Consumption inside the result's publication transaction.** A result cannot exist without its evidence-use records.
+- **The namespace-level sealed reserve.** Defaults: 10%, `exclude`. Assignment is materialized at first observation;
+  rotation and fraction changes are versioned for new entities only; reallocation and release are explicit; spending is
+  at entity level.
+- **A governed reader.** It is now the only path to outcome-bearing facts. The plain reader refuses outcomes and hides
+  reserve rows.
+
+All 69 platform tests pass. ConfidenceGuard code is unchanged until S3. See
+[CG7 status](../validation/cg7/IMPLEMENTATION_STATUS.md).
+
 ## ConfidenceGuard CG7 — S1 platform core (2026-11-19)
 
 The founder approved the revised CG7 plan with Addendum R2 and authorized stage S1. `src/numek_platform/` now holds the
