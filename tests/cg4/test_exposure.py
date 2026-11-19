@@ -10,6 +10,7 @@ from confidenceguard.evidence_use import EvidenceUseLedger
 from confidenceguard.representations import subset
 from .helpers import binary
 from .test_history import retained
+from tests.backend_support import evidence_uses
 
 
 def test_historical_identity_scope_does_not_treat_absent_aliases_as_verified():
@@ -43,7 +44,7 @@ def test_evaluation_exposure_is_durable_even_if_analysis_fails(tmp_path,monkeypa
     def fail(*args,**kwargs):raise EvaluationError('Deliberate interruption after reservation.','fixture_interruption')
     monkeypatch.setattr('confidenceguard.engine.evaluate',fail)
     with pytest.raises(EvaluationError,match='Deliberate'):ws.ingest(batch,request_id='evaluation')
-    assert list(ws.catalog.iter_facts('evidence_use'))[0]['payload']['kind']=='outcome_disclosure'
+    assert evidence_uses(ws)[0]['kind']=='outcome_disclosure'
     event=digest([spec.roles.namespace,json.dumps(['0'],separators=(',',':'))])
     assert EvidenceUseLedger(ws).overlap([event],[])==['previously_exposed_confirmation_population']
     assert ws.evidence_tracking()['continuity']=='unknown'
@@ -65,9 +66,9 @@ def test_vector_bytes_bind_capture_retry_identity(tmp_path):
 def test_historical_preview_is_recorded_as_exposure(tmp_path):
     ws,spec=retained(tmp_path);ws.evidence_tracking(True)
     selection=spec.history['selection'];ws.inspect(selection)
-    uses=list(ws.catalog.iter_facts('evidence_use'))
-    assert uses[-1]['payload']['metadata']['purpose']=='historical_population_preview'
-    assert uses[-1]['payload']['event_count']>=720
+    uses=evidence_uses(ws)
+    assert uses[-1]['metadata']['purpose']=='historical_population_preview'
+    assert uses[-1]['event_count']>=720
 
 
 def test_ledger_checks_all_membership_chunks_even_after_index_loss(tmp_path):
@@ -76,6 +77,22 @@ def test_ledger_checks_all_membership_chunks_even_after_index_loss(tmp_path):
     ledger.record('outcome_disclosure',events=events,units=units,population_digest=digest('population'))
     assert ledger.overlap([events[0]],[])==['previously_exposed_confirmation_population']
     assert ledger.overlap([digest('unrelated')],[])==[]
+    from tests.backend_support import on_platform
+    if on_platform(ws):
+        # Platform: no chunked membership index exists to lose. The equivalent completeness
+        # invariant: every member (not only the first chunk's) is in the durable registry,
+        # and the use's immutable membership object holds exactly its digested membership.
+        from numek_platform.governance.ledger import decode_membership,membership_digest
+        for event in (events[0],events[511],events[512],events[-1]):
+            assert ledger.overlap([event],[])==['previously_exposed_confirmation_population']
+        assert ledger.overlap([],[units[-1]])==['previously_exposed_confirmation_population']
+        with ws.catalog.db.connect() as conn:
+            row=conn.execute('''SELECT u.membership_digest,o.physical_key,o.sha256,o.bytes FROM evidence_uses u
+                                JOIN objects o ON o.id=u.membership_object WHERE u.catalog_id=%s''',(ws.catalog.catalog_id,)).fetchone()
+        stored=decode_membership(ws.catalog.store.read_verified(row['physical_key'],bytes(row['sha256']).hex(),row['bytes']))
+        assert (stored[0],stored[1])==(sorted(events),sorted(units))
+        assert row['membership_digest']==membership_digest(sorted(events),sorted(units))==evidence_uses(ws)[0]['membership_digest']
+        return
     missing=list(ws.catalog.iter_facts('exposure_members',_logical_order=True))[1]
     # Simulate partial index loss, rather than a physical checksum failure.
     with closing(ws.catalog._connect()) as db:

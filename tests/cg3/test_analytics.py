@@ -72,6 +72,7 @@ def test_calendar_and_exact_fixed_windows():
     assert len(exact)==3 and exact[0].start.endswith('000000001Z')
 
 
+@pytest.mark.workspace_backup
 def test_backup_preserves_assessment_and_current_resolver_location(tmp_path):
     batch=create(tmp_path/'inputs',events=80)
     ws=ReliabilityWorkspace.initialize(tmp_path/'workspace',WorkspaceConfig(saving=True,free_disk_bytes=1));ws.ingest(batch)

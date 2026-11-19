@@ -8,6 +8,7 @@ from confidenceguard.method_contracts import ReliabilitySpec,RoleSpec
 from .helpers import binary
 from .test_confirmation import declared
 from .test_interfaces import wait,BASE
+from tests.backend_support import evidence_uses
 
 
 def attached(tmp_path,spec):
@@ -34,7 +35,7 @@ def test_live_CG4_tracks_without_retaining_results_and_detach_revokes_jobs(tmp_p
             return done['output'],response.json['data']['id'],payload
         inspected,_,_=job('investigation_inspect')
         discovery,_,_=job('investigation_discover',fingerprint=inspected['fingerprint'])
-        assert [f['payload']['kind'] for f in ws.catalog.iter_facts('evidence_use')]==['discovery_selection']
+        assert [u['kind'] for u in evidence_uses(ws)]==['discovery_selection']
         assert ws.assessments()==[] and discovery['retained'] is False
         response=client.post(BASE+'/hypothesis-sets',headers=headers,json={'result_id':discovery['result_id'],'confirmation':declared().to_dict()})
         assert response.status_code==201,response.json
@@ -43,7 +44,7 @@ def test_live_CG4_tracks_without_retaining_results_and_detach_revokes_jobs(tmp_p
         assert preview['independence']['ledger_enabled'] is True
         assert not preview['admissibility_reasons']
         assessed,jid,payload=job('investigation_confirm',hypothesis_handle=frozen['handle'],confirmation_fingerprint=preview['fingerprint'])
-        assert sorted(f['payload']['kind'] for f in ws.catalog.iter_facts('evidence_use'))==['confirmation','discovery_selection']
+        assert sorted(u['kind'] for u in evidence_uses(ws))==['confirmation','discovery_selection']
         assert ws.assessments()==[] and assessed['retained'] is False
         assert client.post(BASE+'/workspace/detach',headers=headers,json={}).status_code==200
         assert client.get(BASE+'/jobs/'+jid).status_code==403
@@ -67,9 +68,9 @@ def test_live_CG1_records_outcome_use_before_analysis_failure_without_feature_re
         submitted=client.post(BASE+'/jobs',headers=headers,json=payload);assert submitted.status_code==202
         jid=submitted.json['data']['id'];failed=wait(client,jid)
         assert failed['state']=='failed' and failed['error']['code']=='fixture_interruption'
-        uses=list(ws.catalog.iter_facts('evidence_use'))
-        assert len(uses)==1 and uses[0]['payload']['kind']=='outcome_disclosure'
-        assert uses[0]['payload']['metadata']['purpose']=='live_browser_outcome_assessment'
+        uses=evidence_uses(ws)
+        assert len(uses)==1 and uses[0]['kind']=='outcome_disclosure'
+        assert uses[0]['metadata']['purpose']=='live_browser_outcome_assessment'
         assert ws.assessments()==[]
         client.post(BASE+'/workspace/detach',headers=headers,json={})
         assert client.get(BASE+'/jobs/'+jid).status_code==403
@@ -105,7 +106,7 @@ def test_implicit_inline_outcomes_are_tracked_before_later_CG4_confirmation(tmp_
     inline=replace(spec.evaluation,outcomes=None,runs=(replace(spec.evaluation.runs[0],inline_outcome='y'),))
     ws=ReliabilityWorkspace.initialize(tmp_path/'workspace',WorkspaceConfig(saving=False,free_disk_bytes=1));ws.evidence_tracking(True)
     ws._reserve_live_exposure(inline,EvaluationConfig(),(str(tmp_path),),operation='evaluate',request_id='inline-outcome-use')
-    uses=list(ws.catalog.iter_facts('evidence_use'))
-    assert len(uses)==1 and uses[0]['payload']['kind']=='outcome_disclosure'
+    uses=evidence_uses(ws)
+    assert len(uses)==1 and uses[0]['kind']=='outcome_disclosure'
     result=investigate(replace(spec,evaluation=inline));family=freeze_hypotheses(result,confirmation=declared())
     assert 'previously_exposed_confirmation_population' in inspect_confirmation(family,workspace=ws)['admissibility_reasons']

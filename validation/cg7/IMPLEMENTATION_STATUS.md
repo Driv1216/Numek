@@ -5,6 +5,92 @@ records what is implemented and what evidence exists, stage by stage. Several ki
 engineering correctness, statistical qualification, resilience, measured performance, product completeness,
 independent review and founder acceptance.
 
+## S3d: reserve-backed assessments (G.8) and the v2-specific test port (2026-11-19). Implemented; closure gate passing.
+
+### Implemented
+
+**Reserve-backed CG4 confirmation and CG5 policy assessment (G.8 ordering).**
+1. *Freeze.* The study family and its selection rules are frozen (`freeze_hypotheses`, `freeze_policy_family`); freezing claims nothing.
+2. *Identify eligible reserve membership without protected inspection.*
+   - Platform `governance.reader.reserve_identities` returns, for fresh sealed-reserve entities (or ones already spent by the same family), each opportunity with an outcome fact at K in the selection's windows.
+   - It returns only identity hashes, the opportunity key and tick, and the identity fields of the opportunity payload (`entity`, `opportunity`, `event`, `target`). It never returns covariates, predictions or outcome values.
+   - The family's assessment role (CG4 `H`, CG5 `E`) is then decided by `investigation.identity_role` / `policy_history.identity_role`. These are the same functions role assignment now uses, so the claim and the analysis cannot disagree.
+3. *Reserve and consume atomically.* `PlatformCatalog.claim_reserve` makes one `reserve_claim` reservation (class `confirmation`, consume). It has no error budget, exactly one claim exists per family, and its snapshot is fixed.
+4. *Authorized inspection and assessment.*
+   - `inspect_confirmation` / `inspect_policy_assessment` make or reuse the claim before any worker runs, then run the inspection worker through `governed_call(claim, …)`.
+   - The assessment worker runs under its own confirmation reservation, which consumes the same units: the spent-by-family rule allows it.
+
+**Rules the claim must respect.**
+- **Ordinary workflows are unchanged.** There is no claim, and sealed entities stay withheld, for v2 workspaces, tracking off, no active reserve, roles taken from a data column (not decidable from identities), or nothing eligible.
+- **Retries, scheduled looks and numerical recomputations reuse the original claim.** The authorized population never grows. A family with predeclared looks may read its own units at the later look snapshot; the membership bound still applies.
+- **Interrupted studies keep their claim and spending.** Freshness is never restored, and the retry resumes the same claim.
+- **Another family cannot claim or read those units.**
+- **A claim is not exposure.** It is left out of overlap checks: it reads nothing, and its units are already protected by the reserve rules.
+- **Only confirmation-class receipts confer authority.** Receipts now carry `evidence_kind`. This also prevents a CG5 descriptive `outcome_disclosure` receipt from being passed as authority, which the ledger refuses.
+
+**Frozen input identity under authority.**
+- CG4's frozen-input digest (`cg4_canonical_selected_history_v1`) still covers the selection as discovery saw it.
+- Claimed reserve rows get a separate digest (`sealed_reserve_sha256`, `sealed_reserve_rows`). Digests of v2 and reserve-free catalogs are unchanged.
+- Catalog instances in a worker now read under the worker's current reservation even if they were opened before it was made.
+
+**Product corrections found by the test port.**
+- **Session identifiers.** Platform deletion and purge now release the workspace's process-local untracked session identifiers, as v2 does. This includes completion of an interrupted purge on reopen.
+- **Evidence-use records.** A targeted deletion of an evidence-use membership object now refuses (`governance_record`). Exposure records are durable governance; a purge still retires them, and exposure history survives it.
+- **Repeated evidence-use requests.** A repeated request returns the original receipt, as in v2. Different content refuses.
+- **Standalone runs on retained bytes.** A standalone CG4/CG5 run over bytes already retained in the workspace now depends on those capture objects for deletion (v2 parity; the port had dropped it).
+- **Deterministic fact order.** Typed-feature rows of one object shared a sort key, so their order was undefined. The physical order is now `(object id, loc_a, loc_b, …)`, which is v2's order, and the logical order has full tie-breakers.
+- **Missing backups.** A restore from a missing backup now refuses with `backup_changed` on both backends (it used to raise `FileNotFoundError`).
+- **Backup refusal message.** It was misleading, now corrected. `numek backup create` reads one object store, so it does not cover the per-workspace object stores of ConfidenceGuard workspaces on a shared installation (see Limitations). Platform backup summaries also list their files, matching the v2 manifest.
+
+**v2-specific test port (all 30 S3b failures).** No assertion was removed. Each was replaced by the platform form of the same invariant, through `tests/backend_support.py`. On v2 the tests run unchanged.
+
+| S3b category | Count | Replacement |
+|---|---|---|
+| Workspace backup on a shared installation | 7 | Marked `workspace_backup`, as is the CG6 raw-SQL test below, which also backs up. `tests/conftest.py` runs them, unchanged, on P-LOCAL platform workspaces (own cluster each, stopped afterwards) when the shared DSN is set. The intentional shared-installation behavior is verified by `test_shared_installation_workspace_refuses_workspace_backup_without_side_effects`: `backup_scope` refusal, nothing partial written, workspace unchanged. |
+| Raw v2 SQL | 5 | Storage helper API (`object_ids_for_key`, same query on v2) and `codec_counts` |
+| v2 `evidence_use` facts | 8 | `evidence_uses(ws)` (`EvidenceUseLedger.records()`, the v2 payload shape on both backends). The membership-chunk test checks, on the platform, that every member (across the old 512-member chunk boundaries) is in the durable registry and that the use's immutable membership object holds exactly its digested membership. |
+| Process-local session ledger | 3 | Platform contract: uses are durable governance (nothing held in process memory, every member stays exposed, targeted deletion of a use refuses). Untracked process-local values are released on deletion and purge, also when a purge dies after its tombstones. Another workspace's purge does not affect this workspace. |
+| v2 `objects/` layout | 6 | `stored_evidence(ws)`: the authoritative evidence bytes (the platform store, excluding governance membership objects and materialized copies). `object_file(ws, oid)`: the tamper target. |
+| v2 lock contention (`workspace_busy`) | 1 | Platform contract (plan E.2): the v2 file locks gate nothing. Two concurrent ingests from separate workspace handles both publish, K stays gap-free (2, 3), no fact is lost, and deletion proceeds while the old objects lock is held. |
+
+**New end-to-end tests** (`tests/platform/test_reserve_backed_studies.py`). They use controlled entity registration: every entity whose id is a multiple of 10 is sealed reserve. They cover:
+- CG4 confirmation:
+  - D/S never touch a sealed entity;
+  - freezing claims nothing;
+  - exactly one claim, for the family's H reserve units;
+  - the confirmation consumes exactly those;
+  - its H population contains them and no other sealed entity;
+  - `spent_by` points at the claim;
+  - idempotent retry;
+  - the predeclared look reuses the claim with identical membership.
+- An unrelated family sees none of those units and cannot claim them.
+- A column-role study claims nothing.
+- An interrupted study keeps its claim, and the retry resumes it.
+- CG5 policy assessment:
+  - one claim for the family's E reserve units;
+  - the assessment consumes exactly those;
+  - selection (S) never touched a sealed entity.
+
+### Evidence
+
+| Check | Result |
+|---|---|
+| `tests/cg3`–`tests/cg6` with every workspace on the platform (one closure run) | **592 passed, 0 failed, 10 skipped** (shared DSN; the backup tests run on P-LOCAL through the marker) |
+| `tests/cg3`–`tests/cg6` on catalog v2 (one closure run) | **592 passed, 0 failed, 10 skipped** (the same 10 skips on both backends; they predate CG7) |
+| `tests/platform` | 84 passed, 1 failed. The new shared-installation refusal test caught a real gap: restoring from a missing backup raised a bare `FileNotFoundError` on both backends. `restore` now refuses with `backup_changed`; the file was rerun (5 passed), as were the affected v2 CG3 backup and lifecycle files (21 passed). |
+
+### Not done in S3d (plan items outside this authorization)
+
+- **`ctx.run` refactor** of the 35 `compat.supervise` sites. It was not part of the S3d requirements given. CG workers still spawn per phase; S4+ platform job workers need it.
+- **Retirement of the v2 writer.** It requires S3c (v2 → platform replay and equivalence validation), which has not been run. Retiring the writer first would strand existing v2 workspaces.
+
+### Limitations
+
+- Platform ConfidenceGuard workspaces do not register entities with a reserve at publication; that arrives with S4 ingestion. The end-to-end tests use controlled registration.
+- A reserve claim is a conservative superset: entities later found ineligible (for example, immature outcomes) are still spent. Claims bind the snapshot at which they are made; a selection without a fixed catalog sequence claims at the current head.
+- Roles taken from a data column cannot be decided from identities, so such studies cannot use the sealed reserve.
+- Shared-installation ConfidenceGuard workspaces keep per-workspace object stores, which `numek backup create` does not cover. Workspace backup is available on P-LOCAL. An installation object store for server deployments belongs to S9/S10.
+
 ## S3b: CG4/CG5/CG6 storage, deletion, backup and scoped study authority (2026-11-19). Implemented; gate classified.
 
 ### Implemented
@@ -74,7 +160,12 @@ Shared gate cluster (`NUMEK_PLATFORM_DSN`), `validation/cg7/py313.nosync`.
 - Migration `0006_evidence_use_identity.sql` makes the key `(org_id, catalog_id, id)`.
 - After the fix, the test runs until it reaches its session-ledger assertion (third row of the table below).
 
-**The other 29 failures are obsolete v2-specific assertions** (they are the S3d test port). Each was checked against its failing line:
+**Final disposition of all 30 failures** (corrected in S3d; the earlier wording said "the other 29" while the table below counts 30).
+- 1 failure had a genuine defect *and* an obsolete v2 assertion: `test_deleted_exposure_releases_only_its_owned_session_identifiers`. The defect is the evidence-use key collision above; the assertion is the session-ledger row below, where this test is counted.
+- 29 failures had only obsolete v2-specific assertions.
+- Total: 30 failures, all ported in S3d. The table assigns each test exactly once, by its post-fix disposition (7 + 5 + 8 + 3 + 6 + 1 = 30). S3d also found product gaps behind some of these rows; they are listed in the S3d record.
+
+Each was checked against its failing line:
 
 | Category | Count | Tests | S3d handling |
 |---|---|---|---|
@@ -98,9 +189,9 @@ S3 is executed in four gated steps:
 | Step | Scope | Status |
 |---|---|---|
 | S3a | CG3 catalog on the platform | implemented |
-| S3b | CG4/CG5/CG6 storage, raw-SQL and object-path sites, deletion and backup | **implemented (record above)** |
+| S3b | CG4/CG5/CG6 storage, raw-SQL and object-path sites, deletion and backup | implemented |
 | S3c | v2 → platform replay and equivalence validation | pending |
-| S3d | `ctx.run` refactor, remaining test port, v2 writer retirement | pending |
+| S3d | reserve-backed assessments (G.8) and the v2-specific test port | **implemented (record at the top)**; `ctx.run` refactor and v2 writer retirement remain (v2 writer retirement needs S3c) |
 
 ### Implemented
 

@@ -292,8 +292,16 @@ def prepare_history(spec,config,roots,progress,*,identity_only=False):
                     base.input_facts[variant]={'sample_table':combined,'sample_meaning':next(retained_inputs[id(s)][variant]['sample_meaning'] for s in parts if variant in retained_inputs[id(s)])}
             base.cg4_periods=[w.id for w in selection.windows];base.run_facts={vid:{'repeated_entities':0,'context_conflicts':{},'duplicate_keys':0,'missing_keys':0,'inline_conflicts':0} for vid in variants}
             source_selection={k:v for k,v in selection.to_dict().items() if k!='config'}
-            canonical=hashlib.sha256()
+            canonical=hashlib.sha256();sealed_rows=hashlib.sha256();sealed_count=0
             from .history_storage import serialized
+            # Rows of sealed-reserve entities are present only under a study's G.8
+            # authority. The frozen input identity is the selection as discovery saw
+            # it (without them); the claimed reserve rows get their own digest.
+            unit_of=lambda row:digest([selection.namespace,row.get('entity_key') or row['event_key']])
+            sealed=set()
+            for table in tables.values():
+                units={unit_of({'entity_key':e,'event_key':k}) for k,e in rows(work.con,f'SELECT event_key,entity_key FROM {table}')}
+                sealed|=catalog.sealed_reserve_units(units)
             for variant,table in sorted(tables.items()):
                 cursor=work.con.cursor()
                 try:
@@ -301,12 +309,16 @@ def prepare_history(spec,config,roots,progress,*,identity_only=False):
                     while True:
                         chunk=cursor.fetchmany(512)
                         if not chunk:break
-                        for row in chunk:canonical.update(serialized([variant,{k:v for k,v in zip(columns,row) if k!='ordinal'}]))
+                        for row in chunk:
+                            value={k:v for k,v in zip(columns,row) if k!='ordinal'}
+                            if sealed and unit_of(value) in sealed:sealed_rows.update(serialized([variant,value]));sealed_count+=1
+                            else:canonical.update(serialized([variant,value]))
                         work.check('canonical historical identity')
                 finally:cursor.close()
             # CG3's historical reducer lineage remains unchanged. CG4's immutable
             # admission identity cannot depend on a SQL join's physical row order.
             base.sources={'historical':{'sha256':digest({'normalization':'cg4_canonical_selected_history_v1','selection':source_selection,'selected':canonical.hexdigest()})}}
+            if sealed_count:base.sources['historical'].update(sealed_reserve_sha256=sealed_rows.hexdigest(),sealed_reserve_rows=sealed_count)
             feature_sequence=selection.prediction_catalog_sequence or selection.catalog_sequence
             feature_asof=instant(selection.prediction_as_of or selection.as_of)
             feature_facts=visible_heads(catalog,'feature',feature_sequence,feature_asof,selection.namespace,work.check)

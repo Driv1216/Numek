@@ -86,6 +86,7 @@ def test_conflict_is_not_double_counting_and_recovery(tmp_path):
     assert ws.status()['facts']['prediction'] == 12
 
 
+@pytest.mark.workspace_backup
 def test_saving_and_backup(tmp_path):
     ws = ReliabilityWorkspace.initialize(tmp_path/'workspace', WorkspaceConfig(free_disk_bytes=1))
     specification = batch(tmp_path)

@@ -4,8 +4,10 @@ from confidenceguard import ReliabilityWorkspace,WorkspaceConfig,investigate,fre
 from confidenceguard.evidence_use import EvidenceUseLedger
 from .test_history import retained
 from .test_confirmation import declared
+from tests.backend_support import evidence_uses
 
 
+@pytest.mark.workspace_backup
 def test_restore_and_later_consent_gaps_require_new_scoped_declarations(tmp_path):
     workspace,spec=retained(tmp_path);workspace.evidence_tracking(True)
     discovery=workspace.investigate(spec);old=freeze_hypotheses(discovery,confirmation=declared())
@@ -33,14 +35,14 @@ def test_restore_and_later_consent_gaps_require_new_scoped_declarations(tmp_path
 def test_historical_API_infers_tracking_and_cannot_redirect_it_to_another_workspace(tmp_path):
     workspace,spec=retained(tmp_path);workspace.evidence_tracking(True)
     discovery=investigate(spec)  # no explicit workspace keyword
-    assert any(f['payload']['kind']=='discovery_selection' for f in workspace.catalog.iter_facts('evidence_use'))
+    assert any(u['kind']=='discovery_selection' for u in evidence_uses(workspace))
     family=freeze_hypotheses(discovery,confirmation=declared())
     identity=inspect_confirmation(family)['independence']
     assert identity['local_identity_scope']=='canonical_history_keys_and_retained_original_aliases'
     assert identity['local_separation']=='system_checked'
     assessed=confirm_investigation(family)
     assert assessed.private['evidence_workspace_path']==str(workspace.path)
-    assert any(f['payload']['kind']=='confirmation' for f in workspace.catalog.iter_facts('evidence_use'))
+    assert any(u['kind']=='confirmation' for u in evidence_uses(workspace))
     changed=freeze_hypotheses(discovery,confirmation=declared(),practical_thresholds={c:.2 for c in discovery.data['investigation']['shortlist']})
     assert 'previously_exposed_confirmation_population' in inspect_confirmation(changed)['admissibility_reasons']
     other=ReliabilityWorkspace.initialize(tmp_path/'other',WorkspaceConfig(saving=True,free_disk_bytes=1))

@@ -32,6 +32,7 @@ def test_fitted_auxiliary_into_unchanged_cg2(tmp_path,kind,method,input):
     assert uncertainty and all(m['denominator']==30 and m['value_state']=='finite' for m in uncertainty)
 
 
+@pytest.mark.workspace_backup
 def test_binary_codec_catalog_v2_backup_reopen(tmp_path):
     from .test_devices import torch_spec
     s=torch_spec(tmp_path);ws=ReliabilityWorkspace.initialize(tmp_path/'workspace',config=WorkspaceConfig(saving=True))
@@ -42,9 +43,8 @@ def test_binary_codec_catalog_v2_backup_reopen(tmp_path):
     assert retained_predictor(ws,aid,'model').predictor_digest==s.predictors[0].predictor_digest
     output=reopened.private['output_artifact']
     assert output['path'].endswith('.cgblob')
-    from contextlib import closing
-    with closing(ws.catalog._connect()) as db:
-        assert db.execute("SELECT count(*) FROM objects WHERE encoding='opaque_artifact_bytes_v1'").fetchone()[0]>=2
+    from tests.backend_support import codec_counts
+    assert codec_counts(ws).get('opaque_artifact_bytes_v1',0)>=2
     # Reopening and report rendering must not construct an adapter.
     import unittest.mock
     with unittest.mock.patch('confidenceguard.execution.adapters.Adapter',side_effect=AssertionError('unexpected model load')):

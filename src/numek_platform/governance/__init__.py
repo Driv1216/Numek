@@ -14,6 +14,13 @@ how sealed-reserve entities are treated:
 recording outcome exposure. ConfidenceGuard workers use it where v2 read
 outcomes without a ledger entry: the governed exposure (if any) is recorded
 separately by the caller's own evidence-use record, as in v2.
+
+``reserve_claim`` (class ``confirmation``) is the G.8 study claim: after a
+confirmation family is frozen, the sealed-reserve entities eligible for its
+assessment role are identified from identities only and reserved and consumed
+in one transaction, before any inspection reads them. It allocates no error
+budget and is not itself an assessment; the family's own later reservations
+may overlap it.
 """
 from ..errors import PlatformError
 
@@ -38,6 +45,7 @@ PURPOSES = {
     'numerical_recomputation':     ('numerical_recomputation',  'consume'),
     'covariate_inspection':        ('covariate_inspection',     'covariates'),
     'selection_access':            ('access',                   'withhold'),
+    'reserve_claim':               ('confirmation',             'consume'),
 }
 CONFIRMATION_CLASSES = ('confirmation', 'numerical_recomputation')
 REPLAY_PURPOSES = ('historical_replay', 'outcome_restatement', 'policy_historical_replay', 'policy_outcome_restatement')

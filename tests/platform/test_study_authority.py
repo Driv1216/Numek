@@ -203,7 +203,12 @@ def test_worker_reads_inherit_study_authority_only_within_its_scope(platform, mo
         assert exposed == 0                                              # access is never exposure accounting
         assert list(worker.iter_facts('outcome'))                       # governed outcome read works
         _WORKER_GOVERNANCE.pop(root, None)
-        with study_authority(disclosure), pytest.raises(EvaluationError) as caught:
+        with study_authority(disclosure):                                # a disclosure receipt confers nothing
+            plain = Catalog(ws.path).ensure_governance(namespace='events', k=k, purpose_label='historical_selection')
+        assert plain.governance['authority'] is None
+        _WORKER_GOVERNANCE.pop(root, None)
+        forged = {**disclosure, 'evidence_kind': 'confirmation'}         # and the ledger refuses a mislabelled one
+        with study_authority(forged), pytest.raises(EvaluationError) as caught:
             Catalog(ws.path).ensure_governance(namespace='events', k=k, purpose_label='historical_selection')
         assert caught.value.code == 'authority_scope'                    # only confirmation-class uses grant
         _ingest_more(helpers, ws, tmp_path)                              # K advances past the study snapshot

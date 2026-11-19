@@ -30,6 +30,7 @@ def test_lossless_typed_cells_and_distinct_states():
     assert apply_availability(dated,view='retrospective',as_of_ns=30)['state']=='observed'
 
 
+@pytest.mark.workspace_backup
 def test_mixed_codec_commit_reconstruct_backup_and_delete(tmp_path):
     ws=ReliabilityWorkspace.initialize(tmp_path/'workspace',WorkspaceConfig(saving=True,free_disk_bytes=1))
     assert ws.catalog.catalog_version==2
@@ -43,15 +44,16 @@ def test_mixed_codec_commit_reconstruct_backup_and_delete(tmp_path):
     retained=list(ws.catalog.iter_facts('feature'))
     assert len(retained)==2 and [value(r['payload']['values']['x']) for r in retained]==[0,1]
     assert {r['fact_digest'] for r in retained}=={r['fact_digest'] for r in rows}
-    before={p.name:p.read_bytes() for p in (ws.path/'objects').iterdir()}
+    from tests.backend_support import stored_evidence
+    before=stored_evidence(ws)
     ws.backup(tmp_path/'backup')
     restored=ReliabilityWorkspace.restore(tmp_path/'backup',tmp_path/'restored')
     assert restored.instance_id!=ws.instance_id
     assert restored.status()['exposure_continuity']=='restore_unreconciled'
-    assert {p.name:p.read_bytes() for p in (restored.path/'objects').iterdir()}==before
+    assert stored_evidence(restored)==before
     assert len(list(restored.catalog.iter_facts('feature')))==2
     ws.delete(ws.deletion_preview(object_ids=[retained[0]['object_id']]))
-    assert not list((ws.path/'objects').iterdir())
+    assert stored_evidence(ws)=={}
     assert ws.status()['exposure_continuity']=='incomplete'
     with pytest.raises(EvaluationError):list(ws.catalog.iter_facts('feature'))
 

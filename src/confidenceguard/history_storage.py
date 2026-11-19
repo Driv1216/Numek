@@ -867,6 +867,10 @@ class Catalog:
         path = self._verify_object(location['object_id'], location['sha256'], location['bytes'])
         return np.load(path, mmap_mode='r', allow_pickle=False, max_header_size=10000)
 
+    def sealed_reserve_units(self, units):
+        """Units that are sealed-reserve entities (v2 catalogs have no reserve)."""
+        return set()
+
     def blob_path(self, object_id):
         """Path of a verified retained opaque object (CG6 models, outputs, media)."""
         return self._object_path(_safe_name(object_id))
@@ -1070,6 +1074,8 @@ class Catalog:
         backup = Path(backup).absolute(); destination = Path(destination).absolute()
         if destination.exists() or destination == backup or backup in destination.parents:
             raise EvaluationError('Restore requires a new destination.', 'restore_destination')
+        if not (backup / 'backup.json').is_file():
+            raise EvaluationError('Backup is incomplete or changed.', 'backup_changed')
         with private_file(backup / 'backup.json', 'rb') as stream:
             manifest = strict_json(stream.read(64 * 1024**2 + 1))
         expected = manifest.pop('content_digest', None)

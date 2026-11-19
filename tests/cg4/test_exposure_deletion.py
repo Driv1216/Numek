@@ -1,6 +1,7 @@
 from contextlib import closing
 import pytest
-from confidenceguard import ReliabilityWorkspace,WorkspaceConfig
+from confidenceguard import EvaluationError,ReliabilityWorkspace,WorkspaceConfig
+from tests.backend_support import on_platform
 from confidenceguard.contracts import digest
 from confidenceguard.evidence_use import EvidenceUseLedger,record_session,session_overlap
 
@@ -12,8 +13,25 @@ def workspace(path):
 
 
 def use_object(ws,receipt):
+    if on_platform(ws):
+        with ws.catalog.db.connect() as conn:
+            return conn.execute('SELECT membership_object FROM evidence_uses WHERE catalog_id=%s AND id=%s',
+                                (ws.catalog.catalog_id,receipt['evidence_use_id'])).fetchone()['membership_object'].hex
     with closing(ws.catalog._connect()) as db:
         return db.execute('SELECT object_id FROM evidence_uses WHERE id=?',(receipt['evidence_use_id'],)).fetchone()[0]
+
+
+def platform_exposure_is_durable_governance(ws,ledger,receipt,events):
+    """Platform contract replacing v2 deletable exposure: uses are durable governance rows.
+
+    Nothing is held in process memory, every recorded member stays exposed, and a
+    targeted deletion of a use's record is refused (only a purge retires it, and
+    exposure history survives that).
+    """
+    assert not any(session_overlap([e],[]) for e in events)
+    for event in events:assert ledger.overlap([event],[])==['previously_exposed_confirmation_population']
+    with pytest.raises(EvaluationError) as caught:ws.deletion_preview(object_ids=[use_object(ws,receipt)])
+    assert caught.value.code=='governance_record'
 
 
 def test_deleted_exposure_releases_only_its_owned_session_identifiers(tmp_path):
@@ -24,6 +42,13 @@ def test_deleted_exposure_releases_only_its_owned_session_identifiers(tmp_path):
         return target.record('outcome_disclosure',events=[event],units=[],population_digest=digest('same-population'),request_id=request)
     removed=record(ledger,erased,'removed');record(ledger,kept,'retained');other=record(EvidenceUseLedger(second),shared,'other')
     removed_shared=record(ledger,shared,'shared')
+    if on_platform(first):
+        platform_exposure_is_durable_governance(first,ledger,removed,[erased,kept,shared])
+        assert record(ledger,erased,'removed')==removed                  # idempotent receipt
+        second.delete(second.deletion_preview(purge=True))               # another workspace's purge
+        assert ledger.overlap([shared],[])==['previously_exposed_confirmation_population']
+        assert other['evidence_use_id']!=removed_shared['evidence_use_id']
+        return
     assert session_overlap([erased],[]) and session_overlap([kept],[])
     first.delete(first.deletion_preview(object_ids=[use_object(first,removed),use_object(first,removed_shared)]))
     assert not session_overlap([erased],[])
@@ -49,6 +74,22 @@ def test_tombstone_failure_and_recovery_do_not_retain_deleted_session_values(tmp
     def fault(boundary):
         if boundary=='deletion_tombstoned':raise RuntimeError('synthetic crash after tombstone')
     monkeypatch.setattr(ws.catalog,'_fault',fault)
+    if on_platform(ws):
+        # The use itself cannot be deleted; a purge that dies after its tombstones still
+        # releases this workspace's process-local values, finishes on reopen, and keeps
+        # the durable exposure history.
+        platform_exposure_is_durable_governance(ws,ledger,receipt,[event])
+        with pytest.raises(RuntimeError,match='synthetic crash'):ws.delete(ws.deletion_preview(purge=True))
+        from confidenceguard.evidence_use import _SESSION_USES
+        assert not any(v.get('owner')==ws.instance_id for v in _SESSION_USES)
+        assert session_overlap([standalone],[])                          # an unowned observation is kept
+        with pytest.raises(EvaluationError) as caught:ReliabilityWorkspace(ws.path)
+        assert caught.value.code=='workspace_retired'
+        with ws.catalog.db.connect() as conn:
+            exposed=conn.execute("SELECT outcome_exposed FROM exposure_registry WHERE catalog_id=%s AND member_kind='event' AND hash=%s",
+                                 (ws.catalog.catalog_id,bytes.fromhex(event))).fetchone()
+        assert exposed and exposed['outcome_exposed']                     # exposure history survives the purge
+        return
     with pytest.raises(RuntimeError,match='synthetic crash'):
         ws.delete(ws.deletion_preview(object_ids=[use_object(ws,receipt)]))
     assert not session_overlap([event],[])

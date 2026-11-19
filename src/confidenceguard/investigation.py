@@ -58,23 +58,38 @@ def historical_workspace(spec,workspace):
     return workspace if isinstance(workspace,ReliabilityWorkspace) else ReliabilityWorkspace(root)
 
 
-def _roles(spec,records,raw):
-    assignments={};entity_roles={};partitions={}
-    for role,values in spec.roles.partitions.items():
+def _partitions(roles):
+    partitions={}
+    for role,values in roles.partitions.items():
         for value in values:
             token=json.dumps(value,ensure_ascii=True) if isinstance(value,list) else value
             if token in partitions:raise EvaluationError('CG4 partitions overlap.','role_overlap')
             partitions[token]=role
+    return partitions
+
+
+def identity_role(roles,unit,partitions=None):
+    """CG4 role of a unit from identity alone (partitions or the seeded hash); None for column roles.
+
+    Shared by role assignment and the G.8 reserve claim, so both always agree.
+    """
+    if roles.column:return None
+    partitions=_partitions(roles) if partitions is None else partitions
+    if partitions:return partitions.get(unit)
+    fraction=int(digest([roles.namespace,unit,roles.seed]),16)/(2**256)
+    a,b,_=roles.proportions
+    return 'D' if fraction<a else 'S' if fraction<a+b else 'H'
+
+
+def _roles(spec,records,raw):
+    assignments={};entity_roles={};partitions=_partitions(spec.roles)
     for record in records:
         event=record['event_key'];entity=record.get('entity_key')
         unit=entity if spec.roles.unit=='entity' else event
         if unit is None:raise EvaluationError('Entity-level discovery requires explicit entity keys.','entity_keys_required')
         if spec.roles.column:
             role=spec.roles.values.get(raw.get(record['ordinal'],{}).get(spec.roles.column))
-        elif partitions:role=partitions.get(unit)
-        else:
-            fraction=int(digest([spec.roles.namespace,unit,spec.roles.seed]),16)/(2**256)
-            a,b,_=spec.roles.proportions;role='D' if fraction<a else 'S' if fraction<a+b else 'H'
+        else:role=identity_role(spec.roles,unit,partitions)
         if role not in {'D','S','H'}:raise EvaluationError('Every admitted event requires one CG4 role.','unassigned_role')
         if entity is not None and entity in entity_roles and entity_roles[entity]!=role:raise EvaluationError('An entity crosses D/S/H roles.','role_overlap')
         if entity is not None:entity_roles[entity]=role

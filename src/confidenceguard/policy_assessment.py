@@ -185,10 +185,27 @@ def preview_policy_assessment(result,assessment,*,planned_e_size,requested_half_
     data['preview_digest']=digest(data); return data
 
 
+def _reserve_claim(frozen,study,protocol,roots,workspace):
+    """Claim the family's eligible sealed-reserve E units before inspection (see ``reserve_claims``)."""
+    if not study.input.history:return None
+    from pathlib import Path
+    from .history_contracts import LongitudinalSpec
+    from .history_storage import authority_file
+    from .policy_history import identity_role
+    from .reserve_claims import claim
+    with compat.secure_open(authority_file(Path(study.input.history['workspace_path']).absolute()),roots):pass
+    roles=study.input.roles
+    return claim(workspace,family_digest=frozen.family_digest,selection=LongitudinalSpec.from_dict(study.input.history['selection']),
+        role_of=lambda unit:identity_role(roles,unit),unit=roles.unit,assessment_role='E',
+        purpose_label='cg5_policy_assessment_reserve',schedule=[s.to_dict() for s in protocol.restatement_schedule])
+
+
 def inspect_policy_assessment(frozen,config=None,*,assessment_input=None,allowed_roots=None,workspace=None,progress=None,cancel=None,_protected=False,_deadline=None,_scheduled=None):
     frozen,study,protocol=_input(frozen,assessment_input); study,config,roots=arguments(study,config,allowed_roots)
     workspace=workspace_for(study.input,workspace)
-    identity=compat.supervise(_identity_worker,(study.input,config,study.limits,roots,'E','identity'),config,progress=progress,cancel=cancel,deadline=_deadline).to_dict()
+    from .platform_catalog import governed_call
+    claim=_reserve_claim(frozen,study,protocol,roots,workspace)   # G.8: before any inspection read
+    identity=compat.supervise(governed_call,(claim,_identity_worker,study.input,config,study.limits,roots,'E','identity'),config,progress=progress,cancel=cancel,deadline=_deadline).to_dict()
     population=identity['population']; reasons=[]
     if frozen.data['provenance'].get('imported_membership_available') is False: reasons.append('imported_policy_development_membership_unavailable')
     if set(population['events']).intersection(frozen.data['development_events']) or set(population['units']).intersection(frozen.data['development_units']): reasons.append('observable_development_assessment_overlap')

@@ -129,6 +129,7 @@ def test_fault_recovery_deletion_and_tamper(tmp_path,monkeypatch):
     plan=ws.deletion_preview(assessment_ids=[result.data['analysis_id']]);ws.delete(plan)
     assert ws.status()['facts']['prediction']==before
     with pytest.raises(EvaluationError):ws.open(result.data['analysis_id'])
-    obj=next(ws.catalog.iter_facts('prediction'))['object_id'];path=ws.path/'objects'/(obj+'.jsonl')
+    from tests.backend_support import object_file
+    obj=next(ws.catalog.iter_facts('prediction'))['object_id'];path=object_file(ws,obj)   # the authoritative stored bytes
     with path.open('ab') as stream:stream.write(b'changed')
     with pytest.raises(EvaluationError):list(ws.catalog.iter_facts('prediction'))

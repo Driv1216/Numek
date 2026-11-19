@@ -1,4 +1,3 @@
-from contextlib import closing
 import uuid
 import pytest
 from confidenceguard import ReliabilityWorkspace,WorkspaceConfig,EvaluationError
@@ -14,8 +13,9 @@ def test_deleting_historical_features_transitively_deletes_private_CG4_copies(tm
     annotated=ws.annotate_investigation(result.data['analysis_id'],'Protected note referencing the retained region.')
     source=next(ws.catalog.iter_facts('feature'))['object_id']
     preview=ws.deletion_preview(object_ids=[source])
-    with closing(ws.catalog._connect()) as db:
-        derived={r[0] for r in db.execute("SELECT object_id FROM facts WHERE (kind='assessment' AND key IN (?,?)) OR kind='hypothesis_set'",(digest([result.data['analysis_id']]),digest([annotated.data['analysis_id']])))}
+    derived=(ws.catalog.object_ids_for_key('assessment',digest([result.data['analysis_id']]))|ws.catalog.object_ids_for_key('assessment',digest([annotated.data['analysis_id']]))
+             |{f['object_id'] for f in ws.catalog.iter_facts('hypothesis_set',require_complete=False)})
+    assert len(derived)>=3
     assert derived<=set(preview['object_ids'])
     ws.delete(preview)
     for aid in (result.data['analysis_id'],annotated.data['analysis_id']):
@@ -33,8 +33,7 @@ def test_standalone_byte_identical_retained_source_has_deletion_dependency(tmp_p
     result=ws.investigate(spec)
     source=next(ws.catalog.iter_facts('feature'))['object_id']
     preview=ws.deletion_preview(object_ids=[source])
-    with closing(ws.catalog._connect()) as db:
-        oid=db.execute("SELECT object_id FROM facts WHERE kind='assessment' AND key=?",(digest([result.data['analysis_id']]),)).fetchone()[0]
+    (oid,)=ws.catalog.object_ids_for_key('assessment',digest([result.data['analysis_id']]))
     assert oid in preview['object_ids']
     ws.delete(preview)
     with pytest.raises(EvaluationError):ws.open(result.data['analysis_id'])
@@ -50,12 +49,12 @@ def test_capture_metadata_used_for_origin_checks_is_a_retained_dependency(tmp_pa
     origin=next(f for f in ws.catalog.iter_facts('capture_metadata') if f['identity']==[operation])
     result=ws.investigate(spec)
     assert origin['object_id'] in result.private['history_binding']['source_objects']
-    with closing(ws.catalog._connect()) as db:
-        assessment_object=db.execute("SELECT object_id FROM facts WHERE kind='assessment' AND key=?",(digest([result.data['analysis_id']]),)).fetchone()[0]
+    (assessment_object,)=ws.catalog.object_ids_for_key('assessment',digest([result.data['analysis_id']]))
     preview=ws.deletion_preview(object_ids=[origin['object_id']])
     assert assessment_object in preview['object_ids']
 
 
+@pytest.mark.workspace_backup
 def test_large_sealed_packet_roundtrip_backup_and_complete_deletion(tmp_path):
     ws=ReliabilityWorkspace.initialize(tmp_path/'workspace',WorkspaceConfig(saving=True,free_disk_bytes=1,max_record_bytes=8192))
     aid=uuid.uuid4().hex;payload={'result':{'analysis_id':aid,'schema_version':'confidenceguard.investigation_result/1.0','methodology_id':'failure_investigation_v1','name':'Synthetic packet','generated_at':'2026-01-01T00:00:00Z'},'manifest':{'large_protected_value':'X'*60000}}
@@ -69,5 +68,6 @@ def test_large_sealed_packet_roundtrip_backup_and_complete_deletion(tmp_path):
     parts={f['object_id'] for f in ws.catalog.iter_facts('cg4_packet_part')};preview=ws.deletion_preview(assessment_ids=[aid])
     assert parts<=set(preview['object_ids'])
     ws.delete(preview)
-    assert not any(ws.catalog._object_path(oid).exists() for oid in parts)
+    from tests.backend_support import object_retained
+    assert not any(object_retained(ws,oid) for oid in parts)
     with pytest.raises(EvaluationError):read_packet(ws.catalog,fact)

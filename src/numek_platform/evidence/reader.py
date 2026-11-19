@@ -153,7 +153,10 @@ def resolve(db, read_pin, *, kinds=None, keys=None, opportunity_keys=None, targe
             where.append(extra)
             params.extend(extra_params)
         clause = ' AND '.join(where)
-        tail = (' ORDER BY o.physical_key, f.loc_a' if order == 'physical' else ' ORDER BY p.sequence, o.created_at, f.loc_a') \
+        # Total, deterministic orders. Physical order equals catalog v2's (object id, offset,
+        # length): platform object ids are the v2 ids, and UUID order is their hex order.
+        tail = (' ORDER BY o.id, f.loc_a, f.loc_b, f.kind, f.key, f.revision' if order == 'physical' else
+                ' ORDER BY p.sequence, o.created_at, o.id, f.loc_a, f.loc_b, f.kind, f.key, f.revision') \
             + (' LIMIT %s' if limit else '')
         if limit:
             params.append(limit)

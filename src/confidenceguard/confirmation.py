@@ -394,12 +394,30 @@ def _inspect_confirmation(frozen,spec,config,roots,require_original=False,schedu
             {'status':'completed','peak_workspace_bytes':p.work.peak})
 
 
+def _reserve_claim(frozen,spec,roots,workspace):
+    """Claim the family's eligible sealed-reserve H units before inspection (see ``reserve_claims``)."""
+    if spec.history is None:return None
+    from . import compat
+    from .history_storage import authority_file
+    from .investigation import historical_workspace,identity_role
+    from .investigation_history import frozen_selection
+    from .reserve_claims import claim
+    root,selection=frozen_selection(spec)
+    with compat.secure_open(authority_file(root),roots):pass   # same admission as the inspection worker
+    protocol=ConfirmationSpec.from_dict(frozen.data['confirmation_spec'])
+    return claim(historical_workspace(spec,workspace),family_digest=frozen.evidence_family_digest,selection=selection,
+        role_of=lambda unit:identity_role(spec.roles,unit),unit=spec.roles.unit,assessment_role='H',
+        purpose_label='cg4_confirmation_reserve',schedule=[s.to_dict() for s in protocol.restatement_schedule])
+
+
 def inspect_confirmation(frozen,config=None,*,confirmation_input=None,allowed_roots=None,workspace=None,progress=None,cancel=None,_protected=False,_deadline=None,_scheduled=None,_numerical_extension=None):
     from .investigation import arguments,historical_workspace
     from . import compat
     from .evidence_use import EvidenceUseLedger,session_overlap,session_replay_history_incomplete
     frozen,spec=_input(frozen,confirmation_input);spec,config,roots=arguments(spec,_configuration(frozen,config),allowed_roots)
-    result=compat.supervise(_inspect_confirmation,(frozen,spec,config,roots,confirmation_input is None,_scheduled,_numerical_extension),config,progress=progress,cancel=cancel,deadline=_deadline).to_dict()
+    from .platform_catalog import governed_call
+    claim=_reserve_claim(frozen,spec,roots,workspace)   # G.8: before any inspection read
+    result=compat.supervise(governed_call,(claim,_inspect_confirmation,frozen,spec,config,roots,confirmation_input is None,_scheduled,_numerical_extension),config,progress=progress,cancel=cancel,deadline=_deadline).to_dict()
     from .investigation_contracts import InvestigationSpec
     workspace=historical_workspace(InvestigationSpec.from_dict(result['_effective_spec']),workspace)
     population=result['_protected_population'];reasons=result['admissibility_reasons']

@@ -72,6 +72,55 @@ def membership_from_index(db, read_pin, *, kinds=('opportunity',), event_tick_ra
                    None if r['target_key'] is None else bytes(r['target_key']).hex()) for r in rows)
 
 
+IDENTITY_FIELDS = ('entity', 'opportunity', 'event', 'target')
+
+
+def reserve_identities(db, store, read_pin, *, namespace, tick_ranges, family_digest=None):
+    """Identity-only membership of the sealed reserve (G.8 study claims), before any protected read.
+
+    Returns one record per opportunity of a *fresh* reserve entity (or one
+    already spent by ``family_digest``) in ``namespace`` whose event tick falls
+    in a range, that has an outcome fact at K. Each record carries identity
+    hashes, the opportunity key and tick, and only the identity fields of the
+    opportunity payload (``IDENTITY_FIELDS``): never covariates, predictions or
+    outcome values. Ranges are half-open ``[start, end)`` ticks.
+    """
+    if not tick_ranges:
+        return []
+    clauses = ' OR '.join('(f.event_tick >= %s AND f.event_tick < %s)' for _ in tick_ranges)
+    params = [read_pin.catalog_id, read_pin.k, namespace, family_digest]
+    for start, end in tick_ranges:
+        params.extend((int(start), int(end)))
+    params.append(read_pin.k)
+    with db.transaction('repeatable_read', read_only=True) as conn:
+        rows = conn.execute(
+            f'''SELECT DISTINCT f.key FROM fact_index f
+                JOIN publications p ON p.id = f.publication_id
+                JOIN entity_registry e ON e.catalog_id = f.catalog_id AND e.unit_hash = f.entity_hash
+                     AND e.reserve_state = 'reserve'
+                LEFT JOIN evidence_uses u ON u.catalog_id = e.catalog_id AND u.id = e.spent_by_use
+                WHERE f.catalog_id = %s AND p.sequence <= %s AND f.kind = 'opportunity' AND f.namespace = %s
+                AND (e.spent_by_use IS NULL OR (%s::text IS NOT NULL AND u.family_digest = %s::text))
+                AND ({clauses})
+                AND EXISTS (SELECT 1 FROM fact_index o JOIN publications op ON op.id = o.publication_id
+                            WHERE o.catalog_id = f.catalog_id AND o.kind = 'outcome'
+                            AND (o.event_hash = f.event_hash OR (f.target_key IS NOT NULL AND o.target_key = f.target_key))
+                            AND op.sequence <= %s)''',
+            params[:4] + [family_digest] + params[4:]).fetchall()
+    keys = sorted(bytes(r['key']).hex() if isinstance(r['key'], (bytes, memoryview)) else r['key'] for r in rows)
+    if not keys:
+        return []
+    locators = evidence_reader.resolve(db, read_pin, kinds=['opportunity'], keys=keys, access='maintenance',
+                                       require_complete=False)
+    out = []
+    for locator, record in evidence_reader.read(store, locators):
+        payload = record.get('payload') or {}
+        out.append({'opportunity_key': locator.key, 'event_hash': locator.event_hash, 'entity_hash': locator.entity_hash,
+                    'target_key': payload.get('target_key'), 'tick': (payload.get('time') or {}).get('tick'),
+                    **{field: payload.get(field) for field in IDENTITY_FIELDS}})
+    return out
+
+
 def resolve(db, store, reservation, read_pin, *, strict=False, **filters):
     row = _reservation(db, reservation)
     # A reservation covers knowledge up to its K; reading an earlier snapshot

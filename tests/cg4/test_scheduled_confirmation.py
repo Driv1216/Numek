@@ -3,6 +3,7 @@ from decimal import Decimal
 import pytest
 from confidenceguard import ConfirmationSpec,ConfirmationLook,EvaluationError,freeze_hypotheses
 from .test_history import retained
+from tests.backend_support import evidence_uses
 
 
 def protocol():
@@ -22,7 +23,7 @@ def test_scheduled_look_is_frozen_before_H_and_spends_its_own_allocation(tmp_pat
     second=ws.restate_confirmation(first.data['analysis_id'],'april',request_id='scheduled-april')
     assert second.data['investigation']['family_digest']==first.data['investigation']['family_digest']
     assert second.data['investigation']['predeclared_restatement']['fresh_independent_evidence'] is False
-    uses=[f['payload'] for f in ws.catalog.iter_facts('evidence_use') if f['payload']['kind']=='confirmation']
+    uses=[u for u in evidence_uses(ws) if u['kind']=='confirmation']
     assert len(uses)==2 and sum(Decimal(str(u['alpha'])) for u in uses)==Decimal('.05')
     assert second.private['memberships']==first.private['memberships']
     assert ws.restate_confirmation(first.data['analysis_id'],'april',request_id='scheduled-april').to_private_dict()==second.to_private_dict()

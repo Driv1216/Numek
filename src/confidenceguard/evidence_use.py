@@ -323,6 +323,20 @@ def _record_platform(self,kind,*,events,units,population_digest,family_digest,re
     state=self.status()
     if not state['enabled']:raise EvaluationError('Explicit evidence-use tracking consent required.','exposure_tracking_disabled')
     catalog=self.catalog;request_id=request_id or uuid.uuid4().hex
+    with catalog.db.connect() as conn:
+        prior=conn.execute('SELECT * FROM evidence_uses WHERE catalog_id=%s AND request_id=%s',(catalog.catalog_id,request_id)).fetchone()
+    if prior is not None and 'receipt_catalog_sequence' in (prior['metadata'] or {}):
+        # A repeated request returns the original receipt (v2 parity); different content still
+        # refuses in the ledger.
+        expected=dict(metadata or {},purpose=(metadata or {}).get('purpose',kind))
+        if (prior['kind']!=kind or prior['population_digest']!=population_digest or prior['family_digest']!=family_digest
+                or {k:v for k,v in prior['metadata'].items() if k!='receipt_catalog_sequence'}!=expected):
+            raise EvaluationError('This request id was already used for different content.','idempotency_conflict')
+        return {'evidence_use_id':prior['id'],'evidence_kind':prior['kind'],'catalog_sequence':prior['metadata']['receipt_catalog_sequence'],
+                'continuity_context':{'enabled':True,'continuity':prior['continuity'],'branch_id':prior['branch_id'],
+                    'continuity_token':prior['continuity_token'],'system_verified_external_independence':False,
+                    'guarantee_scope':'predeclared_study_only'}}
+    head=catalog.head();metadata=dict(metadata or {},receipt_catalog_sequence=head)
     try:
         with catalog.db.connect() as conn:
             # One attempt per call; a repeated request id is idempotent in the ledger itself.
@@ -338,8 +352,8 @@ def _record_platform(self,kind,*,events,units,population_digest,family_digest,re
     except PlatformError as exc:
         raise _translate(exc) from exc
     if reservation.reused:
-        return {'evidence_use_id':reservation.id,'reused_reservation':True,'fresh_independent_evidence':False,'continuity_context':state}
-    return {'evidence_use_id':reservation.id,'catalog_sequence':catalog.head(),'continuity_context':state}
+        return {'evidence_use_id':reservation.id,'evidence_kind':reservation.kind,'reused_reservation':True,'fresh_independent_evidence':False,'continuity_context':state}
+    return {'evidence_use_id':reservation.id,'evidence_kind':reservation.kind,'catalog_sequence':head,'continuity_context':state}
 
 
 EvidenceUseLedger._record_platform=_record_platform
@@ -353,7 +367,8 @@ def _records(self):
         rows=conn.execute("SELECT * FROM evidence_uses WHERE catalog_id=%s AND kind<>'access' ORDER BY created_at,id",(self.catalog.catalog_id,)).fetchall()
     def number(value):
         return None if value is None else (int(value) if value==int(value) else float(value))
-    return [{'id':r['id'],'kind':r['kind'],'request_id':r['request_id'],'request_digest':r['request_digest'],'population_digest':r['population_digest'],
+    # A G.8 reserve claim consumes sealed-reserve units but is not an assessment use.
+    return [{'id':r['id'],'kind':'reserve_claim' if r['purpose']=='reserve_claim' else r['kind'],'request_id':r['request_id'],'request_digest':r['request_digest'],'population_digest':r['population_digest'],
              'family_digest':r['family_digest'],'membership_digest':r['membership_digest'],'event_count':r['event_count'],'unit_count':r['unit_count'],
              'study_id':r['study_id'],'alpha':number(r['alpha']),'total_alpha':number(r['total_alpha']),'metadata':r['metadata'] or {},'branch_id':r['branch_id'],
              'continuity':r['continuity'],'continuity_token':r['continuity_token'],

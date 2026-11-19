@@ -23,6 +23,7 @@ from confidenceguard.investigation import arguments, prepared
 from confidenceguard.investigation_replay import replay_investigation, _population
 from confidenceguard.evidence_use import EvidenceUseLedger, population_identifiers
 from .helpers import binary
+from tests.backend_support import stored_evidence
 
 
 def declaration():
@@ -81,9 +82,9 @@ def test_declared_owner_cutoff_live_retained_parity(tmp_path,owner,cutoff,conten
     facts=list(ws.catalog.iter_facts('feature'))
     assert all(f['payload']['information_cutoff']['policy']==FEATURE_TIME_POLICY for f in facts)
     # A later reconstruction never alters the original immutable feature objects.
-    before={p.name:hashlib.sha256(p.read_bytes()).hexdigest() for p in (ws.path/'objects').iterdir()}
+    before=stored_evidence(ws,hashed=True)
     feature_states(history)
-    assert before=={p.name:hashlib.sha256(p.read_bytes()).hexdigest() for p in (ws.path/'objects').iterdir()}
+    assert before==stored_evidence(ws,hashed=True)
 
 
 def test_original_temporal_counterexample_cannot_generate_a_confirmable_gate(tmp_path):
@@ -118,10 +119,10 @@ def test_old_or_invalid_retained_cutoff_is_unavailable_without_rewriting(tmp_pat
         writer.add_features(legacy,('x','z'));writer.finish({'capture_stages':['synthetic_legacy_view']})
         ws.catalog.commit_capture(operation)
     history=replace(history,features=tuple(replace(v,id='legacy') for v in history.features))
-    before={p.name:p.read_bytes() for p in (ws.path/'objects').iterdir()}
+    before=stored_evidence(ws)
     assert all(set(v)=={'observed'} for v in feature_states(live).values())
     assert all(set(v)=={'unavailable'} for v in feature_states(history).values())
-    assert before=={p.name:p.read_bytes() for p in (ws.path/'objects').iterdir()}
+    assert before==stored_evidence(ws)
 
 
 def test_old_cutoff_discoveries_and_frozen_claims_remain_readable_but_cannot_confirm(tmp_path):
@@ -190,13 +191,13 @@ def test_old_replay_reservations_require_explicit_gap_handling_and_keep_bytes(tm
     ws.evidence_tracking(True);ledger=EvidenceUseLedger(ws)
     ledger.record('outcome_disclosure',events=[digest('old')],units=[],population_digest=digest('legacy-replay'),
         metadata={'purpose':'historical_replay','origin':'old-record'})
-    before={p.name:p.read_bytes() for p in (ws.path/'objects').iterdir()}
+    before=stored_evidence(ws)
     assert 'exposure_history_incomplete' in ledger.overlap([digest('unrelated')],[])
     monkeypatch.setattr(uses,'_SESSION_USES',[])
     frozen=freeze_hypotheses(investigate(live),confirmation=declaration())
     preview=inspect_confirmation(frozen,workspace=ws)
     assert 'exposure_history_gap_requires_current_declaration' in preview['admissibility_reasons']
-    assert before=={p.name:p.read_bytes() for p in (ws.path/'objects').iterdir()}
+    assert before==stored_evidence(ws)
     uses.record_session('outcome_disclosure',[digest('old')],[],metadata={'purpose':'outcome_restatement'})
     assert 'session_replay_exposure_history_incomplete' in inspect_confirmation(frozen)['admissibility_reasons']
 

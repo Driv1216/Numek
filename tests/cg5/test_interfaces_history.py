@@ -1,3 +1,4 @@
+import pytest
 import copy,json,time,csv
 from dataclasses import replace
 from click.testing import CliRunner
@@ -78,6 +79,7 @@ def test_history_persistence_restatement(tmp_path):
     assert next(iter(result.private['policies']))==next(iter(restated.private['policies']))
 
 
+@pytest.mark.workspace_backup
 def test_policy_family_packet_backup_and_dependency_deletion(tmp_path):
     from confidenceguard.policy_assessment import freeze_policy_family
     from .test_assessment import protocol

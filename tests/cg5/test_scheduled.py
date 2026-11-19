@@ -4,6 +4,7 @@ import pytest
 from confidenceguard import (PolicyInputSpec,PolicySpec,PolicyStudySpec,PolicyMetricSpec,PolicyAssessmentSpec,PolicyClaim,ConfirmationLook,EvaluationError)
 from confidenceguard.method_contracts import RoleSpec
 from tests.cg4.test_history import retained
+from tests.backend_support import evidence_uses
 CFG={'free_disk_bytes':1}
 
 def test_policy_scheduled_look_preserves_family_and_spends_frozen_allocation(tmp_path):
@@ -43,7 +44,7 @@ def test_policy_scheduled_look_preserves_family_and_spends_frozen_allocation(tmp
     finally:app.extensions['confidenceguard_store'].cleanup()
     assert second.data['policy']['assessment_family_digest']==frozen.family_digest
     assert second.data['policy']['predeclared_restatement']['fresh_independent_evidence'] is False
-    uses=[f['payload'] for f in ws.catalog.iter_facts('evidence_use') if f['payload']['kind']=='confirmation']
+    uses=[u for u in evidence_uses(ws) if u['kind']=='confirmation']
     assert len(uses)==2 and sum(Decimal(str(u['alpha'])) for u in uses)==Decimal('.05')
     with pytest.raises(EvaluationError):ws.inspect_policy_restatement(first.data['analysis_id'],'not-planned',CFG)
     ws.evidence_tracking(False);ws.evidence_tracking(True)

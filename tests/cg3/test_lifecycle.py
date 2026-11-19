@@ -39,6 +39,29 @@ def test_deleted_evidence_cannot_silently_shrink_or_resurrect(tmp_path):
 
 def test_operation_and_download_locks_are_bounded(tmp_path):
     ws=workspace(tmp_path);ws.ingest(batch(tmp_path));errors=[]
+    from tests.backend_support import on_platform
+    if on_platform(ws):
+        # Platform contract (plan E.2): the v2 file locks no longer gate anything and
+        # concurrent operations are serialized by the database instead of refused.
+        # Both publications land, K stays gap-free, and nothing is lost.
+        with file_lock(ws.catalog.operation_path):ws.set_saving(True)
+        from .test_semantics import rewrite
+        from pathlib import Path
+        extra=[batch(tmp_path,'more-'+str(n),count=12) for n in (1,2)]
+        for n,spec in enumerate(extra,1):
+            rewrite(Path(spec['evaluation']['sources'][0]['path']),lambda rows,n=n:[r.update(id=str(100*n+int(r['id']))) for r in rows])
+        receipts=[];failures=[]
+        def ingest(spec):
+            try:receipts.append(ReliabilityWorkspace(ws.path).ingest(spec)['catalog_sequence'])
+            except Exception as exc:failures.append(exc)
+        threads=[threading.Thread(target=ingest,args=(spec,)) for spec in extra]
+        for t in threads:t.start()
+        for t in threads:t.join(120)
+        assert not failures and sorted(receipts)==[2,3] and ws.status()['catalog_sequence']==3
+        assert ws.status()['facts']['prediction']==36
+        fact=next(ws.catalog.iter_facts('prediction'));plan=ws.deletion_preview(object_ids=[fact['object_id']])
+        with file_lock(ws.catalog.objects_lock,False):assert ws.delete(plan)['deleted_objects']==len(plan['object_ids'])
+        return
     def mutate():
         try:ws.set_saving(False)
         except EvaluationError as exc:errors.append(exc.code)
@@ -51,6 +74,7 @@ def test_operation_and_download_locks_are_bounded(tmp_path):
         assert e.value.code=='workspace_busy'
 
 
+@pytest.mark.workspace_backup
 def test_inspection_effective_populations_and_backup_refusal(tmp_path):
     ws=workspace(tmp_path);ws.ingest(batch(tmp_path));before=ws.status()['catalog_sequence']
     preview=ws.inspect(longitudinal(ws))

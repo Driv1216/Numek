@@ -14,6 +14,20 @@ from .history_storage import Catalog,file_lock,serialized
 from .sources import rows
 
 
+def identity_role(roles,unit):
+    """CG5 retained role of a unit from identity alone (seeded whole-unit hash); None for column roles.
+
+    Shared by role assignment and the G.8 reserve claim, so both always agree.
+    """
+    if roles.column or roles.partitions:return None
+    token=int(hashlib.sha256(json.dumps([roles.namespace,roles.seed,unit],separators=(',',':')).encode()).hexdigest(),16)/2**256
+    cumulative=0.
+    for r in ('F','S','C','E'):
+        cumulative+=roles.proportions.get(r,0)
+        if token<cumulative:return r
+    return None
+
+
 def _roles(store,spec):
     """Use CG2's role interpretation and hash convention on immutable keys."""
     con=store.con
@@ -27,11 +41,7 @@ def _roles(store,spec):
             else:
                 unit=entity if spec.roles.unit=='entity' else event
                 if unit is None: raise EvaluationError('Retained entity separation requires entity keys.','entity_keys_required')
-                token=int(hashlib.sha256(json.dumps([spec.roles.namespace,spec.roles.seed,unit],separators=(',',':')).encode()).hexdigest(),16)/2**256
-                cumulative=0.; role=None
-                for r in ('F','S','C','E'):
-                    cumulative+=spec.roles.proportions.get(r,0)
-                    if token<cumulative: role=r; break
+                role=identity_role(spec.roles,unit)
             assignment.append((event,role))
             if len(assignment)>=512: con.executemany('INSERT INTO policy_role_assignment VALUES (?,?)',assignment); assignment=[]
         if assignment: con.executemany('INSERT INTO policy_role_assignment VALUES (?,?)',assignment)

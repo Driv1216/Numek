@@ -133,3 +133,20 @@ def test_cg3_local_workspace_backup_and_restore(tmp_path, monkeypatch, cluster):
         for root in (tmp_path / 'workspace', tmp_path / 'restored'):
             if (root / 'platform').exists():
                 LocalCluster(root / 'platform').stop()
+
+
+def test_shared_installation_workspace_refuses_workspace_backup_without_side_effects(platform, cg3, tmp_path):
+    """Replacement contract for v2 workspace backups on a shared installation (S3d)."""
+    from confidenceguard import EvaluationError, ReliabilityWorkspace
+    tmp_path = tmp_path.resolve()
+    ws = cg3.workspace(tmp_path)
+    ws.ingest(cg3.batch(tmp_path))
+    before = ws.status()
+    with pytest.raises(EvaluationError) as caught:
+        ws.backup(tmp_path / 'backup')
+    assert caught.value.code == 'backup_scope'
+    assert not (tmp_path / 'backup').exists()                       # nothing partial is left behind
+    assert ws.status() == before                                     # and the workspace is unchanged
+    with pytest.raises(EvaluationError) as caught:                  # and nothing restorable exists
+        ReliabilityWorkspace.restore(tmp_path / 'backup', tmp_path / 'restored')
+    assert caught.value.code == 'backup_changed'

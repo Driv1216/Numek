@@ -59,6 +59,12 @@ _WORKER_GOVERNANCE = {}
 _STUDY_AUTHORITY = {'use_id': None}
 
 
+def governed_call(authority, operation, *arguments, progress=None):
+    """Run a supervised worker operation under a study's authority (picklable entry point)."""
+    with study_authority(authority):
+        return operation(*arguments, progress=progress)
+
+
 @contextlib.contextmanager
 def study_authority(reservation):
     """Let worker reads inside this block see the sealed-reserve units consumed by ``reservation``.
@@ -69,7 +75,9 @@ def study_authority(reservation):
     admits (same study family, the reservation's own membership, its
     snapshot); other receipts and v2 workspaces grant nothing.
     """
-    use_id = (reservation or {}).get('evidence_use_id') if isinstance(reservation, dict) else None
+    # Only confirmation-class receipts confer authority (other receipts grant nothing).
+    use_id = (reservation.get('evidence_use_id') if isinstance(reservation, dict)
+              and reservation.get('evidence_kind') in ('confirmation', 'numerical_recomputation') else None)
     previous = _STUDY_AUTHORITY['use_id']
     _STUDY_AUTHORITY['use_id'] = use_id
     try:
@@ -107,7 +115,7 @@ class PlatformCatalog(Catalog):
         self._guard = threading.RLock()
         self._verified = {}
         self._leases = {}
-        self.governance = _WORKER_GOVERNANCE.get(str(self.root))
+        self._governance = None
         self.operation_path = self.root / '.operation.lock'
         self.objects_lock = self.root / '.objects.lock'
         for lock in (self.operation_path, self.objects_lock):
@@ -259,6 +267,13 @@ class PlatformCatalog(Catalog):
             for oid in objects:
                 if not conn.execute('SELECT 1 FROM objects WHERE catalog_id = %s AND id = %s', (self.catalog_id, _uuid(oid))).fetchone():
                     raise EvaluationError('Unknown deletion object.', 'unknown_object')
+            if not purge and conn.execute('SELECT 1 FROM evidence_uses WHERE catalog_id = %s AND membership_object = ANY(%s) LIMIT 1',
+                                          (self.catalog_id, [_uuid(o) for o in objects])).fetchone():
+                # Exposure records are durable governance: deleting one would break its
+                # reservation and could suggest regained freshness. A purge retires them
+                # with the catalog; exposure history survives it.
+                raise EvaluationError('Evidence-use records are durable governance and cannot be deleted.',
+                                      'governance_record')
             evidence_objects = [o for o in objects if self._object_kind(conn, o)[0] != 'assessment']
             if objects:
                 expanded = True
@@ -350,6 +365,10 @@ class PlatformCatalog(Catalog):
                              (self.catalog_id, plan['id']))
             with self.db.connect() as conn:
                 jobs.complete(conn, lease, {'deleted_objects': len(object_uuids)})
+        from .evidence_use import forget_session_uses
+        # v2 parity: release this workspace's process-local untracked observations
+        # (durable platform uses stay recorded; absence is never freshness).
+        forget_session_uses(self.instance_id, purge=plan['purge'], untracked=bool(plan['object_ids']))
         self._fault('deletion_tombstoned')
         if plan['purge']:
             self._retire_files()
@@ -370,6 +389,10 @@ class PlatformCatalog(Catalog):
 
     def _retire_files(self):
         """Complete a committed full purge (idempotent): reclaim bytes, empty local folders, mark retired."""
+        from .evidence_use import forget_session_uses
+        with self.db.connect() as conn:
+            owner = self._setting(conn, 'instance_id')
+        forget_session_uses(owner, purge=True)
         self._reclaim_deleted(())
         for folder in ('objects', 'staging'):
             target = self.root / folder
@@ -391,8 +414,10 @@ class PlatformCatalog(Catalog):
         from numek_platform.backup import create_backup
         destination = Path(destination).absolute()
         if self.binding.get('dsn_env'):
-            raise EvaluationError('This workspace shares a platform installation; back up the installation instead '
-                                  '(numek backup create).', 'backup_scope')
+            # A shared installation's backup is the installation's own procedure; it does not
+            # yet cover the object stores of ConfidenceGuard workspaces bound to it.
+            raise EvaluationError('Workspace backup is available only for workspaces with their own platform cluster; '
+                                  'this workspace shares a platform installation.', 'backup_scope')
         if destination == self.root or self.root in destination.parents or destination in self.root.parents or destination.exists():
             raise EvaluationError('Choose a new backup destination outside the workspace.', 'backup_destination')
         private_directory(destination)
@@ -400,7 +425,8 @@ class PlatformCatalog(Catalog):
         with private_file(destination / BINDING) as stream:
             stream.write(serialized(self.binding))
         summary = {'schema_version': 'confidenceguard.workspace_backup/2.0', 'instance_id': self.instance_id,
-                   'catalog_sequence': self.head(), 'platform_manifest': digest(manifest), 'storage': 'numek_platform'}
+                   'catalog_sequence': self.head(), 'platform_manifest': digest(manifest), 'storage': 'numek_platform',
+                   'files': sorted(manifest['files'])}   # v2 manifest parity: what the backup holds
         summary['content_digest'] = digest(summary)
         with private_file(destination / 'backup.json') as stream:
             stream.write(serialized(summary))
@@ -938,8 +964,17 @@ class PlatformCatalog(Catalog):
     # Reading ------------------------------------------------------------------------------------
     def governed(self, governance):
         """Attach an evidence-use reservation for outcome-bearing reads (see ``reserve_history``)."""
-        self.governance = governance
+        self._governance = governance
         return self
+
+    @property
+    def governance(self):
+        """This instance's reservation, else the one this worker process holds for the root.
+
+        Looked up on every read, so catalog instances opened before the worker
+        reserved (or renewed) read under the same reservation.
+        """
+        return self._governance if self._governance is not None else _WORKER_GOVERNANCE.get(str(self.root))
 
     def ensure_governance(self, *, namespace, k, purpose_label):
         """Reserve before the first outcome read in a process that was not handed a reservation.
@@ -955,16 +990,20 @@ class PlatformCatalog(Catalog):
         if (held is not None and held.get('authority') == authority and held['namespace'] == namespace
                 and held['reservation']['read_k'] >= k):
             return self
-        return self._auto_reserve(namespace=namespace, k=k, purpose_label=purpose_label, authority=authority)
+        self._auto_reserve(namespace=namespace, k=k, purpose_label=purpose_label, authority=authority)
+        return self
 
-    def _auto_reserve(self, *, namespace, k, purpose_label, authority):
+    def _auto_reserve(self, *, namespace, k, purpose_label, authority, install=True):
         lease, governance = self.reserve_history(namespace=namespace, k=k, purpose_label=purpose_label, exposure=False,
                                                  authority=authority)
         governance.update(auto=True, namespace=namespace, purpose_label=purpose_label, authority=authority)
         from multiprocessing import util
         util.Finalize(None, PlatformCatalog._close_attempt, args=(self.db.dsn, lease), exitpriority=10)
+        if not install:
+            return governance
         _WORKER_GOVERNANCE[str(self.root)] = governance
-        return self.governed(governance)
+        self.governed(governance)
+        return governance
 
     @staticmethod
     def _close_attempt(dsn, lease):
@@ -995,13 +1034,20 @@ class PlatformCatalog(Catalog):
                 held = self.governance
                 if held is not None and held.get('auto') and k > held['reservation']['read_k']:
                     # Worker access reservations follow the snapshot a worker reads,
-                    # with the same study authority (which refuses beyond its own K).
-                    self._auto_reserve(namespace=held['namespace'], k=k, purpose_label=held['purpose_label'],
-                                       authority=held.get('authority'))
-                    held = self.governance
+                    # with the same study authority. Past the study's own snapshot the
+                    # authority grants nothing: that one read is made without it (sealed
+                    # reserve rows withheld) and the in-snapshot reservation is kept.
+                    try:
+                        held = self._auto_reserve(namespace=held['namespace'], k=k, purpose_label=held['purpose_label'],
+                                                  authority=held.get('authority'))
+                    except EvaluationError as exc:
+                        if exc.code != 'authority_snapshot':
+                            raise
+                        held = self._auto_reserve(namespace=held['namespace'], k=k, purpose_label=held['purpose_label'],
+                                                  authority=None, install=False)
                 if held is not None:
                     reservation = Reservation(**{k2: (uuid.UUID(v) if k2 in ('catalog_id', 'job_id') and v else v)
-                                                 for k2, v in self.governance['reservation'].items()})
+                                                 for k2, v in held['reservation'].items()})
                     locators = governed_reader.resolve(self.db, self.store, reservation, read_pin, **filters).locators
                 else:
                     locators = reader.resolve(self.db, read_pin, **filters)
@@ -1087,6 +1133,24 @@ class PlatformCatalog(Catalog):
                 if cg5:
                     frozen = result.private.get('frozen_family') or {}
                     dependencies |= self._assessment_objects(conn, 'policy_family', [frozen.get('content_digest')])
+                # (v2 also linked the CG5 evidence-use fact; platform uses are durable governance rows,
+                # not deletable objects, so there is nothing to link.)
+            # A standalone run can reuse the exact bytes already retained here (v2 parity).
+            # Link those known copies for deletion without inferring statistical
+            # independence or identity from different files with similar values.
+            hashes = {v.get('sha256') for v in result.private.get('files', {}).values() if isinstance(v, dict)} - {None}
+            if hashes:
+                for fact in self.iter_facts('capture_metadata', require_complete=False):
+                    metadata = fact['payload']
+                    inputs = list(metadata.get('sources', {}).values())
+                    inputs.extend(v for k, v in metadata.get('external_inputs', {}).items()
+                                  if ':model:' not in k and not k.endswith(':manifest'))
+                    if hashes.intersection(v.get('sha256') for v in inputs if isinstance(v, dict)):
+                        with self.db.connect() as conn:
+                            dependencies |= {r['id'].hex for r in conn.execute(
+                                '''SELECT o.id FROM cg_objects c JOIN objects o ON o.id = c.object_id
+                                   WHERE c.catalog_id = %s AND c.operation_id = %s AND o.state = 'active' ''',
+                                (self.catalog_id, _uuid(fact['identity'][0])))}
             payload['depends_on_objects'] = sorted(dependencies)
             from .investigation_storage import write_packet
             write_packet(writer, 'assessment', [aid], payload)
@@ -1151,6 +1215,16 @@ class PlatformCatalog(Catalog):
         data = self._verified_bytes(_uuid(location['object_id']))
         return np.load(io.BytesIO(data), allow_pickle=False, max_header_size=10000)
 
+    def sealed_reserve_units(self, units):
+        """The subset of ``units`` (hex hashes) registered as sealed-reserve entities."""
+        units = sorted(set(units))
+        if not units:
+            return set()
+        with self.db.connect() as conn:
+            rows = conn.execute("SELECT unit_hash FROM entity_registry WHERE catalog_id = %s AND reserve_state = 'reserve' "
+                                'AND unit_hash = ANY(%s)', (self.catalog_id, [bytes.fromhex(u) for u in units])).fetchall()
+        return {bytes(r['unit_hash']).hex() for r in rows}
+
     def assessment(self, aid):
         """v2 parity: retained binaries a result names exist at their v2 paths (verified copies)."""
         result = super().assessment(aid)
@@ -1196,6 +1270,67 @@ class PlatformCatalog(Catalog):
         os.replace(temporary, target)
         fsync_directory(target.parent)
         return target
+
+    # Sealed-reserve study claims (G.8) -----------------------------------------------------------------
+    def family_claim(self, family_digest):
+        """The study family's reserve claim receipt, or None."""
+        with self.db.connect() as conn:
+            row = conn.execute('''SELECT id, reserve_consumed_units, read_k FROM evidence_uses WHERE catalog_id = %s
+                                  AND purpose = 'reserve_claim' AND family_digest = %s ORDER BY created_at LIMIT 1''',
+                               (self.catalog_id, family_digest)).fetchone()
+        return None if row is None else {'evidence_use_id': row['id'], 'evidence_kind': 'confirmation',
+                                         'reserve_units': row['reserve_consumed_units'],
+                                         'catalog_sequence': row['read_k'], 'reserve_claim': True}
+
+    def claim_reserve(self, *, family_digest, namespace, k, tick_ranges, eligible, purpose_label, metadata=None):
+        """Reserve and consume the sealed-reserve entities a frozen family's assessment role may use.
+
+        G.8 ordering: the family is frozen; eligible reserve membership is found
+        from identities only (``reserve_identities``: keys, clocks, outcome
+        existence; ``eligible`` applies the family's identity-only role rule);
+        one transaction reserves and consumes it; inspection and assessment then
+        read under that authority. Idempotent per family: a retry, a scheduled
+        look or a numerical recomputation reuses the original claim, so the
+        authorized population never grows. Returns None (ordinary workflow) when
+        tracking is off, no active reserve exists, or nothing is eligible.
+        """
+        from numek_platform.errors import PlatformError
+        from numek_platform.evidence import reader
+        from numek_platform.execution import jobs
+        from numek_platform.governance import ledger, reader as governed_reader
+        existing = self.family_claim(family_digest)
+        if existing is not None:
+            return existing
+        try:
+            if not ledger.tracking_status(self.db, self.scope, self.catalog_id)['enabled']:
+                return None
+            with self.db.connect() as conn:
+                active = conn.execute("SELECT 1 FROM reserves WHERE catalog_id = %s AND namespace = %s AND state = 'active'",
+                                      (self.catalog_id, namespace)).fetchone()
+            if active is None:
+                return None
+            with self.db.connect() as conn:
+                lease, _row = jobs.start_inline(conn, self.scope, 'cg_reserve_claim', idempotency_key=uuid.uuid4().hex,
+                                                owner=f'confidenceguard:{os.getpid()}')
+            try:
+                read_pin = reader.pin(self.db, self.scope, self.catalog_id, lease=lease, k=k)
+                identities = governed_reader.reserve_identities(self.db, self.store, read_pin, namespace=namespace,
+                                                                tick_ranges=tick_ranges, family_digest=family_digest)
+                members = sorted({(i['event_hash'], i['entity_hash'], i['target_key']) for i in identities if eligible(i)})
+                reader.release(self.db, read_pin)
+                if not members:
+                    return None
+                reservation = ledger.reserve(
+                    self.db, self.store, self.scope, lease, self.catalog_id, purpose='reserve_claim', members=members,
+                    population_digest='reserve-claim:' + digest(members), family_digest=family_digest, read_k=k,
+                    request_id='reserve-claim:' + family_digest, consume_reserve=True,
+                    metadata={'purpose': purpose_label, 'namespace': namespace, **(metadata or {})})
+            finally:
+                self.finish_attempt(lease)
+        except PlatformError as exc:
+            raise _translate(exc) from exc
+        return {'evidence_use_id': reservation.id, 'evidence_kind': 'confirmation',
+                'reserve_units': reservation.reserve_consumed_units, 'catalog_sequence': k, 'reserve_claim': True}
 
     # Governance for historical analysis -----------------------------------------------------------
     def reserve_history(self, *, namespace, k, purpose_label, metadata=None, exposure=True, authority=None):

@@ -143,7 +143,10 @@ def _authorized_units(conn, catalog_id, authority, purpose, read_k):
     row = conn.execute('SELECT * FROM evidence_uses WHERE catalog_id = %s AND id = %s', (catalog_id, authority)).fetchone()
     if row is None or row['kind'] not in CONFIRMATION_CLASSES:
         raise PlatformError('Study authority must be a confirmation-class reservation of this catalog.', 'authority_scope')
-    if row['read_k'] is not None and (read_k is None or read_k > row['read_k']):
+    looks = bool((row['metadata'] or {}).get('restatement_schedule'))
+    if row['read_k'] is not None and (read_k is None or read_k > row['read_k']) and not looks:
+        # A family with predeclared looks reads its own units again later; the
+        # membership bound below still applies. Others never read past K.
         raise PlatformError('Study authority does not cover this catalog snapshot.', 'authority_snapshot')
     spenders = ('(u.id = %s)' if row['family_digest'] is None else
                 '(u.kind = ANY(%s) AND u.family_digest = %s)')
@@ -198,7 +201,12 @@ def _spent(conn, catalog_id, units, family_digest=None):
 
 
 def _overlap_reasons(conn, catalog_id, query_events, units, family_digest, population_digest):
-    """Ported v2 overlap: any earlier exposure except the same confirmation family and population."""
+    """Ported v2 overlap: any earlier exposure except the same confirmation family and population.
+
+    A G.8 reserve claim reads nothing and is not exposure; its units are held
+    for its family by the reserve rules (withheld from others, never consumable
+    by another family), so it never counts here.
+    """
     reasons = set()
     conn.execute('CREATE TEMP TABLE _req (member_kind text, hash bytea) ON COMMIT DROP')
     with conn.cursor().copy('COPY _req (member_kind, hash) FROM STDIN') as copy:
@@ -213,7 +221,8 @@ def _overlap_reasons(conn, catalog_id, query_events, units, family_digest, popul
         hit = conn.execute(
             '''SELECT 1 FROM confirmation_members m JOIN _req q ON m.member_kind = q.member_kind AND m.hash = q.hash
                JOIN evidence_uses u ON u.catalog_id = m.catalog_id AND u.id = m.use_id
-               WHERE m.catalog_id = %s AND NOT (u.family_digest IS NOT DISTINCT FROM %s AND u.population_digest = %s)
+               WHERE m.catalog_id = %s AND u.purpose <> 'reserve_claim'
+               AND NOT (u.family_digest IS NOT DISTINCT FROM %s AND u.population_digest = %s)
                LIMIT 1''', (catalog_id, family_digest, population_digest)).fetchone()
     if hit is not None:
         reasons.add('previously_exposed_confirmation_population')
@@ -255,14 +264,14 @@ def _confirmation_rules(conn, catalog_id, kind, row, metadata, family_digest, po
             raise PlatformError('Scheduled reuse lacks the original durable family, schedule or identical planned '
                                 'population.', 'scheduled_restatement_provenance')
         other = conn.execute(
-            '''SELECT 1 FROM evidence_uses WHERE catalog_id = %s AND kind = 'confirmation'
+            '''SELECT 1 FROM evidence_uses WHERE catalog_id = %s AND kind = 'confirmation' AND purpose <> 'reserve_claim'
                AND family_digest IS NOT DISTINCT FROM %s AND metadata->>'look_id' = %s AND population_digest <> %s''',
             (catalog_id, family_digest, look_id, population_digest)).fetchone()
         if other:
             raise PlatformError('This scheduled look was already reserved against a different outcome snapshot.',
                                 'scheduled_look_already_assessed')
     prior = conn.execute(
-        '''SELECT id FROM evidence_uses WHERE catalog_id = %s AND kind = 'confirmation'
+        '''SELECT id FROM evidence_uses WHERE catalog_id = %s AND kind = 'confirmation' AND purpose <> 'reserve_claim'
            AND family_digest IS NOT DISTINCT FROM %s AND population_digest = %s
            AND (metadata->>'look_id') IS NOT DISTINCT FROM %s ORDER BY created_at LIMIT 1''',
         (catalog_id, family_digest, population_digest, look_id)).fetchone()
@@ -341,7 +350,12 @@ def reserve(db, store, scope, lease, catalog_id, *, purpose, members, population
         if (again[0], again[1], again[2], again[3]) != (kept, kept_extra_units, withheld, consumed):
             raise PlatformError('Reserve assignments changed during the reservation; retry.', 'governance_changed',
                                 retryable=True)
-        if kind in CONFIRMATION_CLASSES:
+        if purpose == 'reserve_claim':
+            if not row['exposure_tracking']:
+                raise PlatformError('Explicit evidence-use tracking consent required.', 'exposure_tracking_disabled')
+            if family_digest is None:
+                raise PlatformError('A reserve claim belongs to a frozen study family.', 'authority_scope')
+        elif kind in CONFIRMATION_CLASSES:
             reuse = _confirmation_rules(conn, catalog_id, kind, row, metadata, family_digest, population_digest, alpha,
                                         events, units, query_events if query_events is not None else events)
             if reuse is not None:

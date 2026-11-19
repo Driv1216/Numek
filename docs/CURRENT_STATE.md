@@ -1,5 +1,44 @@
 # Numek Current State
 
+## ConfidenceGuard CG7 — S3d reserve-backed assessments and the platform test port (2026-11-19)
+
+**Reserve-backed assessments.** CG4 confirmations and CG5 policy assessments can now use the sealed reserve end to end, in
+the G.8 order:
+1. freeze the family;
+2. find eligible reserve entities from identities only;
+3. reserve and consume them in one transaction;
+4. inspect and assess under that study's authority.
+
+One claim exists per family. Retries, scheduled looks and numerical recomputations reuse it. Other families, monitoring
+and development reads never see those units. Ordinary workflows are unchanged.
+
+**Test port.** All 30 v2-specific test assertions were replaced by the platform form of the same invariant; none was
+removed. Workspace backup tests run on P-LOCAL workspaces, and the shared-installation refusal is a tested contract.
+
+**Product gaps found and fixed by the port:**
+- untracked session identifiers are released on deletion and purge;
+- evidence-use records cannot be deleted individually;
+- a repeated evidence-use request returns its original receipt;
+- standalone runs depend on byte-identical retained sources for deletion;
+- fact iteration order is deterministic;
+- a restore from a missing backup refuses with `backup_changed`.
+
+**Closure gate:**
+- CG3–CG6: 592 passed on the platform and 592 on catalog v2, with 0 failures and the same 10 pre-existing skips.
+- Platform suite: 85 pass after one fix, which was rerun on its own.
+
+**Remaining:**
+- S3c (v2 replay and equivalence validation);
+- the `ctx.run` refactor;
+- retirement of the v2 writer, which needs S3c.
+
+**Limitations.**
+- Reserve entities are registered at publication only from S4.
+- Column-based roles cannot use the reserve.
+- Shared-installation workspaces cannot be backed up at workspace level.
+
+See [CG7 status](../validation/cg7/IMPLEMENTATION_STATUS.md).
+
 ## ConfidenceGuard CG7 — S3b CG4–CG6 storage on the platform (2026-11-19)
 
 CG4, CG5 and CG6 workspaces now run on the NUMEK platform, with v2 deletion, purge, P-LOCAL backup and restore semantics.
