@@ -1,5 +1,36 @@
 # Numek Current State
 
+## ConfidenceGuard CG7 — S4 ingestion (2026-11-20)
+
+**What exists now.** Production evidence can now flow into CG7. A NUMEK installation (one database, object store and
+secrets store) holds one evidence catalog per registered system. Deployments and versioned source contracts feed it.
+
+**Receiving.** Batches arrive by HTTP (per-source service tokens), directory pull, or the `numek_monitor` SDK. Each is
+durably acknowledged only after it is encrypted at rest and recorded. Retries are idempotent and conflicting resends
+are refused.
+
+**Processing.** Each batch is minimized (undeclared fields are dropped and only counted), checked row by row, and
+quarantined per row (encrypted, never logged) or per conflicting fact. Accepted rows publish through the unchanged CG3
+capture path.
+
+**Reserve.** Entities are assigned to the namespace's sealed reserve at publication, so reserve-backed studies now
+work end to end on ingested data.
+
+**Also in S4:**
+- watermarks, lateness and window closure standings;
+- deployment events;
+- deployment identity standings (declared, registered, spec-compatible, sampled output-consistent with a
+  Clopper–Pearson bound, customer-signed statements), with no attestation inferred from agreement;
+- 7/30-day retention, with day-key shredding reported honestly (backups still hold the keys);
+- installation backups that cover unprocessed batches.
+
+**Results:** platform suite 113 passed; CG1–CG6 673 passed, 0 failed.
+
+**Not in S4:** the operations API beyond ingestion, the console and the CLI (S9); detectors and window evaluation (S5).
+D-1 remains for workspace-bound shared catalogs.
+
+See [CG7 status](../validation/cg7/IMPLEMENTATION_STATUS.md).
+
 ## ConfidenceGuard CG7 — S3 complete: migration, execution contexts, v2 writer retired (2026-11-20)
 
 **Persistence is platform-only.** Every persistent ConfidenceGuard workspace now lives on the NUMEK platform: a shared

@@ -69,7 +69,7 @@ class ReliabilityWorkspace:
     def set_saving(self, enabled): return self.catalog.set_saving(enabled)
     def recover(self): return self.catalog.recover()
 
-    def ingest(self, batch, config=None, *, request_id=None, progress=None, cancel=None, allowed_roots=None):
+    def ingest(self, batch, config=None, *, request_id=None, progress=None, cancel=None, allowed_roots=None, conflicts='refuse'):
         if isinstance(batch, dict): batch = PredictionBatchSpec.from_dict(batch)
         if not isinstance(batch, PredictionBatchSpec): raise EvaluationError('PredictionBatchSpec required.')
         if isinstance(config, dict): config = EvaluationConfig.from_dict(config)
@@ -113,7 +113,8 @@ class ReliabilityWorkspace:
                     operation_service = {'evaluate': evaluate, 'study': study, 'fit': fit_methods, 'apply': apply_methods}[batch.operation]
                     result = operation_service(batch.evaluation, config, allowed_roots=roots, progress=progress, cancel=cancel, _capture=descriptor,_deadline=deadline)
                     _append_assessment(stage, result, self.catalog.config)
-                receipt = self.catalog.commit_capture(operation, cancel=cancel, receipt_extra={'assessment_id': result.data['analysis_id']} if result else None)
+                receipt = self.catalog.commit_capture(operation, cancel=cancel, receipt_extra={'assessment_id': result.data['analysis_id']} if result else None,
+                                                      conflicts=conflicts)
                 return receipt
             except BaseException as exc:
                 # A completed ephemeral evaluation is explicitly distinct from an

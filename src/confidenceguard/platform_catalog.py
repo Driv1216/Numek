@@ -59,6 +59,9 @@ _WORKER_GOVERNANCE = {}
 _STUDY_AUTHORITY = {'use_id': None}
 
 
+# Admission refusals that ingestion quarantines per fact instead of refusing a whole capture.
+QUARANTINABLE = ('historical_identity_conflict', 'historical_evidence_unavailable', 'historical_role_reassignment',
+                 'correction_authority', 'correction_chronology', 'correction_predecessor')
 _ATTEMPT_SCOPES = []      # stack of in-process phase scopes (lists of open worker attempts)
 # Catalogs a v2 -> platform migration is validating in this process. Only the migration
 # job reads a ``migrating`` catalog (in process); every other reader is refused.
@@ -193,6 +196,7 @@ class PlatformCatalog(Catalog):
         self._verified = {}
         self._leases = {}
         self._governance = None
+        self._lexical_entity = {}
         self.operation_path = self.root / '.operation.lock'
         self.objects_lock = self.root / '.objects.lock'
         for lock in (self.operation_path, self.objects_lock):
@@ -209,8 +213,15 @@ class PlatformCatalog(Catalog):
         if binding.get('format') != BINDING_FORMAT:
             raise EvaluationError('Unsupported platform binding.', 'catalog_version')
         self.binding = binding
+        self.installation = None
+        if binding.get('installation'):
+            from numek_platform.installation import Installation
+            self.installation = Installation(binding['installation'])
         self.db = Database(self._dsn(binding, self.root), application_name='confidenceguard')
-        self.store = LocalObjectStore(self.root / binding['store'])
+        self.store = (self.installation.store if self.installation is not None
+                      else LocalObjectStore(self.root / binding['store']))
+        # Reserve assignment needs the installation's secrets; standalone workspaces have none.
+        self.secrets = self.installation.secrets if self.installation is not None else None
         from numek_platform.scope import OrgScope
         self.scope = OrgScope(uuid.UUID(binding['org_id']))
         self.catalog_id = uuid.UUID(binding['catalog_id'])
@@ -219,6 +230,9 @@ class PlatformCatalog(Catalog):
 
     @staticmethod
     def _dsn(binding, root):
+        if binding.get('installation'):
+            from numek_platform.installation import Installation
+            return Installation(binding['installation']).dsn()
         if binding.get('dsn_env'):
             dsn = os.environ.get(binding['dsn_env'])
             if not dsn:
@@ -699,14 +713,19 @@ class PlatformCatalog(Catalog):
                 FROM fact_index f JOIN objects o ON o.id = f.object_id WHERE {' AND '.join(where)} LIMIT 1''', params).fetchone()
 
     # Publication (port of v2 commit_capture) ------------------------------------------------------
-    def commit_capture(self, identifier, *, cancel=None, receipt_extra=None):
+    def commit_capture(self, identifier, *, cancel=None, receipt_extra=None, conflicts='refuse'):
+        """Publish a staged capture. ``conflicts='quarantine'`` (CG7 ingestion) leaves facts that conflict with
+        retained evidence (or correct it inadmissibly) out of the publication and reports them, instead of
+        refusing the whole capture."""
+        if conflicts not in ('refuse', 'quarantine'):
+            raise ValueError(conflicts)
         try:
-            return self._commit_capture(identifier, cancel=cancel, receipt_extra=receipt_extra)
+            return self._commit_capture(identifier, cancel=cancel, receipt_extra=receipt_extra, conflicts=conflicts)
         except BaseException:
             self._finish_lease(identifier, failed=True)
             raise
 
-    def _commit_capture(self, identifier, *, cancel, receipt_extra):
+    def _commit_capture(self, identifier, *, cancel, receipt_extra, conflicts='refuse'):
         from .feature_storage import extension, validate_matrix
         from numek_platform.evidence.publish import FactRow, publish, stage_object
         from numek_platform.errors import PlatformError
@@ -735,6 +754,7 @@ class PlatformCatalog(Catalog):
         dependencies, vector_rows = set(), []
         staged_cache, stored_cache = {}, {}
         entity_of = {}
+        quarantined = []
         with self.db.connect() as conn, contextlib.ExitStack() as cleanup:
             cleanup.callback(lambda: [s.close() for s in staged_cache.values() if hasattr(s, 'close')])
             with private_file(stage / 'index.jsonl', 'rb') as stream:
@@ -767,36 +787,45 @@ class PlatformCatalog(Catalog):
                 prior_exists = (any(k == entry['kind'] and key == entry['key'] for k, key, _r in seen)
                                 or self._fact_row(conn, entry['kind'], entry['key']) is not None)
                 is_correction = fact.get('predecessor') is not None or (prior_exists and same is None)
-                if entry['kind'] in {'prediction', 'context', 'opportunity', 'feature', 'representation'} and is_correction:
-                    self._validate_correction(conn, entry, fact, claimed, seen, stage, staged_cache, stored_cache)
-                if same is not None:
-                    if isinstance(same, dict) and same.get('_staged'):
-                        if same['fact_digest'] != claimed:
+                try:
+                    if entry['kind'] in {'prediction', 'context', 'opportunity', 'feature', 'representation'} and is_correction:
+                        self._validate_correction(conn, entry, fact, claimed, seen, stage, staged_cache, stored_cache)
+                    if same is not None:
+                        if isinstance(same, dict) and same.get('_staged'):
+                            if same['fact_digest'] != claimed:
+                                raise EvaluationError('Same fact identity/revision has different content.', 'historical_identity_conflict')
+                            duplicates += 1
+                            continue
+                        if bytes(same['fact_digest']).hex() != claimed:
                             raise EvaluationError('Same fact identity/revision has different content.', 'historical_identity_conflict')
+                        if same['purged'] or same['object_state'] not in ('active', 'tombstoned'):
+                            raise EvaluationError('Previously retained fact was purged or is unavailable; restore a verified '
+                                                  'backup into a new workspace.', 'historical_evidence_unavailable')
+                        prior_record = self._stored_record(same['object_id'], same['codec'], same['loc_a'], same['loc_b'], stored_cache)
+                        prior_digest = prior_record.pop('fact_digest', None)
+                        if prior_digest != claimed or digest(prior_record) != claimed or prior_record != fact:
+                            raise EvaluationError('Indexed duplicate differs from retained canonical identity/payload.',
+                                                  'historical_identity_conflict')
                         duplicates += 1
-                        continue
-                    if bytes(same['fact_digest']).hex() != claimed:
-                        raise EvaluationError('Same fact identity/revision has different content.', 'historical_identity_conflict')
-                    if same['purged'] or same['object_state'] not in ('active', 'tombstoned'):
-                        raise EvaluationError('Previously retained fact was purged or is unavailable; restore a verified '
-                                              'backup into a new workspace.', 'historical_evidence_unavailable')
-                    prior_record = self._stored_record(same['object_id'], same['codec'], same['loc_a'], same['loc_b'], stored_cache)
-                    prior_digest = prior_record.pop('fact_digest', None)
-                    if prior_digest != claimed or digest(prior_record) != claimed or prior_record != fact:
-                        raise EvaluationError('Indexed duplicate differs from retained canonical identity/payload.',
-                                              'historical_identity_conflict')
-                    duplicates += 1
-                    target_object = same['object_id']
-                    rows.append(self._row(FactRow, entry, fact, claimed, target_object, same['locator_kind'], same['loc_a'],
-                                          same['loc_b'], entity_of))
-                else:
-                    new += 1
-                    used.add(entry['object_id'])
-                    target_object = _uuid(entry['object_id'])
-                    seen[identity] = {'_staged': True, 'fact_digest': claimed, 'object_id': entry['object_id'],
-                                      'offset': entry['offset'], 'length': entry['length'], 'codec': codec}
-                    rows.append(self._row(FactRow, entry, fact, claimed, target_object,
-                                          entry.get('locator_kind', 'byte_range'), entry['offset'], entry['length'], entity_of))
+                        target_object = same['object_id']
+                        rows.append(self._row(FactRow, entry, fact, claimed, target_object, same['locator_kind'], same['loc_a'],
+                                              same['loc_b'], entity_of))
+                    else:
+                        new += 1
+                        used.add(entry['object_id'])
+                        target_object = _uuid(entry['object_id'])
+                        seen[identity] = {'_staged': True, 'fact_digest': claimed, 'object_id': entry['object_id'],
+                                          'offset': entry['offset'], 'length': entry['length'], 'codec': codec}
+                        rows.append(self._row(FactRow, entry, fact, claimed, target_object,
+                                              entry.get('locator_kind', 'byte_range'), entry['offset'], entry['length'], entity_of))
+                except EvaluationError as exc:
+                    if conflicts != 'quarantine' or exc.code not in QUARANTINABLE:
+                        raise
+                    # Ingestion: this fact conflicts with retained evidence (or corrects it
+                    # inadmissibly); it is reported and left out, the rest is published.
+                    quarantined.append({'kind': entry['kind'], 'key': entry['key'], 'revision': entry['revision'],
+                                        'reason': exc.code})
+                    continue
                 self._collect_dependencies(conn, fact, target_object, objects, used, dependencies)
         if cancel is not None and cancel.is_set():
             raise EvaluationError('Cancelled before historical commit.', 'cancelled')
@@ -827,27 +856,56 @@ class PlatformCatalog(Catalog):
 
         cg_receipt = {'operation_id': identifier, 'new_facts': new, 'duplicate_occurrences': duplicates,
                       'capture_digest': expected, **(receipt_extra or {})}
+        if conflicts == 'quarantine':
+            cg_receipt['quarantined_facts'] = quarantined
+        entities = self._first_seen_entities(rows)
+
+        def after_head(conn, pid, k):
+            conn.execute("UPDATE publications SET receipt = jsonb_set(receipt, '{cg,catalog_sequence}', to_jsonb(%s::bigint)) "
+                         'WHERE id = %s', (k, pid))
+            self._register_entities(conn, entities, k)
+            self._fault('before_catalog_commit')
+
         try:
             receipt = publish(self.db, self.scope, lease, self.catalog_id, request_id=request_id,
                               request_digest=request_digest, kind='cg_capture', objects=refs, facts=rows,
                               before_head=before_head, publication_id=_uuid(identifier),
                               reservations=getattr(self, '_consumes', {}).pop(identifier, ()),
                               receipt_extra={'cg': {**cg_receipt, 'catalog_sequence': None}},
-                              after_head=lambda conn, pid, k: (conn.execute(
-                                  "UPDATE publications SET receipt = jsonb_set(receipt, '{cg,catalog_sequence}', to_jsonb(%s::bigint)) "
-                                  'WHERE id = %s', (k, pid)), self._fault('before_catalog_commit')))
+                              exposure_lock=bool(entities), after_head=after_head)
         except PlatformError as exc:
             raise _translate(exc) from exc
         if receipt.replayed:
             result = self.receipt(request_id, request_digest)
         else:
-            result = {'operation_id': identifier, 'catalog_sequence': receipt.sequence, 'new_facts': new,
-                      'duplicate_occurrences': duplicates, 'capture_digest': expected, **(receipt_extra or {})}
+            result = {**cg_receipt, 'catalog_sequence': receipt.sequence}
         self._fault('catalog_committed')
         self._finish_lease(identifier)
         shutil.rmtree(stage)
         fsync_directory(self.root / 'staging')
         return result
+
+    def _first_seen_entities(self, rows):
+        """{namespace: [(unit_hash, lexical entity)]} of the opportunities a capture publishes.
+
+        Registered with the namespace's sealed reserve in the publication transaction, at its K
+        (G.8: assignment at first sight; an entity first seen before a reserve existed stays
+        ``pre_reserve``). Needs the installation's secrets; standalone workspaces have none.
+        """
+        if self.secrets is None:
+            return {}
+        out = {}
+        for row in rows:
+            if row.kind == 'opportunity' and row.namespace and row.entity_hash:
+                out.setdefault(row.namespace, {})[row.entity_hash] = self._lexical_entity.get(row.key) or row.opportunity_key
+        return {ns: sorted(values.items()) for ns, values in out.items()}
+
+    def _register_entities(self, conn, entities, k):
+        if not entities:
+            return
+        from numek_platform.governance.reserve import register_entities
+        for namespace, values in entities.items():
+            register_entities(conn, self.secrets, self.scope, self.catalog_id, namespace, values, k)
 
     def _row(self, FactRow, entry, fact, claimed, object_id, locator_kind, a, b, entity_of):
         payload = fact.get('payload') or {}
@@ -857,6 +915,8 @@ class PlatformCatalog(Catalog):
         if kind == 'opportunity':
             opportunity_key = entry['key']
             entity_of[opportunity_key] = payload.get('entity')
+            if self is not None:
+                self._lexical_entity[entry['key']] = payload.get('entity')
             target_key = payload.get('target_key')
         elif kind in ('prediction', 'sample'):
             opportunity_key = payload.get('opportunity_key')

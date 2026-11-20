@@ -5,6 +5,151 @@ records what is implemented and what evidence exists, stage by stage. Several ki
 engineering correctness, statistical qualification, resilience, measured performance, product completeness,
 independent review and founder acceptance.
 
+## S4: ingestion (2026-11-20). Implemented; closure gate passing.
+
+### Implemented (plan H.4, H.5, C.6, G.9, R2.7)
+
+**Installation and registration.**
+- **`numek_platform.installation`.** An installation is one database (named by an environment variable, or a P-LOCAL
+  cluster), one object store, one secrets store and a catalogs directory.
+- **Systems.** Each system owns one ConfidenceGuard platform catalog bound to the installation: its database, object
+  store and secrets. One installation backup therefore covers every system catalog. The binding is derived from the
+  database, so a restored or relocated installation recreates it.
+- **Deployments** carry a registered identity (model id and version, artifact digest, optional CG6 predictor spec) and
+  an optional Ed25519 customer key.
+- **Sources** are versioned contracts (`operations.contracts`):
+  - the format (CSV or JSONL);
+  - the permitted fields, each with type, required/identity, vocabulary, range or probability rules;
+  - probability-sum groups;
+  - an event-time field;
+  - identity fields;
+  - a CG3 `PredictionBatchSpec` template, so publication reuses CG3's identity, correction and dedup rules unchanged.
+
+  A changed contract becomes a new version, and earlier batches keep theirs.
+- **Ingest tokens** are scoped to one source (`ingest:source:<id>`) or deployment (`ingest:deployment:<id>`). They are
+  issued only to service principals, shown once and stored as a hash.
+
+**Receive (the durable acknowledgement).**
+1. The raw body is encrypted with that UTC day's data key (AES-256-GCM, authenticated by source and batch id), under a
+   random object id. Object names reveal nothing about the plaintext.
+2. The body is written durably (W1–W3).
+3. One transaction activates it, records the batch and enqueues its processing job. Only after that commit is the
+   batch acknowledged (HTTP 202).
+
+How retries and failures behave:
+- **Same id, same bytes:** returns the same receipt.
+- **Same id, different bytes:** refused with `batch_conflict` (409).
+- **Crash before commit:** leaves only a pending object, which GC reclaims.
+- **Backpressure:** 429 with `Retry-After` when pending batches or pending raw bytes exceed the admission.
+- **Backfill batches** run in the maintenance lane, never competing with live monitoring.
+
+**Process.**
+1. Decrypt and verify the plaintext digest, then parse.
+2. **Minimization.** Undeclared fields are dropped at parse time and only counted. Their values never reach storage,
+   the quarantine or logs.
+3. **Row checks** (deterministic, standing D): missing identity or required field, type, timestamp, vocabulary, range,
+   probability, probability sums. A failing row is quarantined with its reasons and field names, never its values. The
+   minimized rows are kept encrypted under the day's quarantine key.
+4. **Publication.** Accepted rows publish through the CG3 capture path at one K. A fact that conflicts with retained
+   evidence, or corrects it inadmissibly, is quarantined per fact (`commit_capture(conflicts='quarantine')`) instead
+   of refusing the batch.
+5. **Reserve assignment.** Entities are registered with the namespace's sealed reserve in the publication transaction,
+   at its K: assignment at first sight, and an entity first seen before a reserve existed stays `pre_reserve`. This
+   closes the S3d gap: reserve-backed studies now work end to end on ingested evidence.
+6. One final transaction records the batch state, counts, quarantine and identity standings, and releases the raw body
+   from recovery retention.
+7. Retries are idempotent (the publication's request id is the batch id). Jobs run on worker hosts with
+   `InProcessContext` (`operations.jobs:REGISTRY`), or through `process_pending` on a single host.
+8. **Funnel.** Rows received = accepted + quarantined; facts published = new + duplicate, with conflicting facts
+   quarantined; `funnel()` reports the reconciliation.
+
+**Watermarks and closure.**
+- Producer watermarks are monotonic (a regression is ignored and reported).
+- Rows at or before the watermark that was current at receipt are counted as late.
+- Closure standing of a window `[a, b)` is `producer_declared_complete`, `assumed_complete_after_lateness`, or `open`
+  (plan G.1). Window revisions and detector inputs are S5.
+
+**Directory pull** (`SourceConnector` seam). New or changed files are fingerprinted (path, size, mtime, SHA-256) and
+received. Customer files are never deleted; they are optionally moved to a `processed` directory. Database and S3
+connectors are prepared only, as planned.
+
+**SDK `numek_monitor`** (standard library only).
+- `log()` is non-blocking and never raises.
+- Rows go to an on-disk segment, fsynced by group commit within 200 ms.
+- Sealed batches keep a stable id (buffer id plus sequence), so a resend after a crash or a lost response is
+  recognised.
+- A full buffer drops and counts rows; the known loss is reported in the next batch (`Numek-Dropped-Rows`).
+- Rejected batches are kept aside.
+- Delivery states follow H.5: `buffered_memory`, `buffered_disk`, `sent`, `acknowledged`, `dropped`.
+
+**Deployment identity standings** (each recorded separately with evidence; G.9 and R2.7):
+- `declared` per batch, from a header and/or identity fields; inconsistency fails it.
+- `registered`: the declared identity equals the registered one.
+- `spec_compatible`: the contract's task against the registered predictor's task, recorded with every contract
+  version.
+- `sampled_output_consistent`: a keyed-random sample (HMAC, independent of outputs) replayed through the registered
+  CG6 predictor in-process. It reports mismatches, rows that can't be replayed, and a one-sided Clopper–Pearson upper
+  bound on the mismatch rate. Agreement on samples is stated not to be attestation.
+- `customer_signed_statement_verified`: Ed25519 over a canonical statement (deployment, artifact digest, period).
+  Trust rests on the customer's signing process. Runtime (hardware or TEE) attestation is not implemented and never
+  inferred.
+
+**Deployment events** (model, configuration and data-pipeline changes, rollout, rollback) are recorded with their
+identity and actor.
+
+**Retention and crypto-shredding** (R2.7).
+- Raw bodies of terminal batches are tombstoned after 7 days; unprocessed bodies are kept.
+- Encrypted quarantine rows are tombstoned after 30 days, under each catalog's own maintenance epoch.
+- A day key whose objects are all gone and whose day is past retention is destroyed live. That is reported as
+  `destroyed_live` with "complete only after every backup holding these keys expires (not tracked)", never as
+  deleted.
+
+**HTTP surface** (`operations.web`; ingestion only, the full API and console are S9): batches, batch status,
+watermarks, deployment events and signed statements. It uses bearer tokens, the ConfidenceGuard envelope and
+401/403/404/409/413/429 mapping, and never logs bodies.
+
+**Backups.** Received bodies of unprocessed batches (`retained_for_recovery`) and their day keys are in the
+installation backup (R2.2). A restored installation processes them.
+
+### Evidence
+
+`tests/platform/test_ingestion.py` (14 tests) covers:
+- encrypted, durable, idempotent receipt (identical retry, conflict, enqueued job, opaque object names);
+- minimization (undeclared values absent from every stored fact);
+- row quarantine with reasons and encrypted minimized rows;
+- a reconciled funnel, with a CG3 analysis on the ingested evidence;
+- per-fact conflict quarantine;
+- crash before acknowledgement (orphan raw object reclaimed) and crash after publication (idempotent retry, one K);
+- reserve assignment at publication (`pre_reserve` before the reserve, `reserve`/`non_reserve` after);
+- watermarks, lateness and closure standings;
+- directory pull (new and changed files only; never deletes);
+- the HTTP surface (authentication, per-source and per-deployment scopes, 409 and 429);
+- the SDK: crash recovery from the disk buffer, known loss recorded, a lost-response resend recognised;
+- identity standings: registered pass and fail, spec incompatibility, a valid and a forged signed statement, the
+  sampled output audit consistent and drifted;
+- retention and key shredding (live keys kept);
+- backup and restore of an acknowledged unprocessed batch, which then processes;
+- the worker host processing an ingestion job;
+- a log scanner showing no row or undeclared value in any log record.
+
+| Check | Result |
+|---|---|
+| `tests/platform` | **113 passed** (one run) |
+| `tests/cg1`–`tests/cg6` (capture path changed: conflict mode, reserve registration, receipt shape) | **673 passed, 0 failed, 11 skipped** (one run; the same pre-existing skips) |
+
+### Limitations and deferred (no claim made)
+
+- **Shared-installation workspaces still keep per-workspace stores (D-1).** Installation-bound system catalogs (all
+  ingested evidence) use the installation store and are covered by one installation backup.
+- **Not in S4** (all S9): the operations API beyond ingestion, user sessions, the console, CLI commands for
+  operations, TLS/proxy enforcement for non-loopback serving, and gunicorn packaging. Window evaluation, detectors and
+  references are S5.
+- **Contract checks.** Registration validates that the CG3 batch template parses. It does not prove the template uses
+  only declared fields; a template naming an undeclared column fails processing with an explicit error.
+- **Sampled audits** need the logged inputs and outputs as rows; the caller supplies them (recent raw batches stay
+  readable during retention).
+- **Performance:** not measured in S4. The M.5 tiers (W-DEV) belong to the S10 closure.
+
 ## S3 closure: v2 -> platform migration (S3c), execution contexts, catalog v2 writer retirement (2026-11-20). Implemented; closure gate passing.
 
 S3 is complete with this record: S3a (CG3), S3b (CG4–CG6 storage), S3c (migration and equivalence), S3d (G.8 reserve
