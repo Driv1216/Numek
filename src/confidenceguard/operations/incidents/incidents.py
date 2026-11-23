@@ -121,6 +121,10 @@ def link(installation, conn, anchor, condition):
     shared = _events_before(conn, scope, anchor, span_a) & _events_before(conn, scope, condition, span_c)
     if shared:
         return {'strength': 'exact', 'deployment_events': sorted(shared)}, compatible
+    from ..intelligence import association
+    found = association.structural(_dependencies(conn, scope, anchor), _dependencies(conn, scope, condition))
+    if found:
+        return found, compatible
     pa, pc = _population(installation, conn, anchor), _population(installation, conn, condition)
     if pa and pc:
         jaccard = len(pa & pc) / len(pa | pc)
@@ -129,6 +133,45 @@ def link(installation, conn, anchor, condition):
         if jaccard >= RELATED_THRESHOLD:
             return {'strength': 'related_only', 'jaccard': jaccard}, compatible
     return None, compatible
+
+
+def _dependencies(conn, scope, condition):
+    from ..intelligence import association
+    spec = (_definition(conn, scope, condition['deployment_id'], condition['definition_version'])
+            if condition['definition_version'] else None)
+    identity = conn.execute('SELECT registered_identity FROM ops_deployments WHERE org_id = %s AND id = %s',
+                            (scope.org_id, condition['deployment_id'])).fetchone()['registered_identity']
+    return association.dependencies(condition, spec, identity)
+
+
+def impact(installation, conn, condition):
+    """Impact axes for the priority table: affected volume, region exposure share and region source standing."""
+    scope = installation.scope
+    out = {'affected_units': 0, 'region': None, 'region_share': None, 'region_source_standing': None,
+           'basis': 'units selected in the condition windows (close evaluations); excess outcomes are not estimated here'}
+    if condition['windows'] and condition['definition_version']:
+        rows = conn.execute("""SELECT DISTINCT ON (window_index) units, packet_object FROM ops_window_evaluations
+                               WHERE org_id = %s AND deployment_id = %s AND definition_version = %s AND phase = 'close'
+                                     AND window_index = ANY(%s) ORDER BY window_index, revision DESC""",
+                            (scope.org_id, condition['deployment_id'], condition['definition_version'],
+                             list(condition['windows']))).fetchall()
+        out['affected_units'] = sum(r['units'] for r in rows)
+        source, _, ident = condition['key'].partition(':')
+        plan = None
+        if source == 'detector':
+            plan = conn.execute('SELECT plan FROM ops_detectors WHERE org_id = %s AND deployment_id = %s AND definition_version = %s '
+                                'AND detector_id = %s', (scope.org_id, condition['deployment_id'], condition['definition_version'],
+                                                         ident)).fetchone()
+        region = plan['plan'].get('region') if plan else None
+        if region:
+            members = defined = 0
+            for row in rows:
+                share = packets.read(installation, row['packet_object']).get('region_shares', {}).get(region) or {}
+                members += share.get('members', 0)
+                defined += share.get('defined', 0)
+            out.update(region=region, region_share=(members / defined) if defined else None,
+                       region_source_standing=plan['plan'].get('region_source_standing'))
+    return out
 
 
 def _hold(conn, scope, condition):
@@ -210,7 +253,8 @@ def open_incident(installation, condition_id, *, now, actor='system', prio=None)
         condition = dict(conn.execute('SELECT * FROM ops_conditions WHERE org_id = %s AND id = %s', (scope.org_id, condition_id)).fetchone())
         tier = conn.execute('SELECT tier FROM ops_deployments WHERE org_id = %s AND id = %s',
                             (scope.org_id, condition['deployment_id'])).fetchone()['tier']
-    level, basis = prio or priority_table.decide(condition, tier)
+        context = None if prio else impact(installation, conn, condition)
+    level, basis = prio or priority_table.decide(condition, tier, context)
     k, knowledge, ctx = _knowledge(installation, condition['deployment_id'], [condition_id], now=now)
     knowledge['kind'] = 'detection_dossier'
     lease, ref, dossier_digest = _stage(installation, ctx, knowledge, 'ops_incident_dossier')
@@ -255,7 +299,10 @@ def append_revision(installation, incident_id, reason, *, now):
         incident = _row(conn, scope, incident_id)
         ids = members(conn, scope, incident_id)
     k, knowledge, ctx = _knowledge(installation, incident['deployment_id'], ids, now=now)
-    knowledge.update(kind='knowledge_revision', reason=reason, incident=str(incident_id))
+    from ..intelligence import hypotheses
+    judged = hypotheses.evaluate(installation, incident_id, knowledge_revision=incident['knowledge_revision'] + 1)
+    knowledge.update(kind='knowledge_revision', reason=reason, incident=str(incident_id), hypotheses=judged['states'],
+                     differential=judged['matrix'], observations=judged['observations'])
     lease, ref, packet_digest = _stage(installation, ctx, knowledge, 'ops_incident_revision')
 
     def write(conn):
@@ -302,11 +349,14 @@ def handle(installation, deployment_id, changes, *, now, actor='system'):
             continue
         with installation.db.connect() as conn:
             tier = conn.execute('SELECT tier FROM ops_deployments WHERE org_id = %s AND id = %s', (scope.org_id, deployment_id)).fetchone()['tier']
-        level, basis = priority_table.decide(condition, tier)
+            context = impact(installation, conn, condition)
+        level, basis = priority_table.decide(condition, tier, context)
         if not priority_table.at_least(level, 'P2'):
             continue                                                       # P3/P4: a visible condition, no incident
         result = open_incident(installation, condition_id, now=now, actor=actor, prio=(level, basis))
         opened.append(result['incident'])
+        from ..intelligence import hypotheses
+        hypotheses.evaluate(installation, result['incident'], knowledge_revision=0, actor=actor)
         if related:
             with installation.db.transaction() as conn:
                 for other, reason in related:
@@ -336,8 +386,8 @@ def _group(installation, condition):
             anchor = dict(conn.execute('SELECT * FROM ops_conditions WHERE org_id = %s AND id = %s',
                                        (scope.org_id, candidate['anchor_condition'])).fetchone())
             found, compatible = link(installation, conn, anchor, condition)
-            if found and found['strength'] in ('exact', 'population_overlap') and compatible:
-                rule = 'direct_link' if found['strength'] == 'exact' else 'population_overlap'
+            if found and found['strength'] in ('exact', 'structural', 'population_overlap') and compatible:
+                rule = {'exact': 'direct_link', 'structural': 'structural_link', 'population_overlap': 'population_overlap'}[found['strength']]
                 return candidate['id'], {'rule': rule, 'anchor': str(anchor['id']), 'link': found,
                                          'rationale': f"{found['strength']} link to the anchor and compatible in deployment and time"}, []
             if found or compatible:

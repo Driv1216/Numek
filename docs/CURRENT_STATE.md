@@ -1,5 +1,31 @@
 # Numek Current State
 
+## ConfidenceGuard CG7 — S7 intelligence (2026-11-23)
+
+**What exists now.** Incidents are reasoned about, not only grouped.
+
+**Monitoring.** Monitoring covers frozen CG4 regions: exposure, and region-scoped performance. Conditions link
+structurally through shared frozen inputs (CG4 gates, CG5 policy inputs, CG6 predictor inputs). Priority weighs
+impact, and selected or exploratory regions can never reach P1.
+
+**Hypotheses.** Every incident keeps ten typed hypotheses, judged against deterministic observations in a
+differential matrix (supported, contradicted, contested, unresolved, untestable). Missing evidence becomes an
+information requirement with an ETA or an action, and a deferred trigger.
+
+**Planner.** A budgeted, deterministic planner picks discriminating investigations: contract diff, CG3 mix and
+cohort analysis, domain classifier, label audits, health review, and CG6 shadow replay on approval. It applies
+tiers, approvals, fingerprint deduplication and the R2.7 reuse rule.
+
+**Also in S7:**
+- recurring-pattern matching;
+- Neyman label guidance;
+- a Poisson-binomial calibration-transfer diagnostic;
+- a domain classifier whose exploratory test passed its locked null qualification (4.2% rejections at 5%).
+
+**Results:** platform suite 171 passed; S7 suite 13 passed; Q-DC pass.
+
+**Not in S7:** response comparison and proposals (S8); the API, CLI and console (S9). D-1 remains.
+
 ## ConfidenceGuard CG7 — S6 operations (2026-11-23)
 
 **What exists now.** Monitoring signals become **conditions** with a lifecycle: emerging, active, quiescent,

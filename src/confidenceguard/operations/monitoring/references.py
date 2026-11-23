@@ -53,7 +53,15 @@ def rule_of(definition):
             'max_units_per_entity': definition.get('max_units_per_entity'), 'authority': definition.get('authority', 'supplied'),
             'cohorts': definition.get('cohorts', []), 'features': definition.get('features', {}),
             'statistics': sorted({(d['statistic'], digest(d.get('params') or {})) for d in definition['detectors']}),
-            'params': {d['statistic']: d.get('params') or {} for d in definition['detectors']}}
+            'params': {statistic_key(d): d.get('params') or {} for d in definition['detectors']},
+            'regions': [{'id': r['id'], 'artifact_digest': r['artifact']['artifact_digest'], 'source_standing': r['source_standing']}
+                        for r in definition.get('regions') or []]}
+
+
+def statistic_key(detector):
+    """Reference statistics are keyed by statistic and scope: a region-restricted statistic is its own reference."""
+    region = (detector.get('params') or {}).get('region')
+    return detector['statistic'] if region is None else f"{detector['statistic']}@{region}"
 
 
 def longitudinal_spec(definition, namespace, start, end, k, as_of, window_id='window'):
@@ -137,24 +145,29 @@ def _evaluate_reference(root, spec, k, as_of, governance, progress=None):
 
 def summarize(installation, deployment_id, definition, namespace, selected, rule, ticks):
     """Finite bounds and rates for every declared statistic (deterministic in the keyed unit order)."""
+    from ..intelligence import regions as region_rules
     secret = order_secret(installation, deployment_id)
-    rows = selected['units']
+    rows = region_rules.annotate(selected['units'], definition.get('regions'))
     classes = len(selected['task'].get('classes') or [0, 1])
     alpha_ref = float(rule['alpha'])
     days = (ticks[1] - ticks[0]) / 86400e9
     out = {'statistics': {}, 'selected_units': len(rows), 'period_days': days}
     labelled = sum(1 for u in rows if u.get('outcome_valid'))
-    out['inclusion'] = {'label_availability_rate': labelled / len(rows) if rows else None,
+    # Label availability is compared among units whose follow-up has elapsed (windows are evaluated at maturity).
+    horizon = int(definition['maturity'].get('followup_ns') or definition['maturity'].get('horizon_ns'))
+    elapsed = [u for u in rows if u.get('history_tick') is not None and u['history_tick'] + horizon <= selected['cutoff']]
+    out['inclusion'] = {'label_availability_rate': labelled / len(elapsed) if elapsed else None,
                         'invalid_outcome_rate': (sum(1 for u in rows if u.get('outcome_reason') in unit_rules.INVALID_OUTCOME_REASONS)
                                                  / len(rows)) if rows else None}
-    for statistic, params in rule['params'].items():
+    for key, params in rule['params'].items():
+        statistic = key.split('@', 1)[0]
         if statistic not in unit_rules.STATISTICS:          # refused statistics are reported at inspection
             continue
         values, entities, _events, excluded = unit_rules.stream(rows, statistic=statistic, design=rule['unit_design'],
                                                                 namespace=namespace, secret=secret, classes=classes,
                                                                 params=params)
-        out['statistics'][statistic] = bounds(values, entities, rule, alpha_ref, excluded=excluded, days=days,
-                                              selected=len(rows))
+        out['statistics'][key] = bounds(values, entities, rule, alpha_ref, excluded=excluded, days=days, selected=len(rows))
+    out['region_shares'] = region_rules.shares(rows, definition.get('regions'))
     out['composition'] = composition(rows, definition, namespace, secret, classes, alpha_ref)
     return out
 

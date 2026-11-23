@@ -136,14 +136,17 @@ def _evaluate_window(root, spec, k, as_of, governance, relation, progress=None):
                       {'status': 'completed', 'peak_workspace_bytes': 0})
 
 
-def _compact(namespace, units):
+def _compact(namespace, units, task=None):
     """Packet form of selected units: hashes instead of lexical keys (minimized), plus what detectors read."""
+    from .estimators import _implied
     out = []
     for u in units:
         out.append({'event': digest([namespace, u['event_key']]), 'entity': unit_rules.entity_hash(namespace, u).hex(),
                     'tick': u.get('history_tick'), 'state': u.get('state'), 'decision': u.get('decision'), 'y': u.get('y'),
                     'outcome_valid': u.get('outcome_valid'), 'outcome_reason': u.get('outcome_reason'),
-                    'brier': u.get('brier'), 'confidence': u.get('confidence'), 'group': u.get('g0')})
+                    'brier': u.get('brier'), 'confidence': u.get('confidence'), 'group': u.get('g0'),
+                    'regions': u.get('regions') or {},
+                    'implied_error': None if task is None else _implied('implied_issued_error', u, task)})
     return out
 
 
@@ -155,8 +158,9 @@ def evaluate(installation, ctx, current, reference, phase, index, *, closure, as
     namespace = ctx['namespace']
     lease, governance, result, k, as_of, (start, end) = _select(installation, ctx, definition, reference, phase, index,
                                                                 as_of_tick)
+    from ..intelligence import regions as region_rules
     variant = result['variants'].get(definition['variant'])
-    selected_units = [] if variant is None else variant['units']
+    selected_units = region_rules.annotate([] if variant is None else variant['units'], definition.get('regions'))
     task = reference['packet']['metadata']['task']
     classes = len(task.get('classes') or [0, 1])
     measure_map = {} if variant is None else measures.flat(variant['measurements'])
@@ -169,7 +173,11 @@ def evaluate(installation, ctx, current, reference, phase, index, *, closure, as
     updates, alarms_total, claims_total, signals = [], 0, 0, []
     ref_inclusion = reference['packet']['inclusion'].get('label_availability_rate')
     labelled = sum(1 for u in selected_units if u.get('outcome_valid'))
-    window_inclusion = labelled / len(selected_units) if selected_units else None
+    horizon = definitions.maturity_ns(definition)
+    cutoff = None if variant is None else variant['cutoff']
+    elapsed = [u for u in selected_units if u.get('history_tick') is not None and cutoff is not None
+               and u['history_tick'] + horizon <= cutoff]
+    window_inclusion = labelled / len(elapsed) if elapsed else None
     shifted = (phase == 'maturity' and ref_inclusion is not None and window_inclusion is not None
                and abs(window_inclusion - ref_inclusion) > float(definition.get('inclusion_tolerance', 0.1)))
     for det in detectors:
@@ -235,9 +243,10 @@ def evaluate(installation, ctx, current, reference, phase, index, *, closure, as
               'variant': definition['variant'], 'measurements': [] if variant is None else variant['measurements'],
               'coverage': None if variant is None else variant['coverage'], 'drift': drift,
               'selected_digest': None if variant is None else variant['selected_digest'],
-              'units': _compact(namespace, selected_units), 'estimates': [e[1] for e in estimates],
+              'units': _compact(namespace, selected_units, task), 'estimates': [e[1] for e in estimates],
               'estimate_populations': {e[0]: e[2] for e in estimates},
-              'label_availability_rate': window_inclusion, 'reference_label_availability_rate': ref_inclusion}
+              'label_availability_rate': window_inclusion, 'reference_label_availability_rate': ref_inclusion,
+              'region_shares': region_rules.shares(selected_units, definition.get('regions'))}
     ref = packets.stage(installation, lease, ctx['catalog_id'], packets.encode(packet))
     evaluation_id = uuid.uuid4()
     selection = digest({'selected': packet['selected_digest'], 'units': len(selected_units)})
@@ -422,8 +431,9 @@ def _revision(installation, ctx, current, reference, phase, row, now_tick):
     due, _start, _end = _due(definition, phase, index)
     lease, governance, result, k, as_of, (start, end) = _select(installation, ctx, definition, reference, phase, index,
                                                                 min(due, now_tick), drift=False)
+    from ..intelligence import regions as region_rules
     variant = result['variants'].get(definition['variant'])
-    selected_units = [] if variant is None else variant['units']
+    selected_units = region_rules.annotate([] if variant is None else variant['units'], definition.get('regions'))
     with installation.db.connect() as conn:
         detectors = [dict(r) for r in conn.execute(
             'SELECT detector_id, plan FROM ops_detectors WHERE org_id = %s AND deployment_id = %s AND definition_version = %s '

@@ -34,6 +34,8 @@ STATISTICS = {
     'abstention': {'phase': OUTCOME_FREE, 'tasks': None, 'meaning': 'output state is abstained'},
     'failure': {'phase': OUTCOME_FREE, 'tasks': None, 'meaning': 'output state is failed or missing'},
     'missing_field': {'phase': OUTCOME_FREE, 'tasks': None, 'meaning': 'a declared context field is missing'},
+    'region_membership': {'phase': OUTCOME_FREE, 'tasks': None,
+                          'meaning': 'the unit is a member of a frozen CG4 region (exposure; covariates only)'},
 }
 REFUSED = {'log_loss': 'unbounded_statistic', 'mse': 'unbounded_statistic', 'squared_error': 'unbounded_statistic',
            'absolute_error': 'unbounded_statistic'}
@@ -80,6 +82,9 @@ def value(statistic, unit, *, classes=2, params=None):
     if statistic == 'missing_field':
         features = unit.get('features') or {}
         return float(features.get(params['field']) in (None, ''))
+    if statistic == 'region_membership':
+        member = (unit.get('regions') or {}).get(params['region'])
+        return None if member is None else float(member)
     raise EvaluationError('Unknown statistic.', 'unknown_statistic')
 
 
@@ -129,6 +134,13 @@ def stream(units, *, statistic, design, namespace, secret, seen_entities=frozens
         if not ok:
             excluded[reason] = excluded.get(reason, 0) + 1
             continue
+        region = (params or {}).get('region')
+        if region is not None and statistic != 'region_membership':
+            member = (unit.get('regions') or {}).get(region)        # restriction by covariates only (predictable)
+            if member is not True:
+                key = 'region_unavailable' if member is None else 'outside_region'
+                excluded[key] = excluded.get(key, 0) + 1
+                continue
         ent = entity_hash(namespace, unit)
         if design == 'entity_first' and ent in seen_e:
             excluded['entity_thinned'] = excluded.get('entity_thinned', 0) + 1

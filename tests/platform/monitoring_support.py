@@ -37,22 +37,30 @@ def contract():
                                    'available_at': {'column': 'available'}, 'due_at': {'column': 'due'}}}}}
 
 
-def generate(start_day, days, per_day, *, error_rate, seed, prefix='u'):
+def generate(start_day, days, per_day, *, error_rate, seed, prefix='u', error_rate_b=None, b_share=0.4):
+    """Synthetic rows. With ``error_rate_b`` the group is drawn first and group b has its own error rate (the
+    default path keeps the original random stream, so earlier scenarios are unchanged)."""
     rng = random.Random(seed)
     rows = []
     for d in range(days):
         day = T0 + timedelta(days=start_day + d)
         for j in range(per_day):
             when = day + timedelta(minutes=17 * j)
-            positive = rng.random() < 0.5
+            if error_rate_b is None:
+                positive = rng.random() < 0.5
+                correct = rng.random() >= error_rate
+                group = 'a' if rng.random() < 1 - b_share else 'b'
+            else:
+                group = 'a' if rng.random() < 1 - b_share else 'b'
+                positive = rng.random() < 0.5
+                correct = rng.random() >= (error_rate_b if group == 'b' else error_rate)
             p = 0.8 if positive else 0.2
-            correct = rng.random() >= error_rate
             y = ('1' if positive else '0') if correct else ('0' if positive else '1')
             ident = f'{prefix}{start_day + d}-{j}'
             rows.append({'id': ident, 'entity': f'e-{ident}', 'when': when.strftime('%Y-%m-%dT%H:%M:%SZ'), 'y': y, 'p': str(p),
                          'available': (when + timedelta(days=5)).strftime('%Y-%m-%dT%H:%M:%SZ'),
                          'due': (when + timedelta(days=5)).strftime('%Y-%m-%dT%H:%M:%SZ'),
-                         'group': 'a' if rng.random() < 0.6 else 'b', 'model_version': 'v1'})
+                         'group': group, 'model_version': 'v1'})
     return rows
 
 

@@ -160,6 +160,9 @@ def matched(estimator, original_hashes, units, task, reference=None, namespace='
         out['realized_interval'] = [eprocess.hoeffding(out['realized'], n, alpha / 2, 'lower', 0, bound),
                                     eprocess.hoeffding(out['realized'], n, alpha / 2, 'upper', 0, bound)]
         out['interval_method'] = 'hoeffding (declared bounds)'
+    if estimator == 'implied_issued_error':
+        out['calibration_transfer_diagnostic'] = poisson_binomial_diagnostic(
+            [_implied(estimator, u, task) for u in observed], int(round(sum(realized))))
     if out.get('matched_estimate') is not None:
         out['signed_bias'] = out['matched_estimate'] - out['realized']
         lo, hi = out['realized_interval']
@@ -178,3 +181,31 @@ def ledger_summary(rows):
             'exceedances': sum(1 for r in done if r['matched'].get('exceedance')),
             'mean_coverage': sum(r['matched']['coverage'] for r in done) / len(done),
             'qualification': 'Historical accuracy of an estimator does not establish its assumptions hold now.'}
+
+
+def poisson_binomial_diagnostic(probabilities, observed_errors):
+    """Exact two-sided tail probability of the observed error count under the matched per-unit probabilities (R2.7).
+
+    It assumes:
+    (i) each p_j is the model's *conditional* probability that its issued decision is wrong, given that unit's
+        information. That is individual-level calibration, which marginal calibration does not establish;
+    (ii) errors are conditionally independent across ``entity_first`` units.
+
+    Its standing is diagnostic, never formal, and it has no multiplicity control.
+    """
+    import numpy as np
+    p = [float(x) for x in probabilities if x is not None]
+    if not p:
+        return None
+    dist = np.zeros(len(p) + 1)
+    dist[0] = 1.0
+    for q in p:
+        dist[1:] = dist[1:] * (1 - q) + dist[:-1] * q
+        dist[0] *= 1 - q
+    observed = min(max(int(observed_errors), 0), len(p))
+    tail = float(dist[dist <= dist[observed] * (1 + 1e-12)].sum())
+    return {'units': len(p), 'expected_errors': float(sum(p)), 'observed_errors': observed, 'two_sided_p': min(1.0, tail),
+            'standing': 'diagnostic',
+            'assumptions': ['p_j is the conditional probability the issued decision is wrong (individual calibration)',
+                            'errors are conditionally independent across entity_first units'],
+            'qualification': 'Historical accuracy of an estimator does not establish its assumptions hold now; no multiplicity control.'}

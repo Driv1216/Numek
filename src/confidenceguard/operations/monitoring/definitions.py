@@ -88,6 +88,18 @@ def normalize(spec, models):
     for rule in out['rules']:
         if rule.get('op') not in ('>', '>=', '<', '<=') or 'measure' not in rule or 'id' not in rule:
             raise EvaluationError('Rules declare id, measure, op and value.', 'invalid_definition')
+    from ..intelligence import regions as region_rules
+    out['regions'] = region_rules.validate(out.get('regions'), out['features'])
+    known = {r['id'] for r in out['regions']}
+    for d in detectors:
+        region = (d.get('params') or {}).get('region')
+        if d['statistic'] == 'region_membership' and region is None:
+            raise EvaluationError('region_membership names its region in params.', 'invalid_definition')
+        if region is not None and region not in known:
+            raise EvaluationError('A detector names an undeclared region.', 'invalid_definition')
+    if out.get('policy') is not None:
+        from ...policy_contracts import PolicySpec
+        PolicySpec.from_dict(out['policy'])                     # frozen CG5 policy (its inputs are structural links)
     out['detectors'] = detectors
     return out
 
@@ -105,7 +117,7 @@ def plan_detector(definition, detector, reference, task_kind, *, units_per_day_d
     if not admitted:
         return {**plan, 'admitted': False, 'refusal': reason}
     plan['phase'] = unit_rules.STATISTICS[statistic]['phase']
-    record = reference['packet']['statistics'].get(statistic)
+    record = reference['packet']['statistics'].get(references.statistic_key(detector))
     if record is None or record['n'] == 0:
         return {**plan, 'admitted': False, 'refusal': 'reference_empty'}
     m0, standing = references.null_level(record, float(detector['delta']))
@@ -113,6 +125,10 @@ def plan_detector(definition, detector, reference, task_kind, *, units_per_day_d
         return {**plan, 'admitted': False, 'refusal': 'null_level_at_or_above_one'}
     if standing == 'descriptive':
         plan['reasons'].extend(record['reasons'] or ['reference_design_not_registered'])
+    region = (detector.get('params') or {}).get('region')
+    if region is not None:
+        plan['region'] = region
+        plan['region_source_standing'] = next(r['source_standing'] for r in definition['regions'] if r['id'] == region)
     if plan['phase'] == unit_rules.OUTCOME and definition['maturity']['policy'] != 'equal_followup':
         standing = 'descriptive'
         plan['reasons'].append('maturity_not_equal_followup')

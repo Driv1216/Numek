@@ -1,0 +1,23 @@
+{
+ "format": "numek_cg7_domain_protocol/1",
+ "title": "CG7 M.2 Q-DC: domain-classifier exploratory permutation test under the null (plan G.7, M.2)",
+ "locked": "2026-11-23",
+ "implementation": "src/confidenceguard/operations/intelligence/domain.py (core)",
+ "results": "validation/cg7/results/domain_qualification.json",
+ "stopping_rule": [
+  "One locked run with the seed below.",
+  "An implementation bug reruns the panel only; the rerun and its reason are recorded next to the original outcome.",
+  "A correctly implemented failure is retained and the exploratory test is disabled (the classifier stays descriptive).",
+  "No threshold, seed or design change after the run."
+ ],
+ "panel": {
+  "check": "Null rejection rate of the exploratory permutation test at 0.05: reference and current entities drawn from the same distribution (two categorical and two numeric features, one with missing values); keyed 50/50 entity split; HistGradientBoosting fit on half A; 10,000 label permutations among half-B entities",
+  "runs": 500,
+  "entities_per_arm": 700,
+  "permutations": 10000,
+  "level": 0.05,
+  "seed": 20261123,
+  "acceptance": "fail only if the one-sided exact binomial test of the rejection count against 0.05 rejects at 0.001",
+  "descriptive_outputs": "not qualified (descriptive by design)"
+ }
+}

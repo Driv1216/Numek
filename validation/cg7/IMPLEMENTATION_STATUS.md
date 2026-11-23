@@ -5,6 +5,145 @@ records what is implemented and what evidence exists, stage by stage. Several ki
 engineering correctness, statistical qualification, resilience, measured performance, product completeness,
 independent review and founder acceptance.
 
+## S7: intelligence (2026-11-23). Implemented; closure gate passing.
+
+### Implemented (plan I.1–I.9 except response comparison, G.5–G.7, R2.7)
+
+**S7a: regions, structural links, priority v2.**
+- **Frozen CG4 regions.** A definition declares regions (an id, a frozen membership artifact, and a source standing:
+  `H-confirmed`, `S-selected` or `exploratory`).
+  - **Application:** structured gates are applied to each unit's declared context with CG4's own `apply`, giving
+    member, nonmember or unavailable. This uses covariates only, so a region restriction is predictable inclusion.
+    Diagnostic and geometric gates are refused (`region_kind_unsupported_in_monitoring`).
+  - **What they enable:** a new outcome-free `region_membership` (exposure) statistic; a `params.region`
+    restriction on any statistic, with its own region-scoped reference (`statistic@region`); region shares in
+    packets.
+- **Structural links.** Field dependencies come from:
+  - CG4 gate features;
+  - CG5 policy predicate inputs (from a declared frozen `PolicySpec`);
+  - CG6 predictor-spec inputs;
+  - missing-field detectors, drift rules and cohort rules.
+
+  A structural link joins conditions alongside `exact` and `population_overlap`, recording the shared inputs and
+  "not a common cause".
+- **Priority table `cg7_priority_v2`** adds impact axes: affected units, region share and region source standing.
+  A formal alarm scoped to an S-selected or exploratory region is capped at P2. A region with under 1% of traffic
+  is capped at P2. The impact is recorded with its basis.
+
+**S7b: hypotheses, differential matrix, requirements, triggers.**
+- **The catalog** (H-COMP, H-WITHIN, H-INTEG, H-DEPLOY, H-CALIB, H-UNC, H-POLICY, H-LABEL, H-MULTI, H-MON) is data.
+  Each entry has machine-checkable supporting and contradicting observations, required observations, and
+  executable discriminating templates; a consistency check is tested.
+- **15 deterministic observations** cover identity, integrity, composition projection, within-group change,
+  calibration accountability, label availability, health, regions, other deployments, policy and domain shift.
+  - Each is `True`, `False` or `None` with a standing, its evidence, and, when `None`, a reason, an ETA or an action.
+  - Completed investigations settle observations, keeping their id.
+  - Absence of alarms is not evidence: with no open integrity condition, integrity stays unknown until the
+    contract diff checks it.
+- **States:** supported, contradicted, contested, unresolved, proposed, untestable. They are recomputed with every
+  knowledge revision, and each change is an incident event.
+- **The differential matrix** (✓ / ✗ / ? with standing) is in every revision packet.
+- **Information requirements** carry an ETA (label maturity) or an action. **Deferred triggers** queue the
+  template when the ETA passes. When the evidence arrives and has already decided the hypothesis, the requirement
+  is marked satisfied without a run.
+
+**S7c: planner, templates, recurring patterns.**
+- **The planner:**
+  - candidates come from templates' `discriminates` over movable hypotheses;
+  - value is Σ weight, with weight 2 for F or D support;
+  - selection is greedy by value per minute, with deterministic ties;
+  - tiers: `auto`, `confirm`, and `restricted` (which needs `reserve:consume`);
+  - budgets: 30 auto minutes per deployment per day, counting planned runs; 5 auto runs per incident; a 24 h
+    cooldown;
+  - fingerprint dedup;
+  - the R2.7 reuse rule: only additional units, no corrections, outcome revisions or tombstones, and under 20% new
+    support, gives a reuse marked stale; otherwise it reruns;
+  - every candidate's reasoning is recorded.
+- **Executors:**
+  - `contract_diff`: contract versions, quarantine rate, feature retention;
+  - `label_availability_audit`;
+  - `monitoring_health_review`;
+  - `cg3_mix_decomposition` / `cg3_cohort_contrast`: a CG3 longitudinal analysis with the mix/within split;
+  - `domain_classifier`;
+  - `label_acquisition_guidance`;
+  - `cg6_shadow_replay`: retained raw rows in the span replayed through the registered predictor via the S4 audit,
+    on approval with `logged_outputs`.
+
+  `cg5_policy_replay`, `cg2_recalibration_study` and `cg2_uncertainty_study` refuse explicitly (operator spec
+  required; restricted, S8; not monitored).
+- **Results** are immutable packets. Each completion appends a knowledge revision.
+- **Recurring patterns:** deterministic typed signatures (deployment, condition keys, structural inputs, supported
+  hypotheses, deployment-event kinds), matched at Jaccard ≥ 0.6, shown with each resolution and its verification.
+
+**S7d: domain classifier, label guidance, calibration-transfer diagnostic.**
+- **The G.7 domain classifier:**
+  - one row per entity per arm, in keyed order; entities in both arms are excluded and counted;
+  - declared features only, with outcome and identifier names refused;
+  - a keyed 50/50 split; HistGradientBoosting (CG6 pin) fit on half A;
+  - descriptive held-out AUC with no interval, permutation importance, and domain-probability calibration;
+  - an exploratory exact permutation test (10,000 permutations, average-rank ties), refused below 300 entities per
+    arm in half B;
+  - reads covariates only under `covariate_inspection` reservations, which are consumed.
+- **G.6 Neyman allocation** (n_g ∝ w_g√(r_g(1 − r_g))), with the random-within-strata requirement and expected
+  half-widths. The exposure × excess list is labelled a heuristic.
+- **G.5 / R2.7 Poisson-binomial calibration-transfer diagnostic** on matched implied-error records: an exact
+  two-sided tail, both assumptions listed, standing diagnostic.
+
+**Comparability fix (S5 code).** Reference and window label-availability rates now count only units whose
+follow-up has elapsed (tick + horizon ≤ cutoff). Before, a reference built before full maturity faked a
+label-availability shift against matured windows. The fix was found through the S7 differential, and the S5 and
+S6 suites still pass.
+
+**Schema** `0010_intelligence.sql`: hypotheses, requirements and triggers, investigation runs.
+
+### Evidence
+
+**Q-DC** (locked `validation/cg7/domain_protocol.json`, run once): 500 null runs with 700 entities per arm and
+10,000 permutations each. **21 rejections at 0.05 (4.2%)**, with an exact binomial p of 0.82 against 5%, and no
+refused tests: **pass.** Results are in `validation/cg7/results/domain_qualification.json`.
+
+`tests/platform/test_intelligence.py` (13 tests) runs on a real installation. The scenario: group b degrades
+within the group and its share rises.
+- **Regions and links:** the region reference and exposure alarm start no earlier than the March share rise;
+  diagnostic gates are refused; the structural link between the region conditions shares `group`.
+- **Priority v2:** S-selected cap, impact recorded, low-exposure and exploratory rules.
+- **The differential:**
+  - all ten hypotheses are judged;
+  - H-WITHIN is supported and H-COMP contradicted (equal reference risks: composition explains nothing);
+  - H-LABEL is contradicted after the comparability fix;
+  - H-UNC is untestable;
+  - the identity requirement carries its action;
+  - matrix cells are as expected.
+- **The planner:** ineligibility reasons, greedy order, duplicate suppression on replan, restricted approval refused
+  without `reserve:consume` and refused explicitly with it.
+- **Executions:** the contract diff settles integrity (H-INTEG contradicted); the domain classifier reads
+  covariates under two consumed reservations.
+- **Reuse** after additional units, with zero material changes and a stale fraction under 20%.
+- **Triggers** fire for a movable hypothesis and mark a decided one satisfied.
+- **Patterns, guidance, diagnostic, catalog:** deterministic signatures and thresholds; Neyman allocation and
+  half-widths; the exact Poisson-binomial diagnostic against brute force; the domain-classifier core (AUC equals
+  sklearn with ties, shift detected, overlap exclusion); catalog consistency.
+
+| Check | Result |
+|---|---|
+| `tests/platform` | **171 passed** (one run; 158 earlier + 13 new S7 tests) |
+| `tests/cg1`–`tests/cg6` | Not rerun: S7 changes no CG1–CG6 code path. The last full run was the S5 gate (673 passed, 0 failed). |
+
+### Limitations and deferred (no claim made)
+
+- **Response comparison (I.9) and proposals** are S8. "Previous mitigations" lists resolutions and verification
+  evidence only.
+- **Templates that don't execute yet:**
+  - The CG5 replay needs an operator spec.
+  - The recalibration and uncertainty studies are restricted or unmonitored.
+  - The shadow replay needs retained raw rows and declared logged outputs.
+- **Regions:** only structured CG4 gates are applied in monitoring.
+- **Observation rules** (thresholds such as projection deltas of 0.005/0.002 and AUC of 0.6/0.55) are documented
+  constants, not qualified decision rules. The matrix is association reasoning.
+- **Not covered:** worker-host execution of investigations (the executor is ready; job wiring comes with S9); the
+  API, CLI and console (S9).
+- D-1 remains tracked; there is no production-readiness claim.
+
 ## S6: operations (2026-11-23). Implemented; closure gate passing.
 
 ### Implemented (plan H.4, H.7, H.8, C.4–C.6, G.10)
