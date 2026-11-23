@@ -37,7 +37,7 @@ def contract():
                                    'available_at': {'column': 'available'}, 'due_at': {'column': 'due'}}}}}
 
 
-def generate(start_day, days, per_day, *, error_rate, seed, prefix='u', error_rate_b=None, b_share=0.4):
+def generate(start_day, days, per_day, *, error_rate, seed, prefix='u', error_rate_b=None, b_share=0.4, model_version='v1'):
     """Synthetic rows. With ``error_rate_b`` the group is drawn first and group b has its own error rate (the
     default path keeps the original random stream, so earlier scenarios are unchanged)."""
     rng = random.Random(seed)
@@ -60,7 +60,7 @@ def generate(start_day, days, per_day, *, error_rate, seed, prefix='u', error_ra
             rows.append({'id': ident, 'entity': f'e-{ident}', 'when': when.strftime('%Y-%m-%dT%H:%M:%SZ'), 'y': y, 'p': str(p),
                          'available': (when + timedelta(days=5)).strftime('%Y-%m-%dT%H:%M:%SZ'),
                          'due': (when + timedelta(days=5)).strftime('%Y-%m-%dT%H:%M:%SZ'),
-                         'group': group, 'model_version': 'v1'})
+                         'group': group, 'model_version': model_version})
     return rows
 
 

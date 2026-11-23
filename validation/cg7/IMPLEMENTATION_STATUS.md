@@ -5,6 +5,117 @@ records what is implemented and what evidence exists, stage by stage. Several ki
 engineering correctness, statistical qualification, resilience, measured performance, product completeness,
 independent review and founder acceptance.
 
+## S8: interventions (2026-11-23). Implemented; closure gate passing.
+
+### Implemented (plan G.9 intervention execution, G.10, I.9; F.1.7)
+
+**Proposals** (`operations/interventions/proposals.py`). NUMEK never executes a production change.
+- **Kinds:** policy guard, threshold change, recalibration, rollback, replacement, data fix, monitoring fix, and
+  accepted risk with mitigation.
+- **Each proposal states:**
+  - the change, as data;
+  - the expected post-change identity;
+  - its evidence;
+  - expected effects with uncertainty;
+  - machine-checked prerequisites: registered identity, declared expected identity, registered predictor,
+    registered customer key, verification feasibility, independent evidence;
+  - risks;
+  - the required approver role;
+  - a verification plan.
+- **Evidence bases are validated against the catalog and the ledger:**
+  - `hypothetical_replay` needs a completed investigation run or a saved assessment;
+  - `independent_assessment` needs a saved assessment whose read *consumed a confirmation-class reservation*;
+    anything else is refused as `evidence_not_independent`;
+  - `descriptive`.
+- **Lifecycle:** draft → submitted → approved / rejected → handed_off → executing → verifying → verified /
+  not_verified, plus withdrawn.
+  - The incident follows: response_proposed, response_executing, verifying, and back to investigating if not
+    verified.
+  - Submitted proposals pin their incident's windows until settled + 90 days.
+- **Approval** needs a different principal from the author (`separation_of_duties`) and `intervention:approve`. It
+  is audited and has **no side effect**: deployments, sources, definitions, jobs, the outbox and incident state are
+  byte-identical before and after (tested).
+- **Response comparison** sets proposals side by side, with:
+  - the evidence bases and the strongest one;
+  - effects;
+  - re-checked prerequisites;
+  - risks;
+  - the required role;
+  - the verification plan;
+  - "R4 not claimed";
+  - prior mitigations from recurring-pattern matches, with their verification outcomes.
+
+**Execution** (`execution.py`).
+- **The handoff** is an immutable `ExecutionHandoff` packet: the change, expected identity, verification plan,
+  approvals, evidence references, a statement template, and "NUMEK never executes". It is verified by digest on
+  read.
+- **Separate standings**, each with its evidence kind:
+  - `execution_declared` (declaration);
+  - `identity_consistent_with_handoff` (production): batches received after the later of the declared execution
+    and its declaration;
+  - `behavior_change_observed` (production, descriptive): outcome-free rates before and after, against the declared
+    expectation;
+  - `sampled_behavior_consistent` (production): the S4 keyed-sample audit against the predictor;
+  - `execution_attested` (signature): Ed25519 over `{proposal, handoff_digest, executed_at, identity}` with the
+    registered customer key. Trust is the customer signing process; runtime attestation is not implemented.
+- Production evidence is never merged with hypothetical replay.
+
+**Verification** (`verification.py`).
+- R1 claims bind the incident's health and rule conditions, verified by the S6 R1 lifecycle.
+- R2 and R3 claims start SM2 tests at the first window that begins after the declared execution and has not been
+  evaluated. Each is bound to the incident's member condition with the same statistic, so a claim recovers the
+  condition.
+- A horizon without a claim gives `recovery_not_established`, and the proposal is not verified.
+- A verified proposal resolves its incident with the strongest claim a member condition recorded.
+- R4 (causal) is a contract slot only, never claimed.
+- Verifications refresh in every operations step.
+
+**Schema** `0011_interventions.sql`: proposals and events, approvals, handoffs, execution standings,
+verifications.
+
+### Evidence
+
+`tests/platform/test_interventions.py` (9 tests) runs on a real installation in simulated time:
+- **Evidence:** an investigation run is refused as independent; an unknown reference is refused; R4 is refused.
+- **Submission:** prerequisites recorded, the incident moves to response_proposed, proposal pins created.
+- **Approval:** refused for the author and for a principal without permission; byte-identical state snapshot
+  before and after; audited.
+- **Handoff:** immutable on reread, no second issue.
+- **Comparison:** two proposals with their bases, the R4 note and the replay-versus-production qualification.
+- **Standings:**
+  - execution declared, with verification bound to the matured-error condition;
+  - identity consistency not evaluable before v2 batches and established after them;
+  - a valid attestation established and a forged one failed;
+  - the sampled audit not evaluable without a predictor.
+- **Verification:**
+  - recovered April data establishes both the R2 and R3 claims, from window 9 or later;
+  - the condition recovers;
+  - the incident resolves with an outcome-supported resolution;
+  - the behavior standing is recorded as descriptive;
+  - a strict proposal on the health incident runs out of its horizon (not verified, incident back to
+    investigating);
+  - proposal pins are released 90 days after settlement.
+- **Lifecycle:** a draft cannot be approved; withdrawal is final.
+
+| Check | Result |
+|---|---|
+| `tests/platform` | **180 passed** (one run; 171 earlier + 9 new S8 tests) |
+| `tests/cg1`–`tests/cg6` | Not rerun: S8 changes no CG1–CG6 code path. The last full run was the S5 gate (673 passed, 0 failed). |
+
+### Limitations and deferred (no claim made)
+
+- **Behavior change** compares outcome-free rates only (positive decision, abstention and failure rates). It is
+  descriptive, and judges movement of at least 50% of the expected change.
+- **Sampled behavior consistency** needs a registered predictor and retained raw rows.
+- **Attestation** verifies customer signatures only; there is no hardware or TEE attestation.
+- **Recalibration studies** (fit plus restricted reserve assessment) are attached as `independent_assessment`
+  evidence produced through the existing CG2/CG4 workflows. The planner template still refuses to run them
+  automatically.
+- **Identity evidence** uses batches received after execution was declared, so conservatively it ignores v2 batches
+  that arrived before the declaration.
+- **Not covered:** the API, CLI and console for proposals (S9).
+- D-1 remains tracked; there is no production-readiness claim.
+
 ## S7: intelligence (2026-11-23). Implemented; closure gate passing.
 
 ### Implemented (plan I.1–I.9 except response comparison, G.5–G.7, R2.7)

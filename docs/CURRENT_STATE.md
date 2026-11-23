@@ -1,5 +1,31 @@
 # Numek Current State
 
+## ConfidenceGuard CG7 — S8 interventions (2026-11-23)
+
+**What exists now.** Incidents can carry **response proposals**. Each proposal has:
+- validated evidence (a replay, or an independent assessment that actually consumed a confirmation reservation);
+- expected effects;
+- machine-checked prerequisites;
+- risks;
+- a verification plan.
+
+**Comparison.** Proposals are compared side by side, with prior mitigations from similar incidents.
+
+**Approval and handoff.** Approval needs a second principal and a dedicated permission, and changes nothing in
+production. The customer executes from an immutable handoff packet; NUMEK never executes.
+
+**Execution evidence.** What happened afterwards is recorded as separate standings: declared, identity consistent,
+behavior observed, sampled behavior, and customer-signed attestation. Production evidence is never merged with
+replay.
+
+**Verification.** R2 and R3 claims are verified by SM2 tests that start after execution and are bound to the
+incident's conditions; R1 claims are verified operationally. A verified proposal resolves its incident with
+outcome evidence. A horizon without a claim is `recovery_not_established`. R4 (causal) is never claimed.
+
+**Results:** platform suite 180 passed; S8 suite 9 passed.
+
+**Not in S8:** the API, CLI and console (S9). D-1 remains.
+
 ## ConfidenceGuard CG7 — S7 intelligence (2026-11-23)
 
 **What exists now.** Incidents are reasoned about, not only grouped.
