@@ -1,5 +1,32 @@
 # Numek Current State
 
+## ConfidenceGuard CG7 — S6 operations (2026-11-23)
+
+**What exists now.** Monitoring signals become **conditions** with a lifecycle: emerging, active, quiescent,
+recovered, lapsed or suppressed. Recovery comes only from declared evidence: operational (R1), or an SM2 claim
+(R2/R3) bound to the condition. An absent alarm is never recovery.
+
+**Incidents.** P1 and P2 conditions open or join **incidents**, by a versioned priority table that records its
+reasons.
+- Grouping joins a condition only by a direct link to the incident's anchor (a shared deployment event, or overlap
+  of the evaluated populations), so it is never transitive. Anything weaker becomes a related-incident suggestion.
+- Each incident keeps an immutable detection dossier and appended knowledge revisions ("as known at detection" or
+  "now").
+- It follows the H.7 lifecycle, with acknowledgement timers, audited and reversible split and merge, evidence-checked
+  resolutions, and reopening on recurrence.
+
+**Notifications** come from a transactional outbox, as signed webhooks or SMTP through the allowlisted egress, with
+digests, quiet windows, retries and dead letters (which raise health conditions).
+
+**Running it.** The leader controller schedules monitoring cycles and retention, fires escalations and delivers
+notifications. Observation retention (400 days by default) purges unpinned old facts and marks affected
+evaluations `summary_only`. Installation backups carry all operations state.
+
+**Results:** platform suite 158 passed; S6 suite 14 passed.
+
+**Not in S6:** structural links, hypotheses and impact-based priority (S7); proposals and interventions (S8); the
+API, CLI and console (S9). D-1 remains.
+
 ## ConfidenceGuard CG7 — S5 monitoring (2026-11-20)
 
 **What exists now.** Ingested evidence is monitored. A deployment has a versioned monitoring definition: inspect it to

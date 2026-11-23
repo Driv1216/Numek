@@ -21,6 +21,7 @@ from urllib.parse import urlsplit
 from .errors import PlatformError
 
 MAX_RESPONSE = 64 * 1024
+DEFAULT_PORTS = {'https': 443, 'http': 80, 'smtps': 465, 'smtp': 587}
 
 
 @dataclass(frozen=True)
@@ -47,9 +48,9 @@ def check_destination(url, allowlist, *, resolver=socket.getaddrinfo):
     """Return (entry, host, port, checked_address) or raise ``egress_denied``."""
     parts = urlsplit(url)
     scheme, host = parts.scheme.lower(), (parts.hostname or '').lower()
-    if scheme not in ('https', 'http') or not host or parts.username or parts.password:
+    if scheme not in DEFAULT_PORTS or not host or parts.username or parts.password:
         raise PlatformError('Destination is not permitted.', 'egress_denied')
-    port = parts.port or (443 if scheme == 'https' else 80)
+    port = parts.port or DEFAULT_PORTS[scheme]
     entry = next((e for e in allowlist if e.scheme == scheme and e.host == host and e.port == port), None)
     if entry is None:
         raise PlatformError('Destination is not on the allowlist.', 'egress_denied')
@@ -92,6 +93,8 @@ def post(url, body, headers, allowlist, *, timeout=10, resolver=socket.getaddrin
     entry, host, port, address = check_destination(url, allowlist, resolver=resolver)
     parts = urlsplit(url)
     path = (parts.path or '/') + (f'?{parts.query}' if parts.query else '')
+    if entry.scheme not in ('https', 'http'):
+        raise PlatformError('Destination is not an HTTP endpoint.', 'egress_denied')
     cls = _PinnedHTTPSConnection if entry.scheme == 'https' else _PinnedHTTPConnection
     connection = cls(host, port, address, timeout=timeout)
     try:

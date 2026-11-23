@@ -235,7 +235,7 @@ def confirm(installation, deployment_id, version, inspection_digest, *, actor='s
 
 
 def start_recovery(installation, deployment_id, detector_id, *, claim, alpha, planned_support, statistic, delta=None,
-                   theta=None, start_window=None, horizon_units=None, params=None):
+                   theta=None, start_window=None, horizon_units=None, params=None, condition_id=None):
     """Start an SM2 recovery test (R2: fixed theta; R3: theta = L_ref + Delta) on the confirmed version.
 
     Verification uses only windows not yet evaluated in the statistic's phase (default: the next one), so the
@@ -273,6 +273,7 @@ def start_recovery(installation, deployment_id, detector_id, *, claim, alpha, pl
     plan = {'id': detector_id, 'kind': 'sm2', 'claim': claim, 'statistic': statistic, 'theta': threshold, 'alpha': alpha,
             'rho': test.rho, 'planned_support': planned_support, 'first_window': int(start_window), 'params': params or {},
             'phase': phase, 'delta': delta, 'horizon_units': horizon_units,
+            'condition_id': None if condition_id is None else str(condition_id),
             'error_bound': alpha if claim == 'R2' else alpha + (record or {}).get('alpha_ref', 0),
             'interpretation': 'Average conditional risk of included units since the verification start, not current risk.'}
     with installation.db.transaction() as conn:

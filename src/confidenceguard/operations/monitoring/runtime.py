@@ -202,7 +202,8 @@ def evaluate(installation, ctx, current, reference, phase, index, *, closure, as
             elif kernel.claimed_at is None and kernel.units >= int(plan.get('horizon_units') or 10**18):
                 signals.append({'source': 'recovery', 'source_id': det['detector_id'], 'standing': 'F', 'severity': 'info',
                                 'kind': 'recovery_not_established', 'dedupe': f"{det['detector_id']}:not_established",
-                                'payload': {'units': kernel.units, 'upper': kernel.upper(), 'theta': plan['theta']}})
+                                'payload': {'units': kernel.units, 'upper': kernel.upper(), 'theta': plan['theta'],
+                                            'condition': plan.get('condition_id')}})
         updates.append({'detector': det, 'state': state, 'values': len(values), 'entities': entities, 'events': events,
                         'excluded': excluded, 'alarms': found, 'first_unit': first_unit})
     for item in measures.evaluate_rules([r for r in definition.get('rules', []) if r.get('phase', 'close') == phase],
@@ -350,7 +351,8 @@ def _claim_signal(det, plan, kernel, index):
             'kind': 'threshold_recovery_established' if claim == 'R2' else 'reference_noninferiority_established',
             'dedupe': f"{det['detector_id']}:claim", 'payload': {'claim': claim, 'theta': plan['theta'], 'units': kernel.units,
                                                                  'claimed_at_unit': kernel.claimed_at, 'upper': kernel.upper(),
-                                                                 'wording': wording, 'interpretation': plan['interpretation']}}
+                                                                 'wording': wording, 'interpretation': plan['interpretation'],
+                                                                 'condition': plan.get('condition_id')}}
 
 
 def _signal(conn, scope, deployment_id, version, index, signal):
@@ -469,4 +471,14 @@ def cycle_job(job_ctx, payload):
     installation = Installation(payload['installation'])
     from ...execution_context import InProcessContext, using
     with using(InProcessContext(deadline=job_ctx.deadline)):
-        return cycle(installation, payload['deployment'], now_tick=payload.get('now_tick'))
+        return monitor_once(installation, payload['deployment'], now_tick=payload.get('now_tick'))
+
+
+def monitor_once(installation, deployment_id, *, now_tick=None):
+    """Monitoring cycle, then the operations step (signals → conditions → incidents) at the same time."""
+    from datetime import datetime, timezone
+    from ..incidents import engine
+    now_tick = time.time_ns() if now_tick is None else int(now_tick)
+    summary = cycle(installation, deployment_id, now_tick=now_tick)
+    summary['operations'] = engine.operate(installation, deployment_id, now=datetime.fromtimestamp(now_tick / 1e9, tz=timezone.utc))
+    return summary

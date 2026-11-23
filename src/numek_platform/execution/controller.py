@@ -37,9 +37,10 @@ def assert_leader(conn, holder, epoch):
 
 
 class Controller:
-    def __init__(self, db, *, gc=None, holder=None, ttl_seconds=15, gc_every_seconds=300):
+    def __init__(self, db, *, gc=None, holder=None, ttl_seconds=15, gc_every_seconds=300, tasks=()):
         self.db = db
         self.gc = gc
+        self.tasks = list(tasks)          # callables (holder, epoch) run while leading; they assert the epoch themselves
         self.holder = holder or f'controller-{os.getpid()}-{uuid.uuid4().hex[:8]}'
         self.ttl_seconds = ttl_seconds
         self.gc_every_seconds = gc_every_seconds
@@ -59,6 +60,7 @@ class Controller:
         if self.gc is not None and time.monotonic() - self._last_gc >= self.gc_every_seconds:
             self._last_gc = time.monotonic()
             report['gc'] = self.gc.run_once()
+        report['tasks'] = [task(self.holder, self.epoch) for task in self.tasks]
         return report
 
     def run(self, stop, interval=None):

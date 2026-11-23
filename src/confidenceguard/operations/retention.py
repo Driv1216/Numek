@@ -57,4 +57,8 @@ def sweep(installation, *, raw_days=RAW_DAYS, quarantine_days=QUARANTINE_DAYS, n
 
 def retention_job(ctx, payload):
     from numek_platform.installation import Installation
-    return sweep(Installation(payload['installation']))
+    from .incidents import pins
+    installation = Installation(payload['installation'])
+    report = sweep(installation)
+    report['observations'] = pins.observation_sweep(installation, now=datetime.now(timezone.utc))
+    return report

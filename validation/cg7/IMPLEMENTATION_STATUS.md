@@ -5,6 +5,130 @@ records what is implemented and what evidence exists, stage by stage. Several ki
 engineering correctness, statistical qualification, resilience, measured performance, product completeness,
 independent review and founder acceptance.
 
+## S6: operations (2026-11-23). Implemented; closure gate passing.
+
+### Implemented (plan H.4, H.7, H.8, C.4–C.6, G.10)
+
+**Conditions** (`operations/incidents/conditions.py`) fold monitoring signals into persistent states.
+- `emerging → active`: persistence (2 of the last 3 windows), a formal alarm, or a high or critical deterministic
+  violation.
+- `emerging → lapsed`: no repeat within 3 windows.
+- `active → quiescent`: 2 quiet windows.
+- `quiescent → active`: the condition recurs.
+- `quiescent → recovered`, only by declared criteria:
+  - R1 for deterministic and descriptive health or rule conditions, after a further hold;
+  - R2/R3 when an SM2 recovery test bound to the condition (`start_recovery(condition_id=)`) establishes its claim.
+    A claim made while the condition is active waits for quiescence.
+- **An absent alarm is never recovery.** Detector conditions stay quiescent without an SM2 claim.
+- **Suppression** needs a reason and an expiry, returns to the prior state when it expires, and is audited.
+- Every transition is an append-only event in the same transaction.
+
+**Incidents** (`incidents.py`, priority table `priority.py`).
+- **Priority.** A versioned decision table (`cg7_priority_v1`) records the rule and the "why". Operator overrides
+  need a reason and are audited and notified.
+- **Opening.** P1 and P2 conditions open or join incidents; P3 and P4 remain visible conditions.
+- **Grouping is anchor-compatible and non-transitive.** A condition joins only through a *direct* link to the anchor
+  (`exact`: a shared prior deployment event; or `population_overlap`: Jaccard ≥ 0.5 of evaluated window
+  populations) when it is compatible in deployment and time. Otherwise it opens its own incident, with
+  `related_incident` suggestions; nothing is merged automatically. Every decision is an event with its rule, link
+  and rationale.
+- **Detection dossier.** An immutable packet at K_open holds:
+  - signals;
+  - window evaluations with digests and evidence uses;
+  - detector plans and states;
+  - the reference;
+  - health;
+  - identity standings;
+  - deployment events.
+- **Knowledge revisions** are appended and never rewritten. `view(as_known='detection'|'now')` verifies digests.
+- **Lifecycle** follows the H.7 transition table, with optimistic revisions for operator edits.
+- **Resolution.** Outcome-supported resolutions require a member condition recovered with the matching evidence
+  (R1, R2 or R3). Operator resolutions (`accepted_risk` and the rest) require a reason and are never recovery.
+  A recurrence of the same condition key within 30 days of resolution reopens the incident.
+- **Acknowledgement SLAs** (P1 15 min, P2 1 h, P3 24 h) escalate an unacknowledged incident by level.
+- **Split and merge** are audited, reversible operator actions (each records its inverse). The anchor cannot be
+  split out.
+
+**Notifications** (`notify.py`).
+- An outbox row is written in the incident event's transaction, only for state and priority changes.
+- Payloads carry ids, priority, state and a link only.
+- Webhooks are HMAC-SHA256 signed over `timestamp.body`. The key is generated, shown once and kept in the secrets
+  store.
+- SMTP uses implicit TLS or STARTTLS; plaintext needs an explicit channel flag.
+- Every destination goes through `numek_platform.egress`: the allowlist, the checked-address pin, no redirects.
+  The egress check now also accepts `smtp`/`smtps` destinations.
+- Delivery is at least once, with idempotency keys. Rows are claimed before sending.
+- A failure backs off exponentially (30 s doubling, capped at 1 h). After 8 attempts the row is a dead letter and
+  raises a D health condition (`notification_dead_letter`).
+- Rules set the minimum priority, digests and quiet windows (P1 is never held), and escalation levels.
+
+**Controller and scheduling** (`operations/scheduler.py`; platform `Controller(tasks=)`).
+- While leading, the controller enqueues one idempotent `ops_monitoring_cycle` job per deployment and slot, plus
+  the daily retention job. Both enqueues are guarded by `assert_leader`, so a deposed controller cannot enqueue.
+- It also fires escalation timers and delivers the outbox.
+- The cycle job now runs `monitor_once`: the S5 cycle, then signals → conditions → incidents.
+
+**Retention and pins** (`pins.py`; H.8).
+- Explicit pins (incident, analyst with expiry, study, proposal) protect event-tick ranges. Incident pins stay live
+  while the incident is open and until 90 days after resolution; reopening clears the expiry.
+- The observation sweep purges, through the platform purge at a new K, opportunities past `observation_days`
+  (default 400, per system, minimum 30). It purges the whole revision chain with predictions, context, samples
+  and outcomes, and skips pinned ranges, reporting how many it skipped.
+- Window evaluations that lost facts become `summary_only`.
+
+**Backup and restore.** Operations state (conditions, incidents, events, revisions, outbox, pins, detectors) lives in
+the installation database and its packets in the installation store, so the R2.2 installation backup covers it. The
+restore test verifies this.
+
+**Schema** `0009_incidents.sql`: conditions with signal links and events; incidents with members, events, revisions
+and related suggestions; channels, rules and outbox; pins; retention policies; signal processing marks;
+evaluation reproducibility.
+
+### Evidence
+
+`tests/platform/test_incidents.py` (14 tests) runs on a real installation fed by S4 ingestion and S5 monitoring, in
+simulated time. It covers:
+- **Opening:** a formal alarm opens a P1 incident (rule `formal_tier1`) with a verified dossier at K_open and a live
+  pin; a second formal condition on the same windows joins by population overlap.
+- **Grouping:** every member is linked to the anchor itself (re-verified). The empty-window health condition, which
+  has no link to the anchor, is not grouped and opens its own P2 incident.
+- **Notifications:** webhooks are signed (verified), payloads minimal, the key is absent from the database, and a
+  repeat send sends nothing.
+- **Escalation** past the SLA notifies the level-1 rule.
+- **Lifecycle:** an illegal transition and a stale revision are refused; resolving with R2 before evidence exists
+  is refused; an operator resolution without a reason is refused.
+- **Recovery:** an SM2 R2 claim bound to the condition recovers it, and the outcome-supported resolution succeeds.
+  The "now" revision shows the recovery while the detection dossier stays unchanged, and the pin expires 90 days
+  after resolution.
+- **Recurrence** reopens the incident and clears the pin expiry.
+- **Condition lifecycle:** persistence, lapse, suppression expiry and R1 recovery with the exact event sequence;
+  suppression is audited.
+- **Merge and split:** moved conditions are restored; the audit chain verifies; splitting out the anchor is refused.
+- **Delivery:** a non-allowlisted channel dead-letters after 8 attempts with `egress_denied` and raises a D health
+  signal; an SMTP digest of two updates is delivered as one message; P2/P3 digests are held.
+- **Controller:** it enqueues cycle and retention jobs once per slot under leadership; an impostor epoch is refused.
+- **Backup and restore:** incident knowledge, state and detector checkpoints are identical after restore.
+- **Retention:** an analyst pin keeps exactly its 560 opportunities; other facts are purged and the affected
+  evaluations become `summary_only`.
+
+| Check | Result |
+|---|---|
+| `tests/platform` (includes the S5 suites after the shared-helper move) | **158 passed** (one run; 144 earlier + 14 new S6 tests) |
+| `tests/cg1`–`tests/cg6` | Not rerun: S6 changes no CG1–CG6 code path (selection, catalog, kernels and capture are untouched). The platform suite applies the new migration from scratch. The last full run was the S5 gate (673 passed, 0 failed). |
+
+### Limitations and deferred (no claim made)
+
+- **Links:** only `exact` (shared deployment event) and `population_overlap`. Structural links (CG4 gate features,
+  CG5 predicate inputs, CG6 spec inputs) and the leading-hypothesis contradiction check arrive with S7 intelligence.
+- **The priority table has no impact axis yet** (volume, traffic share, constraint violations, costs), and no region
+  rule. These are S7.
+- **Escalation** notifies further rule levels. On-call schedules and acknowledgement through the notification
+  channel are not implemented.
+- **Retention:** reserve-study pins are created explicitly; there is no automatic pin from CG4 studies. Proposal
+  pins arrive with S8.
+- **Not covered:** PITR and multi-host controller qualification; the API, CLI and console for incidents (S9).
+- D-1 remains tracked; there is no production-readiness claim.
+
 ## S5: monitoring (2026-11-20). Implemented; closure gate passing.
 
 ### Implemented (plan G.1–G.5, H.2, H.4, H.6; Addendum R2.3–R2.5)
