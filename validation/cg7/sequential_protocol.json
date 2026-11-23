@@ -1,0 +1,109 @@
+{
+ "format": "numek_cg7_sequential_protocol/1",
+ "title": "CG7 M.2 statistical qualification of the SM1 and SM2 kernels (Addendum R2.9)",
+ "locked": "2026-11-20",
+ "implementation": "src/confidenceguard/operations/monitoring/eprocess.py",
+ "methods": "docs/CG7_SEQUENTIAL_METHODS.md",
+ "results": "validation/cg7/results/sequential_qualification.json",
+ "stopping_rule": [
+  "One locked run of every panel with the seeds below.",
+  "An implementation bug reruns the affected panel only; the rerun, its reason and the defect are recorded in the results file next to the original outcome.",
+  "A correctly implemented failure is retained; the affected formal standing is disabled and the method falls back to descriptive.",
+  "No threshold, panel, seed or acceptance change after the run; no method shopping."
+ ],
+ "implementation_equivalence": "Each simulation uses a vectorized form of the kernel; before a panel counts, the vectorized form must reproduce eprocess.EDetector / eprocess.recovery_upper exactly (alarm units, claim times) on the first 20 trials of that panel. A mismatch is an implementation bug.",
+ "panels": {
+  "Q-E1a": {
+   "check": "SM1 exact enumeration with resets: all 2^20 Bernoulli paths at the boundary null mu = m0; exact E[N_t] and P(N_t >= 1) for every t <= 20",
+   "m0": [0.05, 0.2, 0.5],
+   "alpha": [0.01, 0.05],
+   "n": 20,
+   "acceptance": "E[N_t] <= t * alpha and P(N_t >= 1) <= t * alpha for every t, exactly (tolerance 1e-12 for floating summation)"
+  },
+  "Q-E1b": {
+   "check": "SM1 recursion equals the brute-force definition (max over run starts of the product, with resets) and never exceeds the Shiryaev-Roberts statistic",
+   "paths": 300,
+   "length": 80,
+   "seed": 20261120,
+   "acceptance": "identical alarm units on every path; CUSUM <= Shiryaev-Roberts at every step (relative 1e-12)"
+  },
+  "Q-E1c": {
+   "check": "SM1 log-space stability over 10^8 units at the boundary null (m0 = 0.05, alpha = 1e-8), chunked Lindley form, cross-checked against EDetector on the first 2e5 units",
+   "units": 100000000,
+   "m0": 0.05,
+   "alpha": 1e-08,
+   "seed": 20261121,
+   "acceptance": "state finite at every chunk boundary; prefix equality with EDetector to 1e-9 in the log statistic and identical alarms; realized alarm count reported against alpha * units = 1 (informational)"
+  },
+  "Q-E1d": {
+   "check": "SM2 exact false-claim probability at the constant boundary null (dynamic programme over the running sum, absorbing claim state), and the closed form against numerical integration of the normal mixture",
+   "theta": [0.05, 0.2, 0.5],
+   "alpha": 0.05,
+   "horizon": 2000,
+   "rho": "horizon / 4",
+   "min_support": 30,
+   "acceptance": "exact P(claim within horizon) <= alpha; mixture integral at the boundary equals 1/alpha to relative 1e-6 on the listed (n, rho, alpha) points",
+   "integration_points": [[30, 25.0, 0.05], [400, 100.0, 0.05], [2000, 500.0, 0.01], [50, 1.0, 0.1], [10000, 2500.0, 0.001]]
+  },
+  "Q-E2": {
+   "check": "SM1 null false alarms with resets by vectorized simulation; n = 2e4 units per trial, alpha = 0.05 / 2e4 (n * alpha = 0.05)",
+   "trials": 2000,
+   "n": 20000,
+   "n_alpha": 0.05,
+   "seed": 20261122,
+   "generators": {
+    "bernoulli_0.005": {"kind": "bernoulli", "m0": 0.005},
+    "bernoulli_0.05": {"kind": "bernoulli", "m0": 0.05},
+    "bernoulli_0.2": {"kind": "bernoulli", "m0": 0.2},
+    "beta_bounded": {"kind": "beta", "m0": 0.1, "a": 1.0, "b": 9.0},
+    "markov_modulated": {"kind": "markov", "m0": 0.1, "means": [0.1, 0.05], "switch": 0.01},
+    "entity_thinned": {"kind": "entity_first", "m0": 0.1, "risk_beta": [0.5, 4.5], "events_per_entity": "1 + Poisson(3)"}
+   },
+   "acceptance": "fail only if the one-sided exact binomial test of the first-alarm count against n * alpha rejects at 0.001, or the 0.999 one-sided lower confidence bound of the mean alarm count (normal approximation, stated) exceeds n * alpha"
+  },
+  "Q-E3": {
+   "check": "SM2 null false claims; horizon 2000, rho = 500, alpha_rec = 0.05, minimum support 30; every claim is false because the running average of conditional means is >= theta throughout",
+   "trials": 2000,
+   "horizon": 2000,
+   "alpha": 0.05,
+   "seed": 20261123,
+   "generators": {
+    "constant_0.05": {"kind": "constant", "theta": 0.05},
+    "constant_0.2": {"kind": "constant", "theta": 0.2},
+    "alternating_0.2": {"kind": "alternating", "theta": 0.2, "d": 0.15},
+    "drifting_0.2": {"kind": "drifting", "theta": 0.2, "d": 0.15}
+   },
+   "acceptance": "fail only if the one-sided exact binomial test of the false-claim count against alpha rejects at 0.001"
+  },
+  "Q-E4": {
+   "check": "SM1 assumption-violation controls (same design as Q-E2); expected inflation, recorded as documented limits, never failures",
+   "trials": 2000,
+   "n": 20000,
+   "n_alpha": 0.05,
+   "seed": 20261124,
+   "generators": {
+    "unthinned_repeated_entities": {"kind": "entity_bursts", "m0": 0.1, "risk_beta": [0.5, 4.5], "burst": 10},
+    "common_shock": {"kind": "blocks", "m0": 0.1, "shift": 0.05, "block": 500},
+    "unrepresentative_reference": {"kind": "bernoulli_true", "m0": 0.1, "true_mean": 0.11}
+   },
+   "acceptance": "none (documented limits)"
+  },
+  "Q-E5": {
+   "check": "Detection planner validity: sustained shift from the first unit, fresh detector; alpha from a target of 0.1 expected false alarms per 30 days at the stated volume; trials capped at 10x the prediction (capped trials count as the cap)",
+   "trials": 400,
+   "seed": 20261125,
+   "scenarios": {
+    "moderate_high_volume": {"m0": 0.063, "m1": 0.08, "units_per_day": 20000},
+    "moderate_low_volume": {"m0": 0.063, "m1": 0.08, "units_per_day": 2000},
+    "rare_high_volume": {"m0": 0.0075, "m1": 0.01, "units_per_day": 20000},
+    "rare_low_volume": {"m0": 0.0075, "m1": 0.01, "units_per_day": 2000}
+   },
+   "target_false_alarms_per_30_days": 0.1,
+   "acceptance": "observed median delay within [0.5, 1.5] x the planner's expected delay (qualifies the planner shown to users, not detector validity)"
+  },
+  "Q-DC": {
+   "check": "Domain-classifier exploratory permutation test",
+   "status": "deferred to S7 with the domain classifier; locked separately before it runs"
+  }
+ }
+}

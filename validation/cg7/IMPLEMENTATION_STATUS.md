@@ -5,6 +5,182 @@ records what is implemented and what evidence exists, stage by stage. Several ki
 engineering correctness, statistical qualification, resilience, measured performance, product completeness,
 independent review and founder acceptance.
 
+## S5: monitoring (2026-11-20). Implemented; closure gate passing.
+
+### Implemented (plan G.1–G.5, H.2, H.4, H.6; Addendum R2.3–R2.5)
+
+**S5a: sequential kernels** (`operations/monitoring/eprocess.py`; proofs in `docs/CG7_SEQUENTIAL_METHODS.md`).
+
+*SM1: bounded-mean e-CUSUM with resets (R2.4).*
+- Grid λ_k = (0.5/m₀)·2^-k, K = 12, equal weights; alarm when the mixture reaches 1/α; every component then resets.
+- Computed in log space. The checkpoint is exact and chunking-invariant.
+- Refuses m₀ outside (0, 1) and units outside [0, 1]. No epochs.
+- The written proof gives E[N_U] ≤ α·E[U] for any stopping-time horizon U, with resets.
+
+*SM2: one-sided Hoeffding normal-mixture confidence sequence (R2.5).*
+- Bounds the running average of conditional means.
+- Supports R2 (fixed θ) and R3 (θ = L_ref + Δ) claims, valid under any checking schedule.
+- Minimum support 30. ρ is fixed before verification (default: planned support / 4).
+
+*Finite bounds and the planner.*
+- Bounds: one-sided Clopper–Pearson and Hoeffding, plus reuse of the CG6 bounded-cluster ratio.
+- The detection planner uses the grid's Bernoulli growth rate (the worst case for a bounded statistic with a given
+  mean). It reports the expected delay in units and days, and flags `insufficient_power`.
+
+**S5b: definitions and exact incremental windows.**
+- **Window pruning** (`load_history(..., window_ticks=)`, H.2). The pruned load reads:
+  - the opportunities with *any* revision in the window, located by a key-only index lookup;
+  - their complete revision chains;
+  - their predictions, context and samples (by opportunity key) and outcomes (by target key).
+
+  The unchanged CG3 `select_history` / `HistoryStore` then run on that load. Cost scales with the window, not
+  history.
+- **Window-scoped reservations.** Membership comes from identity hashes and clocks only, and is committed before
+  any read. The purposes are `monitoring_outcome`, `detector` and `reference`; each is always recorded as exposure.
+- **Versioned definitions** (`definitions.py`). Inspect records a version together with:
+  - the frozen reference;
+  - per-detector admission or refusal: unbounded statistics (log loss, MSE, absolute error) are refused, and so is
+    m₀ ≥ 1;
+  - m₀ = U_ref + δ;
+  - α, from a target number of false alarms per 30 days at the included-unit rate;
+  - planner delay including window and maturity lag;
+  - power, and formal or descriptive standing with reasons.
+
+  A reference that does not end before monitoring starts is refused (`adaptive_reference`). Confirm requires the
+  inspection digest the operator saw (`stale_confirmation` otherwise), supersedes the previous version and creates
+  its detectors. Detectors never carry state across versions. A version confirmed after its start is
+  `added_after_observation`, and its detectors consume only windows that start after confirmation.
+
+**S5c: references, measures, estimators and the ledger.**
+- **References** are immutable and computed once per rule and K, under purpose `reference`. Each holds:
+  - per-statistic included counts and means;
+  - finite bounds under the registered design (Clopper–Pearson / Hoeffding / bounded-cluster), or `None` with
+    reasons;
+  - inclusion rates and the included-unit rate per day;
+  - cohort composition with Bonferroni-split within-group risks;
+  - the frozen selected relation (Parquet).
+- **Window measures** reuse CG1/CG2/CG3 reducers through `longitudinal._evaluate`. Drift uses CG3's own `_drift`
+  against the frozen reference relation (KS, W1, TV, JS, with CG3's refusals).
+- **Rules** are deterministic thresholds (D/P) plus CG3 drift prioritization (P).
+- **Outcome-free estimators** (G.5): implied issued error (1 − p of the issued decision), implied Brier (CG1's
+  definition), and composition projection. Each carries an assumption label and standing E.
+- **Matched accountability ledger.** The original record is immutable. At maturity a matched record is added: the
+  same formula on O ⊆ P_W, the realized value with Clopper–Pearson or Hoeffding intervals, coverage, exclusions,
+  signed bias and exceedance. `ledger_summary` gives descriptive accountability.
+
+**S5d: detector runtime** (`runtime.py`, `units.py`, `health.py`; job kind `ops_monitoring_cycle`, essential lane).
+- **Phases.** Close: outcome-free measures, drift, estimator records, rules and outcome-free detectors. Maturity:
+  matured measures, matched accountability, rules and outcome detectors.
+- **Units.** Inclusion is predictable: selected state, availability and maturity, `entity_first` per detector.
+  Invalid outcome values are excluded and counted. Units are ordered by window, then HMAC(per-deployment secret,
+  event key), so the order is independent of X.
+- **One transaction per window phase.** It holds, in order:
+  1. the fence;
+  2. the exposure lock;
+  3. the packet;
+  4. reservation consumption;
+  5. the evaluation row;
+  6. per detector, a unique segment (`first_unit` contiguous) and a state update guarded by the previous version
+     and window contiguity;
+  7. the admitted units;
+  8. estimates and signals (dedupe keys).
+
+  A replay applies nothing, and a forced re-application refuses.
+- **Late publications** are detected incrementally from facts published since the earliest latest-evaluation K.
+  Outcome arrival is not lateness for the close phase. A late publication creates a new evaluation *revision*; its
+  units never enter running detectors and are counted as late exclusions.
+- **Alarms** carry the fixed R2.4 wording, what is not established, the assumptions, and a comparability
+  annotation. That annotation flags a population-definition shift when label availability differs from the
+  reference beyond tolerance. Descriptive detectors produce P signals with no probability statement.
+- **SM2 recovery tests** start only at a window not yet evaluated, and emit `threshold_recovery_established`,
+  `reference_noninferiority_established` or `recovery_not_established`.
+- **Health** (D) covers:
+  - source silence, failed batches, backlog and known producer loss;
+  - failed ops jobs;
+  - untimed opportunities (new partial index);
+  - closure and maturity backlog, staleness, empty closed windows;
+  - detector standing, power, lag and late exclusions.
+
+  **Coverage map:** formal / insufficient_power / descriptive / not_configured / stale per dimension. "Absence of
+  conditions is not evidence of health."
+- **Schema** `0008_monitoring.sql`: definitions, references, window evaluations (phase, revision), detectors,
+  segments, admitted units, signals, estimates.
+
+### Evidence
+
+**Statistical qualification (M.2).** The locked protocol `validation/cg7/sequential_protocol.json` was run once by
+`sequential_qualification.py`; results are in `validation/cg7/results/sequential_qualification.json`.
+
+| Panel | Result |
+|---|---|
+| Q-E1a exact enumeration, all 2^20 paths, resets, 3 m₀ × 2 α | pass. E[N_t] and P(N_t ≥ 1) ≤ tα at every t; the worst ratio to the bound is 0.02 |
+| Q-E1b recursion = brute-force definition; CUSUM ≤ Shiryaev–Roberts | pass (300 paths, 362 alarms compared, 0 mismatches) |
+| Q-E1c log-space stability over 10^8 units | pass (state finite; prefix equal to `EDetector`; 0 alarms against α·U = 1) |
+| Q-E1d SM2 exact false-claim probability; closed form against numerical integration | pass (exact ≤ 3.7e-4 against 0.05; integration to 1e-6) |
+| Q-E2 SM1 null with resets: 6 generators × 2,000 trials, nα = 0.05 | pass. First alarms 0–4 per panel against an allowance of 100 (the bound is conservative) |
+| Q-E3 SM2 null: constant, alternating and drifting running averages | pass (0 false claims in each panel) |
+| Q-E4 violation controls (documented limits) | Unthinned repeated entities 99%, common shock 99%, and an unrepresentative reference (true mean 1.1·m₀) 33% of trials alarm. This inflation is expected, and the `entity_first` default and the declared assumptions exist for it. |
+| Q-E5 planner validity, 4 scenarios × 400 trials | pass (median delay 0.87–0.93× the prediction) |
+
+The run had one harness defect: Q-E2's outcome was computed but not saved, because of numpy-bool JSON
+serialization. Under the stopping rule, Q-E2 was rerun with the same seed and code path, and the rerun and its
+reason are recorded in the results file. Q-E3 to Q-E5 then ran for the first time (`--resume`). No threshold,
+seed or panel changed.
+
+**Engineering correctness.**
+- `tests/platform/test_sequential_kernels.py` (15 tests): the recursion against its definition, the checkpoint,
+  refusals, log-space stability, the SM2 boundary against numerical integration, support, bounds and the planner.
+- `tests/platform/test_monitoring_windows.py` (7 tests) is the **H.2 equivalence gate**. Pruned and full selection
+  are compared for every window, at two snapshots and two maturity policies, on a history with:
+  - corrections that move opportunities forward and backward between windows;
+  - late, out-of-order, withdrawn and final outcome revisions;
+  - outcomes before predictions;
+  - malformed clocks, retries and repeated entities.
+
+  The two selections are equal in rows, selected digest, every measurement and coverage. The one exclusion is the
+  whole-history `unlocated_opportunities`, which health reports from the index. A mutation check confirms that
+  naive in-window-only pruning is caught. The window reservation is smaller than the namespace's.
+- `tests/platform/test_monitoring.py` (9 tests) runs on a real installation, through S4 ingestion, in simulated
+  time. It covers:
+  - inspection: planner, refusals, a reference computed once and its purpose consumed, stale confirmation, an
+    adaptive reference refused;
+  - the cycle: contiguous and unique segments, contiguous unit indices, the March shift detected with no alarm
+    before it, F signals with fixed wording, evaluations consumed under `monitoring_outcome` / `detector`, an
+    idempotent replay, and a forced double application refused;
+  - estimators: recorded, then matched. Calibration holds before the shift; after it, exceedances are recorded;
+  - a late batch: close and maturity revisions, 30 late units excluded, detector units unchanged;
+  - an SM2 R2 claim on recovered data, and its start-window refusal;
+  - health and coverage: formal matured performance, regions not configured, staleness detected;
+  - drift and rules through CG3 reducers; empty closed windows as D conditions; packets carry hashes, not lexical
+    entities.
+
+| Check | Result |
+|---|---|
+| `tests/platform` | **144 passed** (one run; 113 earlier + 31 new S5 tests) |
+| `tests/cg1`–`tests/cg6` (selection path, reader, reservation and schema changed) | **673 passed, 0 failed, 11 skipped** (one run; the same pre-existing skips) |
+
+### Limitations and deferred (no claim made)
+
+- **Statistics not yet admitted:** coverage miss (interval and set outputs), region membership (frozen CG4 regions)
+  and deferral indicators. They are refused as unknown statistics. Region and policy dimensions show
+  `not_configured` in the coverage map (S7).
+- **Not implemented in S5:**
+  - the G.5 Poisson-binomial calibration-transfer diagnostic;
+  - G.6 Neyman label-allocation guidance;
+  - the G.7 domain classifier and Q-DC (S7);
+  - measurement of reference/stream entity overlap. R2.4 asks for it to be shown; it is stated as an assumption on
+    every alarm instead.
+- **Health:** volume against expected volume is not modelled beyond empty closed windows.
+- **Pending later stages:**
+  - controller scheduling of `ops_monitoring_cycle` (S6 with the controller);
+  - conditions, incidents and notifications built from signals (S6);
+  - retention pins for references and packets (S6);
+  - the API, CLI and console for definitions (S9).
+- **Comparability** is checked through label availability only. Late and thinning rates are recorded but not
+  compared.
+- **Performance:** not measured. The incrementality ratio and M.5 tiers are S10.
+- D-1 remains tracked (shared-installation workspace stores); there is no production-readiness claim.
+
 ## S4: ingestion (2026-11-20). Implemented; closure gate passing.
 
 ### Implemented (plan H.4, H.5, C.6, G.9, R2.7)

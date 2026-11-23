@@ -1144,7 +1144,7 @@ class PlatformCatalog(Catalog):
             pass
 
     def iter_facts(self, kind=None, *, sequence=None, keys=None, fact_digests=(), batch_ids=(), require_complete=True,
-                   max_records=30000000, check=None, _logical_order=False):
+                   max_records=30000000, check=None, _logical_order=False, opportunity_keys=None, target_keys=None):
         from numek_platform.evidence import reader
         from numek_platform.errors import PlatformError
         from numek_platform.governance import reader as governed_reader
@@ -1156,6 +1156,8 @@ class PlatformCatalog(Catalog):
                                   allow_migrating=self._migrating)
             try:
                 filters = {'kinds': None if kind is None else [kind], 'keys': None if keys is None else list(keys),
+                           'opportunity_keys': None if opportunity_keys is None else list(opportunity_keys),
+                           'target_keys': None if target_keys is None else list(target_keys),
                            'fact_digests': list(fact_digests) or None, 'require_complete': require_complete,
                            'occurrence_publications': [_uuid(b) for b in batch_ids] or None,
                            'order': 'logical' if _logical_order else 'physical'}
@@ -1219,6 +1221,23 @@ class PlatformCatalog(Catalog):
             for value in cache.values():
                 if hasattr(value, 'close'):
                     value.close()
+
+    def event_range_keys(self, kind, ticks, *, sequence=None, namespace=None):
+        """Keys with any revision whose event tick is in ``ticks = (lower, upper)`` at K (index only)."""
+        from numek_platform.evidence import reader
+        from numek_platform.errors import PlatformError
+        try:
+            head = self.head()
+            k = head if sequence is None else min(int(sequence), head)
+            read_pin = reader.pin(self.db, self.scope, self.catalog_id, holder=f'confidenceguard:{os.getpid()}', k=k,
+                                  allow_migrating=self._migrating)
+            try:
+                return reader.keys_in_event_range(self.db, read_pin, kind=kind, lower=int(ticks[0]), upper=int(ticks[1]),
+                                                  namespace=namespace)
+            finally:
+                reader.release(self.db, read_pin)
+        except PlatformError as exc:
+            raise _translate(exc) from exc
 
     def variants(self):
         with self.db.connect() as conn:
@@ -1461,7 +1480,8 @@ class PlatformCatalog(Catalog):
                 'reserve_units': reservation.reserve_consumed_units, 'catalog_sequence': k, 'reserve_claim': True}
 
     # Governance for historical analysis -----------------------------------------------------------
-    def reserve_history(self, *, namespace, k, purpose_label, metadata=None, exposure=True, authority=None):
+    def reserve_history(self, *, namespace, k, purpose_label, metadata=None, exposure=True, authority=None,
+                        tick_range=None, purpose=None):
         """Reserve every opportunity of ``namespace`` that has an outcome at K, before reading any.
 
         Membership comes from identity hashes and outcome *existence* only. As in
@@ -1471,6 +1491,11 @@ class PlatformCatalog(Catalog):
         (lease, governance) for the analysis attempt; the caller publishes its
         result under the same lease (consuming the reservation) or abandons it
         (the exposure remains recorded).
+
+        ``tick_range`` (half-open event ticks) limits the membership to opportunities with any revision
+        in that range (a monitoring window, plan H.2); ``purpose`` names an explicit governed purpose
+        (``monitoring_outcome``, ``detector``, ``reference``), always recorded whatever the CG3
+        tracking setting.
         """
         from numek_platform.errors import PlatformError
         from numek_platform.evidence import reader
@@ -1481,11 +1506,13 @@ class PlatformCatalog(Catalog):
                 lease, _row = jobs.start_inline(conn, self.scope, 'cg_history_analysis', idempotency_key=uuid.uuid4().hex,
                                                 owner=f'confidenceguard:{os.getpid()}')
             read_pin = reader.pin(self.db, self.scope, self.catalog_id, lease=lease, k=k, allow_migrating=self._migrating)
-            members = governed_reader.membership_from_index(self.db, read_pin, namespace=namespace)
-            disclosed = exposure and ledger.tracking_status(self.db, self.scope, self.catalog_id)['enabled']
+            members = governed_reader.membership_from_index(
+                self.db, read_pin, namespace=namespace,
+                event_tick_range=None if tick_range is None else [int(tick_range[0]), int(tick_range[1])])
+            disclosed = purpose is not None or (exposure and ledger.tracking_status(self.db, self.scope, self.catalog_id)['enabled'])
             reservation = ledger.reserve(
                 self.db, self.store, self.scope, lease, self.catalog_id,
-                purpose='outcome_disclosure' if disclosed else 'selection_access', members=members,
+                purpose=purpose or ('outcome_disclosure' if disclosed else 'selection_access'), members=members,
                 allow_migrating=self._migrating,
                 population_digest=digest(sorted(members)), read_k=k,
                 metadata={'purpose': purpose_label, 'namespace': namespace, **(metadata or {})},

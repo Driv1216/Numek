@@ -23,8 +23,29 @@ class HistoricalEvidence(Evidence):
             measurement['evidence_refs'].append(ref)
 
 
-def load_history(work, root, spec, sequence, governance=None):
+def load_history(work, root, spec, sequence, governance=None, window_ticks=None):
+    """Materialize the facts ``select_history`` resolves.
+
+    With ``window_ticks = (lower, upper)`` (plan H.2, platform catalogs) only the opportunities with any
+    revision whose event tick is in the window are loaded, with their complete revision chains and their
+    predictions, context, samples and outcomes (by target). ``select_history`` resolves heads per key with
+    no cross-opportunity dependence, so the selected window population equals the full-history selection
+    restricted to that window (closure gate ``tests/platform/test_monitoring_windows.py``). Two
+    whole-history quantities are out of a window's scope: ``unlocated_opportunities`` (untimed
+    opportunities belong to no window; monitoring health counts them from the index) and tombstones
+    outside the window (a full scan refuses on them; a window read does not).
+    """
     catalog = Catalog(root)
+    filters = {}
+    if window_ticks is not None:
+        if not hasattr(catalog, 'event_range_keys'):
+            raise EvaluationError('Window-pruned selection requires a platform catalog.', 'catalog_version')
+        opportunity_keys = catalog.event_range_keys('opportunity', window_ticks,
+                                                    sequence=spec.prediction_catalog_sequence or sequence,
+                                                    namespace=spec.namespace)
+        filters = {'opportunity': {'keys': opportunity_keys}, 'prediction': {'opportunity_keys': opportunity_keys},
+                   'context': {'opportunity_keys': opportunity_keys}, 'sample': {'opportunity_keys': opportunity_keys}}
+        targets = set()
     if governance is not None:
         catalog.governed(governance)
         if hasattr(catalog, 'ensure_governance'):
@@ -37,11 +58,15 @@ def load_history(work, root, spec, sequence, governance=None):
     con.execute('CREATE TABLE hf(kind VARCHAR,key VARCHAR,revision VARCHAR,fact_digest VARCHAR,predecessor VARCHAR,available HUGEINT,authority VARCHAR,sequence BIGINT,payload VARCHAR,identity VARCHAR)')
     scanned = 0; parsed_bytes = 0; record_bytes = 0; objects = set(); pending = []
     for kind in ('opportunity', 'prediction', 'outcome', 'context', 'sample'):
-        for fact in catalog.iter_facts(kind, sequence=(spec.prediction_catalog_sequence or sequence) if kind != 'outcome' else sequence, batch_ids=spec.batch_ids, max_records=spec.max_scan_records, check=work.check):
+        if window_ticks is not None and kind == 'outcome':
+            filters['outcome'] = {'target_keys': sorted(targets)}
+        for fact in catalog.iter_facts(kind, sequence=(spec.prediction_catalog_sequence or sequence) if kind != 'outcome' else sequence, batch_ids=spec.batch_ids, max_records=spec.max_scan_records, check=work.check, **filters.get(kind, {})):
             record_bytes += fact['record_bytes']
             data = fact['payload']
             if data.get('namespace') != spec.namespace:
                 continue
+            if window_ticks is not None and kind == 'opportunity' and data.get('target_key'):
+                targets.add(data['target_key'])
             scanned += 1
             if scanned > spec.max_scan_records:
                 raise EvaluationError('Combined historical scan exceeded admission.', 'history_scan_limit')

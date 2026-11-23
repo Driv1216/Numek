@@ -1,5 +1,31 @@
 # Numek Current State
 
+## ConfidenceGuard CG7 — S5 monitoring (2026-11-20)
+
+**What exists now.** Ingested evidence is monitored. A deployment has a versioned monitoring definition: inspect it to
+see the frozen reference, each detector's null level, false-alarm budget, expected detection delay and power, and the
+refusals; then confirm exactly what was inspected.
+
+**How monitoring runs.** Windows are evaluated when they close (outcome-free measures, drift against the reference,
+estimates) and again when their outcomes mature (performance, accountability, outcome detectors). Each evaluation
+reads only its own window, under a window-scoped evidence-use reservation; selection equals full-history selection
+restricted to the window (equivalence gate).
+
+**Detectors.** SM1 alarms (bounded-mean e-CUSUM with resets, E[false alarms] ≤ α × units) carry fixed wording and
+what they do not establish. SM2 establishes R2/R3 recovery claims. Late data creates window revisions and never enters
+running detectors. Health and a coverage map state what is and is not monitored; absence of alarms is never presented
+as health.
+
+**Qualification.** The locked M.2 protocol ran once and every gating panel passed: exact enumeration over 2^20 paths,
+null simulations, SM2 false-claim checks and planner validity. Violation controls are recorded as documented limits.
+
+**Results:** platform suite 144 passed; CG1–CG6 673 passed, 0 failed.
+
+**Not in S5:** coverage-miss, region and deferral statistics; the domain classifier and Neyman guidance (S7);
+incidents, notifications and scheduling (S6); the API, CLI and console (S9). D-1 remains.
+
+See [CG7 status](../validation/cg7/IMPLEMENTATION_STATUS.md) and [sequential methods](CG7_SEQUENTIAL_METHODS.md).
+
 ## ConfidenceGuard CG7 — S4 ingestion (2026-11-20)
 
 **What exists now.** Production evidence can now flow into CG7. A NUMEK installation (one database, object store and

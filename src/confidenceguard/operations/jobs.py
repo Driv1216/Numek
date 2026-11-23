@@ -9,4 +9,7 @@ REGISTRY = Registry([
             rss_bytes=2 * GiB, threads=1, seconds=1800),
     JobKind('ops_retention', 'confidenceguard.operations.retention:retention_job', lane='maintenance', job_class='warm',
             rss_bytes=1 * GiB, threads=1, seconds=1800),
+    # Monitoring keeps essential capacity: window evaluation, detector advance, estimators, rules, health.
+    JobKind('ops_monitoring_cycle', 'confidenceguard.operations.monitoring.runtime:cycle_job', lane='essential',
+            job_class='warm', rss_bytes=2 * GiB, threads=1, seconds=1800),
 ])

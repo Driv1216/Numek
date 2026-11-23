@@ -192,6 +192,25 @@ def resolve(db, read_pin, *, kinds=None, keys=None, opportunity_keys=None, targe
     return out
 
 
+def keys_in_event_range(db, read_pin, *, kind, lower, upper, namespace=None):
+    """Keys with *any* revision of ``kind`` whose event tick lies in ``[lower, upper)`` at the pin's K.
+
+    Index-only (no fact values are read). Event time is a non-identity attribute, so a correction that
+    moves an opportunity in or out of the window keeps its key: taking every key with any revision in
+    range, then loading complete revision chains, is a superset of the window's selection (plan H.2).
+    """
+    where = ['f.catalog_id = %s', 'f.kind = %s', 'p.sequence IS NOT NULL', 'p.sequence <= %s',
+             'f.event_tick >= %s', 'f.event_tick < %s']
+    params = [read_pin.catalog_id, kind, read_pin.k, lower, upper]
+    if namespace is not None:
+        where.append('f.namespace = %s')
+        params.append(namespace)
+    with db.transaction('repeatable_read', read_only=True) as conn:
+        rows = conn.execute(f'''SELECT DISTINCT f.key FROM fact_index f JOIN publications p ON p.id = f.publication_id
+                                WHERE {' AND '.join(where)} ORDER BY f.key''', params).fetchall()
+    return [bytes(r['key']).hex() for r in rows]
+
+
 def read(store, locators, *, max_record_bytes=8 * 1024**2):
     """Yield (locator, record) pairs, verifying each object over the bytes consumed."""
     by_object = {}
