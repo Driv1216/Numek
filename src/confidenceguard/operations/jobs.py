@@ -12,4 +12,7 @@ REGISTRY = Registry([
     # Monitoring keeps essential capacity: window evaluation, detector advance, estimators, rules, health.
     JobKind('ops_monitoring_cycle', 'confidenceguard.operations.monitoring.runtime:cycle_job', lane='essential',
             job_class='warm', rss_bytes=2 * GiB, threads=1, seconds=1800),
+    # Investigations never compete with the essential lane (plan C.5).
+    JobKind('ops_investigation', 'confidenceguard.operations.intelligence.planner:investigation_job', lane='investigation',
+            job_class='isolated', rss_bytes=4 * GiB, threads=2, seconds=3600),
 ])

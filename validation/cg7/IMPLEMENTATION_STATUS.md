@@ -5,6 +5,183 @@ records what is implemented and what evidence exists, stage by stage. Several ki
 engineering correctness, statistical qualification, resilience, measured performance, product completeness,
 independent review and founder acceptance.
 
+## S9: product (2026-11-23, console 2026-11-24). API, CLI, client, reports, jobs and the operations console implemented. Gate: see Evidence.
+
+### Implemented (plan J, C.6, H.10, M.4)
+
+**Operations API** (`operations/api.py`, `/api/ops/v1`, with the S4 ingestion surface on the same app). 66 declared routes, plus
+session login and logout, OpenAPI, readiness and metrics, cover:
+- the session;
+- systems, deployments and sources;
+- definitions (inspect / confirm);
+- health, detectors, signals and cycles;
+- conditions;
+- incidents: list, view as known at detection or now, transition, assign, priority, merge, split, hypotheses,
+  similar, report;
+- investigations: plan, list, approve, execute;
+- proposals: create, compare, get, submit, decision, handoff, execution, attestation, identity standing, withdraw;
+- channels, rules, pins and retention;
+- console reads: deployment identity, estimates and windows; sources (contract fields, watermark, funnel, quarantine
+  reasons and field names, never values; recent batches); investigations and proposals across incidents;
+- administration: principals (create with a one-time initial password, bind and unbind roles at org or deployment
+  scope, disable with session and token revocation, password reset), own password change, tokens (issue once, list
+  without secrets, revoke), channels and rules listing, the egress allowlist (validated add and remove), retention
+  and pins, the audit log and chain verification against recorded anchors. The last enabled administrator cannot be
+  removed or disabled (`self_lockout`).
+
+How it behaves:
+- **Declarations:** every route declares its permission and resource scope (deployment, system, or via an
+  incident, proposal or run). The same table produces `GET /openapi.json`.
+- **Authentication** is either:
+  - a server-side session: argon2id login, an HttpOnly SameSite=Strict cookie (Secure under TLS), CSRF required
+    on every mutation, revocation on sign-out; or
+  - a scoped token, which narrows its principal's roles and never widens them.
+- **Organisation scoping:** principals of another organisation are refused.
+- **Envelope and errors:** the ConfidenceGuard envelope with mapped statuses (401, 403, 404, 409, 422, 503).
+- **Operations endpoints:** `/readyz` (database, controller leader, oldest essential job) and `/metrics`
+  (Prometheus text: jobs by lane and state with queue age, batches, incidents, outbox, catalog head).
+- **Serving guard:** `serve_guard` refuses non-loopback serving without TLS or a declared trusted proxy.
+- **New role:** `reserve_steward` (read plus `reserve:consume`), the only holder of reserve consumption. It is
+  never granted to service principals, and migration `0012` adds it.
+
+**CLI** (`confidenceguard ops ...`):
+- `init`; `user create` (password on stdin); `token issue` (shown once);
+- `system`, `deployment`, `source register`; `definition inspect` / `confirm`;
+- `cycle`; `incidents`; `incident`; `report` (HTML/PDF/JSON);
+- `audit anchor --sink` (append the chain head to an operator-controlled file) and `audit verify --sink` (recompute the
+  chain and compare every anchor in the sink; exit 1 on mismatch);
+- `serve` (TLS or trusted proxy); `controller` (with the operations tasks and GC); `worker` (the operations job
+  kinds).
+
+**Python client** `OpsClient` (standard library only): session login with CSRF, or a token; `OpsError` carries the
+API code and status.
+
+**Investigation jobs.** `planner.enqueue` creates `ops_investigation` jobs on the investigation lane, isolated (4 GiB,
+two threads), and worker hosts run them under `InProcessContext`.
+
+**Incident report** (`operations/reports.py`, `templates/incident_report.html`, in the CG report house style):
+- **Contents:** header with priority, rule, why and impact; the evidence ladder by standing, with fixed wording,
+  what is not established and assumptions; the differential matrix and states; requirements; investigations;
+  responses with prerequisites, execution evidence and verification; R1, R2, R3 and R4 kept separate; the timeline;
+  as known at detection; limitations; the report digest.
+- **Audiences:** `local` needs `evidence:protected:read`; `shareable` drops actor names, internal ids and evidence
+  references.
+- **PDF** goes through the existing WeasyPrint path.
+
+**Audit coverage.** Operator actions that were not yet written to the hash chain now are, in the transaction that
+makes them: the execution handoff (`proposal.handoff`), every execution standing (`execution.standing`: declared,
+identity consistency, attestation, sampled behavior), definition confirmation (`definition.confirm`) and the retention
+policy (`retention.policy`).
+
+**Operations console** (`frontend/src/ops`, built by `npm run build:ops` into `confidenceguard/static/ops`, served at
+`/ops/` with CSP, nosniff, no framing; the bundle check finds no external hosts). Built as approved in
+`frontend/design/cg7-console-proposal.md`: a separate build, Modules tiles for summaries, dense tables in the incident
+workspace. All eight areas exist:
+- **Fleet:** coverage cells, freshness ("not monitored since"), maturity backlog, detectors, conditions, incident
+  chips, expected false alarms per 30 days; no health score.
+- **Incidents** and the **incident workspace:** the "now" / "as known at detection" toggle; transitions, assignment,
+  resolution with `expected_revision`; the evidence ladder; the differential matrix and requirements; investigations
+  (plan, approve, queue, with refusal reasons); responses with the proposal card (approve or reject; then, for an
+  operator, issue the handoff, record declared execution, check identity against the handoff); R1, R2, R3 and
+  "R4 · not claimed"; the timeline with from → to transitions.
+- **Deployments:** the window series (alarm windows in coral, empty windows as a dash), the identity ladder,
+  detectors, label maturity, the estimator ledger, regions, definition versions.
+- **Setup:** inspect a definition (reference, windows, family, and per detector m₀, α, delay, power and refusals),
+  then confirm exactly the inspected digest.
+- **Investigations** and **Proposals** across incidents, reusing the workspace's run row and proposal card.
+- **Sources:** the funnel with its reconciliation, quarantine reasons with field names, declared fields, watermark,
+  lateness and recent batches.
+- **Admin:** own password; principals and roles; tokens; channels and rules; egress; retention and pins; audit.
+  Secrets are shown once in a dismissable box.
+
+`validation/cg7/console_demo.py` seeds a P-LOCAL demo installation (scenario incidents, automatic investigations, a
+submitted rollback, a batch with two contract failures, a resend, a watermark) with users viewer, operator, analyst,
+approver, reserve_steward and admin; passwords go only to an owner-only `demo-credentials.json`.
+
+### Evidence
+
+`tests/platform/test_ops_api.py` (12 tests) covers:
+- **Sessions:** 401 without authentication; cookie flags; CSRF refused, then accepted; a wrong password refused;
+  sign-out revokes.
+- **Tokens and organisations:** a token narrowed to `role:viewer` cannot plan investigations; a foreign
+  organisation's admin token is refused.
+- **OpenAPI** lists every route with its permission.
+- **Report:** the shareable projection has no actor or id; local is refused for a viewer and allowed for an analyst;
+  HTML is complete.
+- **Operations endpoints:** health, readiness and metrics; the serving guard.
+- **Worker host:** it runs an `ops_investigation` job to completion on the investigation lane.
+- **CLI:** user (with the password policy enforced), service principal and ingest token, incidents, the HTML and
+  JSON report.
+- **PDF:** a real PDF through the CLI. WeasyPrint needs `DYLD_FALLBACK_LIBRARY_PATH=/opt/homebrew/lib` on this Mac,
+  and the test sets it.
+- **Client:** `OpsClient` against a live server, with login, reads, a mutation, a forbidden error and the HTML report.
+- **The authorization matrix:** every declared route for each of 6 roles (396 checks). A role is refused with `forbidden`
+  exactly when it lacks the route's permission. Admin calls in the matrix target a throwaway principal and token.
+- **Console reads:** the source funnel reconciles, the resend counts as duplicates, quarantine shows reasons and the
+  fields `p` and `y` but never a planted row value; investigations and proposals list across incidents.
+- **Administration:** a one-time initial password that signs in and never appears in listings; a deployment-scoped
+  role; separation of duties for service principals; a token shown once, listed without its secret, revoked;
+  disabling signs the user out; the last administrator cannot disable or unbind itself; egress validation (scheme,
+  CIDR) and removal; retention and channel listings without credentials; own password change revokes other sessions
+  only; every change is in the audit log; the chain verifies against an exported anchor, through the API and through
+  `ops audit verify --sink`.
+
+`tests/platform/test_interventions.py` now also asserts that the handoff and the declared, identity and attestation
+standings are in the audit chain, and that the chain verifies.
+
+**Real-browser journeys (M.6),** run on 2026-11-24 in the desktop browser pane against a fresh demo installation with
+`ops serve` and an `ops worker` host:
+- **J1 (onboard), browser part:**
+  - the admin created the `scorecard-producer` service principal (approver and reserve steward greyed out) and an
+    ingest token, shown once;
+  - that token's HTTP batch was acknowledged (202; 401 without it), and the worker published it at K 9;
+  - the analyst inspected a definition (matured-error ≈ 4.3 d after maturity, total 21.3 d, adequate; log loss
+    refused as an unbounded statistic) and confirmed it.
+  - Registration and the backfill came from the seeder and the CLI, not the browser.
+- **J2 (monitoring gap):**
+  - with a 2-minute silence limit, the fleet showed "not monitored since 01:55 UTC" with coverage marked stale;
+  - one controller cycle (`ops cycle`) then opened P2 incident #3, anchored on `health:source_silent:scorecard-events`.
+- **J3 (response and verification):**
+  - the approver approved the rollback; the approver had no handoff action;
+  - the operator issued the handoff and recorded declared execution, and the proposal moved to verifying with the R2
+    claim running;
+  - the producer sent model v2 traffic with its token, and the identity check established
+    `identity_consistent_with_handoff` (production evidence);
+  - the incident moved to verifying, with R1–R3 none and R4 not claimed.
+  - Not reached: an R2/R3 claim. Post-change outcomes need 10 days of follow-up to mature, and the demo cannot wait.
+- **J4 (restricted reserve study), partial:**
+  - restricted approval stayed disabled until the admin granted the analyst `reserve_steward` (it needs `analyze`
+    and `reserve:consume`);
+  - once approved, the recalibration template refused with `restricted_study`, as documented in S8. The study
+    itself goes through the CG2/CG4 workflows.
+- **J5 (identity drift), partial:**
+  - after the v2 batch, the deployment's ladder showed declared established and registered failed (v2 against the
+    registered v1);
+  - sampled-output consistency showed "no evidence recorded": the demo registers no predictor to replay. The CP bound
+    and the H-DEPLOY path were not exercised in the browser; they are covered by S4/S8 tests.
+- **Every page:** no horizontal overflow at 375 px. The console's only errors were the expected 401s (session probes
+  after sign-out, and the deliberate unauthenticated ingest attempt).
+
+| Check | Result |
+|---|---|
+| `tests/platform` | **190 passed** (one run; 180 earlier + 10 new S9 tests) |
+| CG1–CG6 interface suites, which use the shared CLI | **21 passed, 1 skipped** (one run; the same pre-existing skip) |
+| `tests/platform` after console steps 1–4 (2026-11-24) | **192 passed** (one run; 190 + 2 new API tests; the interventions audit assertion added to an existing test) |
+| CG interface files after the shared-CLI change, run per file: `cg1`, `cg2`, `cg3`, `cg4`, `cg6` `test_interfaces.py` and `cg5/test_three_task_interfaces.py` | **17 passed, 1 skipped** (the same pre-existing CG2 skip; `cg4` and `cg5` need `--import-mode=importlib` with the repository root on the path, since `tests/cg4` is not a package. This is a narrower file set than the 21-test run above.) |
+
+### Limitations and deferred (no claim made)
+
+- **Journey coverage is partial** where the demo cannot supply the evidence: no matured post-change outcomes (R2/R3),
+  no registered predictor (sampled consistency, J5's CP bound), and recalibration studies outside the planner (J4).
+- **SMTP credentials** are not taken in the browser; they go through `POST /channels` from a script.
+- **The console has no automated browser tests;** its checks are the API tests above and the recorded journey runs.
+- **`ops serve`** is a single Flask process with threads. gunicorn packaging, systemd units and the OCI image are
+  S10.
+- **Rate limits per token and the API's own 429 handling beyond ingestion** are not implemented.
+- **OIDC** is not implemented (the `IdentityProvider` seam remains).
+- **The PDF report** depends on the WeasyPrint system libraries being installed.
+- D-1 remains tracked; there is no production-readiness claim.
+
 ## S8: interventions (2026-11-23). Implemented; closure gate passing.
 
 ### Implemented (plan G.9 intervention execution, G.10, I.9; F.1.7)

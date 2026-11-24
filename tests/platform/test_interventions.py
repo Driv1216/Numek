@@ -200,6 +200,13 @@ def test_execution_standings_are_separate(ops, proposal, tmp_path):
     assert sampled['outcome'] == 'not_evaluable'                                    # no registered predictor: never inferred
     standings = execution.standings(installation, proposal['id'])
     assert standings['execution_attested']['evidence_kind'] == 'signature' and standings['execution_attested']['outcome'] == 'failed'
+    from numek_platform import audit
+    with installation.db.connect() as conn:                                        # operator actions are in the audit chain
+        audited = {(r['action'], r['payload'].get('standing')) for r in conn.execute(
+            "SELECT action, payload FROM audit_log WHERE org_id = %s AND target = %s", (installation.scope.org_id, str(proposal['id']))).fetchall()}
+        assert audit.verify_chain(conn, installation.scope) == (True, None)
+    assert {('proposal.handoff', None), ('execution.standing', 'execution_declared'), ('execution.standing', 'execution_attested'),
+            ('execution.standing', 'identity_consistent_with_handoff')} <= audited
 
 
 def test_not_verified_when_the_horizon_passes(ops):

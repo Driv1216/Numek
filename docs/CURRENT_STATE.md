@@ -1,5 +1,38 @@
 # Numek Current State
 
+## ConfidenceGuard CG7 — S9 product (2026-11-23; console 2026-11-24)
+
+**What exists now.** CG7 has a complete operations API at `/api/ops/v1`, alongside ingestion, and an operations
+console at `/ops/`.
+- **API coverage:** 66 declared routes over the whole operations lifecycle and its administration, plus an OpenAPI
+  document generated from the route table, readiness and Prometheus metrics.
+- **Authentication:** server-side sessions with CSRF, or scoped tokens that only narrow.
+- **Authorization:** every route declares its permission, and a full role-by-route matrix test enforces it (396
+  checks). A `reserve_steward` role is the only holder of `reserve:consume`.
+- **Audit:** administrative and operator actions, including handoffs, execution standings, definition confirmation and
+  retention policy, are written to the hash chain. `confidenceguard ops audit anchor|verify --sink` exports and checks
+  anchors against an external file.
+
+**Console** (React, a separate build served by `ops serve`, no external requests): fleet, incidents and the incident
+workspace, deployments, setup (inspect then confirm), investigations, proposals (approval, then handoff, declared
+execution and identity check), sources (the reconciled ingestion funnel; quarantine reasons, never values), and admin
+(principals and roles, tokens and passwords shown once, channels and rules, egress, retention and pins, audit
+verification).
+
+**Real-browser journeys.** J1–J3 ran end to end in the browser against a seeded demo, except the outcome-supported
+recovery claim, which needs 10 days of matured follow-up. J4 and J5 ran in part: the restricted study's approval is
+gated correctly but the template refuses by design, and the demo has no registered predictor for sampled replay.
+
+**Tooling.** The `confidenceguard ops` CLI covers administration, monitoring, reports, audit anchors, serving with a
+TLS guard, the leader controller and worker hosts. `OpsClient` is a Python client. Investigations run as isolated
+worker-host jobs.
+
+**Reports.** Incident reports come in shareable and local audiences, as HTML, PDF and JSON.
+
+**Results:** platform suite 192 passed; CG interface files 17 passed, 1 skipped (the pre-existing skip).
+
+**Not in S9:** gunicorn/OCI/systemd packaging, per-token rate limits, OIDC, and the closure gate (S10). D-1 remains.
+
 ## ConfidenceGuard CG7 — S8 interventions (2026-11-23)
 
 **What exists now.** Incidents can carry **response proposals**. Each proposal has:

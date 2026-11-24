@@ -46,12 +46,14 @@ def live_pins(conn, scope, catalog_id, now):
            AND (expires_at IS NULL OR expires_at > %s)''', (scope.org_id, catalog_id, now)).fetchall()]
 
 
-def set_policy(installation, system_id, observation_days):
+def set_policy(installation, system_id, observation_days, *, actor='system'):
+    from .. import audit_action
     scope = installation.scope
     with installation.db.transaction() as conn:
         conn.execute('''INSERT INTO ops_retention_policies(org_id, system_id, observation_days) VALUES (%s, %s, %s)
                         ON CONFLICT (org_id, system_id) DO UPDATE SET observation_days = EXCLUDED.observation_days, updated_at = clock_timestamp()''',
                      (scope.org_id, system_id, observation_days))
+        audit_action(conn, scope, actor, 'retention.policy', system_id, {'observation_days': observation_days})
 
 
 def observation_sweep(installation, *, now):

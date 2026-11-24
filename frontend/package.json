@@ -9,7 +9,9 @@
     "typecheck": "tsc -p tsconfig.json",
     "build:site": "tsc -p tsconfig.json && vite build --config vite.site.config.ts && node scripts/check-bundle.mjs dist/site site",
     "build:app": "tsc -p tsconfig.json && vite build --config vite.app.config.ts && node scripts/check-bundle.mjs ../src/datatrust/static/app app",
-    "build": "npm run build:site && npm run build:app"
+    "dev:ops": "vite --config vite.ops.config.ts",
+    "build:ops": "tsc -p tsconfig.json && vite build --config vite.ops.config.ts && node scripts/check-bundle.mjs ../src/confidenceguard/static/ops app",
+    "build": "npm run build:site && npm run build:app && npm run build:ops"
   },
   "dependencies": {
     "@fontsource-variable/recursive": "5.3.0",

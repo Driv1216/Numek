@@ -282,3 +282,26 @@ def fire_triggers(installation, *, now):
             execute(installation, run['run'], now=now)
         fired.append({'incident': str(requirement['incident_id']), 'observation': requirement['observation'], **run})
     return fired
+
+
+def enqueue(installation, run_id):
+    """Queue a planned run for the worker hosts (job kind ``ops_investigation``, investigation lane, isolated)."""
+    from numek_platform.execution import jobs
+    scope = installation.scope
+    with installation.db.transaction() as conn:
+        run = conn.execute('SELECT state FROM ops_investigation_runs WHERE org_id = %s AND id = %s', (scope.org_id, run_id)).fetchone()
+        if run is None or run['state'] != 'planned':
+            raise EvaluationError('Only a planned run can be queued.', 'run_state')
+        row = jobs.enqueue(conn, scope, 'ops_investigation', idempotency_key=f'ops-investigation:{run_id}', lane='investigation',
+                           job_class='isolated', payload={'installation': str(installation.root), 'run': str(run_id)})
+    return {'run': str(run_id), 'job': str(row['id']), 'state': row['state']}
+
+
+def investigation_job(job_ctx, payload):
+    """Worker-host entry point (``ops_investigation``): the job process is the isolation boundary."""
+    from datetime import datetime, timezone
+    from numek_platform.installation import Installation
+    from ...execution_context import InProcessContext, using
+    installation = Installation(payload['installation'])
+    with using(InProcessContext(deadline=job_ctx.deadline)):
+        return execute(installation, uuid.UUID(payload['run']), now=datetime.now(timezone.utc))

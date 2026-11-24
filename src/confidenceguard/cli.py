@@ -90,4 +90,10 @@ _register_policies(main)
 from .execution.cli import register as _register_execution
 _register_execution(main)
 
+
+
+from .operations.cli import ops as _ops  # noqa: E402  (CG7 reliability operations)
+main.add_command(_ops)
+
+
 if __name__=='__main__':main()

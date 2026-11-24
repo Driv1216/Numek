@@ -24,9 +24,10 @@ ROLE_PERMISSIONS = {
     'operator': {'read', 'operate'},
     'analyst': {'read', 'operate', 'analyze', 'evidence:protected:read'},
     'approver': {'read', 'intervention:approve'},
+    'reserve_steward': {'read', 'reserve:consume'},     # restricted (reserve-consuming) investigations; never automatic
     'admin': {'read', 'operate', 'admin'},
 }
-SERVICE_FORBIDDEN_ROLES = {'approver'}
+SERVICE_FORBIDDEN_ROLES = {'approver', 'reserve_steward'}
 SCOPE_KINDS = ('org', 'system', 'deployment', 'catalog', 'source')
 SESSION_IDLE = dt.timedelta(minutes=30)
 SESSION_ABSOLUTE = dt.timedelta(hours=12)

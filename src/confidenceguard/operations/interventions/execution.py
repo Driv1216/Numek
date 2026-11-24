@@ -49,6 +49,8 @@ def _record(conn, scope, proposal_id, standing, outcome, kind, evidence, actor):
                     VALUES (%s, %s, %s, %s, %s, %s, %s, %s)''',
                  (scope.org_id, uuid.uuid4(), proposal_id, standing, outcome, kind, Jsonb(evidence), actor))
     proposal_rules._event(conn, scope, proposal_id, 'execution_standing', {'standing': standing, 'outcome': outcome}, actor)
+    from .. import audit_action
+    audit_action(conn, scope, actor, 'execution.standing', str(proposal_id), {'standing': standing, 'outcome': outcome, 'evidence_kind': kind})
     return {'standing': standing, 'outcome': outcome, 'evidence_kind': kind, **evidence}
 
 
@@ -80,6 +82,8 @@ def issue_handoff(installation, proposal_id, *, actor, now):
                      'VALUES (%s, %s, %s, %s, %s, %s, %s)', (scope.org_id, uuid.uuid4(), proposal_id, ref.id, packet_digest, actor, now))
         proposal_rules._transition(conn, scope, row, 'handed_off', actor, {'handoff_digest': packet_digest})
         event(conn, scope, proposal['incident_id'], 'response_handed_off', {'proposal': str(proposal_id), 'handoff_digest': packet_digest}, actor)
+        from .. import audit_action
+        audit_action(conn, scope, actor, 'proposal.handoff', str(proposal_id), {'handoff_digest': packet_digest})
     packets.publish(installation, lease, ctx['catalog_id'], [ref], [], write)
     return {'handoff_digest': packet_digest, 'packet': json.loads(json.dumps(packet, default=str))}
 

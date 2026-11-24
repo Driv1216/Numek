@@ -234,6 +234,8 @@ def confirm(installation, deployment_id, version, inspection_digest, *, actor='s
         conn.execute("UPDATE ops_monitoring_definitions SET state = 'confirmed', confirmed_at = clock_timestamp(), "
                      "confirmed_by = %s WHERE org_id = %s AND deployment_id = %s AND version = %s",
                      (actor, scope.org_id, deployment_id, version))
+        from .. import audit_action
+        audit_action(conn, scope, actor, 'definition.confirm', deployment_id, {'version': version, 'inspection_digest': inspection_digest})
         for plan in inspection['detectors']:
             if not plan.get('admitted'):
                 continue
