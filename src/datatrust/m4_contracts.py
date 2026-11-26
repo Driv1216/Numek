@@ -282,12 +282,16 @@ class ComparisonConfig:
     normalized_wasserstein: float = .25
     category_count: int = 20
     category_share: float = .01
+    # The comparison methodology this run records: the current direction-preserving one, or m4_local_2026_10_10 to
+    # reproduce a v1 result exactly.
+    methodology: str = 'm4_local_2026_11_25'
 
     def __post_init__(self):
         for name,cls in (('execution',ExecutionOptions),('advanced',AdvancedTabularOptions),('presentation',PresentationLimits)):
             if isinstance(getattr(self,name),dict): object.__setattr__(self,name,_construct(cls,getattr(self,name)))
             if not isinstance(getattr(self,name),cls): raise ValueError(f'Invalid {name}.')
         if self.execution.backend != 'duckdb_local': raise ValueError('Comparisons require duckdb_local.')
+        if not isinstance(self.methodology,str) or self.methodology not in {'m4_local_2026_10_10','m4_local_2026_11_25'}: raise ValueError('Unknown comparison methodology.')
         if self.sampling not in {'unknown','independent_rows'} or not isinstance(self.inference,bool): raise ValueError('Invalid sampling/inference declaration.')
         if self.inference and self.sampling != 'independent_rows': raise ValueError('Inference requires independent_rows.')
         object.__setattr__(self,'continuous_columns',_names(self.continuous_columns,'continuous quantitative columns'))

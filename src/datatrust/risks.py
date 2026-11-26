@@ -468,6 +468,22 @@ def build_regression_findings(profile):
                 '; '.join(g['expression'] for _,g in selected),
                 'Verify feature availability and derivation against the intended prediction time; observed algebra alone does not prove leakage.',
                 'High' if availability == 'unavailable_at_prediction' else 'Moderate', [base+f'relationship_groups/{i}' for i,_ in selected])
+    dependency = r.get('dependency_search')
+
+    def dependency_finding(code, title, priority, state, advice):
+        # regression_dependency_v1 (opt-in): one finding per declared-availability state; severity follows the declaration only.
+        selected = [(i, f) for i, f in enumerate(dependency['flags']) if f['availability'] == state]
+        if selected:
+            add(code, title, f"{count_phrase(len(selected), 'feature')} {agree(len(selected), 'determines', 'determine')} the target within the searched families (regression_dependency_v1).",
+                ' '.join(f['wording'] for _, f in selected), advice, priority, [base+'dependency_search'])
+            findings[-1]['version'] = 'regression_dependency_v1'
+    if dependency and dependency.get('flags'):
+        dependency_finding('regression_dependency_unavailable', 'Inputs that determine the target, declared unavailable', 'High', 'unavailable_at_prediction',
+                           'Exclude these features from evaluation for the declared objective, or correct the declaration.')
+        dependency_finding('regression_dependency_availability_unknown', 'Inputs that determine the target', 'Moderate', 'unknown',
+                           'Declare when each feature becomes known, then re-run. A deterministic relationship is evidence for review, not proof of leakage.')
+        dependency_finding('regression_dependency_declared_available', 'Declared-available inputs that determine the target', 'Low', 'available_at_prediction',
+                           'Verify the declaration and that the rule holds outside this file.')
     repeated=r['repeated_inputs']
     if repeated and repeated['varying_group_count']:
         add('regression_repeated_input_variation','Target variation within repeated inputs',f"{count_phrase(repeated['varying_group_count'], 'feature-identical group')} {agree(repeated['varying_group_count'], 'contains', 'contain')} varying finite targets.",

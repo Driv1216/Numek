@@ -328,7 +328,8 @@ def repeated_input_evidence(data, target, *, feature_columns=None):
             "interpretation": "Variation may reflect repeated measurements, stochastic outcomes, or omitted context; contradictory labels are not established."}
 
 
-def multioutput_evidence(data, targets, features, options, diagnostic_limits, checkpoint, *, relationship_features=None, annotations=None):
+def multioutput_evidence(data, targets, features, options, diagnostic_limits, checkpoint, *, relationship_features=None, annotations=None,
+                         semantic_types=None, context_availability=None):
     """One shared input pool and round-robin M2 formula search across outputs."""
     from dataclasses import replace
     from datatrust.contracts import TargetExpectations, RegressionRelationLimits
@@ -364,6 +365,18 @@ def multioutput_evidence(data, targets, features, options, diagnostic_limits, ch
             try: next(steps);remaining.append((record,steps))
             except StopIteration as done: record.update(done.value)
         active=remaining
+    if options.dependency_search is not None:
+        # regression_dependency_v1 (opt-in, Stage 6B): one block per output, one budget shared across outputs; every
+        # declared feature is searched (text included), not only the quantitative-geometry relationship pool.
+        from datatrust.regression_dependency import covered_features, search as dependency_search
+        shared={'features':set(),'checks':0,'row_work':0}
+        for record in outputs:
+            if record['finite_count']:
+                semantics=semantic_types or {}
+                record['dependency_search']=dependency_search(data,record['target'],options.dependency_search.limits,features=[c for c in features if c not in targets],
+                                                              availability={**(context_availability or {}),**options.feature_availability},covered=covered_features(record['relationships']),
+                                                              budget=shared,checkpoint=checkpoint,declared_identifiers=[c for c,v in semantics.items() if v=='identifier'],
+                                                              declared_categorical=[c for c,v in semantics.items() if v=='categorical'])
     pairs=[]; pair_used=0; excluded=[]; pool=targets[:diagnostic_limits.max_output_pair_targets]
     for a,b in combinations(pool,2):
         checkpoint('output dependency pair')

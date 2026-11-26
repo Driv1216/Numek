@@ -2,15 +2,20 @@
 // result mosaic anchored by the Candidates hero tile. Text is revealed only on explicit request, live only.
 import { useState, type ReactNode } from 'react';
 import { ApiError, csrfToken, type Fields, type SessionInfo } from './api';
-import { AddSource, ConfirmFrame, FieldSections, Flow, FlowDownloads, LiveOut, MosaicPage, BoundedTable, ReportViewer, SHADES, SourceCard, defaults, familyTile, flowApi, scalarFacts, type Doc, type FlowJob, type FlowStep, type Section } from './flow';
+import { AddSource, ConfirmFrame, FieldSections, Flow, FlowDownloads, LiveOut, ReportViewer, SourceCard, defaults, flowApi, scalarFacts, viewAnchor, type Doc, type FlowJob, type FlowStep, type Section, type ViewTarget } from './flow';
 import { Corners, READ_ONLY } from './parts';
-import type { Tile } from './results/Tiles';
+import { textDashboard } from './results/compositions/text';
+import { ResultsShell, useCompanion } from './results/shell/ResultsShell';
 import { navigate, onLink } from './router';
 
 type Flash = (e: unknown) => void;
 export const textApi = flowApi('/text');
 export const M6_PREFIX = '/app/text';
 const PRESETS = ['corpus', 'classification', 'multilabel', 'token', 'span', 'qa', 'generation', 'conversation', 'retrieval'];
+const PRESET_LABEL: Record<string, string> = {
+  corpus: 'A text corpus', classification: 'Labelled text, one label', multilabel: 'Labelled text, several labels', token: 'Tagged tokens', span: 'Labelled spans',
+  qa: 'Question answering', generation: 'Prompts and completions', conversation: 'Conversations', retrieval: 'A retrieval corpus',
+};
 const PRESET_NOTE: Record<string, string> = {
   corpus: 'Integrity, identities, duplicates and vocabulary of a text corpus.', classification: 'Text with a label per record.', multilabel: 'Text with several labels per record.',
   token: 'Token-level tags.', span: 'Character or token spans.', qa: 'Question answering with answer spans.', generation: 'Prompts and completions.',
@@ -106,7 +111,7 @@ function Sources({ job, info, setJob, flash }: { job: FlowJob | null; info: Sess
         <div className="ap-modes ap-modes--compact" role="radiogroup" aria-label="Dataset task">
           {PRESETS.map((p) => { const on = (job?.preset ?? preset) === p; return (
             <button key={p} type="button" role="radio" aria-checked={on} className={`ap-mode ${on ? 'is-on' : ''}`} onClick={() => { setPreset(p); add(textApi.start({ preset: p })); }}>
-              {on && <Corners />}<b>{p}</b><span>{PRESET_NOTE[p]}</span>
+              {on && <Corners />}<b>{PRESET_LABEL[p]}</b><span>{PRESET_NOTE[p]}</span>
             </button>); })}
         </div>
         {job && job.sources.length > 0 && <p className="ap-muted ap-co__text">Choosing another task starts a new text audit.</p>}
@@ -126,6 +131,51 @@ function Sources({ job, info, setJob, flash }: { job: FlowJob | null; info: Sess
           <div className="ap-acts">{job.sources.length ? <a className="nk-btn" href={`${M6_PREFIX}/configure`} onClick={onLink}>Map fields and semantics →</a> : <span className="nk-btn is-off" aria-disabled="true">Map fields →</span>}</div>
         </section>
       )}
+    </div>
+  );
+}
+
+type Discovery = { error?: string; statement?: string; selectors?: { selector: string; present: number; suggestions: { rule: string; role: string; text: string }[] }[] };
+const blankRow = (cols: Col[]) => Object.fromEntries(cols.map((c) => [c.key, c.def ?? c.options?.[0] ?? ''])) as Record<string, string>;
+
+/** Add a list row, or fill the first row whose `key` is still empty. */
+function addRow(lists: Lists, prefix: string, cols: Col[], key: string, values: Record<string, string>): Lists {
+  const n = lists[prefix + cols[0].key]?.length ?? 0;
+  const at = Array.from({ length: n }, (_, k) => k).find((k) => !(lists[prefix + key]?.[k] ?? '')) ?? n;
+  const row = { ...blankRow(cols), ...values };
+  return { ...lists, ...Object.fromEntries(cols.map((c) => { const v = [...(lists[prefix + c.key] ?? [])]; while (v.length < at) v.push(''); v[at] = at < n && !(c.key in values) ? v[at] : row[c.key]; return [prefix + c.key, v]; })) };
+}
+
+/** Selector discovery over the first framed records (inspection.discover_selectors): applied only when chosen. */
+function TextSuggestions({ s, i, preset, f, set, lists, setLists }: { s: FlowJob['sources'][number]; i: number; preset: string; f: Fields; set: (k: string, v: string) => void; lists: Lists; setLists: (fn: (l: Lists) => Lists) => void }) {
+  const d = s.discovery as Discovery | null | undefined;
+  if (!d || d.error || !d.selectors) return null;
+  const p = `s${i}_`;
+  const by = (role: string) => d.selectors!.filter((x) => x.suggestions.some((y) => y.role === role));
+  const rule = (x: NonNullable<Discovery['selectors']>[number], role: string) => x.suggestions.find((y) => y.role === role)!.rule;
+  const used = new Set(lists[p + 'field_selector'] ?? []);
+  const labelled = new Set(lists[p + 'annotation_selector'] ?? []);
+  const content = by('content').filter((x) => !used.has(x.selector));
+  const topLevel = (x: { selector: string }) => !x.selector.startsWith('/');
+  const ids = by('identifier').filter(topLevel).filter((x) => f[p + 'identity'] !== x.selector);
+  const splits = by('split').filter(topLevel).filter((x) => f[p + 'split'] !== x.selector);
+  const labelKind = preset === 'multilabel' ? 'multilabel' : 'classification';
+  const labels = ['classification', 'multilabel'].includes(preset) ? (preset === 'multilabel' ? by('labels') : by('label')).filter((x) => !labelled.has(x.selector)) : [];
+  const nameOf = (sel: string) => sel.split('/').filter(Boolean).pop() ?? sel;
+  // the label annotates a content field: the one already declared, else the suggested one
+  const contentName = (lists[p + 'field_name'] ?? []).find(Boolean) ?? (by('content')[0] ? nameOf(by('content')[0].selector) : 'text');
+  if (!content.length && !ids.length && !splits.length && !labels.length) return <p className="ap-muted">{d.statement}</p>;
+  return (
+    <div className="ap-suggestbox">
+      <p className="ap-muted">{d.statement}</p>
+      {content.length > 0 && <p className="ap-suggest">Content: {content.map((x) => (
+        <button key={x.selector} type="button" className="ap-chip" title={`${rule(x, 'content')}: free text in the examined records`} onClick={() => setLists((l) => addRow(l, p, FIELD_COLS, 'field_selector', { field_name: nameOf(x.selector), field_selector: x.selector }))}>{x.selector}? <code>{rule(x, 'content')}</code></button>))}</p>}
+      {labels.length > 0 && <p className="ap-suggest">Label: {labels.map((x) => (
+        <button key={x.selector} type="button" className="ap-chip" title={x.suggestions.map((y) => y.text).join(' ')} onClick={() => setLists((l) => addRow(l, p, ANNOTATION_COLS, 'annotation_selector', { annotation_field: contentName, annotation_selector: x.selector, annotation_kind: labelKind }))}>{x.selector}? <code>{rule(x, preset === 'multilabel' ? 'labels' : 'label')}</code></button>))}</p>}
+      {ids.length > 0 && <p className="ap-suggest">Record identity: {ids.map((x) => (
+        <button key={x.selector} type="button" className="ap-chip" onClick={() => set(p + 'identity', x.selector)}>{x.selector}? <code>{rule(x, 'identifier')}</code></button>))}</p>}
+      {splits.length > 0 && <p className="ap-suggest">Split: {splits.map((x) => (
+        <button key={x.selector} type="button" className="ap-chip" onClick={() => set(p + 'split', x.selector)}>{x.selector}? <code>{rule(x, 'split')}</code></button>))}</p>}
     </div>
   );
 }
@@ -156,6 +206,7 @@ function Configure({ job, setJob, flash }: { job: FlowJob; setJob: (j: FlowJob) 
         <section key={s.id} className="ap-sec ap-m4src" aria-label={`${s.id} declarations`}>
           <h2 className="ap-q">{s.id} · {String(s.format ?? '')}</h2>
           <p className="ap-muted">Fields: {s.headers.join(', ') || 'none detected in the first records'}.</p>
+          <TextSuggestions s={s} i={i} preset={preset} f={f} set={set} lists={lists} setLists={setLists} />
           <FieldSections sections={sourceSections(preset).slice(0, 1)} values={f} set={set} prefix={`s${i}_`} headers={s.headers} />
           <h3 className="ap-sub">Content fields</h3>
           <ListRows cols={FIELD_COLS} prefix={`s${i}_`} lists={lists} setLists={setLists} fields={s.headers} label={`Content fields for ${s.id}`} add="Add content field" />
@@ -184,30 +235,7 @@ function Configure({ job, setJob, flash }: { job: FlowJob; setJob: (j: FlowJob) 
 
 /* ——— Result ——— */
 
-type TF = { id: string; family: string; meaning: string; count: number; references: string[]; action: string };
-type TE = { id: string; family: string; meaning: string; data: Doc; references: string[]; scope: string };
-const CANDIDATES = ['exact_duplicates', 'near_duplicates', 'passages', 'repetition'];
-const label = (s: string) => s.replace(/_/g, ' ');
 const short = (r: string) => `…${r.slice(-6)}`;
-
-function CandidateBars({ a, big }: { a: Doc; big?: boolean }) {
-  const fs = (a.findings as TF[]) ?? [], ev = (a.evidence as TE[]) ?? [];
-  const rows = CANDIDATES.map((fam) => ({ fam, n: fs.filter((f) => f.family === fam).reduce((s, f) => s + (f.count ?? 0), 0), ghost: Number((ev.find((e) => e.family === fam)?.data as Doc | undefined)?.subthreshold_candidates ?? 0) }))
-    .filter((r) => r.n || r.ghost || ev.some((e) => e.family === r.fam));
-  if (!rows.length) return null;
-  const max = Math.max(1, ...rows.map((r) => Math.max(r.n, r.ghost)));
-  return (
-    <svg viewBox={`0 0 300 ${rows.length * 30 + 6}`} className="md-viz" preserveAspectRatio="xMidYMid meet">
-      {rows.map((r, i) => (
-        <g key={r.fam} transform={`translate(0 ${i * 30 + 4})`} className="md-grow" style={{ ['--i' as string]: i }}>
-          {r.ghost > 0 && <rect x={0} y={10} width={Math.max(2, (r.ghost / max) * 290)} height={12} rx={2} className="md-ghost" />}
-          <rect x={0} y={10} width={Math.max(r.n ? 3 : 0, (r.n / max) * 290)} height={12} rx={2} className={r.n ? 'md-hot' : 'md-ghost'} />
-          <text x={0} y={7} className="md-t md-t--s">{label(r.fam)} · {r.n.toLocaleString('en-US')}{big && r.ghost ? ` (${r.ghost.toLocaleString('en-US')} below threshold)` : ''}</text>
-        </g>
-      ))}
-    </svg>
-  );
-}
 
 function Reveal({ refs, flash }: { refs: string[]; flash: Flash }) {
   const [shown, setShown] = useState<Record<string, Doc | string>>({});
@@ -251,54 +279,15 @@ function ExportExcerpts({ refs, flash }: { refs: string[]; flash: Flash }) {
   return <button type="button" className="ap-sheet__dl" disabled={!refs.length || busy} onClick={go}>{busy ? 'Exporting…' : `Export excerpts${refs.length ? ` (${refs.length})` : ''} ↓`}</button>;
 }
 
-export function textTiles(a: Doc, live: boolean, flash: Flash): Tile[] {
-  const fs = (a.findings as TF[]) ?? [], ev = (a.evidence as TE[]) ?? [];
-  const cand = fs.filter((f) => CANDIDATES.includes(f.family));
-  const near = ev.find((e) => e.family === 'near_duplicates')?.data as Doc | undefined;
-  const provenance = near ? `near duplicates: ${Number(near.qualifying_pairs ?? 0).toLocaleString('en-US')} qualifying, ${Number(near.subthreshold_candidates ?? 0).toLocaleString('en-US')} below ${near.threshold ?? '—'}${near.not_transitive ? ', not transitive' : ''}` : 'Near-duplicate search was not part of this audit.';
-  const hero: Tile = {
-    id: 'candidates', hero: true, name: 'Candidates', n: '01', kicker: 'review items', bg: '#163F52', light: true,
-    tone: cand.length ? 'finding' : 'info', label: `${cand.length} candidate finding${cand.length === 1 ? '' : 's'}`, detail: provenance,
-    viz: <CandidateBars a={a} />, bigViz: <CandidateBars a={a} big />,
-    chapter: (
-      <>
-        <h3>Candidates</h3>
-        <div className="nk-ch__run"><span>Bounded, calibrated searches</span><b>{cand.length} candidate finding{cand.length === 1 ? '' : 's'}</b><p>{provenance}. Candidates are review items, not verdicts.</p></div>
-        {cand.map((f) => (
-          <div key={f.id} className="nk-ch__f">
-            <b>{label(f.family)} <em>{label(f.meaning)}</em></b>
-            <p>{f.count.toLocaleString('en-US')} · {f.action}</p>
-            {f.references.length > 0 && (live ? <Reveal refs={f.references} flash={flash} /> : <p className="nk-ch__lim">References {f.references.slice(0, 6).map(short).join(' · ')}{f.references.length > 6 ? ` · ${f.references.length - 6} more` : ''}. {READ_ONLY}</p>)}
-          </div>
-        ))}
-      </>
-    ),
-  };
-  const families = [...new Set(ev.map((e) => e.family))];
-  const tiles = families.map((fam, i) => {
-    const recs = ev.filter((e) => e.family === fam), ffs = fs.filter((f) => f.family === fam), data = recs[0]?.data ?? {};
-    const facts = scalarFacts(data, 6);
-    return familyTile({ id: fam, name: label(fam), n: i + 2, kicker: recs[0]?.scope?.replace(/_/g, ' ') ?? '', shade: SHADES[i % SHADES.length], tone: ffs.length ? 'finding' : 'info',
-      label: ffs.length ? `${ffs.reduce((s, f) => s + (f.count ?? 0), 0).toLocaleString('en-US')} · ${label(ffs[0].meaning)}` : facts[0] ? `${facts[0][1]} ${facts[0][0]}` : 'Measured',
-      detail: ffs[0]?.action ?? label(recs[0]?.meaning ?? ''),
-      body: <><h3>{label(fam)}</h3><div className="nk-ch__run"><span>{label(recs[0]?.meaning ?? '')} · {recs[0]?.scope}</span><b>{ffs.length ? `${ffs.length} finding${ffs.length === 1 ? '' : 's'}` : 'No finding'}</b><p>{ffs[0]?.action ?? 'Evidence for review within its examined scope.'}</p></div>
-        {!!facts.length && <dl>{facts.map(([k, v]) => <div key={k}><dt>{k}</dt><dd>{v}</dd></div>)}</dl>}<BoundedTable data={data} /></> });
-  });
-  return [hero, ...tiles];
-}
-
-export function TextPage({ a, out, live, flash, onOpen }: { a: Doc; out: ReactNode; live: boolean; flash: Flash; onOpen: () => void }) {
-  const fs = (a.findings as TF[]) ?? [], profile = (a.profile as Doc) ?? {};
-  return (
-    <MosaicPage checks={a.checks} guidance={a.guidance} name={String(profile.dataset_name ?? 'Text audit')} sub={`${Number(profile.source_count ?? 0)} source${profile.source_count === 1 ? '' : 's'} · Text`} when={String(a.generated_at)} findings={fs.length}
-      status="No score: text runs report evidence and review candidates." partial={(a.execution as Doc)?.status === 'partial'} label="Text checks"
-      tiles={textTiles(a, live, flash)} actions={fs.map((f) => ({ id: f.id, title: label(f.family), priority: f.meaning === 'heuristic_candidate' ? 'Moderate' : 'Low', text: f.action, scope: `${f.count.toLocaleString('en-US')} · ${label(f.meaning)}` }))}
-      summary={String(profile.summary ?? '')} out={out} onOpen={onOpen} coverage={<p className="ap-muted">{String(profile.summary ?? '')}</p>} />
-  );
+export function TextPage({ a, out, live, flash, onOpen, presentation, saved }: { a: Doc; out: ReactNode; live: boolean; flash: Flash; onOpen: (anchor?: string) => void; presentation: string | null; saved?: boolean }) {
+  const companion = useCompanion(presentation);
+  if (companion === undefined) return <div className="ap-rs"><div className="nk-mosaic nk-mosaic--big nk-mosaic--run ap-rs__wait" aria-busy="true" /></div>;
+  const d = textDashboard(a, companion, !!saved, { reveal: live ? (refs) => <Reveal refs={refs} flash={flash} /> : undefined, readOnly: READ_ONLY });
+  return <ResultsShell d={d} label="Text checks" out={out} onOpenReport={onOpen} live={live} />;
 }
 
 export function M6Flow({ path, info, flash, saving, onRail, onSaved }: { path: string; info: SessionInfo; flash: Flash; saving: boolean; onRail: (s: FlowStep, ok: FlowStep[]) => void; onSaved: () => void }) {
-  const [view, setView] = useState(false);
+  const [view, setView] = useState<ViewTarget>(false);
   const dl = <FlowDownloads route="/api/datatrust/v1/text/download" kinds={['pdf', 'html', 'json', 'private']} flash={flash} />;
   return (
     <Flow path={path} prefix={M6_PREFIX} api={textApi} info={info} flash={flash} onRail={onRail} onSaved={onSaved} label="Text audit"
@@ -310,8 +299,8 @@ export function M6Flow({ path, info, flash, saving, onRail, onSaved }: { path: s
             task={<><b>Text audit · {String(job.preset)} · {job.sources.length} source{job.sources.length === 1 ? '' : 's'}</b><span>Confirmation seals sources, referenced assets and any model files. The worker re-checks them before publishing.</span></>} />}
           {job && step === 'report' && analysis && (
             <>
-              <TextPage a={analysis} live flash={flash} onOpen={() => setView(true)} out={<LiveOut saved={!!job.saved_entry} onView={() => setView(true)} onNew={onNew} newLabel="New text audit" downloads={dl} />} />
-              {view && <ReportViewer name="Text audit" src={textApi.report} downloads={dl} onClose={() => setView(false)} />}
+              <TextPage a={analysis} live flash={flash} presentation={textApi.presentation} onOpen={(x) => setView(x ?? true)} out={<LiveOut saved={!!job.saved_entry} onView={() => setView(true)} onNew={onNew} newLabel="New text audit" downloads={dl} />} />
+              {view && <ReportViewer name="Text audit" src={textApi.report} anchor={viewAnchor(view)} downloads={dl} onClose={() => setView(false)} />}
             </>
           )}
         </>

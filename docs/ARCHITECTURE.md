@@ -338,6 +338,142 @@ No usable labels disable a choice. Whole-token outcome signals can elevate
 small-class options; generic words and prior/derived qualifiers do not establish
 business intent. These are selection heuristics, not dataset findings or penalties.
 
+### Input Inspection Boundary (`input_inspection_v1`, 2026-11-25)
+
+`src/datatrust/inspection.py` gives a bounded, deterministic look at an uploaded
+CSV to guide configuration. It is advisory: it is stored on the job
+(`job["input_inspection"]`) and returned in the job view, and it is never written
+into analysis JSON, specifications, fingerprints, reports or history. The analysis
+keeps its own authoritative read.
+
+**Item classes.** Every item is one of:
+- *observed*: a count or value read from the inspected rows;
+- *structural*: a deterministic property, stated with its denominator and scope ("in every row" only after a complete pass, otherwise "in the inspected rows");
+- *suggestion*: a heuristic with a named rule and its reason. It is never applied; the user confirms each one;
+- *unknown*: what inspection cannot establish (meaning, availability at prediction time).
+
+**Budgets (`InspectionBudget`, enforceable).**
+
+| Budget | Default | Enforcement |
+|---|---|---|
+| Whole-file bytes | 64 MiB | file size checked before reading; larger files get the fallback |
+| Whole-file rows | 500,000 | counted while reading; the pass stops at the limit |
+| Fallback rows | 50,000 | the first rows only, when the byte budget is exceeded |
+| Profiled columns | 500 | later columns are listed by name only |
+| Listed columns | 2,000 | later columns are counted, not listed |
+| Memory | chunks of 50,000 rows | per-column accumulators; distinct values tracked exactly up to 10,000, then reported as capped; exact uniqueness tracked (64-bit hashes) for at most 16 columns, identifier-named first |
+| Time | 4 seconds | deadline checked between chunks |
+
+When any budget stops the pass, `coverage.statement` says exactly what was seen
+(e.g. "Inspected the first 50,000 rows only (the inspection limit); suggestions
+describe those rows."), and whole-file statements (unique, constant) are not made.
+A failed inspection is recorded (`error`) and never blocks the upload.
+
+**Parsing.** The pass uses the analysis's own pandas arguments
+(`ingestion.csv_read_kwargs`, `apply_column_types`). Before an analysis is chosen
+it runs under the *provisional profile*: the detected separator with every other
+option at its default, which equals each core workflow's default and
+classification's pinned profile. The inspection is cached by parse fingerprint
+(`profile_fingerprint`); choosing an analysis reuses it when the fingerprint is
+unchanged, and a parsing change (separator, encoding, missing policy, tokens,
+column types) reruns it once. Classification reuses the frame its upload
+inspection already parsed, so the default path reads the file once.
+
+**Rule catalogue.**
+
+| Rule | Meaning |
+|---|---|
+| R-ID-1 | Possible identifier: an identifier-like name (id, uuid, guid, key, index, identifier) and a different value in every inspected row |
+| R-ID-2 | A different value in every inspected row, in a whole-number or text column, without an identifier-like name (a fractional measurement is often unique and is not suggested) |
+| R-TIME-1 | Parses as a date or time in at least 99% of tested non-missing values (ISO 8601 only; no locale guessing, so `03/04/2024` is never suggested) |
+| R-TIME-2 | Whole numbers in the epoch-seconds or epoch-milliseconds range; a time only if the user confirms the unit |
+| R-BIN-1 | Exactly two values that read as a yes/no indicator (0/1, true/false, yes/no, y/n) |
+| R-MULTI-1 | Two or more R-BIN-1 columns; the multilabel analysis applies only if they are labels |
+| R-CAT-1 | 2 to `min(20, max(2, rows // 2))` distinct values (the target-guidance ceiling), not unique |
+| R-NUM-1 | Numeric, finite and not constant |
+| R-TEXT-1 | Free text: at least half of the values have 40 or more characters or five or more words |
+| R-STATUS-1 | At most 10 values, at least half from an annotation-status vocabulary (labeled, pending, skipped, ...) |
+| R-ENTITY-1 | Where times repeat in the inspected rows, a column whose values make each (value, time) pair unique (at most 1% of the repeats remain): possibly an entity, one series per value. Tested on the clock candidate's inspected rows (`time_structure`); amended in Stage 5 from a name-and-type heuristic that matched, for example, wind direction |
+| R-KEY-1 | Present in every source and a different value in every inspected row of each: possibly an identity key (comparisons) |
+| R-MAP-1 | Names that differ only in letter case, spaces, hyphens or underscores across sources: possibly the same column (comparisons) |
+
+**Multi-source sources (Stage 5).** Comparison and temporal sources are inspected when added, always under the bounded head budget (`SOURCE_BUDGET`: whole file up to 8 MiB and 20,000 rows, otherwise the first 20,000 rows). Parquet reads its schema from metadata and the first row batch only. For temporal sources `time_structure` reads the clock candidates and small-value-set columns of the inspected rows once, and reports each clock's suggested interpretation (civil date, instant with an offset, local date-time needing a timezone, or epoch with its unit), the entity test above, and the most common spacing between consecutive distinct times, which is offered as a schedule choice and never applied.
+
+**Upload and analysis choice.** `POST /core/uploads` stores and inspects a file
+without an analysis (job stage `choose`); `POST /core/job/analysis` chooses or
+changes it, clearing declarations made for another analysis (as a separator
+change does) and keeping the file. Configure and generate refuse a job with no
+analysis. The one-call `POST /core/jobs` with `mode` is unchanged; both paths
+produce the same analysis JSON for every core and M3 mode
+(`tests/test_app_api.py`).
+
+### Regression dependency search (`regression_dependency_v1`, opt-in, 2026-11-25)
+
+`src/datatrust/regression_dependency.py` implements the founder-approved J2 method
+(`validation/regression_dependency/DOSSIER.md`, decisions D0–D3: approve, m = 5,
+no tolerant variants, declared-available is Low). It is off by default
+(`RegressionOptions.dependency_search = None`). When off it adds no block, no check,
+no finding and no key: `omit_default_delimiter` drops the `None` field from every
+record, so fingerprints and seals are unchanged. It is turned on by
+`RegressionOptions(dependency_search=True)`, config JSON `"dependency_search": true |
+{"limits": {...}}`, the CLI flag `--regression-dependency-search`, or the app's
+Advanced toggle.
+
+When on, the methodology stays `tabular_regression_v1`, and
+`profile.regression.dependency_search` records:
+- the gates, limits and per-feature checks;
+- identifier exclusions, features covered by an existing copy or affine relationship,
+  and unsearched features;
+- the budget used and the flags.
+
+Multi-output regression records one block per output under one shared budget.
+
+The search looks for three families, one grouped pass per feature–target pair:
+- **categorical determination**, with k = 5 categories of at least m = 5 rows holding
+  ≥ 80% of rows; singletons never count;
+- **target interval coding**;
+- **strict or step monotone mapping**.
+
+Severity follows declared availability only:
+
+| Declared availability | Severity | Finding code |
+|---|---|---|
+| unknown | Moderate | `regression_dependency_availability_unknown` |
+| unavailable | High | `regression_dependency_unavailable` |
+| available | Low | `regression_dependency_declared_available` |
+
+"Leakage" appears only as a possibility. Findings carry
+`version: regression_dependency_v1`.
+
+### Readiness v2 (`tabular_{clustering,anomaly}_readiness_v2`, 2026-11-25)
+
+New clustering and anomaly readiness runs record two prerequisites in `profile.readiness`. Both are evidence only, and no
+model is fitted and no readiness verdict is given.
+
+- **`complete_case_coverage`:** the share of rows with every quantitative-geometry feature finite. Finding
+  `limited_complete_case_coverage`:
+  - Low below 80%, the dependency searches' coverage gate;
+  - Moderate below 50%, the column-missingness High boundary.
+- **`redundant_quantitative_features`:** exact duplicates and pairs with |Pearson r| ≥ 0.98, the existing M4 gate. A pair
+  qualifies only with ≥ 100 rows of finite overlap and ≥ 10 distinct values per column. Finding
+  `redundant_quantitative_features` is Low and worded "may be intended", never a defect.
+  - **Bounds:** at most 64 features and 2e8 row work (`DependencyLimits`). Declared quantitative features go first, then
+    source order. Beyond the bounds the status is `bounded` and unsearched pairs are counted.
+
+`guidance.policy` states these thresholds. v1 results keep their method id and render unchanged.
+
+### Direction-preserving comparisons (`m4_local_2026_11_25`, 2026-11-25)
+
+Comparisons record each column's signed missingness and non-finite change with its
+direction and magnitude. An increase at or beyond `missingness_change` (0.05, with
+at least `minimum_population` 100 rows) keeps the existing "Supported input or
+annotation populations differ" finding. A decrease at or beyond it is recorded as a
+material change, never a finding. That record is the `material_changes` measurement,
+with `evidence_type: material_change` and the possible causes stated.
+`ComparisonConfig.methodology` records the version, and `m4_local_2026_10_10`
+reproduces v1 output exactly. Advanced single-source analysis keeps
+`m4_local_2026_10_10`.
+
 ### M2 Regression Workflow and Evidence
 
 Regression requires an explicit numeric non-boolean target. Shared ingestion
@@ -474,6 +610,67 @@ nothing.
 - Every PDF, every specification-based path and the app use the current report.
 - M6, M7 and M9 exports add `presentation_identity` and `print_profile` to `export_identity`.
 - `text_presentation.executive_summary` stays frozen, because export JSON fields depend on it.
+
+### Results dashboards and the presentation companion (2026-11-25)
+
+The local app (`frontend/src/app`, built into `src/datatrust/static/app`) draws every completed result, live or saved,
+through one path:
+1. `results/resolve.ts` picks the composition from the recorded `methodology_id`, plus `comparison.preset | mode` for M4. Anything unknown goes to `generic`.
+2. A pure composition builder (`results/compositions/*.tsx`, `results/roles.tsx` `m4Dashboard`) turns the canonical JSON and the companion into a `Dashboard`: identity, statement, tiles, a finding-to-tile route, extra coverage.
+   - Builders only read, format and select recorded values; every derived share states its denominator.
+   - Live-only private controls are passed in as slots by the workflow pages, so builders never call an API and run unchanged in the node test harness.
+3. `results/compositions/common.ts` `buildDashboard` adds the normalised parts (`results/normalize.ts`):
+   - the ledger, with finding identity and recorded rank (a priority, or an evidence meaning kept as a different kind);
+   - coverage from recorded checks and `guidance.scope`;
+   - the result state;
+   - the "recorded by an earlier version" note.
+4. `results/shell/ResultsShell.tsx` renders it, with `results/Tiles.tsx` as the only tile engine (positional `#t=<n>` state, focus by `data-ref`).
+
+**Presentation companion.**
+- `src/datatrust/dashboard_companion.py` builds `dashboard_companion_v1` from the same `*_presentation.report_view` the report renders:
+  - finding titles and ranks;
+  - the text `executive_summary` actions and image executive actions;
+  - concept entries;
+  - the report's names for families, meanings, populations and outcomes.
+- Locators are read from the served HTML bytes (element ids and `table.dt-index` links), never assumed.
+- It returns no source content and adds nothing the report does not render from the same JSON.
+- Routes: `/core/job`, `/m4`, `/temporal`, `/text`, `/images`, `/cross` and `/history/<id>`, each followed by `/presentation`, under the same guard and `no-store` as `/analysis`.
+
+**Shared interpretation (`interpretation_v1`, `src/datatrust/interpretation.py`).**
+- A pure function of a recorded result. It never creates, removes, re-ranks or recomputes a finding or value, and returns:
+  - `summary`: per-workflow sentences, each with the JSON-pointer facts behind every number;
+  - `findings`: the recorded `finding_guidance_v1`, unchanged; nothing is back-filled for older results;
+  - `more_conclusive`: declarations that would resolve recorded unknowns or unsupplied configuration, through the
+    `UNKNOWN_RESOLUTION` table, which maps every recordable unknown exactly once;
+  - `clean`: completed scope for results without findings;
+  - `states`: the result-state vocabulary.
+- The companion carries it to the dashboards, and the renderer passes the same object to every report family
+  (`guidance_layers.interpretation`), so the two surfaces cannot drift.
+
+**Guided start and configuration.**
+- **Start page:** `frontend/src/app/start.tsx`.
+- **Analysis list:** `applicability.applicable_analyses`, built from the input inspection.
+  - It lists every analysis as can run, needs input, or unlikely, with reasons and rule IDs.
+  - It never ranks, preselects or gates.
+- **Upload before analysis:** `POST /core/uploads` and `POST /core/job/analysis` defer the analysis choice; changing it
+  keeps the file.
+- **Configure layers:** `configure.tsx` holds the Essential, Recommended and Advanced layers, the availability control
+  with its bulk confirmation, the role-aware switch, role suggestion chips, and the review panel.
+- **Review panel:** `job.review` (`api_web.review_view`) states the methodology the run will record, the same
+  `effective_policy` result, and is tested equal to the recorded `methodology_id` for every mode.
+- **Multi-source suggestions** are advisory and never in specifications:
+  - comparison identity keys (R-KEY-1) and name mappings (R-MAP-1);
+  - temporal clock, entity and spacing (`time_structure`);
+  - text selectors and image manifest columns (`discover_selectors`, with box evidence);
+  - record-source keys;
+  - the records models' qualification status (read-only).
+
+**Finding routes.** `results/finding-routes.json` maps every code the core, regression, M3 and contextual engines can emit to a tile, per tabular composition. `tests/test_outcome_states.py` keeps that guarantee and the `NARRATIVE_ONLY` parity with the history index.
+
+**Tests.**
+- `tests/dashboard_harness.py` bundles the builders with esbuild and runs them in node over the representative corpus (`validation/dashboard/cases.json`). Tests skip without node or the git-ignored heavy cases.
+- The per-workflow suites are `test_dashboard_{cases,projections,tabular,comparison,temporal,evidence,history,companion}.py`.
+- `python -m validation.dashboard.baseline` captures every case and chapter at five sizes for visual review.
 
 ## Dependencies And Validation Architecture
 

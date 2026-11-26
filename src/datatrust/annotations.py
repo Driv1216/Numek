@@ -77,8 +77,8 @@ def effective_policy(columns, task, config):
         legacy_task = replace(task, target=names[0] if names else None, targets=(), feature_columns=None, metadata_columns=(), group_columns=())
         return legacy_task, config, roles, None
     methods = {"classification": "tabular_partial_classification_v1", "regression": "tabular_multioutput_regression_v1" if len(names) > 1 else "tabular_annotation_regression_v1",
-               "multilabel_classification": "tabular_multilabel_v1", "clustering": "tabular_clustering_readiness_v1",
-               "anomaly_detection": "tabular_anomaly_readiness_v1", "dataset_profile": "tabular_role_profile_v1"}
+               "multilabel_classification": "tabular_multilabel_v1", "clustering": "tabular_clustering_readiness_v2",
+               "anomaly_detection": "tabular_anomaly_readiness_v2", "dataset_profile": "tabular_role_profile_v1"}  # readiness v2: Stage 6C (J3)
     return task, config, roles, methods[task.kind]
 
 

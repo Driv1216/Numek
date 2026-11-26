@@ -9,7 +9,8 @@ from flask import Blueprint,abort,flash,jsonify,redirect,render_template,request
 from werkzeug.utils import secure_filename
 from datatrust.m4_web import Sessions
 from datatrust.ingestion import source_digest,source_signature,inspect_source_tokens
-from datatrust.m4_web import source_delimiter
+from datatrust.m4_web import advisory_inspection, source_delimiter
+from datatrust.inspection import time_structure
 from datatrust.contracts import FidelityInspectionLimits
 from datatrust.temporal_contracts import *
 from datatrust.temporal import preflight,audit_temporal
@@ -99,7 +100,11 @@ def add_m5_source(store,j,upload,local,fmt,delimiter=','):
             chosen=source_delimiter(path,delimiter)
             raw=inspect_source_tokens(path,'utf-8',FidelityInspectionLimits(max_bytes=65536,max_records=5,max_cells=1000),chosen);headers=raw['headers'];preview=raw['records']
             if not headers:raise ValueError('A readable CSV header is required.')
-        j['sources'].append({'id':'source'+str(len(j['sources'])+1),'path':path,'format':fmt,'filename':filename,'owned':owned,'headers':headers,'preview':preview,'signature':source_signature(path),'sha256':source_digest(path),'delimiter':chosen,'delimiter_detected':delimiter=='auto' and chosen!=','})
+        inspection=advisory_inspection(path,fmt,chosen)
+        if fmt=='parquet' and 'columns' in inspection:headers=[c['name'] for c in inspection['columns']]  # names from the Parquet schema
+        try:timing=time_structure(path,inspection,fmt,chosen)
+        except Exception as exc:timing={'error':str(exc)}
+        j['sources'].append({'id':'source'+str(len(j['sources'])+1),'path':path,'format':fmt,'filename':filename,'owned':owned,'headers':headers,'preview':preview,'signature':source_signature(path),'sha256':source_digest(path),'delimiter':chosen,'delimiter_detected':delimiter=='auto' and chosen!=',','inspection':inspection,'time':timing})
         j['state']='sources'
     except (ValueError,OSError):
         if owned and path is not None and path.parent==j['directory'] and not path.is_symlink():path.unlink(missing_ok=True)

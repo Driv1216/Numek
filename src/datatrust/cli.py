@@ -37,6 +37,8 @@ PRINT_PROFILE = click.option('--print-profile', type=click.Choice(['focused', 'c
               help="Classification HTML only: a plain audit keeps the frozen legacy report unless 'current' is chosen.")
 @click.option("--print-profile", type=click.Choice(["focused", "complete"]), default="focused", show_default=True,
               help=PRINT_PROFILE_HELP)
+@click.option("--regression-dependency-search", is_flag=True, default=False,
+              help="Regression only: also run the opt-in regression_dependency_v1 search (categorical determination, interval coding, monotone mappings). Evidence only.")
 def audit(
     dataset_path: str,
     target: str,
@@ -52,10 +54,19 @@ def audit(
     delimiter: str = None,
     report_style: str = None,
     print_profile: str = "focused",
+    regression_dependency_search: bool = False,
 ):
     """Audit a CSV dataset and write a discoverable report bundle."""
     try:
         config = _load_config(config_path)
+        if regression_dependency_search:
+            from dataclasses import replace
+            from datatrust.contracts import RegressionDependencyOptions, RegressionOptions
+            if task != "regression" and not task_spec_path:
+                raise ValueError("--regression-dependency-search applies to regression only.")
+            base = config or AnalysisConfig()
+            regression = base.regression or RegressionOptions()
+            config = replace(base, regression=replace(regression, dependency_search=regression.dependency_search or RegressionDependencyOptions()))
         if delimiter is not None:
             from dataclasses import replace
             from datatrust.ingestion import resolve_delimiter

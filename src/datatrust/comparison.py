@@ -34,8 +34,21 @@ def declared_meaning(r,column):
     return {'semantic':semantic,'units':units,'target_kind':kind}
 
 
+def _direction(measure,change,na,nb,config):
+    """Signed change with its direction (Stage 6A). A decrease at or beyond the threshold is a material change: recorded,
+    never a finding or warning; the increase keeps the existing review semantics."""
+    return {f'{measure}_direction':'increase' if change>0 else 'decrease' if change<0 else 'none',f'{measure}_magnitude':abs(change),
+            f'{measure}_material_decrease':min(na,nb)>=config.minimum_population and change<=-config.missingness_change}
+
+
+MATERIAL_MEANING=('A decrease is a material change, not a defect: imputation, back-fill, a changed collection process, a fixed source or '
+                  'row filtering can each cause it. It does not establish which version is correct; if values were imputed, the imputed '
+                  'rows carry no observed information.')
+
+
 def distributions(e,a,b,pairs,config,scope,*,conditional=False,inference_allowed=True):
     con=e.work.con;details=[];tests=[]
+    directional=getattr(config,'methodology','m4_local_2026_10_10')!='m4_local_2026_10_10'
     if config.inference and not conditional:
         try:from scipy import stats
         except ImportError as exc:raise ValueError('Optional inference requires datatrust[statistics]; install it explicitly.') from exc
@@ -44,6 +57,8 @@ def distributions(e,a,b,pairs,config,scope,*,conditional=False,inference_allowed
         ma=con.execute(f'SELECT count(*) FROM {a.table} WHERE {ca} IS NULL').fetchone()[0];mb=con.execute(f'SELECT count(*) FROM {b.table} WHERE {cb} IS NULL').fetchone()[0]
         change=mb/nb-ma/na
         item={'column':logical,'left_column':x,'right_column':y,'left_rows':na,'right_rows':nb,'left_missing':ma,'right_missing':mb,'missingness_change':change,'missingness_review':min(na,nb)>=config.minimum_population and change>=config.missingness_change}
+        if directional:
+            item.update(_direction('missingness',change,na,nb,config))
         left_role,right_role=column_role(a,x),column_role(b,y)
         role_changed=left_role!=right_role
         item.update(left_role=left_role,right_role=right_role,role_changed=role_changed)
@@ -54,6 +69,8 @@ def distributions(e,a,b,pairs,config,scope,*,conditional=False,inference_allowed
             ib=con.execute(f'SELECT count(*) FROM {b.table} WHERE {cb} IS NOT NULL AND NOT isfinite({cb})').fetchone()[0]
             delta=ib/nb-ia/na
             item.update(left_nonfinite=ia,right_nonfinite=ib,nonfinite_change=delta,nonfinite_review=min(na,nb)>=config.minimum_population and delta>=config.missingness_change)
+            if directional:
+                item.update(_direction('nonfinite',delta,na,nb,config))
         meanings=declared_meaning(a,x),declared_meaning(b,y)
         conflicting=any(meanings[0][key] is not None and meanings[1][key] is not None and meanings[0][key]!=meanings[1][key] for key in ('semantic','units','target_kind'))
         if conflicting:
@@ -130,6 +147,14 @@ def distributions(e,a,b,pairs,config,scope,*,conditional=False,inference_allowed
     blocks=[{'column':d['column'],'reason':d['distribution_block']} for d in details if d.get('distribution_block')]
     e.coverage[scope+'.populations'].update(role_change_qualifications=qualifications,distribution_blocks=blocks)
     if any(d.get('missingness_review') or d.get('nonfinite_review') or d.get('distribution_review') or d.get('new_or_disappearing_review') for d in details):e.finding(ident,'Supported input or annotation populations differ','Moderate',scope=scope)
+    if directional:
+        changes=[{'column':d['column'],'measure':m,'from_share':d[f'left_{"missing" if m=="missingness" else "nonfinite"}']/d['left_rows'],
+                  'to_share':d[f'right_{"missing" if m=="missingness" else "nonfinite"}']/d['right_rows'],'direction':'decrease','magnitude':d[f'{m}_magnitude']}
+                 for d in details for m in ('missingness','nonfinite') if d.get(f'{m}_material_decrease')]
+        if changes:
+            e.add(scope,'material_changes',{'evidence_type':'material_change','changes':changes,'threshold':config.missingness_change,
+                  'minimum_population':config.minimum_population,'meaning':MATERIAL_MEANING},columns=sorted({c['column'] for c in changes}),
+                  population='rows of this segment in each source; shares of the segment' if conditional else 'parsed rows of each source; shares of all rows',affected=len(changes))
     return datum
 
 

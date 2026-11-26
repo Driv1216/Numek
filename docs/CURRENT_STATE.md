@@ -1,5 +1,90 @@
 # Numek Current State
 
+## DataTrust — guided analysis and evidence intelligence, Stages 1–6 (2026-11-25)
+
+Stage notes: `validation/guided/README.md`. Nothing is committed yet.
+
+**Report presentation re-pin (Stage 6D, deliberate).**
+- **What changed:** every report family renders interpretation_v1 after the guidance scope box: "In brief", the clean-result scope, and "What would make this more conclusive".
+  - It comes from the same `interpret()` the dashboards render.
+  - `datatrust.interpretation` is now a shared presentation module.
+- **Re-pinned:**
+  - all 9 presentation identities (`tests/fixtures/presentation_identities.json`);
+  - 18 M2 and 3 M1 report hashes.
+- **How it was checked:** through `validation.report_experience.repin`, which re-asserts every analytical value and aborts if anything other than `html_sha256` changes.
+- **Not changed:** saved report bytes are not re-rendered.
+
+**Analytical changes**
+- **Opt-in `regression_dependency_v1`:** off is unchanged byte for byte.
+- **Direction-preserving comparisons (`m4_local_2026_11_25`):** a decrease is a material change, never a finding.
+- **Readiness v2 (`tabular_{clustering,anomaly}_readiness_v2`):** complete-case coverage and redundant features, with no verdict.
+
+## DataTrust — workflow-specific results dashboards (2026-11-25)
+
+Every DataTrust workflow now ends on its own results dashboard, drawn from its own recorded evidence, inside one
+shared shell in the local app. The visual identity is unchanged: Modules tiles and chapters, the Deep water palette, and
+coral for evidence. Presentation only:
+- no analysis, score, threshold, schema, report template or saved artifact changed;
+- `tests/fixtures/presentation_identities.json` is unchanged;
+- ConfidenceGuard is out of scope.
+
+Stage notes and measurements are in `validation/dashboard/README.md`; the plan is the founder-approved "Workflow-
+Specific Dashboard Redesign".
+
+**What the user sees.**
+- **One shell for every workflow:**
+  - a header and outcome band;
+  - a findings ledger (a compact band, or a side column at 1,520 px of content and wider);
+  - the workflow's tiles and chapters;
+  - a coverage ledger (not completed, bounded, excluded, not applicable, not requested, methodology);
+  - one report bar.
+- **Per workflow:**
+
+  | Workflow | Lead tile |
+  |---|---|
+  | Classification | The score, guardrails and sub-scores |
+  | Numerical outcomes | Target histogram and fences; recorded relationship expressions |
+  | Dataset profile | Independent column-flag bars |
+  | Annotation | Coverage per target and per row vector |
+  | Multilabel | Label vectors |
+  | Clustering and anomaly readiness | Feature geometry, "No model fitted; no readiness verdict" |
+  | M4 comparisons | Roles, or row lineage for before and after |
+  | M4 advanced | Structure |
+  | M5 | Timeline |
+  | M6 | The report's review actions |
+  | M7 | The report's decisions |
+  | M9 | Reconciliation per rule |
+  | Unknown methodology | Generic view, as recorded |
+- **Wording and ranks:**
+  - An unscored workflow states its recorded no-score reason once, in the coverage ledger's methodology group, and nowhere else (history included).
+  - Text and image findings show their recorded evidence meaning in the report's words; the app no longer turns it into a priority.
+- **History:**
+  - Each entry has one outcome worded for its workflow ("Score 72.4 · Moderate", "3 findings · 1 High", "Partial", "No threshold-level findings").
+  - The list has a Workflow filter, and the risk filter is labelled "Classification risk band". It is shown for All, Tabular datasets and M4, the workflows that can carry a band.
+  - The saved-analysis sheet lists findings by recorded rank for every workflow. Before this, text and image findings were missing from it.
+
+**Presentation companion.**
+- `GET …/presentation` returns, per live job and saved entry, the report's own:
+  - finding names and ranks;
+  - text and image actions;
+  - concept entries;
+  - names for families, meanings, populations and outcomes.
+- Every report link is verified against the exact HTML served, live or saved: anchor, then section, then finding-index position, then none. The dashboard words each link by what was verified.
+- Cached per scope (LRU 16), keyed on the analysis and HTML digests, presentation identity, print profile and disclosure context.
+
+**Defect ledger (plan section C).**
+
+| Defects | Status |
+|---|---|
+| D1 (made-up M6/M7 priorities), D2 (coral class colours), D3 (invented duplicate sizes), D4 (name-length leakage bars), D5 (first M7 pair always hot), D6 (score tile on unscored runs), D7 ("N of 14 checks"), D9 (unknown saved workflow waited forever), D10 ("Open live result" went to core), D11 (no classification HTML download), D13 (no core findings list), D14 (failed fetch left the wait block), D15 (history "no score defined", risk filter everywhere, no workflow filter), D16 (schematic drawings) | Fixed |
+| D8 (partial M7/M9 unreachable) | Not a defect: the jobs record `completed` with a partial `execution.status`, which the dashboards show |
+| D12 (`computed` vs `available` scoring spelling) | Documented only: the frontend reads both as "scored", and the schemas are unchanged |
+
+**Known limits.**
+- Live private inspection (M6 reveal, M7 pair viewer, M9 investigate) was moved into chapters unchanged. Its export and history exclusions are covered by the existing API tests; it was not re-driven in a browser in this initiative.
+- The CSRF race on the first app load (worked around by a reload in the live flow script) is pre-existing and not fixed here.
+- M9's model-qualification decision is still open. Saved M9 results show their recorded judgments, and a result where every judgment abstained says so.
+
 ## ConfidenceGuard CG7 — S9 product (2026-11-23; console 2026-11-24)
 
 **What exists now.** CG7 has a complete operations API at `/api/ops/v1`, alongside ingestion, and an operations

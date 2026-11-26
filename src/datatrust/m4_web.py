@@ -81,6 +81,14 @@ def start_m4(store,mode):
     j=store.create(mode);session['m4_job']=j['id'];return j
 
 
+def advisory_inspection(path,fmt='csv',delimiter=','):
+    """The bounded, advisory input inspection of a source (datatrust.inspection.SOURCE_BUDGET). Never part of the
+    specification or its fingerprint; a failure is recorded, not raised."""
+    from datatrust.inspection import inspect_source
+    try:return inspect_source(path,fmt,delimiter)
+    except Exception as exc:return {'version':'input_inspection_v1','error':str(exc)}
+
+
 def add_m4_source(store,j,upload,local,delimiter=','):
     """Admit one uploaded or data-root CSV. Raises ValueError/OSError; a rejected upload is removed."""
     path=None;owned=False
@@ -98,7 +106,7 @@ def add_m4_source(store,j,upload,local,delimiter=','):
         chosen=source_delimiter(path,delimiter)
         raw=inspect_source_tokens(path,'utf-8',FidelityInspectionLimits(max_bytes=65536,max_records=5,max_cells=1000),chosen)
         if not raw['headers']:raise ValueError('A readable CSV header is required.')
-        j['sources'].append({'id':'source'+str(len(j['sources'])+1),'path':path,'filename':filename,'owned':owned,'signature':source_signature(path),'sha256':source_digest(path),'headers':raw['headers'],'preview':raw['records'],'delimiter':chosen,'delimiter_detected':delimiter=='auto' and chosen!=','})
+        j['sources'].append({'id':'source'+str(len(j['sources'])+1),'path':path,'filename':filename,'owned':owned,'signature':source_signature(path),'sha256':source_digest(path),'headers':raw['headers'],'preview':raw['records'],'delimiter':chosen,'delimiter_detected':delimiter=='auto' and chosen!=',','inspection':advisory_inspection(path,'csv',chosen)})
         j['state']='sources'
     except (ValueError,OSError):
         if owned and path is not None and path.parent==j['directory'] and not path.is_symlink():path.unlink(missing_ok=True)

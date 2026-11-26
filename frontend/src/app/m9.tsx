@@ -3,9 +3,10 @@
 // images and review decisions appear only in the live chapter of this session.
 import { useEffect, useState, type ReactNode } from 'react';
 import { ApiError, csrfToken, type Fields, type SessionInfo } from './api';
-import { BoundedTable, ConfirmFrame, FieldSections, Flow, FlowDownloads, LiveOut, MosaicPage, ReportViewer, Running, SHADES, defaults, familyTile, flowApi, scalarFacts, useAfterRun, type Doc, type FlowJob, type FlowStep, type Section } from './flow';
+import { ConfirmFrame, FieldSections, Flow, FlowDownloads, LiveOut, ReportViewer, Running, defaults, flowApi, scalarFacts, useAfterRun, viewAnchor, type Doc, type FlowJob, type FlowStep, type Section, type ViewTarget } from './flow';
 import { READ_ONLY, SeparatorSelect } from './parts';
-import type { Tile } from './results/Tiles';
+import { crossDashboard } from './results/compositions/cross';
+import { ResultsShell, useCompanion } from './results/shell/ResultsShell';
 import { navigate, onLink } from './router';
 
 type Flash = (e: unknown) => void;
@@ -176,13 +177,40 @@ function rule(rels: string[], maps: string[]): Section[] {
   ];
 }
 const MODELS: Section[] = [
-  { title: 'Optional verified local models', collapsed: true, note: 'Pinned and offline. Unqualified methods abstain.', fields: [
+  { title: 'Optional verified local models', collapsed: true, note: 'Pinned and offline. A method whose qualification does not match this build abstains: it adds no judgment, and the deterministic rules still run.', fields: [
     { name: 'nli_directory', label: 'NLI directory' }, { name: 'retrieval_directory', label: 'E5 retrieval directory' }, { name: 'image_text_directory', label: 'Joint image–text directory' }] },
 ];
 
 type Decl = { id: string; [k: string]: unknown };
-function Builder({ title, n, items, line, collection, sections, action, submit, job, setJob, flash }: {
+type Discovery = { error?: string; statement?: string; columns?: string[]; keys?: string[] } | null | undefined;
+type Status = Record<string, { state: 'qualified' | 'stale' | 'not_qualified'; model: string | null; text: string }>;
+const MODEL_LABEL: Record<string, string> = { nli: 'Text agreement (NLI)', image_text: 'Image–text agreement' };
+
+/** Identifier candidates of the chosen record sources (bounded head read), applied only when chosen. */
+function KeyHints({ job, f, set }: { job: FlowJob; f: Fields; set: (k: string, v: string) => void }) {
+  const keysOf = (id: string) => ((job.sources.find((s) => s.id === id)?.discovery as Discovery)?.keys ?? []);
+  const sides = ([['left', f.left_source], ['right', f.right_source]] as const).map(([side, id]) => [side, id, keysOf(id).filter((k) => f[`${side}_keys`] !== k)] as const).filter(([, , k]) => k.length);
+  if (!sides.length) return null;
+  return (
+    <div className="ap-suggestbox">{sides.map(([side, id, keys]) => (
+      <p key={side} className="ap-suggest">{side === 'left' ? 'Left' : 'Right'} keys in {id}: {keys.map((k) => (
+        <button key={k} type="button" className="ap-chip" title="A different value in every inspected row" onClick={() => set(`${side}_keys`, k)}>{k}? <code>R-ID</code></button>))}</p>))}
+    </div>
+  );
+}
+
+/** What each optional model can do in this build, before it is selected (cross_web.model_status, read-only). */
+function ModelStatus({ status }: { status?: Status }) {
+  if (!status) return null;
+  return (
+    <ul className="ap-review__u">{Object.entries(status).map(([k, v]) => (
+      <li key={k}><b>{MODEL_LABEL[k] ?? k}</b>{v.model ? ` (${v.model})` : ''}: {v.state === 'qualified' ? 'qualified. ' : v.state === 'stale' ? 'qualification stale. ' : 'not qualified. '}{v.text}</li>
+    ))}</ul>
+  );
+}
+function Builder({ title, n, items, line, collection, sections, action, submit, job, setJob, flash, hint }: {
   title: string; n: number; items: Decl[]; line: (d: Decl) => string; collection: string; sections: Section[]; action: string; submit: string; job: FlowJob; setJob: (j: FlowJob) => void; flash: Flash;
+  hint?: (f: Fields, set: (k: string, v: string) => void) => ReactNode;
 }) {
   const [f, setF] = useState<Fields>(() => ({ ...defaults(sections), ...Object.fromEntries(Object.entries(job.fields as Fields).filter(([k]) => k in defaults(sections))) }));
   const [busy, setBusy] = useState(false);
@@ -191,6 +219,7 @@ function Builder({ title, n, items, line, collection, sections, action, submit, 
     <section className="ap-sec ap-m4src" aria-label={title}>
       <h2 className="ap-q">{n}. {title} · {items.length}</h2>
       {!!items.length && <ul className="ap-more__list">{items.map((d) => <li key={d.id}>{line(d)} <button type="button" className="ap-link" disabled={busy} onClick={() => act({ action: 'remove', collection, identity: d.id })}>Remove</button></li>)}</ul>}
+      {hint?.(f, (k, v) => setF((x) => ({ ...x, [k]: v })))}
       <FieldSections sections={sections} values={f} set={(k, v) => setF((x) => ({ ...x, [k]: v }))} />
       <div className="ap-acts"><button type="button" className="nk-btn nk-btn--ghost" disabled={busy} onClick={() => act({ ...f, action })}>{submit}</button></div>
     </section>
@@ -213,13 +242,15 @@ function Configure({ job, setJob, flash }: { job: FlowJob; setJob: (j: FlowJob) 
       {job.state === 'failed' && job.error && <p className="ap-note ap-note--warn">{job.error}</p>}
       <section className="ap-sec" aria-label="Sources">
         <h2 className="ap-q">1. Sources · {job.sources.length}</h2>
-        <ul className="ap-more__list">{job.sources.map((s) => <li key={s.id}>{s.id} · {String(s.kind ?? '')} · {String(s.format ?? '')} · {s.filename}</li>)}</ul>
+        <ul className="ap-more__list">{job.sources.map((s) => { const d = s.discovery as Discovery; return <li key={s.id}>{s.id} · {String(s.kind ?? '')} · {String(s.format ?? '')} · {s.filename}{d?.statement ? ` · ${d.statement}` : ''}{d?.keys?.length ? ` Possible keys: ${d.keys.join(', ')}.` : ''}</li>; })}</ul>
         <a className="ap-link" href={`${M9_PREFIX}/sources`} onClick={onLink}>Add or remove sources</a>
       </section>
-      <Builder key={`r${ids.join()}`} title="Associations and context" n={2} items={list('relationships')} line={(r) => `${r.id} · ${r.left_source} → ${r.right_source} · ${lab(String(r.cardinality))}`} collection="relationships" sections={relationship(ids)} action="relationship" submit="Declare this relationship" {...common} />
+      <Builder key={`r${ids.join()}`} title="Associations and context" n={2} items={list('relationships')} line={(r) => `${r.id} · ${r.left_source} → ${r.right_source} · ${lab(String(r.cardinality))}`} collection="relationships" sections={relationship(ids)} action="relationship" submit="Declare this relationship" {...common}
+        hint={(f, set) => <KeyHints job={job} f={f} set={set} />} />
       <Builder title="Reusable mappings" n={3} items={list('mappings')} line={(m) => `${m.id} · ${lab(String(m.kind))} · ${m.layout}`} collection="mappings" sections={MAPPING} action="mapping" submit="Save this recipe" {...common} />
       <Builder key={`u${rels.join()}${maps.join()}`} title="Reconciliation rules" n={4} items={list('rules')} line={(r) => `${r.id} · ${r.field} · ${r.method} · ${r.mapping ?? r.right_field ?? ''}`} collection="rules" sections={rule(rels, maps)} action="rule" submit="Map this field to evidence" {...common} />
-      <Builder title="Models" n={5} items={[]} line={() => ''} collection="" sections={MODELS} action="models" submit="Set optional models" {...common} />
+      <Builder title="Models" n={5} items={[]} line={() => ''} collection="" sections={MODELS} action="models" submit="Set optional models" {...common}
+        hint={() => <ModelStatus status={job.model_status as Status | undefined} />} />
       <section className="ap-sec" aria-labelledby="ap-pv-h">
         <h2 id="ap-pv-h" className="ap-q">6. Preview and confirmation</h2>
         {preview ? (
@@ -259,39 +290,8 @@ function Confirm({ job, saving, setJob, flash }: { job: FlowJob; saving: boolean
 
 /* ——— Result ——— */
 
-type XE = { id: string; family: string; population: string; data: Doc; references: string[]; scope: string };
-type XF = { id: string; family: string; title: string; priority: string; population: string; counts: Doc; references: string[] };
 type Target = { kind: string; population: string; evidence_refs?: string[]; detail?: Doc; semantic?: Doc };
-const STATUS = ['satisfied', 'violated', 'conflicting_evidence', 'inconclusive', 'incomplete', 'unassessed'];
 const targetLabel = (t: Target) => lab(String(t.semantic?.status ?? t.detail?.reason ?? t.detail?.status ?? t.kind));
-
-function rulesOf(a: Doc) {
-  const fams = (((a.coverage as Doc | undefined)?.families as Record<string, Doc> | undefined) ?? {});
-  return ((a.evidence as XE[]) ?? []).filter((e) => e.family === 'reconciliation').map((e) => {
-    const d = e.data, records = Number(d.records ?? 0), n = (k: string) => Number(d[k] ?? 0);
-    return { id: e.population, method: String(fams[e.population]?.method ?? ''), records, counts: STATUS.map((k) => [k, n(k)] as [string, number]).filter(([, v]) => v > 0), satisfied: n('satisfied'), assessed: records - n('unassessed'), incomplete: n('incomplete_records') };
-  });
-}
-
-function RuleBars({ a, big }: { a: Doc; big?: boolean }) {
-  const rules = rulesOf(a);
-  if (!rules.length) return null;
-  const cls: Record<string, string> = { satisfied: 'md-ink', violated: 'md-hot-l', conflicting_evidence: 'md-hot', unassessed: 'md-ghost', incomplete: 'md-ghost-l', inconclusive: 'md-ghost-l' };
-  return (
-    <svg viewBox={`0 0 300 ${rules.length * 34 + 6}`} className="md-viz" preserveAspectRatio="xMidYMid meet">
-      {rules.map((r, i) => {
-        let x = 0;
-        return (
-          <g key={r.id} transform={`translate(0 ${i * 34 + 4})`} className="md-grow" style={{ ['--i' as string]: i }}>
-            <text x={0} y={8} className="md-t md-t--s">{lab(r.id)}{r.method ? ` · ${r.method}` : ''} · {r.assessed ? `${r.satisfied} of ${r.records} reconcile` : 'unassessed'}</text>
-            {r.counts.map(([k, v]) => { const w = r.records ? (v / r.records) * 296 : 0, at = x; x += w; return <rect key={k} x={at + 2} y={12} width={Math.max(1.5, w - 1)} height={14} rx={1.5} className={cls[k] ?? 'md-ghost'}><title>{lab(k)} {v}</title></rect>; })}
-            {big && <text x={298} y={8} className="md-t md-t--s md-t--r">{r.counts.map(([k, v]) => `${lab(k)} ${v}`).join(' · ')}</text>}
-          </g>
-        );
-      })}
-    </svg>
-  );
-}
 
 function Evidence({ e }: { e: Doc }) {
   const loc = (e.location as Doc | undefined) ?? {};
@@ -379,58 +379,25 @@ function Reconciliation({ a, live, job, setJob, flash }: { a: Doc; live: boolean
   );
 }
 
-export function crossTiles(a: Doc, live: boolean, flash: Flash, job?: FlowJob, setJob?: (j: FlowJob) => void): Tile[] {
-  const ev = (a.evidence as XE[]) ?? [], fs = (a.findings as XF[]) ?? [], profile = (a.profile as Doc) ?? {};
-  const rules = rulesOf(a), assessed = rules.filter((r) => r.assessed > 0);
-  const sat = assessed.reduce((s, r) => s + r.satisfied, 0), of = assessed.reduce((s, r) => s + r.records, 0);
-  const flagged = rules.some((r) => r.counts.some(([k]) => k === 'violated' || k === 'conflicting_evidence'));
-  const label = !assessed.length ? 'No rule could be assessed' : `${sat.toLocaleString('en-US')} of ${of.toLocaleString('en-US')} ${assessed.length === 1 ? 'records' : 'record checks'} reconcile`;
-  const n = (k: string) => Number(profile[k] ?? 0).toLocaleString('en-US');
-  const hero: Tile = {
-    id: 'reconciliation', hero: true, name: 'Reconciliation', n: '01', kicker: `${rules.length} rule${rules.length === 1 ? '' : 's'}`, bg: '#163F52', light: true,
-    tone: flagged ? 'finding' : 'info', label, detail: `${n('records')} records · ${n('documents')} documents · ${n('pages')} pages`,
-    viz: <RuleBars a={a} />, bigViz: <RuleBars a={a} big />,
-    chapter: (
-      <>
-        <h3>Reconciliation</h3>
-        <div className="nk-ch__run"><span>Records against supplied evidence, per declared rule</span><b>{label}</b><p>Agreement is judged on examined evidence only. A satisfied rule does not certify a document, and an unassessed rule makes no claim.</p></div>
-        <Reconciliation a={a} live={live} job={job} setJob={setJob} flash={flash} />
-      </>
-    ),
-  };
-  const families = [...new Set(ev.map((e) => e.family))].filter((f) => f !== 'reconciliation');
-  return [hero, ...families.map((fam, i) => {
-    const recs = ev.filter((e) => e.family === fam), ffs = fs.filter((f) => f.family === fam), data = recs[0]?.data ?? {}, facts = scalarFacts(data, 6);
-    return familyTile({ id: fam, name: lab(fam), n: i + 2, kicker: `${recs.length} population${recs.length === 1 ? '' : 's'}`, shade: SHADES[i % SHADES.length], tone: ffs.length ? 'finding' : 'info',
-      label: ffs.length ? ffs[0].title : facts[0] ? `${facts[0][1]} ${facts[0][0]}` : 'Measured', detail: recs.map((e) => lab(e.population)).join(' · '),
-      body: <><h3>{lab(fam)}</h3><div className="nk-ch__run"><span>{recs.map((e) => lab(e.population)).join(' · ')} · {recs[0]?.scope}</span><b>{ffs.length ? `${ffs.length} finding${ffs.length === 1 ? '' : 's'}` : 'No finding'}</b><p>{ffs[0]?.title ?? 'Evidence for review within its examined scope.'}</p></div>
-        {recs.map((e) => { const f = scalarFacts(e.data, 8); return <div key={e.id}>{recs.length > 1 && <b>{lab(e.population)}</b>}{!!f.length && <dl>{f.map(([k, v]) => <div key={k}><dt>{k}</dt><dd>{v}</dd></div>)}</dl>}<BoundedTable data={e.data} /></div>; })}</> });
-  })];
-}
-
-export function CrossPage({ a, out, live, flash, onOpen, job, setJob }: { a: Doc; out: ReactNode; live: boolean; flash: Flash; onOpen: () => void; job?: FlowJob; setJob?: (j: FlowJob) => void }) {
-  const fs = (a.findings as XF[]) ?? [], profile = (a.profile as Doc) ?? {};
-  const counts = (f: XF) => Object.entries(f.counts ?? {}).filter(([k, v]) => typeof v === 'number' && k !== 'records' && v > 0).map(([k, v]) => `${lab(k)} ${v}`).join(' · ');
-  return (
-    <MosaicPage checks={a.checks} guidance={a.guidance} name={String(profile.dataset_name ?? 'Records ↔ documents')} sub={`${Number(profile.source_count ?? 0)} sources · Records ↔ documents`} when={String(a.generated_at)} findings={fs.length}
-      status="No score: reconciliation reports evidence and review targets." partial={(a.execution as Doc)?.status === 'partial'} label="Reconciliation checks"
-      tiles={crossTiles(a, live, flash, job, setJob)} actions={fs.map((f) => ({ id: f.id, title: f.title, priority: f.priority, text: counts(f), scope: lab(f.population) }))}
-      summary={String(profile.summary ?? '')} out={out} onOpen={onOpen} coverage={<p className="ap-muted">Analytical downloads omit source content and use opaque references. The private manifest and review JSON are separate files; review JSON includes your notes.</p>} />
-  );
+export function CrossPage({ a, out, live, flash, onOpen, job, setJob, presentation, saved }: { a: Doc; out: ReactNode; live: boolean; flash: Flash; onOpen: (anchor?: string) => void; job?: FlowJob; setJob?: (j: FlowJob) => void; presentation: string | null; saved?: boolean }) {
+  const companion = useCompanion(presentation);
+  if (companion === undefined) return <div className="ap-rs"><div className="nk-mosaic nk-mosaic--big nk-mosaic--run ap-rs__wait" aria-busy="true" /></div>;
+  const d = crossDashboard(a, companion, !!saved, { targets: <Reconciliation a={a} live={live} job={job} setJob={setJob} flash={flash} /> });
+  return <ResultsShell d={d} label="Reconciliation checks" out={out} onOpenReport={onOpen} live={live} />;
 }
 
 /** A saved Records ↔ documents entry: read-only, with an explicit reopen using the user's own private manifest. */
-export function SavedCross({ a, out, flash, onOpen, analysisUrl }: { a: Doc; out: ReactNode; flash: Flash; onOpen: () => void; analysisUrl: string }) {
+export function SavedCross({ a, out, flash, onOpen, analysisUrl, presentation }: { a: Doc; out: ReactNode; flash: Flash; onOpen: (anchor?: string) => void; analysisUrl: string; presentation: string | null }) {
   const report = async () => { const r = await fetch(analysisUrl, { credentials: 'same-origin' }); if (!r.ok) throw new ApiError('The saved result could not be read.', r.status); return r.blob(); };
   return (
     <>
-      <CrossPage a={a} live={false} flash={flash} onOpen={onOpen} out={<>{out}<Reopen flash={flash} report={report} title="Reopen with your private manifest" /></>} />
+      <CrossPage a={a} live={false} saved flash={flash} onOpen={onOpen} presentation={presentation} out={<>{out}<Reopen flash={flash} report={report} title="Reopen with your private manifest" /></>} />
     </>
   );
 }
 
 export function M9Flow({ path, info, flash, saving, onRail, onSaved }: { path: string; info: SessionInfo; flash: Flash; saving: boolean; onRail: (s: FlowStep, ok: FlowStep[]) => void; onSaved: () => void }) {
-  const [view, setView] = useState(false);
+  const [view, setView] = useState<ViewTarget>(false);
   const dl = <FlowDownloads route="/api/datatrust/v1/cross/download" kinds={['pdf', 'html', 'json', 'private', 'review']} flash={flash} />;
   return (
     <Flow path={path} prefix={M9_PREFIX} api={crossApi} info={info} flash={flash} onRail={onRail} onSaved={onSaved} label="Records ↔ documents" reachable={reach}
@@ -441,8 +408,8 @@ export function M9Flow({ path, info, flash, saving, onRail, onSaved }: { path: s
           {job && step === 'confirm' && <Confirm job={job} saving={saving} setJob={setJob} flash={flash} />}
           {job && step === 'report' && analysis && (
             <>
-              <CrossPage a={analysis} live flash={flash} job={job} setJob={setJob} onOpen={() => setView(true)} out={<LiveOut saved={!!job.saved_entry} onView={() => setView(true)} onNew={onNew} newLabel="New reconciliation" downloads={dl} />} />
-              {view && <ReportViewer name="Records ↔ documents" src={crossApi.report} downloads={dl} onClose={() => setView(false)} />}
+              <CrossPage a={analysis} live flash={flash} job={job} setJob={setJob} presentation={crossApi.presentation} onOpen={(x) => setView(x ?? true)} out={<LiveOut saved={!!job.saved_entry} onView={() => setView(true)} onNew={onNew} newLabel="New reconciliation" downloads={dl} />} />
+              {view && <ReportViewer name="Records ↔ documents" src={crossApi.report} anchor={viewAnchor(view)} downloads={dl} onClose={() => setView(false)} />}
             </>
           )}
         </>

@@ -9,6 +9,8 @@ import uuid
 import webbrowser
 from pathlib import Path
 
+import pandas as pd
+
 from flask import (
     Flask,
     abort,
@@ -26,7 +28,7 @@ from dataclasses import asdict, replace
 from datatrust import AnalysisConfig, CsvParseOptions, DataTrust, DatasetSpec, ExecutionLimits, TaskSpec, RegressionOptions, TargetExpectations
 from datatrust.ingestion import resolve_delimiter, inspect_unlabeled_dataset, inspect_regression_dataset, inspect_regression_target, load_dataset, source_digest, source_signature
 from datatrust.annotations import effective_policy, annotation_coverage, feature_semantics, specification_fingerprint
-from datatrust.contracts import AnnotationOptions, AnnotationSpec, ContextOptions, FeatureOptions, MultilabelOptions
+from datatrust.contracts import AnnotationOptions, AnnotationSpec, ContextOptions, DependencyLimits, FeatureOptions, MultilabelOptions, RegressionDependencyOptions
 from datatrust.pdf import PDFRenderError, render_pdf_report
 from datatrust.profiler import inspect_classification_target, inspect_csv_dataset
 from datatrust.renderer import ArtifactCollisionError, write_report_artifacts, _regression_inspection_notice, _report_filters
@@ -147,9 +149,30 @@ def core_parsing(job):
     return CsvParseOptions(delimiter=job["config"].parsing.delimiter) if job["mode"] == "classification" else job["config"].parsing
 
 
-def inspect_upload(job):
-    return (inspect_csv_dataset(job["dataset_path"], preview_rows=10, options=core_parsing(job)) if job["mode"] == "classification"
+def inspect_upload(job, frame_sink=None):
+    return (inspect_csv_dataset(job["dataset_path"], preview_rows=10, options=core_parsing(job), frame_sink=frame_sink) if job["mode"] == "classification"
         else (inspect_regression_dataset if job["mode"] == "regression" else inspect_unlabeled_dataset)(DatasetSpec(job["dataset_path"]), job["config"]))
+
+
+def inspection_options(job):
+    """The parse options the advisory input inspection uses: the chosen workflow's own, or before a workflow is chosen
+    the provisional profile (the detected separator with every default), which equals each core workflow's default."""
+    return core_parsing(job) if job.get("mode") else CsvParseOptions(delimiter=job["config"].parsing.delimiter)
+
+
+def refresh_input_inspection(job, frame=None):
+    """The advisory input inspection (datatrust.inspection), reused while the parse fingerprint is unchanged and
+    rerun once when it changes. Never part of the analysis: a failure is recorded, not raised."""
+    from datatrust.inspection import inspect_table, profile_fingerprint
+    options = inspection_options(job)
+    current = job.get("input_inspection")
+    if current and current.get("profile", {}).get("fingerprint") == profile_fingerprint(options):
+        return current
+    try:
+        job["input_inspection"] = inspect_table(job["dataset_path"], options, frame=frame)
+    except (OSError, ValueError, UnicodeDecodeError, pd.errors.ParserError) as exc:
+        job["input_inspection"] = {"version": "input_inspection_v1", "profile": {"fingerprint": profile_fingerprint(options)}, "error": str(exc)}
+    return job["input_inspection"]
 
 
 def start_job(store, analysis_config, mode, uploaded, delimiter=","):
@@ -180,13 +203,72 @@ def start_job(store, analysis_config, mode, uploaded, delimiter=","):
         store.remove(job["id"])
         raise WorkflowError("Regression options require regression mode.", "index")
     try:
-        job["inspection"] = inspect_upload(job)
+        sink = {}
+        job["inspection"] = inspect_upload(job, sink)
         job["file_size"] = job["dataset_path"].stat().st_size
     except (FileNotFoundError, ValueError) as exc:
         store.remove(job["id"])
         raise WorkflowError(str(exc), "index") from exc
+    refresh_input_inspection(job, sink.get("frame"))
 
     session["job_id"] = job["id"]
+    return job
+
+
+ANALYSIS_MODES = {"classification", "unlabeled", "regression"} | M3_MODES
+
+
+def start_upload(store, uploaded, delimiter="auto"):
+    """Upload without choosing an analysis: the file is checked, previewed and inspected under the provisional profile,
+    and an analysis is chosen afterwards (`choose_analysis`), as often as needed, without uploading again."""
+    if delimiter not in DELIMITER_CHOICES:
+        raise WorkflowError("Choose a comma, semicolon, tab or vertical bar separator.", "index")
+    if uploaded is None or not uploaded.filename:
+        raise WorkflowError("Choose a CSV file to continue.", "index")
+    source_filename = _source_filename(uploaded.filename)
+    if not source_filename.lower().endswith(".csv"):
+        raise WorkflowError("DataTrust accepts .csv files only.", "index")
+    store.remove(session.pop("job_id", None))
+    job = store.create(uploaded, source_filename)
+    try:
+        chosen = resolve_delimiter(job["dataset_path"], delimiter)
+        job.update(mode=None, config=with_delimiter(AnalysisConfig(), chosen), delimiter_detected=delimiter == "auto" and chosen != ",")
+        job["inspection"] = inspect_unlabeled_dataset(DatasetSpec(job["dataset_path"]), job["config"])
+        job["file_size"] = job["dataset_path"].stat().st_size
+    except (FileNotFoundError, ValueError) as exc:
+        store.remove(job["id"])
+        raise WorkflowError(str(exc), "index") from exc
+    refresh_input_inspection(job)
+    session["job_id"] = job["id"]
+    return job
+
+
+def choose_analysis(job, analysis_config, mode, target=None):
+    """Choose, or change, the analysis for an uploaded file. Declarations made for another analysis are cleared, as a
+    separator change clears them; the file and its separator are kept. The input inspection is reused while the chosen
+    analysis parses the file the same way. `target`, for the role-aware switch, keeps the chosen outcome as
+    the target role of a targeted M3 analysis; every other declaration is cleared."""
+    if mode not in ANALYSIS_MODES:
+        raise WorkflowError("Choose one of the listed analyses.", "index")
+    if analysis_config.regression is not None and mode not in {"regression", "annotation_regression"}:
+        raise WorkflowError("Regression options require regression mode.", "index")
+    previous = {k: job.get(k) for k in ("mode", "config", "inspection")}
+    job.update(mode=mode, config=with_delimiter(analysis_config, job["config"].parsing.delimiter))
+    try:
+        sink = {}
+        inspection = inspect_upload(job, sink)
+    except (FileNotFoundError, ValueError) as exc:
+        job.update(previous)
+        raise WorkflowError(str(exc), "index") from exc
+    for key in ("target", "target_info", "task_spec", "summary", "result", "context_seal", "availability_bulk"):
+        job.pop(key, None)
+    invalidate_artifacts(job)
+    job["inspection"] = inspection
+    if mode in M3_MODES:
+        populate_m3_forms(job)
+        if target and mode in {"annotation_classification", "annotation_regression"} and target in inspection["columns"]:
+            job["task_spec"] = TaskSpec(KIND_FOR[mode], targets=(target,))
+    refresh_input_inspection(job, sink.get("frame"))
     return job
 
 
@@ -207,6 +289,7 @@ def set_delimiter(job, delimiter):
     job["inspection"] = inspection
     if job["mode"] in M3_MODES:
         populate_m3_forms(job)
+    refresh_input_inspection(job)
     return job
 
 
@@ -244,9 +327,22 @@ def apply_context(job, form):
     job["context_seal"] = context_fingerprint(context)
 
 
+def record_bulk_availability(job, form):
+    """Which availability declarations were made with the bulk action, so the review can list them apart from the ones
+    made column by column. Presentation only: never part of the configuration, the analysis or its fingerprint."""
+    if "availability_bulk" not in form:
+        return
+    try:
+        names = json.loads(form.get("availability_bulk") or "[]")
+    except ValueError as exc:
+        raise WorkflowError("The bulk availability list is invalid.", "configure") from exc
+    job["availability_bulk"] = [c for c in names if isinstance(c, str) and c in job["inspection"]["columns"]] if isinstance(names, list) else []
+
+
 def configure_core(job, form):
     """Configure for classification, regression and unlabeled jobs. Returns the next stage: configure or confirm."""
     apply_context(job, form)
+    record_bulk_availability(job, form)
     target = form.get("target", "") if job["mode"] != "unlabeled" else None
     dataset_name = form.get("dataset_name", "")
     purpose = form.get("purpose", "")
@@ -277,7 +373,9 @@ def configure_core(job, form):
                     integer_required=optional_flag("target_integer", existing.expectations.integer_required))
                 availability = {c:form.get("availability_"+c, existing.feature_availability.get(c, "unknown")) for c in job["inspection"]["columns"] if c != target}
                 availability = {c:v for c,v in availability.items() if v != "unknown"}
-                updated_config = replace(updated_config, regression=RegressionOptions(expectations, availability, existing.relation_limits))
+                search = (RegressionDependencyOptions(existing.dependency_search.limits if existing.dependency_search else DependencyLimits())
+                          if form.get("regression_dependency_search") == "on" else None) if form.get("regression_options_submitted") else existing.dependency_search
+                updated_config = replace(updated_config, regression=RegressionOptions(expectations, availability, existing.relation_limits, dependency_search=search))
             inspection = (inspect_regression_dataset if job["mode"] == "regression" else inspect_unlabeled_dataset)(DatasetSpec(job["dataset_path"]), updated_config)
         else:
             updated_config = replace(job["config"], parsing=core_parsing(job))
@@ -317,6 +415,7 @@ KIND_FOR = {'annotation_classification':'classification','annotation_regression'
 def configure_m3(job, form):
     """Configure for the six M3 modes: column roles, semantics and annotation declarations. Returns confirm."""
     apply_context(job, form)
+    record_bulk_availability(job, form)
     try:
         columns=job['inspection']['columns']
         roles={c:form.get('role_'+c,'feature') for c in columns}
@@ -341,6 +440,8 @@ def configure_m3(job, form):
             declarations = RegressionOptions.from_dict({'expectations_by_target':json.loads(form.get('expectations_by_target','{}')),'feature_availability':json.loads(form.get('feature_availability','{}'))})
             regression = replace(base, expectations_by_target=declarations.expectations_by_target,
                                  feature_availability=declarations.feature_availability)
+            if 'dependency_search' in form:
+                regression = replace(regression, dependency_search=(base.dependency_search or RegressionDependencyOptions()) if form.get('dependency_search') == 'on' else None)
             if declarations.expectations_by_target and len(targets)>1:
                 regression = replace(regression, expectations=declarations.expectations)
         config=replace(job['config'],parsing=parsing,annotations=annotation,features=FeatureOptions(semantics,sensitivity),
@@ -485,6 +586,9 @@ def create_app(workspace: Path, max_upload_mib: float = 100, analysis_config=Non
         job = current_job()
         if not job:
             flash("That analysis session is no longer available. Upload the CSV again.", "error")
+            return None
+        if job.get("mode") is None:  # uploaded through the app without an analysis chosen yet
+            flash("Choose an analysis for this file first.", "error")
             return None
         return job
 

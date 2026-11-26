@@ -369,8 +369,19 @@ class RegressionOptions:
     relation_limits: RegressionRelationLimits = field(default_factory=RegressionRelationLimits)
 
     expectations_by_target: dict = field(default_factory=dict, kw_only=True)
+    # Opt-in regression_dependency_v1 (Stage 6B). None is off and is left out of every record (see omit_default_delimiter),
+    # so results, fingerprints and seals made without it are unchanged byte for byte.
+    dependency_search: Optional["RegressionDependencyOptions"] = field(default=None, kw_only=True)
 
     def __post_init__(self):
+        if self.dependency_search is False:
+            object.__setattr__(self, "dependency_search", None)
+        elif self.dependency_search is True:
+            object.__setattr__(self, "dependency_search", RegressionDependencyOptions())
+        elif isinstance(self.dependency_search, dict):
+            object.__setattr__(self, "dependency_search", RegressionDependencyOptions(_construct(DependencyLimits, self.dependency_search.get("limits", {}))))
+        if self.dependency_search is not None and not isinstance(self.dependency_search, RegressionDependencyOptions):
+            raise ValueError("dependency_search must be true or an object with limits.")
         if not isinstance(self.expectations_by_target, dict):
             raise ValueError("expectations_by_target must be an object.")
         mapped = {k: _construct(TargetExpectations, v) if isinstance(v, dict) else v for k, v in self.expectations_by_target.items()}
@@ -388,12 +399,16 @@ class RegressionOptions:
 
     @classmethod
     def from_dict(cls, value):
-        if not isinstance(value, dict) or set(value) - {"expectations", "feature_availability", "relation_limits", "expectations_by_target"}:
-            raise ValueError("RegressionOptions must contain only expectations, feature_availability, and relation_limits.")
+        if not isinstance(value, dict) or set(value) - {"expectations", "feature_availability", "relation_limits", "expectations_by_target", "dependency_search"}:
+            raise ValueError("RegressionOptions must contain only expectations, feature_availability, relation_limits, expectations_by_target and dependency_search.")
+        search = value.get("dependency_search")
+        if search is not None and search is not True and search is not False and not (isinstance(search, dict) and set(search) <= {"limits"}):
+            raise ValueError("dependency_search must be true, false, or an object with limits.")
         return cls(_construct(TargetExpectations, value.get("expectations", {})),
                    value.get("feature_availability", {}),
                    _construct(RegressionRelationLimits, value.get("relation_limits", {})),
-                   expectations_by_target=value.get("expectations_by_target", {}))
+                   expectations_by_target=value.get("expectations_by_target", {}),
+                   dependency_search=None if search is False else search)
 
 
 CONTEXT_MEANINGS = ("not_collected", "not_applicable", "refused", "censored", "category")
@@ -451,6 +466,16 @@ class DependencyLimits:
     def __post_init__(self):
         for item in fields(self):
             _positive(getattr(self, item.name), item.name, integer=True)
+
+
+@dataclass(frozen=True)
+class RegressionDependencyOptions:
+    """The opt-in regression_dependency_v1 search (Stage 6B): its bounds are the shared DependencyLimits."""
+    limits: DependencyLimits = field(default_factory=DependencyLimits)
+
+    def __post_init__(self):
+        if not isinstance(self.limits, DependencyLimits):
+            raise ValueError("dependency_search limits must be DependencyLimits.")
 
 
 @dataclass(frozen=True)
@@ -627,6 +652,8 @@ def omit_default_delimiter(value):
         record = {k: omit_default_delimiter(v) for k, v in value.items()}
         if _PARSE_OPTION_KEYS <= record.keys() and record.get("delimiter") == ",":
             record.pop("delimiter")
+        if {"expectations", "feature_availability", "relation_limits"} <= record.keys() and record.get("dependency_search", 0) is None:
+            record.pop("dependency_search")  # the opt-in regression dependency search, when off
         if {"parsing", "fidelity_inspection"} <= record.keys() and "context" in record and record["context"] is None:
             record.pop("context")
         return record

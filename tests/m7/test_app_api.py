@@ -87,3 +87,18 @@ def test_completed_image_audit_is_saved_without_images(tmp_path):
         if f.is_file():
             assert b'data:image' not in f.read_bytes(), f
     c.close()
+
+
+def test_overlay_export_without_a_compatible_frame_is_refused_clearly(tmp_path):
+    c = Client(tmp_path)
+    c.post('/images/start', {'preset': 'manifest'})
+    c.post('/images/sources', {'root_id': 'root_0', 'relative_path': 'data.jsonl', 'asset_relative': '.', 'format': 'jsonl', 'role': 'train', 'source_id': 's'})
+    c.post('/images/inspect'); c.wait('configure')
+    c.post('/images/configure', {'s0_task': 'unlabeled', 's0_path': 'path', 's0_logical_id': 'id'})
+    sealed = c.wait('confirm')
+    c.post('/images/run', {'fingerprint': sealed['fingerprint']}); c.wait('completed')
+    ref = c.client.get(f'{API}/images/pairs').json['data']['references'][0]
+    refused = c.post('/images/export-examples', {'references': ref, 'overlays': 'yes'})
+    assert refused.status_code == 409 and refused.json['error']['code'] == 'changed_or_unavailable'
+    assert c.post('/images/export-examples', {'references': ref}).status_code == 200
+    c.close()

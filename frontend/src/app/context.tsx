@@ -14,12 +14,15 @@ export function contextField(c: ContextDecl): string {
   return declared ? JSON.stringify({ prediction: c.prediction, columns, ...(c.limits ? { limits: c.limits } : {}) }) : '';
 }
 
-export function ContextPanel({ job, value, onChange, availability = true }: { job: JobView; value: ContextDecl; onChange: (c: ContextDecl) => void; availability?: boolean }) {
+/** `parts` shows a subset inside a configuration layer (`bare`, no collapsible wrapper); by default everything, collapsed. */
+export function ContextPanel({ job, value, onChange, availability = true, parts, bare = false }: { job: JobView; value: ContextDecl; onChange: (c: ContextDecl) => void; availability?: boolean; parts?: ('prediction' | 'codes' | 'advanced')[]; bare?: boolean }) {
+  const show = (x: 'prediction' | 'codes' | 'advanced') => !parts || parts.includes(x);
+  const reads = show('codes') || availability;
   const [info, setInfo] = useState<ContextInfo | null>(null);
   const [failed, setFailed] = useState<string | null>(null);
   const [advanced, setAdvanced] = useState(() => JSON.stringify(Object.fromEntries(Object.entries(value.columns).filter(([, d]) => d.applies_when || d.unit).map(([k, d]) => [k, { ...(d.applies_when ? { applies_when: d.applies_when } : {}), ...(d.unit ? { unit: d.unit } : {}) }])), null, 1));
   const [advancedError, setAdvancedError] = useState<string | null>(null);
-  useEffect(() => { let live = true; api.context().then((x) => live && setInfo(x)).catch((x) => live && setFailed(String(x?.message ?? x))); return () => { live = false; }; }, [job.source_filename, job.config.parsing.delimiter]);
+  useEffect(() => { if (!reads) return; let live = true; api.context().then((x) => live && setInfo(x)).catch((x) => live && setFailed(String(x?.message ?? x))); return () => { live = false; }; }, [job.source_filename, job.config.parsing.delimiter, reads]);
   const column = (name: string, change: (d: ColumnDecl) => ColumnDecl) => onChange({ ...value, columns: { ...value.columns, [name]: change({ ...(value.columns[name] ?? {}) }) } });
   const meaningOf = (c: ContextInfo['candidates'][number]) => {
     const d = value.columns[c.column];
@@ -47,16 +50,15 @@ export function ContextPanel({ job, value, onChange, availability = true }: { jo
   const target = job.target;
   const suggested = info?.candidates.length ?? 0;
   const declared = Object.values(value.columns).filter((d) => Object.values(d).some((x) => x != null && (typeof x !== 'object' || Object.keys(x).length))).length;
-  return (
-    <details className="ap-more ap-sec" open={declared > 0 || undefined}>
-      <summary>Context (optional){suggested ? ` · ${suggested} suggested code${suggested === 1 ? '' : 's'}` : ''}{declared ? ` · ${declared} column${declared === 1 ? '' : 's'} declared` : ''}</summary>
-      <p className="ap-muted">What you know about the data and its use. Declarations never change parsed values, findings or the score: they add a separate interpreted view, and a bounded search checks whether any feature determines the target.</p>
-      <div className="ap-fields ap-fields--two">
+  const body = (
+    <>
+      {!bare && <p className="ap-muted">What you know about the data and its use. Declarations never change parsed values, findings or the score: they add a separate interpreted view, and a bounded search checks whether any feature determines the target.</p>}
+      {show('prediction') && <div className="ap-fields ap-fields--two">
         <label>Prediction objective <span>optional</span><input maxLength={500} value={value.prediction.objective ?? ''} onChange={(x) => onChange({ ...value, prediction: { ...value.prediction, objective: x.target.value || null } })} placeholder="For example: decide which clients to call" /></label>
         <label>Prediction point <span>when the prediction is made</span><input maxLength={500} value={value.prediction.point ?? ''} onChange={(x) => onChange({ ...value, prediction: { ...value.prediction, point: x.target.value || null } })} placeholder="For example: before the first contact" /></label>
-      </div>
-      <h3 className="ap-q ap-q--sub">Suggested codes</h3>
-      {failed ? <p className="ap-note ap-note--warn">Suggestions are unavailable: {failed}</p>
+      </div>}
+      {show('codes') && <h3 className="ap-q ap-q--sub">Meanings for suggested codes</h3>}
+      {!show('codes') ? null : failed ? <p className="ap-note ap-note--warn">Suggestions are unavailable: {failed}</p>
         : !info ? <p className="ap-muted">Reading the file for suggestions…</p>
         : !info.candidates.length ? <p className="ap-muted">No value matched the suggestion rules ({info.rules}). You can still declare codes under Advanced.</p>
         : (
@@ -80,9 +82,16 @@ export function ContextPanel({ job, value, onChange, availability = true }: { jo
           ))}</div>
         </>
       )}
-      <label className="ap-fields__wide">Advanced: conditions and units <span>JSON, for example {'{"pdays": {"applies_when": {"column": "previous", "op": ">", "value": 0}, "unit": "days"}}'}</span>
-        <textarea rows={3} value={advanced} onChange={(x) => applyAdvanced(x.target.value)} aria-invalid={!!advancedError} /></label>
-      {advancedError && <p className="ap-note ap-note--warn" role="alert">{advancedError}</p>}
+      {show('advanced') && <label className="ap-fields__wide">Conditions and units <span>JSON, for example {'{"pdays": {"applies_when": {"column": "previous", "op": ">", "value": 0}, "unit": "days"}}'}</span>
+        <textarea rows={3} value={advanced} onChange={(x) => applyAdvanced(x.target.value)} aria-invalid={!!advancedError} /></label>}
+      {show('advanced') && advancedError && <p className="ap-note ap-note--warn" role="alert">{advancedError}</p>}
+    </>
+  );
+  if (bare) return <div className="ap-ctx">{body}</div>;
+  return (
+    <details className="ap-more ap-sec" open={declared > 0 || undefined}>
+      <summary>Context (optional){suggested ? ` · ${suggested} suggested code${suggested === 1 ? '' : 's'}` : ''}{declared ? ` · ${declared} column${declared === 1 ? '' : 's'} declared` : ''}</summary>
+      {body}
     </details>
   );
 }

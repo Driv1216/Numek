@@ -1,16 +1,20 @@
 // The mosaic's tile and chapter mechanics for the workflow layouts (M4 to M9): one mosaic, anchored by a
 // 2×2 hero tile, whose tiles emerge one after another and each grow into their chapter, as in Modules.
-// The hero's open chapter is remembered as #hero, so a reload or a shared link returns to it.
+// The open chapter is remembered by its position (#t=<n>; the earlier #hero still opens the hero), so a reload or a
+// shared link returns to it without putting any data value in the URL. The findings ledger opens a chapter through
+// `request` and focuses the finding block whose data-ref matches.
 import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 'react';
 import { reducedMotion } from '../../foundation/motion';
-import { scopeStatements, type Tone } from './adapter';
+import { type Tone } from './adapter';
 
 export interface Tile {
   id: string; name: string; n: string; kicker: string; bg: string; light: boolean; wide?: boolean;
   tone: Tone; label: string; detail: string; viz?: ReactNode; chapter: ReactNode; bigViz?: ReactNode; hero?: boolean;
 }
 
-export function Tiles({ tiles, label }: { tiles: Tile[]; label: string }) {
+export interface TileRequest { tile: string; ref: string | null; nonce: number }
+
+export function Tiles({ tiles, label, request }: { tiles: Tile[]; label: string; request?: TileRequest | null }) {
   const grid = useRef<HTMLDivElement>(null);
   const panel = useRef<HTMLDivElement>(null);
   const closeBtn = useRef<HTMLButtonElement>(null);
@@ -30,13 +34,31 @@ export function Tiles({ tiles, label }: { tiles: Tile[]; label: string }) {
     void p.offsetWidth;
     p.style.transition = 'clip-path .7s cubic-bezier(.7, 0, .18, 1)'; p.style.clipPath = 'inset(0 round 18px)';
   }, [open]);
-  useEffect(() => { if (open) closeBtn.current?.focus(); }, [open]);
-  const hero = tiles.find((x) => x.hero);
-  useEffect(() => { if (hero && location.hash === '#hero') { setShown(hero.id); setOpen(hero.id); } }, []);
+  const focusRef = useRef<string | null>(null);
   useEffect(() => {
-    const want = hero && shown === hero.id && open ? '#hero' : '';
-    if (location.hash !== want && (want || location.hash === '#hero')) history.replaceState(history.state, '', location.pathname + location.search + want);
-  }, [open, shown, hero]);
+    if (!open) return;
+    const ref = focusRef.current;
+    focusRef.current = null;
+    const target = ref ? panel.current?.querySelector<HTMLElement>(`[data-ref="${CSS.escape(ref)}"]`) : null;
+    if (target) { target.tabIndex = -1; target.focus({ preventScroll: true }); target.scrollIntoView({ block: 'nearest', behavior: reducedMotion() ? 'auto' : 'smooth' }); target.classList.add('is-focus'); }
+    else closeBtn.current?.focus();
+  }, [open, shown]);
+  const hero = tiles.find((x) => x.hero);
+  useEffect(() => {
+    const at = /^#t=(\d+)$/.exec(location.hash), pick = at ? tiles[Number(at[1]) - 1] : location.hash === '#hero' ? hero : undefined;
+    if (pick) { setShown(pick.id); setOpen(pick.id); }
+  }, []);
+  useEffect(() => {
+    const pos = open && shown ? tiles.findIndex((x) => x.id === shown) + 1 : 0;
+    const want = pos ? `#t=${pos}` : '';
+    if (location.hash !== want && (want || /^#(t=\d+|hero)$/.test(location.hash))) history.replaceState(history.state, '', location.pathname + location.search + want);
+  }, [open, shown, tiles]);
+  useEffect(() => {
+    if (!request || !tiles.some((x) => x.id === request.tile)) return;
+    focusRef.current = request.ref;
+    setShown(request.tile); setOpen(request.tile);
+    grid.current?.scrollIntoView({ block: 'start', behavior: reducedMotion() ? 'auto' : 'smooth' });
+  }, [request?.nonce]);
   const openCh = (id: string) => { setShown(id); setOpen(id); };
   const close = () => {
     const p = panel.current, id = shown;
@@ -82,31 +104,6 @@ export function Tiles({ tiles, label }: { tiles: Tile[]; label: string }) {
           </div>
         )}
       </div>
-    </div>
-  );
-}
-
-/** Canonical checks that did not complete, stated plainly above the tiles, so no tile reads as clean for them. */
-export function CheckScope({ checks }: { checks?: unknown }) {
-  const lines = scopeStatements(checks);
-  if (!lines.length) return null;
-  const shown = lines.slice(0, 6);
-  return (
-    <ul className="nk-ch__cov ap-rs__scope" aria-label="Checks that did not complete">
-      {shown.map((x) => <li key={x}>{x}</li>)}
-      {lines.length > shown.length && <li>{lines.length - shown.length} more in the canonical report’s methodology and coverage section.</li>}
-    </ul>
-  );
-}
-
-/** The analysis's recorded scope conclusion and open questions (finding_guidance_v1); nothing for older results. */
-export function ScopeNote({ guidance }: { guidance?: unknown }) {
-  const scope = (guidance as { scope?: { conclusion?: string; unknowns?: string[] } } | undefined)?.scope;
-  if (!scope?.conclusion) return null;
-  return (
-    <div className="ap-rs__scopenote">
-      <p className="ap-muted">{scope.conclusion}</p>
-      {!!scope.unknowns?.length && <details className="ap-more"><summary>Not assessed by this analysis</summary><ul className="nk-ch__cov">{scope.unknowns.map((u) => <li key={u}>{u}</li>)}</ul></details>}
     </div>
   );
 }

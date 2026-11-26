@@ -37,8 +37,9 @@ def load_csv_dataset(
     return read_csv(dataset_path, usecols=usecols, nrows=nrows, options=options)
 
 
-def inspect_csv_dataset(dataset_path: Path, preview_rows: int = 10, options=None) -> dict:
-    """Return upload-stage facts without requiring a target selection."""
+def inspect_csv_dataset(dataset_path: Path, preview_rows: int = 10, options=None, frame_sink=None) -> dict:
+    """Return upload-stage facts without requiring a target selection. `frame_sink` (a dict), when given, receives the
+    parsed frame under 'frame', so the advisory input inspection can profile it without reading the file again."""
     from datatrust.ingestion import validate_csv_structure
     validate_csv_structure(dataset_path, options)  # A malformed file is refused at upload, not after configuring.
     data = load_csv_dataset(dataset_path, options=options)
@@ -47,6 +48,8 @@ def inspect_csv_dataset(dataset_path: Path, preview_rows: int = 10, options=None
     if len(data.columns) == 0:
         raise ValueError("Dataset must contain at least one named column.")
 
+    if frame_sink is not None:
+        frame_sink["frame"] = data
     preview = []
     for record in data.head(preview_rows).to_dict(orient="records"):
         preview.append({str(name): _display_scalar(value) for name, value in record.items()})

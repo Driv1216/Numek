@@ -19,6 +19,10 @@ from datatrust.ingestion import source_signature, verify_source
 
 PARSING_POLICY = 'scalable_csv_v1'
 METHOD = 'm4_local_2026_10_10'
+# Comparisons (Stage 6A, J1): direction-preserving missingness and non-finite change. A decrease is recorded as a material
+# change, never a finding; increases keep their existing finding. Advanced single-source analysis keeps METHOD.
+COMPARISON_METHOD = 'm4_local_2026_11_25'
+COMPARISON_METHODS = (METHOD, COMPARISON_METHOD)
 
 
 def fail(message, code='resource_limit', stage='scalable execution'):

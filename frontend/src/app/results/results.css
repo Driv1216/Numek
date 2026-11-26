@@ -1,0 +1,217 @@
+/* The shared results shell (workflow-specific dashboard redesign). Deep water tokens only; coral marks evidence a
+   finding cites, never decoration. The ledger adapts to the space; the Modules mosaic keeps its columns. */
+
+.ap-dash__head { align-items: end; }
+.ap-dash__head .nk-label { display: inline-flex; margin-bottom: 10px; }
+.ap-dash__chips { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; margin: 0 0 18px; }
+.ap-state { display: inline-flex; align-items: center; gap: 8px; font: 500 12px/1.2 var(--mono); padding: 6px 10px; border-radius: 99px; border: 1px solid var(--line); background: var(--card); }
+.ap-state::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background: var(--dt); }
+.ap-state.is-findings::before { background: var(--ink); }
+.ap-state.is-clean::before { background: transparent; border: 1.5px solid var(--dt); }
+.ap-state.is-partial { border-color: color-mix(in srgb, var(--coral) 45%, transparent); }
+.ap-state.is-partial::before { background: linear-gradient(90deg, var(--coral) 50%, transparent 50%); border: 1.5px solid var(--coral); }
+.ap-state.is-bounded::before { background: transparent; border: 1.5px dashed var(--ink); }
+
+.ap-outcome { display: grid; gap: 10px; margin: 0 0 22px; padding: 18px 22px; border-radius: 16px; background: var(--card); border: 1px solid var(--line); }
+.ap-outcome__lead { margin: 0; font-size: 17px; line-height: 1.45; max-width: 78ch; }
+.ap-outcome__n { display: flex; flex-wrap: wrap; gap: 8px 18px; align-items: center; }
+.ap-outcome__c { display: inline-flex; align-items: center; gap: 6px; font: 400 13px var(--mono); color: var(--mute); }
+.ap-outcome__c b { font: 650 18px var(--sans); color: var(--ink); }
+.ap-outcome__c.is-warn { color: #8A2A18; }
+.ap-outcome__hist { margin: 0; font: 400 12px/1.45 var(--mono); color: var(--mute); }
+
+/* Rank marks: shape and ink, with the word. */
+.ap-rank { display: inline-flex; align-items: center; gap: 6px; font: 500 10.5px/1.2 var(--mono); text-transform: uppercase; letter-spacing: .04em; white-space: nowrap; }
+.ap-rank i { width: 10px; height: 10px; flex: none; border: 1.5px solid var(--ink); }
+.ap-rank.is-p-high i { background: var(--coral); border-color: var(--coral); }
+.ap-rank.is-p-moderate i { border-color: var(--coral); border-radius: 50%; }
+.ap-rank.is-p-low i { border-radius: 50%; }
+.ap-rank.is-m-violation i { background: var(--ink); transform: rotate(45deg) scale(.85); }
+.ap-rank.is-m-other i { transform: rotate(45deg) scale(.85); }
+.nk-ch .ap-rank i { border-color: currentColor; }
+.nk-ch .ap-rank.is-p-high i, .nk-ch .ap-rank.is-p-moderate i { border-color: var(--coral); }
+.nk-ch__f b .ap-rank { margin-left: 8px; vertical-align: 2px; }
+.nk-ch__f.is-focus { outline: 2px solid currentColor; outline-offset: 6px; border-radius: 4px; }
+
+/* Body: the ledger is a compact band above the mosaic, or a side column when the body is wide enough to keep the
+   mosaic's four columns (about 1,520 px of content). */
+.ap-dash__body { container-type: inline-size; margin-bottom: 26px; }
+.ap-dash__grid { display: grid; gap: 18px; grid-template-columns: minmax(0, 1fr); }
+@container (min-width: 1520px) {
+  .ap-dash__grid:not(.is-solo) { grid-template-columns: minmax(0, 1fr) clamp(320px, 22%, 380px); align-items: start; }
+  .ap-dash__grid:not(.is-solo) > .ap-ledger { grid-column: 2; grid-row: 1; position: sticky; top: 88px; max-height: calc(100svh - 112px); overflow: auto; }
+  .ap-dash__grid:not(.is-solo) > .ap-dash__mosaic { grid-column: 1; grid-row: 1; }
+  .ap-dash__grid:not(.is-solo) .ap-ledger__list .ap-ledger__it { grid-template-columns: minmax(0, 1fr); }
+}
+
+.ap-ledger { padding: 16px 18px; border-radius: 16px; background: var(--card); border: 1px solid var(--line); }
+.ap-ledger__h { display: flex; justify-content: space-between; gap: 12px; align-items: baseline; flex-wrap: wrap; }
+.ap-ledger__h .ap-sub { margin: 0 0 10px; }
+.ap-ledger__order { font: 400 11.5px var(--mono); color: var(--mute); }
+.ap-ledger__list { list-style: none; margin: 0; padding: 0; display: grid; }
+.ap-ledger__it { display: grid; grid-template-columns: 200px minmax(0, 1fr) auto; gap: 4px 14px; align-items: start; padding: 10px 0; border-top: 1px solid var(--line); }
+.ap-ledger__t { display: grid; gap: 2px; min-width: 0; }
+.ap-ledger__t b { font-size: 15px; font-weight: 650; line-height: 1.3; }
+.ap-ledger__t p { margin: 4px 0 0; font-size: 13.5px; color: var(--ink); max-width: 80ch; }
+.ap-ledger__t .ap-ledger__next { color: var(--mute); }
+.ap-ledger__scope { font: 400 12px var(--mono); color: var(--mute); overflow-wrap: anywhere; }
+.ap-ledger__ctx { font: normal 500 10px var(--mono); text-transform: uppercase; margin-left: 8px; padding: 2px 6px; border-radius: 5px; background: var(--dt-l); }
+.ap-ledger__acts { display: flex; gap: 14px; align-items: center; white-space: nowrap; }
+.ap-ledger__more { margin-top: 10px; }
+.ap-ledger__clean b { display: block; font-size: 16px; font-weight: 650; }
+.ap-ledger__clean p { margin: 4px 0 0; font-size: 14px; color: var(--mute); max-width: 80ch; }
+.ap-ledger__clean a { color: var(--dt-d); }
+
+.ap-cov { margin: 0 0 24px; padding: 18px 22px; border-radius: 16px; border: 1px solid var(--line); }
+.ap-cov .ap-sub { margin-bottom: 8px; }
+.ap-cov__g { margin-top: 10px; }
+.ap-cov__g summary { cursor: pointer; font-weight: 600; font-size: 14px; color: var(--dt-d); }
+.ap-cov__g summary span { font: 500 11px var(--mono); margin-left: 6px; padding: 2px 7px; border-radius: 99px; background: rgba(15, 27, 34, .06); color: var(--ink); }
+.ap-cov__g .nk-ch__cov { margin: 8px 0 4px; }
+.ap-cov__g .nk-ch__cov span { color: var(--mute); }
+.ap-cov__g .ap-muted { margin: 6px 0 0; }
+
+/* Evidence tables: native semantics, sortable headers, a caption that states the count. */
+.ap-evt table caption { caption-side: top; text-align: left; font: 400 11.5px var(--mono); color: inherit; opacity: .75; padding: 0 0 6px; }
+.ap-evt th button { border: 0; background: none; padding: 0; font: inherit; color: inherit; cursor: pointer; text-align: left; }
+.ap-evt th button span { opacity: .55; }
+.ap-evt > .ap-link { margin-top: 8px; color: inherit; }
+
+/* Chart primitives. */
+.ap-chart { margin: 0; display: grid; gap: 6px; }
+.ap-chart figcaption { font: 400 11.5px/1.4 var(--mono); opacity: .8; }
+.ap-chart__na { margin: 0; font: 400 12px var(--mono); opacity: .75; }
+.ap-bars ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 5px; }
+.ap-bars li { display: grid; grid-template-columns: minmax(80px, 30%) minmax(0, 1fr) auto; gap: 10px; align-items: center; font-size: 12.5px; }
+.ap-bars__l { overflow-wrap: anywhere; }
+.ap-bars__t { height: 8px; border-radius: 2px; background: color-mix(in srgb, currentColor 10%, transparent); overflow: hidden; }
+.ap-bars__t i { display: block; height: 100%; background: currentColor; opacity: .85; }
+.ap-bars li.is-hot .ap-bars__t i { background: var(--coral); opacity: 1; }
+.ap-bars__v { font: 400 12px var(--mono); white-space: nowrap; }
+.ap-prop__t, .ap-stack__t { display: flex; height: 10px; border-radius: 2px; background: color-mix(in srgb, currentColor 10%, transparent); overflow: hidden; }
+.ap-prop__t i { display: block; background: currentColor; opacity: .85; } .ap-prop__t i.is-hot { background: var(--coral); opacity: 1; }
+.ap-stack__t i { display: block; } .ap-stack__t i.is-0 { background: currentColor; opacity: .9; } .ap-stack__t i.is-1 { background: currentColor; opacity: .45; }
+.ap-stack__t i.is-2 { background: currentColor; opacity: .2; } .ap-stack__t i.is-hot { background: var(--coral); opacity: 1; }
+
+@media (max-width: 1000px) {
+  .ap-ledger__it { grid-template-columns: minmax(0, 1fr); }
+  .ap-ledger__acts { justify-content: flex-start; }
+}
+@media (max-width: 720px) {
+  .ap-outcome { padding: 14px 16px; }
+  .ap-ledger, .ap-cov { padding: 14px 16px; }
+  .ap-outcome__lead { font-size: 15.5px; }
+}
+
+/* Sub-scores: 0–100 tracks, the critical line at 50, the governing cap as a coral mark on the evidence score. */
+.ap-subs ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.ap-subs li { display: grid; grid-template-columns: minmax(90px, 34%) minmax(0, 1fr) 44px; gap: 10px; align-items: center; font-size: 13px; }
+.ap-subs__t { position: relative; height: 9px; border-radius: 2px; background: color-mix(in srgb, currentColor 14%, transparent); }
+.ap-subs__t i { position: absolute; inset: 0 auto 0 0; background: currentColor; opacity: .85; border-radius: 2px; }
+.ap-subs li.is-hot .ap-subs__t i { background: var(--coral); opacity: 1; }
+.ap-subs__t em { position: absolute; top: -3px; bottom: -3px; width: 1px; background: currentColor; opacity: .55; }
+.ap-subs__t b { position: absolute; top: -5px; bottom: -5px; width: 3px; margin-left: -1px; background: var(--coral); }
+.ap-subs__v { font: 500 12.5px var(--mono); text-align: right; }
+
+/* Charts on tile faces are thumbnails: the chapter carries the caption, denominator and full list. */
+.nk-tile__viz .ap-chart { width: 100%; align-self: end; }
+.nk-tile__viz .ap-chart figcaption, .nk-tile__viz .ap-chart__na { display: none; }
+.nk-tile__viz .ap-bars li, .nk-tile__viz .ap-subs li { font-size: 11px; gap: 6px; }
+.nk-tile__viz .ap-bars li:nth-child(n + 4), .nk-tile__viz .ap-subs li:nth-child(n + 6) { display: none; }
+.nk-tile--hero .nk-tile__viz .ap-bars li:nth-child(n + 4) { display: grid; }
+.nk-tile--hero .nk-tile__viz .ap-bars li:nth-child(n + 7) { display: none; }
+/* A face with a chart keeps its detail to one line, so the chart never runs over the text. */
+.nk-tile:has(.nk-tile__viz .ap-chart) .nk-tile__fig span { -webkit-line-clamp: 1; }
+.nk-tile:not(.nk-tile--hero) .nk-tile__viz { overflow: hidden; }
+.nk-tile__viz .ap-bars__v { font-size: 10.5px; }
+.nk-ch__viz .ap-chart { width: 100%; }
+/* Keep the face chart clear of the tile's "Open ↗" mark. */
+.nk-tile:has(.nk-tile__viz .ap-chart) .nk-tile__viz { padding-bottom: 18px; }
+
+/* Recorded distributions. */
+.ap-hist__bars { display: flex; align-items: flex-end; gap: 1px; height: 120px; border-bottom: 1px solid color-mix(in srgb, currentColor 40%, transparent); }
+.ap-hist__bars i { flex: 1; background: currentColor; opacity: .8; min-width: 1px; }
+.ap-hist__axis { display: flex; justify-content: space-between; font: 400 11px var(--mono); opacity: .8; }
+.ap-qs__t { position: relative; height: 26px; }
+.ap-qs__range { position: absolute; top: 12px; height: 2px; background: currentColor; opacity: .45; }
+.ap-qs__box { position: absolute; top: 6px; height: 14px; border: 1.5px solid currentColor; border-radius: 2px; }
+.ap-qs__m { position: absolute; top: 4px; width: 1.5px; height: 18px; background: currentColor; opacity: .7; }
+.ap-qs__m.is-med { width: 3px; opacity: 1; }
+.ap-qs__f { position: absolute; top: 0; height: 26px; border-left: 1.5px dashed currentColor; opacity: .8; }
+.nk-tile__viz .ap-hist__bars { height: 52px; }
+.nk-tile__viz .ap-hist__axis { display: none; }
+
+/* Temporal chapters: one block per evidence record, and a wrapping list of feature names (no truncation, long names break). */
+.nk-ch__rec { display: grid; gap: 10px; padding: 14px 0; border-top: 1px solid color-mix(in srgb, currentColor 22%, transparent); min-width: 0; }
+.nk-ch__rec h4 { margin: 0; font: 600 11px/1.4 var(--mono); text-transform: uppercase; letter-spacing: .04em; opacity: .85; overflow-wrap: anywhere; }
+.nk-ch__rec dd, .nk-ch dd { overflow-wrap: anywhere; }
+.ap-names { display: flex; flex-wrap: wrap; gap: 6px; margin: 0; padding: 0; list-style: none; }
+.ap-names li { font: 500 12px/1.4 var(--mono); padding: 3px 8px; border-radius: 5px; background: color-mix(in srgb, currentColor 10%, transparent); overflow-wrap: anywhere; max-width: 100%; }
+
+/* Temporal timeline, chapter form: one HTML row per retained series on a shared axis. */
+.ap-tl ul { list-style: none; margin: 0 0 8px; padding: 0; display: grid; gap: 6px; }
+.ap-tl li { display: grid; grid-template-columns: minmax(80px, 34%) minmax(0, 1fr); gap: 10px; align-items: center; font-size: 12.5px; }
+.ap-tl li.ap-tl__src { display: block; font: 600 11px var(--mono); text-transform: uppercase; letter-spacing: .04em; opacity: .85; }
+.ap-tl__l { overflow-wrap: anywhere; }
+.ap-tl__t { position: relative; height: 8px; border-radius: 2px; background: color-mix(in srgb, currentColor 10%, transparent); }
+.ap-tl__t i { position: absolute; top: 0; bottom: 0; border-radius: 2px; background: currentColor; opacity: .85; }
+.ap-tl li.is-hot .ap-tl__t i { background: var(--coral); opacity: 1; }
+.ap-tl__axis { display: flex; justify-content: space-between; margin-left: calc(34% + 10px); font: 400 11.5px var(--mono); opacity: .85; gap: 8px; }
+@media (max-width: 640px) { .ap-tl li { grid-template-columns: 1fr; gap: 3px; } .ap-tl__axis { margin-left: 0; } }
+
+/* Result tiles: a long tile name wraps instead of running into its kicker. */
+.nk-tile--btn .nk-tile__top { gap: 10px; }
+
+/* Review actions and decisions (text and image heroes): the report's own groups, in its order. */
+.ap-actions { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; counter-reset: act; min-width: 0; }
+.ap-actions > li { display: grid; grid-template-columns: 22px minmax(0, 1fr); column-gap: 8px; row-gap: 2px; counter-increment: act; font-size: 12.5px; line-height: 1.35; }
+.ap-actions > li::before { content: counter(act); grid-row: span 3; font: 600 11px/1.6 var(--mono); text-align: center; border: 1px solid color-mix(in srgb, currentColor 45%, transparent); border-radius: 4px; height: 18px; }
+.ap-actions > li.is-hot::before { background: var(--coral); border-color: var(--coral); color: #fff; }
+.ap-actions b { font-weight: 650; overflow-wrap: anywhere; }
+.ap-actions span { opacity: .82; overflow-wrap: anywhere; }
+.ap-actions p, .ap-actions ul { grid-column: 2; margin: 4px 0 0; }
+.ap-actions ul { padding-left: 16px; }
+.nk-tile__viz .ap-actions { gap: 5px; } .nk-tile__viz .ap-actions > li { font-size: 11.5px; }
+.nk-tile__viz .ap-actions > li:nth-child(n+5) { display: none; }
+.ap-scope { margin: 0; padding-left: 18px; display: grid; gap: 4px; font-size: 13.5px; }
+
+/* Records and documents: one row per declared rule (name, outcome bar, outcomes in the report's words). */
+.ap-rules { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; min-width: 0; }
+.ap-rules li { display: grid; gap: 4px; font-size: 12.5px; }
+.ap-rules b { font-weight: 650; overflow-wrap: anywhere; }
+.ap-rules li > span:last-child { opacity: .82; overflow-wrap: anywhere; }
+.ap-rules__t { display: flex; height: 10px; border-radius: 2px; overflow: hidden; background: color-mix(in srgb, currentColor 10%, transparent); }
+.ap-rules__t i { display: block; height: 100%; background: currentColor; opacity: .85; }
+.ap-rules__t i.is-unassessed, .ap-rules__t i.is-incomplete, .ap-rules__t i.is-inconclusive { opacity: .3; }
+.ap-rules__t i.is-hot { background: var(--coral); opacity: 1; }
+.nk-tile__viz .ap-rules li { font-size: 11.5px; }
+/* A long kicker gives way to the tile name. */
+.nk-tile--btn .nk-tile__n { flex-shrink: 1; min-width: 0; max-width: 45%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* History outcomes: findings without a High priority read in ink; the sheet states the outcome where no score exists. */
+.ap-recent__m .is-find, .ap-hist__it .is-find { color: var(--ink); }
+.ap-sheet__outcome { margin: 0; font: 500 15px/1.4 var(--mono); }
+.ap-sheet__outcome.is-elev { color: var(--coral); } .ap-sheet__outcome.is-low { color: var(--cg-d); }
+.ap-sheet__fs .ap-rank { align-self: start; }
+.ap-sheet__fs li { grid-template-columns: minmax(90px, 170px) minmax(0, 1fr); } .ap-sheet__fs .ap-rank { grid-row: span 2; }
+
+/* History filters and retention: fields fill their grid cell and never push past the page at phone width. */
+.ap-hist__find select, .ap-hist__find input, .ap-hist__set input { width: 100%; min-width: 0; box-sizing: border-box; }
+.ap-hist__set .ap-acts { flex-wrap: wrap; }
+@media (max-width: 720px) { .ap-hist__set .ap-fields--two { grid-template-columns: minmax(0, 1fr); } .ap-hist__set .ap-acts__hint { overflow-wrap: anywhere; } }
+
+/* interpretation_v1: recorded guidance inside finding blocks, the ledger's "why it may matter" line, and the
+   "what would make this more conclusive" list. Reading order first; options collapsed. */
+.ap-guide { display: grid; gap: 10px; margin-top: 6px; padding: 12px 14px; border-radius: 8px; background: color-mix(in srgb, currentColor 6%, transparent); }
+.ap-guide__g h5 { margin: 0 0 4px; font: 600 11px/1.4 var(--mono); text-transform: uppercase; letter-spacing: .04em; opacity: .8; }
+.ap-guide__g ul { margin: 0; padding-left: 18px; display: grid; gap: 3px; font-size: 13.5px; line-height: 1.45; }
+.ap-guide__opts summary { cursor: pointer; font: 600 11px/1.4 var(--mono); text-transform: uppercase; letter-spacing: .04em; opacity: .8; }
+.ap-guide__opts ul { list-style: none; margin: 8px 0 0; padding: 0; display: grid; gap: 10px; }
+.ap-guide__opts li { display: grid; gap: 2px; font-size: 13px; line-height: 1.45; }
+.ap-guide__opts em { font: normal 600 10.5px var(--mono); text-transform: uppercase; letter-spacing: .03em; margin-right: 6px; opacity: .75; }
+.ap-ledger__why { font-size: 13px; color: var(--ink); } .ap-ledger__why em { font: normal 600 10.5px var(--mono); text-transform: uppercase; margin-right: 6px; color: var(--mute); }
+.ap-ledger__more-h { margin: 12px 0 4px; font: 600 11px/1.4 var(--mono); text-transform: uppercase; letter-spacing: .04em; color: var(--mute); }
+.ap-more-c ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.ap-more-c li { display: grid; gap: 2px; font-size: 13.5px; line-height: 1.45; } .ap-more-c li span { color: var(--mute); }
+.ap-more-c.is-compact li { font-size: 13px; }
+.ap-more-c .ap-muted { margin: 8px 0 0; font-size: 13px; }

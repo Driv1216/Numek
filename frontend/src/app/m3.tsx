@@ -5,9 +5,9 @@ import { ContextPanel, contextField, emptyContext } from './context';
 import { reducedMotion } from '../foundation/motion';
 import { api, type Fields, type JobView, type M3Mode, type SaveResult } from './api';
 import { MiB, fmt } from './parts';
-import { appliesTo, m3Label } from './results/adapter';
-import { mods } from './results/modules';
+import { m3Label } from './results/adapter';
 import { navigate, onLink, stepHref } from './router';
+import { Layer, ReviewPanel, suggestedRole } from './configure';
 
 type Flash = (e: unknown) => void;
 const ROLES = ['feature', 'target', 'metadata', 'group', 'ignored'];
@@ -29,6 +29,7 @@ export function M3Configure({ job, submit, busy, separator }: { job: JobView; su
   const [statusColumn, setStatusColumn] = useState(m3.annotation?.status_column ?? '');
   const [json, setJson] = useState({ ...m3.json });
   const [scale, setScale] = useState(m3.scale_sensitive == null ? 'unknown' : String(m3.scale_sensitive));
+  const [dependency, setDependency] = useState(!!job.config.regression?.dependency_search);
   const [encoding, setEncoding] = useState(p.encoding);
   const [policy, setPolicy] = useState(p.missing_policy);
   const [na, setNa] = useState(JSON.stringify(p.na_values));
@@ -42,7 +43,7 @@ export function M3Configure({ job, submit, busy, separator }: { job: JobView; su
     const f: Fields = { dataset_name: name, purpose, encoding, missing_policy: policy, na_values: na, column_types: types, context: contextField(ctx) };
     for (const c of cols) { f[`role_${c}`] = roles[c]; f[`semantic_${c}`] = meaning[c]; }
     if (!unlabeled(mode)) Object.assign(f, { annotation_expectation: expectation, status_column: statusColumn, status_values: json.status_values, per_target_annotations: json.per_target_annotations });
-    if (mode === 'annotation_regression') Object.assign(f, { expectations_by_target: json.expectations_by_target, feature_availability: json.feature_availability });
+    if (mode === 'annotation_regression') Object.assign(f, { expectations_by_target: json.expectations_by_target, feature_availability: json.feature_availability, dependency_search: dependency ? 'on' : '' });
     if (mode === 'multilabel_classification') f.multilabel_options = json.multilabel_options;
     if (mode === 'clustering' || mode === 'anomaly_detection') f.scale_sensitive = scale;
     return f;
@@ -55,27 +56,32 @@ export function M3Configure({ job, submit, busy, separator }: { job: JobView; su
       {separator}
       <dl className="ap-cards">{[['File', job.source_filename], ['Size', `${MiB(job.file_size)} MiB`], ['Columns', fmt(job.inspection.column_count)], ['Roles', counts.map(([r, k]) => `${k} ${r}`).join(' · ')]].map(([k, v]) => <div key={k}><dt>{k}</dt><dd className={k === 'Roles' ? 'ap-cards__small' : ''}>{v}</dd></div>)}</dl>
 
-      <section className="ap-sec" aria-labelledby="ap-roles-h">
-        <h2 id="ap-roles-h" className="ap-q">Each column’s role and meaning</h2>
+      <Layer kind="essential" title="Each column’s role and meaning" why={unlabeled(mode) ? 'Roles decide which columns describe each row (features) and which are context (metadata) or left out.' : 'Roles decide which columns are outcomes (targets), inputs (features) or context (metadata, groups). The method that runs follows from them.'} ifMissing="Every column is analysed as a feature.">
         <div className="ap-table ap-roles" tabIndex={0} aria-label="Column roles, scrollable">
           <table>
-            <thead><tr><th>Column</th><th>First rows</th><th>Role</th><th>Feature meaning</th></tr></thead>
+            <thead><tr><th>Column</th><th>First rows</th><th>Role</th><th>Suggested</th><th>Feature meaning</th></tr></thead>
             <tbody>{cols.map((c) => (
               <tr key={c} className={roles[c] === 'target' ? 'is-t' : roles[c] === 'ignored' ? 'is-off' : ''}>
                 <td><b>{c}</b></td>
                 <td className="ap-roles__eg">{job.inspection.preview.slice(0, 3).map((r) => r[c]).join(' · ')}</td>
                 <td><select aria-label={`Role for ${c}`} value={roles[c]} onChange={(e) => setRoles((x) => ({ ...x, [c]: e.target.value }))}>{ROLES.filter((r) => r !== 'target' || !unlabeled(mode)).map((r) => <option key={r}>{r}</option>)}</select></td>
+                <td>{(() => {
+                  const s = suggestedRole(job, c);
+                  if (!s || (s.role === 'target' && unlabeled(mode))) return null;
+                  return roles[c] === s.role
+                    ? <span className="ap-chip is-done" title={`${s.rule}: ${s.why}`}>{s.role} ✓</span>
+                    : <button type="button" className="ap-chip" title={`${s.rule}: ${s.why}`} aria-label={`Use the suggested role ${s.role} for ${c} (${s.why})`} onClick={() => setRoles((x) => ({ ...x, [c]: s.role }))}>{s.role}? <code>{s.rule}</code></button>;
+                })()}</td>
                 <td><select aria-label={`Meaning for ${c}`} value={meaning[c]} onChange={(e) => setMeaning((x) => ({ ...x, [c]: e.target.value }))}>{MEANINGS.map((m) => <option key={m}>{m}</option>)}</select></td>
               </tr>
             ))}</tbody>
           </table>
         </div>
-        <p className="ap-muted ap-co__text">Group keys and annotation status columns are metadata. Ignored columns remain visible in source structure but are excluded from input diagnostics. Integer codes and identifiers are not assumed quantitative.</p>
-      </section>
+        <p className="ap-muted ap-co__text">Suggestions come from the file inspection and are applied only when you click one; every column starts as a feature. Group keys and annotation status columns are metadata. Ignored columns remain visible in source structure but are excluded from input diagnostics. Integer codes and identifiers are not assumed quantitative.</p>
+      </Layer>
 
       {!unlabeled(mode) && (
-        <section className="ap-sec" aria-labelledby="ap-ann-h">
-          <h2 id="ap-ann-h" className="ap-q">Annotation expectations and status</h2>
+        <Layer kind="recommended" title="Should every row have a label?" why="An expectation tells DataTrust whether a missing label is a gap or allowed. A status column says which rows are labelled, pending or skipped." ifMissing="Missing labels are described, not called gaps.">
           <div className="ap-fields ap-fields--two">
             <label>Default annotation expectation<select value={expectation} onChange={(e) => setExpectation(e.target.value)}>{['unknown', 'expected', 'optional'].map((v) => <option key={v}>{v}</option>)}</select></label>
             <label>Shared annotation status column<select value={statusColumn} onChange={(e) => setStatusColumn(e.target.value)}><option value="">None declared</option>{cols.map((c) => <option key={c}>{c}</option>)}</select></label>
@@ -90,8 +96,15 @@ export function M3Configure({ job, submit, busy, separator }: { job: JobView; su
             </div>
             <p className="ap-muted">Example: {'{"pending": {"expectation": "expected", "annotation_status": "unknown"}}'}</p>
           </details>
-        </section>
+        </Layer>
       )}
+      {(mode === 'clustering' || mode === 'anomaly_detection') && (
+        <Layer kind="recommended" title="Is the intended method sensitive to feature scales?" why="Distance-based methods usually are: a column measured in thousands outweighs one measured in fractions unless the data is rescaled." ifMissing="Scale differences are reported conditionally, not as a prerequisite problem.">
+          <div className="ap-fields"><label>Scale sensitivity<select value={scale} onChange={(e) => setScale(e.target.value)}><option value="unknown">Undeclared</option><option value="true">Yes</option><option value="false">No</option></select></label></div>
+          <p className="ap-note">Low-cardinality integer and yes/no codes remain ambiguous unless you declare their meaning. These diagnostics do not assess clustering quality or anomaly correctness; no model is fitted and no readiness verdict is given.</p>
+        </Layer>
+      )}
+      <Layer kind="advanced" title="Expectations as JSON, CSV interpretation, name, purpose and context">
       {mode === 'annotation_regression' && (
         <details className="ap-more ap-sec">
           <summary>Numerical expectations and prediction-time availability</summary>
@@ -101,6 +114,7 @@ export function M3Configure({ job, submit, busy, separator }: { job: JobView; su
             <label>Input availability <span>JSON object</span><textarea rows={3} value={json.feature_availability} onChange={(e) => setJ('feature_availability', e.target.value)} /></label>
           </div>
           <p className="ap-muted">Example: {'{"heating": {"kind": "continuous", "minimum": 0, "units": "kW"}}'}</p>
+          <label className="ap-check"><input type="checkbox" checked={dependency} onChange={(e) => setDependency(e.target.checked)} /> Also search for features that determine each output (regression_dependency_v1: lookups, binned copies, monotone mappings; evidence only)</label>
         </details>
       )}
       {mode === 'multilabel_classification' && (
@@ -109,12 +123,6 @@ export function M3Configure({ job, submit, busy, separator }: { job: JobView; su
           <div className="ap-fields"><label>MultilabelOptions <span>JSON object</span><textarea rows={3} value={json.multilabel_options} onChange={(e) => setJ('multilabel_options', e.target.value)} /></label></div>
           <p className="ap-muted">minimum_positive, maximum_positive, mutually_exclusive groups, and directed requires pairs. Unknown assignments can leave constraints inconclusive.</p>
         </details>
-      )}
-      {(mode === 'clustering' || mode === 'anomaly_detection') && (
-        <section className="ap-sec">
-          <div className="ap-fields"><label>Is the intended method sensitive to feature scales?<select value={scale} onChange={(e) => setScale(e.target.value)}><option value="unknown">Undeclared</option><option value="true">Yes</option><option value="false">No</option></select></label></div>
-          <p className="ap-note">Undeclared numeric geometry remains conditional on representation. Low-cardinality integer/binary codes remain ambiguous unless you declare their meaning. These diagnostics do not assess clustering quality or anomaly correctness.</p>
-        </section>
       )}
       <details className="ap-more ap-sec">
         <summary>CSV interpretation</summary>
@@ -130,6 +138,7 @@ export function M3Configure({ job, submit, busy, separator }: { job: JobView; su
         <label>Purpose <span>optional · 1,000 characters</span><textarea maxLength={1000} rows={3} value={purpose} onChange={(e) => setPurpose(e.target.value)} /></label>
       </div>
       <ContextPanel job={{ ...job, target: cols.find((c) => roles[c] === 'target') ?? null }} value={ctx} onChange={setCtx} availability={mode !== 'annotation_regression'} />
+      </Layer>
       <div className="ap-acts">
         <button type="button" className={`nk-btn ${busy ? 'is-run' : ''}`} disabled={busy} onClick={() => submit(fields())}>{busy ? 'Checking declarations…' : 'Review declarations and coverage →'}</button>
         <a className="nk-btn nk-btn--ghost" href="/app/" onClick={onLink}>Back</a>
@@ -147,7 +156,8 @@ export function M3Confirm({ job, onJob, flash, saving, onSaved }: { job: JobView
   const [ack, setAck] = useState(false);
   const [keep, setKeep] = useState(true);
   const [run, setRun] = useState(false);
-  const planned = appliesTo(mode).filter((id) => !['score', 'local', 'reports'].includes(id)).map((id) => mods.find((m) => m.id === id)!.name);
+  const planned = ['annotation_classification', 'annotation_regression', 'multilabel_classification'].includes(mode)
+    ? ['Missing values', 'Repeated rows', 'Annotation coverage and disagreement', 'Unusual values'] : ['Missing values', 'Repeated rows', 'Unusual values'];
   const go = () => {
     if (run || !ack) return;
     setRun(true);
@@ -161,6 +171,7 @@ export function M3Confirm({ job, onJob, flash, saving, onSaved }: { job: JobView
       <header className="ap-head"><span className="nk-label">Step 3 · Confirm</span><h1>Confirm the analysis.</h1></header>
       <div className="ap-co__task"><b>{m3Label[mode]}</b><span>{job.dataset_name || job.source_filename} · {fmt(t.rows)} parsed rows. Policy: {t.methodology}. Scoring: {t.methodology === 'classification_legacy_2026_08_13' ? 'legacy compatibility policy' : 'not defined'}.</span></div>
       <dl className="ap-cards">{[['Targets', t.roles.targets.join(', ') || 'None'], ['Input features', fmt(n(t.roles.features))], ['Metadata', fmt(n(t.roles.metadata))], ['Ignored', fmt(n(t.roles.ignored))]].map(([k, v]) => <div key={k}><dt>{k}</dt><dd>{v}</dd></div>)}</dl>
+      <ReviewPanel job={job} />
       {t.annotations && (
         <section className="ap-sec">
           <h2 className="ap-sub">Annotation coverage</h2>

@@ -4,6 +4,7 @@ import '@fontsource/ibm-plex-mono/500.css';
 import '../foundation/base.css';
 import '../foundation/nk.css';
 import './app.css';
+import './results/results.css';
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import App from './App';

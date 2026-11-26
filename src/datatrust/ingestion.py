@@ -180,16 +180,10 @@ def verify_source(path, source, stage="source verification"):
         raise AnalysisError("Source changed during analysis; no mixed-snapshot result was produced.", code="source_changed", stage=stage)
 
 
-def read_csv(dataset_path, *, usecols=None, nrows=None, options=None):
-    """Keep the established default pandas call and product error translations."""
-    path = Path(dataset_path)
-    if not path.exists():
-        raise FileNotFoundError(f"Dataset not found: {path}")
-    if not path.is_file():
-        raise ValueError(f"Dataset path is not a file: {path}")
-    if options is not None and options.column_missing_policies:
-        raise ValueError("Per-column missing policies require scalable execution.")
-    kwargs = {"usecols": usecols, "nrows": nrows}
+def csv_read_kwargs(options):
+    """The pandas.read_csv arguments for parse options: the established default call when the options are the defaults.
+    Shared by `read_csv` and the advisory input inspection (datatrust.inspection), so both parse identically."""
+    kwargs = {}
     if options is not None and options != CsvParseOptions():
         kwargs["encoding"] = options.encoding
         if options.delimiter != ",":
@@ -199,19 +193,37 @@ def read_csv(dataset_path, *, usecols=None, nrows=None, options=None):
             kwargs["na_values"] = [""] if options.missing_policy == "empty_only" else list(options.na_values)
         # Read numeric overrides as strings first, then require conversion.
         kwargs["dtype"] = {name: "string" for name in options.column_types}
+    return kwargs
+
+
+def apply_column_types(data, options):
+    """Apply declared numeric column overrides to parsed data, refusing values that do not convert."""
+    if options is not None:
+        unknown = set(options.column_types) - set(data.columns)
+        if unknown:
+            raise ValueError("Unknown column type overrides: " + ", ".join(sorted(unknown)))
+        for name, kind in options.column_types.items():
+            if kind == "numeric":
+                try:
+                    data[name] = pd.to_numeric(data[name], errors="raise")
+                except (ValueError, TypeError) as exc:
+                    raise ValueError(f"Column '{name}' contains invalid numeric values; no values were coerced to missing.") from exc
+    return data
+
+
+def read_csv(dataset_path, *, usecols=None, nrows=None, options=None):
+    """Keep the established default pandas call and product error translations."""
+    path = Path(dataset_path)
+    if not path.exists():
+        raise FileNotFoundError(f"Dataset not found: {path}")
+    if not path.is_file():
+        raise ValueError(f"Dataset path is not a file: {path}")
+    if options is not None and options.column_missing_policies:
+        raise ValueError("Per-column missing policies require scalable execution.")
+    kwargs = {"usecols": usecols, "nrows": nrows, **csv_read_kwargs(options)}
     try:
         data = pd.read_csv(path, **kwargs)
-        if options is not None:
-            unknown = set(options.column_types) - set(data.columns)
-            if unknown:
-                raise ValueError("Unknown column type overrides: " + ", ".join(sorted(unknown)))
-            for name, kind in options.column_types.items():
-                if kind == "numeric":
-                    try:
-                        data[name] = pd.to_numeric(data[name], errors="raise")
-                    except (ValueError, TypeError) as exc:
-                        raise ValueError(f"Column '{name}' contains invalid numeric values; no values were coerced to missing.") from exc
-        return data
+        return apply_column_types(data, options)
     except pd.errors.EmptyDataError as exc:
         raise ValueError("Dataset is empty and cannot be analyzed.") from exc
     except pd.errors.ParserError as exc:

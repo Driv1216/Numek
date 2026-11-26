@@ -2,13 +2,11 @@
 // shell, a declarative field renderer that keeps the classic field contract, the running and stopped
 // views, and the mosaic page (hero tile, family tiles, actions, coverage) every result uses.
 import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
-import { Status } from '../foundation/system';
 import { reducedMotion } from '../foundation/motion';
 import { ApiError, call, type Fields, type SessionInfo } from './api';
 import { Chips, SourceCard } from './m4';
 import { Viewer } from './parts';
-import { date, type Tone } from './results/adapter';
-import { Tiles, type Tile, CheckScope, ScopeNote } from './results/Tiles';
+import { ReportBar } from './results/shell/ReportBar';
 import { navigate, onLink } from './router';
 
 type Flash = (e: unknown) => void;
@@ -43,6 +41,8 @@ export function flowApi(base: string) {
       return json;
     },
     report: `${BASE}${base}/report`,
+    /** dashboard_companion_v1 for this session's result (an API path for `call`). */
+    presentation: `${base}/presentation`,
   };
 }
 export type FlowApi = ReturnType<typeof flowApi>;
@@ -221,54 +221,7 @@ export function FlowDownloads({ route, kinds, flash }: { route: string; kinds: s
   );
 }
 
-/* ——— The mosaic page every supervised result uses ——— */
-
-export interface Action { id: string; priority?: string; title: string; text: string; scope?: string }
-export function MosaicPage({ name, sub, when, findings, status, partial, tiles, actions, summary, out, coverage, onOpen, label, checks, guidance }: {
-  name: string; sub: string; when: string; findings: number; status: string; partial: boolean; tiles: Tile[]; actions: Action[]; summary?: string; out: ReactNode; coverage: ReactNode; onOpen: () => void; label: string; checks?: unknown; guidance?: unknown;
-}) {
-  return (
-    <div className="ap-rs">
-      <header className="ap-rs__bar"><h1>{name}</h1><p>{sub}<br />{date(when)} · {findings} finding{findings === 1 ? '' : 's'} · <button type="button" className="ap-rs__open" onClick={onOpen}>Open report ↗</button></p></header>
-      <p className="ap-rs__saved"><Status tone="dev">{status}</Status></p>
-      {partial && <p className="ap-note ap-note--warn"><b>Analysis incomplete</b> Review unavailable checks; completed evidence remains available.</p>}
-      <CheckScope checks={checks} />
-      <ScopeNote guidance={guidance} />
-      <Tiles tiles={tiles} label={label} />
-      <section className="ap-sec ap-actions" aria-labelledby="ap-act-h">
-        <h2 id="ap-act-h" className="ap-q">Actions</h2>
-        {actions.length ? (
-          <ul className="ap-sheet__fs">{actions.map((f) => <li key={f.id}><span className={`ap-sev is-${(f.priority ?? 'low').toLowerCase()}`}>{f.priority ?? 'Review'}</span><b>{f.title}{f.scope && <> · <span className="ap-actions__scope">{f.scope}</span></>}</b><span>{f.text}</span></li>)}</ul>
-        ) : <p className="ap-muted">No qualifying findings were produced within completed scope. Review declarations and unsearched scope before relying on this result.</p>}
-        {summary && <p className="ap-muted">{summary}</p>}
-      </section>
-      {out}
-      <details className="ap-more ap-rs__cov"><summary>Coverage and limitations</summary>{coverage}</details>
-    </div>
-  );
-}
-
 /** A family tile: canonical counts on its face, canonical wording and bounded data in its chapter. */
-export function familyTile(p: { id: string; name: string; n: number; kicker: string; shade: [string, boolean]; tone: Tone; label: string; detail: string; viz?: ReactNode; body: ReactNode; wide?: boolean }): Tile {
-  return { id: p.id, name: p.name, n: String(p.n).padStart(2, '0'), kicker: p.kicker, bg: p.shade[0], light: p.shade[1], wide: p.wide, tone: p.tone, label: p.label, detail: p.detail, viz: p.viz, chapter: p.body };
-}
-export const SHADES: [string, boolean][] = [['#D5E4EB', false], ['#2C6E8E', true], ['#FBFAF7', false], ['#BCD3DE', false], ['#163F52', true]];
-
-/** The first list of records in an evidence object, as a bounded table. */
-export function BoundedTable({ data }: { data: Doc }) {
-  const entry = Object.entries(data).find(([, v]) => Array.isArray(v) && v.length && typeof v[0] === 'object');
-  if (!entry) return null;
-  const rows = entry[1] as Doc[];
-  const keys = Object.keys(rows[0]).filter((k) => rows.some((r) => ['string', 'number', 'boolean'].includes(typeof r[k]))).slice(0, 6);
-  if (!keys.length) return null;
-  return (
-    <div className="ap-chtab">
-      <table><thead><tr>{keys.map((k) => <th key={k}>{k.replace(/_/g, ' ')}</th>)}</tr></thead>
-        <tbody>{rows.slice(0, 20).map((r, i) => <tr key={i}>{keys.map((k) => <td key={k}>{typeof r[k] === 'number' ? Number(r[k]).toLocaleString('en-US', Number.isInteger(r[k]) ? {} : { maximumSignificantDigits: 6 }) : String(r[k] ?? '—')}</td>)}</tr>)}</tbody></table>
-      {rows.length > 20 && <p>{rows.length - 20} more rows in the canonical JSON.</p>}
-    </div>
-  );
-}
 
 /** Scalar facts of an evidence object, for a chapter's definition list. */
 export function scalarFacts(data: Doc, limit = 8): [string, string][] {
@@ -285,6 +238,8 @@ export function Flow({ path, prefix, api, info, flash, onRail, onSaved, label, r
 }) {
   const [job, setJobState] = useState<FlowJob | null | undefined>(undefined);
   const [analysis, setAnalysis] = useState<Doc | null>(null);
+  const [failed, setFailed] = useState<string | null>(null);
+  const [attempt, setAttempt] = useState(0);
   const setJob = useCallback((j: FlowJob | null) => setJobState(j), []);
   useEffect(() => { api.job().then((r) => setJobState(r.job)).catch((e) => { setJobState(null); flash(e); }); }, [api]); // eslint-disable-line react-hooks/exhaustive-deps
   const requested = (new RegExp(`^${prefix}/(sources|configure|confirm|report)/?$`).exec(path)?.[1] ?? 'sources') as FlowStep;
@@ -300,29 +255,41 @@ export function Flow({ path, prefix, api, info, flash, onRail, onSaved, label, r
     const t = setInterval(() => { api.job().then((r) => r.job && setJobState(r.job)).catch(() => {}); }, 1000);
     return () => clearInterval(t);
   }, [running, api]);
-  useEffect(() => { setAnalysis(null); if (job?.result) api.analysis().then(setAnalysis).catch(flash); }, [job?.result?.status, job?.fingerprint]); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    setAnalysis(null); setFailed(null);
+    if (job?.result) api.analysis().then(setAnalysis).catch((e) => setFailed(e instanceof Error ? e.message : 'The result could not be read.'));
+  }, [job?.result?.status, job?.fingerprint, attempt]); // eslint-disable-line react-hooks/exhaustive-deps
   if (job === undefined) return null;
   const onNew = () => { api.reset().then(() => { setJobState(null); navigate(`${prefix}/sources`); }).catch(flash); };
   if (step === 'report' && job) {
     if (running) return <Running job={job} label={label} api={api} setJob={setJob} flash={flash} />;
     if (job.state === 'failed' || job.state === 'cancelled') return <Stopped job={job} prefix={prefix} />;
+    if (failed) return <ResultError message={failed} onRetry={() => setAttempt((n) => n + 1)} />;
     if (!analysis) return <div className="ap-rs"><div className="nk-mosaic nk-mosaic--big nk-mosaic--run ap-rs__wait" aria-busy="true" /></div>;
   }
   return <>{render({ step, job, setJob, analysis, info, onNew })}</>;
 }
 
-/** The out section shared by live results. */
+/** The reports-and-files section of a live result. */
 export function LiveOut({ saved, downloads, onView, onNew, newLabel }: { saved: boolean; downloads: ReactNode; onView: () => void; onNew: () => void; newLabel: string }) {
+  return <ReportBar saved={saved} downloads={downloads} onView={onView} extra={<button type="button" className="nk-btn nk-btn--ghost" onClick={onNew}>{newLabel}</button>} />;
+}
+
+/** The canonical report, opened at a verified anchor when the dashboard asks for one. */
+export function ReportViewer({ name, src, downloads, onClose, anchor }: { name: string; src: string; downloads: ReactNode; onClose: () => void; anchor?: string | null }) {
+  return <Viewer name={name} src={anchor ? `${src}#${encodeURIComponent(anchor)}` : src} note="the canonical DataTrust report" downloads={downloads} onClose={onClose} />;
+}
+
+/** A completed result that could not be read: say so, and offer to try again, never an endless wait. */
+export function ResultError({ message, onRetry }: { message: string; onRetry: () => void }) {
   return (
-    <section className="ap-rs__out">
-      <div><h2 className="ap-q">Take it with you</h2>
-        {saved ? <p className="ap-muted ap-rs__savedline"><Status tone="on">Saved on this machine · <a href="/app/history" onClick={onLink}>manage in History</a></Status>A PDF you download now is added to the saved copy.</p>
-          : <p className="ap-muted">Exports use completed evidence and do not reanalyze. This result lasts for this session.</p>}</div>
-      <div className="ap-acts"><button type="button" className="nk-btn" onClick={onView}>View full report</button>{downloads}<button type="button" className="nk-btn nk-btn--ghost" onClick={onNew}>{newLabel}</button></div>
-    </section>
+    <div className="ap-rs">
+      <p className="ap-note ap-note--warn" role="alert"><b>The result could not be read.</b> {message}</p>
+      <div className="ap-acts"><button type="button" className="nk-btn" onClick={onRetry}>Try again</button></div>
+    </div>
   );
 }
 
-export function ReportViewer({ name, src, downloads, onClose }: { name: string; src: string; downloads: ReactNode; onClose: () => void }) {
-  return <Viewer name={name} src={src} note="the canonical DataTrust report" downloads={downloads} onClose={onClose} />;
-}
+/** What a page asks for when it opens the report: `true` for the top, or a verified anchor. */
+export type ViewTarget = false | true | string;
+export const viewAnchor = (v: ViewTarget) => (typeof v === 'string' ? v : null);

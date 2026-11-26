@@ -2,24 +2,37 @@
 // and the saved-report view. Saved analyses are read-only canonical results, verified before they open.
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Status } from '../foundation/system';
-import { ApiError, api, type Analysis, type Finding, type HistoryState, type JobView, type M3Mode, type M4Analysis, type SavedEntry } from './api';
-import { m4Header } from './m4';
+import { ApiError, api, type Analysis, type HistoryState, type JobView, type M3Mode, type M4Analysis, type SavedEntry } from './api';
 import { TemporalPage } from './m5';
 import { TextPage } from './m6';
 import { ImagePage } from './m7';
 import { SavedCross } from './m9';
 import { M4_MODE_LABEL, RolesReport } from './results/roles';
 import { Corners, MiB, READ_ONLY, Viewer, fmt } from './parts';
-import { activeTiles, date, fromAnalysis, governingCap, isFinding, m3Label } from './results/adapter';
-import { Mosaic } from './results/Mosaic';
-import { ScopeNote } from './results/Tiles';
+import { date, governingCap, m3Label } from './results/adapter';
+import { canonicalFindings, recordedRank } from './results/normalize';
+import { RankMark } from './results/shell/Ledger';
+import { useCompanion } from './results/shell/ResultsShell';
+import type { Companion } from './results/model';
+import { RISK_BAND, WORKFLOWS, outcome } from './results/outcome';
+import { resolveComposition } from './results/resolve';
+import { TabularPage } from './results/compositions/index';
+import { ReportBar } from './results/shell/ReportBar';
 import { navigate, onLink, stepHref } from './router';
 
+/** Where a saved entry's live result opens, by the workflow that produced it. */
+const LIVE: Record<string, string> = { core: '/app/core/report', m4: '/app/m4/report', m5: '/app/temporal/report', m6: '/app/text/report', m7: '/app/images/report', m9: '/app/cross/report' };
+const liveHref = (e: SavedEntry) => LIVE[e.workflow] ?? stepHref('report');
+
 type Flash = (e: unknown) => void;
-const sevRank: Record<string, number> = { High: 0, Moderate: 1, Low: 2 };
 const WORKFLOW_LABEL: Record<string, string> = { m5: 'Temporal', m6: 'Text', m7: 'Images', m9: 'Records ↔ documents' };
 const modeLabel = (e: SavedEntry) => (WORKFLOW_LABEL[e.workflow] ? `${WORKFLOW_LABEL[e.workflow]}${e.mode && e.mode !== e.workflow ? ` · ${e.mode.replace(/_/g, ' ')}` : ''}` : e.workflow === 'm4' ? M4_MODE_LABEL[e.mode] ?? e.mode : e.mode === 'classification' ? `Classification${e.summary.subtype ? ` · ${e.summary.subtype}` : ''}` : e.mode === 'regression' ? 'Regression' : e.mode === 'unlabeled' ? 'Unlabeled' : m3Label[e.mode as M3Mode] ?? e.mode);
-const scoreClass = (e: SavedEntry) => (e.score == null ? 'is-none' : e.risk_level === 'Low' ? 'is-low' : 'is-elev');
+type Outcome = ReturnType<typeof outcome>;
+/** An entry's title: its recorded name or file, else its workflow, never blank. */
+const titleOf = (e: SavedEntry) => e.dataset_name || e.source_filename || modeLabel(e);
+const entryOutcome = (e: SavedEntry): Outcome => (e.state !== 'ok' ? { text: e.state === 'missing' ? 'Files missing' : 'Changed on disk', cls: 'is-elev' }
+  : outcome({ score: e.score, risk: e.risk_level, findings: e.summary.findings ?? [], status: e.summary.execution_status }));
+
 const retention = (s: HistoryState) => {
   const parts = [s.max_age_days ? `${s.max_age_days} days` : null, s.max_total_bytes ? `${Math.round(s.max_total_bytes / 1048576).toLocaleString('en-US')} MiB in total` : null].filter(Boolean);
   return parts.length ? `Kept for up to ${parts.join(' or ')}, whichever comes first, then removed oldest first` : 'Kept until you delete them';
@@ -78,10 +91,10 @@ export function Rail({ job, history, flash }: { job: JobView | null; history: Re
           <>
             <div className="ap-recent__h"><b>This session</b></div>
             <ul><li>
-              <a className="ap-recent__it" href={stepHref(job.stage)} onClick={onLink}>
+              <a className="ap-recent__it" href={stepHref(job.stage === 'choose' ? 'upload' : job.stage)} onClick={onLink}>
                 <b>{s?.dataset_name ?? job.dataset_name ?? job.source_filename}</b>
                 <span>{job.source_filename}</span>
-                <span className="ap-recent__m"><em>{job.mode}</em>{job.stage !== 'report' ? <i className="is-none">{job.stage}</i> : s?.overall == null ? <i className="is-none">no score defined</i> : <i className={s.risk_level === 'Low' ? 'is-low' : 'is-elev'}>{s.overall.toFixed(1)} · {s.risk_level}</i>}</span>
+                <span className="ap-recent__m"><em>{job.mode ? job.mode.replace(/_/g, ' ') : 'no analysis yet'}</em>{job.stage !== 'report' || !s ? <i className="is-none">{job.stage === 'choose' ? 'choose an analysis' : job.stage}</i> : (() => { const o = outcome({ score: s.overall, risk: s.risk_level, findings: s.risks ?? [], status: s.execution?.status }); return <i className={o.cls}>{o.text}</i>; })()}</span>
               </a>
             </li></ul>
           </>
@@ -105,9 +118,9 @@ export function Rail({ job, history, flash }: { job: JobView | null; history: Re
                   {recent.map((e) => (
                     <li key={e.id}>
                       <button type="button" className={pick === e.id ? 'is-on' : ''} aria-pressed={pick === e.id} onClick={() => setPick(e.id)}>
-                        <b>{e.dataset_name ?? e.source_filename}</b>
+                        <b>{titleOf(e)}</b>
                         <span>{e.source_filename}</span>
-                        <span className="ap-recent__m"><em>{date(e.created_at)}</em>{e.state !== 'ok' ? <i className="is-elev">{e.state === 'missing' ? 'missing' : 'changed on disk'}</i> : e.score == null ? <i className="is-none">no score defined</i> : <i className={scoreClass(e)}>{e.score.toFixed(1)} · {e.risk_level}</i>}</span>
+                        <span className="ap-recent__m"><em>{date(e.created_at)}</em><i className={entryOutcome(e).cls}>{entryOutcome(e).text}</i></span>
                       </button>
                     </li>
                   ))}
@@ -140,13 +153,13 @@ function DeleteButton({ id, onDeleted, flash, label = 'Delete' }: { id: string; 
     : <button type="button" className="ap-sheet__dl ap-del" onClick={() => setSure(true)}>{label}</button>;
 }
 
-/** Findings from any workflow's verified canonical JSON; "no major issues" is a statement, not a finding. */
-function savedFindings(a: Analysis) {
-  type Raw = { code?: string; id?: string; title?: string; family?: string; meaning?: string; severity?: string; priority?: string };
-  return ((a.findings ?? []) as unknown as Raw[]).map((f) => ({
-    code: String(f.code ?? f.id ?? ''), title: f.title ?? [f.family, f.meaning].filter(Boolean).map((x) => String(x).replace(/_/g, ' ')).join(' · '),
-    severity: (f.severity ?? f.priority ?? 'Low') as Finding['severity'],
-  })).filter((f) => f.severity in sevRank && isFinding(f));
+/** Findings from any workflow's verified canonical JSON, with their recorded rank (a priority, or the evidence meaning
+ *  text and image findings record); "no major issues" is a statement, not a finding. */
+function savedFindings(a: Analysis, companion?: Companion | null) {
+  return canonicalFindings(a as unknown as Record<string, unknown>).map(({ f, index }) => ({
+    key: `${String(f.code ?? f.id ?? '')}:${index}`, title: companion?.findings.find((c) => c.index === index)?.title || String(f.title ?? '') || [f.family, f.meaning].filter(Boolean).map((x) => String(x).replace(/_/g, ' ')).join(' · ') || String(f.code ?? f.id ?? 'Finding'),
+    detail: String(f.code ?? f.family ?? '').replace(/_/g, ' '), rank: recordedRank(f),
+  })).sort((x, y) => x.rank.order - y.rank.order);
 }
 const narrativeOf = (a: Analysis | null) => { const nv = (a as { narrative?: { overall_assessment?: string; summary?: string } } | null)?.narrative; return nv?.overall_assessment ?? nv?.summary ?? null; };
 
@@ -161,7 +174,9 @@ function ReportSheet({ id, onClose, onDeleted, flash }: { id: string; onClose: (
     api.history.entry(id).then((x) => { setE(x); if (x.state === 'ok') return api.history.analysis(id).then(setA); }).catch((x) => { flash(x); onClose(); });
   }, [id]);
   useEffect(() => { const esc = (k: KeyboardEvent) => { if (k.key === 'Escape') onClose(); }; addEventListener('keydown', esc); return () => removeEventListener('keydown', esc); }, [onClose]);
-  const fs = a ? savedFindings(a).sort((x, y) => sevRank[x.severity] - sevRank[y.severity]) : [];
+  // The report's own finding names, verified for this saved entry; canonical titles while it loads or if unreadable.
+  const companion = useCompanion(e?.state === 'ok' ? `/history/${id}/presentation` : null);
+  const fs = a ? savedFindings(a, companion) : [];
   const values = ['computed', 'available'].includes(a?.scoring?.status ?? '') ? a!.scoring.values : null;
   const cap = governingCap(values);
   return (
@@ -174,8 +189,8 @@ function ReportSheet({ id, onClose, onDeleted, flash }: { id: string; onClose: (
         </header>
         {!e || (e.state === 'ok' && !a) ? <p className="ap-sheet__note">Verifying the saved files…</p> : (
           <>
-            <h2>{e.dataset_name ?? e.source_filename}</h2>
-            <p className="ap-sheet__meta">{e.source_filename} · {modeLabel(e)} · {MiB(e.bytes)} MiB · saved {date(e.created_at)}{e.summary.elapsed_seconds != null ? ` · ${e.summary.elapsed_seconds.toFixed(2)} s` : ''}</p>
+            <h2>{titleOf(e)}</h2>
+            <p className="ap-sheet__meta">{[e.source_filename, modeLabel(e), `${MiB(e.bytes)} MiB`, `saved ${date(e.created_at)}`, e.summary.elapsed_seconds != null ? `${e.summary.elapsed_seconds.toFixed(2)} s` : null].filter(Boolean).join(' · ')}</p>
             {e.state !== 'ok' ? (
               <>
                 <p className="ap-note ap-note--warn"><b>{e.state === 'missing' ? 'Files missing' : 'Changed on disk'}</b> {e.state === 'missing' ? 'The saved files for this analysis are no longer in the history folder.' : 'A saved file no longer matches what was recorded, so it is not opened.'}</p>
@@ -183,18 +198,17 @@ function ReportSheet({ id, onClose, onDeleted, flash }: { id: string; onClose: (
               </>
             ) : (
               <>
-                <div className={`ap-sheet__score ${scoreClass(e)}`}>
-                  {!values ? <><b>No score</b><span>{a?.scoring?.reason ?? 'No universal score is defined for this kind of data, by design. The report gives evidence.'}</span></> : <><b>{values.overall.toFixed(1)}</b><span>{values.risk_level} risk{cap ? ` · capped at ${cap.cap}` : ''}</span></>}
-                </div>
+                {values ? <div className={`ap-sheet__score ${values.risk_level === 'Low' ? 'is-low' : 'is-elev'}`}><b>{values.overall.toFixed(1)}</b><span>{values.risk_level} risk{cap ? ` · capped at ${cap.cap}` : ''}</span></div>
+                  : <p className={`ap-sheet__outcome ${entryOutcome(e).cls}`}>{entryOutcome(e).text}</p>}
                 {narrativeOf(a) && <p className="ap-sheet__lead">{narrativeOf(a)}</p>}
                 <h3>{fs.length ? `Findings (${fs.length})` : 'Findings'}</h3>
                 <ul className="ap-sheet__fs">
-                  {fs.length ? fs.map((f) => <li key={f.code}><span className={`ap-sev is-${f.severity.toLowerCase()}`}>{f.severity}</span><b>{f.title}</b><span>{f.code.replace(/_/g, ' ')}</span></li>)
-                    : <li><span className="ap-sev">None</span><b>No review findings</b><span>The completed checks produced no findings.</span></li>}
+                  {fs.length ? fs.map((f) => <li key={f.key}><RankMark rank={f.rank} /><b>{f.title}</b><span>{f.detail}</span></li>)
+                    : <li><span className="ap-sev">None</span><b>No threshold-level findings</b><span>No finding met its threshold within the completed scope.</span></li>}
                 </ul>
                 <div className="ap-sheet__acts">
                   <a className="nk-btn" href={`/app/history/${e.id}`} onClick={(x) => { onLink(x); onClose(); }}>Open full result</a>
-                  {e.live && <a className="nk-btn nk-btn--ghost" href={stepHref('report')} onClick={(x) => { onLink(x); onClose(); }}>Open live result</a>}
+                  {e.live && <a className="nk-btn nk-btn--ghost" href={liveHref(e)} onClick={(x) => { onLink(x); onClose(); }}>Open live result</a>}
                   <SavedDownloads e={e} flash={flash} />
                   <DeleteButton id={e.id} onDeleted={onDeleted} flash={flash} />
                 </div>
@@ -222,7 +236,7 @@ export function SavedReport({ id, onDeleted, flash }: { id: string; onDeleted: (
   const [e, setE] = useState<SavedEntry | null>(null);
   const [a, setA] = useState<Analysis | null>(null);
   const [failed, setFailed] = useState<string | null>(null);
-  const [view, setView] = useState(false);
+  const [view, setView] = useState<false | true | string>(false);
   useEffect(() => {
     let live = true; setE(null); setA(null); setFailed(null);
     api.history.entry(id).then(async (x) => {
@@ -232,76 +246,50 @@ export function SavedReport({ id, onDeleted, flash }: { id: string; onDeleted: (
     return () => { live = false; };
   }, [id]);
   if (failed) return <div className="ap-rs"><p className="ap-note ap-note--warn" role="alert">{failed}</p><a className="nk-btn" href="/app/history" onClick={onLink}>← All saved analyses</a></div>;
-  if (!e) return <div className="ap-rs"><div className="nk-mosaic nk-mosaic--big nk-mosaic--run ap-rs__wait" aria-busy="true" /></div>;
-  const name = e.dataset_name ?? e.source_filename ?? 'Saved analysis';
+  if (!e || (e.state === 'ok' && !a)) return <div className="ap-rs"><div className="nk-mosaic nk-mosaic--big nk-mosaic--run ap-rs__wait" aria-busy="true" /></div>;
+  const name = titleOf(e);
+  const open = (anchor?: string) => setView(anchor ?? true);
+  const rendered = e.presentation ? `Rendered by DataTrust ${e.presentation.package_version ?? 'not recorded'}, report templates ${e.presentation.report_templates ?? 'not recorded'}, app build ${e.presentation.app_build ?? 'not recorded'}.` : 'How this report was rendered was not recorded by the version that saved it.';
   const out = (
-    <section className="ap-rs__out">
-      <div>
-        <h2 className="ap-q">Saved on this machine</h2>
-        <p className="ap-muted">{e.live ? 'This analysis is still open in this session, so its evidence can be inspected there.' : READ_ONLY}</p>
-        <p className="ap-muted">Analysed {utc(e.generated_at)} · saved {utc(e.created_at)}. {e.presentation ? `Rendered by DataTrust ${e.presentation.package_version ?? 'not recorded'}, report templates ${e.presentation.report_templates ?? 'not recorded'}, app build ${e.presentation.app_build ?? 'not recorded'}.` : 'How this report was rendered was not recorded by the version that saved it.'}</p>
-      </div>
-      <div className="ap-acts">
-        {e.state === 'ok' && <button type="button" className="nk-btn" onClick={() => setView(true)}>View full report</button>}
-        {e.state === 'ok' && <SavedDownloads e={e} flash={flash} />}
-        <DeleteButton id={e.id} onDeleted={onDeleted} flash={flash} label={e.state === 'ok' ? 'Delete' : 'Remove from history'} />
-      </div>
-    </section>
+    <ReportBar saved savedNote={<>{e.live ? <><a href={liveHref(e)} onClick={onLink}>Open the live result</a>: it is still open in this session, so its evidence can be inspected there. </> : `${READ_ONLY} `}Analysed {utc(e.generated_at)} · saved {utc(e.created_at)}. {rendered}</>}
+      downloads={e.state === 'ok' ? <SavedDownloads e={e} flash={flash} /> : null} onView={e.state === 'ok' ? () => setView(true) : undefined}
+      extra={<DeleteButton id={e.id} onDeleted={onDeleted} flash={flash} label={e.state === 'ok' ? 'Delete' : 'Remove from history'} />} />
   );
-  const viewer = view && <Viewer name={name} src={api.history.report(e.id)} note="the saved canonical DataTrust report" downloads={<SavedDownloads e={e} flash={flash} />} onClose={() => setView(false)} />;
-  if (e.workflow === 'm9' && e.state === 'ok') {
-    if (!a) return <div className="ap-rs"><div className="nk-mosaic nk-mosaic--big nk-mosaic--run ap-rs__wait" aria-busy="true" /></div>;
-    return <><p className="ap-rs__saved"><Status tone="on">Saved analysis · read-only canonical result</Status></p><SavedCross a={a as unknown as Record<string, unknown>} flash={flash} onOpen={() => setView(true)} out={out} analysisUrl={`/api/datatrust/v1/history/${e.id}/analysis`} />{viewer}</>;
-  }
-  if (e.workflow === 'm7' && e.state === 'ok') {
-    if (!a) return <div className="ap-rs"><div className="nk-mosaic nk-mosaic--big nk-mosaic--run ap-rs__wait" aria-busy="true" /></div>;
-    return <><p className="ap-rs__saved"><Status tone="on">Saved analysis · read-only canonical result</Status></p><ImagePage a={a as unknown as Record<string, unknown>} live={false} flash={flash} onOpen={() => setView(true)} out={out} />{viewer}</>;
-  }
-  if (e.workflow === 'm6' && e.state === 'ok') {
-    if (!a) return <div className="ap-rs"><div className="nk-mosaic nk-mosaic--big nk-mosaic--run ap-rs__wait" aria-busy="true" /></div>;
-    return <><p className="ap-rs__saved"><Status tone="on">Saved analysis · read-only canonical result</Status></p><TextPage a={a as unknown as Record<string, unknown>} live={false} flash={flash} onOpen={() => setView(true)} out={out} />{viewer}</>;
-  }
-  if (e.workflow === 'm5' && e.state === 'ok') {
-    if (!a) return <div className="ap-rs"><div className="nk-mosaic nk-mosaic--big nk-mosaic--run ap-rs__wait" aria-busy="true" /></div>;
-    return <><p className="ap-rs__saved"><Status tone="on">Saved analysis · read-only canonical result</Status></p><TemporalPage a={a as unknown as Record<string, unknown>} live={false} onOpen={() => setView(true)} out={out} />{viewer}</>;
-  }
-  if (e.workflow === 'm4' && e.state === 'ok') {
-    if (!a) return <div className="ap-rs"><div className="nk-mosaic nk-mosaic--big nk-mosaic--run ap-rs__wait" aria-busy="true" /></div>;
-    const m4 = a as unknown as M4Analysis;
-    return <><RolesReport a={m4} header={<>{m4Header(m4, e.mode, () => setView(true))}<p className="ap-rs__saved"><Status tone="on">Saved analysis · read-only canonical result</Status></p></>} out={out} />{viewer}</>;
-  }
-  const run = a && e.workflow === 'core' ? fromAnalysis(a, e.mode, e.artifacts) : null;
-  return (
+  const viewer = view && <Viewer name={name} src={typeof view === 'string' ? `${api.history.report(e.id)}#${encodeURIComponent(view)}` : api.history.report(e.id)} note="the saved canonical DataTrust report" downloads={<SavedDownloads e={e} flash={flash} />} onClose={() => setView(false)} />;
+  if (e.state !== 'ok') return (
     <div className="ap-rs">
-      <header className="ap-rs__bar">
-        <h1>{name}</h1>
-        <p>{e.source_filename} · {modeLabel(e)}<br />{e.generated_at ? `Analysed ${date(e.generated_at)}` : `Saved ${date(e.created_at)}`}{e.summary.elapsed_seconds != null ? ` · ${e.summary.elapsed_seconds.toFixed(2)} s` : ''}{run ? ` · ${activeTiles(run)} of 14 checks apply` : ''}{e.state === 'ok' && <> · <button type="button" className="ap-rs__open" onClick={() => setView(true)}>Open report ↗</button></>}</p>
-      </header>
-      <p className="ap-rs__saved"><Status tone="on">Saved analysis · read-only canonical result</Status>{e.live && <a href={stepHref('report')} onClick={onLink}>Open the live result</a>}</p>
-      {e.state !== 'ok'
-        ? <p className="ap-note ap-note--warn"><b>{e.state === 'missing' ? 'Files missing' : 'Changed on disk'}</b> {e.state === 'missing' ? 'The saved files for this analysis are no longer in the history folder.' : 'A saved file no longer matches what was recorded, so it is not opened.'}</p>
-        : a && run ? <Mosaic a={a} run={run} runName={name} /> : <div className="nk-mosaic nk-mosaic--big nk-mosaic--run ap-rs__wait" aria-busy="true" />}
-      {a && run && <ScopeNote guidance={(a as { guidance?: unknown }).guidance} />}
+      <header className="ap-rs__bar"><h1>{name}</h1><p>{[e.source_filename, modeLabel(e)].filter(Boolean).join(' · ')}</p></header>
+      <p className="ap-note ap-note--warn"><b>{e.state === 'missing' ? 'Files missing' : 'Changed on disk'}</b> {e.state === 'missing' ? 'The saved files for this analysis are no longer in the history folder.' : 'A saved file no longer matches what was recorded, so it is not opened.'}</p>
       {out}
-      {viewer}
     </div>
   );
+  // The recorded methodology decides the dashboard, never the mode the entry was saved under.
+  const doc = a as unknown as Record<string, unknown>;
+  const { composition } = resolveComposition(doc);
+  const presentation = `/history/${e.id}/presentation`;
+  const page = composition === 'cross' ? <SavedCross a={doc} flash={flash} onOpen={open} out={out} presentation={presentation} analysisUrl={`/api/datatrust/v1/history/${e.id}/analysis`} />
+    : composition === 'image' ? <ImagePage a={doc} live={false} saved flash={flash} onOpen={open} out={out} presentation={presentation} />
+    : composition === 'text' ? <TextPage a={doc} live={false} saved flash={flash} onOpen={open} out={out} presentation={presentation} />
+    : composition === 'temporal' ? <TemporalPage a={doc} live={false} saved onOpen={open} out={out} presentation={presentation} />
+    : composition === 'comparison' || composition === 'structure' ? <RolesReport a={a as unknown as M4Analysis} saved onOpen={open} out={out} presentation={presentation} />
+    : <TabularPage a={doc} saved live={false} onOpen={open} out={out} presentation={presentation} fallbackName={name} />;
+  return <>{page}{viewer}</>;
 }
 
 /* ——— The History page ——— */
 
 export function HistoryPage({ history, flash }: { history: ReturnType<typeof useHistory>; flash: Flash }) {
   const { state, refresh } = history;
-  const [q, setQ] = useState(''); const [risk, setRisk] = useState(''); const [from, setFrom] = useState(''); const [to, setTo] = useState('');
+  const [q, setQ] = useState(''); const [workflow, setWorkflow] = useState(''); const [risk, setRisk] = useState(''); const [from, setFrom] = useState(''); const [to, setTo] = useState('');
   const [items, setItems] = useState<SavedEntry[]>([]); const [total, setTotal] = useState(0); const [next, setNext] = useState<number | null>(null);
   const [days, setDays] = useState(''); const [mib, setMib] = useState('');
   const [sure, setSure] = useState(false);
   const ready = !!(state?.enabled && state.access);
-  const params = () => ({ q, risk, from: from ? `${from}T00:00:00` : '', to: to ? `${to}T23:59:59` : '' });
+  const params = () => ({ q, workflow, risk: RISK_BAND.has(workflow) ? risk : '', from: from ? `${from}T00:00:00` : '', to: to ? `${to}T23:59:59` : '' });
   const load = useCallback((cursor = 0) => {
     if (!ready) return;
     api.history.list({ ...params(), cursor: String(cursor) }).then((p) => { setItems((x) => (cursor ? [...x, ...p.items] : p.items)); setTotal(p.total); setNext(p.next_cursor); }).catch(flash);
-  }, [ready, q, risk, from, to]);
+  }, [ready, q, workflow, risk, from, to]);
   useEffect(() => { const t = setTimeout(() => load(0), 200); return () => clearTimeout(t); }, [load]);
   useEffect(() => { if (state) { setDays(state.max_age_days ? String(state.max_age_days) : ''); setMib(state.max_total_bytes ? String(Math.round(state.max_total_bytes / 1048576)) : ''); } }, [state]);
   const changed = () => { refresh(); load(0); };
@@ -322,7 +310,8 @@ export function HistoryPage({ history, flash }: { history: ReturnType<typeof use
             <section className="ap-sec" aria-label="Search saved analyses">
               <div className="ap-fields ap-hist__find">
                 <label>Search <span>name, file, target or finding</span><input type="search" value={q} onChange={(x) => setQ(x.target.value)} placeholder="adult, imbalance, credit_risk…" /></label>
-                <label>Risk<select value={risk} onChange={(x) => setRisk(x.target.value)}><option value="">Any</option>{['Low', 'Moderate', 'Elevated', 'High'].map((r) => <option key={r}>{r}</option>)}</select></label>
+                <label>Workflow<select value={workflow} onChange={(x) => setWorkflow(x.target.value)}>{WORKFLOWS.map(([v, l]) => <option key={v} value={v}>{l}</option>)}</select></label>
+                {RISK_BAND.has(workflow) && <label>Classification risk band<select value={risk} onChange={(x) => setRisk(x.target.value)}><option value="">Any</option>{['Low', 'Moderate', 'Elevated', 'High'].map((r) => <option key={r}>{r}</option>)}</select></label>}
                 <label>From<input type="date" value={from} onChange={(x) => setFrom(x.target.value)} /></label>
                 <label>To<input type="date" value={to} onChange={(x) => setTo(x.target.value)} /></label>
               </div>
@@ -332,14 +321,14 @@ export function HistoryPage({ history, flash }: { history: ReturnType<typeof use
                   {items.map((e) => (
                     <li key={e.id}>
                       <a href={`/app/history/${e.id}`} onClick={onLink} className="ap-hist__it">
-                        <b>{e.dataset_name ?? e.source_filename}</b>
-                        <span>{e.source_filename} · {modeLabel(e)} · {date(e.created_at)}</span>
-                        <em className={e.state !== 'ok' ? 'is-elev' : scoreClass(e)}>{e.state !== 'ok' ? (e.state === 'missing' ? 'missing' : 'changed on disk') : e.score == null ? 'no score defined' : `${e.score.toFixed(1)} · ${e.risk_level}`}</em>
+                        <b>{titleOf(e)}</b>
+                        <span>{[e.source_filename, modeLabel(e), date(e.created_at)].filter(Boolean).join(' · ')}</span>
+                        <em className={entryOutcome(e).cls}>{entryOutcome(e).text}</em>
                       </a>
                     </li>
                   ))}
                 </ul>
-              ) : <div className="ap-sel ap-sel--empty"><Corners tone="ghost" /><b>Nothing here yet.</b><p>{q || risk || from || to ? 'No saved analysis matches these filters.' : 'Completed analyses appear here once saving is on.'}</p></div>}
+              ) : <div className="ap-sel ap-sel--empty"><Corners tone="ghost" /><b>Nothing here yet.</b><p>{q || workflow || risk || from || to ? 'No saved analysis matches these filters.' : 'Completed analyses appear here once saving is on.'}</p></div>}
               {next != null && <div className="ap-acts"><button type="button" className="nk-btn nk-btn--ghost" onClick={() => load(next)}>Show more</button></div>}
             </section>
             <section className="ap-sec ap-hist__set" aria-labelledby="ap-set-h">

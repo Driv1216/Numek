@@ -242,3 +242,152 @@ def test_target_preview_sends_only_the_most_frequent_classes(app):
     assert _upload(client, token, many).status_code == 201
     info = client.get(f'{API}/core/job/target-preview?target=id').json['data']['target_info']
     assert info['class_count'] == 300 and len(info['target_distribution']) == 50
+
+
+def test_the_csrf_token_is_minted_with_the_app_document_never_by_concurrent_api_requests(app):
+    # The app document mints the token before any script runs, so every API request the page makes already carries it.
+    page = app.test_client()
+    page.get('/app/')
+    with page.session_transaction() as state:
+        minted = state['datatrust_api_csrf']
+    assert _token(page) == minted
+    assert _post(page, minted, '/core/job/new').status_code == 200
+
+    # A cookie-less API request (the race on a cold load) no longer mints a token of its own: before, two concurrent
+    # first requests each minted one, and the cookie the browser kept last no longer matched the page's token.
+    cold = app.test_client()
+    assert cold.get(f'{API}/core/job').status_code == 200
+    with cold.session_transaction() as state:
+        assert 'datatrust_api_csrf' not in state
+
+
+def test_a_missing_or_stale_csrf_token_is_refused_with_a_code_the_client_can_recover_from(app):
+    client = app.test_client()
+    stale = _token(client)
+    with client.session_transaction() as state:  # the session was replaced, as when another tab reset the cookie
+        state.clear()
+    refused = _post(client, stale, '/core/job/new')
+    assert refused.status_code == 403 and refused.json['error']['code'] == 'csrf'
+    # The client refetches the session's token and sends the same request once more (api.ts `call`).
+    assert _post(client, _token(client), '/core/job/new').status_code == 200
+
+
+# Stage 3: upload first, choose the analysis afterwards ----------------------------------------------------------------
+
+def _upload_only(client, token, data, name='same.csv'):
+    return client.post(f'{API}/core/uploads', data={'dataset': (_csv(data), name)}, headers={'X-CSRF-Token': token},
+                       content_type='multipart/form-data')
+
+
+M3_ALL = {'x': [1.0, 2.5, 3.0, 4.5, 5.0, 6.5, 7.0, 8.5] * 4, 'z': [0.5, 1.5, 9.0, 2.0, 3.5, 4.0, 7.5, 6.0] * 4,
+          'a': [0, 1, 0, 1, 1, 0, 0, 1] * 4, 'b': [1, 1, 0, 0, 1, 0, 1, 0] * 4}
+PATHS = [
+    ('classification', CLASSIFICATION, {'target': 'label'}),
+    ('regression', REGRESSION, {'target': 'y', 'regression_options_submitted': '1', 'target_kind': 'unspecified'}),
+    ('unlabeled', CLASSIFICATION, {}),
+    ('annotation_classification', M3_ALL, {'role_x': 'feature', 'role_z': 'feature', 'role_a': 'target', 'role_b': 'metadata', 'annotation_expectation': 'unknown'}),
+    ('annotation_regression', M3_ALL, {'role_x': 'feature', 'role_z': 'target', 'role_a': 'feature', 'role_b': 'metadata', 'annotation_expectation': 'unknown'}),
+    ('multilabel_classification', M3_ALL, {'role_x': 'feature', 'role_z': 'feature', 'role_a': 'target', 'role_b': 'target', 'annotation_expectation': 'unknown'}),
+    ('clustering', M3_ALL, {'role_x': 'feature', 'role_z': 'feature', 'role_a': 'metadata', 'role_b': 'metadata', 'scale_sensitive': 'true'}),
+    ('anomaly_detection', M3_ALL, {'role_x': 'feature', 'role_z': 'feature', 'role_a': 'metadata', 'role_b': 'metadata', 'scale_sensitive': 'false'}),
+    ('role_profile', M3_ALL, {'role_x': 'feature', 'role_z': 'metadata', 'role_a': 'ignored', 'role_b': 'feature'}),
+]
+
+
+@pytest.mark.parametrize('mode,data,fields', PATHS, ids=[p[0] for p in PATHS])
+def test_choosing_the_analysis_after_upload_gives_the_same_analysis(app, mode, data, fields):
+    one, two = app.test_client(), app.test_client()
+    ack = {'representation_ack': 'confirmed'} if mode in {'annotation_classification', 'annotation_regression', 'multilabel_classification',
+                                                          'clustering', 'anomaly_detection', 'role_profile'} else {}
+    t1 = _token(one)
+    assert _upload(one, t1, data, mode=mode, name='same.csv').status_code == 201
+    assert _post(one, t1, '/core/job/configure', {'dataset_name': 'Same', 'purpose': '', **fields}).status_code == 200
+    assert _post(one, t1, '/core/job/generate', ack).json['data']['job']['stage'] == 'report'
+    t2 = _token(two)
+    uploaded = _upload_only(two, t2, data)
+    assert uploaded.status_code == 201 and uploaded.json['data']['job']['stage'] == 'choose'
+    if mode != 'unlabeled':  # first choose something else, then change it: no upload needed
+        assert _post(two, t2, '/core/job/analysis', {'mode': 'unlabeled'}).status_code == 200
+    assert _post(two, t2, '/core/job/analysis', {'mode': mode}).json['data']['job']['stage'] == 'configure'
+    assert _post(two, t2, '/core/job/configure', {'dataset_name': 'Same', 'purpose': '', **fields}).status_code == 200
+    assert _post(two, t2, '/core/job/generate', ack).json['data']['job']['stage'] == 'report'
+    left, right = (c.get(f'{API}/core/job/analysis').get_data(as_text=True) for c in (one, two))
+    assert _canonical(left) == _canonical(right)
+
+
+def test_an_upload_alone_is_neither_configured_nor_run(app):
+    client = app.test_client()
+    token = _token(client)
+    job = _upload_only(client, token, CLASSIFICATION).json['data']['job']
+    assert job['stage'] == 'choose' and job['mode'] is None
+    assert job['input_inspection']['version'] == 'input_inspection_v1' and job['input_inspection']['coverage']['complete']
+    for path in ('/core/job/configure', '/core/job/generate'):
+        refused = _post(client, token, path, {'target': 'label'})
+        assert refused.status_code == 422 and refused.json['error']['message'] == 'Choose an analysis for this file first.'
+    bad = _post(client, token, '/core/job/analysis', {'mode': 'temporal'})
+    assert bad.status_code == 422 and bad.json['error']['message'] == 'Choose one of the listed analyses.'
+    assert client.get(f'{API}/core/job').json['data']['job']['stage'] == 'choose'
+    classic = client.get('/configure')
+    assert classic.status_code == 302 and classic.headers['Location'].endswith('/')
+
+
+def test_changing_the_analysis_clears_declarations_and_keeps_the_file_and_inspection(app):
+    client = app.test_client()
+    token = _token(client)
+    _upload_only(client, token, CLASSIFICATION)
+    first = _post(client, token, '/core/job/analysis', {'mode': 'classification'}).json['data']['job']
+    _post(client, token, '/core/job/configure', {'target': 'label', 'dataset_name': 'Kept?'})
+    assert client.get(f'{API}/core/job').json['data']['job']['stage'] == 'confirm'
+    changed = _post(client, token, '/core/job/analysis', {'mode': 'regression'}).json['data']['job']
+    assert changed['stage'] == 'configure' and changed['mode'] == 'regression' and changed.get('target_info') is None
+    assert changed['input_inspection'] == first['input_inspection']  # same parse profile: reused
+    assert changed['source_filename'] == first['source_filename']
+
+
+# Stage 4b: the review shows the methodology the run records ---------------------------------------------------------
+
+def _analysis(client):
+    return json.loads(client.get(f'{API}/core/job/analysis').get_data(as_text=True))
+
+
+@pytest.mark.parametrize('mode,data,fields', PATHS, ids=[p[0] for p in PATHS])
+def test_the_review_names_the_methodology_the_run_records(app, mode, data, fields):
+    client = app.test_client()
+    token = _token(client)
+    _upload_only(client, token, data)
+    _post(client, token, '/core/job/analysis', {'mode': mode})
+    review = _post(client, token, '/core/job/configure', {'dataset_name': 'Same', 'purpose': '', **fields}).json['data']['job']['review']
+    ack = {} if mode in {'classification', 'regression', 'unlabeled'} else {'representation_ack': 'confirmed'}
+    assert _post(client, token, '/core/job/generate', ack).json['data']['job']['stage'] == 'report'
+    assert review['methodology'] == _analysis(client)['methodology_id'] and review['name']
+
+
+@pytest.mark.parametrize('expectation,method', [('unknown', 'tabular_partial_classification_v1'), ('expected', 'classification_legacy_2026_08_13')])
+def test_the_role_aware_switch_keeps_the_target_and_the_review_states_the_method(app, expectation, method):
+    client = app.test_client()
+    token = _token(client)
+    _upload_only(client, token, CLASSIFICATION)
+    _post(client, token, '/core/job/analysis', {'mode': 'classification'})
+    switched = _post(client, token, '/core/job/analysis', {'mode': 'annotation_classification', 'target': 'label'}).json['data']['job']
+    assert switched['m3']['task']['targets'] == ['label'] and switched['m3']['task']['features'] is None
+    fields = {'role_label': 'target', 'role_row_id': 'metadata', 'annotation_expectation': expectation}
+    if expectation == 'expected':
+        fields['role_row_id'] = 'feature'  # nothing beyond the scored method's own declarations: the scored method runs
+    review = _post(client, token, '/core/job/configure', fields).json['data']['job']['review']
+    assert review['methodology'] == method and review['scored'] == (method == 'classification_legacy_2026_08_13')
+    _post(client, token, '/core/job/generate', {'representation_ack': 'confirmed'})
+    assert _analysis(client)['methodology_id'] == method
+
+
+def test_bulk_availability_is_listed_apart_and_never_reaches_the_analysis(app):
+    client = app.test_client()
+    token = _token(client)
+    _upload_only(client, token, REGRESSION)
+    _post(client, token, '/core/job/analysis', {'mode': 'regression'})
+    fields = {'target': 'y', 'regression_options_submitted': '1', 'target_kind': 'unspecified', 'availability_x': 'available_at_prediction',
+              'availability_z': 'available_at_prediction', 'availability_bulk': json.dumps(['x', 'nope'])}
+    review = _post(client, token, '/core/job/configure', fields).json['data']['job']['review']
+    assert review['availability']['available'] == ['x', 'z'] and review['availability']['bulk'] == ['x'] and review['availability']['consequence']
+    assert review['availability']['unknown'] == 0 and any('prediction point' in u for u in review['unknowns'])
+    _post(client, token, '/core/job/generate')
+    assert 'availability_bulk' not in json.dumps(_analysis(client))

@@ -143,12 +143,17 @@ def add_m6_source(store,j,form,upload):
             if path.exists():raise ValueError('Uploaded filename is already occupied.')
             upload.save(path);os.chmod(path,0o600)
         source=TextSourceSpec(str(path),fmt,form.get('encoding','utf-8'),form.get('delimiter',','),form.get('quotechar','"'))
-        preview=[]
+        preview=[];records=[]
         for n,(loc,record,reason) in enumerate(frames(path,source,TextAnalysisConfig().execution,TextWorkLimits())):
             if n>=128:break
-            if 'header' in loc:preview=loc['header'];break
-            if record is not None:preview=list(record);break
-        j['sources'].append({'id':identity,'path':path,'format':fmt,'encoding':source.encoding,'delimiter':source.delimiter,'quotechar':source.quotechar,'fields':preview})
+            if 'header' in loc:preview=preview or loc['header'];continue
+            if record is not None:
+                preview=preview or list(record);records.append(record)
+        # Advisory selector discovery over the same framed records (at most 128); never part of the specification.
+        from datatrust.inspection import discover_selectors
+        try:discovery=discover_selectors(records)
+        except Exception as exc:discovery={'error':str(exc)}
+        j['sources'].append({'id':identity,'path':path,'format':fmt,'encoding':source.encoding,'delimiter':source.delimiter,'quotechar':source.quotechar,'fields':preview,'discovery':discovery})
 
 
 def configure_m6(store,j,form):

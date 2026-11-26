@@ -6,7 +6,7 @@ helpers. It never loads data, scores classification, or exports artifacts.
 from dataclasses import asdict
 import numpy as np
 from datatrust.annotations import annotation_coverage, feature_semantics, cohort_evidence, observation
-from datatrust.contracts import AnnotationOptions, RegressionOptions, Applicability, ExecutionStatus, CheckOutcome
+from datatrust.contracts import AnnotationOptions, RegressionOptions, Applicability, ExecutionStatus, CheckOutcome, omit_default_delimiter
 from datatrust.regression import multioutput_evidence
 from datatrust.multilabel import multilabel_evidence, repeated_inputs
 from datatrust.unsupervised import readiness_evidence
@@ -17,7 +17,7 @@ def analyze_tasks(data, task, config, roles, profile, checks, record, optional, 
     semantics=feature_semantics(data,roles['features'],config.features)
     profile['feature_semantics']=semantics
     profile['declarations']={'annotations':asdict(config.annotations or AnnotationOptions()),'features':asdict(config.features),
-                             'regression':asdict(config.regression) if config.regression else None,
+                             'regression':omit_default_delimiter(asdict(config.regression)) if config.regression else None,
                              'multilabel':asdict(config.multilabel) if config.multilabel else None}
     record('feature_semantics',['/profile/feature_semantics'],'selected input features',len(semantics))
     if roles['targets']:
@@ -39,12 +39,16 @@ def analyze_tasks(data, task, config, roles, profile, checks, record, optional, 
         profile['repeated_inputs']=optional('annotation_repetition',lambda:repeated_inputs(data,roles['features'],roles['targets'],task.kind,config.diagnostics,annotations=config.annotations))
         if profile['repeated_inputs'] is not None:record('annotation_repetition',['/profile/repeated_inputs'],'selected input vectors')
     elif task.kind=='regression':
-        profile['multioutput_regression']=optional('multioutput_regression',lambda:multioutput_evidence(data,roles['targets'],roles['features'],config.regression or RegressionOptions(),config.diagnostics,checkpoint,relationship_features=[s['column'] for s in semantics if s['quantitative_geometry']],annotations=config.annotations))
+        profile['multioutput_regression']=optional('multioutput_regression',lambda:multioutput_evidence(data,roles['targets'],roles['features'],config.regression or RegressionOptions(),config.diagnostics,checkpoint,relationship_features=[s['column'] for s in semantics if s['quantitative_geometry']],annotations=config.annotations,
+                                                                                                    semantic_types=config.features.semantic_types,context_availability=config.context.availability() if config.context else None))
         r=profile['multioutput_regression']
         if r is not None:
             record('multioutput_regression',['/profile/multioutput_regression'],'finite observed targets; joint metrics use matched populations')
             for i,o in enumerate(r['outputs']):
                 pointer=f'/profile/multioutput_regression/outputs/{i}'
+                if o.get('dependency_search'):
+                    d=o['dependency_search']
+                    record('regression_dependency_search',[pointer+'/dependency_search'],'feature-target checks within the search bounds',len(d['checks']),len(d['flags']),method='regression_dependency_v1',scope=o['target'])
                 record('output_evidence',[pointer],'finite observed target',o['finite_count'],columns=[o['target']],scope=o['target'])
                 if o['statistics']:
                     for name,reason in o['statistics']['unavailable_statistics'].items():
@@ -139,8 +143,27 @@ def build_m3_findings(profile,task):
         for availability,severity in [('unavailable_at_prediction','High'),('unknown','Moderate')]:
             selected=[{'target':o['target'],**g} for o in r['outputs'] for g in o['relationship_groups'] if g['action_eligible'] and g['availability']==availability]
             add('input_target_relationships_'+availability,'Verified input-target relationships',severity,selected,['/profile/multioutput_regression'],'Confirm prediction-time availability. Verified relationships apply only to their observed support, not missing outputs.','fully verified finite input-target overlaps')
+        for code,severity,availability in [('regression_dependency_unavailable','High','unavailable_at_prediction'),('regression_dependency_availability_unknown','Moderate','unknown'),
+                                           ('regression_dependency_declared_available','Low','available_at_prediction')]:
+            selected=[{'target':o['target'],'feature':f['feature'],'family':f['family'],'form':f['form'],'wording':f['wording']}
+                      for o in r['outputs'] for f in (o.get('dependency_search') or {}).get('flags',[]) if f['availability']==availability]
+            add(code,'Inputs that determine an output (regression_dependency_v1)',severity,selected,['/profile/multioutput_regression'],
+                'Declare when each feature becomes known; a deterministic relationship is evidence for review, not proof of leakage.' if availability=='unknown' else
+                'Exclude these features from evaluation for the declared objective, or correct the declaration.' if availability=='unavailable_at_prediction' else
+                'Verify the declaration and that the rule holds outside this file.','finite outputs with the feature present')
+            if selected:findings[-1]['version']='regression_dependency_v1'
     readiness=profile.get('readiness')
     if readiness:
+        coverage=readiness.get('complete_case_coverage') or {}
+        if coverage.get('review'):
+            add('limited_complete_case_coverage','Rows with every quantitative feature finite','Moderate' if coverage['review']=='moderate' else 'Low',
+                [{'complete_rows':coverage['complete_rows'],'rows':coverage['rows'],'share':coverage['share'],'quantitative_feature_count':coverage['quantitative_feature_count']}],
+                ['/profile/readiness/complete_case_coverage'],'Decide how rows with gaps are handled (dropped or imputed) before a distance-based method; either changes the population analysed.',
+                'rows of the selected input representation')
+        redundancy=readiness.get('redundant_quantitative_features') or {}
+        add('redundant_quantitative_features','Quantitative features that carry nearly the same information','Low',redundancy.get('pairs') or [],
+            ['/profile/readiness/redundant_quantitative_features'],'Distance-based methods will weight this dimension more than once. This may be intended; keep both, drop one, or combine them deliberately.',
+            'pairwise finite overlaps of eligible quantitative features')
         add('conditional_scale_review','Conditional quantitative scale review','Low',[r for r in readiness['scale_ratios'] if r['conditional_review']],['/profile/readiness'],'Review units and preprocessing for the chosen method; representation-dependent scale ratios do not prove similarity distortion.','separate declared and assumed quantitative populations')
     repetition=profile.get('repeated_inputs') or (r or {}).get('repeated_inputs')
     if repetition and repetition.get('varying_row_union'):

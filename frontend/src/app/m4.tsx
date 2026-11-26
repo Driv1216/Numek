@@ -1,13 +1,14 @@
 // M4 in the app: Sources, Configure, Confirm and Report, on the same session job as the classic /m4 pages.
 // Targets, features, groups and keys are picked as column chips; the request keeps the classic fields.
 import { useCallback, useEffect, useRef, useState, type ReactElement } from 'react';
-import { Status } from '../foundation/system';
 import { reducedMotion } from '../foundation/motion';
 import { ApiError, api, type Fields, type M4Analysis, type M4Job, type M4Mode, type SessionInfo } from './api';
 import { Corners, SeparatorSelect, Viewer, separatorName } from './parts';
-import { date } from './results/adapter';
-import { M4_MODE_LABEL, RolesReport, rolesOf, runName } from './results/roles';
+import { ResultError } from './flow';
+import { ReportBar } from './results/shell/ReportBar';
+import { M4_MODE_LABEL, RolesReport, runName } from './results/roles';
 import { navigate, onLink } from './router';
+import { Layer } from './configure';
 
 type Flash = (e: unknown) => void;
 export type M4Step = 'sources' | 'configure' | 'confirm' | 'report';
@@ -138,6 +139,14 @@ function KeyRows({ value, options, onChange, label }: { value: string; options: 
   );
 }
 
+const INTENT_TEXT: Record<string, string> = {
+  unknown: 'Not declared: overlap is reported, not called a violation',
+  record_disjoint: 'No record may appear in more than one split',
+  entity_disjoint: 'No entity (identity key) may appear in more than one split',
+  group_disjoint: 'No group may span more than one split',
+  overlap_permitted: 'Overlap between splits is allowed',
+};
+
 function Configure({ job, setJob, flash }: { job: M4Job; setJob: (j: M4Job) => void; flash: Flash }) {
   const [f, setF] = useState<Fields>(() => {
     const out: Fields = { identity_keys: '', group_keys: '', evaluation_intent: 'unknown', configuration: '{}', ...job.fields };
@@ -150,53 +159,86 @@ function Configure({ job, setJob, flash }: { job: M4Job; setJob: (j: M4Job) => v
   });
   const [busy, setBusy] = useState(false);
   const set = (k: string, v: string) => setF((x) => ({ ...x, [k]: v }));
-  const aligned = [...new Set(job.sources.flatMap((s) => { try { const m = JSON.parse(f[`${s.id}_mapping`] || '{}') as Record<string, string>; return s.headers.map((h) => m[h] ?? h); } catch { return s.headers; } }))];
+  const mapping = (id: string): Record<string, string> => { try { return JSON.parse(f[`${id}_mapping`] || '{}'); } catch { return {}; } };
+  const alignedOf = (s: M4Job['sources'][number]) => s.headers.map((h) => mapping(s.id)[h] ?? h);
+  const aligned = [...new Set(job.sources.flatMap(alignedOf))];
+  const partial = job.sources.length > 1 ? aligned.filter((c) => !job.sources.every((s) => alignedOf(s).includes(c))) : [];
+  const keyRows = f.identity_keys.split('\n').map((l) => l.trim()).filter(Boolean);
+  const keySuggestions = (job.suggestions?.identity_keys ?? []).filter((k) => !keyRows.includes(k.columns.join(',')));
+  const mapSuggestions = (job.suggestions?.mappings ?? []).filter((m) => mapping(m.source)[m.column] !== m.aligned);
   const submit = () => { setBusy(true); api.m4.configure(f).then((r) => { setJob(r.job); navigate(m4Href('confirm')); }).catch(flash).finally(() => setBusy(false)); };
+  const compare = job.mode !== 'advanced';
   return (
     <div className="ap-cf">
-      <header className="ap-head"><span className="nk-label">Step 2 · Configure</span><h1>Roles, parsing and alignment.</h1><p>{M4_MODE_LABEL[job.mode]}. No silent feature intersection or inferred renaming occurs.</p></header>
-      {job.sources.map((s) => (
-        <section key={s.id} className="ap-sec ap-m4src" aria-label={`${s.filename} declarations`}>
-          <h2 className="ap-q">{s.filename}</h2>
-          <div className="ap-fields ap-fields--two">
-            {job.mode === 'before_after'
-              ? <label>Source role<input readOnly value={s.id === 'source1' ? 'Before (the first source)' : 'After (the second source)'} /></label>
-              : <label>Source role<select value={f[`${s.id}_role`]} onChange={(e) => set(`${s.id}_role`, e.target.value)}>{ROLES[job.mode].map((r) => <option key={r} value={r}>{ROLE_LABEL[r] ?? r}</option>)}</select></label>}
-            <label>Task<select value={f[`${s.id}_task`]} onChange={(e) => set(`${s.id}_task`, e.target.value)}>{TASKS.map((t) => <option key={t}>{t}</option>)}</select></label>
-          </div>
-          {([['targets', 'Targets', 'leave empty for target-free sources'], ['features', 'Selected features', 'none selected uses every eligible feature'], ['groups', 'Within-source group columns', '']] as const).map(([k, l, hint]) => (
-            <div key={k} className="ap-chipset"><span className="ap-chipset__l">{l}{hint && <em>{hint}</em>}</span><Chips options={s.headers} value={split(f[`${s.id}_${k}`])} label={`${l} for ${s.filename}`} onChange={(v) => set(`${s.id}_${k}`, v.join(','))} /></div>
-          ))}
-          <details className="ap-more">
-            <summary>Parsing, analytical declarations and name mapping</summary>
-            <div className="ap-fields ap-fields--two">
-              <label>Per-source parsing and analytical declarations <span>AnalysisConfig JSON</span><textarea rows={4} value={f[`${s.id}_parsing`]} onChange={(e) => set(`${s.id}_parsing`, e.target.value)} /></label>
-              <label>Source-name → aligned-name mapping <span>JSON; exact names otherwise</span><textarea rows={4} value={f[`${s.id}_mapping`]} onChange={(e) => set(`${s.id}_mapping`, e.target.value)} /></label>
+      <header className="ap-head"><span className="nk-label">Step 2 · Configure</span><h1>{compare ? 'How do these files relate?' : 'Roles, parsing and limits.'}</h1><p>{M4_MODE_LABEL[job.mode]}. No silent feature intersection or inferred renaming occurs: suggestions apply only when you choose them.</p></header>
+      <Layer kind="essential" title={compare ? 'Which file plays which part?' : 'The file'} why={job.mode === 'splits' ? 'Roles decide which pairs are checked for overlap and which populations are compared.' : job.mode === 'advanced' ? undefined : 'The reference is what the current version is compared against.'}>
+        <div className="ap-m4roles">
+          {job.sources.map((s) => (
+            <div key={s.id} className="ap-m4roles__r">
+              <b>{s.filename}</b>
+              <span className="ap-muted">{s.inspection?.coverage?.statement ?? s.inspection?.error ?? ''}</span>
+              {job.mode === 'before_after'
+                ? <span className="ap-m4roles__fixed">{s.id === 'source1' ? 'Before (the first source)' : 'After (the second source)'}</span>
+                : <select aria-label={`Role of ${s.filename}`} value={f[`${s.id}_role`]} onChange={(e) => set(`${s.id}_role`, e.target.value)}>{ROLES[job.mode].map((r) => <option key={r} value={r}>{ROLE_LABEL[r] ?? r}</option>)}</select>}
             </div>
-            <p className="ap-muted">Example: {'{"parsing":{"column_types":{"id":"string"}},"features":{"semantic_types":{"id":"identifier"}}}'}. Declared identifiers and keys default to exact strings and empty-only missingness.</p>
-          </details>
-        </section>
-      ))}
-      {job.mode !== 'advanced' && (
-        <section className="ap-sec" aria-labelledby="ap-cmp-h">
-          <h2 id="ap-cmp-h" className="ap-q">How the sources relate</h2>
+          ))}
+        </div>
+      </Layer>
+      {compare && (
+        <Layer kind="recommended" title={job.mode === 'splits' ? 'What must not be shared between splits?' : job.mode === 'before_after' ? 'What did the pipeline do, and how are rows traced?' : 'How are rows matched across versions?'}
+          why={job.mode === 'splits' ? 'Training data that reappears in evaluation inflates measured performance. Declaring what must stay separate turns overlap into a checked requirement.' : 'An identity key lets DataTrust follow the same record across files instead of comparing totals only.'}
+          ifMissing={job.mode === 'splits' ? 'Overlap is reported, but not called a violation.' : 'Rows cannot be traced; only counts and distributions are compared.'}>
+          {job.mode === 'splits' && (
+            <fieldset className="ap-intent-q"><legend className="ap-q ap-q--sub">Separation required</legend>
+              {INTENTS.map((i) => (
+                <label key={i} className={`ap-opt ${f.evaluation_intent === i ? 'is-on' : ''}`}><input type="radio" name="intent" checked={f.evaluation_intent === i} onChange={() => set('evaluation_intent', i)} /><span className="ap-opt__r" aria-hidden="true" /><span className="ap-opt__t"><b>{INTENT_TEXT[i]}</b>{i === 'entity_disjoint' && <span>Needs an identity key below.</span>}{i === 'group_disjoint' && <span>Needs a group key below.</span>}</span></label>
+              ))}
+            </fieldset>
+          )}
+          {keySuggestions.length > 0 && (
+            <p className="ap-suggest">Suggested identity {keySuggestions.length === 1 ? 'key' : 'keys'}: {keySuggestions.map((k) => (
+              <button key={k.columns.join()} type="button" className="ap-chip" title={k.text} onClick={() => set('identity_keys', [...keyRows, k.columns.join(',')].join('\n'))}>{k.columns.join(' + ')}? <code>{k.rule}</code></button>
+            ))}</p>
+          )}
           <KeyRows label="Identity keys" value={f.identity_keys} options={aligned} onChange={(v) => set('identity_keys', v)} />
           <KeyRows label="Comparison group keys" value={f.group_keys} options={aligned} onChange={(v) => set('group_keys', v)} />
           {job.mode === 'before_after' && (
             <div className="ap-fields">
               <label>Declared transformations <span>JSON list · kinds: impute, drop_rows, drop_columns, cap, transform, encode, rename, deduplicate, filter, resample, other</span>
                 <textarea rows={4} value={f.transformations ?? '[]'} onChange={(e) => set('transformations', e.target.value)} /></label>
-              <p className="ap-muted">For example {'[{"kind": "drop_columns", "columns": ["telephone"]}, {"kind": "impute", "columns": ["age"]}, {"kind": "filter", "description": "credit_amount < 10000"}]'}. Declared steps are compared with what the data shows; nothing is performed. Identity keys above make record-level lineage possible.</p>
+              <p className="ap-muted">For example {'[{"kind": "drop_columns", "columns": ["telephone"]}, {"kind": "impute", "columns": ["age"]}]'}. Declared steps are compared with what the data shows; nothing is performed. Fewer findings afterwards do not establish improvement.</p>
             </div>
           )}
-{job.mode !== 'before_after' &&           <div className="ap-fields"><label>Evaluation intent<select value={f.evaluation_intent} onChange={(e) => set('evaluation_intent', e.target.value)}>{INTENTS.map((i) => <option key={i} value={i}>{i.replace(/_/g, ' ')}</option>)}</select></label></div>}
-        </section>
+          {(partial.length > 0 || mapSuggestions.length > 0) && (
+            <div className="ap-align">
+              <h3 className="ap-q ap-q--sub">Columns that do not align</h3>
+              {partial.length > 0 && <p className="ap-muted">Not in every source, so not compared: {partial.join(', ')}.</p>}
+              {mapSuggestions.length > 0 && <p className="ap-suggest">Possibly the same column: {mapSuggestions.map((m) => (
+                <button key={`${m.source}:${m.column}`} type="button" className="ap-chip" title={m.text} onClick={() => set(`${m.source}_mapping`, JSON.stringify({ ...mapping(m.source), [m.column]: m.aligned }))}>{m.column} → {m.aligned}? <code>{m.rule}</code></button>
+              ))}</p>}
+            </div>
+          )}
+        </Layer>
       )}
-      <details className="ap-more ap-sec">
-        <summary>Job execution and advanced diagnostics</summary>
-        <div className="ap-fields"><label>Configuration <span>JSON</span><textarea rows={5} value={f.configuration} onChange={(e) => set('configuration', e.target.value)} /></label></div>
+      <Layer kind="advanced" title="Tasks, targets, parsing, name mapping and limits">
+        {job.sources.map((s) => (
+          <section key={s.id} className="ap-sec ap-m4src" aria-label={`${s.filename} declarations`}>
+            <h3 className="ap-q ap-q--sub">{s.filename}</h3>
+            <div className="ap-fields ap-fields--two">
+              <label>Task<select value={f[`${s.id}_task`]} onChange={(e) => set(`${s.id}_task`, e.target.value)}>{TASKS.map((t) => <option key={t}>{t}</option>)}</select></label>
+            </div>
+            {([['targets', 'Targets', 'leave empty for target-free sources'], ['features', 'Selected features', 'none selected uses every eligible feature'], ['groups', 'Within-source group columns', '']] as const).map(([k, l, hint]) => (
+              <div key={k} className="ap-chipset"><span className="ap-chipset__l">{l}{hint && <em>{hint}</em>}</span><Chips options={s.headers} value={split(f[`${s.id}_${k}`])} label={`${l} for ${s.filename}`} onChange={(v) => set(`${s.id}_${k}`, v.join(','))} /></div>
+            ))}
+            <div className="ap-fields ap-fields--two">
+              <label>Per-source parsing and analytical declarations <span>AnalysisConfig JSON</span><textarea rows={4} value={f[`${s.id}_parsing`]} onChange={(e) => set(`${s.id}_parsing`, e.target.value)} /></label>
+              <label>Source-name → aligned-name mapping <span>JSON; exact names otherwise</span><textarea rows={4} value={f[`${s.id}_mapping`]} onChange={(e) => set(`${s.id}_mapping`, e.target.value)} /></label>
+            </div>
+          </section>
+        ))}
+        <div className="ap-fields"><label>Job execution and advanced diagnostics <span>JSON</span><textarea rows={5} value={f.configuration} onChange={(e) => set('configuration', e.target.value)} /></label></div>
         <p className="ap-muted">Use execution for job limits and advanced for constraints, requested_pairs, spearman_pairs, and segments. Version comparisons optionally accept inference:true with sampling:"independent_rows". Budgets remain bounded and coverage is reported explicitly.</p>
-      </details>
+      </Layer>
       <div className="ap-acts">
         <button type="button" className={`nk-btn ${busy ? 'is-run' : ''}`} disabled={busy} onClick={submit}>{busy ? 'Binding the specification…' : 'Review effective specification →'}</button>
         <a className="nk-btn nk-btn--ghost" href={m4Href('sources')} onClick={onLink}>Back to sources</a>
@@ -249,26 +291,19 @@ function M4Downloads({ flash }: { flash: Flash }) {
   );
 }
 
-export function m4Header(a: M4Analysis, mode: string, open: () => void) {
-  const roles = rolesOf(a);
-  return (
-    <header className="ap-rs__bar">
-      <h1>{runName(a)}</h1>
-      <p>{roles.map((r) => r.file).join(' ↔ ')} · {M4_MODE_LABEL[mode] ?? mode}<br />{date(a.generated_at)} · {a.findings.length} finding{a.findings.length === 1 ? '' : 's'} · <button type="button" className="ap-rs__open" onClick={open}>Open report ↗</button></p>
-    </header>
-  );
-}
 
 function Report({ job, setJob, flash, onNew }: { job: M4Job; setJob: (j: M4Job) => void; flash: Flash; onNew: () => void }) {
   const [a, setA] = useState<M4Analysis | null>(null);
-  const [view, setView] = useState(false);
+  const [failed, setFailed] = useState<string | null>(null);
+  const [attempt, setAttempt] = useState(0);
+  const [view, setView] = useState<false | true | string>(false);
   const running = job.state === 'running';
   useEffect(() => {
     if (!running) return;
     const t = setInterval(() => { api.m4.job().then((r) => r.job && setJob(r.job)).catch(() => {}); }, 1000);
     return () => clearInterval(t);
   }, [running, setJob]);
-  useEffect(() => { if (job.result) api.m4.analysis().then(setA).catch(flash); }, [job.result?.status]);
+  useEffect(() => { setFailed(null); if (job.result) api.m4.analysis().then(setA).catch((e) => setFailed(e instanceof Error ? e.message : 'The result could not be read.')); }, [job.result?.status, attempt]);
   if (running) return (
     <div className="ap-co">
       <header className="ap-head"><span className="nk-label">Step 4 · Analyze</span><h1>Analyzing locally.</h1><p>One supervised worker on this machine. You can leave this page; the result stays in this session.</p></header>
@@ -283,17 +318,13 @@ function Report({ job, setJob, flash, onNew }: { job: M4Job; setJob: (j: M4Job) 
       <div className="ap-acts"><a className="nk-btn" href={m4Href('confirm')} onClick={onLink}>Back to confirm</a><a className="nk-btn nk-btn--ghost" href={m4Href('configure')} onClick={onLink}>Edit declarations</a></div>
     </div>
   );
+  if (failed) return <ResultError message={failed} onRetry={() => setAttempt((x) => x + 1)} />;
   if (!a) return <div className="ap-rs"><div className="nk-mosaic nk-mosaic--big nk-mosaic--run ap-rs__wait" aria-busy="true" /></div>;
   return (
     <>
-      <RolesReport a={a} header={m4Header(a, job.mode, () => setView(true))} out={
-        <section className="ap-rs__out">
-          <div><h2 className="ap-q">Take it with you</h2>
-            {job.saved_entry ? <p className="ap-muted ap-rs__savedline"><Status tone="on">Saved on this machine · <a href="/app/history" onClick={onLink}>manage in History</a></Status>A PDF you download now is added to the saved copy.</p>
-              : <p className="ap-muted">Exports use completed evidence and do not reanalyze. This result lasts for this session.</p>}</div>
-          <div className="ap-acts"><button type="button" className="nk-btn" onClick={() => setView(true)}>View full report</button><M4Downloads flash={flash} /><button type="button" className="nk-btn nk-btn--ghost" onClick={onNew}>New comparison</button></div>
-        </section>} />
-      {view && <Viewer name={runName(a)} src={api.m4.report} note="the canonical DataTrust comparison report" downloads={<M4Downloads flash={flash} />} onClose={() => setView(false)} />}
+      <RolesReport a={a} presentation="/m4/presentation" onOpen={(x) => setView(x ?? true)} out={
+        <ReportBar saved={!!job.saved_entry} downloads={<M4Downloads flash={flash} />} onView={() => setView(true)} extra={<button type="button" className="nk-btn nk-btn--ghost" onClick={onNew}>New comparison</button>} />} />
+      {view && <Viewer name={runName(a)} src={typeof view === 'string' ? `${api.m4.report}#${encodeURIComponent(view)}` : api.m4.report} note="the canonical DataTrust comparison report" downloads={<M4Downloads flash={flash} />} onClose={() => setView(false)} />}
     </>
   );
 }

@@ -193,6 +193,12 @@ def render_analysis_result(result, *, print_profile="focused"):
     return _with_separator_note(_render_analysis_result(result, print_profile), result)
 
 
+def _interpretation(value, result):
+    """interpretation_v1 for the report (Stage 6D): the same function the dashboards render, from the recorded result only."""
+    from datatrust.interpretation import interpret
+    return interpret(value, family_of(result))
+
+
 def _render_analysis_result(result, print_profile="focused"):
     from datatrust.report_layout import PROFILES
     if print_profile not in PROFILES:
@@ -203,22 +209,22 @@ def _render_analysis_result(result, print_profile="focused"):
         from datatrust.cross_presentation import report_view
         from datatrust.report_concepts import build_manifest
         view = report_view(result, print_profile)
-        return env.get_template('cross_report.html').render(result=value, view=view, M=build_manifest('cross', value, view))
+        return env.get_template('cross_report.html').render(result=value, view=view, I=_interpretation(value, result), M=build_manifest('cross', value, view))
     if result.schema_version == '1.6':
         from datatrust.image_presentation import report_view
         from datatrust.report_concepts import build_manifest
         view = report_view(result, print_profile)
-        return env.get_template('image_report.html').render(result=value, view=view, M=build_manifest('image', value, view))
+        return env.get_template('image_report.html').render(result=value, view=view, I=_interpretation(value, result), M=build_manifest('image', value, view))
     if result.schema_version == '1.5':
         from datatrust.text_presentation import report_view
         from datatrust.report_concepts import build_manifest
         view = report_view(result, print_profile)
-        return env.get_template('text_report.html').render(result=value, view=view, M=build_manifest('text', value, view))
+        return env.get_template('text_report.html').render(result=value, view=view, I=_interpretation(value, result), M=build_manifest('text', value, view))
     if result.schema_version == '1.4':
         from datatrust.temporal_presentation import report_view
         from datatrust.report_concepts import build_manifest
         view = report_view(result, profile_name=print_profile)
-        return env.get_template('temporal_report.html').render(result=value, view=view, M=build_manifest('temporal', value, view))
+        return env.get_template('temporal_report.html').render(result=value, view=view, I=_interpretation(value, result), M=build_manifest('temporal', value, view))
     if result.schema_version in ('1.3', '1.2'):
         from datatrust.report_concepts import build_manifest
         if result.schema_version == '1.3':
@@ -227,15 +233,15 @@ def _render_analysis_result(result, print_profile="focused"):
             from datatrust.presentation import report_view
         view = report_view(result, print_profile)
         manifest = build_manifest(family_of(result), value, view)
-        return env.get_template('m4_report.html' if result.schema_version == '1.3' else 'm3_report.html').render(result=value, view=view, M=manifest)
+        return env.get_template('m4_report.html' if result.schema_version == '1.3' else 'm3_report.html').render(result=value, view=view, I=_interpretation(value, result), M=manifest)
     from datatrust.tabular_presentation import report_view as tabular_view
     from datatrust.report_concepts import build_manifest
     view = tabular_view(value, print_profile)
     manifest = build_manifest(family_of(result), value, view)
     if result.methodology_id == "classification_legacy_2026_08_13":
         # The current classification report; the frozen legacy report.html stays with render_html_report.
-        return env.get_template("classification_report.html").render(result=value, view=view, M=manifest)
-    return env.get_template("regression_report.html" if result.task.kind == "regression" else "unlabeled_report.html").render(result=value, view=view, M=manifest)
+        return env.get_template("classification_report.html").render(result=value, view=view, I=_interpretation(value, result), M=manifest)
+    return env.get_template("regression_report.html" if result.task.kind == "regression" else "unlabeled_report.html").render(result=value, view=view, I=_interpretation(value, result), M=manifest)
 
 
 def write_analysis_json(result, path):

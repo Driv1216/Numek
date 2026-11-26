@@ -21,20 +21,22 @@ import json
 from flask import Blueprint, abort, jsonify, redirect, request, send_file, send_from_directory, session
 from werkzeug.exceptions import HTTPException, RequestEntityTooLarge, default_exceptions
 
+from datatrust.dashboard_companion import Cache as CompanionCache
 from datatrust.history import HistoryError
 from datatrust.profiler import inspect_classification_target
 from datatrust.renderer import _regression_inspection_notice, presentation_identity
 from datatrust.report_identity import family_of
 from datatrust.ingestion import source_digest, source_signature
+from datatrust.contracts import omit_default_delimiter
 from datatrust.m4_web import add_m4_source, configure_m4, discard_m4, m4_artifact, run_m4, start_m4
 from datatrust.temporal_web import add_m5_source, configure_m5, m5_artifact, m5_investigation, run_m5, start_m5
 from datatrust.text_web import add_m6_source, configure_m6, m6_artifact, m6_checked, m6_evidence, m6_excerpts, names as m6_names, run_m6, start_m6
 from werkzeug.datastructures import MultiDict
-from datatrust.cross_web import confirm_m9, m9_action, m9_action_message, m9_artifact, m9_checked, m9_disclose, m9_import_review, m9_load_result, m9_target, preview_m9, run_m9, start_m9
+from datatrust.cross_web import confirm_m9, m9_action, m9_action_message, m9_artifact, m9_checked, m9_disclose, m9_import_review, m9_load_result, m9_target, model_status, preview_m9, run_m9, start_m9
 from datatrust.image_web import add_m7_source, configure_m7, inspect_m7, m7_artifact, m7_checked, m7_examples, m7_pairs, m7_resolve, run_m7, start_m7
 from werkzeug.utils import secure_filename
 from datatrust.pdf import PDFRenderError, render_pdf_report
-from datatrust.web import M3_MODES, WorkflowError, artifact_owned, configure_core, configure_m3, core_parsing, core_pdf, generate_report, set_delimiter, start_job
+from datatrust.web import M3_MODES, WorkflowError, artifact_owned, configure_core, configure_m3, core_parsing, core_pdf, generate_report, set_delimiter, start_job, start_upload, choose_analysis, refresh_input_inspection
 
 PREFIX = '/api/datatrust/v1'
 CORE_MODES = ('classification', 'regression', 'unlabeled', *sorted(M3_MODES))
@@ -80,6 +82,8 @@ def _warnings(job, warnings):
 
 
 def stage_of(job):
+    if job.get('mode') is None:
+        return 'choose'  # uploaded and inspected; no analysis chosen yet
     if 'summary' in job and artifact_owned(job, 'html'):
         return 'report'
     return 'confirm' if 'target_info' in job else 'configure'
@@ -94,14 +98,18 @@ def job_view(job):
         'dataset_name': job.get('dataset_name'), 'purpose': job.get('purpose'), 'target': job.get('target'),
         'inspection': {**{k: plain(inspection.get(k)) for k in ('row_count', 'preview_row_count', 'column_count', 'columns', 'preview', 'target_options', 'limits')},
                        'parsing_warnings': _warnings(job, inspection.get('parsing_warnings'))},
-        'config': {'parsing': plain(config.parsing), 'regression': plain(config.regression), 'fidelity_inspection': plain(config.fidelity_inspection),
+        'config': {'parsing': plain(config.parsing), 'regression': omit_default_delimiter(plain(config.regression)) if config.regression else None, 'fidelity_inspection': plain(config.fidelity_inspection),
                    'context': config.context.to_dict() if config.context else None},
         'delimiter_detected': bool(job.get('delimiter_detected')),
         'target_info': bounded_target(plain(job.get('target_info'))) if 'target_info' in job else None,
         'summary': None,
         'artifacts': sorted(k for k in ('html', 'pdf', 'json') if artifact_owned(job, k)),
         'saved_entry': (job.get('history') or {}).get('entry') if (job.get('history') or {}).get('json_sha256') == job.get('artifacts', {}).get('json', {}).get('sha256') else None,
+        # Advisory only (input_inspection_v1): kept current with the job's parse profile, never part of the analysis.
+        'input_inspection': plain(refresh_input_inspection(job)),
     }
+    view['suggestions'] = input_suggestions(view['input_inspection'])
+    view['review'] = review_view(job) if 'target_info' in job else None
     if job['mode'] in M3_MODES:
         task, features, annotation = job.get('task_spec'), config.features, config.annotations
         view['m3'] = {
@@ -118,6 +126,84 @@ def job_view(job):
         summary['parsing_warnings'] = _warnings(job, job['summary'].get('parsing_warnings'))
         view['summary'] = summary
     return view
+
+
+READINESS_METHODS = {'tabular_clustering_readiness_v1', 'tabular_anomaly_readiness_v1', 'tabular_clustering_readiness_v2', 'tabular_anomaly_readiness_v2'}
+CORE_METHODS = {'classification': 'classification_legacy_2026_08_13', 'regression': 'tabular_regression_v1', 'unlabeled': 'unlabeled_csv_profile_v1'}
+METHOD_NAMES = {
+    'classification_legacy_2026_08_13': 'Category outcome, with the review score',
+    'tabular_regression_v1': 'Numerical outcome',
+    'unlabeled_csv_profile_v1': 'Dataset profile',
+    'tabular_partial_classification_v1': 'Role-aware category outcome',
+    'tabular_annotation_regression_v1': 'Role-aware numerical outcome',
+    'tabular_multioutput_regression_v1': 'Several numerical outcomes',
+    'tabular_multilabel_v1': 'Several labels per row',
+    'tabular_clustering_readiness_v1': 'Clustering readiness',
+    'tabular_anomaly_readiness_v1': 'Anomaly-detection readiness',
+    'tabular_clustering_readiness_v2': 'Clustering readiness',
+    'tabular_anomaly_readiness_v2': 'Anomaly-detection readiness',
+    'tabular_role_profile_v1': 'Profile with chosen columns',
+}
+BULK_CONSEQUENCE = ('Declaring a column available tells DataTrust it is known before the prediction is made. If one of these is only '
+                    'known after the outcome, its relation to the target is treated as legitimate and the leakage concern does not appear.')
+
+
+def review_view(job):
+    """What will run, as the run will record it: the methodology (the same `effective_policy` the analysis uses), the
+    declarations, and what stays unknown. Built from the confirmed job; presentation only."""
+    mode, config, info = job['mode'], job['config'], job.get('target_info') or {}
+    method = info.get('methodology') if mode in M3_MODES else CORE_METHODS[mode]
+    task = job.get('task_spec')
+    targets = list(task.targets) if mode in M3_MODES and task else [job['target']] if job.get('target') else []
+    columns = [c for c in job['inspection']['columns'] if c not in targets]
+    context = config.context
+    if mode == 'regression' or method in {'tabular_annotation_regression_v1', 'tabular_multioutput_regression_v1'}:
+        declared = dict((config.regression.feature_availability if config.regression else {}) or {})
+    else:
+        declared = {c: d.availability for c, d in (context.columns.items() if context else []) if d.availability}
+    available = [c for c in columns if declared.get(c) == 'available_at_prediction']
+    unavailable = [c for c in columns if declared.get(c) == 'unavailable_at_prediction']
+    bulk = [c for c in job.get('availability_bulk') or [] if c in available]
+    point = context.prediction_point if context else None
+    codes = sum(len(d.placeholders or {}) + len(d.sentinels or ()) for d in (context.columns.values() if context else []))
+    predicts = method not in {'unlabeled_csv_profile_v1', 'tabular_role_profile_v1', *READINESS_METHODS}
+    unknowns = []
+    if predicts and not point:
+        unknowns.append('No prediction point is declared, so availability at prediction time is not checked against it.')
+    if predicts and len(columns) - len(available) - len(unavailable):
+        unknowns.append(f'{len(columns) - len(available) - len(unavailable):,} of {len(columns):,} columns have unknown availability. '
+                        'A column known only after the outcome cannot be detected from the data alone.')
+    if method == 'classification_legacy_2026_08_13':
+        unknowns.append('Leakage is checked by column name and by a bounded target-dependency search; meaning is not.')
+    if method == 'tabular_regression_v1':
+        unknowns.append('Exact copies, linear rescalings and sums of two columns are searched, plus lookups, binned copies and monotone mappings '
+                        '(the opt-in dependency search). Other relations are not searched.' if config.regression and config.regression.dependency_search else
+                        'Only copies, linear rescalings and sums of two columns are searched as relations that reproduce the target. '
+                        'The opt-in dependency search (Advanced) also looks for lookups, binned copies and monotone mappings.')
+    if method in READINESS_METHODS:
+        if config.features.scale_sensitive is None:
+            unknowns.append('Whether the intended method is sensitive to feature scales is undeclared, so scale differences are reported conditionally.')
+        unknowns.append('No model is fitted and no readiness verdict is given.')
+    annotations = config.annotations
+    if annotations is not None and annotations.default.expectation == 'unknown':
+        unknowns.append('No annotation expectation is declared, so missing labels are not called gaps.')
+    return {
+        'methodology': method, 'name': METHOD_NAMES.get(method, method), 'scored': method == 'classification_legacy_2026_08_13',
+        'targets': targets,
+        'availability': {'available': available, 'unavailable': unavailable, 'unknown': len(columns) - len(available) - len(unavailable),
+                         'bulk': bulk, 'consequence': BULK_CONSEQUENCE if bulk else None} if predicts else None,
+        'prediction_point': point, 'codes_declared': codes, 'unknowns': unknowns,
+    }
+
+
+def input_suggestions(inspection):
+    """Advisory guidance derived from the input inspection: which analyses fit the file ("Start from a CSV") and the
+    numerical-outcome groups. None when the inspection failed."""
+    from datatrust.applicability import applicable_analyses
+    from datatrust.target_guidance import regression_target_groups
+    if not inspection or 'columns' not in inspection:
+        return None
+    return {'analyses': applicable_analyses(inspection), 'regression_targets': regression_target_groups(inspection)}
 
 
 # Canonical statements that are narrative, not findings (frontend/src/app/results/outcome-map.json "narrative_only").
@@ -184,6 +270,24 @@ def names_only(value):
     return value
 
 
+def compact_inspection(inspection):
+    """A source's advisory inspection for the page: coverage and each column's rules, without the repeated texts."""
+    if not inspection:
+        return None
+    if 'columns' not in inspection:
+        return {'error': inspection.get('error')}
+    return {'coverage': plain(inspection['coverage']), 'rules': inspection['rules'],
+            'columns': [{'name': c['name'], 'rules': [x['rule'] for x in c['suggestions']], 'roles': sorted({x['role'] for x in c['suggestions']}),
+                         'distinct': (c['observed'] or {}).get('distinct'), 'missing': (c['observed'] or {}).get('missing')} for c in inspection['columns']]}
+
+
+def source_suggestions(sources):
+    """Comparison suggestions across a job's sources (R-KEY-1 identity keys, R-MAP-1 name mappings). Advisory."""
+    from datatrust.inspection import identity_key_candidates, name_mapping_candidates
+    return {'identity_keys': identity_key_candidates({s['id']: s.get('inspection') for s in sources}),
+            'mappings': name_mapping_candidates({s['id']: list(s['headers']) for s in sources})}
+
+
 def async_view(j, **extra):
     """A supervised job (M5 onward) as data: sources by file name, specification with paths reduced to names."""
     name = lambda src: src.get('filename') or PurePath(str(src['path'])).name
@@ -194,7 +298,8 @@ def async_view(j, **extra):
         'state': j['state'],
         'sources': [{'id': src['id'], 'filename': name(src), 'format': src.get('format'), 'origin': 'upload' if src.get('owned', src['path'].parent == j.get('directory')) else 'local',
                      'headers': plain(src.get('headers') or src.get('fields') or []), 'preview': plain(src.get('preview') or []), 'sha256': src.get('sha256'),
-                     'delimiter': src.get('delimiter', ','), 'delimiter_detected': bool(src.get('delimiter_detected'))} for src in j.get('sources', [])],
+                     'delimiter': src.get('delimiter', ','), 'delimiter_detected': bool(src.get('delimiter_detected')),
+                     'inspection': compact_inspection(src.get('inspection')), 'time': plain(src.get('time')), 'discovery': plain(src.get('discovery'))} for src in j.get('sources', [])],
         'fields': j.get('fields', {}), 'fingerprint': j.get('fingerprint'),
         'manifest': _scrub(plain(j.get('manifest')), names), 'configuration': plain(j.get('configuration')),
         'effective': _scrub(plain(j.get('effective')), names),
@@ -212,7 +317,9 @@ def m4_view(j):
         'mode': j['mode'], 'state': j['state'], 'limit': M4_LIMITS[j['mode']],
         'sources': [{'id': src['id'], 'filename': src['filename'], 'origin': 'upload' if src['owned'] else 'local',
                      'headers': plain(src['headers']), 'preview': plain(src['preview']), 'sha256': src['sha256'],
-                     'delimiter': src.get('delimiter', ','), 'delimiter_detected': bool(src.get('delimiter_detected'))} for src in j['sources']],
+                     'delimiter': src.get('delimiter', ','), 'delimiter_detected': bool(src.get('delimiter_detected')),
+                     'inspection': compact_inspection(src.get('inspection'))} for src in j['sources']],
+        'suggestions': source_suggestions(j['sources']),
         'fields': j.get('fields', {}), 'fingerprint': j.get('fingerprint'),
         'manifest': _scrub(plain(j.get('manifest')), names), 'configuration': plain(j.get('configuration')),
         'progress': plain(j.get('progress') or {}), 'error': j.get('error'),
@@ -230,6 +337,7 @@ def register(app, analysis_config, max_upload_mib, history=None, launch_token=No
     m9 = app.extensions['datatrust_m9_store']
     app.extensions['datatrust_history'] = history
     launch = {'token': launch_token}
+    companions = CompanionCache()
     bp = Blueprint('datatrust_api', __name__, url_prefix=PREFIX)
 
     def failure(status, code, message, back=None):
@@ -245,6 +353,13 @@ def register(app, analysis_config, max_upload_mib, history=None, launch_token=No
         job = store.get(session.get('job_id'))
         if not job:
             abort(404, description='That analysis session is no longer available. Upload the CSV again.')
+        return job
+
+    def analysis_job():
+        """The current job, once an analysis has been chosen for it (an upload alone is not configured or run)."""
+        job = current_job()
+        if job.get('mode') is None:
+            raise WorkflowError('Choose an analysis for this file first.', 'index')
         return job
 
     def fields():
@@ -336,10 +451,13 @@ def register(app, analysis_config, max_upload_mib, history=None, launch_token=No
             abort(403, description='Same origin required.')
         if request.headers.get('Sec-Fetch-Site') == 'cross-site':
             abort(403, description='Same origin required.')
-        token = session.setdefault('datatrust_api_csrf', secrets.token_urlsafe(32))
+        # The token is minted when the app document loads (`shell`) or by `/session`, never here: concurrent first API
+        # requests without a session cookie would otherwise each mint a different token, and whichever cookie the browser
+        # kept last would no longer match the token the page was given.
+        token = session.get('datatrust_api_csrf')
         if request.method not in SAFE_METHODS:
-            if not hmac.compare_digest(request.headers.get('X-CSRF-Token', ''), token):
-                abort(403, description='A current CSRF token is required. Reload the page and try again.')
+            if not token or not hmac.compare_digest(request.headers.get('X-CSRF-Token', ''), token):
+                return failure(403, 'csrf', 'A current CSRF token is required. Reload the page and try again.')
             if not (request.is_json or request.mimetype == 'multipart/form-data'):
                 abort(415, description='Send JSON, or multipart form data for uploads.')
         try:
@@ -376,7 +494,9 @@ def register(app, analysis_config, max_upload_mib, history=None, launch_token=No
 
     @bp.get('/session')
     def bootstrap():
-        return ok({'csrf_token': session['datatrust_api_csrf'], 'upload_limit_bytes': app.config.get('MAX_CONTENT_LENGTH'),
+        # Normally minted with the app document; a client that calls the API directly gets one here.
+        token = session.setdefault('datatrust_api_csrf', secrets.token_urlsafe(32))
+        return ok({'csrf_token': token, 'upload_limit_bytes': app.config.get('MAX_CONTENT_LENGTH'),
                    'upload_limit_mib': max_upload_mib, 'modes': list(CORE_MODES),
                    'roots': [{'id': f'root_{i}', 'label': r.name or 'root'} for i, r in enumerate(m4.roots)]})
 
@@ -390,6 +510,18 @@ def register(app, analysis_config, max_upload_mib, history=None, launch_token=No
         mode = request.form.get('mode', 'classification')
         job = start_job(store, analysis_config, mode, request.files.get('dataset'), request.form.get('delimiter', 'auto'))
         return ok({'job': job_view(job)}, 201)
+
+    @bp.post('/core/uploads')
+    def create_upload():
+        """Upload a CSV without choosing an analysis; choose one with /core/job/analysis, and change it there later."""
+        job = start_upload(store, request.files.get('dataset'), request.form.get('delimiter', 'auto'))
+        return ok({'job': job_view(job)}, 201)
+
+    @bp.post('/core/job/analysis')
+    def set_analysis():
+        """Choose or change the analysis for the uploaded file without uploading it again."""
+        body = fields()
+        return ok({'job': job_view(choose_analysis(current_job(), analysis_config, body.get('mode', ''), body.get('target') or None))})
 
     @bp.get('/core/job/context')
     def context_candidates():
@@ -415,13 +547,13 @@ def register(app, analysis_config, max_upload_mib, history=None, launch_token=No
 
     @bp.post('/core/job/configure')
     def configure():
-        job = current_job()
+        job = analysis_job()
         next_stage = (configure_m3 if job['mode'] in M3_MODES else configure_core)(job, fields())
         return ok({'next': next_stage, 'job': job_view(job)})
 
     @bp.post('/core/job/generate')
     def generate():
-        job = current_job()
+        job = analysis_job()
         body = fields()
         save = can_save() and body.get('save_to_history', 'yes') != 'no'
         pending = history.begin('core', job.get('dataset_name') or job['source_filename']) if save else None
@@ -448,6 +580,14 @@ def register(app, analysis_config, max_upload_mib, history=None, launch_token=No
         if not artifact_owned(job, 'html'):
             abort(404, description='No canonical report is available for this session.')
         return framed(send_file(job['report_path'], mimetype='text/html'))
+
+    @bp.get('/core/job/presentation')
+    def core_presentation():
+        """The report-owned names, ranks and verified report locators for this session's dashboard (dashboard_companion_v1)."""
+        job = current_job()
+        if not artifact_owned(job, 'json'):
+            abort(404, description='No canonical analysis is available for this session.')
+        return companion(f"live:{job['json_path']}", job['json_path'], job['report_path'] if artifact_owned(job, 'html') else None)
 
     @bp.get('/core/job/download/<kind>')
     def core_download(kind):
@@ -556,6 +696,12 @@ def register(app, analysis_config, max_upload_mib, history=None, launch_token=No
     def m4_report():
         return framed(send_file(m4_artifact(m4_job(), 'html'), mimetype='text/html'))
 
+    @bp.get('/m4/presentation')
+    def m4_presentation():
+        j = m4_job()
+        path = m4_artifact(j, 'json')
+        return companion(f'live:{path}', path, m4_artifact(j, 'html'))
+
     @bp.post('/m4/new')
     def m4_new():
         discard_m4(m4)
@@ -638,6 +784,12 @@ def register(app, analysis_config, max_upload_mib, history=None, launch_token=No
         response.headers['Referrer-Policy'] = 'no-referrer'
         return response
 
+    def companion(scope, json_path, html_path, presentation=None):
+        """dashboard_companion_v1 for one result and the exact report bytes served with it (see dashboard_companion)."""
+        analysis = Path(json_path).read_bytes()
+        html = Path(html_path).read_bytes() if html_path else None
+        return ok(companions.companion(scope, analysis, html, presentation or ({'source': 'current'} if scope.startswith('live:') else None)))
+
     @bp.get('/temporal/download/<kind>')
     def m5_download(kind):
         return send_file(m5_artifact(m5_job(), kind), as_attachment=True, download_name='numek-temporal-review.' + kind)
@@ -645,6 +797,12 @@ def register(app, analysis_config, max_upload_mib, history=None, launch_token=No
     @bp.get('/temporal/report')
     def m5_report():
         return framed(send_file(m5_artifact(m5_job(), 'html'), mimetype='text/html'))
+
+    @bp.get('/temporal/presentation')
+    def m5_presentation():
+        j = m5_job()
+        path = m5_artifact(j, 'json')
+        return companion(f'live:{path}', path, m5_artifact(j, 'html'))
 
     @bp.get('/temporal/investigate')
     def m5_investigate():
@@ -746,6 +904,12 @@ def register(app, analysis_config, max_upload_mib, history=None, launch_token=No
     def m6_report():
         return framed(send_file(m6_checked(m6_job(), 'html'), mimetype='text/html'))
 
+    @bp.get('/text/presentation')
+    def m6_presentation():
+        j = m6_job()
+        path = m6_artifact(j, 'json')
+        return companion(f'live:{path}', path, m6_checked(j, 'html'))
+
     @bp.post('/text/evidence')
     def m6_reveal():
         """Exact local evidence for one reference; content only when reveal is asked for explicitly."""
@@ -794,7 +958,9 @@ def register(app, analysis_config, max_upload_mib, history=None, launch_token=No
         return {
             'state': j['state'], 'phase': j.get('phase'), 'preset': j.get('preset'), 'inspected': bool(j.get('inspected')), 'preview': plain(j.get('preview')),
             'sources': [{**_scrub(plain(item), paths), 'filename': PurePath(str((item.get('source') or {}).get('path', ''))).name, 'format': (item.get('source') or {}).get('format'),
-                         'origin': 'upload' if str((item.get('source') or {}).get('path', '')).startswith(str(j['directory'])) else 'local', 'headers': [], 'preview': [], 'sha256': None} for item in j['sources']],
+                         'origin': 'upload' if str((item.get('source') or {}).get('path', '')).startswith(str(j['directory'])) else 'local', 'preview': [], 'sha256': None,
+                         'headers': [x['selector'] for x in ((j.get('discovery') or {}).get(item.get('id')) or {}).get('selectors', []) if not x['selector'].startswith('/')],
+                         'discovery': plain((j.get('discovery') or {}).get(item.get('id')))} for item in j['sources']],
             'fields': j.get('form_values') or {}, 'fingerprint': j.get('fingerprint') if j['state'] in {'confirm', 'running', 'completed', 'failed', 'cancelled'} else None,
             'manifest': {k: v for k, v in _scrub(plain(j['spec'].to_dict()), paths).items() if k != 'allowed_roots'} if j.get('spec') is not None else None, 'configuration': plain(config.to_dict()) if config is not None else None, 'effective': None,
             'max_seconds': config.execution.max_seconds if config is not None else None,
@@ -885,6 +1051,12 @@ def register(app, analysis_config, max_upload_mib, history=None, launch_token=No
     def m7_report():
         return framed(send_file(m7_checked(m7_job(), 'html'), mimetype='text/html'))
 
+    @bp.get('/images/presentation')
+    def m7_presentation():
+        j = m7_job()
+        path = m7_artifact(j, 'json')
+        return companion(f'live:{path}', path, m7_checked(j, 'html'))
+
     @bp.get('/images/pairs')
     def m7_pair_list():
         references, pairs = m7_pairs(m7_job())
@@ -909,7 +1081,15 @@ def register(app, analysis_config, max_upload_mib, history=None, launch_token=No
     @bp.post('/images/export-examples')
     def m7_export():
         body = fields()
-        return send_file(m7_examples(m7, m7_job(), [r for r in body.get('references', '').split(',') if r], body.get('overlays') == 'yes', body.get('labels') == 'yes'), as_attachment=True)
+        # The same refusal as local viewing (`/images/resolve`): an overlay without a compatible frame, or evidence that
+        # changed on disk, is a clear 409, never an unexplained server error.
+        try:
+            path = m7_examples(m7, m7_job(), [r for r in body.get('references', '').split(',') if r], body.get('overlays') == 'yes', body.get('labels') == 'yes')
+        except HTTPException:
+            raise
+        except Exception:
+            return failure(409, 'changed_or_unavailable', 'Evidence changed, is unavailable, or has an unresolved overlay frame.')
+        return send_file(path, as_attachment=True)
 
     @bp.post('/images/new')
     def m7_new():
@@ -942,7 +1122,9 @@ def register(app, analysis_config, max_upload_mib, history=None, launch_token=No
             'state': j['state'], 'phase': j.get('phase'),
             'spec': {k: v for k, v in _scrub(plain(j['spec']), paths).items() if k != 'allowed_roots'}, 'config': plain(j.get('config') or {}),
             'sources': [{'id': i['id'], 'filename': PurePath(str(i['path'])).name, 'format': i.get('format'), 'kind': i.get('kind'), 'role': i.get('role'),
-                         'origin': 'upload' if str(i['path']).startswith(str(j['directory'])) else 'local', 'headers': [], 'preview': [], 'sha256': None} for i in j['spec'].get('inputs', [])],
+                         'origin': 'upload' if str(i['path']).startswith(str(j['directory'])) else 'local', 'preview': [], 'sha256': None,
+                         'headers': ((j.get('discovery') or {}).get(i['id']) or {}).get('columns', []), 'discovery': plain((j.get('discovery') or {}).get(i['id']))} for i in j['spec'].get('inputs', [])],
+            'model_status': model_status(),
             'preview': names_only(plain(j.get('preview'))), 'fields': {k: v for k, v in (j.get('form_values') or {}).items() if not k.endswith('_json')},
             'fingerprint': (j.get('sealed') or {}).get('spec') if j['state'] in {'confirm', 'running', 'completed', 'failed', 'cancelled'} else None,
             'sealed_models': plain((j.get('sealed') or {}).get('models')), 'manifest': None, 'configuration': None, 'effective': None,
@@ -1038,6 +1220,12 @@ def register(app, analysis_config, max_upload_mib, history=None, launch_token=No
     @bp.get('/cross/report')
     def m9_report():
         return framed(send_file(m9_checked(m9, m9_job(), 'html'), mimetype='text/html'))
+
+    @bp.get('/cross/presentation')
+    def m9_presentation():
+        j = m9_job()
+        path = m9_artifact(m9, j, 'json')
+        return companion(f'live:{path}', path, m9_checked(m9, j, 'html'))
 
     @bp.post('/cross/investigate')
     def m9_investigate():
@@ -1162,6 +1350,17 @@ def register(app, analysis_config, max_upload_mib, history=None, launch_token=No
     def history_report(eid):
         return framed(send_file(saved_file(eid, 'html'), mimetype='text/html'))
 
+    @bp.get('/history/<eid>/presentation')
+    def history_presentation(eid):
+        """Locators are verified against this saved, immutable report; its recorded presentation identity, if any, is named."""
+        view = entry_or_404(eid)
+        recorded = (view.get('presentation') or {}).get('report_templates')
+        try:
+            html = saved().file(eid, 'html')
+        except KeyError:
+            html = None
+        return companion(f'saved:{eid}', saved_file(eid, 'json'), html, {'id': recorded, 'source': 'manifest'} if recorded else None)
+
     @bp.get('/history/<eid>/download/<kind>')
     def history_download(eid, kind):
         if kind not in {'html', 'pdf', 'json'}:
@@ -1218,6 +1417,9 @@ def register(app, analysis_config, max_upload_mib, history=None, launch_token=No
     @client.get('/app/<path:subpath>')
     def shell(subpath=''):
         # The launch link printed or opened by `datatrust ui` unlocks history for this browser, once.
+        # The API CSRF token is minted with the document, before any script runs, so every API request the page makes
+        # carries a session cookie that already holds it (see `guard`).
+        session.setdefault('datatrust_api_csrf', secrets.token_urlsafe(32))
         offered = request.args.get('launch')
         if offered is not None:
             if launch['token'] and hmac.compare_digest(offered, launch['token']):

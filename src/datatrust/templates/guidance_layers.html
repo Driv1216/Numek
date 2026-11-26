@@ -4,7 +4,23 @@
 .dt-layer ul { margin: 4px 0 8px 18px; padding: 0; } .dt-layer li { margin: 2px 0; } .dt-layer table { width: 100%; border-collapse: collapse; table-layout: fixed; }
 .dt-layer th, .dt-layer td { text-align: left; vertical-align: top; padding: 5px 8px 5px 0; border-bottom: 1px solid #d5e4eb; overflow-wrap: anywhere; font-size: 0.92em; }
 .dt-layer .dt-kind { font-size: 0.8em; text-transform: uppercase; letter-spacing: .04em; opacity: .75; } .dt-item { break-inside: avoid-page; border-top: 1px solid #bcd3de; padding-top: 8px; margin-top: 14px; }
+.dt-interp h2 { margin: 18px 0 8px; } .dt-interp__summary li { margin: 4px 0; } .dt-interp__more li { margin: 4px 0; } .dt-interp { break-inside: avoid-page; }
 @media print { .dt-item h3 { break-after: avoid; } }</style>{% endmacro %}
+
+{% macro interpretation(I) %}{% if I %}
+<section class="dt-layer dt-interp" id="interpretation">
+  <h2>In brief</h2>
+  <ul class="dt-interp__summary">{% for s in I.summary %}<li>{{ s.text }}</li>{% endfor %}</ul>
+  {% if I.clean %}<div class="callout dt-interp__clean"><h3>A clean result, and its scope</h3>
+    <p>{{ I.clean.checks_completed }} of {{ I.clean.checks_recorded }} recorded checks completed without a finding that calls for review.</p>
+    {% if I.clean.thresholds %}<h4>Review thresholds that were not met</h4><ul>{% for t in I.clean.thresholds %}<li>{{ t.rule }}: {{ t.threshold }}</li>{% endfor %}</ul>{% endif %}
+    {% if I.clean.not_established %}<h4>Not established by a clean result</h4><ul>{% for u in I.clean.not_established %}<li>{{ u }}</li>{% endfor %}</ul>{% endif %}
+  </div>{% endif %}
+  {% if I.more_conclusive %}<h3>What would make this more conclusive</h3>
+  <ul class="dt-interp__more">{% for m in I.more_conclusive %}<li><b>{{ m.label }}.</b> {{ m.why }}</li>{% endfor %}</ul>
+  <p class="section-note">Supply these in a new run. This report records the analysis exactly as it was configured.</p>{% endif %}
+  <p class="section-note">{{ I.version }}: built only from what this result records; it adds no finding and changes no value.</p>
+</section>{% endif %}{% endmacro %}
 
 {% macro scope_box(g) %}
 <div class="dt-layer callout">

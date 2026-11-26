@@ -18,7 +18,7 @@ from datatrust.scalable import Workspace
 from datatrust.worker import run_supervised
 from datatrust.text_normalization import strict_json
 
-PRESETS={'directory':('directory','unlabeled','unlabeled'),'classes':('directory','classification','class_subdirectories'),'manifest':('jsonl','unlabeled','unlabeled'),'coco_detection':('coco','detection','unlabeled'),'coco_segmentation':('coco','segmentation','unlabeled'),'yolo':('yolo','detection','unlabeled'),'masks':('jsonl','segmentation','unlabeled')}
+PRESETS={'comparison':('directory','unlabeled','unlabeled'),'multilabel':('jsonl','multilabel_classification','unlabeled'),'directory':('directory','unlabeled','unlabeled'),'classes':('directory','classification','class_subdirectories'),'manifest':('jsonl','unlabeled','unlabeled'),'coco_detection':('coco','detection','unlabeled'),'coco_segmentation':('coco','segmentation','unlabeled'),'yolo':('yolo','detection','unlabeled'),'masks':('jsonl','segmentation','unlabeled')}
 
 
 def inspection_binding(spec):
@@ -80,6 +80,28 @@ def m7_spawn(store,j,operation):
     j['thread']=threading.Thread(target=execute,daemon=True); j['thread'].start()
 
 
+def manifest_discovery(path,fmt,delimiter=','):
+    """Advisory column discovery for a manifest source (the first 128 records): path, label, objects and split
+    candidates, and what the box values allow. Never part of the specification; a failure is recorded."""
+    from datatrust.inspection import discover_selectors
+    if fmt not in {'jsonl','csv'}: return None
+    try:
+        records=[]
+        if fmt=='jsonl':
+            with open(path,encoding='utf-8') as handle:
+                for line in handle:
+                    if len(records)>=128: break
+                    if line.strip(): records.append(json.loads(line))
+        else:
+            import csv
+            with open(path,encoding='utf-8',newline='') as handle:
+                for n,row in enumerate(csv.DictReader(handle,delimiter=delimiter or ',')):
+                    if n>=128: break
+                    records.append(row)
+        return discover_selectors(records)
+    except Exception as exc: return {'error':str(exc)}
+
+
 def start_m7(store,preset):
     old=store.jobs.get(session.get('m7_job'))
     if old and old['state']=='running': abort(409)
@@ -98,7 +120,7 @@ def add_m7_source(store,j,form,upload):
         if fmt=='directory': raise ValueError('Directory audits use a configured local root.')
         path=j['directory']/('source-'+secure_filename(upload.filename)); upload.save(path); path.chmod(0o600)
     else: path=Path(local).absolute(); authorized(path,m7_allowed(store,j))
-    if j['preset'] in {'manifest','masks'}: fmt=form.get('format','jsonl')
+    if j['preset'] in {'manifest','masks','multilabel','comparison'}: fmt=form.get('format','directory' if j['preset']=='comparison' else 'jsonl')
     asset_root=form.get('asset_root','').strip() or None
     if asset_root: authorized(asset_root,m7_allowed(store,j))
     identity=form.get('source_id','dataset').strip()
@@ -106,6 +128,7 @@ def add_m7_source(store,j,form,upload):
     item=ImageInputSpec(identity,source,ImageTaskSpec(task),role=form.get('role','dataset'),annotations=ImageAnnotationSpec(box_format='xywh' if fmt=='coco' else 'normalized_cxcywh' if fmt=='yolo' else 'xyxy',mask_encoding='coco' if fmt=='coco' else 'semantic_png'))
     if identity in {x['id'] for x in j['sources']}: raise ValueError('Source ID is already present.')
     j['sources'].append(item.to_dict()); j['state']='sources'
+    j.setdefault('discovery',{})[identity]=manifest_discovery(path,fmt,form.get('delimiter',','))
 
 
 def inspect_m7(store,j):
@@ -134,7 +157,14 @@ def configure_m7(store,j,form):
             cats=tuple(int(x.strip()) if task in {'detection','segmentation'} and x.strip().isdigit() else x.strip() for x in form.get(prefix+'categories','').split(',') if x.strip())
             ann=replace(item.annotations,box_format=form.get(prefix+'box_format',item.annotations.box_format),color_mapping=strict_json(form.get(prefix+'color_mapping') or '{}'),expectation=form.get(prefix+'expectation','unknown'),coordinate_frame=form.get(prefix+'frame','encoded'),categories=cats,mask_encoding=form.get(prefix+'mask_encoding',item.annotations.mask_encoding),missing_yolo_labels_are_negative=form.get(prefix+'missing_negative')=='yes')
             inputs.append(replace(item,source=replace(item.source,json_columns=columns),task=ImageTaskSpec(task),mapping=mapping,annotations=ann))
-        spec=ImageAuditSpec(tuple(inputs),allowed_roots=m7_allowed(store,j),dataset_name=form.get('dataset_name') or None)
+        comparisons=()
+        if j['preset']=='comparison':
+            # The guided comparison: the source declared as reference against the one declared as current.
+            if len(inputs)!=2: raise ValueError('Comparing two image sets needs exactly two sources.')
+            roles={x.role:x.id for x in inputs}
+            reference,current=roles.get('reference',inputs[0].id),roles.get('current',inputs[1].id)
+            comparisons=(ImageComparisonSpec(reference,current,align_logical_keys=form.get('align_logical_keys','yes')=='yes'),)
+        spec=ImageAuditSpec(tuple(inputs),comparisons=comparisons,allowed_roots=m7_allowed(store,j),dataset_name=form.get('dataset_name') or None)
         config=ImageAnalysisConfig(models=ImageModelOptions(form.get('model_directory') or None))
     spec=replace(spec,allowed_roots=m7_allowed(store,j))
     for item in spec.inputs: authorized(item.source.path,m7_allowed(store,j))

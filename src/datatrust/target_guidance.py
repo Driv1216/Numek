@@ -232,3 +232,77 @@ def assess_regression_target(series, name, kind="unspecified"):
             "reason_codes": reasons, "declared_kind": kind,
             "explanation": "Review: " + ", ".join(reason.replace('_', ' ') for reason in reasons) if reasons else "Numerically compatible; observed values do not establish business intent.",
             "selector_explanation": "Integer-valued observations alone do not establish a count target." if numeric and n and finite.map(lambda v: float(v).is_integer()).all() else "Explicitly confirm the intended numerical outcome."}
+
+
+# Regression target groups (Guided Analysis Stage 4a; founder-gated thresholds). Built from the full-file input inspection
+# (datatrust.inspection), not the ten preview rows; ordering and explanation only. The confirmation step's own full
+# assessment (assess_regression_target) still decides whether a choice needs an acknowledgement, and every column it
+# would flag lands in "review" here.
+REGRESSION_OUTCOME_TOKENS = EXPLICIT_OUTCOME_TOKENS | {
+    "price", "cost", "amount", "total", "count", "cnt", "sales", "revenue", "demand", "quantity", "load", "strength",
+    "yield", "income", "salary", "consumption", "usage", "value", "rating",
+}
+REGRESSION_GROUP_ORDER = ("outcome_word", "numeric", "review", "unavailable")
+REGRESSION_GROUPS = {
+    "outcome_word": "Numeric, with many values and outcome-style wording in the name.",
+    "numeric": "Numeric, with many values. The name does not suggest an outcome; that does not rule it out.",
+    "review": "Numeric, but possibly an identifier, a code, a time, a constant or too few values. Usable after a confirmation.",
+    "unavailable": "Not read as numbers. Declare the column numeric under CSV interpretation to use it.",
+}
+
+
+def regression_target_groups(inspection):
+    """Group every column of an input inspection for the numerical-outcome picker. Nothing is preselected."""
+    rows = inspection["coverage"]["rows_inspected"]
+    ceiling = min(20, max(2, rows // 2))
+    options = []
+    for column in inspection["columns"]:
+        if column.get("not_profiled"):
+            options.append({"name": column["name"], "group": "unavailable", "reasons": ["not_profiled"],
+                            "text": "Listed, not profiled: beyond the inspection's column limit."})
+            continue
+        observed, rules = column["observed"], {s["rule"] for s in column["suggestions"]}
+        tokens = set(column_name_tokens(column["name"]))
+        numeric = "R-NUM-1" in rules or (observed["minimum"] is not None and observed["minimum"] == observed["maximum"])
+        distinct = observed["distinct"]
+        many = observed["distinct_capped"] or (distinct is not None and distinct > ceiling)
+        reasons = []
+        if not numeric and observed["minimum"] is None:
+            numeric_dtype = str(column["dtype"]).startswith(("int", "uint", "float", "Int", "UInt", "Float"))
+            group, reasons = "unavailable", ["no_values" if not observed["non_missing"] else "no_finite_values" if numeric_dtype else "not_numeric"]
+        else:
+            if rules & {"R-ID-1", "R-ID-2"} or tokens & IDENTIFIER_TOKENS:
+                reasons.append("identifier_like")
+            if "R-TIME-2" in rules:
+                reasons.append("epoch_like")
+            if distinct == 1:
+                reasons.append("constant")
+            elif not many or tokens & {"category", "class", "code"}:
+                reasons.append("few_values" if not many else "code_name")
+            if observed["non_missing"] < 4:
+                reasons.append("limited_observations")
+            group = "review" if reasons else ("outcome_word" if tokens & REGRESSION_OUTCOME_TOKENS and not tokens & SUPPRESSING_TOKENS else "numeric")
+        options.append({"name": column["name"], "group": group, "reasons": reasons, "distinct": distinct,
+                        "distinct_capped": observed["distinct_capped"] if observed else False,
+                        "missing": observed["missing"] if observed else None, "text": _regression_text(group, reasons, distinct, ceiling)})
+    options.sort(key=lambda o: REGRESSION_GROUP_ORDER.index(o["group"]))
+    return {"ceiling": ceiling, "groups": REGRESSION_GROUPS, "options": options, "coverage": inspection["coverage"]["statement"]}
+
+
+_REASON_TEXT = {
+    "identifier_like": "looks like an identifier",
+    "epoch_like": "may be a timestamp in epoch units",
+    "constant": "has one value",
+    "few_values": "has a small set of values, so it may be a category code",
+    "code_name": "its name suggests a code or category",
+    "limited_observations": "has fewer than 4 values",
+}
+
+
+def _regression_text(group, reasons, distinct, ceiling):
+    if group == "unavailable":
+        return {"not_numeric": REGRESSION_GROUPS["unavailable"], "no_finite_values": "Numeric, but no finite values."}.get(reasons[0], "No values to use.")
+    if reasons:
+        return "Review: it " + "; ".join(_REASON_TEXT[r] for r in reasons) + "."
+    count = "more than 10,000" if distinct is None else f"{distinct:,}"
+    return f"{count} distinct values (more than {ceiling})."

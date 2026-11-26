@@ -24,7 +24,7 @@ from pathlib import Path
 TEMPLATES = Path(__file__).parent / 'templates'
 PRINT_POLICY_VERSION = 'report_print_v1'
 SHELL, SCRIPT = '_report_shell.html', '_report_script.js.html'
-_SHARED_MODULES = ('datatrust.report_format', 'datatrust.report_layout')
+_SHARED_MODULES = ('datatrust.report_format', 'datatrust.report_layout', 'datatrust.interpretation')  # interpretation: Stage 6D
 _CONCEPTS = ('datatrust.report_concepts', 'datatrust.report_context')
 _TABULAR = ('datatrust.tabular_presentation',) + _CONCEPTS
 

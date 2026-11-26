@@ -30,8 +30,33 @@ export interface ContextDecl { prediction: { objective: string | null; point: st
 export interface ContextCandidate { column: string; value: string | number; kind: 'text_placeholder' | 'numeric_sentinel'; rows: number; rate: number; rule: string }
 export interface ContextInfo { candidates: ContextCandidate[]; rules: string; columns: string[]; context: ContextDecl | null; meanings: string[]; availability: string[]; operators: string[] }
 
+export interface InspectionSuggestion { rule: string; role: string; text: string }
+export interface InputInspection {
+  version: string; error?: string; profile: { fingerprint: string; delimiter?: string };
+  coverage?: { complete: boolean; stopped: 'bytes' | 'rows' | 'time' | null; rows_inspected: number; bytes: number; columns_total: number; columns_profiled: number; columns_listed: number; statement: string };
+  columns?: { name: string; dtype: string | null; not_profiled?: boolean; structural: string[]; suggestions: InspectionSuggestion[];
+    observed: null | { non_missing: number; missing: number; distinct: number | null; distinct_capped: boolean; minimum: number | null; maximum: number | null } }[];
+  table?: { rule: string; columns: string[]; text: string }[]; rules?: Record<string, string>; unknowns?: string[];
+}
+
+export type FitState = 'can_run' | 'needs_input' | 'unlikely';
+export interface AnalysisFit { analysis: string; state: FitState; reason: string; rules: string[] }
+export interface RegressionTarget { name: string; group: 'outcome_word' | 'numeric' | 'review' | 'unavailable'; reasons: string[]; distinct?: number | null; distinct_capped?: boolean; missing?: number | null; text: string }
+/** Advisory guidance from the input inspection (src/datatrust/applicability.py, target_guidance.regression_target_groups). */
+export interface InputSuggestions {
+  analyses: AnalysisFit[];
+  regression_targets: { ceiling: number; groups: Record<RegressionTarget['group'], string>; options: RegressionTarget[]; coverage: string };
+}
+
 export interface JobView {
-  mode: Mode; stage: Stage; source_filename: string; file_size: number;
+  /** null until an analysis is chosen for an upload made with `uploadOnly` (stage 'choose'). */
+  mode: Mode; stage: Stage | 'choose'; source_filename: string; file_size: number;
+  /** input_inspection_v1 (src/datatrust/inspection.py): advisory, never part of the analysis. */
+  input_inspection?: InputInspection | null;
+  suggestions?: InputSuggestions | null;
+  /** What will run, from the server's method resolution (api_web.review_view); present once configured. */
+  review?: { methodology: string; name: string; scored: boolean; targets: string[]; prediction_point: string | null; codes_declared: number; unknowns: string[];
+    availability: null | { available: string[]; unavailable: string[]; unknown: number; bulk: string[]; consequence: string | null } } | null;
   dataset_name: string | null; purpose: string | null; target: string | null;
   inspection: {
     row_count: number | null; preview_row_count: number | null; column_count: number; columns: string[];
@@ -39,7 +64,7 @@ export interface JobView {
   };
   config: {
     parsing: { encoding: string; missing_policy: string; na_values: string[]; column_types: Record<string, string>; delimiter: string };
-    regression: { expectations: Expectations; feature_availability: Record<string, string> } | null;
+    regression: { expectations: Expectations; feature_availability: Record<string, string>; dependency_search?: { limits: Record<string, number> } | null } | null;
     fidelity_inspection: { max_bytes: number; max_records: number; max_cells: number };
     context?: ContextDecl | null;
   };
@@ -65,11 +90,19 @@ export interface JobView {
   };
 }
 
-export interface M4Source { id: string; filename: string; origin: 'upload' | 'local'; headers: string[]; preview: { tokens?: string[] }[]; sha256: string; delimiter?: string; delimiter_detected?: boolean }
+/** A source's advisory inspection (api_web.compact_inspection); never part of the specification. */
+export type SourceInspection = { error?: string; coverage?: { statement: string; complete: boolean; rows_inspected: number }; rules?: Record<string, string>;
+  columns?: { name: string; rules: string[]; roles: string[]; distinct: number | null; missing: number | null }[] };
+export interface Spacing { seconds: number; nanoseconds: number; label: string; share: number; first: string; text: string }
+/** Temporal observations for a source (inspection.time_structure): suggestions only. */
+export interface TimeStructure { error?: string; clocks: { column: string; kind: string; encoding: string; epoch_unit: string | null; naive: boolean; repeats: number; spacing: Spacing | null; rule: string }[];
+  entities: { column: string; clock: string; rule: string; distinct: number; text: string }[]; measurements: { column: string; type: string }[]; statement: string | null }
+export interface M4Source { id: string; filename: string; origin: 'upload' | 'local'; headers: string[]; preview: { tokens?: string[] }[]; sha256: string; delimiter?: string; delimiter_detected?: boolean; inspection?: SourceInspection | null }
 export interface M4Job {
   mode: M4Mode; state: 'sources' | 'configure' | 'confirm' | 'running' | 'completed' | 'partial' | 'failed' | 'cancelled'; limit: number;
   sources: M4Source[]; fields: Fields; fingerprint: string | null; manifest: Record<string, unknown> | null; configuration: Record<string, unknown> | null;
   progress: { stage?: string }; error: string | null; result: { status: string; findings: number } | null; saved_entry: string | null;
+  suggestions?: { identity_keys: { columns: string[]; rule: string; text: string }[]; mappings: { source: string; column: string; aligned: string; rule: string; text: string }[] };
 }
 export interface M4Finding { id: string; title: string; priority: 'High' | 'Moderate' | 'Low'; severity?: string; scope: string; affected_count: number | null; denominator: number | null; evidence_refs: string[]; evidence_type: string; next_action: string; limitations: string }
 export type M4Analysis = Record<string, unknown> & {
@@ -121,12 +154,19 @@ let csrf = '';
 /** The session's API CSRF token, for the few downloads made with fetch. */
 export const csrfToken = () => csrf;
 
-export async function call<T>(method: 'GET' | 'POST', path: string, body?: Fields | FormData): Promise<T> {
+export async function call<T>(method: 'GET' | 'POST', path: string, body?: Fields | FormData, retried = false): Promise<T> {
   const headers: Record<string, string> = {};
   if (method !== 'GET') headers['X-CSRF-Token'] = csrf;
   if (body && !(body instanceof FormData)) headers['Content-Type'] = 'application/json';
   const res = await fetch(BASE + path, { method, headers, credentials: 'same-origin', body: body instanceof FormData ? body : body ? JSON.stringify(body) : undefined });
   const json = await res.json().catch(() => null);
+  // A missing or stale CSRF token is refused before the request does anything, so it is safe to fetch the session's
+  // current token and send the same request once more.
+  if (res.status === 403 && json?.error?.code === 'csrf' && !retried) {
+    const s = await call<SessionInfo>('GET', '/session');
+    csrf = s.csrf_token;
+    return call<T>(method, path, body, true);
+  }
   if (!res.ok || !json) throw new ApiError(json?.error?.message ?? 'DataTrust could not complete the request.', res.status, json?.error?.back);
   return json.data as T;
 }
@@ -135,6 +175,9 @@ export const api = {
   async session() { const s = await call<SessionInfo>('GET', '/session'); csrf = s.csrf_token; return s; },
   job: () => call<{ job: JobView | null; classic_job?: string }>('GET', '/core/job'),
   upload(mode: Mode, file: File, delimiter = 'auto') { const f = new FormData(); f.set('mode', mode); f.set('delimiter', delimiter); f.set('dataset', file); return call<{ job: JobView }>('POST', '/core/jobs', f); },
+  /** Upload without choosing an analysis (input inspection only); choose or change it with `chooseAnalysis`. */
+  uploadOnly(file: File, delimiter = 'auto') { const f = new FormData(); f.set('delimiter', delimiter); f.set('dataset', file); return call<{ job: JobView }>('POST', '/core/uploads', f); },
+  chooseAnalysis: (mode: Mode, target?: string | null) => call<{ job: JobView }>('POST', '/core/job/analysis', target ? { mode, target } : { mode }),
   delimiter: (delimiter: string) => call<{ job: JobView }>('POST', '/core/job/delimiter', { delimiter }),
   context: () => call<ContextInfo>('GET', '/core/job/context'),
   targetPreview: (target: string) => call<{ target_info: ClassTarget }>('GET', `/core/job/target-preview?target=${encodeURIComponent(target)}`),

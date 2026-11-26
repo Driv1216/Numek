@@ -556,6 +556,28 @@ CATALOGUE["preprocessing_unreconciled"] = {
     "options": [_option("Declare complete, unique identity keys", "A stable identifier exists.", "Identifiers change between the files.", _VERIFY_AGAIN)],
     "unknowns": ["Record-level lineage was not available."],
 }
+CATALOGUE["complete_case_coverage"] = {
+    "impact": ["Distance-based methods need a value for every selected feature; rows with a gap are dropped or imputed, and either changes the population the method sees."],
+    "investigate": ["Which features carry the gaps, and whether the rows with gaps differ from complete rows."],
+    "options": [
+        _option("Drop incomplete rows", "The complete rows represent the population you intend to model.", "Gaps concentrate in a group you need to keep.",
+                "Compare complete and incomplete rows on the observed features before and after dropping."),
+        _option("Impute the gaps", "A defensible imputation exists for the affected features.", "Missingness itself carries meaning for the task.",
+                "Re-run this analysis on the imputed data and record the imputation."),
+    ],
+    "unknowns": ["Why values are missing is not established; complete rows may not represent the whole dataset."],
+}
+CATALOGUE["redundant_features"] = {
+    "impact": ["Two features that carry nearly the same information count the same dimension twice in a distance, so that dimension dominates."],
+    "investigate": ["Whether the pair measures the same quantity (units, derivations) or is coincidentally correlated in this sample."],
+    "options": [
+        _option("Keep one of the pair", "The features measure the same thing.", "Each adds distinct meaning that matters for the task.",
+                "Re-run and confirm the redundancy finding no longer applies."),
+        _option("Keep both deliberately", "The extra weight on this dimension is intended.", "The weighting was not chosen on purpose.",
+                "Document the weighting decision with the analysis."),
+    ],
+    "unknowns": ["Correlation in this file does not establish that the features are interchangeable elsewhere."],
+}
 CATALOGUE["generic_review"] = {
     "impact": ["See the finding's canonical text for its possible impact."],
     "investigate": ["The retained evidence and the applicable declaration."],
@@ -577,13 +599,15 @@ CODE_KEY = {
     **dict.fromkeys(("possible_target_leakage", "leakage_review_prompts", "regression_name_review"), "name_leakage"),
     **dict.fromkeys(("regression_declared_availability", "declared_input_unavailability"), "declared_unavailable"),
     **dict.fromkeys(("regression_relationships_unavailable_at_prediction", "input_target_relationships_unavailable_at_prediction"), "target_relationship"),
-    **dict.fromkeys(("regression_relationships_unknown", "input_target_relationships_unknown"), "target_relationship_unknown"),
+    **dict.fromkeys(("regression_relationships_unknown", "input_target_relationships_unknown", "regression_dependency_availability_unknown"), "target_relationship_unknown"),
+    "regression_dependency_unavailable": "target_relationship", "regression_dependency_declared_available": "deterministic_predictor",
     **dict.fromkeys(("constant_fields", "near_constant_fields"), "constant_features"),
     "high_cardinality_categoricals": "high_cardinality",
     **dict.fromkeys(("numeric_outlier_concentration", "output_extreme_candidates", "regression_target_extremes"), "outliers"),
     **dict.fromkeys(("regression_target_concentration", "output_concentration"), "concentration"),
     **dict.fromkeys(("non_finite_values", "regression_nonfinite_targets"), "non_finite"),
     "conditional_scale_review": "scale",
+    "limited_complete_case_coverage": "complete_case_coverage", "redundant_quantitative_features": "redundant_features",
     **dict.fromkeys(("regression_declared_constraints", "numerical_target_constraints", "multilabel_declared_constraints"), "declared_constraints"),
     **dict.fromkeys(("invalid_annotations", "annotation_declaration_conflicts", "unresolved_annotation_metadata"), "annotation_validity"),
     **dict.fromkeys(("no_feature_columns", "regression_no_features"), "no_features"),
@@ -905,7 +929,16 @@ def _scoring(value):
     }
 
 
+_READINESS_V2 = [
+    {"rule": "Complete-case coverage", "threshold": "Below 80% of rows (Moderate below 50%)", "effect": "Finding (evidence only). 80% is the dependency searches' coverage gate; 50% the column-missingness High boundary."},
+    {"rule": "Redundant quantitative features", "threshold": "Exact duplicates, or |Pearson r| ≥ 0.98 with ≥ 100 overlapping rows and ≥ 10 distinct values per column", "effect": "Low finding (may be intended). 0.98 is the existing M4 dependency gate."},
+    {"rule": "Pair search bounds", "threshold": "At most 64 features and 2e8 row work (DependencyLimits); declared quantitative features first", "effect": "Beyond the bounds the search is bounded and unsearched pairs are counted."},
+    {"rule": "Scale review", "threshold": "IQR ratio ≥ 10 between eligible features", "effect": "Conditional Low finding unless scale sensitivity is declared false."},
+    {"rule": "Verdict", "threshold": "None", "effect": "No model is fitted and no readiness verdict is given."},
+]
 POLICY = {
+    "tabular_clustering_readiness_v2": _READINESS_V2,
+    "tabular_anomaly_readiness_v2": _READINESS_V2,
     "classification_legacy_2026_08_13": [
         {"rule": "Target imbalance finding", "threshold": "Majority class ≥ 75% of labelled rows (High from 90%)", "effect": "Finding; target-balance sub-score falls as the majority share exceeds an even split."},
         {"rule": "Column missingness penalty", "threshold": "≥ 25% / ≥ 50% / 100% missing", "effect": "10 / 20 / 30 feature-usability points."},

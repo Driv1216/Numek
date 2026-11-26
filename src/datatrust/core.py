@@ -307,6 +307,20 @@ def run_analysis(dataset: DatasetSpec, task: TaskSpec, config=None) -> AnalysisR
                 for i, group in enumerate(r["relationship_groups"]):
                     group["evidence_refs"] = [record("regression_relationship_group", [prefix+f"relationship_groups/{i}"], "verified relationship support scopes", columns=group["columns"], scope=group["id"])]
                     group["evidence_refs"] += [ref for relation in r["relationships"] if relation["id"] in group["relationship_ids"] for ref in relation["evidence_refs"]]
+            if options.dependency_search is not None:
+                # regression_dependency_v1 (opt-in, Stage 6B): evidence only; absent from the result when off.
+                from datatrust.regression_dependency import covered_features, search as dependency_search
+                declared = {**(config.context.availability() if config.context else {}), **options.feature_availability}
+                semantics = config.features.semantic_types
+                r["dependency_search"] = optional("regression_dependency_search", lambda: dependency_search(
+                    handle.data, task.target, options.dependency_search.limits, availability=declared,
+                    covered=covered_features(r.get("relationships")), checkpoint=checkpoint,
+                    declared_identifiers=[c for c, v in semantics.items() if v == "identifier"],
+                    declared_categorical=[c for c, v in semantics.items() if v == "categorical"]))
+                if r["dependency_search"] is not None:
+                    d = r["dependency_search"]
+                    record("regression_dependency_search", [prefix+"dependency_search"], "feature-target checks within the search bounds",
+                           len(d["checks"]), len(d["flags"]), method="regression_dependency_v1", scope=task.target)
             r["repeated_inputs"] = optional("regression_repeated_inputs", lambda: repeated_input_evidence(handle.data, task.target)) if profile["feature_count"] else None
             if r["repeated_inputs"] is not None:
                 record("regression_repeated_inputs", [prefix+"repeated_inputs"], "finite targets grouped by exact feature values", r["repeated_inputs"]["denominator"], r["repeated_inputs"]["varying_rows"])

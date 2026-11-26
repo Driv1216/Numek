@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 
 export type Step = 'upload' | 'configure' | 'confirm' | 'report';
 export const steps: { id: Step; n: number; t: string }[] = [
-  { id: 'upload', n: 1, t: 'Upload' }, { id: 'configure', n: 2, t: 'Configure' }, { id: 'confirm', n: 3, t: 'Confirm' }, { id: 'report', n: 4, t: 'Report' },
+  { id: 'upload', n: 1, t: 'Start' }, { id: 'configure', n: 2, t: 'Configure' }, { id: 'confirm', n: 3, t: 'Confirm' }, { id: 'report', n: 4, t: 'Report' },
 ];
 
 export const stepHref = (s: Step) => (s === 'upload' ? '/app/' : `/app/core/${s}`);

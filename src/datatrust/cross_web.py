@@ -108,6 +108,44 @@ def start_m9(store):
     return j
 
 
+def record_discovery(path,kind,fmt,delimiter=','):
+    """Advisory discovery for a structured record source: its columns and identifier candidates (bounded head read).
+    Documents are previewed by the supervised preview instead. Never part of the specification."""
+    if kind!='structured' or fmt not in {'csv','jsonl','parquet'}: return None
+    from datatrust.inspection import discover_selectors,inspect_source
+    try:
+        if fmt=='jsonl':
+            records=[]
+            with open(path,encoding='utf-8') as handle:
+                for line in handle:
+                    if len(records)>=128: break
+                    if line.strip(): records.append(json.loads(line))
+            d=discover_selectors(records)
+            return {'statement':d['statement'],'columns':[x['selector'] for x in d['selectors'] if not x['selector'].startswith('/')],
+                    'keys':[x['selector'] for x in d['selectors'] if any(r['role']=='identifier' for r in x['suggestions'])]}
+        i=inspect_source(path,fmt,delimiter or ',')
+        return {'statement':i['coverage']['statement'],'columns':[c['name'] for c in i['columns']],
+                'keys':[c['name'] for c in i['columns'] if any(r['role']=='identifier' for r in c['suggestions'])]}
+    except Exception as exc: return {'error':str(exc)}
+
+
+def model_status():
+    """Whether each optional model method is qualified for this build, from the publisher registry alone (read-only):
+    a stored qualification counts only for the exact analysis code it was measured on. Unqualified methods abstain."""
+    from datatrust.cross_models import algorithm_identity,registry
+    allow=registry();identity=algorithm_identity();out={}
+    for kind in ('nli','image_text'):
+        q=allow.get('qualification',{}).get(kind,{});official=allow.get('models',{}).get(kind) or {}
+        if q.get('status')!='passed': state='not_qualified'
+        elif q.get('algorithm_identity')!=identity or q.get('revision')!=official.get('revision'): state='stale'
+        else: state='qualified'
+        out[kind]={'state':state,'model':official.get('model'),
+                   'text':{'qualified':'Qualified for this build; judgments apply within the measured profile.',
+                           'stale':'Its qualification was measured on a different build of the analysis code, so in this build its judgments abstain. Re-qualification is a separate decision.',
+                           'not_qualified':'Not qualified, so its judgments abstain.'}[state]}
+    return out
+
+
 def m9_action(store,j,values,upload):
     """One guided configure action (source, relationship, mapping, rule, import, models, remove). Raises on refusal."""
     form=lambda name,default='':values.get(name,default).strip()
@@ -123,6 +161,7 @@ def m9_action(store,j,values,upload):
         metadata=strict_json(form('metadata','{}'))
         source=CrossRepresentationInputSpec(form('source_id'),str(path),form('kind','structured'),form('format','csv'),id_selector=form('id_selector','id'),text_selector=form('text_selector','text'),path_selector=form('path_selector','path'),split_selector=form('split_selector') or None,role=form('role','dataset'),language=form('language') or None,layout=form('layout') or None,layout_selector=form('layout_selector') or None,asset_root=form('asset_root') or None,metadata=metadata,json_columns=columns('json_columns'),delimiter=values.get('delimiter',',') or ',')
         j['spec']['inputs']=[x for x in j['spec']['inputs'] if x['id']!=source.id]+[source.to_dict()]
+        j.setdefault('discovery',{})[source.id]=record_discovery(path,source.kind,source.format,source.delimiter)
     elif action=='relationship':
         context_map={name:[form('left_'+name),form('right_'+name)] for name in ('entity','period','version','currency','unit') if form('left_'+name) or form('right_'+name)}
         cutoff=ClockSpec(form('cutoff'),timezone=form('timezone') or None) if form('cutoff') else None
