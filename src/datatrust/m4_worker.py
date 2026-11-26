@@ -73,6 +73,8 @@ def _executive_narrative(findings,coverage,evidence,status,mode):
     if blocked:
         sentences.append('Some selected methods were blocked; conclusions exclude those definitions.')
         scope_limits.append('Blocked methods and excluded alignments remain visible in coverage; available marginal evidence can still be reported.')
+        scope_limits.extend(dict.fromkeys(d['reason'] for key, d in diagnostics.items()
+                               if key.endswith('.regression_dependency_search') and d['status'] == 'blocked'))
     if any(d.get('role_change_qualifications') for d in diagnostics.values()):
         scope_limits.append('Role-changed fields compare supplied marginal values, with the existing sampling/method gates for optional tests; equivalent feature use, target meaning or annotation selection is not established.')
     return {'summary':' '.join(sentences),'limitations':scope_limits+['Parsed equality does not establish byte-identical records or proven leakage.','Effects and support describe supplied populations; conditional evidence is descriptive.','Search bounds and detail omissions remain visible in coverage.']}

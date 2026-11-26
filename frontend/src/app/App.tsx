@@ -344,7 +344,7 @@ function TabularConfigure({ job, submit, busy, separator, onJob, flash }: Config
                 </div></>}
               <RoleNotes job={job} target={target} onJob={onJob} flash={flash} />
             </div>
-            <div className="ap-target__r">
+            <div className="ap-target__expectations">
               <div className="ap-sel ap-fields ap-fields--panel">
                 <span className="ap-sel__k">What the outcome should look like · recommended</span>
                 <label>Target intent<select value={kind} onChange={(x) => setKind(x.target.value)}>{['unspecified', 'continuous', 'count'].map((v) => <option key={v} value={v}>{v}</option>)}</select></label>
