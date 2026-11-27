@@ -1,0 +1,30 @@
+{
+  "dataset": {
+    "path": "/Users/drivyaanshyadav/Desktop/Numek/datasets/regression/uci_appliances_energy/prepared/energydata_complete.csv"
+  },
+  "task": {
+    "kind": "regression",
+    "target": "Appliances",
+    "metadata_columns": [
+      "date"
+    ]
+  },
+  "analysis": {
+    "regression": {
+      "expectations": {
+        "kind": "continuous",
+        "units": "Wh per 10-minute interval",
+        "nonnegative": true
+      },
+      "feature_availability": {
+        "lights": "unavailable_at_prediction"
+      },
+      "dependency_search": true
+    },
+    "context": {
+      "prediction": {
+        "point": "Before the target ten-minute interval begins"
+      }
+    }
+  }
+}

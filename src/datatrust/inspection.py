@@ -233,8 +233,10 @@ def inspect_table(path, options, budget=InspectionBudget(), *, frame=None, frame
                  {'bytes': f'The file is larger than {budget.full_bytes // MIB} MiB: inspected the first {rows:,} rows only; suggestions describe those rows.',
                   'rows': f'Inspected the first {rows:,} rows only (the inspection limit); suggestions describe those rows.',
                   'time': f'Stopped after {rows:,} rows at the {budget.deadline_seconds:g}-second inspection limit; suggestions describe those rows.'}[stopped])
-    if len(header) > len(profiled):
-        statement += f' Columns {len(profiled) + 1:,}–{len(header):,} were listed, not profiled.'
+    if len(listed) > len(profiled):
+        statement += f' Columns {len(profiled) + 1:,}–{len(listed):,} were listed without profiling.'
+    if len(header) > len(listed):
+        statement += f' {len(header) - len(listed):,} additional columns were omitted from the listing.'
     return {
         'version': VERSION, 'profile': {'fingerprint': profile_fingerprint(options) if options else None, 'delimiter': options.delimiter if options else None},
         'coverage': {'complete': complete, 'stopped': stopped, 'rows_inspected': rows, 'bytes': size, 'columns_total': len(header),

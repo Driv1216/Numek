@@ -1,0 +1,34 @@
+{
+  "dataset": {
+    "path": "/Users/drivyaanshyadav/Desktop/Numek/datasets/regression/epa_fuel_economy/prepared/gasoline_2020_2024.csv"
+  },
+  "task": {
+    "kind": "regression",
+    "target": "comb08",
+    "metadata_columns": [
+      "id",
+      "createdOn",
+      "modifiedOn"
+    ]
+  },
+  "analysis": {
+    "regression": {
+      "expectations": {
+        "kind": "continuous",
+        "units": "US miles per gallon",
+        "nonnegative": true
+      },
+      "feature_availability": {
+        "city08": "unknown",
+        "highway08": "unknown",
+        "comb08U": "unavailable_at_prediction"
+      },
+      "dependency_search": true
+    },
+    "context": {
+      "prediction": {
+        "point": "Before the combined label estimate is published"
+      }
+    }
+  }
+}

@@ -60,7 +60,13 @@ All sub-scores are transparent values from 0 to 100. Higher is better.
   inside a healthy dataset-wide average
 - **Uniqueness**: `100 - duplicate_row_percentage`
 - **Target Balance**: for classification, based on how far the largest class is
-  from an even class distribution
+  from an even class distribution. The legacy score uses the largest class
+  percentage already rounded to two decimals. It computes the even share as
+  `100 / class_count`, divides the excess share by `100 - even_share`, then
+  multiplies by 100 to get the penalty. The score is clamped and rounded to two
+  decimals with Python's `round` on the resulting binary floating-point value.
+  At a decimal midpoint the binary result can lie slightly to either side. For
+  example, a largest class share of 45.45% across three classes yields 81.83.
 - **Feature Usability**: penalizes severely missing, constant, near-constant,
   high-cardinality categorical, and numeric outlier-heavy columns
 - **Leakage Risk**: penalizes strong outcome-like column-name candidates.

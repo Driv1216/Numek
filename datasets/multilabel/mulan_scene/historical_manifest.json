@@ -1,0 +1,154 @@
+{
+  "sources": {
+    "energy": {
+      "archive": "energy.zip",
+      "archive_sha256": "499441eee27929a4b00417f58fd8c63c9cc14b8a71520cd0dd27fcb626738351",
+      "download_url": "https://archive.ics.uci.edu/static/public/242/energy+efficiency.zip",
+      "source_url": "https://archive.ics.uci.edu/dataset/242/energy+efficiency",
+      "attribution": "Tsanas, A. and Xifara, A. (2012), Energy Efficiency, UCI Machine Learning Repository. DOI 10.24432/C51307.",
+      "license": "CC BY 4.0 per UCI dataset page",
+      "members": {
+        "ENB2012_data.xlsx": "0089fcffc1415e41e2ff63730cca5280efe54fc43d722dfde1b0aaa808e35dc4"
+      },
+      "column_mapping": {
+        "X1": "relative_compactness",
+        "X2": "surface_area",
+        "X3": "wall_area",
+        "X4": "roof_area",
+        "X5": "overall_height",
+        "X6": "orientation",
+        "X7": "glazing_area",
+        "X8": "glazing_distribution",
+        "Y1": "heating_load",
+        "Y2": "cooling_load"
+      }
+    },
+    "scene": {
+      "archive": "scene.rar",
+      "archive_sha256": "8dae3b1bb244544ff478dd85980fc92d8e6472b4b68dbc2fc915ceeb4d5f1bcc",
+      "download_url": "https://sourceforge.net/projects/mulan/files/datasets/scene.rar/download",
+      "source_url": "https://mulan.sourceforge.net/datasets-mlc.html",
+      "attribution": "Boutell, Luo, Shen and Brown (2004), Learning multi-label scene classification; dataset distributed by Mulan.",
+      "license": "No explicit dataset license found in the distributed ARFF/XML files; availability does not establish an additional license.",
+      "members": {
+        "scene.arff": "5905548975b69b639ab31a295f7bf1ab7379a3f016450012722d28f660f4b143",
+        "scene.xml": "9de52ca3d3368a831f574de365b94d55679d8d7e35496d13b353983e7d8ad576"
+      },
+      "label_roles_from_xml": [
+        "Beach",
+        "Sunset",
+        "FallFoliage",
+        "Field",
+        "Mountain",
+        "Urban"
+      ]
+    },
+    "linnerud": {
+      "archive": "scikit-learn-1.7.2.tar.gz",
+      "archive_sha256": "363ca6f51164fce2ece13b59370ca4ec670a1b73188e0eb387f6ea99c2e2bf67",
+      "download_url": "https://codeload.github.com/scikit-learn/scikit-learn/tar.gz/refs/tags/1.7.2",
+      "source_url": "https://scikit-learn.org/stable/modules/generated/sklearn.datasets.load_linnerud.html",
+      "attribution": "Linnerud exercise/physiological tables distributed in official scikit-learn 1.7.2 release archive.",
+      "license": "scikit-learn BSD-3-Clause; included release COPYING retained as source evidence.",
+      "members": {
+        "scikit-learn-1.7.2/sklearn/datasets/data/linnerud_exercise.csv": "cb8d8c24937643fa2459682efb86c5e667bcd6dd93109eef81964d9e9f11bf8c",
+        "scikit-learn-1.7.2/sklearn/datasets/data/linnerud_physiological.csv": "2bf7e05c1cd7d0adf0eca1e456941f624bed0a4fc96694d60d0ff7853ec5fcf7",
+        "scikit-learn-1.7.2/sklearn/datasets/descr/linnerud.rst": "8c323e008b15799653555592894ceda799442f81f6bacf38edb805dc54866f5b",
+        "scikit-learn-1.7.2/COPYING": "75684d16f4662ab842ed5af9482ac01939aee83c8243d89993616d959d3053f8"
+      }
+    }
+  },
+  "datasets": {
+    "energy": {
+      "file": "data/prepared/energy.csv",
+      "sha256": "c41310e9c6847dd86f1344e120f8b079a1d91d741379259e45bc296da74aa9f4",
+      "rows": 768,
+      "columns": 10,
+      "task": {
+        "kind": "regression",
+        "targets": [
+          "heating_load",
+          "cooling_load"
+        ]
+      },
+      "config": {
+        "features": {
+          "semantic_types": {
+            "orientation": "categorical",
+            "glazing_distribution": "categorical",
+            "relative_compactness": "quantitative",
+            "surface_area": "quantitative",
+            "wall_area": "quantitative",
+            "roof_area": "quantitative",
+            "overall_height": "quantitative",
+            "glazing_area": "quantitative"
+          }
+        },
+        "regression": {
+          "expectations_by_target": {
+            "heating_load": {
+              "kind": "continuous"
+            },
+            "cooling_load": {
+              "kind": "continuous"
+            }
+          }
+        }
+      }
+    },
+    "scene": {
+      "file": "data/prepared/scene.csv",
+      "sha256": "30da457e475acce169323ba673d7e481fa0cf11825c17b14e86a8b0c3b9b559d",
+      "rows": 2407,
+      "columns": 300,
+      "task": {
+        "kind": "multilabel_classification",
+        "targets": [
+          "Beach",
+          "Sunset",
+          "FallFoliage",
+          "Field",
+          "Mountain",
+          "Urban"
+        ]
+      },
+      "config": {}
+    },
+    "linnerud": {
+      "file": "data/prepared/linnerud.csv",
+      "sha256": "a9d748ca2570466adbb535057ddc3e370777d616f973223263d9a65daf0ed5eb",
+      "rows": 20,
+      "columns": 6,
+      "task": {
+        "kind": "regression",
+        "targets": [
+          "Weight",
+          "Waist",
+          "Pulse"
+        ]
+      },
+      "config": {
+        "features": {
+          "semantic_types": {
+            "Chins": "quantitative",
+            "Situps": "quantitative",
+            "Jumps": "quantitative"
+          }
+        },
+        "regression": {
+          "expectations_by_target": {
+            "Weight": {
+              "kind": "continuous"
+            },
+            "Waist": {
+              "kind": "continuous"
+            },
+            "Pulse": {
+              "kind": "continuous"
+            }
+          }
+        }
+      }
+    }
+  }
+}

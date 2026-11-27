@@ -1,0 +1,129 @@
+{
+  "preparation_version": "m2_regression_prepare_v1",
+  "preparation_script_sha256": "062767175d57a4190a336478409e90df3edbd8ee204d5a733e94a8763d37fcb1",
+  "prepared_at": "2026-10-09T11:11:51.718693+00:00",
+  "retrieval_date": "2026-10-09",
+  "python": "3.11.15",
+  "pandas": "3.0.3",
+  "xlrd": "2.0.2",
+  "sources": {
+    "concrete": {
+      "url": "https://archive.ics.uci.edu/static/public/165/concrete+compressive+strength.zip",
+      "uci_page": "https://archive.ics.uci.edu/dataset/165/concrete+compressive+strength",
+      "doi": "https://doi.org/10.24432/C5PK67",
+      "citation": "Yeh, I. (1998). Concrete Compressive Strength. UCI Machine Learning Repository.",
+      "license": "CC BY 4.0 (UCI dataset page)",
+      "archive_sha256": "dad85d14de8aee4e07479daa774e6b569a313715b71a3b92c95a07cf91c2c9a7",
+      "source_files": [
+        "Concrete_Data.xls",
+        "Concrete_Readme.txt"
+      ],
+      "member_sha256": {
+        "Concrete_Data.xls": "710076c66b9ca3f8050e7942f3dcbdbe04013534daeb0077ffd3079a52d8e0c4",
+        "Concrete_Readme.txt": "5cd3cdb31d3cfd68287daa6b22ed0541d6932113e83ee0980ced63641af3441d"
+      }
+    },
+    "bike": {
+      "url": "https://archive.ics.uci.edu/static/public/275/bike+sharing+dataset.zip",
+      "uci_page": "https://archive.ics.uci.edu/dataset/275/bike+sharing+dataset",
+      "doi": "https://doi.org/10.24432/C5W894",
+      "citation": "Fanaee-T, H. (2013). Bike Sharing. UCI Machine Learning Repository. Cite Fanaee-T and Gama, Event labeling combining ensemble detectors and background knowledge, doi:10.1007/s13748-013-0040-3.",
+      "license": "CC BY 4.0 (UCI dataset page); publication attribution also preserved from archive README",
+      "archive_sha256": "b70182d0d0508e9abbb79306ce5c0cec34869000f8220175ac83d11dbe845401",
+      "source_files": [
+        "hour.csv",
+        "day.csv",
+        "Readme.txt"
+      ],
+      "member_sha256": {
+        "hour.csv": "e03de4ee4ef4dc376ac6e04bf829673c6269e8eba5c60fa121640fa2f829504f",
+        "day.csv": "a6bcf826782d3c0fbfdcbeead17cd0884185a0dafe8ff10cd48a874ee7ba18be",
+        "Readme.txt": "b92c8628622948bf0828c43a1b315d1517c3d7fd63654730d0dea379b8e88175"
+      }
+    }
+  },
+  "datasets": {
+    "concrete": {
+      "file": "data/prepared/concrete.csv",
+      "sha256": "938d457c467afb225716d3829152b9931e5951f61f1d1907fd3dcd2bf16e8491",
+      "rows": 1030,
+      "columns": 9,
+      "target": "strength_mpa",
+      "header_mapping": {
+        "Cement (component 1)(kg in a m^3 mixture)": "cement",
+        "Blast Furnace Slag (component 2)(kg in a m^3 mixture)": "blast_furnace_slag",
+        "Fly Ash (component 3)(kg in a m^3 mixture)": "fly_ash",
+        "Water  (component 4)(kg in a m^3 mixture)": "water",
+        "Superplasticizer (component 5)(kg in a m^3 mixture)": "superplasticizer",
+        "Coarse Aggregate  (component 6)(kg in a m^3 mixture)": "coarse_aggregate",
+        "Fine Aggregate (component 7)(kg in a m^3 mixture)": "fine_aggregate",
+        "Age (day)": "age_days",
+        "Concrete compressive strength(MPa, megapascals) ": "strength_mpa"
+      },
+      "source": "concrete",
+      "expectations": {
+        "kind": "continuous",
+        "units": "MPa"
+      },
+      "preparation": "No row filtering, filling, scaling, or deduplication; Concrete headers renamed and XLS converted to CSV."
+    },
+    "bike_hour": {
+      "file": "data/prepared/bike_hour.csv",
+      "sha256": "11e08374c448229649b93e64c7442558b93d516a008804bd70bdb8c82333c434",
+      "rows": 17379,
+      "columns": 17,
+      "target": "cnt",
+      "header_mapping": {},
+      "source": "bike",
+      "expectations": {
+        "kind": "count",
+        "units": "rental bikes per interval"
+      },
+      "preparation": "No row filtering, filling, scaling, or deduplication; Concrete headers renamed and XLS converted to CSV."
+    },
+    "bike_hour_components_removed": {
+      "file": "data/prepared/bike_hour_components_removed.csv",
+      "sha256": "ccb6bb40b008c1476c334d38bf0f0af6bc867074fc54b929aeee744234dcd0f4",
+      "rows": 17379,
+      "columns": 15,
+      "target": "cnt",
+      "header_mapping": {},
+      "source": "bike",
+      "expectations": {
+        "kind": "count",
+        "units": "rental bikes per interval"
+      },
+      "preparation": "No row filtering, filling, scaling, or deduplication; Concrete headers renamed and XLS converted to CSV.",
+      "derivation": "Remove casual and registered only; negative control for component-sum checks."
+    },
+    "bike_day": {
+      "file": "data/prepared/bike_day.csv",
+      "sha256": "75c2c56f116c9ebbd9bcb06087c2b7fffc7b8f8225dd37d388aa7e1996cf19dc",
+      "rows": 731,
+      "columns": 16,
+      "target": "cnt",
+      "header_mapping": {},
+      "source": "bike",
+      "expectations": {
+        "kind": "count",
+        "units": "rental bikes per interval"
+      },
+      "preparation": "No row filtering, filling, scaling, or deduplication; Concrete headers renamed and XLS converted to CSV."
+    },
+    "bike_day_components_removed": {
+      "file": "data/prepared/bike_day_components_removed.csv",
+      "sha256": "1008e7eccc8c80e5f01d2252f3bf6af3b0bc70e0e37da6069fa0da0ac49c51d0",
+      "rows": 731,
+      "columns": 14,
+      "target": "cnt",
+      "header_mapping": {},
+      "source": "bike",
+      "expectations": {
+        "kind": "count",
+        "units": "rental bikes per interval"
+      },
+      "preparation": "No row filtering, filling, scaling, or deduplication; Concrete headers renamed and XLS converted to CSV.",
+      "derivation": "Remove casual and registered only; negative control for component-sum checks."
+    }
+  }
+}

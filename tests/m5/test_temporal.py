@@ -45,6 +45,16 @@ def test_fixed_gaps_duplicates_and_missing(tmp_path):
     assert not list(tmp_path.glob('datatrust-m4-*'))
 
 
+def test_summary_surfaces_blocked_elapsed_continuity(tmp_path):
+    temporal = TemporalSpec(ClockSpec('time', kind='local_datetime'), (MeasurementSpec('x'),),
+                            schedule=ScheduleSpec('fixed', cadence_ns='60000000000', anchor='2020-01-01T00:00:00'))
+    result = audit(tmp_path, 'time,x\n2020-01-01T00:00:00,1\n2020-01-01T00:01:00,2\n', temporal=temporal)
+    summary = result.narrative['summary']
+    assert summary.startswith('Scheduled continuity was blocked')
+    assert 'Fixed elapsed schedules require resolved instant clocks.' in summary
+    assert '2 supplied input rows' in summary
+
+
 def test_bound_timing_and_unknown(tmp_path):
     p=tmp_path/'data.csv';p.write_text('time,x,y,cutoff,available\n2020-01-01T00:00:00Z,1,2,2020-01-02T00:00:00Z,2020-01-03T00:00:00Z\n')
     t=TemporalSpec(ClockSpec('time'),(MeasurementSpec('x'),MeasurementSpec('y')))

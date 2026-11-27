@@ -177,6 +177,19 @@ def test_missing_reference_is_reserved_against_export_collision(tmp_path):
     assert not (tmp_path/'missing.png').exists()
 
 
+def test_mask_distinguishes_invalid_orientation_from_dimension_mismatch(tmp_path):
+    image = Image.new('RGB', (40, 24), 'white')
+    exif = image.getexif()
+    exif[274] = 0
+    image.save(tmp_path/'invalid.jpg', exif=exif)
+    Image.new('L', (40, 24)).save(tmp_path/'matching.png')
+    Image.new('L', (39, 24)).save(tmp_path/'mismatched.png')
+    spec = fixture(tmp_path, rows=[{'path':'invalid.jpg', 'mask':'matching.png'},
+                                  {'path':'image.png', 'mask':'mismatched.png'}], task='segmentation')
+    reasons = family(run(spec), 'annotations')['invalidity_reasons']
+    assert reasons == {'invalid_image_orientation':1, 'mask_frame_mismatch':1}
+
+
 def test_rgb_semantic_mask_preserves_lexical_category_ids(tmp_path):
     pixels=np.zeros((24,40,3),dtype=np.uint8); pixels[3:8,2:12]=[255,0,0]; Image.fromarray(pixels).save(tmp_path/'rgb.png')
     ann=ImageAnnotationSpec(categories=('001',),mask_encoding='rgb_png',color_mapping={'0,0,0':0,'255,0,0':'001'})
