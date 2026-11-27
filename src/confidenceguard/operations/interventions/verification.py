@@ -75,6 +75,11 @@ def feasibility(installation, proposal):
             problems.append(f"{claim['id']}: the reference has no {statistic} record")
         elif claim['claim'] == 'R3' and record['lower'] is None:
             problems.append(f"{claim['id']}: the reference has no finite lower bound for {statistic} (R3 unavailable)")
+        if record is not None and not (claim['claim'] == 'R3' and record['lower'] is None):
+            standing, reasons = definitions.recovery_admission(current['spec'], statistic, claim['claim'], record)
+            if standing != 'formal':
+                problems.append(f"{claim['id']}: {claim['claim']} cannot be formally admitted ({', '.join(reasons)}); "
+                                'its claim would be descriptive, not recovery evidence')
     return problems
 
 
@@ -152,10 +157,14 @@ def refresh(installation, proposal_id, *, now, actor='system'):
                     result = ('established', {'conditions': ids, 'wording': 'Operational condition returned to acceptable state; '
                                                                            'no outcome evidence.'})
             else:
-                det = conn.execute('SELECT state, plan FROM ops_detectors WHERE org_id = %s AND detector_id = %s',
+                det = conn.execute('SELECT state, plan, standing FROM ops_detectors WHERE org_id = %s AND detector_id = %s',
                                    (scope.org_id, claim['detector_id'])).fetchone()
                 state = det['state']
-                if state.get('claimed_at') is not None:
+                if state.get('claimed_at') is not None and det['standing'] != 'formal':
+                    # R2.5: a descriptive SM2 claim never verifies recovery.
+                    result = ('not_established', {'units': state['units'], 'reason': 'claim_not_formally_admitted',
+                                                  'reasons': det['plan'].get('reasons', [])})
+                elif state.get('claimed_at') is not None:
                     from ..monitoring import eprocess
                     kernel = eprocess.RecoveryTest.from_state(state)
                     result = ('established', {'claimed_at_unit': state['claimed_at'], 'units': state['units'], 'upper': kernel.upper(),

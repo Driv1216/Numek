@@ -22,6 +22,34 @@ from ..fsutil import private_directory
 
 MIN_MAJOR = 16
 SOCKET_LIMIT = 100
+# WAL may grow to max_wal_size between checkpoints (more under sustained load before a checkpoint finishes);
+# the resource preflight reserves WAL_PEAK_BYTES for it.
+MAX_WAL_BYTES = 4 * 2**30
+WAL_PEAK_BYTES = MAX_WAL_BYTES + MAX_WAL_BYTES // 2
+
+
+def host_memory_bytes():
+    try:
+        return os.sysconf('SC_PAGE_SIZE') * os.sysconf('SC_PHYS_PAGES')
+    except (ValueError, OSError, AttributeError):
+        return 8 * 2**30
+
+
+def tuning(memory_bytes=None):
+    """Server settings for a P-LOCAL cluster on a shared developer or analyst machine.
+
+    PostgreSQL's defaults (128 MB shared_buffers, 1 GB max_wal_size) make a monitoring installation evict its own
+    indexes and checkpoint every few seconds under ingestion (measured in S10: checkpoints 13-15 s apart, with
+    full-page writes after each). The cache takes an eighth of RAM within [128 MB, 2 GB], leaving the machine
+    for analysis jobs; checkpoints follow time, not every burst of writes.
+    """
+    memory = memory_bytes or host_memory_bytes()
+    mb = 2**20
+    shared = min(max(memory // 8, 128 * mb), 2048 * mb)
+    return {'shared_buffers': f'{shared // mb}MB', 'effective_cache_size': f'{max(memory // 2, shared) // mb}MB',
+            'maintenance_work_mem': '256MB', 'work_mem': '16MB', 'max_wal_size': f'{MAX_WAL_BYTES // mb}MB',
+            'min_wal_size': '256MB', 'checkpoint_timeout': '15min', 'checkpoint_completion_target': '0.9',
+            'wal_compression': 'on'}
 SEARCH = ('/opt/homebrew/opt/postgresql@17/bin', '/opt/homebrew/opt/postgresql@16/bin',
           '/usr/local/opt/postgresql@17/bin', '/usr/lib/postgresql/17/bin', '/usr/lib/postgresql/16/bin')
 
@@ -93,7 +121,9 @@ class LocalCluster:
                        f"unix_socket_directories = '{self.socket_dir}'\n"
                        'unix_socket_permissions = 0700\n'
                        'fsync = on\nsynchronous_commit = on\nfull_page_writes = on\n'
-                       'wal_level = replica\nmax_connections = 100\n')
+                       'wal_level = replica\nmax_connections = 100\n'
+                       '# Memory and checkpoints, sized from this host at initialization (numek_platform.local.tuning).\n'
+                       + ''.join(f"{name} = '{value}'\n" for name, value in tuning().items()))
         return True
 
     def running(self):

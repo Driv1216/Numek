@@ -113,7 +113,7 @@ def _select(installation, ctx, definition, reference, phase, index, as_of_tick, 
     from ...execution_context import ctx as run_ctx
     ws = ctx['workspace']
     start, end = windows.window_ticks(definition['start'], definition['window_ns'], index)
-    k = ws.status()['catalog_sequence']
+    k = ws.catalog.head()                      # the head row only (status() counts every fact: cost grows with history)
     as_of = windows.iso(as_of_tick)
     spec = references.longitudinal_spec(definition, ctx['namespace'], windows.iso(start), windows.iso(end), k, as_of,
                                         window_id=windows.window_id(definition['start'], definition['window_ns'], index))
@@ -178,12 +178,15 @@ def evaluate(installation, ctx, current, reference, phase, index, *, closure, as
     elapsed = [u for u in selected_units if u.get('history_tick') is not None and cutoff is not None
                and u['history_tick'] + horizon <= cutoff]
     window_inclusion = labelled / len(elapsed) if elapsed else None
-    shifted = (phase == 'maturity' and ref_inclusion is not None and window_inclusion is not None
-               and abs(window_inclusion - ref_inclusion) > float(definition.get('inclusion_tolerance', 0.1)))
+    invalid_rate = (sum(1 for u in selected_units if u.get('outcome_reason') in unit_rules.INVALID_OUTCOME_REASONS)
+                    / len(selected_units)) if selected_units else None
+    overlap = references.entity_overlap(reference['packet'], namespace, selected_units)
     for det in detectors:
         plan = det['plan']
         if index < plan.get('first_window', 0):
             continue
+        comparability = _comparability(definition, reference['packet'], phase, det, window_inclusion, invalid_rate, overlap)
+        shifted = comparability['shifted']
         seen_entities, seen_events = _seen(installation, deployment_id, version, det['detector_id'], namespace, selected_units)
         values, entities, events, excluded = unit_rules.stream(
             selected_units, statistic=plan['statistic'], design=definition['unit_design'], namespace=namespace,
@@ -196,7 +199,7 @@ def evaluate(installation, ctx, current, reference, phase, index, *, closure, as
             alarms_total += len(found)
             standing = {'formal': 'F', 'descriptive': 'P', 'insufficient_power': 'P'}[det['standing']]
             for alarm in found:
-                signals.append(_alarm_signal(det, plan, alarm, index, standing, shifted, window_inclusion, ref_inclusion))
+                signals.append(_alarm_signal(det, plan, alarm, index, standing, comparability))
         else:
             kernel = eprocess.RecoveryTest.from_state(det['state'])
             before = kernel.claimed_at
@@ -206,9 +209,10 @@ def evaluate(installation, ctx, current, reference, phase, index, *, closure, as
             if before is None and kernel.claimed_at is not None:
                 claims_total += 1
                 found = [{'claimed_at_unit': kernel.claimed_at, 'upper': kernel.upper()}]
-                signals.append(_claim_signal(det, plan, kernel, index))
+                signals.append(_claim_signal(det, plan, kernel, index, comparability))
             elif kernel.claimed_at is None and kernel.units >= int(plan.get('horizon_units') or 10**18):
-                signals.append({'source': 'recovery', 'source_id': det['detector_id'], 'standing': 'F', 'severity': 'info',
+                signals.append({'source': 'recovery', 'source_id': det['detector_id'],
+                                'standing': 'F' if det['standing'] == 'formal' else 'P', 'severity': 'info',
                                 'kind': 'recovery_not_established', 'dedupe': f"{det['detector_id']}:not_established",
                                 'payload': {'units': kernel.units, 'upper': kernel.upper(), 'theta': plan['theta'],
                                             'condition': plan.get('condition_id')}})
@@ -246,6 +250,8 @@ def evaluate(installation, ctx, current, reference, phase, index, *, closure, as
               'units': _compact(namespace, selected_units, task), 'estimates': [e[1] for e in estimates],
               'estimate_populations': {e[0]: e[2] for e in estimates},
               'label_availability_rate': window_inclusion, 'reference_label_availability_rate': ref_inclusion,
+              'invalid_outcome_rate': invalid_rate, 'reference_entity_overlap': overlap,
+              'reference_invalid_outcome_rate': reference['packet']['inclusion'].get('invalid_outcome_rate'),
               'region_shares': region_rules.shares(selected_units, definition.get('regions'))}
     ref = packets.stage(installation, lease, ctx['catalog_id'], packets.encode(packet))
     evaluation_id = uuid.uuid4()
@@ -330,38 +336,94 @@ def _apply(conn, scope, deployment_id, version, index, evaluation_id, update):
                 copy.write_row(value)
 
 
-def _alarm_signal(det, plan, alarm, index, standing, shifted, window_inclusion, ref_inclusion):
+def _comparability(definition, reference_packet, phase, det, window_inclusion, invalid_rate, overlap=None):
+    """R2.4 comparability of the included population with the reference, for one detector and window.
+
+    Compared rates (``shifted`` lists those beyond the declared tolerance):
+    - label availability among units whose follow-up elapsed (outcome detectors; ``inclusion_tolerance``, default 0.1);
+    - invalid-outcome rate (outcome detectors; the same tolerance);
+    - late exclusion: units published after their window was processed, over all units this detector has seen. The
+      reference has none by construction (``late_tolerance``, default 0.01, plan G.3).
+    Entity-first thinning is recorded with the detector's exclusions but not compared: the stream accumulates repeat
+    entities over months while the reference covers one period, so their thinning rates differ by design.
+    The reference/stream entity overlap is measured and shown; independence remains a declared assumption.
+    """
+    tolerance = float(definition.get('inclusion_tolerance', 0.1))
+    late_tolerance = float(definition.get('late_tolerance', 0.01))
+    inclusion = reference_packet.get('inclusion') or {}
+    rates, limits = {}, {}
+    if phase == 'maturity':
+        if window_inclusion is not None and inclusion.get('label_availability_rate') is not None:
+            rates['label_availability'] = (window_inclusion, inclusion['label_availability_rate'])
+            limits['label_availability'] = tolerance
+        if invalid_rate is not None and inclusion.get('invalid_outcome_rate') is not None:
+            rates['invalid_outcome'] = (invalid_rate, inclusion['invalid_outcome_rate'])
+            limits['invalid_outcome'] = tolerance
+    seen = int(det.get('units') or 0) + int(det.get('late_excluded') or 0)
+    if seen:
+        rates['late_exclusion'] = (int(det.get('late_excluded') or 0) / seen, 0.0)
+        limits['late_exclusion'] = late_tolerance
+    shifted = sorted(k for k, (window, ref) in rates.items() if abs(window - ref) > limits[k])
+    return {'shifted': shifted, 'rates': {k: {'window': w, 'reference': r, 'tolerance': limits[k]} for k, (w, r) in rates.items()},
+            'reference_entity_overlap': overlap}
+
+
+def _population_note(comparability):
+    if comparability['shifted']:
+        return ('formal for the included population; population definition has shifted relative to reference ('
+                + ', '.join(comparability['shifted']) + ')')
+    return 'included population comparable to reference'
+
+
+def _assumptions(comparability):
+    overlap = comparability.get('reference_entity_overlap')
+    independence = 'reference independent of the monitored stream'
+    if overlap is not None:
+        independence += f" (measured entity overlap with the reference: {overlap['shared']} of {overlap['entities']} window entities)"
+    return ['conditional risk of included units given the observed past', 'no unmodelled common shocks', independence]
+
+
+def _alarm_signal(det, plan, alarm, index, standing, comparability):
     wording = (f"The matured observed-label sequence since the detector start is inconsistent (expected false alarms <= "
                f"alpha per included unit, alpha = {plan['alpha']:.3g}) with per-unit conditional {plan['statistic']} risk "
                f"never exceeding {plan['m0']:.4g}. Risk exceeded that level at some point after approximately unit "
                f"{alarm['onset']}.")
+    rates = comparability['rates']
     payload = {'detector': det['detector_id'], 'statistic': plan['statistic'], 'unit': alarm['unit'], 'onset_unit': alarm['onset'],
                'log_statistic': alarm['log_statistic'], 'm0': plan['m0'], 'alpha': plan['alpha'], 'standing': det['standing'],
                'reasons': plan.get('reasons', []), 'added_after_observation': plan.get('added_after_observation', False),
                'wording': wording if standing == 'F' else 'Descriptive alarm (no probability statement): ' + wording,
                'not_established': ['average risk over the period', 'cause', 'a probability that degradation occurred',
                                    'anything about unlabelled, immature, reserve-held or late-excluded units'],
-               'assumptions': ['conditional risk of included units given the observed past', 'no unmodelled common shocks',
-                               'reference independent of the monitored stream'],
-               'population': ('formal for the included population; population definition has shifted relative to reference'
-                              if shifted else 'included population comparable to reference'),
-               'label_availability_rate': window_inclusion, 'reference_label_availability_rate': ref_inclusion}
+               'assumptions': _assumptions(comparability),
+               'population': _population_note(comparability), 'comparability': comparability,
+               'label_availability_rate': (rates.get('label_availability') or {}).get('window'),
+               'reference_label_availability_rate': (rates.get('label_availability') or {}).get('reference')}
     return {'source': 'detector', 'source_id': det['detector_id'], 'standing': standing,
             'severity': 'high' if standing == 'F' else 'medium', 'kind': 'sequential_alarm',
             'dedupe': f"{det['detector_id']}:alarm:{alarm['unit']}", 'payload': payload}
 
 
-def _claim_signal(det, plan, kernel, index):
+def _claim_signal(det, plan, kernel, index, comparability):
+    """An SM2 claim. Formal only when the test was admitted formally (R2.5); a descriptive claim is never recovery."""
     claim = plan['claim']
+    formal = det['standing'] == 'formal'
     wording = (f"Post-start risk on matured observed labels is below {plan['theta']:.4g} (error <= {plan['error_bound']:.3g})."
                if claim == 'R2' else
                f"Post-start risk is not worse than the reference by more than {plan['delta']} (error <= {plan['error_bound']:.3g}).")
-    return {'source': 'recovery', 'source_id': det['detector_id'], 'standing': 'F', 'severity': 'info',
-            'kind': 'threshold_recovery_established' if claim == 'R2' else 'reference_noninferiority_established',
-            'dedupe': f"{det['detector_id']}:claim", 'payload': {'claim': claim, 'theta': plan['theta'], 'units': kernel.units,
-                                                                 'claimed_at_unit': kernel.claimed_at, 'upper': kernel.upper(),
-                                                                 'wording': wording, 'interpretation': plan['interpretation'],
-                                                                 'condition': plan.get('condition_id')}}
+    if not formal:
+        wording = ('Descriptive recovery indication (no error statement; not recovery evidence; reasons: '
+                   + ', '.join(plan.get('reasons') or ['not_formally_admitted']) + '): ' + wording)
+        kind = 'descriptive_recovery_indication'
+    else:
+        kind = 'threshold_recovery_established' if claim == 'R2' else 'reference_noninferiority_established'
+    return {'source': 'recovery', 'source_id': det['detector_id'], 'standing': 'F' if formal else 'P', 'severity': 'info',
+            'kind': kind, 'dedupe': f"{det['detector_id']}:claim",
+            'payload': {'claim': claim, 'theta': plan['theta'], 'units': kernel.units, 'claimed_at_unit': kernel.claimed_at,
+                        'upper': kernel.upper(), 'wording': wording, 'interpretation': plan['interpretation'],
+                        'condition': plan.get('condition_id'), 'standing': det['standing'], 'reasons': plan.get('reasons', []),
+                        'population': _population_note(comparability), 'comparability': comparability,
+                        'assumptions': _assumptions(comparability)}}
 
 
 def _signal(conn, scope, deployment_id, version, index, signal):
@@ -376,8 +438,12 @@ def _signal(conn, scope, deployment_id, version, index, signal):
 def revise(installation, ctx, current, reference, phase, now_tick):
     """New revisions for evaluated windows whose facts changed after their latest evaluation (late publications).
 
-    Incremental: candidate windows are found from the facts published since the earliest latest-evaluation K,
-    mapped back to their opportunities' event ticks; each candidate is then checked against its own K.
+    Incremental: the facts published since the last scan (the revision cursor, at least the earliest
+    latest-evaluation K) are joined to the opportunities of evaluated windows; a window is late when its newest
+    linked publication is after its own K. Facts for windows not yet evaluated (a bulk catch-up) are not scanned
+    against history: they are first evaluations. Every fact is scanned once: the cursor moves to the catalog head read at the
+    start of the scan, and only when every late window found was revised in this cycle (otherwise the next cycle
+    rescans from the old cursor, and windows already revised carry their new K).
     """
     definition, version = current['spec'], current['version']
     scope = installation.scope
@@ -393,33 +459,62 @@ def revise(installation, ctx, current, reference, phase, now_tick):
                ORDER BY window_index, revision DESC''', (scope.org_id, deployment_id, version, phase)).fetchall()}
         if not latest:
             return []
+        head = conn.execute('SELECT head FROM catalog_heads WHERE org_id = %s AND catalog_id = %s',
+                            (scope.org_id, ctx['catalog_id'])).fetchone()['head']
+        cursor = conn.execute('SELECT checked_sequence FROM ops_revision_cursors WHERE org_id = %s AND deployment_id = %s '
+                              'AND definition_version = %s AND phase = %s', (scope.org_id, deployment_id, version, phase)).fetchone()
         floor = min(r['catalog_sequence'] for r in latest.values())
-        ticks = conn.execute(
-            f'''WITH new AS (SELECT x.kind, x.key, x.opportunity_key, x.target_key FROM fact_index x
-                               JOIN publications px ON px.id = x.publication_id
-                               WHERE x.catalog_id = %s AND px.sequence > %s {kinds})
-               SELECT DISTINCT o.event_tick FROM fact_index o
-               WHERE o.catalog_id = %s AND o.kind = 'opportunity' AND o.event_tick >= %s
-                 AND (o.key IN (SELECT key FROM new WHERE kind = 'opportunity')
-                      OR o.opportunity_key IN (SELECT opportunity_key FROM new WHERE opportunity_key IS NOT NULL)
-                      OR o.target_key IN (SELECT target_key FROM new WHERE kind = 'outcome'))''',
-            (ctx['catalog_id'], floor, ctx['catalog_id'], start)).fetchall()
-        candidates = sorted({(int(r['event_tick']) - start) // length for r in ticks} & set(latest))
-        late = []
-        for index in candidates:
-            row = latest[index]
-            changed = conn.execute(
-                f'''SELECT 1 FROM fact_index o JOIN publications p ON p.id = o.publication_id
-                   WHERE o.catalog_id = %s AND o.kind = 'opportunity' AND o.event_tick >= %s AND o.event_tick < %s
-                     AND (p.sequence > %s OR EXISTS (
-                         SELECT 1 FROM fact_index x JOIN publications px ON px.id = x.publication_id
-                         WHERE x.catalog_id = o.catalog_id AND px.sequence > %s {kinds}
-                           AND (x.opportunity_key = o.opportunity_key OR x.target_key = o.target_key)))
-                   LIMIT 1''', (ctx['catalog_id'], row['start_tick'], row['end_tick'], row['catalog_sequence'],
-                                row['catalog_sequence'])).fetchone()
-            if changed:
-                late.append(row)
-    return [_revision(installation, ctx, current, reference, phase, row, now_tick) for row in late[:MAX_REVISIONS_PER_CYCLE]]
+        if cursor is not None:
+            floor = max(floor, int(cursor['checked_sequence']))
+        # Only opportunities inside evaluated windows can make a window late; facts for windows not yet evaluated
+        # (a bulk catch-up) are first evaluations, not revisions.
+        low = min(int(r['start_tick']) for r in latest.values())
+        high = max(int(r['end_tick']) for r in latest.values())
+        # A window is late when a fact linked to one of its opportunities (the opportunity itself, a fact carrying its
+        # opportunity key, or an outcome for its target) was published after the window's latest evaluation K.
+        # Driven from the new facts by index probes, so the cost follows what was published since the cursor,
+        # never the history. An opportunity fact's opportunity_key is its own key, and predictions and context
+        # carry their opportunity's key: that link is a probe on the partition key. Outcomes link by target.
+        # Each probe is a LATERAL subquery with its conditions inside (OFFSET 0 keeps it unflattened). A plain join
+        # lets the planner scan every opportunity in the evaluated range once and filter it against every new fact,
+        # which is quadratic after a bulk catch-up (millions of new facts). Keys are deduplicated before probing.
+        # Close measures are outcome-free, so outcomes are not linked for them.
+        outcome_link = '' if phase == 'close' else '''
+                            UNION ALL
+                            SELECT o.event_tick, n.sequence FROM (SELECT target_key, max(sequence) AS sequence FROM new
+                                                                  WHERE kind = 'outcome' GROUP BY target_key) n
+                            CROSS JOIN LATERAL (SELECT o0.event_tick FROM fact_index o0
+                                                WHERE o0.catalog_id = %(c)s AND o0.target_key = n.target_key
+                                                  AND o0.kind = 'opportunity' OFFSET 0) o'''
+        from numek_platform.db import point_lookups
+        with conn.transaction(), point_lookups(conn):
+            linked = conn.execute(
+                f'''WITH new AS MATERIALIZED (SELECT x.kind, x.opportunity_key, x.target_key, px.sequence FROM fact_index x
+                                   JOIN publications px ON px.id = x.publication_id
+                                   WHERE x.catalog_id = %(c)s AND px.sequence > %(floor)s AND px.sequence <= %(head)s {kinds}),
+                        links AS (
+                            SELECT o.event_tick, n.sequence FROM (SELECT opportunity_key, max(sequence) AS sequence FROM new
+                                                                  WHERE opportunity_key IS NOT NULL GROUP BY opportunity_key) n
+                            CROSS JOIN LATERAL (SELECT o0.event_tick FROM fact_index o0
+                                                WHERE o0.catalog_id = %(c)s AND o0.kind = 'opportunity'
+                                                  AND o0.route = n.opportunity_key AND o0.key = n.opportunity_key OFFSET 0) o
+                            {outcome_link})
+                   SELECT floor((event_tick - %(start)s)::numeric / %(length)s) AS window_index, max(sequence) AS newest
+                   FROM links WHERE event_tick >= %(low)s AND event_tick < %(high)s GROUP BY 1''',
+                {'c': ctx['catalog_id'], 'floor': floor, 'head': head, 'low': max(low, start), 'high': high,
+                 'start': start, 'length': length}).fetchall()
+        newest = {int(r['window_index']): int(r['newest']) for r in linked}
+        late = [latest[index] for index in sorted(set(newest) & set(latest))
+                if newest[index] > int(latest[index]['catalog_sequence'])]
+    revised = [_revision(installation, ctx, current, reference, phase, row, now_tick) for row in late[:MAX_REVISIONS_PER_CYCLE]]
+    if len(late) <= MAX_REVISIONS_PER_CYCLE:
+        with installation.db.transaction() as conn:
+            conn.execute('''INSERT INTO ops_revision_cursors(org_id, deployment_id, definition_version, phase, checked_sequence)
+                            VALUES (%s, %s, %s, %s, %s)
+                            ON CONFLICT (org_id, deployment_id, definition_version, phase) DO UPDATE
+                            SET checked_sequence = greatest(ops_revision_cursors.checked_sequence, EXCLUDED.checked_sequence),
+                                updated_at = clock_timestamp()''', (scope.org_id, deployment_id, version, phase, head))
+    return revised
 
 
 def _revision(installation, ctx, current, reference, phase, row, now_tick):

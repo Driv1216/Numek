@@ -1,0 +1,35 @@
+# NUMEK operations controller: the epoch-fenced leader (scheduling, window closing, conditions, notifications, GC).
+# A second instance on another host is safe; only one leads at a time.
+[Unit]
+Description=NUMEK ConfidenceGuard operations controller
+After=network-online.target postgresql.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=numek
+Group=numek
+EnvironmentFile=/etc/numek/ops.env
+ExecStart=/opt/numek/venv/bin/confidenceguard ops controller
+KillSignal=SIGTERM
+TimeoutStopSec=45
+Restart=on-failure
+RestartSec=5
+UMask=0077
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=yes
+PrivateTmp=yes
+PrivateDevices=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectControlGroups=yes
+RestrictSUIDSGID=yes
+LockPersonality=yes
+RestrictRealtime=yes
+CapabilityBoundingSet=
+ReadWritePaths=/var/lib/numek
+ReadOnlyPaths=/etc/numek
+
+[Install]
+WantedBy=multi-user.target

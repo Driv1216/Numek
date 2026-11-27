@@ -7,7 +7,12 @@ Recovery point: one PostgreSQL snapshot S. A backup contains
   longer needed for recovery (``retained_for_recovery = false``) unless asked;
   raw objects of acknowledged-but-unprocessed batches are therefore always in;
 * a keyring, wrapped with the operator's passphrase, holding every data key
-  that any included object needs; the backup refuses if one is missing;
+  that any included object needs (the backup refuses if one is missing), every
+  other live data key (the restored installation keeps encrypting with them),
+  and every operational secret the installation needs to keep working: sealed
+  reserve assignment secrets, notification channel secrets, monitoring unit-order
+  and audit-sampling secrets (R2.2);
+* the installation configuration file, when given, with its digest;
 * a manifest with the SHA-256 of every file.
 
 A ``gc_holds`` row keeps every object present at S on disk while it is copied.
@@ -45,6 +50,18 @@ def _sha_file(path):
     return digest.hexdigest()
 
 
+def _keyring_names(secret_store, live_keys):
+    """Secrets copied into the keyring besides the required data keys: every live data key that is still present,
+    and every operational (non-data-key) secret. Destroyed data keys are absent from the store and stay out."""
+    if secret_store is None:
+        return []
+    from .secrets import DATA_KEY_PREFIX, _key_name
+    live = [_key_name(r['org_id'], r['key_id']) for r in live_keys]
+    names = [n for n in live if secret_store.exists(n)]
+    names += [n for n in secret_store.names() if not n.startswith(DATA_KEY_PREFIX)]
+    return sorted(set(names))
+
+
 def create_backup(db, store, secret_store, destination, *, passphrase, include_terminal_raw=False, config_bytes=None):
     destination = Path(destination).absolute()
     if destination.exists():
@@ -63,6 +80,7 @@ def create_backup(db, store, secret_store, destination, *, passphrase, include_t
                    WHERE state = 'active' AND (codec <> 'encrypted_raw_batch_v1' OR retained_for_recovery OR %s)
                    ORDER BY id''', (include_terminal_raw,)).fetchall()
             keys = sorted({(r['org_id'], r['key_id']) for r in objects if r['key_id'] is not None}, key=str)
+            live_keys = conn.execute("SELECT org_id, key_id FROM key_records WHERE state = 'active' ORDER BY key_id").fetchall()
             dump = destination / 'database.dump'
             result = subprocess.run([str(find_binaries() / 'pg_dump'), '--snapshot', snapshot, '-Fc', '--no-owner',
                                      '-f', str(dump), '-d', db.dsn], capture_output=True, text=True, env=server_env())
@@ -70,11 +88,12 @@ def create_backup(db, store, secret_store, destination, *, passphrase, include_t
                 raise PlatformError('Database dump failed: ' + result.stderr.strip()[-300:], 'backup_failed')
         os.chmod(dump, 0o600)
         files['database.dump'] = _sha_file(dump)
-        if keys or passphrase is not None:
+        names = _keyring_names(secret_store, live_keys)
+        if keys or names or passphrase is not None:
             if passphrase is None:
-                raise PlatformError('This backup includes encrypted objects; a backup passphrase is required.',
-                                    'backup_passphrase')
-            keyring = export_keyring(secret_store, keys, passphrase)
+                raise PlatformError('This backup includes encrypted objects or installation secrets; a backup passphrase '
+                                    'is required.', 'backup_passphrase')
+            keyring = export_keyring(secret_store, keys, passphrase, names=names)
             write_atomic(destination / 'keyring.bin', keyring)
             files['keyring.bin'] = hashlib.sha256(keyring).hexdigest()
         object_root = private_directory(destination / 'objects')
@@ -92,7 +111,9 @@ def create_backup(db, store, secret_store, destination, *, passphrase, include_t
             files['config.bin'] = hashlib.sha256(config_bytes).hexdigest()
         manifest = {'format': 'numek_platform_backup/1', 'installation_id': str(installation), 'snapshot': snapshot,
                     'created_at': dt.datetime.now(dt.timezone.utc).isoformat(), 'objects': len(objects),
-                    'keys': len(keys), 'include_terminal_raw': include_terminal_raw,
+                    'keys': len(keys), 'secrets': sorted({n.split('/', 1)[0] for n in names}),
+                    'secret_count': len(names), 'include_terminal_raw': include_terminal_raw,
+                    'config_sha256': None if config_bytes is None else hashlib.sha256(config_bytes).hexdigest(),
                     'recovery_point': 'database snapshot; batches acknowledged after it are not covered',
                     'files': files}
         write_atomic(destination / MANIFEST, json.dumps(manifest, sort_keys=True, indent=1).encode())
@@ -127,7 +148,15 @@ def restore_backup(source, db, store, secret_store, *, passphrase):
     if (source / 'keyring.bin').exists():
         import_keyring(secret_store, (source / 'keyring.bin').read_bytes(), passphrase)
     with db.connect() as conn:
-        rows = conn.execute("SELECT id, physical_key, sha256, bytes FROM objects WHERE state = 'active'").fetchall()
+        rows = conn.execute("SELECT id, physical_key, sha256, bytes, codec, retained_for_recovery FROM objects "
+                            "WHERE state = 'active'").fetchall()
+    # Only raw batches the cut deliberately left out (terminal, not retained for recovery) may be absent. Any other
+    # absent object means an incomplete or altered backup: refuse rather than mark evidence reclaimed.
+    excludable = not manifest.get('include_terminal_raw', False)
+    for row in rows:
+        if not (source / 'objects' / row['physical_key'].replace('/', '__')).exists() and not (
+                excludable and row['codec'] == 'encrypted_raw_batch_v1' and not row['retained_for_recovery']):
+            raise PlatformError('The backup lacks an evidence object that was active at its snapshot.', 'backup_invalid')
     restored = 0
     for row in rows:
         backup_file = source / 'objects' / row['physical_key'].replace('/', '__')

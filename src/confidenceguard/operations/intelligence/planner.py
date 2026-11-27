@@ -124,7 +124,10 @@ def plan(installation, incident_id, *, now, only=None, actor='system'):
     for candidate in ranked:
         meta = templates.TEMPLATES[candidate['template']]
         spec = templates.spec_for(candidate['template'], ctx, now)
-        logical = digest({k_: v for k_, v in spec.items() if k_ not in ('as_of',)})
+        # Templates that run the same analysis share one logical fingerprint, so the second is a duplicate (or a
+        # reuse) of the first rather than a second identical computation.
+        logical = digest({**{k_: v for k_, v in spec.items() if k_ not in ('as_of', 'template')},
+                          'analysis': meta.get('same_analysis_as', candidate['template'])})
         fingerprint = digest([logical, k])
         reasoning = {**candidate, 'value_per_minute': candidate['value'] / meta['cost'], 'tier': meta['tier'],
                      'incident_priority': incident['priority']}

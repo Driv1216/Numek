@@ -5,6 +5,235 @@ records what is implemented and what evidence exists, stage by stage. Several ki
 engineering correctness, statistical qualification, resilience, measured performance, product completeness,
 independent review and founder acceptance.
 
+## Independent review corrections (2026-11-27). Implemented; affected suites rerun.
+
+The independent technical review returned CORRECTIONS REQUIRED. Every correction, its cause, files and tests are in
+[`docs/CG7_REVIEW_CORRECTIONS.md`](../../docs/CG7_REVIEW_CORRECTIONS.md). In short:
+- **B1** SM2 recovery tests use the SM1 admission rules (R2.5); descriptive claims never recover or verify.
+- **R2.4** comparability adds invalid-outcome and late-exclusion rates; reference/stream entity overlap is measured.
+- **B2** backups wrap every operational secret and live data key, plus the installation configuration
+  (`confidenceguard ops backup create`); restore refuses a backup missing an evidence object.
+- **B3** the incrementality gate covers both phases: close **1.126**, maturity **1.131** (fresh routed W-DEV-S1 run,
+  `results/review_corrections/`).
+- **B4** the closure report lists what plan F.1 items are not implemented.
+- Non-blocking: routed facts must name their opportunity (`route_undetermined`); sign-in throttling (migration 0015);
+  `/metrics` loopback-or-auth; shared CG3 analysis fingerprint; object directory fsync; coverage map regions; condition
+  transitions chain within one tick (a race found while verifying).
+
+Gate on the corrected source: see the corrections document, section Verification.
+
+## S10 pass 2: resilience, security, installed wheel, closure gate and docs (2026-11-26). Implemented. CG7 implementation complete; awaiting independent review and founder acceptance.
+
+The closure report is [`CG7_IMPLEMENTATION_REPORT.md`](CG7_IMPLEMENTATION_REPORT.md).
+
+### Implemented
+
+**M.3 resilience** (`tests/platform/test_resilience.py`, 7 tests; one webhook test in `test_incidents.py`):
+
+| Fault | Acceptance checked |
+|---|---|
+| Crash at each processing boundary (`checked`, `objects_published`, `before_catalog_commit`, `catalog_committed`, `published`), then retry | each batch published once; K contiguous; no duplicate fact; funnel reconciled |
+| Object store full (ENOSPC on write) | `storage_full`, retryable; HTTP 507 with `Retry-After`; no partial staged file; nothing acknowledged; the same batch succeeds once space is back |
+| SIGKILL of a worker host and its job processes mid-job, at two points | lease superseded (fence + 1); the job reruns and publishes once; the dead attempts' pending objects reclaimed |
+| SIGKILL of one gunicorn worker, then of the whole server | worker replaced; every acknowledged batch kept; restart ready within 60 s |
+| SIGKILL of the controller | the successor waits for the lease on database time, then leads at epoch + 1; the old epoch is refused |
+| Host clock ±1 h | cannot take leadership or expire a live lease (both use database `now()`) |
+| Database stopped and restarted under a running worker host and controller | receive refuses retryably; `readyz` 503, then 200 within 60 s; both loops alive; ingestion resumes |
+| Webhook answering 500, then hanging | backoff 30 s then 60 s, never early; the hang bounded by the egress timeout; dead letter after 8 attempts with one idempotency key; D signal |
+
+**Defects found by these tests and fixed:**
+- **Full disk.** It surfaced as a raw OS error and left a partial staged file. `LocalObjectStore` now removes the
+  partial file and raises `storage_full` (retryable); the ingestion surface and the API map it to 507.
+- **Database restart killed the loops.** `WorkerHost.run` let any database error escape, and `Controller.run` caught
+  only `PlatformError` (not a connection dropped mid-query). Both now treat the database being unavailable as
+  transient. An attempt that loses its connection is killed and retried under a new fence. `host.unavailable`
+  counts skipped rounds.
+- **Ingestion HTTP surface.** A `PlatformError` raised before translation (for example, the database down)
+  returned 500. It now has its own handler: 503 with `Retry-After`.
+
+**M.4, remaining items** (`test_security.py`, 3 tests):
+- **Sessions:** a new id and secret at every login (no fixation; a session exists only after authentication);
+  revocation; an absolute lifetime that ends active sessions; forged secrets refused; only hashes stored.
+- **Tokens:** expiry; the secret never stored.
+- **Secret files:** 0600, directories 0700; loosened, hard-linked or symlinked secret files refused; path escape
+  refused.
+
+**Installed wheel (M.6).** `uv build` produced the wheel. It was installed with `[operations]` into a fresh Python
+3.13 environment and run from a directory outside the source tree:
+- imports resolve to the installed wheel (gunicorn 23.0.0, psycopg 3.3.6, scikit-learn 1.9.1);
+- `ops init` creates a P-LOCAL installation at schema 14;
+- a batch publishes at K 1 with routed predictions;
+- `ops serve` returns `readyz` 200 and serves the console, and exits 0 on SIGTERM;
+- the wheel includes migrations 0013–0014 and the console bundle.
+
+**Docs:** `docs/CG7_CONFIDENCEGUARD.md` and `docs/NUMEK_PLATFORM.md` (new); CG7 sections in `docs/ARCHITECTURE.md`
+and `METHODOLOGY.md`; `docs/CURRENT_STATE.md`; the implementation report.
+
+### Closure gate (every affected suite, once, each in its own session)
+
+| Suite (each in its own pytest session) | Result |
+|---|---|
+| `tests/platform` | **215 passed** |
+| `tests/cg1` | **38 passed** |
+| `tests/cg2` | **43 passed**, 1 skipped (pre-existing) |
+| `tests/cg3` | **67 passed** |
+| `tests/cg4` (`--import-mode=importlib`) | **312 passed** |
+| `tests/cg5` (`--import-mode=importlib`) | **109 passed** |
+| `tests/cg6` | **104 passed**, 10 skipped (hardware) |
+| DataTrust root and `m4`, `m5`, `m6`, `m7`, `m9` | 5 / 0 / 0 / 1 / 13 / 24 failures. **Every failure set is identical** to the same suites on the committed HEAD (`e3d6c741`, exported to a clean directory, same environment). **No DataTrust regression.** S10 changes no DataTrust file. |
+
+**DataTrust failure causes** (all present at HEAD):
+- missing optional extras: `reportlab`, `ijson`, `pycocotools`, the offline language model;
+- image-core execution errors;
+- frozen-result checksum tests.
+
+**How the gate was run.**
+- WeasyPrint needs `DYLD_FALLBACK_LIBRARY_PATH=/opt/homebrew/lib` on this Mac. Without it, 22 PDF tests fail to load
+  `libgobject`; that first run was discarded as environmental.
+- The m-suites must run in separate sessions: their test modules share basenames.
+
+## S10 pass 1: packaging, preflight and performance (2026-11-26). Implemented. The incrementality gate passes (1.15 against 1.3) after the founder-approved routed layout.
+
+The first measurement failed the gate (1.47). The founder approved the structural fix (routed fact partitions,
+migration 0014), and the gate was measured again on a from-scratch W-DEV-S1 installation.
+
+### Implemented
+
+**Serving** (`operations/serving.py`, `ops serve`). gunicorn 23.0.0 `gthread` through `BaseApplication`, with
+`preload_app` off. The installation is opened in the master before forking (P-LOCAL starts once); each worker builds
+its own app. The S9 serving guard is kept: non-loopback serving requires TLS or a declared trusted proxy.
+`forwarded_allow_ips` is set only with `--trusted-proxy`. The JSON access log records the path without the query
+string. `max_requests` has jitter.
+
+**Packaging** (`deploy/`).
+- `constraints/cg7-ops-linux-x86_64-py313.lock`: 42 pins, all hashed (`uv pip compile --extra operations
+  --generate-hashes`, linux x86_64 manylinux_2_28, `--exclude-newer 2026-11-12`). New `operations` extra.
+- `deploy/oci/Containerfile`: base image pinned by digest; lock installed with `--require-hashes`, then the wheel with
+  `--no-deps`; non-root `numek` (uid 10001); `/var/lib/numek` mode 0700. Allowlist `.dockerignore`.
+- `deploy/compose/`: postgres 17.12, init, api (TLS, loopback port), controller, worker; `read_only`,
+  `no-new-privileges`, `cap_drop: ALL`. The password comes from a git-ignored `.env` (`env.example` is committed).
+- `deploy/systemd/`: api, controller and templated worker units, hardened (`ProtectSystem=strict`,
+  `NoNewPrivileges`, `ReadWritePaths=/var/lib/numek`); the worker uses `KillMode=mixed`.
+- `deploy/README.md`: profiles (P-LOCAL; P-SERVER systemd and OCI **intended, not qualified**), install, preflight,
+  backups and audit anchors, known limits.
+
+**Workloads and preflight (R2.8)** (`operations/workloads.py`, `ops preflight`). W-REF and W-DEV keep their
+identities. W-DEV-S1 is a separately named smaller workload (`parent='W-DEV'`, deviations listed): 1 deployment,
+10k predictions a day, 30 features, 30- and 90-day histories. Preflight runs a 10⁶-fact calibration, projects
+database, WAL peak, objects, raw, staging, backup and memory, and admits against 20% disk and memory reserves.
+`ops preflight` exits 3 when the workload is not admitted.
+
+**Workload runner** (`validation/cg7/workload_run.py`). Refuses a workload without an admitted preflight record.
+Runs N `ops worker` processes, loads milestones, times every window evaluation, then a 5-day live phase and
+restart-to-ready. Every timing is appended to `progress.jsonl` as it happens. Uses a 1-day reference (see the
+phase-result limit below).
+
+**Defects found by the workload and fixed** (each was invisible in the CI-sized tests):
+1. Late-revision check (H.6) was non-incremental: it rescanned all history each cycle (5.1 s of a 6.3 s cycle).
+   It is now cursor-based: new table `ops_revision_cursors` (migration 0013).
+2. After a bulk catch-up the revision query never finished (more than 29 minutes on 3M facts; an OR of IN lists
+   over all new facts). It is now driven from the new facts by index probes on the partition key, restricted to
+   windows already evaluated, with one query deciding lateness against each window's K. 4 s on that catch-up.
+3. `_read_locators` was quadratic. Single pass.
+4. Ingestion (`commit_capture`) had a quadratic duplicate scan (1.25 billion steps for 10k rows) and two point
+   queries per fact. Now one set lookup and chunked prefetch queries; the correction path is indexed the same way.
+   A 10k-row batch went from 74.7 s to 9.8 s.
+5. The prefetch, and the duplicate check at publication, were planned as merge or hash joins over the whole index,
+   so their cost grew with history (19.3 s against 0.25 s per 10k identities at 4.7M facts). New
+   `numek_platform.db.point_lookups` plans a block as index probes and restores the settings afterwards.
+6. Each governed read resolved the whole population a second time only to count withheld rows; it is now a count
+   query with the same refusals.
+7. Each window evaluation counted every fact in the catalog to read K (`status()`); it now reads the head row.
+8. P-LOCAL ran PostgreSQL defaults: 128 MB `shared_buffers` against a 6.9 GB database, and checkpoints 13–15 s
+   apart (160 warnings in one run). New clusters are sized from the host (`numek_platform.local.tuning`:
+   `shared_buffers` an eighth of RAM within 128 MB–2 GB, `max_wal_size` 4 GB, `checkpoint_timeout` 15 min,
+   `wal_compression`). The preflight reserves the larger WAL peak. Existing clusters are not changed.
+9. **Window reads scanned every partition** (the cause of the first gate failure). Governed window reads selected
+   predictions, context and outcomes by `opportunity_key` / `target_key`, which were not the partition key, so every
+   query visited all 32 partitions and its cost grew with history. **Routed layout (migration 0014, founder
+   approved):** `fact_index` gains `route` (`opportunity_key` for predictions and context, the key for every other
+   kind; a CHECK enforces the rule) and is hash-partitioned by it, so a window's opportunities, predictions and
+   context live in the partitions of its opportunity keys. Unique and no-fork indexes include `route`; identity stays
+   `(catalog, kind, key, revision)`, and re-importing a purged fact is refused through the global tombstone key.
+   Window selection now reads by routes (a LATERAL index probe per route, `evidence.reader.resolve(routes=…)`);
+   outcomes are routed by their own key, which is the target key. Capture derives the prediction's opportunity key
+   from its identity and refuses a payload that disagrees (`capture_changed`). The H.2 equivalence test now also
+   mutates the routed filters. Upgrade of the 4.75M-fact run-v2 installation: 70.8 s, fact set and digests
+   unchanged, zero rule violations, predictions co-located with their opportunities.
+10. **The catch-up query hung again on the routed layout** (35+ minutes after the 60-day load). The planner scanned
+   every opportunity in the evaluated range once and filtered it against all 3M new facts (quadratic), because the
+   route condition could not reach a materialized inner side. Each link is now a deduplicated LATERAL probe with its
+   conditions inside (`OFFSET 0`), and close measures no longer link outcomes. On the loaded 90-day data: close
+   6.1 s, maturity 32.6 s for the full 60-day catch-up (a daily catch-up is a small fraction of that).
+
+### Evidence
+
+**Focused tests.** `tests/platform/test_s10_packaging.py` (7: serving options and guard; a real gunicorn start,
+401, no query string in the log, two workers, clean SIGTERM exit; deployment files pin inputs and keep secrets out;
+workload identities and admission; deterministic synthetic rows; tuning bounds and WAL reservation;
+`point_lookups` scoped to its block). `test_monitoring.py` extended: revision cursors, repeat cycles find nothing, a
+later late batch is still revised, and a bulk catch-up revises only windows evaluated before its data arrived.
+
+**Affected suites after all fixes** (each run separately; CG4 with `--import-mode=importlib`): platform 199 passed;
+CG3 67; CG4 312; CG5 109; CG6 104 passed, 10 skipped.
+
+**OCI image.** Built for linux/amd64 (emulated on an arm64 Mac): the hash-pinned lock installed, runs as uid 10001,
+`/var/lib/numek` 0700, gunicorn 23.0.0, psycopg 3.3.6 and the scientific stack import. **Compose stack** brought up
+end to end (postgres healthy, init exit 0, api healthy over TLS, controller and worker running): `readyz` 200,
+unauthenticated `/systems` 401, plain HTTP refused, the query string absent from the access log, no errors in the
+logs. Torn down with its volumes. This is a smoke check on emulation, not P-SERVER qualification.
+
+**Preflight records** (this Mac: 16 GiB RAM; 151.7 GiB free for the W-REF and W-DEV records, which predate the WAL
+change and were not recomputed, since the 1.5 GiB difference cannot change their decisions; 129.5 GiB free for the
+final W-DEV-S1 record):
+
+| Workload | Decision | Reason |
+|---|---|---|
+| W-REF | `not_admitted_on_host`, identity retained | disk: 3,872 GiB needed |
+| W-DEV | `not_admitted_on_host`, identity retained | disk: 389 GiB needed, 121.4 GiB usable |
+| W-DEV-S1 | admitted | 24.3 GiB projected |
+
+Calibration after the fixes: 1,232.7 database bytes and 1,979 WAL bytes per fact; 695 rows/s single process.
+
+**W-DEV-S1 runs** (4 workers, 1-day reference). Three runs: before the fixes; after defects 1–8 (unrouted);
+routed (defects 1–9, from scratch at schema 14, fresh preflight). The routed run completed every close-window
+evaluation at both milestones; it was stopped in the post-load catch-up (defect 10), so its later phases were not
+measured and the unrouted values are shown for them.
+
+| Measure | Before the fixes | Unrouted | **Routed** | Objective |
+|---|---|---|---|---|
+| **Incrementality, close phase** (median of last 7 windows, 90 d ÷ 30 d) | 22.3 ÷ 9.1 s = 2.46 | 13.0 ÷ 8.9 s = 1.47 | **7.37 ÷ 6.43 s = 1.15** | ≤ 1.3 (mandatory gate): **passes** |
+| Incrementality, maturity phase | 1.19 | 1.44 | not measured | (reported) |
+| Load, 30-day milestone | 1,796 rows/s | 1,152 rows/s | 1,029 rows/s | — |
+| Load, 60 further days | 376 rows/s | 1,288 rows/s | 1,782 rows/s | — |
+| Durable ack p95 (10k-row batch) | 0.17 s | 0.12 s | not measured | < 2 s: met (unrouted) |
+| Publish lag, live (idle queue) | 58–64 s | 17–29 s | not measured | p95 < 5 min: met (unrouted) |
+| Daily window, p50 / p95 | close 16.4 / 33.2 s | close 12.0 / 18.3 s; maturity 10.4 / 13.4 s | close 7.3 / 7.9 s | < 2 min at W-REF size: not measured at that size |
+| Restart to ready | 0.95 s | 0.81 s | not measured | < 60 s: met (unrouted) |
+| Database bytes per indexed fact | 1,453 | 1,453 | 1,449 | ≤ 150: **not met** (about 10×) |
+| Parquet bytes vs JSONL (400k records re-encoded) | — | 20.5% | — | ≤ 40%: met by the codec, but ingestion writes JSONL |
+| Checkpoint warnings during the run | 160 | 0 | 0 | — |
+
+Routed calibration: 1,201.7 database bytes and 2,018.6 WAL bytes per fact. Essential-lane latency during backfill
+plus a CG6 job was not measured. The full routed run was not repeated after defect 10 (founder decision: record the
+completed measurements, verify the fix on the loaded data).
+
+### Open decisions and limitations (no claim made)
+
+- **Remaining growth.** The routed close ratio is 1.15: about 0.9 s per window still grows with history, mostly the
+  exposure-registry upsert in `reserve_window`. Within the gate; not addressed.
+- **Outcome-to-opportunity links** in the catch-up probe `fact_by_target`, which is not on the partition key (32
+  partition probes per distinct target). Measured at 32.6 s for a 60-day catch-up; acceptable, not optimized.
+- **Phase-result budget.** A phase returns about 1.6 KB per unit through its JSON result, against a 32 MiB
+  spawned-job budget, so a phase is limited to about 20k units. The workload therefore uses a 1-day reference
+  (10k units), not the planned 7 days, and W-REF-sized windows cannot run. The fix (not returning per-unit rows
+  through the result) needs a founder decision.
+- **Storage objective missed.** About 1,450 database bytes per fact against ≤ 150: `fact_index` is about 330 heap
+  and 532 index bytes per fact, `fact_occurrences` 133 and 243. Not addressed.
+- **Parquet codec unused** by ingestion; the 20.5% is a re-encoding measurement.
+- **systemd units not verified** (`systemd-analyze` is not available here). P-SERVER stays intended, not qualified.
+- **W-DEV and W-REF not measured** on this host (not admitted); reported as such, never shrunk. D-1 remains.
+
 ## S9: product (2026-11-23, console 2026-11-24). API, CLI, client, reports, jobs and the operations console implemented. Gate: see Evidence.
 
 ### Implemented (plan J, C.6, H.10, M.4)

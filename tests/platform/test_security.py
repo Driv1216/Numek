@@ -159,3 +159,68 @@ def test_egress_never_follows_redirects():
         assert status == 302                                         # returned, not followed
     finally:
         server.shutdown()
+
+
+# S10 (M.4 remaining items) --------------------------------------------------------------------------------------------
+
+def test_sessions_rotate_on_login_expire_absolutely_and_revoke(platform):
+    """No fixation: a session exists only after authentication and every login gets a new id and secret. The
+    absolute lifetime ends a session even while it is in use; revocation ends it at once. Secrets are stored hashed."""
+    principal = _user(platform, 'rotating')
+    with platform.db.transaction() as conn:
+        first, _ = identity.create_session(conn, principal)
+        second, _ = identity.create_session(conn, principal)
+        assert first.split('_')[1] != second.split('_')[1] and first.split('_')[2] != second.split('_')[2]
+        stored = conn.execute('SELECT secret_hash FROM sessions').fetchall()
+        assert all(first.split('_', 2)[2].encode() not in bytes(r['secret_hash']) for r in stored)
+        identity.authenticate_session(conn, first)
+        identity.revoke_session(conn, first)
+        with pytest.raises(PlatformError):
+            identity.authenticate_session(conn, first)
+        identity.authenticate_session(conn, second)                  # other sessions are unaffected
+        conn.execute("UPDATE sessions SET absolute_expires_at = now() - interval '1 second', last_seen_at = now()")
+        with pytest.raises(PlatformError) as expired:
+            identity.authenticate_session(conn, second)               # active, but past its absolute lifetime
+        assert expired.value.code == 'unauthenticated'
+        with pytest.raises(PlatformError):
+            identity.authenticate_session(conn, 'nms_' + second.split('_')[1] + '_forged-secret')
+
+
+def test_tokens_expire_and_only_their_hash_is_stored(platform):
+    service = _user(platform, 'expiring', role=None, kind='service')
+    with platform.db.transaction() as conn:
+        token, token_id = identity.issue_token(conn, platform.scope, service, ['ingest:source:s1'], expires_in='1 hour')
+        identity.authenticate_token(conn, token)
+        row = conn.execute('SELECT * FROM api_tokens WHERE id = %s', (token_id,)).fetchone()
+        assert token.split('_', 2)[2] not in repr(dict(row))         # the secret is never stored, only its SHA-256
+        conn.execute("UPDATE api_tokens SET expires_at = now() - interval '1 second' WHERE id = %s", (token_id,))
+        with pytest.raises(PlatformError) as expired:
+            identity.authenticate_token(conn, token)
+        assert expired.value.code == 'unauthenticated'
+
+
+def test_secret_files_are_owner_only_and_loosened_or_linked_files_are_refused(tmp_path):
+    import os
+    import stat
+    store = FileSecretStore(tmp_path / 'secrets')
+    store.put('channels/hook', b'signing key')
+    path = tmp_path / 'secrets' / 'channels' / 'hook'
+    assert stat.S_IMODE(path.stat().st_mode) == 0o600
+    assert stat.S_IMODE((tmp_path / 'secrets').stat().st_mode) == 0o700
+    assert stat.S_IMODE(path.parent.stat().st_mode) == 0o700
+    assert store.get('channels/hook') == b'signing key'
+    os.chmod(path, 0o640)                                            # someone loosened the file
+    with pytest.raises(PlatformError) as loose:
+        store.get('channels/hook')
+    assert loose.value.code == 'unsafe_path'
+    os.chmod(path, 0o600)
+    os.link(path, tmp_path / 'secrets' / 'second-name')              # a hard link elsewhere could expose it
+    with pytest.raises(PlatformError):
+        store.get('channels/hook')
+    os.unlink(tmp_path / 'secrets' / 'second-name')
+    path.unlink()
+    os.symlink(tmp_path / 'elsewhere', path)                         # a planted symlink is not followed
+    with pytest.raises(PlatformError):
+        store.get('channels/hook')
+    with pytest.raises(PlatformError):
+        store.put('../escape', b'x')

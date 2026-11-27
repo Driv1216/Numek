@@ -14,7 +14,7 @@
     confidenceguard ops report 3 --out incident-3.pdf --format pdf [--audience local] [--json-out incident-3.json]
     confidenceguard ops audit anchor --sink /var/log/numek/anchors.jsonl   (append the chain head to an external sink)
     confidenceguard ops audit verify --sink /var/log/numek/anchors.jsonl   (recompute the chain; compare every anchor in the sink)
-    confidenceguard ops serve [--host 127.0.0.1 --port 8443 --tls-cert C --tls-key K | --trusted-proxy]
+    confidenceguard ops serve [--host 127.0.0.1 --port 8443 --workers 2 --threads 8] [--tls-cert C --tls-key K | --trusted-proxy --proxy-ips IP]
     confidenceguard ops controller
     confidenceguard ops worker [--lanes essential,investigation,maintenance]
 
@@ -259,6 +259,49 @@ def report(root, number, out, report_format, audience, json_out):
     _echo(reports.export(installation, _incident_id(installation, number), out, format=report_format, audience=audience, json_path=json_out))
 
 
+@ops.command('preflight')
+@click.option('--workload', 'workload_id', required=True, help='W-REF, W-DEV or a named smaller workload such as W-DEV-S1.')
+@click.option('--scratch', required=True, type=click.Path(file_okay=False), help='Scratch directory on the disk to be measured.')
+@click.option('--calibration-facts', default=1_000_000, type=click.IntRange(1000), help='Facts ingested for calibration.')
+@click.option('--calibration', 'calibration_path', type=click.Path(exists=True, dir_okay=False),
+              help="Reuse an earlier preflight's calibration (same feature shape) instead of measuring again.")
+@click.option('--out', type=click.Path(dir_okay=False), help='Write the preflight record (JSON) here.')
+@_guard
+def preflight(workload_id, scratch, calibration_facts, calibration_path, out):
+    """Calibrate on a scratch P-LOCAL installation, project the workload, and admit it or not (plan R2.8)."""
+    from . import workloads
+    if workload_id not in workloads.WORKLOADS:
+        raise click.ClickException(f'Unknown workload; choose from {", ".join(workloads.WORKLOADS)}.')
+    calibration = json.loads(Path(calibration_path).read_text())['calibration'] if calibration_path else None
+    record = workloads.preflight(workload_id, scratch, calibration=calibration, calibration_facts=calibration_facts)
+    if out:
+        Path(out).write_text(json.dumps(record, indent=1, sort_keys=True, default=str) + '\n')
+    _echo({k: record[k] for k in ('workload', 'decision', 'reasons', 'identity', 'projection')} | {'workload': workload_id})
+    if record['decision'] != 'admitted':
+        sys.exit(3)
+
+
+@ops.group('backup')
+def backup_group():
+    """Recoverable backups of the whole installation (R2.2)."""
+
+
+@backup_group.command('create')
+@installation_option
+@click.option('--destination', required=True, type=click.Path(file_okay=False), help='A new directory outside the installation.')
+@click.option('--include-terminal-raw', is_flag=True, help='Also copy raw batches already processed (within raw retention).')
+@click.password_option('--passphrase', prompt='Backup passphrase', help='Wraps the keyring (at least 12 characters).')
+@_guard
+def backup_create(root, destination, include_terminal_raw, passphrase):
+    """Database snapshot, its objects, the installation configuration and a wrapped keyring of every secret it needs."""
+    from numek_platform.backup import create_backup
+    from numek_platform.installation import CONFIG
+    installation = _installation(root)
+    config = (installation.root / CONFIG).read_bytes()
+    _echo(create_backup(installation.db, installation.store, installation.secrets, destination, passphrase=passphrase,
+                        include_terminal_raw=include_terminal_raw, config_bytes=config))
+
+
 @ops.group('audit')
 def audit_group():
     """The hash-chained audit log and its external anchors."""
@@ -296,19 +339,23 @@ def audit_verify(root, sink):
 @installation_option
 @click.option('--host', default='127.0.0.1')
 @click.option('--port', default=8443, type=click.IntRange(1, 65535))
+@click.option('--workers', default=2, type=click.IntRange(1, 64), help='gunicorn worker processes.')
+@click.option('--threads', default=8, type=click.IntRange(1, 256), help='Request threads per worker.')
+@click.option('--timeout', default=60, type=click.IntRange(5, 3600), help='Seconds before a silent worker is replaced.')
 @click.option('--tls-cert', type=click.Path(exists=True, dir_okay=False))
 @click.option('--tls-key', type=click.Path(exists=True, dir_okay=False))
 @click.option('--trusted-proxy', is_flag=True, help='TLS terminates at a declared trusted reverse proxy.')
+@click.option('--proxy-ips', default='127.0.0.1', help='Addresses whose X-Forwarded-* headers are trusted (with --trusted-proxy).')
 @_guard
-def serve(root, host, port, tls_cert, tls_key, trusted_proxy):
-    """Serve the operations API and ingestion (single process; gunicorn packaging arrives with S10)."""
-    from . import api
+def serve(root, host, port, workers, threads, timeout, tls_cert, tls_key, trusted_proxy, proxy_ips):
+    """Serve the operations API, ingestion and console under gunicorn (gthread workers)."""
+    from . import api, serving
+    root = str(_installation(root).root)
     tls = bool(tls_cert and tls_key)
-    api.serve_guard(host, tls=tls, trusted_proxy=trusted_proxy)
-    app = api.create_app(_installation(root), secure_cookies=tls or trusted_proxy)
-    click.echo(f"NUMEK operations API: {'https' if tls else 'http'}://{host}:{port}{api.PREFIX}")
-    app.run(host=host, port=port, debug=False, use_reloader=False, threaded=True,
-            ssl_context=(tls_cert, tls_key) if tls else None)
+    click.echo(f"NUMEK operations API: {'https' if tls else 'http'}://{host}:{port}{api.PREFIX} "
+               f"({workers} workers x {threads} threads)", err=True)
+    serving.serve(root, host, port, workers=workers, threads=threads, timeout=timeout, tls_cert=tls_cert, tls_key=tls_key,
+                  trusted_proxy=trusted_proxy, proxy_ips=proxy_ips)
 
 
 @ops.command('controller')

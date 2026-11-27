@@ -85,6 +85,37 @@ Specific Dashboard Redesign".
 - The CSRF race on the first app load (worked around by a reload in the live flow script) is pre-existing and not fixed here.
 - M9's model-qualification decision is still open. Saved M9 results show their recorded judgments, and a result where every judgment abstained says so.
 
+## ConfidenceGuard CG7 — S10 closure: implementation complete, awaiting review (2026-11-26)
+
+All of S1–S10 is implemented. The closure report is
+[`validation/cg7/CG7_IMPLEMENTATION_REPORT.md`](../validation/cg7/CG7_IMPLEMENTATION_REPORT.md); the product and
+platform are described in [CG7 ConfidenceGuard](CG7_CONFIDENCEGUARD.md) and [NUMEK platform](NUMEK_PLATFORM.md).
+Independent review, the understanding gate and founder acceptance have not happened.
+
+**S10 delivered.**
+- `ops serve` under gunicorn (gthread), with the TLS / trusted-proxy guard and query strings kept out of the access
+  log.
+- A hash-pinned Linux x86_64 lock and an OCI image (smoke-tested on amd64 emulation), a compose example (brought up
+  end to end over TLS), and hardened systemd units (not verified).
+- `ops preflight` (calibrate, project, admit) and a workload runner.
+- P-LOCAL clusters sized from the host.
+- **Routed fact layout** (migration 0014, founder approved): predictions and context are partitioned with their
+  opportunity, so window reads stay in their partitions.
+- Resilience hardening: a full object store refuses cleanly (507, retryable, nothing partial); the worker host and
+  controller survive database restarts; the ingestion API maps database outages to 503.
+
+**Gates.**
+- Incrementality **passes**: 1.15 against 1.3 (W-DEV-S1; 1.47 before routing).
+- M.3 resilience and the remaining M.4 security items pass; the installed wheel runs from outside the source tree.
+- Closure gate passes: platform 215, CG1–CG6 673 passed (11 pre-existing or hardware skips); DataTrust failure sets
+  identical to the committed HEAD (no regression).
+
+**Measured on this Mac:** ack p95 0.12 s, live publish lag 17–29 s, restart to ready 0.8 s, daily close window
+7.3 / 7.9 s (p50 / p95). W-REF and W-DEV are `not_admitted_on_host` with their identities retained.
+
+**Open decisions:** the phase-result budget (about 20k units per phase); storage at about 1,450 database bytes per
+fact against ≤ 150 (missed); Parquet ingestion unused. D-1 remains. P-SERVER is intended, not qualified.
+
 ## ConfidenceGuard CG7 — S9 product (2026-11-23; console 2026-11-24)
 
 **What exists now.** CG7 has a complete operations API at `/api/ops/v1`, alongside ingestion, and an operations

@@ -1,0 +1,38 @@
+# NUMEK operations worker host, one instance per %i (numek-ops-worker@1, @2, ...). Each claims fenced jobs on the
+# configured lanes; the essential lane keeps reserved slots so investigations cannot starve monitoring.
+# Job processes are supervised as a process tree; their scratch lives under the installation root.
+[Unit]
+Description=NUMEK ConfidenceGuard operations worker host %i
+After=network-online.target postgresql.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=numek
+Group=numek
+EnvironmentFile=/etc/numek/ops.env
+ExecStart=/opt/numek/venv/bin/confidenceguard ops worker --lanes ${NUMEK_WORKER_LANES}
+KillSignal=SIGTERM
+# Lease renewal stops on exit, so an in-flight job is requeued with a new fence after its lease expires.
+TimeoutStopSec=90
+KillMode=mixed
+Restart=on-failure
+RestartSec=5
+UMask=0077
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=yes
+PrivateTmp=yes
+PrivateDevices=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectControlGroups=yes
+RestrictSUIDSGID=yes
+LockPersonality=yes
+RestrictRealtime=yes
+CapabilityBoundingSet=
+ReadWritePaths=/var/lib/numek
+ReadOnlyPaths=/etc/numek
+
+[Install]
+WantedBy=multi-user.target

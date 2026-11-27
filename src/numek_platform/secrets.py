@@ -49,12 +49,26 @@ class FileSecretStore:
     def exists(self, name):
         return self._path(name).is_file()
 
+    def names(self, prefix=''):
+        """Every stored secret name (sorted), optionally under ``prefix``. Temporary write files are skipped."""
+        out = []
+        for path in self.root.rglob('*'):
+            if path.is_symlink() or not path.is_file() or any(part.startswith('.') for part in path.relative_to(self.root).parts):
+                continue
+            name = '/'.join(path.relative_to(self.root).parts)
+            if NAME.match(name) and name.startswith(prefix):
+                out.append(name)
+        return sorted(out)
+
     def delete(self, name):
         try:
             self._path(name).unlink()
             return True
         except FileNotFoundError:
             return False
+
+
+DATA_KEY_PREFIX = 'datakeys/'
 
 
 def _key_name(org_id, key_id):
@@ -103,14 +117,21 @@ def _kdf(passphrase, salt):
     return Scrypt(salt=salt, length=32, n=2**15, r=8, p=1).derive(passphrase.encode())
 
 
-def export_keyring(secret_store, entries, passphrase):
-    """Wrap {(org_id, key_id)} keys for a backup. Refuses if any key is missing."""
+def export_keyring(secret_store, entries, passphrase, *, names=()):
+    """Wrap {(org_id, key_id)} data keys and the named secrets for a backup. Refuses if a required key is missing.
+
+    ``entries`` are required (an included object needs them); ``names`` are further secrets copied as they are
+    (operational secrets and live data keys the restored installation keeps using, R2.2).
+    """
     keys = {}
     for org_id, key_id in entries:
         name = _key_name(org_id, key_id)
         if not secret_store.exists(name):
             raise PlatformError('A key required by the backup is missing or destroyed.', 'backup_key_missing')
         keys[name] = secret_store.get(name).hex()
+    for name in names:
+        if name not in keys:
+            keys[name] = secret_store.get(name).hex()
     salt, nonce = _secrets.token_bytes(16), _secrets.token_bytes(12)
     body = json.dumps({'keys': keys}, sort_keys=True).encode()
     return KEYRING_MAGIC + salt + nonce + AESGCM(_kdf(passphrase, salt)).encrypt(nonce, body, KEYRING_MAGIC)

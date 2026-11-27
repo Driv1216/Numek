@@ -234,7 +234,7 @@ TEMPLATES = {
     'cg3_mix_decomposition': {'tier': 'auto', 'cost': 5.0, 'cost_class': 'medium', 'discriminates': ('H-COMP', 'H-WITHIN'),
                               'eligible': _eligible_cohorts, 'run': cg3_mix},
     'cg3_cohort_contrast': {'tier': 'auto', 'cost': 5.0, 'cost_class': 'medium', 'discriminates': ('H-WITHIN', 'H-COMP'),
-                            'eligible': _eligible_cohorts, 'run': cg3_mix},
+                            'eligible': _eligible_cohorts, 'run': cg3_mix, 'same_analysis_as': 'cg3_mix_decomposition'},
     'domain_classifier': {'tier': 'auto', 'cost': 5.0, 'cost_class': 'medium', 'discriminates': ('H-COMP', 'H-INTEG'),
                           'eligible': _eligible_always, 'run': domain_classifier},
     'label_acquisition_guidance': {'tier': 'auto', 'cost': 0.5, 'cost_class': 'small', 'discriminates': (),

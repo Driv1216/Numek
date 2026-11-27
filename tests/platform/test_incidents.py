@@ -443,3 +443,70 @@ def test_retention_skips_pins_and_marks_windows_summary_only(ops, detected):
                             (tick(datetime(2026, 1, 15, tzinfo=timezone.utc)),)).fetchone()['n']
         summary = conn.execute("SELECT count(*) AS n FROM ops_window_evaluations WHERE reproducibility = 'summary_only'").fetchone()['n']
     assert kept == 14 * 40 and summary == report['windows_summary_only']
+
+
+class _Flaky(BaseHTTPRequestHandler):
+    mode, keys = '500', []
+
+    def do_POST(self):
+        _Flaky.keys.append(self.headers.get('Numek-Idempotency-Key'))
+        self.rfile.read(int(self.headers.get('Content-Length', 0)))
+        if _Flaky.mode == 'hang':
+            import time
+            time.sleep(15)
+            return
+        self.send_response(500)
+        self.end_headers()
+
+    def log_message(self, *args):
+        pass
+
+
+def test_failing_and_hanging_webhooks_retry_with_backoff_then_dead_letter(ops, detected):
+    """M.3: an endpoint answering 500, then one that never answers (bounded by the egress timeout), then 500 until the
+    last attempt. Retries back off exponentially, are never early, keep one idempotency key, and end as a dead letter
+    with a D health signal."""
+    import time
+    from http.server import ThreadingHTTPServer
+    from confidenceguard.operations.incidents import incidents, notify
+    installation, _key = ops
+    server = ThreadingHTTPServer(('127.0.0.1', 0), _Flaky)
+    threading.Thread(target=server.serve_forever, daemon=True).start()
+    port = server.server_address[1]
+    _allow(installation, 'http', port)
+    notify.configure_channel(installation, 'flaky', 'webhook', f'http://127.0.0.1:{port}/hook', actor='admin')
+    notify.add_rule(installation, 'flaky-all', 'flaky', min_priority='P4')
+    target = _error_incident(installation)
+    at = datetime(2026, 8, 1, tzinfo=timezone.utc)
+    incidents.set_priority(installation, target['id'], 'P2', reason='flaky endpoint check', actor='lead', now=at)
+
+    def row():
+        with installation.db.connect() as conn:
+            return dict(conn.execute("SELECT state, attempts, next_attempt_at, last_error FROM ops_notification_outbox "
+                                     "WHERE channel_id = 'flaky'").fetchone())
+    try:
+        notify.send_due(installation, now=at)
+        first = row()
+        assert first['state'] == 'queued' and first['attempts'] == 1
+        assert first['last_error'] == {'code': 'http_status', 'status': 500}
+        assert first['next_attempt_at'] == at + timedelta(seconds=30)
+        notify.send_due(installation, now=at + timedelta(seconds=10))                 # not due yet: no early retry
+        assert row()['attempts'] == 1
+        _Flaky.mode = 'hang'
+        started = time.monotonic()
+        notify.send_due(installation, now=first['next_attempt_at'])
+        assert time.monotonic() - started < 14                                       # the egress timeout bounds it
+        second = row()
+        assert second['attempts'] == 2 and second['last_error']['code'] == 'egress_failed'          # the timeout
+        assert second['next_attempt_at'] == first['next_attempt_at'] + timedelta(seconds=60)   # backoff doubles
+        _Flaky.mode = '500'
+        while row()['state'] != 'dead':
+            notify.send_due(installation, now=row()['next_attempt_at'])
+        assert row()['attempts'] == notify.MAX_ATTEMPTS
+        assert len(_Flaky.keys) == notify.MAX_ATTEMPTS and len(set(_Flaky.keys)) == 1   # one idempotency key throughout
+        with installation.db.connect() as conn:
+            signal = conn.execute("SELECT standing FROM ops_signals WHERE source_id = 'notification_dead_letter' "
+                                  "ORDER BY created_at DESC LIMIT 1").fetchone()
+        assert signal['standing'] == 'D'
+    finally:
+        server.shutdown()

@@ -30,6 +30,8 @@ ROLE_PERMISSIONS = {
 SERVICE_FORBIDDEN_ROLES = {'approver', 'reserve_steward'}
 SCOPE_KINDS = ('org', 'system', 'deployment', 'catalog', 'source')
 SESSION_IDLE = dt.timedelta(minutes=30)
+LOGIN_FAILURE_LIMIT = 10                       # failed sign-ins per name ...
+LOGIN_FAILURE_WINDOW = dt.timedelta(minutes=15)  # ... inside this window lock the name out until they age out
 SESSION_ABSOLUTE = dt.timedelta(hours=12)
 _hasher = PasswordHasher()  # argon2id with the library's current recommended parameters
 
@@ -83,6 +85,20 @@ def set_password(conn, scope, principal, password):
         '''INSERT INTO password_credentials(org_id, principal_id, hash) VALUES (%s, %s, %s)
            ON CONFLICT (org_id, principal_id) DO UPDATE SET hash = EXCLUDED.hash, updated_at = now()''',
         (scope.org_id, principal.id, _hasher.hash(password)))
+
+
+def login_throttled(conn, scope, name):
+    """True while ``name`` has reached the failed sign-in limit inside the window (soft lockout, ASVS L1)."""
+    row = conn.execute('SELECT count(*) AS n FROM login_failures WHERE org_id = %s AND name = %s AND failed_at > now() - %s',
+                       (scope.org_id, str(name)[:200], LOGIN_FAILURE_WINDOW)).fetchone()
+    return row['n'] >= LOGIN_FAILURE_LIMIT
+
+
+def record_login_failure(conn, scope, name):
+    """Record one failed sign-in (call in its own transaction, so a failed attempt's rollback cannot erase it)."""
+    conn.execute('DELETE FROM login_failures WHERE org_id = %s AND name = %s AND failed_at <= now() - %s',
+                 (scope.org_id, str(name)[:200], LOGIN_FAILURE_WINDOW))
+    conn.execute('INSERT INTO login_failures(org_id, name) VALUES (%s, %s)', (scope.org_id, str(name)[:200]))
 
 
 def verify_password(conn, scope, name, password):

@@ -172,9 +172,9 @@ def test_cross_organisation_references_are_impossible(platform):
     with platform.db.transaction() as conn, pytest.raises(psycopg.errors.ForeignKeyViolation):
         conn.execute(
             '''INSERT INTO fact_index(org_id, catalog_id, kind, key, revision, fact_digest, object_id, locator_kind,
-                                      loc_a, loc_b, publication_id)
-               SELECT %s, %s, 'context', %s, 'x', %s, %s, 'row', 0, 0, id FROM publications LIMIT 1''',
-            (other_scope.org_id, other_catalog, bytes(32), bytes(32), ref.id))
+                                      loc_a, loc_b, publication_id, route)
+               SELECT %s, %s, 'context', %s, 'x', %s, %s, 'row', 0, 0, id, %s FROM publications LIMIT 1''',
+            (other_scope.org_id, other_catalog, bytes(32), bytes(32), ref.id, bytes(32)))
     with pytest.raises(PlatformError) as caught:
         publish_records(platform, [record('context', ['ns', 'e2'], {'x': 2})], scope=other_scope,
                         catalog_id=platform.catalog_id, lease=lease_for(platform, scope=other_scope))

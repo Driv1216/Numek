@@ -174,6 +174,23 @@ def test_late_batch_creates_a_revision_and_is_excluded_from_detectors(monitored,
                                 "ORDER BY revision").fetchall()
     assert after['late_excluded'] - before['late_excluded'] == 30 and after['units'] == before['units']
     assert [v['revision'] for v in versions] == [1, 2]
+    # S10: the scan is incremental. The cursor stands at the head read by the scan; a repeat cycle finds nothing;
+    # a later late batch (window 2) is still found once the cursor has moved past the earlier publications.
+    def cursors():
+        with monitored.db.connect() as conn:
+            head = conn.execute('SELECT max(head) AS h FROM catalog_heads').fetchone()['h']
+            rows = {r['phase']: r['checked_sequence'] for r in conn.execute(
+                "SELECT phase, checked_sequence FROM ops_revision_cursors WHERE deployment_id = 'scorecard-prod'").fetchall()}
+        return head, rows
+    head, marks = cursors()
+    assert set(marks) == {'close', 'maturity'} and all(0 < v <= head for v in marks.values())
+    again = runtime.cycle(monitored, 'scorecard-prod', now_tick=tick(datetime(2026, 4, 21, 1, tzinfo=timezone.utc)))
+    assert again['revisions'] == []
+    send(monitored, generate(47, 1, 10, error_rate=0.1, seed=10, prefix='later'), 'later')    # Feb 17 (window 2)
+    later = runtime.cycle(monitored, 'scorecard-prod', now_tick=tick(datetime(2026, 4, 21, 2, tzinfo=timezone.utc)))
+    assert {r['window'] for r in later['revisions']} == {2} and {r['phase'] for r in later['revisions']} == {'close', 'maturity'}
+    head_after, marks_after = cursors()
+    assert all(marks_after[p] > marks[p] for p in marks) and all(v <= head_after for v in marks_after.values())
 
 
 def test_recovery_claim_with_sm2(monitored, confirmed):
@@ -184,8 +201,18 @@ def test_recovery_claim_with_sm2(monitored, confirmed):
     assert caught.value.code == 'invalid_recovery'
     plan = definitions.start_recovery(monitored, 'scorecard-prod', 'recovery-r2', claim='R2', alpha=0.05,
                                       planned_support=300, statistic='error', theta=0.3)
+    def evaluated():
+        with monitored.db.connect() as conn:
+            return {(r['phase'], r['window_index']) for r in conn.execute(
+                "SELECT DISTINCT phase, window_index FROM ops_window_evaluations WHERE deployment_id = 'scorecard-prod'").fetchall()}
+    before = evaluated()
     send(monitored, generate(94, 21, 40, error_rate=0.1, seed=11, prefix='apr'), 'april')     # Apr 5-25: recovered
-    runtime.cycle(monitored, 'scorecard-prod', now_tick=tick(datetime(2026, 5, 20, tzinfo=timezone.utc)))
+    caught_up = runtime.cycle(monitored, 'scorecard-prod', now_tick=tick(datetime(2026, 5, 20, tzinfo=timezone.utc)))
+    # S10: a bulk catch-up. Windows already closed before April's data arrived (empty, by lateness) are revised;
+    # windows first evaluated by this catch-up are first evaluations, never revisions.
+    first = evaluated() - before
+    revised = {(r['phase'], r['window']) for r in caught_up['revisions']}
+    assert first and revised and revised <= before and not revised & first
     with monitored.db.connect() as conn:
         det = conn.execute("SELECT state, cursor_window FROM ops_detectors WHERE detector_id = 'recovery-r2'").fetchone()
         claim = conn.execute("SELECT payload FROM ops_signals WHERE source = 'recovery' AND source_id = 'recovery-r2'").fetchone()

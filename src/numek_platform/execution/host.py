@@ -18,6 +18,8 @@ import time
 import uuid
 from dataclasses import dataclass, field
 
+import psycopg
+
 from ..errors import FenceLost, PlatformError
 from . import jobs as job_store
 from .supervision import ChildProcess
@@ -96,6 +98,7 @@ class WorkerHost:
         self.name = name or f'host-{os.getpid()}'
         self.owner = f'{self.name}:{self.id.hex[:8]}'
         self.lease_seconds = lease_seconds
+        self.unavailable = 0              # claim rounds skipped because the database was unavailable
         self.scratch_root = str(scratch_root or os.path.join(self.store_root, 'scratch'))
         os.makedirs(self.scratch_root, mode=0o700, exist_ok=True)
         os.chmod(self.scratch_root, 0o700)
@@ -159,8 +162,16 @@ class WorkerHost:
         return launched
 
     def run(self, stop):
+        """Claim and run jobs until ``stop``. The database being unavailable (down, restarting, a dropped
+        connection) is transient: the host keeps its running attempts, waits and claims again. Their leases
+        are renewed when the database returns, or expire and the jobs retry under a new fence."""
         while not stop.is_set():
-            self.step()
+            try:
+                self.step()
+            except (PlatformError, psycopg.Error):
+                self.unavailable += 1
+                stop.wait(min(5.0, max(self.poll_seconds, 1.0)))
+                continue
             stop.wait(self.poll_seconds)
         self.shutdown()
 

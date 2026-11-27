@@ -1,0 +1,41 @@
+# NUMEK ConfidenceGuard operations API and console (gunicorn gthread workers). Profile P-SERVER: intended, not
+# qualified. Install the wheel with the `operations` extra into /opt/numek/venv (constraints/cg7-ops-linux-x86_64-py313.lock),
+# create /etc/numek/ops.env from ops.env.example (mode 0600), then:
+#   systemctl enable --now numek-ops-api numek-ops-controller numek-ops-worker@1
+[Unit]
+Description=NUMEK ConfidenceGuard operations API
+After=network-online.target postgresql.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=numek
+Group=numek
+EnvironmentFile=/etc/numek/ops.env
+ExecStart=/opt/numek/venv/bin/confidenceguard ops serve --host ${NUMEK_API_HOST} --port ${NUMEK_API_PORT} \
+    --workers ${NUMEK_API_WORKERS} --threads ${NUMEK_API_THREADS} \
+    --tls-cert /etc/numek/tls/tls.crt --tls-key /etc/numek/tls/tls.key
+# gunicorn stops gracefully on SIGTERM (graceful_timeout 30 s).
+KillSignal=SIGTERM
+TimeoutStopSec=45
+Restart=on-failure
+RestartSec=5
+UMask=0077
+# Hardening: the service writes only its installation root.
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=yes
+PrivateTmp=yes
+PrivateDevices=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectControlGroups=yes
+RestrictSUIDSGID=yes
+LockPersonality=yes
+RestrictRealtime=yes
+CapabilityBoundingSet=
+ReadWritePaths=/var/lib/numek
+ReadOnlyPaths=/etc/numek
+
+[Install]
+WantedBy=multi-user.target

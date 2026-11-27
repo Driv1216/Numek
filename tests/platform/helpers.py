@@ -3,7 +3,7 @@ import uuid
 
 from numek_platform.canonical import digest
 from numek_platform.evidence import codecs
-from numek_platform.evidence.publish import FactRow, publish, stage_object
+from numek_platform.evidence.publish import ROUTED_KINDS, FactRow, publish, stage_object
 from numek_platform.execution import jobs
 
 
@@ -22,7 +22,8 @@ def lease_for(platform, kind='test', scope=None, key=None):
 
 
 def publish_records(platform, records, *, codec=codecs.OBSERVATIONS, request_id=None, lease=None, scope=None,
-                    catalog_id=None, event_ticks=None, event_hashes=None, entity_hashes=None, **kwargs):
+                    catalog_id=None, event_ticks=None, event_hashes=None, entity_hashes=None, opportunity_keys=None,
+                    target_keys=None, **kwargs):
     scope = scope or platform.scope
     catalog_id = catalog_id or platform.catalog_id
     lease = lease or lease_for(platform, scope=scope)
@@ -35,12 +36,24 @@ def publish_records(platform, records, *, codec=codecs.OBSERVATIONS, request_id=
     ref = stage_object(platform.db, platform.store, lease, data, catalog_id=catalog_id, codec=codec,
                        records=len(records))
     facts = []
+
+    def opportunity_of(i, rec):
+        # Routed kinds must name their opportunity (publish refuses ``route_undetermined``). Generic test records
+        # whose identity does not start with an opportunity key are their own route, as before migration 0014.
+        if opportunity_keys is not None:
+            return opportunity_keys[i]
+        if rec['kind'] not in ROUTED_KINDS:
+            return None
+        head = (rec.get('identity') or [None])[0]
+        return head if isinstance(head, str) and len(head) == 64 and all(c in '0123456789abcdef' for c in head) else rec['key']
     for i, (rec, (kind, a, b)) in enumerate(zip(records, locations)):
         facts.append(FactRow(rec['kind'], rec['key'], rec['revision'], rec['fact_digest'], ref.id, kind, a, b,
                              predecessor=rec['predecessor'],
                              event_tick=None if event_ticks is None else event_ticks[i],
                              event_hash=None if event_hashes is None else event_hashes[i],
-                             entity_hash=None if entity_hashes is None else entity_hashes[i]))
+                             entity_hash=None if entity_hashes is None else entity_hashes[i],
+                             opportunity_key=opportunity_of(i, rec),
+                             target_key=None if target_keys is None else target_keys[i]))
     receipt = publish(platform.db, scope, lease, catalog_id, request_id=request_id or uuid.uuid4().hex,
                       request_digest=digest([r['fact_digest'] for r in records]), kind='ingest',
                       objects=[ref], facts=facts, **kwargs)

@@ -41,6 +41,17 @@ def _reservation(db, reservation):
     return row
 
 
+# An outcome fact exists at K for opportunity row ``f``: by target (an outcome's route is its key, which is its
+# target key, so this is one probe within one partition), or by event hash. The two are separate EXISTS so the
+# target probe is not lost inside an OR. Two positional placeholders, both K.
+_OUTCOME_AT_K = '''(EXISTS (SELECT 1 FROM fact_index o JOIN publications op ON op.id = o.publication_id
+                            WHERE f.target_key IS NOT NULL AND o.catalog_id = f.catalog_id AND o.kind = 'outcome'
+                            AND o.route = f.target_key AND o.target_key = f.target_key AND op.sequence <= %s)
+                    OR EXISTS (SELECT 1 FROM fact_index o JOIN publications op ON op.id = o.publication_id
+                            WHERE o.catalog_id = f.catalog_id AND o.kind = 'outcome' AND o.event_hash = f.event_hash
+                            AND op.sequence <= %s))'''
+
+
 def membership_from_index(db, read_pin, *, kinds=('opportunity',), event_tick_range=None, require_outcome=True,
                           namespace=None):
     """Membership pairs (event_hash, unit_hash) from non-outcome fields only.
@@ -59,11 +70,8 @@ def membership_from_index(db, read_pin, *, kinds=('opportunity',), event_tick_ra
         where.append('f.event_tick >= %s AND f.event_tick < %s')
         params.extend(event_tick_range)
     if require_outcome:
-        where.append('''EXISTS (SELECT 1 FROM fact_index o JOIN publications op ON op.id = o.publication_id
-                                WHERE o.catalog_id = f.catalog_id AND o.kind = 'outcome'
-                                AND (o.event_hash = f.event_hash OR (f.target_key IS NOT NULL AND o.target_key = f.target_key))
-                                AND op.sequence <= %s)''')
-        params.append(read_pin.k)
+        where.append(_OUTCOME_AT_K)
+        params.extend([read_pin.k, read_pin.k])
     with db.transaction('repeatable_read', read_only=True) as conn:
         rows = conn.execute(
             f'''SELECT DISTINCT f.event_hash, f.entity_hash, f.target_key FROM fact_index f
@@ -91,7 +99,7 @@ def reserve_identities(db, store, read_pin, *, namespace, tick_ranges, family_di
     params = [read_pin.catalog_id, read_pin.k, namespace, family_digest]
     for start, end in tick_ranges:
         params.extend((int(start), int(end)))
-    params.append(read_pin.k)
+    params.extend([read_pin.k, read_pin.k])
     with db.transaction('repeatable_read', read_only=True) as conn:
         rows = conn.execute(
             f'''SELECT DISTINCT f.key FROM fact_index f
@@ -102,10 +110,7 @@ def reserve_identities(db, store, read_pin, *, namespace, tick_ranges, family_di
                 WHERE f.catalog_id = %s AND p.sequence <= %s AND f.kind = 'opportunity' AND f.namespace = %s
                 AND (e.spent_by_use IS NULL OR (%s::text IS NOT NULL AND u.family_digest = %s::text))
                 AND ({clauses})
-                AND EXISTS (SELECT 1 FROM fact_index o JOIN publications op ON op.id = o.publication_id
-                            WHERE o.catalog_id = f.catalog_id AND o.kind = 'outcome'
-                            AND (o.event_hash = f.event_hash OR (f.target_key IS NOT NULL AND o.target_key = f.target_key))
-                            AND op.sequence <= %s)''',
+                AND {_OUTCOME_AT_K}''',
             params[:4] + [family_digest] + params[4:]).fetchall()
     keys = sorted(bytes(r['key']).hex() if isinstance(r['key'], (bytes, memoryview)) else r['key'] for r in rows)
     if not keys:
@@ -155,8 +160,7 @@ def resolve(db, store, reservation, read_pin, *, strict=False, **filters):
         return f'{protected} AND {reserve}', []
 
     allowed = evidence_reader.resolve(db, read_pin, access='governed', _governance=governance, **filters)
-    everything = evidence_reader.resolve(db, read_pin, access='maintenance', **filters)
-    withheld = len(everything) - len(allowed)
+    withheld = evidence_reader.resolve(db, read_pin, access='maintenance', _count=True, **filters) - len(allowed)
     if strict and withheld:
         raise PlatformError('The selection includes evidence outside this reservation.', 'reservation_membership')
     return GovernedResult(allowed, withheld)

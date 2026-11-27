@@ -1,0 +1,67 @@
+# Single-host example: PostgreSQL, a one-shot installation init, the API (with the console), the controller and one
+# worker host. Intended, not qualified (plan C.2). Start with:
+#
+#   cp deploy/compose/env.example deploy/compose/.env      # then set a strong POSTGRES_PASSWORD (.env is git-ignored)
+#   mkdir -p deploy/compose/tls && cp your.crt deploy/compose/tls/tls.crt && cp your.key deploy/compose/tls/tls.key
+#   docker compose -f deploy/compose/compose.yaml up -d
+#   docker compose -f deploy/compose/compose.yaml run --rm init user create alice --role admin   (password on stdin)
+#
+# - The API, controller and workers share one volume, because the object store and secrets are a local filesystem;
+#   that also keeps this example to one host. More hosts need the S3 object store (deferred).
+# - The API is published on the host's loopback only. Expose it through your own TLS-terminating proxy, or change the
+#   published address deliberately.
+# - For production use, pin the postgres image by digest; this example names the version only.
+name: numek-ops
+
+x-numek: &numek
+  image: numek-ops:dev
+  build: {context: ../.., dockerfile: deploy/oci/Containerfile}
+  environment:
+    NUMEK_DSN: postgresql://numek:${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in deploy/compose/.env}@postgres:5432/numek
+  volumes: [numek-data:/var/lib/numek]
+  restart: unless-stopped
+  read_only: true
+  tmpfs: [/tmp]
+  security_opt: [no-new-privileges:true]
+  cap_drop: [ALL]
+
+services:
+  postgres:
+    image: postgres:17.12-trixie
+    environment: {POSTGRES_USER: numek, POSTGRES_DB: numek, POSTGRES_PASSWORD: "${POSTGRES_PASSWORD:?}"}
+    volumes: [pg-data:/var/lib/postgresql/data]
+    healthcheck: {test: [CMD-SHELL, pg_isready -U numek -d numek], interval: 5s, timeout: 3s, retries: 20}
+    restart: unless-stopped
+
+  init:            # creates (or reopens) the installation and migrates the schema, then exits
+    <<: *numek
+    restart: "no"
+    command: [init, --root, /var/lib/numek, --dsn-env, NUMEK_DSN]
+    depends_on: {postgres: {condition: service_healthy}}
+
+  api:
+    <<: *numek
+    command: [serve, --host, 0.0.0.0, --port, "8443", --workers, "2", --threads, "8",
+              --tls-cert, /run/numek-tls/tls.crt, --tls-key, /run/numek-tls/tls.key]
+    volumes: [numek-data:/var/lib/numek, ./tls:/run/numek-tls:ro]
+    ports: ["127.0.0.1:8443:8443"]
+    healthcheck:
+      test: [CMD, python, -c, "import ssl,urllib.request,sys; c=ssl.create_default_context(); c.check_hostname=False; c.verify_mode=ssl.CERT_NONE; sys.exit(0 if urllib.request.urlopen('https://127.0.0.1:8443/readyz', timeout=3, context=c).status == 200 else 1)"]
+      interval: 15s
+      timeout: 5s
+      retries: 4
+    depends_on: {init: {condition: service_completed_successfully}}
+
+  controller:      # the single active leader (epoch-fenced); running two is safe but only one leads
+    <<: *numek
+    command: [controller]
+    depends_on: {init: {condition: service_completed_successfully}}
+
+  worker:          # scale with: docker compose up -d --scale worker=3
+    <<: *numek
+    command: [worker, --lanes, "essential,investigation,maintenance"]
+    depends_on: {init: {condition: service_completed_successfully}}
+
+volumes:
+  numek-data: {}
+  pg-data: {}

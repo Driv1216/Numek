@@ -108,13 +108,16 @@ def backup():
 @click.option('--secrets', 'secrets_root', required=True, type=click.Path(path_type=Path))
 @click.option('--destination', required=True, type=click.Path(path_type=Path))
 @click.option('--include-terminal-raw', is_flag=True)
+@click.option('--config', 'config_path', type=click.Path(path_type=Path, exists=True, dir_okay=False),
+              help='The installation configuration file to include (with its digest).')
 @click.password_option('--passphrase', prompt='Backup passphrase')
-def backup_create(dsn, path, objects_root, secrets_root, destination, include_terminal_raw, passphrase):
+def backup_create(dsn, path, objects_root, secrets_root, destination, include_terminal_raw, config_path, passphrase):
     from .backup import create_backup
     from .objects import LocalObjectStore
     from .secrets import FileSecretStore
     _emit(create_backup(_database(dsn, path), LocalObjectStore(objects_root), FileSecretStore(secrets_root),
-                        destination, passphrase=passphrase, include_terminal_raw=include_terminal_raw))
+                        destination, passphrase=passphrase, include_terminal_raw=include_terminal_raw,
+                        config_bytes=None if config_path is None else config_path.read_bytes()))
 
 
 @backup.command('verify')

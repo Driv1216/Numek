@@ -33,7 +33,10 @@ cg4 = ["scipy>=1.18.1,<1.19", "catboost==1.2.10", "pyarrow>=25.0.1,<26", "thread
 cg4-encoders-py314 = ["torch==2.10.0", "transformers==4.57.1", "tokenizers==0.22.1", "safetensors==0.6.2"]
 cg6 = ["scikit-learn==1.9.1", "skops==0.16.0", "torch==2.8.0", "safetensors==0.6.2", "onnx==1.23.2", "onnxruntime==1.26.0", "tokenizers==0.22.1", "Pillow==12.3.0", "threadpoolctl==3.6.0", "scipy>=1.18.1,<1.19"]
 cg6-cuda = ["scikit-learn==1.9.1", "skops==0.16.0", "torch==2.8.0", "safetensors==0.6.2", "onnx==1.23.2", "onnxruntime-gpu==1.26.0", "tokenizers==0.22.1", "Pillow==12.3.0", "threadpoolctl==3.6.0", "scipy>=1.18.1,<1.19"]
-platform = ["psycopg[binary]==3.3.6", "argon2-cffi==25.1.0", "cryptography==50.0.2", "pyarrow>=25.0.1,<26", "threadpoolctl==3.6.0"]
+platform = ["psycopg[binary]==3.3.6", "argon2-cffi==25.1.0", "cryptography==50.0.2", "gunicorn==23.0.0", "pyarrow>=25.0.1,<26", "threadpoolctl==3.6.0"]
+# CG7 operations service (API, controller, workers): the platform plus the statistics the monitoring and
+# investigation templates import. This is what the OCI image installs (constraints/cg7-ops-linux-x86_64-py313.lock).
+operations = ["datatrust[platform,statistics]", "scikit-learn==1.9.1"]
 text-language = ["lingua-language-detector==2.1.1"]
 text-embeddings = ["torch==2.8.0", "transformers==4.57.1", "tokenizers==0.22.1", "safetensors==0.6.2"]
 dev = [

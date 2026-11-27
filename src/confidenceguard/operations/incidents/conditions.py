@@ -145,6 +145,13 @@ def _recovery(conn, scope, signal, actor):
     if payload.get('kind') == 'recovery_not_established':
         _event(conn, scope, row['id'], row['state'], row['state'], 'recovery_not_established', actor, payload)
         return (row['id'], 'recovery_not_established')
+    if signal['standing'] != 'F':
+        # R2.5: a test outside the formal admission (maturity, unit design, reference design) is never recovery
+        # evidence; its indication is recorded and the condition's state is unchanged.
+        _event(conn, scope, row['id'], row['state'], row['state'], 'descriptive_recovery_indication', actor,
+               {'claim': payload.get('claim'), 'signal': str(signal['id']), 'reasons': payload.get('reasons', []),
+                'wording': payload.get('wording')})
+        return (row['id'], 'descriptive_only')
     evidence = {'claim': payload['claim'], 'signal': str(signal['id']), 'wording': payload['wording'],
                 'theta': payload['theta'], 'units': payload['units'], 'interpretation': payload['interpretation']}
     if row['state'] == 'quiescent':
@@ -167,15 +174,25 @@ def tick(installation, deployment_id, *, now, actor='system'):
         rows = conn.execute(f'SELECT * FROM ops_conditions WHERE org_id = %s AND deployment_id = %s AND state IN {OPEN} '
                             'ORDER BY created_at FOR UPDATE', (scope.org_id, deployment_id)).fetchall()
         for row in rows:
-            new, reason, recovery = _next(row, current, now)
-            if new is None:
-                continue
-            conn.execute('UPDATE ops_conditions SET state = %s, recovery = coalesce(%s, recovery), prior_state = NULL, '
-                         'suppressed_until = CASE WHEN %s THEN NULL ELSE suppressed_until END, revision = revision + 1, '
-                         'updated_at = clock_timestamp() WHERE org_id = %s AND id = %s',
-                         (new, Jsonb(recovery) if recovery else None, row['state'] == 'suppressed', scope.org_id, row['id']))
-            _event(conn, scope, row['id'], row['state'], new, reason, actor, recovery or {})
-            changes.append((row['id'], new))
+            row = dict(row)
+            # Transitions chain within one tick (for example active -> quiescent -> recovered when an established
+            # recovery claim was waiting for quiescence), so the outcome never depends on whether the claim arrived
+            # before or after the condition went quiet. Each step is its own event; at most three steps are possible.
+            for _step in range(3):
+                new, reason, recovery = _next(row, current, now)
+                if new is None:
+                    break
+                conn.execute('UPDATE ops_conditions SET state = %s, recovery = coalesce(%s, recovery), prior_state = NULL, '
+                             'suppressed_until = CASE WHEN %s THEN NULL ELSE suppressed_until END, revision = revision + 1, '
+                             'updated_at = clock_timestamp() WHERE org_id = %s AND id = %s',
+                             (new, Jsonb(recovery) if recovery else None, row['state'] == 'suppressed', scope.org_id, row['id']))
+                _event(conn, scope, row['id'], row['state'], new, reason, actor, recovery or {})
+                changes.append((row['id'], new))
+                was_suppressed = row['state'] == 'suppressed'
+                row.update(state=new, recovery=recovery or row['recovery'], prior_state=None,
+                           suppressed_until=None if was_suppressed else row['suppressed_until'])
+                if new not in OPEN:
+                    break
     return changes
 
 

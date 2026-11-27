@@ -99,8 +99,15 @@ def release(db, read_pin):
 
 def resolve(db, read_pin, *, kinds=None, keys=None, opportunity_keys=None, target_keys=None, object_ids=None,
             event_tick_range=None, require_complete=True, limit=None, access='plain', _governance=None,
-            fact_digests=None, occurrence_publications=None, namespace=None, order='physical'):
+            fact_digests=None, occurrence_publications=None, namespace=None, order='physical', _count=False, routes=None):
     """Resolve visible fact locators at the pin's K (one REPEATABLE READ snapshot).
+
+    ``routes`` selects facts by partition route (migration 0014): predictions and context by their opportunity's
+    key, every other kind by its own key. It is read as one index probe per route within that route's partition,
+    so its cost follows the routes asked for, not the history held.
+
+    ``_count=True`` (maintenance only) returns how many locators the same call would return, applying the
+    same completeness and availability refusals, without building them.
 
     ``access='plain'`` never returns protected (outcome-bearing) facts: an
     explicit kind request that would include one refuses with
@@ -109,7 +116,7 @@ def resolve(db, read_pin, *, kinds=None, keys=None, opportunity_keys=None, targe
     ``numek_platform.governance.reader.resolve``. ``access='maintenance'``
     (compaction) moves bytes without exposing values to analysis.
     """
-    if access not in ACCESS or (access == 'governed') != (_governance is not None):
+    if access not in ACCESS or (access == 'governed') != (_governance is not None) or (_count and access != 'maintenance'):
         raise PlatformError('Invalid evidence access mode.', 'invalid_access')
     where = ['f.catalog_id = %s', 'p.sequence IS NOT NULL', 'p.sequence <= %s']
     params = [read_pin.catalog_id, read_pin.k]
@@ -147,12 +154,25 @@ def resolve(db, read_pin, *, kinds=None, keys=None, opportunity_keys=None, targe
         lower, upper = event_tick_range
         where.append('f.event_tick >= %s AND f.event_tick < %s')
         params.extend([lower, upper])
+    source, source_params = 'fact_index f', []
+    if routes is not None:
+        # A LATERAL probe per route: the plan must start from the routes, each probe an index scan on
+        # (catalog_id, kind, route) pruned at run time to its route's partition. OFFSET 0 keeps the subquery from
+        # being flattened into a join the planner could drive from the whole index, so the probe's own
+        # conditions are written inside it. Distinct routes: the probe never repeats a fact.
+        if kinds is None:
+            raise PlatformError('A read by route names its kinds.', 'invalid_access')
+        source = ('unnest(%s::bytea[]) AS rq(route) CROSS JOIN LATERAL '
+                  '(SELECT f0.* FROM fact_index f0 WHERE f0.catalog_id = %s AND f0.kind = ANY(%s) '
+                  'AND f0.route = rq.route OFFSET 0) f')
+        source_params = [sorted({bytes.fromhex(v) for v in routes}), read_pin.catalog_id, list(kinds)]
     with db.transaction('repeatable_read', read_only=access != 'governed') as conn:
         if _governance is not None:
             extra, extra_params = _governance(conn)
             where.append(extra)
             params.extend(extra_params)
         clause = ' AND '.join(where)
+        params = source_params + params
         # Total, deterministic orders. Physical order equals catalog v2's (object id, offset,
         # length): platform object ids are the v2 ids, and UUID order is their hex order.
         tail = (' ORDER BY o.id, f.loc_a, f.loc_b, f.kind, f.key, f.revision' if order == 'physical' else
@@ -162,18 +182,30 @@ def resolve(db, read_pin, *, kinds=None, keys=None, opportunity_keys=None, targe
             params.append(limit)
         if require_complete:
             purged = conn.execute(
-                f'''SELECT 1 FROM fact_index f JOIN publications p ON p.id = f.publication_id
+                f'''SELECT 1 FROM {source} JOIN publications p ON p.id = f.publication_id
                     JOIN fact_tombstones t ON t.catalog_id = f.catalog_id AND t.kind = f.kind AND t.key = f.key
                          AND t.revision = f.revision
                     WHERE {clause} LIMIT 1''', params[:len(params) - (1 if limit else 0)]).fetchone()
             if purged:
                 raise PlatformError('Selected historical evidence was deleted or is unavailable; choose an intact '
                                     'explicit population.', 'historical_evidence_unavailable')
+        if _count:
+            # Same visibility and availability rules as the row query, without materializing locators.
+            total = conn.execute(
+                f'''SELECT count(*) AS n, coalesce(bool_or(o.state NOT IN ('active', 'tombstoned')), false) AS unavailable
+                    FROM {source} JOIN publications p ON p.id = f.publication_id
+                    JOIN objects o ON o.id = f.object_id
+                    WHERE {clause} AND NOT EXISTS (SELECT 1 FROM fact_tombstones t WHERE t.catalog_id = f.catalog_id
+                          AND t.kind = f.kind AND t.key = f.key AND t.revision = f.revision)''',
+                params[:len(params) - (1 if limit else 0)]).fetchone()
+            if total['unavailable']:
+                raise PlatformError('Selected evidence object is unavailable.', 'historical_evidence_unavailable')
+            return min(total['n'], limit) if limit else total['n']
         rows = conn.execute(
             f'''SELECT f.kind, f.key, f.revision, f.fact_digest, f.predecessor, p.sequence, f.object_id,
                        o.physical_key, o.sha256, o.bytes, o.codec, o.state AS object_state,
                        f.locator_kind, f.loc_a, f.loc_b, f.event_hash, f.entity_hash, f.protected
-                FROM fact_index f JOIN publications p ON p.id = f.publication_id
+                FROM {source} JOIN publications p ON p.id = f.publication_id
                 JOIN objects o ON o.id = f.object_id
                 WHERE {clause} AND NOT EXISTS (SELECT 1 FROM fact_tombstones t WHERE t.catalog_id = f.catalog_id
                       AND t.kind = f.kind AND t.key = f.key AND t.revision = f.revision){tail}''', params).fetchall()

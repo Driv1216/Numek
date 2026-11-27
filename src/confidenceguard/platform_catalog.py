@@ -35,6 +35,7 @@ Those land in later S3 steps.
 import contextlib
 import hashlib
 import os
+import re
 import shutil
 import threading
 import uuid
@@ -127,6 +128,22 @@ def platform_bound(root):
 
 def _uuid(oid):
     return uuid.UUID(hex=_safe_name(oid))
+
+
+_HEX64 = re.compile(r'^[0-9a-f]{64}$')
+
+
+def _identity_opportunity(identity):
+    """A prediction's or context's opportunity key: the first element of its identity, if it is a key."""
+    if isinstance(identity, list) and identity and isinstance(identity[0], str) and _HEX64.match(identity[0]):
+        return identity[0]
+    return None
+
+
+def identity_route(kind, key, identity):
+    """The partition route of a staged fact (migration 0014), from its verified identity alone."""
+    from numek_platform.evidence.publish import ROUTED_KINDS, route_of
+    return route_of(kind, key, _identity_opportunity(identity) if kind in ROUTED_KINDS else None)
 
 
 def _translate(exc):
@@ -698,19 +715,32 @@ class PlatformCatalog(Catalog):
             raise EvaluationError('Invalid retained record location.', 'evidence_changed')
         return strict_json(raw)
 
-    def _fact_row(self, conn, kind, key, *, revision=None, fact_digest=None):
-        where, params = ['f.catalog_id = %s', 'f.kind = %s', 'f.key = %s'], [self.catalog_id, kind, bytes.fromhex(key)]
-        if revision is not None:
-            where.append('f.revision = %s')
-            params.append(revision)
-        if fact_digest is not None:
-            where.append('f.fact_digest = %s')
-            params.append(bytes.fromhex(fact_digest))
-        return conn.execute(
-            f'''SELECT f.*, o.codec, o.state AS object_state,
-                       EXISTS (SELECT 1 FROM fact_tombstones t WHERE t.catalog_id = f.catalog_id AND t.kind = f.kind
-                               AND t.key = f.key AND t.revision = f.revision) AS purged
-                FROM fact_index f JOIN objects o ON o.id = f.object_id WHERE {' AND '.join(where)} LIMIT 1''', params).fetchone()
+    def _existing_facts(self, conn, identities, chunk=10_000):
+        """Every retained revision of the ``(kind, key, route)`` identities a capture names, fetched in chunked set
+        queries (not one or two point queries per fact), each probe within the one partition of its route.
+        Returns rows by (kind, key, revision) and by (kind, key)."""
+        triples = sorted({(kind, bytes.fromhex(key), bytes.fromhex(route)) for kind, key, route in identities})
+        by_identity, by_key = {}, {}
+        for i in range(0, len(triples), chunk):
+            part = triples[i:i + chunk]
+            # Point lookups (the planner otherwise walks the whole index: 19 s instead of 0.25 s per
+            # 10k identities at 4.7M facts, growing with history).
+            from numek_platform.db import point_lookups
+            with conn.transaction(), point_lookups(conn):
+                found = conn.execute(
+                    '''SELECT f.*, o.codec, o.state AS object_state,
+                              EXISTS (SELECT 1 FROM fact_tombstones t WHERE t.catalog_id = f.catalog_id AND t.kind = f.kind
+                                      AND t.key = f.key AND t.revision = f.revision) AS purged
+                       FROM unnest(%s::text[], %s::bytea[], %s::bytea[]) AS q(kind, key, route)
+                       JOIN fact_index f ON f.catalog_id = %s AND f.kind = q.kind AND f.route = q.route AND f.key = q.key
+                       JOIN objects o ON o.id = f.object_id''',
+                    ([k for k, _, _ in part], [key for _, key, _ in part], [r for _, _, r in part],
+                     self.catalog_id)).fetchall()
+            for row in found:
+                identity = (row['kind'], bytes(row['key']).hex(), row['revision'])
+                by_identity[identity] = row
+                by_key.setdefault(identity[:2], []).append(row)
+        return by_identity, by_key
 
     # Publication (port of v2 commit_capture) ------------------------------------------------------
     def commit_capture(self, identifier, *, cancel=None, receipt_extra=None, conflicts='refuse'):
@@ -763,13 +793,14 @@ class PlatformCatalog(Catalog):
                     if len(line) > 16384:
                         raise EvaluationError('Invalid capture index.', 'capture_changed')
                     entries.append(strict_json(line))
+            # Pass 1: read and verify every staged record (its route comes from its verified identity).
+            staged = {}
             for count, entry in enumerate(entries):
                 if count % 4096 == 0:
                     if cancel is not None and cancel.is_set():
                         raise EvaluationError('Cancelled before historical publication.', 'cancelled')
                     self.reserve()
                 if entry.get('kind') == 'vector_location':
-                    vector_rows.append(self._validate_vector(conn, stage, objects, entry, staged_cache, validate_matrix, used))
                     continue
                 obj = objects.get(entry['object_id'])
                 codec = obj.get('encoding', 'utf8_jsonl_v1') if obj else None
@@ -782,14 +813,27 @@ class PlatformCatalog(Catalog):
                 if (claimed != entry['fact_digest'] or digest(fact) != claimed or digest(fact['identity']) != entry['key']
                         or fact['kind'] != entry['kind'] or fact['revision'] != entry['revision']):
                     raise EvaluationError('Record and directory identities differ.', 'capture_changed')
+                staged[count] = (codec, fact, claimed, identity_route(entry['kind'], entry['key'], fact['identity']))
+            # Retained revisions of every named identity, and the facts staged so far, both by (kind, key):
+            # duplicate, prior-existence and predecessor checks are lookups, not scans or per-fact queries.
+            existing, existing_by_key = self._existing_facts(
+                conn, [(entry['kind'], entry['key'], staged[i][3]) for i, entry in enumerate(entries) if i in staged])
+            staged_by_key = {}
+            # Pass 2: duplicates, corrections and conflicts, in index order.
+            for count, entry in enumerate(entries):
+                if entry.get('kind') == 'vector_location':
+                    vector_rows.append(self._validate_vector(conn, stage, objects, entry, staged_cache, validate_matrix, used))
+                    continue
+                codec, fact, claimed, _route = staged[count]
                 identity = (entry['kind'], entry['key'], entry['revision'])
-                same = seen.get(identity) or self._fact_row(conn, entry['kind'], entry['key'], revision=entry['revision'])
-                prior_exists = (any(k == entry['kind'] and key == entry['key'] for k, key, _r in seen)
-                                or self._fact_row(conn, entry['kind'], entry['key']) is not None)
+                same = seen.get(identity) or existing.get(identity)
+                prior_exists = identity[:2] in staged_by_key or identity[:2] in existing_by_key
                 is_correction = fact.get('predecessor') is not None or (prior_exists and same is None)
                 try:
                     if entry['kind'] in {'prediction', 'context', 'opportunity', 'feature', 'representation'} and is_correction:
-                        self._validate_correction(conn, entry, fact, claimed, seen, stage, staged_cache, stored_cache)
+                        self._validate_correction(entry, fact, claimed, staged_by_key.get(identity[:2], ()),
+                                                  existing_by_key.get(identity[:2], ()), existing.get(identity),
+                                                  stage, staged_cache, stored_cache)
                     if same is not None:
                         if isinstance(same, dict) and same.get('_staged'):
                             if same['fact_digest'] != claimed:
@@ -816,6 +860,7 @@ class PlatformCatalog(Catalog):
                         target_object = _uuid(entry['object_id'])
                         seen[identity] = {'_staged': True, 'fact_digest': claimed, 'object_id': entry['object_id'],
                                           'offset': entry['offset'], 'length': entry['length'], 'codec': codec}
+                        staged_by_key.setdefault(identity[:2], []).append(seen[identity])
                         rows.append(self._row(FactRow, entry, fact, claimed, target_object,
                                               entry.get('locator_kind', 'byte_range'), entry['offset'], entry['length'], entity_of))
                 except EvaluationError as exc:
@@ -918,11 +963,18 @@ class PlatformCatalog(Catalog):
             if self is not None:
                 self._lexical_entity[entry['key']] = payload.get('entity')
             target_key = payload.get('target_key')
-        elif kind in ('prediction', 'sample'):
+        elif kind == 'prediction':
+            # The opportunity key comes from the identity ([opportunity key, variant, slot, attempt]): it fixes
+            # the fact's partition route (migration 0014), so it must never depend on the payload.
+            opportunity_key = _identity_opportunity(fact.get('identity'))
+            if opportunity_key is not None and payload.get('opportunity_key') != opportunity_key:
+                raise EvaluationError('Prediction opportunity differs from its identity.', 'capture_changed')
+            target_key = payload.get('target_key')
+        elif kind == 'sample':
             opportunity_key = payload.get('opportunity_key')
             target_key = payload.get('target_key')
         elif kind == 'context':
-            opportunity_key = fact['identity'][0] if fact.get('identity') else None
+            opportunity_key = _identity_opportunity(fact.get('identity'))
         elif kind == 'outcome':
             target_key = entry['key']
         if namespace is not None and opportunity_key is not None:
@@ -942,12 +994,14 @@ class PlatformCatalog(Catalog):
                        available_tick=int(fact['available_ns']) if fact.get('available_ns') is not None else None,
                        namespace=namespace, protected=protected)
 
-    def _validate_correction(self, conn, entry, fact, claimed, seen, stage, staged_cache, stored_cache):
+    def _validate_correction(self, entry, fact, claimed, staged, retained, existing, stage, staged_cache, stored_cache):
+        """``staged`` / ``retained``: this identity's facts staged earlier in the capture / already indexed;
+        ``existing``: the indexed row at this exact revision, if any."""
         from .feature_storage import extension
-        staged_parent = next((v for (k, key, _r), v in seen.items() if k == entry['kind'] and key == entry['key']
-                              and v['fact_digest'] == fact.get('predecessor')), None)
-        parent = staged_parent or (self._fact_row(conn, entry['kind'], entry['key'], fact_digest=fact['predecessor'])
-                                   if fact.get('predecessor') else None)
+        predecessor = fact.get('predecessor')
+        staged_parent = next((v for v in staged if v['fact_digest'] == predecessor), None)
+        parent = staged_parent or (next((r for r in retained if bytes(r['fact_digest']).hex() == predecessor), None)
+                                   if predecessor else None)
         if parent is None or not fact.get('reason') or fact.get('available_ns') is None:
             raise EvaluationError('Correction requires a matching predecessor, reason and availability.', 'correction_predecessor')
         if staged_parent:
@@ -963,7 +1017,6 @@ class PlatformCatalog(Catalog):
                 raise EvaluationError('Corrections cannot relabel historical role/entity separation.', 'historical_role_reassignment')
             if parent_record['authority'] != fact['authority']:
                 raise EvaluationError('Prediction correction authority differs.', 'correction_authority')
-        existing = self._fact_row(conn, entry['kind'], entry['key'], revision=entry['revision'])
         if existing is not None and bytes(existing['fact_digest']).hex() != claimed:
             raise EvaluationError('Correction revision conflicts.', 'historical_identity_conflict')
 
@@ -1144,7 +1197,8 @@ class PlatformCatalog(Catalog):
             pass
 
     def iter_facts(self, kind=None, *, sequence=None, keys=None, fact_digests=(), batch_ids=(), require_complete=True,
-                   max_records=30000000, check=None, _logical_order=False, opportunity_keys=None, target_keys=None):
+                   max_records=30000000, check=None, _logical_order=False, opportunity_keys=None, target_keys=None,
+                   routes=None):
         from numek_platform.evidence import reader
         from numek_platform.errors import PlatformError
         from numek_platform.governance import reader as governed_reader
@@ -1158,6 +1212,7 @@ class PlatformCatalog(Catalog):
                 filters = {'kinds': None if kind is None else [kind], 'keys': None if keys is None else list(keys),
                            'opportunity_keys': None if opportunity_keys is None else list(opportunity_keys),
                            'target_keys': None if target_keys is None else list(target_keys),
+                           'routes': None if routes is None else list(routes),
                            'fact_digests': list(fact_digests) or None, 'require_complete': require_complete,
                            'occurrence_publications': [_uuid(b) for b in batch_ids] or None,
                            'order': 'logical' if _logical_order else 'physical'}
@@ -1207,8 +1262,10 @@ class PlatformCatalog(Catalog):
     def _read_locators(self, locators):
         """Decode locators: platform codecs via verify-on-read, legacy typed features via the v2 row reader."""
         from numek_platform.evidence import reader
-        native = [l for l in locators if l.codec in ('utf8_jsonl_v1', 'observation_facts_parquet_v1')]
-        other = [l for l in locators if l not in native]
+        # One pass, order kept (a membership test against the native list was quadratic in the facts read).
+        native, other = [], []
+        for locator in locators:
+            (native if locator.codec in ('utf8_jsonl_v1', 'observation_facts_parquet_v1') else other).append(locator)
         yield from reader.read(self.store, native, max_record_bytes=self.config.max_record_bytes)
         cache = {}
         try:

@@ -130,7 +130,7 @@ Summing over s (Tonelli's theorem):
   - Inclusion that depends on outcome values is forbidden.
   - Units with invalid outcome values are excluded and counted. The formal standing then requires the declared assumption that invalidity is unrelated to the statistic.
 - **The estimand is the included-unit conditional risk.** Informative lateness or selective labelling changes what the claim is about, not its false-alarm validity. A low exclusion rate is never treated as validity evidence.
-- **Comparability (interpretation).** The reference uses the identical inclusion rule. If inclusion rates differ from the reference beyond the declared tolerance, the alarm is reported as "formal for the included population; population definition has shifted relative to reference".
+- **Comparability (interpretation).** The reference uses the identical inclusion rule. Each alarm and claim compares, per detector and window: label availability among units whose follow-up elapsed and the invalid-outcome rate (outcome detectors; `inclusion_tolerance`, default 0.1), and the late-exclusion rate (`late_tolerance`, default 0.01; the reference has none by construction). If any differs beyond its tolerance, the alarm is reported as "formal for the included population; population definition has shifted relative to reference (*rates*)". Entity-first thinning is recorded but not compared: the stream accumulates repeat entities over months while the reference covers one period, so their thinning rates differ by design. The measured reference/stream entity overlap is shown with every alarm and claim.
 - **Dependence.** Positive dependence (repeated entities, common shocks) can break the conditional-mean condition while the marginal risk stays acceptable.
   - `entity_first` thinning is the default.
   - Common shocks are a declared assumption.
@@ -189,6 +189,13 @@ where μ̄_n = (1/n) Σ_{i≤n} μ_i. The inversion actually bounds |S_n|; SM2 u
 - Both claims are valid under any data-dependent checking schedule, because the confidence sequence holds at every n simultaneously.
 - ρ is fixed before verification starts. The default is planned support / 4, which places the tightest point near the planned support. Any fixed ρ is valid.
 - In R3, a wide reference makes the claim **harder**, which is the correct direction.
+
+**Admission (R2.5: the same rules as SM1, review correction B1).** An SM2 test is formal only when SM1 on the same
+definition would be: outcome statistics need `equal_followup` maturity, `event` units need an independence
+declaration, and R3 needs the reference statistic under a registered finite design. Otherwise the test is admitted
+**descriptive**: it still runs, but a crossing is reported as a `descriptive_recovery_indication` (standing P), never
+recovers a condition and never verifies a plan. Proposals whose R2/R3 claims could only be descriptive fail the
+`verification_feasible` prerequisite. The confidence-sequence arithmetic does not change; only the standing does.
 
 **Interpretation and outcomes.**
 - R2 and R3 concern the **average conditional risk of included units since the verification start**, not the instantaneous current risk.

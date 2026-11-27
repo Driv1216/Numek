@@ -225,7 +225,8 @@ def test_gate_rejects_naive_pruning(history, monkeypatch):
     def naive(self, kind=None, **kwargs):
         for fact in original(self, kind, **kwargs):
             tick = (fact.get('payload') or {}).get('time', {}).get('tick')
-            if kind == 'opportunity' and kwargs.get('keys') is not None and not (tick and lower <= int(tick) < upper):
+            pruned = kwargs.get('keys') is not None or kwargs.get('routes') is not None   # S10: windows read by route
+            if kind == 'opportunity' and pruned and not (tick and lower <= int(tick) < upper):
                 continue
             yield fact
 

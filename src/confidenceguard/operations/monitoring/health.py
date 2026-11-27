@@ -30,8 +30,9 @@ DIMENSIONS = {
 }
 DESCRIPTIVE_ONLY = {'longitudinal': 'drift against the frozen reference (CG3 distances)',
                     'execution_and_identity': 'identity standings (S4)'}
-NOT_YET = {'regions': 'frozen-region exposure detectors are part of CG7 S7 (intelligence)',
-           'policy': 'policy replay monitoring is part of CG7 S7'}
+# Not monitored in CG7 (disclosed in the closure report): the G.2 policy dimension (supplied actions against a
+# frozen CG5 replay and its constraint ledger).
+NOT_YET = {'policy': 'policy monitoring (supplied actions against a frozen CG5 replay) is not implemented in CG7'}
 
 
 def report(installation, deployment_id, *, now_tick=None):
@@ -86,7 +87,7 @@ def report(installation, deployment_id, *, now_tick=None):
             "SELECT count(DISTINCT key) AS n FROM fact_index WHERE catalog_id = %s AND namespace = %s AND kind = 'opportunity' "
             "AND event_tick IS NULL", (ctx['catalog_id'], ctx['namespace'])).fetchone()['n']
         if not current:
-            out['coverage'] = {d: {'status': 'not_configured'} for d in [*DIMENSIONS, *DESCRIPTIVE_ONLY, *NOT_YET]}
+            out['coverage'] = {d: {'status': 'not_configured'} for d in [*DIMENSIONS, 'regions', *DESCRIPTIVE_ONLY, *NOT_YET]}
             out['conditions'].append({'kind': 'not_monitored', 'severity': 'high', 'detail': 'no confirmed definition'})
             return out
         version = current['version']
@@ -127,10 +128,17 @@ def report(installation, deployment_id, *, now_tick=None):
     return out
 
 
+def _region_detectors(detectors):
+    return [d for d in detectors if d['kind'] == 'sm1'
+            and (d['plan']['statistic'] == 'region_membership' or d['plan'].get('region') is not None)]
+
+
 def coverage(definition, detectors, stale):
     out = {}
-    for dimension, statistics in DIMENSIONS.items():
-        relevant = [d for d in detectors if d['kind'] == 'sm1' and d['plan']['statistic'] in statistics]
+    groups = {dimension: [d for d in detectors if d['kind'] == 'sm1' and d['plan']['statistic'] in statistics]
+              for dimension, statistics in DIMENSIONS.items()}
+    groups['regions'] = _region_detectors(detectors)       # frozen CG4 regions: exposure and in-region detectors (S7)
+    for dimension, relevant in groups.items():
         if stale and relevant:
             status = 'stale'
         elif any(d['standing'] == 'formal' for d in relevant):
@@ -139,6 +147,8 @@ def coverage(definition, detectors, stale):
             status = 'insufficient_power'
         elif relevant:
             status = 'descriptive'
+        elif dimension == 'regions':
+            status = 'not_configured'
         else:
             status = 'descriptive_measures_only' if dimension != 'integrity' or definition.get('rules') else 'not_configured'
         out[dimension] = {'status': status, 'detectors': [d['detector_id'] for d in relevant]}

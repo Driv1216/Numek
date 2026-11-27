@@ -52,5 +52,6 @@ def publish(ctx, payload):
     receipt = publish_evidence(ctx.db, ctx.scope, ctx.lease, uuid.UUID(payload['catalog_id']),
                                request_id=f'job:{ctx.lease.job_id}', request_digest=digest(fact), kind='ingest',
                                objects=[ref], facts=[FactRow('context', fact['key'], 'initial', fact['fact_digest'],
-                                                             ref.id, 'row', 0, 0)])
+                                                             ref.id, 'row', 0, 0,
+                                                             opportunity_key=fact['key'])])   # its own route (generic record)
     return receipt.to_dict()

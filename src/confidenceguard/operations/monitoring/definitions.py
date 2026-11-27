@@ -109,6 +109,29 @@ def maturity_ns(definition):
     return int(m.get('followup_ns') or m.get('horizon_ns'))
 
 
+def design_reasons(definition, phase):
+    """Unit-design and maturity reasons that make a sequential claim descriptive (R2.4; R2.5 applies the same rules
+    to SM2 recovery tests). Empty when the design admits a formal claim."""
+    reasons = []
+    if phase == unit_rules.OUTCOME and definition['maturity']['policy'] != 'equal_followup':
+        reasons.append('maturity_not_equal_followup')
+    if definition['unit_design'] == 'event' and not definition.get('independent_units'):
+        reasons.append('event_units_without_independence_declaration')
+    return reasons
+
+
+def recovery_admission(definition, statistic, claim, record):
+    """R2.5 admission of an SM2 recovery test: ``(standing, reasons)``.
+
+    The same predictable-inclusion, unit and bounds rules as SM1 (R2.4). R3 also needs the reference statistic under a
+    registered finite design. A descriptive test may still run, but its claim is never recovery evidence.
+    """
+    reasons = design_reasons(definition, unit_rules.STATISTICS[statistic]['phase'])
+    if claim == 'R3' and (record is None or record.get('design') is None or record.get('lower') is None):
+        reasons.append('reference_design_not_registered')
+    return ('descriptive' if reasons else 'formal'), reasons
+
+
 def plan_detector(definition, detector, reference, task_kind, *, units_per_day_declared=None):
     """Admission, null level, alpha and the planner for one detector."""
     statistic = detector['statistic']
@@ -129,12 +152,10 @@ def plan_detector(definition, detector, reference, task_kind, *, units_per_day_d
     if region is not None:
         plan['region'] = region
         plan['region_source_standing'] = next(r['source_standing'] for r in definition['regions'] if r['id'] == region)
-    if plan['phase'] == unit_rules.OUTCOME and definition['maturity']['policy'] != 'equal_followup':
+    design = design_reasons(definition, plan['phase'])
+    if design:
         standing = 'descriptive'
-        plan['reasons'].append('maturity_not_equal_followup')
-    if definition['unit_design'] == 'event' and not definition.get('independent_units'):
-        standing = 'descriptive'
-        plan['reasons'].append('event_units_without_independence_declaration')
+        plan['reasons'].extend(design)
     included_per_day = record['units_per_day']
     if units_per_day_declared:
         included_per_day = float(units_per_day_declared) * (record['inclusion_rate'] or 0)
@@ -287,8 +308,10 @@ def start_recovery(installation, deployment_id, detector_id, *, claim, alpha, pl
                                   'reference_design_not_registered')
     else:
         raise EvaluationError('Recovery claims are R2 or R3.', 'invalid_recovery')
+    standing, reasons = recovery_admission(current['spec'], statistic, claim, record)
     test = eprocess.RecoveryTest.planned(threshold, float(alpha), int(planned_support))
     plan = {'id': detector_id, 'kind': 'sm2', 'claim': claim, 'statistic': statistic, 'theta': threshold, 'alpha': alpha,
+            'standing': standing, 'reasons': reasons,
             'rho': test.rho, 'planned_support': planned_support, 'first_window': int(start_window), 'params': params or {},
             'phase': phase, 'delta': delta, 'horizon_units': horizon_units,
             'condition_id': None if condition_id is None else str(condition_id),
@@ -297,9 +320,9 @@ def start_recovery(installation, deployment_id, detector_id, *, claim, alpha, pl
     with installation.db.transaction() as conn:
         conn.execute('''INSERT INTO ops_detectors(org_id, deployment_id, definition_version, detector_id, kind, phase, standing,
                             plan, state)
-                        VALUES (%s, %s, %s, %s, 'sm2', %s, 'formal', %s, %s)''',
-                     (installation.scope.org_id, deployment_id, current['version'], detector_id, plan['phase'], Jsonb(plan),
-                      Jsonb(test.state())))
+                        VALUES (%s, %s, %s, %s, 'sm2', %s, %s, %s, %s)''',
+                     (installation.scope.org_id, deployment_id, current['version'], detector_id, plan['phase'], standing,
+                      Jsonb(plan), Jsonb(test.state())))
     return plan
 
 

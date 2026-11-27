@@ -43,8 +43,12 @@ def load_history(work, root, spec, sequence, governance=None, window_ticks=None)
         opportunity_keys = catalog.event_range_keys('opportunity', window_ticks,
                                                     sequence=spec.prediction_catalog_sequence or sequence,
                                                     namespace=spec.namespace)
-        filters = {'opportunity': {'keys': opportunity_keys}, 'prediction': {'opportunity_keys': opportunity_keys},
-                   'context': {'opportunity_keys': opportunity_keys}, 'sample': {'opportunity_keys': opportunity_keys}}
+        # By partition route (migration 0014): an opportunity's route is its key, a prediction's or context's is its
+        # opportunity's key (identity[0]), an outcome's is its key, which is its target key. Each read is then one
+        # index probe per key within that key's partition, so its cost follows the window, not the history.
+        # Samples route by their own key and are still read by opportunity key.
+        filters = {'opportunity': {'routes': opportunity_keys}, 'prediction': {'routes': opportunity_keys},
+                   'context': {'routes': opportunity_keys}, 'sample': {'opportunity_keys': opportunity_keys}}
         targets = set()
     if governance is not None:
         catalog.governed(governance)
@@ -59,7 +63,7 @@ def load_history(work, root, spec, sequence, governance=None, window_ticks=None)
     scanned = 0; parsed_bytes = 0; record_bytes = 0; objects = set(); pending = []
     for kind in ('opportunity', 'prediction', 'outcome', 'context', 'sample'):
         if window_ticks is not None and kind == 'outcome':
-            filters['outcome'] = {'target_keys': sorted(targets)}
+            filters['outcome'] = {'routes': sorted(targets)}
         for fact in catalog.iter_facts(kind, sequence=(spec.prediction_catalog_sequence or sequence) if kind != 'outcome' else sequence, batch_ids=spec.batch_ids, max_records=spec.max_scan_records, check=work.check, **filters.get(kind, {})):
             record_bytes += fact['record_bytes']
             data = fact['payload']

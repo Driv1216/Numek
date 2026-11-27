@@ -1,5 +1,48 @@
 # Numek Architecture
 
+## CG7 architecture: NUMEK platform and reliability operations — 2026-11-26
+
+CG7 adds a new top-level package, `numek_platform`, and moves all persistent ConfidenceGuard state onto it. The
+CG1–CG6 analytical kernels, contracts, method identities and refusals are unchanged.
+
+**Persistence.**
+- PostgreSQL is the single transactional authority. It holds:
+  - evidence identity, the routed fact index and K;
+  - governance and the sealed reserve;
+  - jobs with fenced leases;
+  - operations state;
+  - identity and the audit chain.
+- Bulk evidence is in an immutable content-addressed object store, verified on every read.
+- DuckDB/Arrow run inside jobs only.
+- The catalog v2 SQLite writer is retired behind a validated one-way migration; a read-only legacy reader remains.
+- The ephemeral workbench and DataTrust do not use the platform.
+
+**Processes.** Each process is stateless outside the database:
+- `ops serve` (gunicorn gthread: API, ingestion, console);
+- `ops controller` (single leader by epoch: scheduling, window cycles, conditions, notifications, GC);
+- `ops worker` hosts (warm and isolated job processes, process-tree budgets, fenced leases).
+
+Leases and leadership use the database clock. Both loops survive a database restart.
+
+**Operations domain.** `confidenceguard/operations`:
+- registry and contracts;
+- ingestion;
+- monitoring (windows, references, measures, SM1/SM2, estimators, health);
+- incidents (conditions, grouping, dossiers, notifications, retention);
+- intelligence (hypotheses, matrix, planner, regions, patterns);
+- interventions (proposals, approvals, handoff, execution standings, recovery);
+- API, CLI, client, reports and console.
+
+**Contracts.** Each one is documented in [CG7 ConfidenceGuard](CG7_CONFIDENCEGUARD.md) and the
+[NUMEK platform](NUMEK_PLATFORM.md):
+- K-prefix consistency;
+- governance before access;
+- the object lifecycle (W1–W4, GC invariants, lock order);
+- the backup recovery point S;
+- the migration point of no return.
+
+**Deployment.** P-LOCAL (managed cluster) is in use. P-SERVER (OCI, compose, systemd) is intended, not qualified.
+
 ## CG6 accepted architecture — 2026-11-08
 
 The founder has confirmed CG6 is done and accepted; CG1–CG6 are complete within

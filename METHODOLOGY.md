@@ -806,3 +806,70 @@ scalar ranking metrics, safe findings and methodological qualifications. See
 [CG1 contracts and methodology](docs/CG1_CONFIDENCEGUARD.md) and
 [focused review evidence](validation/cg1/REVIEW_CORRECTIONS.md). These corrections
 do not change DataTrust scoring or accepted analytical engines.
+
+
+## ConfidenceGuard CG7 reliability-operations methodology
+
+CG7 monitors deployed models continuously. It reuses the CG1–CG6 measures and adds a small set of formal
+sequential methods. Every result carries one standing:
+
+| Code | Standing |
+|---|---|
+| D | deterministic violation |
+| F | formally admitted claim |
+| P | practical effect beyond a declared threshold, descriptive |
+| E | estimate under a named assumption |
+| X | experimental (CG6) |
+| A | association |
+| H | hypothesis |
+
+**Windows and populations.**
+- Windows are half-open in event time. They close by producer watermark or after the declared lateness.
+- Label-dependent measures use matured cohorts (`equal_followup`, with outcomes known at opportunity + horizon), so
+  labels arriving at different times do not bias them.
+- The estimand is always the eligible observed-label population. Label availability is monitored separately.
+- The statistical unit defaults to the first matured opportunity per entity (`entity_first`).
+- Inclusion rules may use only information available before the outcome value.
+
+**SM1 (change detection).**
+- A bounded-mean e-CUSUM over [0, 1] statistics with declared true bounds, resetting at every alarm.
+- With resets, E[false alarms] ≤ α·E[units] for any stopping-time horizon; there are no epochs.
+- The null is conditional risk ≤ m₀ = U_ref + δ, where U_ref is a finite upper bound of the frozen reference under
+  its registered design. Otherwise the detector is descriptive.
+- An alarm says the conditional risk exceeded m₀ at some point. It is never an average-risk or causal statement.
+- A power planner marks detectors that would be too slow as `insufficient_power`, and those do not count as
+  coverage.
+
+**SM2 (recovery).**
+- A one-sided Hoeffding normal-mixture confidence sequence for the running average of conditional means since
+  verification started. It is valid under any checking schedule.
+- R2 compares against a fixed threshold θ, with error ≤ α_rec.
+- R3 compares against θ = L_ref + Δ, where L_ref is the reference *lower* bound, so a wide reference makes the claim
+  harder. Error ≤ α_rec + α_ref.
+- R1 (operational, outcome-free) is kept separate. R4 (causal) is never claimed.
+
+**Estimators and accountability.**
+- Outcome-free estimates follow the actual decision rule:
+  - the implied error of issued decisions;
+  - CG5 model-implied cost;
+  - a composition projection over frozen regions or cohorts.
+- Each estimate names its assumption.
+- When outcomes mature, the estimate is recomputed on the matured subset with the same formula and compared with the
+  realized value. That tests the assumption on that subset, not on the whole window.
+
+**Governance.**
+- Protected evidence is read only under a committed reservation.
+- A namespace-level sealed reserve (10%, covariates excluded by default) is assigned at first observation. It is
+  never used for development and is consumed per entity by confirmation studies.
+
+**Intelligence.**
+- Hypotheses are data with machine-checkable predictions. The differential matrix shows each hypothesis against
+  observed evidence with its standing.
+- Investigations are planned deterministically within budgets and governance tiers.
+- The domain classifier is descriptive. Its permutation test is exploratory and single-look.
+
+**Not used:** PSI, parametric CUSUM/EWMA, ADWIN, Page–Hinkley, MMD, bootstrap monitoring claims, BBSE and importance
+weighting.
+
+See the [proofs and qualification](docs/CG7_SEQUENTIAL_METHODS.md) (M.2: exact enumeration and locked Monte Carlo
+panels) and [CG7 ConfidenceGuard](docs/CG7_CONFIDENCEGUARD.md).

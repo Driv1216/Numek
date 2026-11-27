@@ -10,6 +10,8 @@ import threading
 import time
 import uuid
 
+import psycopg
+
 from ..errors import PlatformError
 from . import jobs as job_store
 
@@ -68,7 +70,7 @@ class Controller:
         while not stop.is_set():
             try:
                 self.run_once()
-            except PlatformError:
+            except (PlatformError, psycopg.Error):   # includes the database restarting or a dropped connection
                 pass
             stop.wait(interval)
 

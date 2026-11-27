@@ -1,0 +1,83 @@
+{
+ "at": "2026-11-27T03:10:48.320795+00:00",
+ "calibration": {
+  "batch_rows": 10000,
+  "db_bytes_per_fact": 1197.6,
+  "evidence_object_bytes_per_row": 4749.1,
+  "facts": 1000020,
+  "facts_per_row": 5.0001,
+  "ingest_rows_per_second_single_process": 614.2,
+  "object_bytes_by_codec": {
+   "encrypted_raw_batch_v1": 64158987,
+   "utf8_jsonl_v1": 949824718
+  },
+  "raw_object_bytes_per_row": 320.8,
+  "receive_seconds_per_batch_p95": 0.091,
+  "rows": 200000,
+  "verify_on_read": {
+   "bytes": 540749022,
+   "bytes_per_second": 1600161242,
+   "seconds": 0.338
+  },
+  "wal_bytes_per_fact": 2021.4
+ },
+ "decision": "admitted",
+ "digest": "326ef426a8985c85183c108dc63e4d8b11c33012ebb3c6790f6ade141d27a729",
+ "host": {
+  "cpus": 10,
+  "free_bytes": 153728073728,
+  "memory_bytes": 17179869184,
+  "path": "/private/tmp/claude-501/-Users-drivyaanshyadav--claude-spares-spare-7dF4HQ/c121a2de-2d4d-4db4-92d8-539f18c8381f/scratchpad/b3/preflight-scratch",
+  "platform": "Darwin 27.0.0 arm64",
+  "total_bytes": 494384795648
+ },
+ "identity": "smaller named workload of W-DEV",
+ "projection": {
+  "assumptions": [
+   "a revision adds one fact",
+   "backups are written to the same disk",
+   "raw batches are retained 7 days",
+   "2 worker hosts at 2 GiB each, two API workers"
+  ],
+  "backup_bytes": 9663497784,
+  "database_bytes": 5389307784,
+  "disk_bytes": 25798318512,
+  "evidence_object_bytes": 4274190000,
+  "facts": 4500090,
+  "history_days": 90,
+  "memory_bytes": 7516192768,
+  "raw_object_bytes": 22456000,
+  "rows": 900000,
+  "single_process_load_hours": 0.41,
+  "staging_bytes": 6416000,
+  "wal_generated_bytes": 9096481926,
+  "wal_peak_bytes": 6442450944
+ },
+ "reasons": [],
+ "schema": "numek.workload_preflight/1",
+ "workload": "W-DEV-S1",
+ "workload_definition": {
+  "concurrent": [],
+  "deployments": 1,
+  "description": "One W-DEV deployment's prediction stream (10k predictions a day, 30 numeric features and one categorical), measured at 30 and 90 days of history.",
+  "deviations": [
+   "one system and one deployment instead of 3 and 20 (per-deployment volume equals W-DEV)",
+   "no revisions: corrections enter through the workspace API, not producer batches, and are not generated",
+   "no frozen regions and no policy",
+   "no concurrent backfill or CG6 job"
+  ],
+  "features": 30,
+  "history_days": [
+   30,
+   90
+  ],
+  "id": "W-DEV-S1",
+  "parent": "W-DEV",
+  "policies": 0,
+  "predictions_per_day": 10000,
+  "regions": 0,
+  "revisions_per_day": 0,
+  "status": "engineering_objective",
+  "systems": 1
+ }
+}

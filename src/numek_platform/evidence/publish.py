@@ -21,6 +21,7 @@ from dataclasses import dataclass, field
 import psycopg
 from psycopg.types.json import Jsonb
 
+from ..db import point_lookups
 from ..errors import PlatformError
 from ..execution.jobs import assert_fence
 from .catalogs import catalog, require_active
@@ -154,6 +155,16 @@ def publish(db, scope, lease, catalog_id, *, request_id, request_digest, kind, o
         raise ValueError(on_conflict)
     if lease.org_id != scope.org_id:
         raise PlatformError('Job and scope belong to different organisations.', 'scope_mismatch')
+    facts = list(facts)
+    if not allow_migrating:
+        # Route integrity (migration 0014): a routed fact is stored in its opportunity's partition, so it must name that
+        # opportunity. Without it the fact would route by its own key and one identity could occupy two partitions,
+        # escaping the per-partition unique and no-fork indexes. Producers derive opportunity_key from identity[0]
+        # (ConfidenceGuard capture refuses a payload that disagrees). Only migrated, already purged facts lack it.
+        for fact in facts:
+            if fact.kind in ROUTED_KINDS and fact.opportunity_key is None:
+                raise PlatformError('A prediction or context fact must name its opportunity key (its partition route).',
+                                    'route_undetermined')
     for attempt in range(3):
         try:
             return _publish_once(db, scope, lease, catalog_id, request_id, request_digest, kind, list(objects),
@@ -252,8 +263,16 @@ def _check_deletion_since_pin(conn, catalog_id, pin, tombstone_epoch):
 
 _COLUMNS = ('kind', 'key', 'revision', 'fact_digest', 'predecessor', 'object_id', 'locator_kind', 'loc_a', 'loc_b',
             'opportunity_key', 'target_key', 'entity_hash', 'event_hash', 'event_tick', 'available_tick', 'namespace',
-            'protected')
+            'protected', 'route')
 PROTECTED_BY_DEFAULT = ('outcome', 'raw')
+# Kinds stored in their opportunity's partition (migration 0014). Their opportunity_key must be identity[0]: the
+# producer sets it from the identity, so one logical identity always has one route.
+ROUTED_KINDS = ('prediction', 'context')
+
+
+def route_of(kind, key, opportunity_key):
+    """The partition route of a fact (hex): its opportunity's key for ROUTED_KINDS, otherwise its own key."""
+    return opportunity_key if kind in ROUTED_KINDS and opportunity_key is not None else key
 
 
 def _insert_facts(conn, scope, catalog_id, publication_id, facts):
@@ -276,31 +295,46 @@ def _insert_facts(conn, scope, catalog_id, publication_id, facts):
         '''CREATE TEMP TABLE _facts (kind text, key bytea, revision text, fact_digest bytea, predecessor bytea,
                object_id uuid, locator_kind text, loc_a bigint, loc_b bigint, opportunity_key bytea, target_key bytea,
                entity_hash bytea, event_hash bytea, event_tick numeric, available_tick numeric, namespace text,
-               protected boolean) ON COMMIT DROP''')
+               protected boolean, route bytea) ON COMMIT DROP''')
     with conn.cursor().copy(f'COPY _facts ({", ".join(_COLUMNS)}) FROM STDIN') as copy:
         for f in unique:
             copy.write_row((f.kind, _b(f.key), f.revision, _b(f.fact_digest), _b(f.predecessor), f.object_id,
                             f.locator_kind, f.loc_a, f.loc_b, _b(f.opportunity_key), _b(f.target_key),
                             _b(f.entity_hash), _b(f.event_hash), f.event_tick, f.available_tick, f.namespace,
-                            f.kind in PROTECTED_BY_DEFAULT if f.protected is None else bool(f.protected)))
+                            f.kind in PROTECTED_BY_DEFAULT if f.protected is None else bool(f.protected),
+                            _b(route_of(f.kind, f.key, f.opportunity_key))))
 
+    # Joins from the staged batch into fact_index are point lookups: their cost follows the batch, not the
+    # history (the planner otherwise hash-joins against a scan of every indexed fact).
+    with point_lookups(conn):
+        return _insert_staged(conn, scope, catalog_id, publication_id, conflicts)
+
+
+def _insert_staged(conn, scope, catalog_id, publication_id, conflicts):
     # Predecessors must already exist on the same identity chain (or in this batch) and not be purged.
     missing = conn.execute(
         '''SELECT n.kind, n.key, n.revision FROM _facts n
            WHERE n.predecessor IS NOT NULL
              AND NOT EXISTS (SELECT 1 FROM _facts b WHERE b.kind = n.kind AND b.key = n.key AND b.fact_digest = n.predecessor)
-             AND NOT EXISTS (SELECT 1 FROM fact_index f WHERE f.catalog_id = %s AND f.kind = n.kind AND f.key = n.key
-                             AND f.fact_digest = n.predecessor
+             AND NOT EXISTS (SELECT 1 FROM fact_index f WHERE f.catalog_id = %s AND f.kind = n.kind AND f.route = n.route
+                             AND f.key = n.key AND f.fact_digest = n.predecessor
                              AND NOT EXISTS (SELECT 1 FROM fact_tombstones t WHERE t.catalog_id = f.catalog_id
                                              AND t.kind = f.kind AND t.key = f.key AND t.revision = f.revision))
            LIMIT 1''', (catalog_id,)).fetchone()
     if missing:
         raise PlatformError('Correction predecessor is unavailable.', 'correction_predecessor')
+    # Purged identities are refused through the global tombstone key, whatever partition their row is in (facts
+    # whose bytes were deleted before migration 0014 route by key; see that migration).
+    purged = conn.execute(
+        '''SELECT 1 FROM _facts n JOIN fact_tombstones t ON t.catalog_id = %s AND t.kind = n.kind AND t.key = n.key
+           AND t.revision = n.revision LIMIT 1''', (catalog_id,)).fetchone()
+    if purged:
+        raise PlatformError('Purged evidence cannot be re-imported under its old identity.', 'historical_evidence_unavailable')
 
     inserted = conn.execute(
         f'''INSERT INTO fact_index(org_id, catalog_id, publication_id, {", ".join(_COLUMNS)})
             SELECT %s, %s, %s, {", ".join(_COLUMNS)} FROM _facts
-            ON CONFLICT (catalog_id, kind, key, revision) DO NOTHING
+            ON CONFLICT (catalog_id, kind, route, key, revision) DO NOTHING
             RETURNING kind, key, revision''', (scope.org_id, catalog_id, publication_id)).fetchall()
     inserted_ids = {(r['kind'], bytes(r['key']), r['revision']) for r in inserted}
 
@@ -308,8 +342,9 @@ def _insert_facts(conn, scope, catalog_id, publication_id, facts):
         '''SELECT n.kind, n.key, n.revision, n.fact_digest = f.fact_digest AS same,
                   EXISTS (SELECT 1 FROM fact_tombstones t WHERE t.catalog_id = f.catalog_id AND t.kind = f.kind
                           AND t.key = f.key AND t.revision = f.revision) AS purged
-           FROM _facts n JOIN fact_index f ON f.catalog_id = %s AND f.kind = n.kind AND f.key = n.key
-                AND f.revision = n.revision AND f.publication_id <> %s''', (catalog_id, publication_id)).fetchall()
+           FROM _facts n JOIN fact_index f ON f.catalog_id = %s AND f.kind = n.kind AND f.route = n.route
+                AND f.key = n.key AND f.revision = n.revision AND f.publication_id <> %s''',
+        (catalog_id, publication_id)).fetchall()
     duplicates = 0
     for row in existing:
         identity = (row['kind'], bytes(row['key']), row['revision'])

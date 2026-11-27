@@ -89,7 +89,7 @@ def build(installation, deployment_id, definition, *, now_tick=None):
     if instant(end) > instant(definition['start']):
         raise EvaluationError('The reference must end before monitoring starts (a rule fixed in advance).', 'adaptive_reference')
     ws = deployment['workspace']
-    k = ws.status()['catalog_sequence']
+    k = ws.catalog.head()
     rule_digest = digest(rule)
     with installation.db.connect() as conn:
         row = conn.execute('SELECT * FROM ops_references WHERE org_id = %s AND deployment_id = %s AND rule_digest = %s '
@@ -167,6 +167,9 @@ def summarize(installation, deployment_id, definition, namespace, selected, rule
                                                                 namespace=namespace, secret=secret, classes=classes,
                                                                 params=params)
         out['statistics'][key] = bounds(values, entities, rule, alpha_ref, excluded=excluded, days=days, selected=len(rows))
+    # Reference entities (64-bit prefixes of the detector entity hash), so every window can measure and show its
+    # entity overlap with the reference (R2.4). Independence of the reference stays a declared assumption.
+    out['entity_digests'] = sorted({unit_rules.entity_hash(namespace, u).hex()[:16] for u in rows})
     out['region_shares'] = region_rules.shares(rows, definition.get('regions'))
     out['composition'] = composition(rows, definition, namespace, secret, classes, alpha_ref)
     return out
@@ -256,6 +259,20 @@ def relation(installation, reference):
     data = packets.read(installation, reference['relation_object'])
     packet = reference['packet']
     return {'relation': data, 'metadata': packet['metadata'], 'coverage': packet['coverage']}
+
+
+def entity_overlap(packet, namespace, units):
+    """How many of a window's entities also appear in the reference (R2.4: measured and displayed).
+
+    ``None`` for a reference built before the measurement existed (it holds no entity digests).
+    """
+    digests = packet.get('entity_digests')
+    if digests is None:
+        return None
+    reference = set(digests)
+    window = {unit_rules.entity_hash(namespace, u).hex()[:16] for u in units}
+    shared = len(window & reference)
+    return {'entities': len(window), 'shared': shared, 'fraction': shared / len(window) if window else None}
 
 
 def null_level(statistic_record, delta):

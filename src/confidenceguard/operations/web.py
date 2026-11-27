@@ -19,7 +19,8 @@ from ..contracts import EvaluationError
 from . import identity, ingest
 
 STATUS = {'unauthenticated': 401, 'forbidden': 403, 'unknown_source': 404, 'unknown_deployment': 404, 'unknown_batch': 404,
-          'batch_conflict': 409, 'batch_too_large': 413, 'backpressure': 429, 'platform_unavailable': 503}
+          'batch_conflict': 409, 'batch_too_large': 413, 'backpressure': 429, 'platform_unavailable': 503,
+          'storage_full': 507}
 
 
 def create_app(installation):
@@ -31,7 +32,7 @@ def create_app(installation):
         code = getattr(exc, 'code', 'failed')
         response = jsonify({'error': {'code': code, 'message': str(exc)[:300]}})
         response.status_code = STATUS.get(code, 400)
-        if code == 'backpressure':
+        if code in ('backpressure', 'storage_full', 'platform_unavailable'):
             response.headers['Retry-After'] = '30'
         return response
 
@@ -49,6 +50,12 @@ def create_app(installation):
 
     @app.errorhandler(EvaluationError)
     def evaluation_error(exc):
+        return fail(exc)
+
+    from numek_platform.errors import PlatformError
+
+    @app.errorhandler(PlatformError)
+    def platform_error(exc):          # for example the database being unavailable before a handler translated it
         return fail(exc)
 
     @app.errorhandler(413)

@@ -9,6 +9,7 @@ Physical keys are ``objects/<org>/<sha[:2]>/<sha>.<generation>``. Deduplication
 reuses only *active* objects; any other state gets a new generation, so
 reclaiming one generation can never delete bytes another generation needs.
 """
+import errno
 import hashlib
 import os
 import shutil
@@ -21,6 +22,12 @@ from .fsutil import fsync_directory, open_private, private_directory
 
 MAX_OBJECT_BYTES = 256 * 1024**2
 CHUNK = 1024**2
+FULL = (errno.ENOSPC, errno.EDQUOT)
+
+
+def _storage_full(exc):
+    return PlatformError('Object storage is full; nothing was stored. Retry after space is freed.', 'storage_full',
+                         retryable=True)
 
 
 @dataclass(frozen=True)
@@ -63,27 +70,42 @@ class LocalObjectStore:
         digest, size = hashlib.sha256(), 0
         if isinstance(chunks, (bytes, bytearray, memoryview)):
             chunks = [bytes(chunks)]
-        with open_private(path, 'xb') as stream:
-            for chunk in chunks:
-                size += len(chunk)
-                if size > self.max_object_bytes:
-                    stream.close()
-                    path.unlink()
-                    raise PlatformError('Object exceeds the configured size limit.', 'object_too_large')
-                digest.update(chunk)
-                stream.write(chunk)
-            stream.flush()
-            os.fsync(stream.fileno())
-        fsync_directory(folder)
+        try:
+            with open_private(path, 'xb') as stream:
+                for chunk in chunks:
+                    size += len(chunk)
+                    if size > self.max_object_bytes:
+                        stream.close()
+                        path.unlink()
+                        raise PlatformError('Object exceeds the configured size limit.', 'object_too_large')
+                    digest.update(chunk)
+                    stream.write(chunk)
+                stream.flush()
+                os.fsync(stream.fileno())
+            fsync_directory(folder)
+        except OSError as exc:
+            # A full disk leaves no partial object behind and is reported as retryable, never as a raw OS error.
+            path.unlink(missing_ok=True)
+            if exc.errno in FULL:
+                raise _storage_full(exc) from exc
+            raise
         return Staged(path, digest.hexdigest(), size)
 
     def promote(self, staged, physical_key):
         """W3: move a staged file into its permanent key (after its row exists)."""
         target = self._path(physical_key)
+        created = [d for d in (target.parent.parent, target.parent) if not d.exists()]
         private_directory(target.parent)
+        for directory in created:                     # a new directory's own entry is durable only once its parent is synced
+            fsync_directory(directory.parent)
         if target.exists():
             raise PlatformError('Object location is already occupied.', 'object_conflict')
-        os.link(staged.path, target)  # never replaces an existing name
+        try:
+            os.link(staged.path, target)  # never replaces an existing name
+        except OSError as exc:
+            if exc.errno in FULL:
+                raise _storage_full(exc) from exc
+            raise
         staged.path.unlink()
         fsync_directory(target.parent)
         fsync_directory(staged.path.parent)

@@ -27,6 +27,7 @@ Principals of another organisation are refused. ``ROUTES`` also produces the Ope
 **Health.** ``/healthz`` and ``/readyz`` check the database, the controller leader and queue age. ``/metrics``
 exposes Prometheus text. Request bodies and evidence values are never logged.
 """
+import contextlib
 import json
 import time
 import uuid
@@ -44,8 +45,8 @@ STATUS = {'unauthenticated': 401, 'forbidden': 403, 'csrf_failed': 403, 'separat
           'unknown_deployment': 404, 'unknown_source': 404, 'incident_unknown': 404, 'proposal_unknown': 404, 'definition_unknown': 404,
           'reference_unknown': 404, 'handoff_unknown': 404, 'stale_revision': 409, 'stale_confirmation': 409, 'incident_transition': 409,
           'proposal_transition': 409, 'run_state': 409, 'registration_conflict': 409, 'definition_state': 409,
-          'self_lockout': 409, 'principal_unknown': 404, 'token_unknown': 404, 'weak_password': 422, 'invalid_scope': 422,
-          'invalid_principal': 422, 'invalid_egress': 422, 'recovery_evidence_required': 422, 'prerequisites_unmet': 422, 'evidence_not_independent': 422, 'platform_unavailable': 503}
+          'self_lockout': 409, 'login_throttled': 429, 'principal_unknown': 404, 'token_unknown': 404, 'weak_password': 422, 'invalid_scope': 422,
+          'invalid_principal': 422, 'invalid_egress': 422, 'recovery_evidence_required': 422, 'prerequisites_unmet': 422, 'evidence_not_independent': 422, 'platform_unavailable': 503, 'storage_full': 507}
 ROUTES = []
 
 
@@ -953,11 +954,21 @@ def create_app(installation, *, secure_cookies=False):
     @app.post(PREFIX + '/session')
     def login():
         body = request.get_json(silent=True) or {}
+        name = body.get('name', '')
         try:
             with installation.db.transaction() as conn:
-                principal = identity.verify_password(conn, installation.scope, body.get('name', ''), body.get('password', ''))
+                if identity.login_throttled(conn, installation.scope, name):
+                    raise EvaluationError('Too many failed sign-ins for this name; try again later.', 'login_throttled')
+                principal = identity.verify_password(conn, installation.scope, name, body.get('password', ''))
                 token, csrf = identity.create_session(conn, principal)
+        except EvaluationError as exc:
+            response = envelope_error(exc)
+            response.headers['Retry-After'] = str(int(identity.LOGIN_FAILURE_WINDOW.total_seconds()))
+            return response
         except PlatformError as exc:
+            if exc.code == 'unauthenticated':
+                with contextlib.suppress(PlatformError), installation.db.transaction() as conn:
+                    identity.record_login_failure(conn, installation.scope, name)
             return envelope_error(exc)
         response = make_response(jsonify({'data': {'principal': principal.name, 'csrf': csrf}}))
         response.set_cookie(COOKIE, token, httponly=True, samesite='Strict', secure=secure_cookies, path='/')
@@ -999,6 +1010,13 @@ def create_app(installation, *, secure_cookies=False):
 
     @app.get('/metrics')
     def metrics():
+        # Operational counts only, but still installation metadata: open to loopback scrapers (a local Prometheus or a
+        # reverse proxy on the host), otherwise an authenticated principal with read permission.
+        if request.remote_addr not in ('127.0.0.1', '::1'):
+            try:
+                _require(installation, authenticate(), 'read')
+            except (EvaluationError, PlatformError) as exc:
+                return envelope_error(exc)
         return Response(prometheus(installation), mimetype='text/plain; version=0.0.4')
 
     console = Path(__file__).resolve().parent.parent / 'static' / 'ops'
