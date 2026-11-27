@@ -1,0 +1,192 @@
+{
+  "spec": {
+    "inputs": [
+      {
+        "id": "claims",
+        "path": "/Users/drivyaanshyadav/Desktop/Numek/datasets/Technical Archive/cross_representation/bea_gdp_2024q4/prepared/bea_cross_vintage.csv",
+        "kind": "structured",
+        "format": "csv",
+        "id_selector": "id",
+        "text_selector": "text",
+        "path_selector": "path",
+        "split_selector": null,
+        "role": "dataset",
+        "language": "en",
+        "layout": null,
+        "layout_selector": null,
+        "asset_root": null,
+        "metadata": {},
+        "encoding": "utf-8",
+        "delimiter": ",",
+        "json_columns": []
+      },
+      {
+        "id": "release",
+        "path": "/Users/drivyaanshyadav/Desktop/Numek/datasets/Cross-Representation Reliability/Complex - US GDP Releases/Input - Release Document List.csv",
+        "kind": "document",
+        "format": "csv",
+        "id_selector": "id",
+        "text_selector": "text",
+        "path_selector": "path",
+        "split_selector": null,
+        "role": "dataset",
+        "language": "en",
+        "layout": "bea_release",
+        "layout_selector": null,
+        "asset_root": "/Users/drivyaanshyadav/Desktop/Numek/datasets/Technical Archive/cross_representation/bea_gdp_2024q4/raw",
+        "metadata": {},
+        "encoding": "utf-8",
+        "delimiter": ",",
+        "json_columns": []
+      }
+    ],
+    "relationships": [
+      {
+        "id": "same_vintage",
+        "left_source": "claims",
+        "right_source": "release",
+        "left_keys": [
+          "id"
+        ],
+        "right_keys": [
+          "id"
+        ],
+        "namespace": "declared",
+        "meaning": "supporting_evidence",
+        "cardinality": "one_to_many",
+        "required": "required",
+        "inverse_required": false,
+        "key_representation": "typed",
+        "association_source": null,
+        "association_left": "left_id",
+        "association_right": "right_id",
+        "association_left_keys": [],
+        "association_right_keys": [],
+        "context": {},
+        "availability": null,
+        "cutoff": null,
+        "valid_from": null,
+        "valid_to": null,
+        "version_mode": "all"
+      }
+    ],
+    "mappings": [
+      {
+        "id": "gdp",
+        "layout": "bea_release",
+        "kind": "label_value",
+        "labels": [
+          "Real gross domestic product (GDP) increased at an annual rate of"
+        ],
+        "pattern": "\\s*(?P<value>\\d+\\.\\d+)\\s+percent",
+        "section": null,
+        "pages": [
+          1
+        ],
+        "parts": [
+          "word/document.xml"
+        ],
+        "headers": {},
+        "value_column": "value",
+        "row_column": null,
+        "row_label": null,
+        "row_selector": null,
+        "context_columns": {},
+        "strategy": "lines",
+        "unit": null,
+        "currency": null,
+        "substitutions": {},
+        "overrides": {}
+      }
+    ],
+    "rules": [
+      {
+        "id": "gdp_growth",
+        "relationship": "same_vintage",
+        "field": "value",
+        "mapping": "gdp",
+        "right_field": null,
+        "method": "decimal",
+        "representation": "raw",
+        "aliases": {},
+        "tolerance": "0",
+        "factor": "1",
+        "decimal_separator": ".",
+        "thousands_separator": ",",
+        "evidence_decimal_separator": null,
+        "evidence_thousands_separator": null,
+        "date_format": "%Y-%m-%d",
+        "evidence_date_format": null,
+        "unit": null,
+        "currency": null,
+        "authority_role": null,
+        "authority_source": null,
+        "alternative_relationship": null,
+        "claim_template": null,
+        "claim_language": null
+      }
+    ],
+    "separation": [],
+    "allowed_roots": [
+      "/Users/drivyaanshyadav/Desktop/Numek/datasets/Technical Archive/cross_representation/bea_gdp_2024q4"
+    ],
+    "dataset_name": null,
+    "purpose": null
+  },
+  "options": {
+    "execution": {
+      "backend": "duckdb_local",
+      "max_source_bytes": 5368709120,
+      "max_combined_source_bytes": 8589934592,
+      "max_rows": 10000000,
+      "max_combined_rows": 30000000,
+      "max_columns": 1000,
+      "memory_bytes": 2147483648,
+      "max_rss_bytes": 6442450944,
+      "threads": 2,
+      "batch_bytes": 33554432,
+      "max_record_bytes": 8388608,
+      "workspace_bytes": 25769803776,
+      "free_disk_bytes": 42949672960,
+      "max_seconds": 1500,
+      "result_bytes": 33554432,
+      "scratch_directory": null
+    },
+    "limits": {
+      "inputs": 64,
+      "declarations": 128,
+      "associations": 10000000,
+      "documents": 1000,
+      "pages": 10000,
+      "document_bytes": 134217728,
+      "expanded_docx_bytes": 268435456,
+      "xml_bytes": 16777216,
+      "zip_members": 10000,
+      "characters": 50000000,
+      "candidates": 100,
+      "tables": 100,
+      "region_chars": 10000,
+      "discovery_visits": 100000000,
+      "pattern_seconds": 0.05,
+      "details": 100,
+      "witnesses": 5,
+      "private_bytes": 67108864,
+      "claims": 2000,
+      "evidence_candidates": 5,
+      "image_pairs": 2000,
+      "model_seconds": 600,
+      "image_assets": 100000,
+      "image_pixels": 100000000000,
+      "image_media_bytes": 137438953472,
+      "image_media_per_input_bytes": 68719476736,
+      "tokenizer_bytes": 67108864,
+      "tokenizer_tokens": 1000000
+    },
+    "models": {
+      "nli_directory": null,
+      "retrieval_directory": null,
+      "image_text_directory": null
+    },
+    "seed": 0
+  }
+}

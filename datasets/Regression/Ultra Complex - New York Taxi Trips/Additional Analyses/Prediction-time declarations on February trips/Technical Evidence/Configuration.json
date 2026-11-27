@@ -1,0 +1,33 @@
+{
+  "dataset": {
+    "path": "/Users/drivyaanshyadav/Desktop/Numek/datasets/Technical Archive/regression/nyc_tlc_yellow_2024/prepared/taxi_2024_02_first_250k.csv"
+  },
+  "task": {
+    "kind": "regression",
+    "target": "duration_minutes",
+    "metadata_columns": [
+      "source_row_ordinal",
+      "duration_status"
+    ]
+  },
+  "analysis": {
+    "regression": {
+      "expectations": {
+        "kind": "continuous",
+        "units": "minutes",
+        "nonnegative": true
+      },
+      "feature_availability": {
+        "tpep_dropoff_datetime": "unavailable_at_prediction",
+        "DOLocationID": "unavailable_at_prediction",
+        "trip_distance": "unavailable_at_prediction"
+      },
+      "dependency_search": true
+    },
+    "context": {
+      "prediction": {
+        "point": "At pickup, before dropoff or recorded trip distance"
+      }
+    }
+  }
+}

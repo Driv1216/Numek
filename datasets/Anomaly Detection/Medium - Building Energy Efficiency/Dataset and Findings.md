@@ -1,0 +1,34 @@
+# Building Energy Efficiency
+
+Simulated residential building designs with heating and cooling load results.
+
+**Difficulty · Medium.** 768 rows, eight building inputs, and both loads excluded from the feature pool. The label is based on the workload evaluated in Anomaly Detection. [Publisher](https://archive.ics.uci.edu/dataset/242).
+
+## Start here
+
+- [Input - Building Energy Efficiency.csv](Input%20-%20Building%20Energy%20Efficiency.csv)
+- Recommended DataTrust report — [PDF](Recommended%20-%20Anomaly%20review%20of%20building%20features.pdf) · [HTML](Recommended%20-%20Anomaly%20review%20of%20building%20features.html).
+
+## Task and settings
+
+Anomaly review of building features. The task uses declared features without a prediction target. Context or identifier columns include `heating_load`, `cooling_load`.
+
+## What DataTrust found and what was checked
+
+The report flags near-redundant variables and conditional scale differences. Independent finite-value and scale controls were used.
+
+## Missed coverage and limitations
+
+The report establishes descriptive evidence and neither fault labels nor detection accuracy.
+
+## Usefulness
+
+Useful before distance-based screening.
+
+## Reproduce it manually
+
+Open the input files above and choose this workflow in DataTrust. Use the saved field roles, declarations, and limits. The visible input names are for review. The saved configuration resolves the exact retained sources and related assets.
+
+[Saved configuration](Technical%20Evidence/Configuration%20-%20Anomaly%20review%20of%20building%20features.json) · [Exact replay instructions](../../Technical%20Archive/Replay%20Instructions.md).
+
+The original attempt, independent checks and earlier versions are in [Technical Evidence](Technical%20Evidence).

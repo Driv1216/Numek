@@ -1,0 +1,138 @@
+{
+  "spec": {
+    "inputs": [
+      {
+        "id": "ud",
+        "source": {
+          "path": "/Users/drivyaanshyadav/Desktop/Numek/datasets/Technical Archive/text/ud_english_ewt/prepared/ud_english.jsonl",
+          "format": "jsonl",
+          "encoding": "utf-8",
+          "delimiter": ",",
+          "quotechar": "\"",
+          "json_columns": []
+        },
+        "fields": [
+          {
+            "name": "text",
+            "selector": "text",
+            "kind": "document",
+            "required": false,
+            "asset": null
+          }
+        ],
+        "role": "corpus",
+        "namespace": null,
+        "id_selector": "id",
+        "split_selector": null,
+        "task": {
+          "kind": "token",
+          "input_fields": [
+            "text"
+          ],
+          "output_fields": [],
+          "required_outputs": false
+        },
+        "annotations": [
+          {
+            "field": "text",
+            "selector": "tags",
+            "kind": "token",
+            "expectation": "unknown",
+            "tokens_selector": "tokens",
+            "offset_unit": "codepoint",
+            "scheme": "none",
+            "allow_overlap": true,
+            "status_selector": null,
+            "required_statuses": [
+              "complete"
+            ],
+            "answerable_selector": null,
+            "content_source": null,
+            "content_id_selector": null
+          }
+        ],
+        "conversation": null,
+        "retrieval": null,
+        "assets": []
+      }
+    ],
+    "evaluation": {
+      "comparisons": []
+    },
+    "allowed_roots": [
+      "/Users/drivyaanshyadav/Desktop/Numek/datasets"
+    ]
+  },
+  "options": {
+    "execution": {
+      "backend": "duckdb_local",
+      "max_source_bytes": 5368709120,
+      "max_combined_source_bytes": 8589934592,
+      "max_rows": 10000000,
+      "max_combined_rows": 30000000,
+      "max_columns": 1000,
+      "memory_bytes": 2147483648,
+      "max_rss_bytes": 6442450944,
+      "threads": 2,
+      "batch_bytes": 33554432,
+      "max_record_bytes": 8388608,
+      "workspace_bytes": 25769803776,
+      "free_disk_bytes": 42949672960,
+      "max_seconds": 1500,
+      "result_bytes": 33554432,
+      "scratch_directory": null
+    },
+    "limits": {
+      "max_depth": 32,
+      "max_nested_items": 10000,
+      "max_items": 30000000,
+      "max_supplied_tokens": 100000000,
+      "max_annotations": 50000000,
+      "max_assets": 100000,
+      "lexical_units": 50000,
+      "lexical_graphemes": 20000,
+      "shingle_positions": 25000000,
+      "signature_work": 200000000,
+      "candidates": 250000,
+      "verification_visits": 100000000,
+      "vocabulary_tokens": 100000000,
+      "language_units": 10000,
+      "embedding_windows": 2000,
+      "windows_per_parent": 16,
+      "semantic_pairs": 2000000,
+      "tokenizer_bytes": 67108864,
+      "tokenizer_tokens": 1000000,
+      "private_bytes": 33554432,
+      "details": 100,
+      "witnesses": 5
+    },
+    "models": {
+      "language": false,
+      "languages": [
+        "ENGLISH",
+        "HINDI",
+        "SPANISH",
+        "FRENCH",
+        "GERMAN",
+        "CHINESE",
+        "ARABIC"
+      ],
+      "embedding_directory": null,
+      "embedding_revision": "fd1525a9fd15316a2d503bf26ab031a61d056e98",
+      "long_documents": "token_windows_v1",
+      "tokenizer": false,
+      "embeddings": true
+    },
+    "representations": [
+      "raw",
+      "nfc"
+    ],
+    "seed": 0,
+    "near_duplicates": true,
+    "passages": true,
+    "vocabulary": true,
+    "lexical_complete": false,
+    "near_threshold": 0.8,
+    "minimum_passage": 50
+  }
+}

@@ -1,0 +1,200 @@
+{
+  "spec": {
+    "inputs": [
+      {
+        "id": "retail",
+        "source": {
+          "path": "/Users/drivyaanshyadav/Desktop/Numek/datasets/Technical Archive/comparisons/uci_online_retail_ii/prepared/retail_50000.csv",
+          "format": "csv",
+          "dataset_name": null,
+          "purpose": null,
+          "source_filename": null,
+          "parsing": {
+            "encoding": "utf-8",
+            "missing_policy": "pandas_default",
+            "na_values": [],
+            "column_types": {},
+            "column_missing_policies": {}
+          }
+        },
+        "temporal": {
+          "clock": {
+            "column": "invoice_time",
+            "kind": "instant",
+            "encoding": "iso",
+            "format": null,
+            "epoch_unit": null,
+            "timezone": "Europe/London",
+            "timezone_column": null,
+            "ambiguity": "unresolved",
+            "fold_column": null,
+            "date_convention": null
+          },
+          "measurements": [
+            {
+              "name": "quantity",
+              "column": null,
+              "representation": "quantitative",
+              "unit": null,
+              "meaning": null,
+              "past_observation": false
+            }
+          ],
+          "observation": "event",
+          "layout": "wide",
+          "entity_columns": [
+            "country"
+          ],
+          "observation_keys": [],
+          "measurement_column": null,
+          "value_column": null,
+          "schedule": {
+            "kind": "none",
+            "cadence_ns": null,
+            "anchor": null,
+            "civil_unit": null,
+            "timezone": null,
+            "month_end": "skip",
+            "source_id": null,
+            "time_column": null,
+            "entity_columns": [],
+            "measurement_column": null,
+            "expectation": "required_record",
+            "collection_status_column": null,
+            "collection_active_values": [
+              "active"
+            ]
+          },
+          "active_intervals": [],
+          "unique_observations": false,
+          "source_order_is_arrival": false,
+          "dense_long": false,
+          "assessment_time": null,
+          "max_adjacency_ns": null,
+          "required_lookback_ns": null
+        },
+        "role": "dataset",
+        "task": {
+          "kind": "dataset_profile",
+          "target": null,
+          "targets": [],
+          "feature_columns": null,
+          "metadata_columns": [],
+          "group_columns": []
+        },
+        "config": {
+          "parsing": {
+            "encoding": "utf-8",
+            "missing_policy": "pandas_default",
+            "na_values": [],
+            "column_types": {},
+            "column_missing_policies": {}
+          },
+          "fidelity_inspection": {
+            "max_bytes": 1048576,
+            "max_records": 200,
+            "max_cells": 20000
+          },
+          "limits": null,
+          "regression": null,
+          "annotations": null,
+          "features": {
+            "semantic_types": {},
+            "scale_sensitive": null
+          },
+          "multilabel": null,
+          "diagnostics": {
+            "max_multilabel_pair_targets": 32,
+            "max_output_pair_targets": 32,
+            "max_multilabel_comparisons": 20000000,
+            "max_output_comparisons": 20000000,
+            "max_cohort_comparisons": 20000000,
+            "max_patterns": 10000,
+            "max_examples": 5
+          },
+          "presentation": {
+            "executive_actions": 5,
+            "target_panels": 6,
+            "feature_details": 20,
+            "table_rows": 20,
+            "appendix_rows": 100
+          },
+          "execution": null,
+          "advanced": null
+        }
+      }
+    ],
+    "availability": [],
+    "histories": [],
+    "maturity": [],
+    "evaluation": {
+      "folds": []
+    },
+    "dataset_name": null,
+    "purpose": null
+  },
+  "analysis": {
+    "execution": {
+      "backend": "duckdb_local",
+      "max_source_bytes": 5368709120,
+      "max_combined_source_bytes": 8589934592,
+      "max_rows": 10000000,
+      "max_combined_rows": 30000000,
+      "max_columns": 1000,
+      "memory_bytes": 2147483648,
+      "max_rss_bytes": 6442450944,
+      "threads": 2,
+      "batch_bytes": 33554432,
+      "max_record_bytes": 8388608,
+      "workspace_bytes": 25769803776,
+      "free_disk_bytes": 42949672960,
+      "max_seconds": 1500,
+      "result_bytes": 33554432,
+      "scratch_directory": null
+    },
+    "limits": {
+      "max_cells": 100000000,
+      "max_series": 1000000,
+      "behavior_measurements": 32,
+      "detailed_series": 64,
+      "max_windows": 64,
+      "max_folds": 32,
+      "max_comparisons": 2048,
+      "observation_visits": 1000000000,
+      "retained_details": 100,
+      "witnesses": 5,
+      "decoded_batch_bytes": 67108864,
+      "parquet_metadata_bytes": 16777216
+    },
+    "behavior": {
+      "enabled": true,
+      "windows": 12,
+      "explicit_windows": [],
+      "reference_window": 0,
+      "requested_measurements": [],
+      "requested_series": [],
+      "multivariate_pairs": [],
+      "min_support": 100,
+      "missingness_increase": 0.05,
+      "distribution_effect": 0.1,
+      "normalized_w1": 0.25,
+      "flatline_observations": 10,
+      "volatility_support": 100,
+      "volatility_ratio": 2.0,
+      "rate_differences": false,
+      "seasonality": [],
+      "min_cycles": 8,
+      "min_window_cycles": 2,
+      "min_phase_support": 20,
+      "stable_cohort": true,
+      "version": "temporal_investigation_defaults_v1"
+    },
+    "presentation": {
+      "executive_actions": 5,
+      "target_panels": 6,
+      "feature_details": 20,
+      "table_rows": 20,
+      "appendix_rows": 100
+    }
+  }
+}
