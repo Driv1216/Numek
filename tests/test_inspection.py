@@ -120,7 +120,11 @@ def test_column_budgets_list_then_count(tmp_path):
     cov = out['coverage']
     assert (cov['columns_total'], cov['columns_profiled'], cov['columns_listed']) == (10, 3, 6)
     assert [c.get('not_profiled', False) for c in out['columns']] == [False] * 3 + [True] * 3
-    assert cov['statement'].endswith('Columns 4–10 were listed, not profiled.')
+    assert cov['statement'].endswith('Columns 4–6 were listed without profiling. 4 additional columns were omitted from the listing.')
+
+    coverage = inspect_table(_wide(tmp_path, cols=9), CsvParseOptions(),
+                             InspectionBudget(profiled_columns=3, listed_columns=10))['coverage']
+    assert coverage['statement'].endswith('Columns 4–10 were listed without profiling.')
 
 
 def test_distinct_tracking_is_capped(tmp_path):

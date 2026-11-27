@@ -12,6 +12,34 @@ from datatrust.web import create_app
 from .test_foundation import source
 
 
+def test_disk_regression_dependency_opt_in_discloses_skipped_method(tmp_path):
+    prices = 'product,price\n' + ''.join(f'product{i % 8},{5 * (i % 8 + 1)}\n' for i in range(160))
+    item = source(tmp_path, 'price.csv', prices, TaskSpec('regression', 'price'))
+    config = AnalysisConfig(execution=ExecutionOptions(), regression=RegressionOptions(dependency_search=True))
+
+    def audit(cfg):
+        return DataTrust.from_spec(item.dataset, item.task, cfg).analyze_result()
+
+    result = audit(config)
+    key = 'dataset.regression_dependency_search'
+    check = next(row for row in result.to_dict()['checks'] if row['check_id'] == key)
+    assert check['applicability'] == 'blocked'
+    assert check['execution'] == 'skipped'
+    assert check['evidence_refs'] == []
+    assert result.coverage['diagnostics'][key]['stopping_reason'] == 'unsupported_backend'
+    assert key not in result.coverage['measurements']
+    assert result.execution['status'] == 'completed'
+    report = tmp_path / 'disk.html'
+    result.generate_artifacts(report)
+    assert check['reason'] in report.read_text()
+
+    disabled = audit(replace(config, regression=RegressionOptions()))
+    assert key not in disabled.coverage['diagnostics']
+    assert not any(row.check_id == key for row in disabled.checks)
+    in_memory = audit(replace(config, execution=None))
+    assert in_memory.profile['regression']['dependency_search']['flags']
+
+
 def test_numeric_keys_and_missing_overrides(tmp_path):
     a=source(tmp_path,'a.csv','key,x\n001,1\n1,2\nNA,3\n',TaskSpec('dataset_profile',group_columns=('key',)),AnalysisConfig(parsing=CsvParseOptions(column_types={'key':'numeric'},column_missing_policies={'key':{'missing_policy':'pandas_default'}})))
     w=Workspace(ExecutionOptions(),[a])

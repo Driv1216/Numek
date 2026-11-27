@@ -21,6 +21,7 @@ def scalar(value): return isinstance(value,(str,int)) and not isinstance(value,b
 def canonical(value): return json.dumps(value,sort_keys=True,ensure_ascii=True,separators=(',',':'),allow_nan=False)
 
 def frame(spec,asset,payload):
+    if asset.get('decode')=='invalid_orientation': return None,'invalid_image_orientation'
     if asset.get('decode')!='decoded': return None,'image_dimensions_unavailable'
     if spec.coordinate_frame=='unknown': return None,'unknown_coordinate_frame'
     w,h=asset['width'],asset['height']; ow,oh=(h,w) if asset['orientation']>=5 else (w,h)
@@ -114,7 +115,7 @@ def segmentation(value,w,h,limits,budget):
     return {'kind':'polygons','vertices':vertices,'area':int(bitmap.sum()) if bitmap is not None else None,'raster_examined':bitmap is not None},bitmap
 
 
-def mask_file(store,item,path,asset,geometry,budget):
+def mask_file(store,item,path,asset,geometry,budget,*,frame_block_reason=None):
     import numpy as np
     from PIL import Image
     info,raw=store.media_file(path,item.id,kind='mask')
@@ -125,7 +126,8 @@ def mask_file(store,item,path,asset,geometry,budget):
     with Image.open(io.BytesIO(raw)) as mask:
         if mask.format!='PNG' or getattr(mask,'n_frames',1)!=1: raise ValueError('unsupported_mask_format')
         if mask.width*mask.height>store.config.limits.pixels_per_asset or mask.width*mask.height*16>store.config.limits.decode_bytes: raise ValueError('mask_pixel_safety_excluded')
-        if geometry is None or mask.size!=(geometry['width'],geometry['height']): raise ValueError('mask_frame_mismatch')
+        if geometry is None: raise ValueError(frame_block_reason or 'coordinate_comparison_blocked')
+        if mask.size!=(geometry['width'],geometry['height']): raise ValueError('mask_frame_mismatch')
         store.decoded_pixels+=mask.width*mask.height
         if store.decoded_pixels>store.config.limits.decoded_pixels: error('decoded_pixel_work_limit')
         mask.load(); data=np.asarray(mask)
@@ -200,7 +202,7 @@ def normalize(store,item,oid,payload,asset,objects=None):
     elif task=='segmentation' and not absent(payload['mask']) and isinstance(payload['mask'],str):
         root=Path(item.source.asset_root or (item.source.path if item.source.format=='directory' else Path(item.source.path).parent))
         try:
-            detail,_=mask_file(store,item,root/payload['mask'],asset,geometry,store.segment_budget)
+            detail,_=mask_file(store,item,root/payload['mask'],asset,geometry,store.segment_budget,frame_block_reason=blocked)
             segment_details.append(detail)
             if spec.mask_encoding=='binary_png':
                 if scalar(payload['labels']): labels.append(payload['labels'])

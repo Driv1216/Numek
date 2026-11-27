@@ -137,7 +137,7 @@ export function variationTile(a: Doc, route: (f: Doc) => string, i: number): Til
 }
 
 export function numericTile(a: Doc, route: (f: Doc) => string, i: number, opts: { legacy: boolean; usability?: Doc | null }): Tile {
-  const cols = columnsOf(a).filter((c) => c.role !== 'target' && c.is_numeric !== false && (typeof c.outlier_rate === 'number' || zeroIqr(c)));
+  const cols = columnsOf(a).filter((c) => (c.role == null || c.role === 'feature') && c.is_numeric !== false && (typeof c.outlier_rate === 'number' || zeroIqr(c)));
   const ranked = [...cols].filter((c) => typeof c.outlier_rate === 'number').sort((x, y) => (y.outlier_rate ?? 0) - (x.outlier_rate ?? 0));
   const zero = cols.filter(zeroIqr);
   const rows = (a.profile as Doc)?.row_count as number | undefined;

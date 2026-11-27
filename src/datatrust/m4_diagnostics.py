@@ -622,6 +622,15 @@ def analyze_input(e,r,*,advanced=True,reference=None):
     e.optional(r.id,'multilabel',lambda:multilabel(e,r,a))
     if r.task.kind=='regression':
         e.optional(r.id,'constraints',lambda:constraints(e,r))
+        if r.config.regression and r.config.regression.dependency_search is not None:
+            from datatrust.regression_dependency import METHOD_ID
+
+            key = f'{r.id}.regression_dependency_search'
+            reason = f'The requested regression dependency search ({METHOD_ID}) requires the in-memory backend and was skipped.'
+            e.checks.append(CheckOutcome(key, Applicability.BLOCKED, ExecutionStatus.SKIPPED,
+                                         scope=r.id, reason=reason, version=METHOD_ID))
+            e.coverage[key] = {'status': 'blocked', 'reason': reason, 'population': 'declared numerical targets',
+                               'columns': list(r.task.target_names), 'stopping_reason': 'unsupported_backend'}
     e.optional(r.id,'arithmetic_relationships',lambda:relationships(e,r,profile))
     e.optional(r.id,'unsupervised_readiness',lambda:readiness(e,r,profile))
     if advanced:

@@ -1,0 +1,157 @@
+{
+  "spec": {
+    "inputs": [
+      {
+        "id": "records",
+        "path": "/Users/drivyaanshyadav/Desktop/Numek/datasets/cross_representation/bea_gdp_2024q4/prepared/fanout_25000/records.csv",
+        "kind": "structured",
+        "format": "csv",
+        "id_selector": "id",
+        "text_selector": "text",
+        "path_selector": "path",
+        "split_selector": null,
+        "role": "dataset",
+        "language": null,
+        "layout": null,
+        "layout_selector": null,
+        "asset_root": null,
+        "metadata": {},
+        "encoding": "utf-8",
+        "delimiter": ",",
+        "json_columns": []
+      },
+      {
+        "id": "documents",
+        "path": "/Users/drivyaanshyadav/Desktop/Numek/datasets/cross_representation/bea_gdp_2024q4/prepared/fanout_25000/documents.csv",
+        "kind": "document",
+        "format": "csv",
+        "id_selector": "id",
+        "text_selector": "text",
+        "path_selector": "path",
+        "split_selector": null,
+        "role": "dataset",
+        "language": null,
+        "layout": null,
+        "layout_selector": null,
+        "asset_root": "/Users/drivyaanshyadav/Desktop/Numek/datasets/cross_representation/bea_gdp_2024q4/prepared/fanout_25000",
+        "metadata": {},
+        "encoding": "utf-8",
+        "delimiter": ",",
+        "json_columns": []
+      },
+      {
+        "id": "links",
+        "path": "/Users/drivyaanshyadav/Desktop/Numek/datasets/cross_representation/bea_gdp_2024q4/prepared/fanout_25000/associations.csv",
+        "kind": "structured",
+        "format": "csv",
+        "id_selector": "id",
+        "text_selector": "text",
+        "path_selector": "path",
+        "split_selector": null,
+        "role": "dataset",
+        "language": null,
+        "layout": null,
+        "layout_selector": null,
+        "asset_root": null,
+        "metadata": {},
+        "encoding": "utf-8",
+        "delimiter": ",",
+        "json_columns": []
+      }
+    ],
+    "relationships": [
+      {
+        "id": "explicit",
+        "left_source": "records",
+        "right_source": "documents",
+        "left_keys": [
+          "id"
+        ],
+        "right_keys": [
+          "id"
+        ],
+        "namespace": "declared",
+        "meaning": "supporting_evidence",
+        "cardinality": "many_to_many",
+        "required": "required",
+        "inverse_required": false,
+        "key_representation": "typed",
+        "association_source": "links",
+        "association_left": "left_id",
+        "association_right": "right_id",
+        "association_left_keys": [],
+        "association_right_keys": [],
+        "context": {},
+        "availability": null,
+        "cutoff": null,
+        "valid_from": null,
+        "valid_to": null,
+        "version_mode": "all"
+      }
+    ],
+    "mappings": [],
+    "rules": [],
+    "separation": [],
+    "allowed_roots": [
+      "/Users/drivyaanshyadav/Desktop/Numek/datasets/cross_representation/bea_gdp_2024q4/prepared/fanout_25000"
+    ],
+    "dataset_name": null,
+    "purpose": null
+  },
+  "analysis": {
+    "execution": {
+      "backend": "duckdb_local",
+      "max_source_bytes": 5368709120,
+      "max_combined_source_bytes": 8589934592,
+      "max_rows": 10000000,
+      "max_combined_rows": 30000000,
+      "max_columns": 1000,
+      "memory_bytes": 2147483648,
+      "max_rss_bytes": 6442450944,
+      "threads": 2,
+      "batch_bytes": 33554432,
+      "max_record_bytes": 8388608,
+      "workspace_bytes": 25769803776,
+      "free_disk_bytes": 42949672960,
+      "max_seconds": 1500,
+      "result_bytes": 33554432,
+      "scratch_directory": null
+    },
+    "limits": {
+      "inputs": 64,
+      "declarations": 128,
+      "associations": 2000000,
+      "documents": 1000,
+      "pages": 10000,
+      "document_bytes": 134217728,
+      "expanded_docx_bytes": 268435456,
+      "xml_bytes": 16777216,
+      "zip_members": 10000,
+      "characters": 50000000,
+      "candidates": 100,
+      "tables": 100,
+      "region_chars": 10000,
+      "discovery_visits": 100000000,
+      "pattern_seconds": 0.05,
+      "details": 100,
+      "witnesses": 5,
+      "private_bytes": 67108864,
+      "claims": 2000,
+      "evidence_candidates": 5,
+      "image_pairs": 2000,
+      "model_seconds": 600,
+      "image_assets": 100000,
+      "image_pixels": 100000000000,
+      "image_media_bytes": 137438953472,
+      "image_media_per_input_bytes": 68719476736,
+      "tokenizer_bytes": 67108864,
+      "tokenizer_tokens": 1000000
+    },
+    "models": {
+      "nli_directory": null,
+      "retrieval_directory": null,
+      "image_text_directory": null
+    },
+    "seed": 0
+  }
+}

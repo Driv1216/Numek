@@ -1,0 +1,284 @@
+{
+  "spec": {
+    "inputs": [
+      {
+        "id": "docs",
+        "source": {
+          "path": "/Users/drivyaanshyadav/Desktop/Numek/datasets/text/allenai_scifact/prepared/scifact_docs.jsonl",
+          "format": "jsonl",
+          "encoding": "utf-8",
+          "delimiter": ",",
+          "quotechar": "\"",
+          "json_columns": []
+        },
+        "fields": [
+          {
+            "name": "text",
+            "selector": "text",
+            "kind": "document",
+            "required": false,
+            "asset": null
+          }
+        ],
+        "role": "documents",
+        "namespace": null,
+        "id_selector": "id",
+        "split_selector": null,
+        "task": {
+          "kind": "corpus",
+          "input_fields": [],
+          "output_fields": [],
+          "required_outputs": false
+        },
+        "annotations": [],
+        "conversation": null,
+        "retrieval": {
+          "kind": "document",
+          "parent_source": null,
+          "parent_selector": null,
+          "field": null,
+          "parent_field": null,
+          "extractive": false,
+          "start_selector": "start",
+          "end_selector": "end",
+          "offset_unit": "codepoint",
+          "query_source": null,
+          "query_selector": "query_id",
+          "target_source": null,
+          "target_selector": "document_id",
+          "grade_selector": "relevance",
+          "positive_grades": [
+            1
+          ]
+        },
+        "assets": []
+      },
+      {
+        "id": "queries",
+        "source": {
+          "path": "/Users/drivyaanshyadav/Desktop/Numek/datasets/text/allenai_scifact/prepared/scifact_queries.jsonl",
+          "format": "jsonl",
+          "encoding": "utf-8",
+          "delimiter": ",",
+          "quotechar": "\"",
+          "json_columns": []
+        },
+        "fields": [
+          {
+            "name": "text",
+            "selector": "text",
+            "kind": "document",
+            "required": false,
+            "asset": null
+          }
+        ],
+        "role": "queries",
+        "namespace": null,
+        "id_selector": "id",
+        "split_selector": null,
+        "task": {
+          "kind": "corpus",
+          "input_fields": [],
+          "output_fields": [],
+          "required_outputs": false
+        },
+        "annotations": [],
+        "conversation": null,
+        "retrieval": {
+          "kind": "query",
+          "parent_source": null,
+          "parent_selector": null,
+          "field": null,
+          "parent_field": null,
+          "extractive": false,
+          "start_selector": "start",
+          "end_selector": "end",
+          "offset_unit": "codepoint",
+          "query_source": null,
+          "query_selector": "query_id",
+          "target_source": null,
+          "target_selector": "document_id",
+          "grade_selector": "relevance",
+          "positive_grades": [
+            1
+          ]
+        },
+        "assets": []
+      },
+      {
+        "id": "chunks",
+        "source": {
+          "path": "/Users/drivyaanshyadav/Desktop/Numek/datasets/text/allenai_scifact/prepared/scifact_chunks.jsonl",
+          "format": "jsonl",
+          "encoding": "utf-8",
+          "delimiter": ",",
+          "quotechar": "\"",
+          "json_columns": []
+        },
+        "fields": [
+          {
+            "name": "text",
+            "selector": "text",
+            "kind": "document",
+            "required": false,
+            "asset": null
+          }
+        ],
+        "role": "chunks",
+        "namespace": null,
+        "id_selector": "id",
+        "split_selector": null,
+        "task": {
+          "kind": "corpus",
+          "input_fields": [],
+          "output_fields": [],
+          "required_outputs": false
+        },
+        "annotations": [],
+        "conversation": null,
+        "retrieval": {
+          "kind": "chunk",
+          "parent_source": "docs",
+          "parent_selector": "parent",
+          "field": "text",
+          "parent_field": "text",
+          "extractive": true,
+          "start_selector": "start",
+          "end_selector": "end",
+          "offset_unit": "codepoint",
+          "query_source": null,
+          "query_selector": "query_id",
+          "target_source": null,
+          "target_selector": "document_id",
+          "grade_selector": "relevance",
+          "positive_grades": [
+            1
+          ]
+        },
+        "assets": []
+      },
+      {
+        "id": "judgments",
+        "source": {
+          "path": "/Users/drivyaanshyadav/Desktop/Numek/datasets/text/allenai_scifact/prepared/scifact_judgments.jsonl",
+          "format": "jsonl",
+          "encoding": "utf-8",
+          "delimiter": ",",
+          "quotechar": "\"",
+          "json_columns": []
+        },
+        "fields": [],
+        "role": "judgments",
+        "namespace": null,
+        "id_selector": null,
+        "split_selector": null,
+        "task": {
+          "kind": "corpus",
+          "input_fields": [],
+          "output_fields": [],
+          "required_outputs": false
+        },
+        "annotations": [],
+        "conversation": null,
+        "retrieval": {
+          "kind": "judgment",
+          "parent_source": null,
+          "parent_selector": null,
+          "field": null,
+          "parent_field": null,
+          "extractive": false,
+          "start_selector": "start",
+          "end_selector": "end",
+          "offset_unit": "codepoint",
+          "query_source": "queries",
+          "query_selector": "query",
+          "target_source": "docs",
+          "target_selector": "doc",
+          "grade_selector": "relevance",
+          "positive_grades": [
+            1
+          ]
+        },
+        "assets": []
+      }
+    ],
+    "evaluation": {
+      "comparisons": []
+    },
+    "allowed_roots": [
+      "/Users/drivyaanshyadav/Desktop/Numek/datasets"
+    ]
+  },
+  "options": {
+    "execution": {
+      "backend": "duckdb_local",
+      "max_source_bytes": 5368709120,
+      "max_combined_source_bytes": 8589934592,
+      "max_rows": 10000000,
+      "max_combined_rows": 30000000,
+      "max_columns": 1000,
+      "memory_bytes": 2147483648,
+      "max_rss_bytes": 6442450944,
+      "threads": 2,
+      "batch_bytes": 33554432,
+      "max_record_bytes": 8388608,
+      "workspace_bytes": 25769803776,
+      "free_disk_bytes": 42949672960,
+      "max_seconds": 1500,
+      "result_bytes": 33554432,
+      "scratch_directory": null
+    },
+    "limits": {
+      "max_depth": 32,
+      "max_nested_items": 10000,
+      "max_items": 30000000,
+      "max_supplied_tokens": 100000000,
+      "max_annotations": 50000000,
+      "max_assets": 100000,
+      "lexical_units": 50000,
+      "lexical_graphemes": 20000,
+      "shingle_positions": 25000000,
+      "signature_work": 200000000,
+      "candidates": 250000,
+      "verification_visits": 100000000,
+      "vocabulary_tokens": 100000000,
+      "language_units": 10000,
+      "embedding_windows": 2000,
+      "windows_per_parent": 16,
+      "semantic_pairs": 2000000,
+      "tokenizer_bytes": 67108864,
+      "tokenizer_tokens": 1000000,
+      "private_bytes": 33554432,
+      "details": 100,
+      "witnesses": 5
+    },
+    "models": {
+      "language": false,
+      "languages": [
+        "ENGLISH",
+        "HINDI",
+        "SPANISH",
+        "FRENCH",
+        "GERMAN",
+        "CHINESE",
+        "ARABIC"
+      ],
+      "embedding_directory": null,
+      "embedding_revision": "fd1525a9fd15316a2d503bf26ab031a61d056e98",
+      "long_documents": "token_windows_v1",
+      "tokenizer": false,
+      "embeddings": true
+    },
+    "representations": [
+      "raw",
+      "nfc"
+    ],
+    "seed": 0,
+    "near_duplicates": true,
+    "passages": true,
+    "vocabulary": true,
+    "lexical_complete": false,
+    "near_threshold": 0.8,
+    "minimum_passage": 50
+  }
+}
